@@ -59,6 +59,23 @@
 				</Panel>
 			</Panel>
 
+			<Panel id="XHSWavePressurePanel" class="XHSWavePressurePanel" hittest="false">
+				<Panel class="XHSWavePressureMark" hittest="false">
+					<Label text="!" />
+				</Panel>
+				<Panel class="XHSWavePressureCopy" hittest="false">
+					<Panel class="XHSWavePressureHeader" hittest="false">
+						<Label class="XHSWavePressureEyebrow" text="#xhs_phase_one_spawn_budget_eyebrow" />
+						<Label id="XHSWavePressureCount" class="XHSWavePressureCount" text="0 / 150" />
+					</Panel>
+					<Label id="XHSWavePressureTitle" class="XHSWavePressureTitle" text="#xhs_phase_one_spawn_budget_rising" />
+					<Label id="XHSWavePressureDetail" class="XHSWavePressureDetail" text="#xhs_phase_one_spawn_budget_detail_normal" />
+					<Panel class="XHSWavePressureTrack" hittest="false">
+						<Panel id="XHSWavePressureFill" class="XHSWavePressureFill" hittest="false" />
+					</Panel>
+				</Panel>
+			</Panel>
+
 			<Panel id="XHSReviveFrameStack" class="XHSReviveFrameStack" hittest="false" />
 
 			<Panel id="XHSFragmentQuestIntro" class="XHSFragmentQuestIntro" hittest="false">

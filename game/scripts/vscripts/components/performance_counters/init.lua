@@ -16,6 +16,12 @@ local COUNTER_NAMES = {
 	"orders",
 	"orders_suppressed",
 	"repeated_orders",
+	"creep_order_owner_conflicts",
+	"creep_order_owner_handoffs",
+	"creep_orders_blocked_wrong_owner",
+	"creep_orders_deduplicated",
+	"creep_orders_modifier_ai",
+	"creep_orders_wave",
 	"ai_thinks",
 	"ai_director_ticks",
 	"ai_agents_registered",
@@ -38,6 +44,19 @@ local COUNTER_NAMES = {
 local function RealNow()
 	if RealTime ~= nil then return RealTime() end
 	if Time ~= nil then return Time() end
+	return GameRules:GetGameTime()
+end
+
+-- Prefer the process CPU clock for spans inside one server frame. Time() can
+-- remain frozen for an entire frame and RealTime() can be coarsely quantized,
+-- which made every sampled query incorrectly report 0 ms.
+local function ProfileNow()
+	if os ~= nil and os.clock ~= nil then
+		local ok, value = pcall(os.clock)
+		if ok and tonumber(value) ~= nil then return tonumber(value) end
+	end
+	if Time ~= nil then return Time() end
+	if RealTime ~= nil then return RealTime() end
 	return GameRules:GetGameTime()
 end
 
@@ -255,9 +274,9 @@ function XHSPerformanceCounters:InstallGlobalWrappers()
 				return {}
 			end
 		end
-		local startedAt = RealNow()
+		local startedAt = ProfileNow()
 		local result = XHSPerformanceCounters.original_find_units_in_radius(...)
-		local elapsedMs = math.max(0, (RealNow() - startedAt) * 1000)
+		local elapsedMs = math.max(0, (ProfileNow() - startedAt) * 1000)
 		local resultCount = type(result) == "table" and #result or 0
 		XHSPerformanceCounters:Increment("zone_searches", 1)
 		XHSPerformanceCounters:Increment("zone_results", resultCount)

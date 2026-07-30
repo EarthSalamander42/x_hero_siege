@@ -11,6 +11,8 @@
 	var moveToken = 0;
 	var lastPhase = "";
 	var archiveExpanded = false;
+	var leaderboardCollapsed = false;
+	var leaderboardWasActive = false;
 
 	function Panel(id) {
 		return $("#" + id);
@@ -351,6 +353,22 @@
 		}
 	}
 
+	function SetLeaderboardCollapsed(collapsed) {
+		leaderboardCollapsed = collapsed === true;
+		var leaderboard = Panel("XHSFarmLeaderboard");
+		var collapseButton = Panel("XHSFarmLeaderboardCollapse");
+		var collapseLabel = Panel("XHSFarmLeaderboardCollapseLabel");
+		if (leaderboard) {
+			leaderboard.SetHasClass("IsCollapsed", leaderboardCollapsed);
+		}
+		if (collapseButton) {
+			collapseButton.SetHasClass("IsCollapsed", leaderboardCollapsed);
+		}
+		if (collapseLabel) {
+			collapseLabel.text = leaderboardCollapsed ? "\u25BC" : "\u25B2";
+		}
+	}
+
 	function UpdateCelebration(data, players, phase) {
 		var leaderboard = Panel("XHSFarmLeaderboard");
 		var eyebrow = Panel("XHSFarmLeaderboardEyebrow");
@@ -370,7 +388,7 @@
 			eyebrow.text = killRace ? "RAMERO & BARISTOL" : "FARM EVENT";
 		}
 		if (title) {
-			title.text = killRace ? "KILL RACE" : (celebrating ? "FINAL RESULTS" : "LIVE LEADERBOARD");
+			title.text = killRace ? "KILL PROGRESS" : (celebrating ? "FINAL RESULTS" : "LIVE LEADERBOARD");
 		}
 		if (status) {
 			status.text = killRace ? "TO " + targetKills : (celebrating ? "FINAL" : "LIVE");
@@ -421,13 +439,20 @@
 		}
 		if (!active && !available) {
 			leaderboard.SetHasClass("IsVisible", false);
+			leaderboardWasActive = false;
 			return;
 		}
 		if (active) {
+			if (!leaderboardWasActive) {
+				SetLeaderboardCollapsed(false);
+			}
 			archiveExpanded = false;
 			leaderboard.SetHasClass("IsVisible", true);
 			leaderboard.SetHasClass("IsReopened", false);
 		} else {
+			if (leaderboardWasActive) {
+				SetLeaderboardCollapsed(false);
+			}
 			SetArchiveExpanded(archiveExpanded);
 		}
 
@@ -456,6 +481,7 @@
 		rows.SetHasClass("IsWaiting", players.length === 0);
 		rows.style.height = String(Math.max(54, players.length * ROW_STRIDE)) + "px";
 		lastPhase = phase;
+		leaderboardWasActive = active;
 	}
 
 	function OnNetTableChanged(tableName, key, data) {
@@ -473,6 +499,14 @@
 				Game.EmitSound("ui_generic_button_click");
 			});
 		}
+		var collapseButton = Panel("XHSFarmLeaderboardCollapse");
+		if (collapseButton) {
+			collapseButton.SetPanelEvent("onactivate", function () {
+				SetLeaderboardCollapsed(!leaderboardCollapsed);
+				Game.EmitSound("ui_generic_button_click");
+			});
+		}
+		SetLeaderboardCollapsed(false);
 		CustomNetTables.SubscribeNetTableListener(NET_TABLE, OnNetTableChanged);
 		RenderState(CustomNetTables.GetTableValue(NET_TABLE, NET_KEY));
 		if (typeof XHSNameDisplay !== "undefined" && XHSNameDisplay.Subscribe) {

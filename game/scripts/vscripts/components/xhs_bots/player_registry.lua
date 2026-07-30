@@ -92,10 +92,13 @@ function XHSBotPlayerRegistry:BindHero(playerID, hero)
 	record.hero_entindex = hero:entindex()
 	record.hero_name = hero:GetUnitName()
 	record.alive = hero:IsAlive()
+	record.hero_missing_since = nil
+	record.hero_missing_checks = 0
 	if changedHero then
 		record.state = hero:IsAlive() and "INITIALIZING" or "DEAD"
 	end
 	hero.xhs_is_bot = true
+	hero.is_fake_hero = nil
 	hero.xhs_bot_player_id = record.player_id
 	return record
 end
@@ -169,6 +172,35 @@ function XHSBotPlayerRegistry:GetHumanCount()
 	return #self:GetHumanPlayerIDs()
 end
 
+function XHSBotPlayerRegistry:HasHumanCombatHero()
+	if HeroList == nil or HeroList.GetAllHeroes == nil then return false end
+	for _, hero in pairs(HeroList:GetAllHeroes() or {}) do
+		if hero ~= nil and not hero:IsNull()
+			and hero.IsRealHero ~= nil and hero:IsRealHero()
+			and hero:GetTeamNumber() == DOTA_TEAM_GOODGUYS
+			and hero.is_fake_hero ~= true
+			and not self:IsXHSBotUnit(hero) then
+			local playerID = hero.GetPlayerID ~= nil
+				and tonumber(hero:GetPlayerID()) or -1
+			if playerID >= 0
+				and self:IsHumanPlayerID(playerID)
+				and hero:GetUnitName() ~= "npc_dota_hero_wisp" then
+				return true
+			end
+		end
+	end
+	return false
+end
+
+-- Spectator-controlled bot-only sessions have no Radiant human identity.
+-- Requiring both conditions prevents a disconnected/unpicked normal player
+-- from accidentally handing campaign progression to the AI.
+function XHSBotPlayerRegistry:IsBotOnlyCombatSession()
+	return #self:GetXHSBotPlayerIDs() > 0
+		and self:GetHumanCount() == 0
+		and not self:HasHumanCombatHero()
+end
+
 function XHSBotPlayerRegistry:GetCombatParticipantPlayerIDs()
 	local seen = {}
 	local ids = {}
@@ -210,13 +242,40 @@ function XHSBotPlayerRegistry:GetBotHero(playerID)
 		return hero
 	end
 
+	hero = PlayerResource ~= nil
+		and PlayerResource.GetSelectedHeroEntity ~= nil
+		and PlayerResource:GetSelectedHeroEntity(playerID) or nil
+	if IsValidHeroForPlayer(playerID, hero) then
+		self:BindHero(playerID, hero)
+		return hero
+	end
+
 	if record.hero_entindex ~= nil and EntIndexToHScript ~= nil then
 		local ok, entity = pcall(EntIndexToHScript, record.hero_entindex)
 		if ok and IsValidHeroForPlayer(playerID, entity) then
+			self:BindHero(playerID, entity)
 			return entity
 		end
 	end
+
+	-- Scripted revives and ReplaceHeroWith can briefly leave the Player object
+	-- without an assigned handle. Rediscover the real hero by immutable player
+	-- identity before declaring it missing; never bind showcases or illusions.
+	if HeroList ~= nil and HeroList.GetAllHeroes ~= nil then
+		for _, candidate in pairs(HeroList:GetAllHeroes() or {}) do
+			if IsValidHeroForPlayer(playerID, candidate)
+				and candidate.is_fake_hero ~= true
+				and (candidate.IsIllusion == nil or not candidate:IsIllusion()) then
+				self:BindHero(playerID, candidate)
+				return candidate
+			end
+		end
+	end
+
 	record.hero_entindex = nil
+	record.hero_missing_since = record.hero_missing_since
+		or (GameRules ~= nil and GameRules:GetGameTime() or 0)
+	record.hero_missing_checks = (record.hero_missing_checks or 0) + 1
 	return nil
 end
 
@@ -261,6 +320,11 @@ end
 function XHSSessionContainsBots()
 	return XHSBotPlayerRegistry ~= nil
 		and #XHSBotPlayerRegistry:GetXHSBotPlayerIDs() > 0
+end
+
+function XHSBotOnlyAutonomyAllowed()
+	return XHSBotPlayerRegistry ~= nil
+		and XHSBotPlayerRegistry:IsBotOnlyCombatSession()
 end
 
 return XHSBotPlayerRegistry

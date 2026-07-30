@@ -11,7 +11,6 @@
 	var hiddenPanels = [];
 	var musicHandles = [];
 	var renderSerial = 0;
-	var cameraSerial = 0;
 	var stateSerial = 0;
 
 	$.Msg("[XHS][Cinematic] Loaded. root=", root ? root.id : "<missing>");
@@ -142,97 +141,8 @@
 		return null;
 	}
 
-	function ReturnCameraToHero(speed) {
-		var hero = Players.GetPlayerHeroEntityIndex(Players.GetLocalPlayer());
-		var position = hero !== -1 ? Entities.GetAbsOrigin(hero) : null;
-		if (position) GameUI.SetCameraTargetPosition(position, Number(speed) || 0.65);
-	}
-
-	function NormalizePosition(position) {
-		if (!position) return null;
-		if (typeof position === "string") {
-			var values = position.trim().split(/\s+/);
-			if (values.length < 3) return null;
-			return [Number(values[0]) || 0, Number(values[1]) || 0, Number(values[2]) || 0];
-		}
-		if (position.length >= 3 || (position[0] !== undefined && position[1] !== undefined && position[2] !== undefined)) {
-			return [Number(position[0]) || 0, Number(position[1]) || 0, Number(position[2]) || 0];
-		}
-		if (position.x !== undefined && position.y !== undefined && position.z !== undefined) {
-			return [Number(position.x) || 0, Number(position.y) || 0, Number(position.z) || 0];
-		}
-		return null;
-	}
-
-	function GetCameraLookAtPosition(fallback) {
-		if (typeof GameUI.GetCameraLookAtPosition === "function") {
-			var current = NormalizePosition(GameUI.GetCameraLookAtPosition());
-			if (current) return current;
-		}
-		return NormalizePosition(fallback);
-	}
-
-	function GetStateCameraTarget(state) {
-		if (!state) return null;
-		var entIndex = Number(state.camera_entindex) || -1;
-		if (entIndex > 0 && Entities.IsValidEntity(entIndex)) {
-			return NormalizePosition(Entities.GetAbsOrigin(entIndex));
-		}
-		return NormalizePosition(state.camera_position);
-	}
-
-	function StartCameraMove(state, target, speed) {
-		if (!state || !target) return;
-		state._camera_from = GetCameraLookAtPosition(target);
-		state._camera_started_at = Game.GetGameTime();
-		state._camera_duration = Math.max(0, Number(speed) || 0);
-	}
-
-	function MaintainCamera(serial, state) {
-		if (serial !== cameraSerial || state !== GetTopState()) return;
-		var target = GetStateCameraTarget(state);
-		if (target) {
-			if (!state._camera_from) StartCameraMove(state, target, state.camera_speed);
-			var duration = Math.max(0, Number(state._camera_duration) || 0);
-			var elapsed = Math.max(0, Game.GetGameTime() - (Number(state._camera_started_at) || 0));
-			var progress = duration > 0 ? Math.min(1, elapsed / duration) : 1;
-			var eased = progress * progress * (3 - 2 * progress);
-			var from = state._camera_from || target;
-			var position = [
-				from[0] + (target[0] - from[0]) * eased,
-				from[1] + (target[1] - from[1]) * eased,
-				from[2] + (target[2] - from[2]) * eased
-			];
-
-			// Force the exact pause-aware interpolation point every frame. This
-			// preserves the smooth travelling while defeating edge-pan, drag,
-			// minimap clicks and keyboard camera movement until cinematic end.
-			GameUI.SetCameraTargetPosition(position, 0.0);
-		}
-		$.Schedule(0.0, function () { MaintainCamera(serial, state); });
-	}
-
-	function MaintainNativeCamera(serial, state) {
-		if (serial !== cameraSerial || state !== GetTopState()) return;
-		var target = GetStateCameraTarget(state);
-		if (target) GameUI.SetCameraTargetPosition(target, 0.0);
-		$.Schedule(0.0, function () { MaintainNativeCamera(serial, state); });
-	}
-
-	function StartNativeCameraMove(serial, state, target) {
-		var duration = Math.max(0, Number(state.camera_speed) || 0);
-		GameUI.SetCameraTargetPosition(target, duration);
-
-		// Let Dota perform the same native travel used by the arena return.
-		// Once it has arrived, resume the cinematic lock on the destination.
-		$.Schedule(duration, function () {
-			MaintainNativeCamera(serial, state);
-		});
-	}
-
-	function Render(returnCamera) {
+	function Render() {
 		renderSerial++;
-		cameraSerial++;
 		var state = GetTopState();
 		RestoreHud();
 		if (!state) {
@@ -241,7 +151,6 @@
 			root.RemoveClass("XHSCinematicHasTitle");
 			topBar.style.height = "0%";
 			bottomBar.style.height = "0%";
-			if (returnCamera !== false) ReturnCameraToHero(0.65);
 			return;
 		}
 
@@ -258,15 +167,6 @@
 		ApplyLetterbox(state.letterbox_pct, state.transition);
 		PlayMusic(state.music || "", state.music_layers);
 		root.AddClass("XHSCinematicActive");
-		var cameraTarget = GetStateCameraTarget(state);
-		if (cameraTarget) {
-			if (Number(state.native_camera) !== 0) {
-				StartNativeCameraMove(cameraSerial, state, cameraTarget);
-			} else {
-				StartCameraMove(state, cameraTarget, state.camera_speed);
-				MaintainCamera(cameraSerial, state);
-			}
-		}
 	}
 
 	function Begin(data) {
@@ -301,22 +201,8 @@
 		for (var i = stateOrder.length - 1; i >= 0; i--) {
 			if (stateOrder[i] === id) stateOrder.splice(i, 1);
 		}
-		Render(Number(endedState.return_camera) !== 0);
+		Render();
 		$.Msg("[XHS][Cinematic] End id=", id, " stack=", stateOrder.length);
-	}
-
-	function SetCameraTarget(position, speed) {
-		var state = GetTopState();
-		position = NormalizePosition(position);
-		if (!state || !position) return false;
-
-		state.camera_entindex = -1;
-		state.camera_position = position;
-		state.camera_speed = Math.max(0, Number(speed) || 0);
-		StartCameraMove(state, position, state.camera_speed);
-		cameraSerial++;
-		MaintainCamera(cameraSerial, state);
-		return true;
 	}
 
 	GameEvents.Subscribe("xhs_cinematic_begin", Begin);
@@ -324,7 +210,6 @@
 	GameUI.CustomUIConfig().XHSCinematics = {
 		begin: Begin,
 		end: End,
-		setCameraTarget: SetCameraTarget,
 		isActive: function () { return !!GetTopState(); }
 	};
 })();

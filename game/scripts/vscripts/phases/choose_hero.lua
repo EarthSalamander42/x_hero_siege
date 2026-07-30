@@ -17,15 +17,22 @@ local HERO_SELECTION_DESTINATION_PARTICLE = "particles/items2_fx/teleport_end.vp
 local HERO_SELECTION_ARRIVAL_PARTICLE = "particles/items2_fx/teleport_start.vpcf"
 local HERO_SELECTION_SOURCE_HOLD = 0.90
 local HERO_SELECTION_FOCUS_CAMERA_SPEED = 0.30
-local HERO_SELECTION_CAMERA_SPEED = 1.25
+local HERO_SELECTION_CAMERA_SPEED = 2.25
 local HERO_SELECTION_CAMERA_SETTLE = 0.20
 local HERO_SELECTION_TELEPORT_DURATION =
 	HERO_SELECTION_SOURCE_HOLD + HERO_SELECTION_CAMERA_SPEED + HERO_SELECTION_CAMERA_SETTLE
+-- This is only a hard recovery path. It must never race the normal
+-- CameraMotion on_arrive callback, especially while the client-origin
+-- handshake or slow motion makes the rendered trip longer than its nominal
+-- duration.
+local HERO_SELECTION_FAILSAFE_DELAY = 2.0
+local HERO_SELECTION_FAILSAFE_MAX_WAIT = 9.0
 local HERO_SELECTION_ARRIVAL_DURATION = 0.65
 local HERO_SELECTION_DISPLAYS = {
 	standard = {},
 	vip = {},
 }
+local HERO_SELECTION_CLEANED_UP = false
 
 local function IsValidSelectionUnit(unit)
 	return unit ~= nil and IsValidEntity(unit) and not unit:IsNull()
@@ -33,8 +40,67 @@ end
 
 local function RegisterSelectionDisplay(group, index, unit)
 	if not IsValidSelectionUnit(unit) then return end
+	if HERO_SELECTION_CLEANED_UP then
+		UTIL_Remove(unit)
+		return
+	end
 	HERO_SELECTION_DISPLAYS[group][index] = HERO_SELECTION_DISPLAYS[group][index] or {}
 	table.insert(HERO_SELECTION_DISPLAYS[group][index], unit)
+end
+
+local function RemoveHeroSelectionDisplay(unit, removed)
+	if not IsValidSelectionUnit(unit) then return 0 end
+	local entindex = unit:entindex()
+	if removed[entindex] then return 0 end
+	removed[entindex] = true
+	unit:StopSound("Portal.Loop_Appear")
+	if unit.FadeGesture ~= nil then
+		unit:FadeGesture(ACT_DOTA_TELEPORT)
+	end
+	UTIL_Remove(unit)
+	return 1
+end
+
+-- Bot assignments do not walk through the physical showcase, so their picks
+-- cannot individually consume the corresponding display. Once a bot-only
+-- roster is complete, retire the entire gallery in one idempotent pass. Any
+-- released ambient particle following a showcase entity is retired with its
+-- owner instead of surviving for the rest of the match.
+function XHSCleanupHeroSelectionShowcase(reason)
+	if HERO_SELECTION_CLEANED_UP then return 0, "already_cleaned" end
+	HERO_SELECTION_CLEANED_UP = true
+
+	local removed = {}
+	local removedCount = 0
+	for _, group in pairs(HERO_SELECTION_DISPLAYS) do
+		for _, displays in pairs(group) do
+			for _, unit in pairs(displays) do
+				removedCount = removedCount
+					+ RemoveHeroSelectionDisplay(unit, removed)
+			end
+		end
+	end
+
+	-- Lua reloads clear the local registry while engine entities remain. The
+	-- marker is authoritative and excludes real player/bot heroes.
+	if Entities.FindAllByClassname ~= nil then
+		for _, unit in pairs(
+			Entities:FindAllByClassname("npc_dota_hero") or {}
+		) do
+			if IsValidSelectionUnit(unit) and unit.is_fake_hero == true then
+				removedCount = removedCount
+					+ RemoveHeroSelectionDisplay(unit, removed)
+			end
+		end
+	end
+
+	HERO_SELECTION_DISPLAYS = { standard = {}, vip = {} }
+	print(
+		"[XHSBots][SelectionCleanup] reason="
+			.. tostring(reason or "bot_only_roster_complete")
+			.. " removed=" .. tostring(removedCount)
+	)
+	return removedCount, "cleaned"
 end
 
 local function GetSelectionDisplays(group, index, point)
@@ -87,14 +153,18 @@ local function GetSelectionTransform(group, index, pickedHeroName)
 	if not IsValidSelectionUnit(primary) and Entities.FindAllByClassname ~= nil then
 		local nearestDistance = nil
 		for _, unit in pairs(Entities:FindAllByClassname("npc_dota_hero") or {}) do
-			if IsValidSelectionUnit(unit)
-				and unit.is_fake_hero == true
+			local validUnit = IsValidSelectionUnit(unit)
+			local ownerID = validUnit and unit.GetPlayerOwnerID ~= nil
+				and unit:GetPlayerOwnerID() or -1
+			if validUnit
 				and unit:GetUnitName() == pickedHeroName
+				and (unit.is_fake_hero == true or ownerID < 0)
 			then
 				local distance = point ~= nil
 					and (unit:GetAbsOrigin() - point:GetAbsOrigin()):Length2D()
 					or 0
-				if nearestDistance == nil or distance < nearestDistance then
+				if distance <= 600
+					and (nearestDistance == nil or distance < nearestDistance) then
 					primary = unit
 					nearestDistance = distance
 				end
@@ -129,23 +199,40 @@ end
 local function StartHeroSelectionDisplayTeleport(display)
 	if not IsValidSelectionUnit(display) then return end
 
-	-- Use a native gesture for showcase units. StartAnimation relies on a Lua
-	-- modifier being linked client-side, which is not guaranteed after a reload.
-	if display.StartGestureWithPlaybackRate ~= nil then
-		display:StartGestureWithPlaybackRate(ACT_DOTA_TELEPORT, 1.0)
-	elseif display.StartGesture ~= nil then
-		display:StartGesture(ACT_DOTA_TELEPORT)
-	else
+	-- Selection displays are kept motionless by dummy_passive_vulnerable,
+	-- whose data-driven modifier applies MODIFIER_STATE_STUNNED. That state
+	-- wins over ACT_DOTA_TELEPORT on several hero models. The display has
+	-- already been consumed at this point, so retire the clickable passive
+	-- and keep it safe through explicit cinematic states instead.
+	if display.RemoveAbility ~= nil then
+		display:RemoveAbility("dummy_passive_vulnerable")
+	end
+	display:RemoveModifierByName("modifier_dummy_vulnerable")
+	display:AddNewModifier(display, nil, "modifier_invulnerable", {
+		duration = HERO_SELECTION_TELEPORT_DURATION,
+	})
+	display:AddNewModifier(display, nil, "modifier_command_restricted", {
+		duration = HERO_SELECTION_TELEPORT_DURATION,
+	})
+
+	-- Showcase heroes are unowned. Native gestures can remain server-only on
+	-- those entities, so use XHS' replicated animation modifier first.
+	if type(StartAnimation) == "function" then
 		StartAnimation(display, {
 			duration = HERO_SELECTION_TELEPORT_DURATION,
 			activity = ACT_DOTA_TELEPORT,
 			rate = 1.0,
 		})
+	elseif display.StartGestureWithPlaybackRate ~= nil then
+		display:StartGestureWithPlaybackRate(ACT_DOTA_TELEPORT, 1.0)
+	elseif display.StartGesture ~= nil then
+		display:StartGesture(ACT_DOTA_TELEPORT)
 	end
 end
 
 local function StopHeroSelectionDisplayTeleport(display)
 	if not IsValidSelectionUnit(display) then return end
+	if type(EndAnimation) == "function" then EndAnimation(display) end
 	if display.FadeGesture ~= nil then
 		display:FadeGesture(ACT_DOTA_TELEPORT)
 	elseif display.RemoveGesture ~= nil then
@@ -246,10 +333,16 @@ local function StartHeroSelectionDestinationTeleport(position, playerID)
 	return particle
 end
 
-local function AwakenSelectedHero(newHero, baseTransform, destinationParticle, player)
+local function AwakenSelectedHero(newHero, baseTransform, destinationParticle, player, playerID)
 	DestroyHeroSelectionParticle(destinationParticle, false)
 	if newHero == nil or newHero:IsNull() then
 		SetHeroSelectionHealthFrameHidden(player, false)
+		if CameraMotion ~= nil then
+			CameraMotion:Release(playerID, {
+				owner = "hero_selection",
+				mode = "free",
+			})
+		end
 		return
 	end
 
@@ -285,6 +378,12 @@ local function AwakenSelectedHero(newHero, baseTransform, destinationParticle, p
 
 	Timers:CreateTimer(HERO_SELECTION_ARRIVAL_DURATION, function()
 		DestroyHeroSelectionParticle(arrivalParticle, false)
+		if CameraMotion ~= nil then
+			CameraMotion:Release(playerID, {
+				owner = "hero_selection",
+				mode = "free",
+			})
+		end
 		return nil
 	end)
 end
@@ -318,26 +417,24 @@ function XHSBeginHeroSelectionTransition(id, pickedHeroName, oldHero, startingGo
 	if player ~= nil and transform.position ~= nil then
 		-- First frame of the transition belongs to the selected showcase unit.
 		-- The existing delayed move to the base remains the second camera beat.
-		CustomGameEventManager:Send_ServerToPlayer(player, "set_player_camera", {
-			hPosition = transform.position,
-			iSpeed = HERO_SELECTION_FOCUS_CAMERA_SPEED,
+		CameraMotion:Move(id, transform.position, {
+			from = oldHero,
+			duration = HERO_SELECTION_FOCUS_CAMERA_SPEED,
+			easing = "smootherstep",
+			owner = "hero_selection",
+			priority = 70,
+			policy = "replace",
+			persistent = true,
 		})
 	end
 	local sourceParticles = StartHeroSelectionSourceTeleport(transform, id)
 	local destinationParticle = nil
+	local transitionCompleted = false
+	local travelHandle = nil
 
-	Timers:CreateTimer(HERO_SELECTION_SOURCE_HOLD, function()
-		destinationParticle = StartHeroSelectionDestinationTeleport(baseTransform.position, id)
-		if player ~= nil then
-			CustomGameEventManager:Send_ServerToPlayer(player, "set_player_camera", {
-				hPosition = baseTransform.position,
-				iSpeed = HERO_SELECTION_CAMERA_SPEED,
-			})
-		end
-		return nil
-	end)
-
-	Timers:CreateTimer(HERO_SELECTION_TELEPORT_DURATION, function()
+	local function CompleteSelectionTransition()
+		if transitionCompleted then return end
+		transitionCompleted = true
 		FinishHeroSelectionSourceTeleport(transform, sourceParticles)
 
 		XHSPrecache:ReplaceHeroWith(id, pickedHeroName, startingGold, 0, oldHero, {
@@ -346,9 +443,21 @@ function XHSBeginHeroSelectionTransition(id, pickedHeroName, oldHero, startingGo
 			teleportToBase = false,
 			deferOldHeroCleanup = true,
 		}, function(newHero)
+			-- ReplaceHeroWith changes the selected unit and can reset the client
+			-- camera target. Restore the already-arrived camera dummy before
+			-- revealing the new hero and keep it locked for the full TP arrival.
+			if CameraMotion ~= nil and CameraMotion.RefreshTarget ~= nil then
+				CameraMotion:RefreshTarget(id, "hero_selection")
+			end
 			if newHero == nil or newHero:IsNull() then
 				DestroyHeroSelectionParticle(destinationParticle, true)
 				SetHeroSelectionHealthFrameHidden(player, false)
+				if CameraMotion ~= nil then
+					CameraMotion:Release(id, {
+						owner = "hero_selection",
+						mode = "free",
+					})
+				end
 				if IsValidSelectionUnit(oldHero) then
 					oldHero.xhs_hero_selection_transition = nil
 					oldHero:RemoveNoDraw()
@@ -356,8 +465,69 @@ function XHSBeginHeroSelectionTransition(id, pickedHeroName, oldHero, startingGo
 				return
 			end
 
-			AwakenSelectedHero(newHero, baseTransform, destinationParticle, player)
+			AwakenSelectedHero(newHero, baseTransform, destinationParticle, player, id)
 		end)
+		-- ReplaceHeroWith can reset SetCameraTarget synchronously before its
+		-- completion callback. Reassert once after the call as well as inside
+		-- the callback so neither the synchronous nor asynchronous path can
+		-- detach the camera from its destination dummy.
+		if CameraMotion ~= nil and CameraMotion.RefreshTarget ~= nil then
+			CameraMotion:RefreshTarget(id, "hero_selection")
+		end
+	end
+
+	Timers:CreateTimer(HERO_SELECTION_SOURCE_HOLD, function()
+		destinationParticle = StartHeroSelectionDestinationTeleport(baseTransform.position, id)
+		if player ~= nil then
+			travelHandle = CameraMotion:Move(id, baseTransform.position, {
+				duration = HERO_SELECTION_CAMERA_SPEED,
+				easing = "smootherstep",
+				-- Dummy arrival is not rendered-camera arrival: Dota keeps
+				-- smoothing the view after SetCameraTarget reaches its endpoint.
+				-- Require two client position samples at the destination before
+				-- ReplaceHeroWith is allowed to reset the camera target.
+				confirm_rendered_arrival = true,
+				rendered_arrival_epsilon = 96,
+				rendered_arrival_samples = 2,
+				rendered_arrival_interval = 0.10,
+				rendered_arrival_timeout = 8.0,
+				owner = "hero_selection",
+				priority = 70,
+				policy = "replace",
+				persistent = true,
+				on_arrive = function()
+					-- Dummy arrival is server-authoritative, but the rendered
+					-- camera needs a short settling window to catch the moving
+					-- target. Replacing the hero immediately here visibly cuts
+					-- the final part of the travelling.
+					Timers:CreateTimer(HERO_SELECTION_CAMERA_SETTLE, function()
+						CompleteSelectionTransition()
+						return nil
+					end)
+				end,
+			})
+		end
+		return nil
+	end)
+
+	-- Hard recovery for a missing/rejected/cancelled request. A live request is
+	-- allowed to finish: replacing the Wisp while its camera dummy is still
+	-- travelling resets SetCameraTarget and visibly cuts the trip.
+	local failsafeDeadline = GameRules:GetGameTime()
+		+ HERO_SELECTION_TELEPORT_DURATION
+		+ HERO_SELECTION_FAILSAFE_DELAY
+		+ HERO_SELECTION_FAILSAFE_MAX_WAIT
+	Timers:CreateTimer(HERO_SELECTION_TELEPORT_DURATION + HERO_SELECTION_FAILSAFE_DELAY, function()
+		if transitionCompleted then return nil end
+		if travelHandle ~= nil
+			and travelHandle.IsActive ~= nil
+			and travelHandle:IsActive()
+			and travelHandle.HasArrived ~= nil
+			and not travelHandle:HasArrived()
+			and GameRules:GetGameTime() < failsafeDeadline then
+			return 0.10
+		end
+		CompleteSelectionTransition()
 		return nil
 	end)
 end
@@ -374,6 +544,7 @@ local function ReplaceSelectedHero(id, pickedHeroName, oldHero, difficulty, grou
 end
 
 function SpawnHeroLoadout(hero_count)
+	if HERO_SELECTION_CLEANED_UP then return end
 	local left_angle = { 4, 5, 6, 7, 8, 14, 15, 16 }
 	local top_angle = { 11, 12, 13, 22, 23, 24, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39 }
 	local bot_angle = { 9, 10, 25, 26, 27 }
@@ -407,6 +578,7 @@ function SpawnHeroesBis()
 	local hero_vip_count = 1
 
 	Timers:CreateTimer(function()
+		if HERO_SELECTION_CLEANED_UP then return nil end
 		SpawnHeroLoadout(hero_count)
 		if hero_count < #HEROLIST then
 			hero_count = hero_count + 1
@@ -417,6 +589,7 @@ function SpawnHeroesBis()
 	end)
 
 	Timers:CreateTimer(5.0, function()
+		if HERO_SELECTION_CLEANED_UP then return nil end
 		if hero_vip_count == 4 then
 			local dummy_hero = CreateUnitByName("npc_dota_hero_chaos_knight", Entities:FindByName(nil, "choose_vip_4_point"):GetAbsOrigin() + Vector(-100, 0, 0), true, nil, nil, DOTA_TEAM_GOODGUYS)
 			dummy_hero:SetAngles(0, 270, 0)

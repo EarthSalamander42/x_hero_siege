@@ -178,7 +178,7 @@
 
 .XHSFarmLeaderboardHeaderCopy
 {
-	width: 225px;
+	width: 196px;
 	height: 100%;
 	margin-left: 10px;
 	padding-top: 10px;
@@ -203,6 +203,36 @@
 	font-weight: bold;
 	letter-spacing: 1px;
 	text-shadow: 0px 2px 4px #000000;
+}
+
+.XHSFarmLeaderboardCollapse
+{
+	width: 28px;
+	height: 100%;
+	background-color: none;
+	border: 0px solid transparent;
+	transition-property: brightness, pre-transform-scale2d;
+	transition-duration: 0.12s;
+}
+
+.XHSFarmLeaderboardCollapse:hover
+{
+	brightness: 1.7;
+	pre-transform-scale2d: 1.08;
+}
+
+.XHSFarmLeaderboardCollapse Label
+{
+	align: center center;
+	margin-top: 1px;
+	color: #91b9cf;
+	font-size: 13px;
+	text-shadow: 0px 1px 3px #000000;
+}
+
+.XHSFarmLeaderboardCollapse.IsCollapsed Label
+{
+	color: #ffd17d;
 }
 
 .XHSFarmLeaderboardLive
@@ -287,6 +317,15 @@
 	transition-property: height;
 	transition-duration: 0.24s;
 	transition-timing-function: ease-out;
+}
+
+.XHSFarmLeaderboard.IsCollapsed .XHSFarmWinnerCelebration,
+.XHSFarmLeaderboard.IsCollapsed .XHSFarmLeaderboardColumnLabels,
+.XHSFarmLeaderboard.IsCollapsed .XHSFarmLeaderboardRows
+{
+	height: 0px;
+	visibility: collapse;
+	opacity: 0;
 }
 
 .XHSFarmLeaderboardWaiting
@@ -392,8 +431,8 @@
 
 .XHSFarmHeroFrame
 {
-	width: 42px;
-	height: 42px;
+	width: 52px;
+	height: 36px;
 	vertical-align: center;
 	margin-left: 1px;
 	border: 1px solid #78cce34a;
@@ -422,7 +461,7 @@
 
 .XHSFarmIdentity
 {
-	width: 126px;
+	width: 116px;
 	height: 100%;
 	margin-left: 8px;
 	padding-top: 8px;
@@ -431,7 +470,7 @@
 
 .XHSFarmPlayerName
 {
-	width: 126px;
+	width: 116px;
 	height: 20px;
 	color: #e8f6ff;
 	font-size: 15px;
@@ -443,7 +482,7 @@
 
 .XHSFarmPlayerStage
 {
-	width: 126px;
+	width: 116px;
 	height: 17px;
 	margin-top: -1px;
 	color: #7fa8c1;

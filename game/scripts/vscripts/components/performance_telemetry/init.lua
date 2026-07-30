@@ -8,10 +8,12 @@ local SAMPLES_PER_BATCH = 6
 local MAX_PENDING_BATCHES = 8
 local MAX_CLIENT_FPS = 500
 local CLIENT_REPORT_TIMEOUT = 12
-local SERVER_FRAME_INCIDENT_MS = 40
+local SERVER_SIM_LAG_INCIDENT_MS = 20
+local SERVER_PACING_INTERVAL = 0.1
+local SERVER_PACING_GRACE = 0.04
 local CLIENT_FPS_INCIDENT = 40
 local INCIDENT_CONTEXT_SAMPLES = 4
-local LOCAL_REPORT_SCHEMA_VERSION = 1
+local LOCAL_REPORT_SCHEMA_VERSION = 4
 local LOCAL_REPORT_MAX_SAMPLES = math.ceil(3 * 60 * 60 / SAMPLE_INTERVAL)
 local LOCAL_REPORT_TOP_SOURCES = 3
 local LOCAL_REPORT_PREFIX = "[XHS_PERF_REPORT"
@@ -20,6 +22,14 @@ local ACTIVITY_INCIDENT_THRESHOLDS = {
 	spatial_query_cost_ms_per_second = { threshold = 10, reason = "spatial_query_cost" },
 	orders_per_second = { threshold = 200, reason = "order_pressure" },
 	repeated_orders_per_second = { threshold = 50, reason = "repeated_order_pressure" },
+	creep_order_owner_conflicts_per_second = {
+		threshold = 0.1,
+		reason = "creep_order_owner_conflict",
+	},
+	creep_orders_blocked_wrong_owner_per_second = {
+		threshold = 0.1,
+		reason = "creep_order_wrong_owner_blocked",
+	},
 	ai_thinks_per_second = { threshold = 300, reason = "ai_think_pressure" },
 	wave_thinks_per_second = { threshold = 800, reason = "wave_think_pressure" },
 	damage_events_per_second = { threshold = 500, reason = "damage_pressure" },
@@ -50,6 +60,33 @@ local BOSSES = {
 local function Now()
 	if RealTime ~= nil then return RealTime() end
 	return Time ~= nil and Time() or GameRules:GetGameTime()
+end
+
+local function ProfileNow()
+	if os ~= nil and os.clock ~= nil then
+		local ok, value = pcall(os.clock)
+		if ok and tonumber(value) ~= nil then return tonumber(value) end
+	end
+	if Time ~= nil then return Time() end
+	return Now()
+end
+
+local function PacingNow()
+	if Time ~= nil then
+		local ok, value = pcall(Time)
+		if ok and tonumber(value) ~= nil then return tonumber(value) end
+	end
+	return Now()
+end
+
+local function ProfileClockName()
+	if os ~= nil and os.clock ~= nil then
+		local ok, value = pcall(os.clock)
+		if ok and tonumber(value) ~= nil then return "os.clock" end
+	end
+	if Time ~= nil then return "Time" end
+	if RealTime ~= nil then return "RealTime" end
+	return "game_time"
 end
 
 local function Round(value, decimals)
@@ -342,6 +379,24 @@ function XHSPerformanceTelemetry:BuildLocalSourceLines(sequence, expanded)
 	return lines
 end
 
+function XHSPerformanceTelemetry:BuildLocalProfileLines(sequence, director)
+	local lines = {}
+	for index = 1, math.min(5, #((director or {}).active_profiles or {})) do
+		local profile = director.active_profiles[index] or {}
+		table.insert(lines, JoinFields(LOCAL_REPORT_PREFIX .. "_PROFILE]", {
+			sequence,
+			index,
+			profile.unit_name or "",
+			profile.agents or 0,
+			table.concat(profile.abilities or {}, ","),
+			profile.think_calls or 0,
+			Round(profile.think_cost_average_ms or 0, 3),
+			Round(profile.think_cost_max_ms or 0, 3),
+		}))
+	end
+	return lines
+end
+
 function XHSPerformanceTelemetry:CaptureLocalReportSample(sample)
 	if not IsInToolsMode() then return end
 	self.local_report_samples = self.local_report_samples or {}
@@ -354,7 +409,7 @@ function XHSPerformanceTelemetry:CaptureLocalReportSample(sample)
 	local paused = GameRules.IsGamePaused ~= nil
 		and GameRules:IsGamePaused() and 1 or 0
 	local expandedSources = sample.incident_id ~= nil
-		or (tonumber(sample.server_frame_ms_p95) or 0) >= 25
+		or (tonumber(sample.server_sim_lag_ms_p95) or 0) >= 15
 		or (client.fps_p5 >= 0 and client.fps_p5 < 50)
 
 	local record = {
@@ -368,9 +423,13 @@ function XHSPerformanceTelemetry:CaptureLocalReportSample(sample)
 			sample.wave,
 			sample.difficulty,
 			Round(hostTimescale, 2),
-			sample.server_frame_ms,
-			sample.server_frame_ms_p95,
-			sample.server_frame_ms_max,
+			sample.server_sim_lag_ms,
+			sample.server_sim_lag_ms_p95,
+			sample.server_sim_lag_ms_max,
+			sample.server_sim_health_pct,
+			sample.server_observer_interval_ms,
+			sample.server_observer_interval_ms_p95,
+			sample.server_observer_interval_ms_max,
 			client.count,
 			client.fps_average,
 			client.fps_p5,
@@ -387,6 +446,8 @@ function XHSPerformanceTelemetry:CaptureLocalReportSample(sample)
 			sample.ai_controllers,
 			sample.wave_controllers,
 			sample.ability_controllers,
+			sample.movement_owner_ai,
+			sample.movement_owner_wave,
 			director.active_agents or 0,
 			director.queued_agents or 0,
 			director.cached_profiles or 0,
@@ -405,6 +466,12 @@ function XHSPerformanceTelemetry:CaptureLocalReportSample(sample)
 			ActivityValue(activity, "spatial_cache_misses_per_second"),
 			ActivityValue(activity, "orders_per_second"),
 			ActivityValue(activity, "repeated_orders_per_second"),
+			ActivityValue(activity, "creep_orders_modifier_ai_per_second"),
+			ActivityValue(activity, "creep_orders_wave_per_second"),
+			ActivityValue(activity, "creep_order_owner_conflicts_per_second"),
+			ActivityValue(activity, "creep_orders_blocked_wrong_owner_per_second"),
+			ActivityValue(activity, "creep_orders_deduplicated_per_second"),
+			ActivityValue(activity, "creep_order_owner_handoffs_per_second"),
 			ActivityValue(activity, "damage_events_per_second"),
 			ActivityValue(activity, "ability_casts_per_second"),
 			ActivityValue(activity, "projectiles_per_second"),
@@ -428,6 +495,7 @@ function XHSPerformanceTelemetry:CaptureLocalReportSample(sample)
 			sample.incident_id or 0,
 		}),
 		sources = self:BuildLocalSourceLines(sample.sequence, expandedSources),
+		profiles = self:BuildLocalProfileLines(sample.sequence, director),
 	}
 	table.insert(self.local_report_samples, record)
 	if #self.local_report_samples > LOCAL_REPORT_MAX_SAMPLES then
@@ -450,30 +518,43 @@ function XHSPerformanceTelemetry:PrintLocalReport(reason)
 		"map=" .. SafeField(GetMapName()),
 		"mod=" .. SafeField(GAME_VERSION or ""),
 		"interval_s=" .. tostring(SAMPLE_INTERVAL),
+		"profile_clock=" .. ProfileClockName(),
 		"samples=" .. tostring(#samples),
 		"dropped=" .. tostring(self.local_report_dropped_samples or 0),
 	}))
 	print(JoinFields(LOCAL_REPORT_PREFIX .. "_SUMMARY]", {
 		"sample_count=" .. tostring(summary.sample_count or 0),
 		"incidents=" .. tostring(summary.incident_count or 0),
-		"server_avg_ms=" .. tostring(summary.server_frame_ms_average or 0),
-		"server_max_ms=" .. tostring(summary.server_frame_ms_max or 0),
+		"server_sim_lag_avg_ms=" .. tostring(summary.server_sim_lag_ms_average or 0),
+		"server_sim_lag_max_ms=" .. tostring(summary.server_sim_lag_ms_max or 0),
+		"server_sim_health_avg_pct=" .. tostring(summary.server_sim_health_pct_average or 100),
+		"server_observer_interval_avg_ms="
+			.. tostring(summary.server_observer_interval_ms_average or 0),
+		"server_observer_interval_max_ms="
+			.. tostring(summary.server_observer_interval_ms_max or 0),
 		"client_fps_p5_min=" .. tostring(summary.client_fps_p5_min or -1),
 		"creeps_max=" .. tostring(summary.creeps_max or 0),
 		"units_max=" .. tostring(summary.total_units_max or 0),
 	}))
 	print(JoinFields(LOCAL_REPORT_PREFIX .. "_COLUMNS]", {
 		"seq", "game_s", "state", "paused", "context", "phase", "wave",
-		"difficulty", "timescale", "server_avg_ms", "server_p95_ms",
-		"server_max_ms", "clients", "client_fps_avg", "client_fps_p5",
+		"difficulty", "timescale", "server_sim_lag_avg_ms", "server_sim_lag_p95_ms",
+		"server_sim_lag_max_ms", "server_sim_health_pct",
+		"server_observer_interval_avg_ms", "server_observer_interval_p95_ms",
+		"server_observer_interval_max_ms",
+		"clients", "client_fps_avg", "client_fps_p5",
 		"client_frame_p95_ms", "client_detail",
 		"creeps", "units", "heroes", "bosses", "summons", "breakables",
 		"other", "thinkers", "ai_ctrl", "wave_ctrl", "ability_ctrl",
+		"movement_owner_ai", "movement_owner_wave",
 		"director_active", "director_queued", "profiles", "profiles_passive",
 		"director_budget", "ai_s", "ai_processed_s", "ai_sleeping_s",
 		"wave_s", "ability_s", "spatial_s", "spatial_hits_s",
 		"spatial_cost_ms_s", "spatial_max_ms", "cache_hits_s",
-		"cache_misses_s", "orders_s", "repeat_orders_s", "damage_s",
+		"cache_misses_s", "orders_s", "repeat_orders_s",
+		"creep_orders_ai_s", "creep_orders_wave_s",
+		"order_owner_conflicts_s", "orders_blocked_wrong_owner_s",
+		"orders_deduplicated_s", "order_owner_handoffs_s", "damage_s",
 		"casts_s", "projectiles_s", "spawns_s", "deaths_s",
 		"target_changes_s", "bots_configured", "bots_live", "bots_active",
 		"bots_paused", "bot_orders_s", "bot_order_reject_s", "bot_casts_s",
@@ -486,6 +567,9 @@ function XHSPerformanceTelemetry:PrintLocalReport(reason)
 		for _, sourceLine in ipairs(record.sources or {}) do
 			print(sourceLine)
 		end
+		for _, profileLine in ipairs(record.profiles or {}) do
+			print(profileLine)
+		end
 	end
 	for _, incident in ipairs(self.incidents or {}) do
 		print(JoinFields(LOCAL_REPORT_PREFIX .. "_INCIDENT]", {
@@ -495,7 +579,7 @@ function XHSPerformanceTelemetry:PrintLocalReport(reason)
 			incident.start_sequence or 0,
 			incident.end_sequence or 0,
 			table.concat(incident.reasons or {}, ","),
-			incident.peak_server_frame_ms or 0,
+			incident.peak_server_sim_lag_ms or 0,
 			incident.min_client_fps_p5 or -1,
 		}))
 	end
@@ -508,7 +592,7 @@ function XHSPerformanceTelemetry:PrintLocalReport(reason)
 			incident.start_sequence or 0,
 			incident.end_sequence or 0,
 			table.concat(incident.reasons or {}, ","),
-			incident.peak_server_frame_ms or 0,
+			incident.peak_server_sim_lag_ms or 0,
 			incident.min_client_fps_p5 or -1,
 		}))
 	end
@@ -519,28 +603,127 @@ function XHSPerformanceTelemetry:PrintLocalReport(reason)
 	return true
 end
 
+function XHSPerformanceTelemetry:ObserveServerPacing(wallNow, hostTimescale)
+	local gameNow = GameRules:GetGameTime()
+	local paused = GameRules.IsGamePaused ~= nil and GameRules:IsGamePaused()
+	local previousWall = self.server_pacing_wall_at
+	local previousGame = self.server_pacing_game_at
+	self.server_pacing_wall_at = wallNow
+	self.server_pacing_game_at = gameNow
+	if paused or previousWall == nil or previousGame == nil then return end
+
+	local wallDelta = wallNow - previousWall
+	local gameDelta = gameNow - previousGame
+	hostTimescale = math.max(0.01, tonumber(hostTimescale) or 1)
+	if wallDelta <= 0 or gameDelta <= 0 then return end
+
+	local expectedWallDelta = gameDelta / hostTimescale
+	local progressLagMs = math.max(0, wallDelta - expectedWallDelta) * 1000
+	local progressHealthPct = math.max(0, math.min(100,
+		gameDelta / (wallDelta * hostTimescale) * 100
+	))
+	local expectedObserverDelta = SERVER_PACING_INTERVAL / hostTimescale
+	local observerGrace = SERVER_PACING_GRACE / hostTimescale
+	local observerLagMs = math.max(
+		0,
+		wallDelta - expectedObserverDelta - observerGrace
+	) * 1000
+	local observerHealthPct = math.max(0, math.min(100,
+		(expectedObserverDelta + observerGrace) / wallDelta * 100
+	))
+	local lagMs = math.max(progressLagMs, observerLagMs)
+	local healthPct = math.min(progressHealthPct, observerHealthPct)
+	table.insert(self.server_observer_interval_observations, wallDelta * 1000)
+	table.insert(self.server_sim_lag_observations, lagMs)
+	table.insert(self.server_sim_health_observations, healthPct)
+end
+
+function XHSPerformanceTelemetry:BuildServerPacingSnapshot(reset)
+	local lag = self.server_sim_lag_observations or {}
+	local health = self.server_sim_health_observations or {}
+	local observerIntervals = self.server_observer_interval_observations or {}
+	table.sort(lag)
+	table.sort(observerIntervals)
+	local count = #lag
+	local lagSum = 0
+	for _, value in ipairs(lag) do lagSum = lagSum + value end
+	local healthSum = 0
+	for _, value in ipairs(health) do healthSum = healthSum + value end
+	local observerSum = 0
+	for _, value in ipairs(observerIntervals) do observerSum = observerSum + value end
+	local p95Index = math.max(1, math.min(count, math.ceil(count * 0.95)))
+	local observerCount = #observerIntervals
+	local observerP95Index = math.max(
+		1,
+		math.min(observerCount, math.ceil(observerCount * 0.95))
+	)
+	local snapshot = {
+		lag_average_ms = Round(count > 0 and lagSum / count or 0, 2),
+		lag_p95_ms = Round(count > 0 and lag[p95Index] or 0, 2),
+		lag_max_ms = Round(count > 0 and lag[count] or 0, 2),
+		health_average_pct = Round(#health > 0 and healthSum / #health or 100, 1),
+		observer_interval_average_ms = Round(
+			observerCount > 0 and observerSum / observerCount or 0,
+			2
+		),
+		observer_interval_p95_ms = Round(
+			observerCount > 0 and observerIntervals[observerP95Index] or 0,
+			2
+		),
+		observer_interval_max_ms = Round(
+			observerCount > 0 and observerIntervals[observerCount] or 0,
+			2
+		),
+	}
+	self.server_pacing_latest = snapshot
+	if reset == true then
+		self.server_sim_lag_observations = {}
+		self.server_sim_health_observations = {}
+		self.server_observer_interval_observations = {}
+	end
+	return snapshot
+end
+
+function XHSPerformanceTelemetry:GetServerPacingSnapshot()
+	if #(self.server_sim_lag_observations or {}) > 0 then
+		return self:BuildServerPacingSnapshot(false)
+	end
+	return self.server_pacing_latest or {
+		lag_average_ms = 0,
+		lag_p95_ms = 0,
+		lag_max_ms = 0,
+		health_average_pct = 100,
+		observer_interval_average_ms = 0,
+		observer_interval_p95_ms = 0,
+		observer_interval_max_ms = 0,
+	}
+end
+
 function XHSPerformanceTelemetry:BuildSample()
-	local startedAt = Now()
-	table.sort(self.server_frame_observations)
-	local frameCount = #self.server_frame_observations
-	local frameSum = 0
-	for _, frameMs in ipairs(self.server_frame_observations) do frameSum = frameSum + frameMs end
-	local frameP95Index = math.max(1, math.min(frameCount, math.ceil(frameCount * 0.95)))
-	local frameAverage = frameCount > 0 and frameSum / frameCount or 0
-	local frameP95 = frameCount > 0 and self.server_frame_observations[frameP95Index] or 0
-	local frameMaximum = frameCount > 0 and self.server_frame_observations[frameCount] or 0
-	self.server_frame_observations = {}
+	local startedAt = ProfileNow()
+	local pacing = self:BuildServerPacingSnapshot(true)
 	local sample = {
 		sequence = self.next_sequence,
 		game_time = Round(GameRules:GetDOTATime(false, false), 1),
-		server_frame_ms = Round(frameAverage, 2),
-		server_frame_ms_p95 = Round(frameP95, 2),
-		server_frame_ms_max = Round(frameMaximum, 2),
+		server_sim_lag_ms = pacing.lag_average_ms,
+		server_sim_lag_ms_p95 = pacing.lag_p95_ms,
+		server_sim_lag_ms_max = pacing.lag_max_ms,
+		server_sim_health_pct = pacing.health_average_pct,
+		server_observer_interval_ms = pacing.observer_interval_average_ms,
+		server_observer_interval_ms_p95 = pacing.observer_interval_p95_ms,
+		server_observer_interval_ms_max = pacing.observer_interval_max_ms,
+		-- Compatibility aliases for the schema-1 backend. These values now
+		-- represent scheduler/simulation lag, not Source's fixed 33.3 ms tick.
+		server_frame_ms = pacing.lag_average_ms,
+		server_frame_ms_p95 = pacing.lag_p95_ms,
+		server_frame_ms_max = pacing.lag_max_ms,
 		total_units = 0,
 		creeps = 0,
 		ai_controllers = 0,
 		wave_controllers = 0,
 		ability_controllers = 0,
+		movement_owner_ai = 0,
+		movement_owner_wave = 0,
 		heroes = 0,
 		bosses = 0,
 		summons = 0,
@@ -574,6 +757,11 @@ function XHSPerformanceTelemetry:BuildSample()
 			sample.total_units = sample.total_units + 1
 			if unit:HasModifier("modifier_ai") then sample.ai_controllers = sample.ai_controllers + 1 end
 			if unit.xhs_wave_order_controller == true then sample.wave_controllers = sample.wave_controllers + 1 end
+			if unit.xhs_movement_order_owner == "modifier_ai" then
+				sample.movement_owner_ai = sample.movement_owner_ai + 1
+			elseif unit.xhs_movement_order_owner == "wave" then
+				sample.movement_owner_wave = sample.movement_owner_wave + 1
+			end
 			if isDummy or isRune then
 				sample.other_units = sample.other_units + 1
 			elseif BOSSES[unitName] == true or unit.Boss == true then
@@ -613,15 +801,15 @@ function XHSPerformanceTelemetry:BuildSample()
 		or sample.wave_controllers
 	sample.ability_checks_per_second = sample.activity.ability_loop_thinks_per_second
 		or sample.ability_controllers
-	sample.profiler_ms = Round(math.max(0, (Now() - startedAt) * 1000), 2)
+	sample.profiler_ms = Round(math.max(0, (ProfileNow() - startedAt) * 1000), 2)
 	self.next_sequence = self.next_sequence + 1
 	return sample
 end
 
 function XHSPerformanceTelemetry:DetectIncident(sample)
 	local reasons = {}
-	if sample.server_frame_ms_p95 >= SERVER_FRAME_INCIDENT_MS then
-		table.insert(reasons, "server_frame")
+	if sample.server_sim_lag_ms_p95 >= SERVER_SIM_LAG_INCIDENT_MS then
+		table.insert(reasons, "server_sim_lag")
 	end
 	for _, player in ipairs(sample.players or {}) do
 		if player.fps_p5 < CLIENT_FPS_INCIDENT then
@@ -645,7 +833,8 @@ function XHSPerformanceTelemetry:DetectIncident(sample)
 				start_sequence = math.max(0, sample.sequence - INCIDENT_CONTEXT_SAMPLES),
 				end_sequence = sample.sequence,
 				reasons = reasons,
-				peak_server_frame_ms = sample.server_frame_ms_max,
+				peak_server_sim_lag_ms = sample.server_sim_lag_ms_max,
+				peak_server_frame_ms = sample.server_sim_lag_ms_max,
 				min_client_fps_p5 = nil,
 				dirty = true,
 			}
@@ -670,10 +859,12 @@ function XHSPerformanceTelemetry:DetectIncident(sample)
 	if self.active_incident ~= nil then
 		sample.incident_id = self.active_incident.incident_id
 		self.active_incident.end_sequence = sample.sequence
-		self.active_incident.peak_server_frame_ms = math.max(
-			self.active_incident.peak_server_frame_ms or 0,
-			sample.server_frame_ms_max
+		self.active_incident.peak_server_sim_lag_ms = math.max(
+			self.active_incident.peak_server_sim_lag_ms or 0,
+			sample.server_sim_lag_ms_max
 		)
+		self.active_incident.peak_server_frame_ms =
+			self.active_incident.peak_server_sim_lag_ms
 		for _, player in ipairs(sample.players or {}) do
 			if self.active_incident.min_client_fps_p5 == nil
 				or player.fps_p5 < self.active_incident.min_client_fps_p5 then
@@ -696,8 +887,22 @@ function XHSPerformanceTelemetry:UpdateSummary(sample)
 	summary.sample_count = summary.sample_count + 1
 	summary.first_game_time = summary.first_game_time or sample.game_time
 	summary.last_game_time = sample.game_time
-	summary.server_frame_ms_sum = summary.server_frame_ms_sum + sample.server_frame_ms
-	summary.server_frame_ms_max = math.max(summary.server_frame_ms_max, sample.server_frame_ms_max)
+	summary.server_sim_lag_ms_sum =
+		summary.server_sim_lag_ms_sum + sample.server_sim_lag_ms
+	summary.server_sim_lag_ms_max =
+		math.max(summary.server_sim_lag_ms_max, sample.server_sim_lag_ms_max)
+	summary.server_sim_health_pct_sum =
+		summary.server_sim_health_pct_sum + sample.server_sim_health_pct
+	summary.server_observer_interval_ms_sum =
+		summary.server_observer_interval_ms_sum
+		+ (tonumber(sample.server_observer_interval_ms) or 0)
+	summary.server_observer_interval_ms_max = math.max(
+		summary.server_observer_interval_ms_max,
+		tonumber(sample.server_observer_interval_ms_max) or 0
+	)
+	-- Schema-1 aliases retained for the existing backend normalization.
+	summary.server_frame_ms_sum = summary.server_sim_lag_ms_sum
+	summary.server_frame_ms_max = summary.server_sim_lag_ms_max
 	summary.creeps_max = math.max(summary.creeps_max, sample.creeps)
 	summary.total_units_max = math.max(summary.total_units_max, sample.total_units)
 	for metricName, _ in pairs(ACTIVITY_INCIDENT_THRESHOLDS) do
@@ -716,10 +921,20 @@ end
 
 function XHSPerformanceTelemetry:BuildSummary()
 	local summary = CopyTable(self.summary)
-	summary.server_frame_ms_average = summary.sample_count > 0
-		and Round(summary.server_frame_ms_sum / summary.sample_count, 2)
+	summary.server_sim_lag_ms_average = summary.sample_count > 0
+		and Round(summary.server_sim_lag_ms_sum / summary.sample_count, 2)
 		or 0
+	summary.server_sim_health_pct_average = summary.sample_count > 0
+		and Round(summary.server_sim_health_pct_sum / summary.sample_count, 1)
+		or 100
+	summary.server_observer_interval_ms_average = summary.sample_count > 0
+		and Round(summary.server_observer_interval_ms_sum / summary.sample_count, 2)
+		or 0
+	summary.server_frame_ms_average = summary.server_sim_lag_ms_average
 	summary.server_frame_ms_sum = nil
+	summary.server_sim_lag_ms_sum = nil
+	summary.server_sim_health_pct_sum = nil
+	summary.server_observer_interval_ms_sum = nil
 	summary.dropped_batches = self.dropped_batches
 	summary.session_players = self:BuildSessionPlayers()
 	return summary
@@ -841,7 +1056,12 @@ function XHSPerformanceTelemetry:Init()
 	self.retry_count = 0
 	self.next_send_at = 0
 	self.next_sample_at = Now() + SAMPLE_INTERVAL
-	self.server_frame_observations = {}
+	self.server_sim_lag_observations = {}
+	self.server_sim_health_observations = {}
+	self.server_observer_interval_observations = {}
+	self.server_pacing_wall_at = nil
+	self.server_pacing_game_at = nil
+	self.server_pacing_latest = nil
 	self.dropped_batches = 0
 	self.finalized = false
 	self.local_report_samples = {}
@@ -854,6 +1074,11 @@ function XHSPerformanceTelemetry:Init()
 		incident_count = 0,
 		server_frame_ms_sum = 0,
 		server_frame_ms_max = 0,
+		server_sim_lag_ms_sum = 0,
+		server_sim_lag_ms_max = 0,
+		server_sim_health_pct_sum = 0,
+		server_observer_interval_ms_sum = 0,
+		server_observer_interval_ms_max = 0,
 		creeps_max = 0,
 		total_units_max = 0,
 	}
@@ -884,13 +1109,13 @@ function XHSPerformanceTelemetry:Init()
 		end
 		local now = Now()
 		local hostTimescale = Convars ~= nil and math.max(Convars:GetFloat("host_timescale"), 0.01) or 1
-		table.insert(self.server_frame_observations, math.max(0, FrameTime() * 1000 / hostTimescale))
+		self:ObserveServerPacing(PacingNow(), hostTimescale)
 		local state = GameRules:State_Get()
 		if state >= DOTA_GAMERULES_STATE_PRE_GAME and now >= self.next_sample_at then
 			self.next_sample_at = now + SAMPLE_INTERVAL
 			self:Collect()
 		end
 		self:TrySend()
-		return 0.1
-	end, 0.1)
+		return SERVER_PACING_INTERVAL
+	end, SERVER_PACING_INTERVAL)
 end

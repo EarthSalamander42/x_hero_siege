@@ -51,8 +51,21 @@ local function IsApiBotPlayerID(player_id)
 	return false
 end
 
+local function IsApiSpectatorPlayerID(player_id)
+	if not IsValidApiPlayerID(player_id)
+		or PlayerResource.GetTeam == nil then
+		return false
+	end
+
+	local ok, team = pcall(function()
+		return PlayerResource:GetTeam(tonumber(player_id))
+	end)
+	return ok and tonumber(team) == 1
+end
+
 local function IsApiPersistentPlayerID(player_id)
 	if not IsValidApiPlayerID(player_id) then return false end
+	if IsApiSpectatorPlayerID(player_id) then return false end
 
 	if IsXHSPersistentPlayerID ~= nil then
 		local ok, is_persistent = pcall(IsXHSPersistentPlayerID, tonumber(player_id))
@@ -1899,6 +1912,20 @@ function api:CompleteGame()
 	local players = {}
 	local backend_players = {}
 	local has_xhs_bot_session = self:HasXHSBotSession()
+	if has_xhs_bot_session
+		and XHSBotDecisionAudit ~= nil
+		and type(XHSBotDecisionAudit.Finalize) == "function" then
+		local auditCallOK, auditOK, auditMessage = pcall(function()
+			return XHSBotDecisionAudit:Finalize("complete_game")
+		end)
+		if not auditCallOK then
+			print("[XHSBots][AUDIT] type=finalize_error reason=complete_game error="
+				.. tostring(auditOK))
+		elseif auditOK == false and auditMessage ~= "audit_already_finalized" then
+			print("[XHSBots][AUDIT] type=finalize_error reason=complete_game error="
+				.. tostring(auditMessage))
+		end
+	end
 
 	local function CountItemsBought(itemsBought, itemName)
 		local count = 0
@@ -2002,7 +2029,8 @@ function api:CompleteGame()
 	end
 
 	for id = 0, PlayerResource:GetPlayerCount() - 1 do
-		if PlayerResource:IsValidPlayerID(id) then
+		if PlayerResource:IsValidPlayerID(id)
+			and not IsApiSpectatorPlayerID(id) then
 			local items = {}
 			local heroEntity = ResolveEndScreenHero(id)
 			local hero = json.null

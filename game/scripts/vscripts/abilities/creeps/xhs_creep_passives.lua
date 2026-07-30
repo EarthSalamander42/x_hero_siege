@@ -475,7 +475,7 @@ function modifier_xhs_creep_passive:OnAttackLanded(params)
 	local proc_chance = Special(ability, "proc_chance")
 	if bonus > 0 and RollPseudoRandomPercentage(proc_chance, 1972, parent) then
 		ApplyDamage({ victim = target, attacker = parent, ability = ability, damage = parent:GetAverageTrueAttackDamage(target) * bonus * 0.01, damage_type = DAMAGE_TYPE_PHYSICAL })
-		PlayProcFeedback(parent, target, "particles/items_fx/skull_basher.vpcf", "DOTA_Item.SkullBasher")
+		PlayProcFeedback(parent, target, "particles/units/heroes/hero_sniper/sniper_headshot_slow.vpcf", "DOTA_Item.SkullBasher")
 	end
 
 	local mana_burn = Special(ability, "mana_burn_pct")

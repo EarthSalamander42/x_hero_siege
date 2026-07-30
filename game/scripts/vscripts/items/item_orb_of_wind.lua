@@ -1,6 +1,5 @@
 LinkLuaModifier("modifier_orb_of_wind", "items/item_orb_of_wind.lua", LUA_MODIFIER_MOTION_NONE)
 LinkLuaModifier("modifier_orb_of_wind_zephyr", "items/item_orb_of_wind.lua", LUA_MODIFIER_MOTION_NONE)
-LinkLuaModifier("modifier_orb_of_wind_guard", "items/item_orb_of_wind.lua", LUA_MODIFIER_MOTION_NONE)
 
 require("items/orb_toggle")
 
@@ -111,12 +110,8 @@ function modifier_orb_of_wind:OnAttackFail(params)
 	local damage_reduction_pct = ability:GetSpecialValueFor("evasion_proc_damage_reduction_pct")
 	local duration = ability:GetSpecialValueFor("evasion_proc_duration")
 
-	if move_speed_pct > 0 then
+	if move_speed_pct > 0 or damage_reduction_pct > 0 then
 		self:GetParent():AddNewModifier(self:GetParent(), ability, "modifier_orb_of_wind_zephyr", { duration = duration })
-	end
-
-	if damage_reduction_pct > 0 then
-		self:GetParent():AddNewModifier(self:GetParent(), ability, "modifier_orb_of_wind_guard", { duration = duration })
 	end
 
 	if move_speed_pct > 0 or damage_reduction_pct > 0 then
@@ -130,9 +125,27 @@ modifier_orb_of_wind_zephyr.XHS_LINK_CLIENT = true
 function modifier_orb_of_wind_zephyr:IsHidden() return false end
 function modifier_orb_of_wind_zephyr:IsPurgable() return true end
 
+function modifier_orb_of_wind_zephyr:OnCreated()
+	if not IsServer() then return end
+
+	local ability = self:GetAbility()
+	if ability == nil or ability:IsNull()
+		or ability:GetSpecialValueFor("evasion_proc_damage_reduction_pct") <= 0 then
+		return
+	end
+
+	local guard_particle = ParticleManager:CreateParticle(
+		"particles/items2_fx/pipe_of_insight.vpcf",
+		PATTACH_ABSORIGIN_FOLLOW,
+		self:GetParent()
+	)
+	self:AddParticle(guard_particle, false, false, -1, false, false)
+end
+
 function modifier_orb_of_wind_zephyr:DeclareFunctions()
 	return {
 		MODIFIER_PROPERTY_MOVESPEED_BONUS_PERCENTAGE,
+		MODIFIER_PROPERTY_INCOMING_DAMAGE_PERCENTAGE,
 	}
 end
 
@@ -140,34 +153,24 @@ function modifier_orb_of_wind_zephyr:GetModifierMoveSpeedBonus_Percentage()
 	return self:GetAbility():GetSpecialValueFor("evasion_proc_movespeed_pct")
 end
 
+function modifier_orb_of_wind_zephyr:GetModifierIncomingDamage_Percentage()
+	return 0 - self:GetAbility():GetSpecialValueFor("evasion_proc_damage_reduction_pct")
+end
+
+function modifier_orb_of_wind_zephyr:GetTexture()
+	local ability = self:GetAbility()
+	if ability ~= nil and not ability:IsNull()
+		and ability:GetAbilityName() == "item_tempest_aegis" then
+		return "modifiers/tempest_aegis"
+	end
+
+	return "modifiers/zephyr_gem"
+end
+
 function modifier_orb_of_wind_zephyr:GetEffectName()
 	return "particles/units/heroes/hero_windrunner/windrunner_windrun.vpcf"
 end
 
 function modifier_orb_of_wind_zephyr:GetEffectAttachType()
-	return PATTACH_ABSORIGIN_FOLLOW
-end
-
-modifier_orb_of_wind_guard = modifier_orb_of_wind_guard or class({})
-modifier_orb_of_wind_guard.XHS_LINK_CLIENT = true
-
-function modifier_orb_of_wind_guard:IsHidden() return false end
-function modifier_orb_of_wind_guard:IsPurgable() return true end
-
-function modifier_orb_of_wind_guard:DeclareFunctions()
-	return {
-		MODIFIER_PROPERTY_INCOMING_DAMAGE_PERCENTAGE,
-	}
-end
-
-function modifier_orb_of_wind_guard:GetModifierIncomingDamage_Percentage()
-	return 0 - self:GetAbility():GetSpecialValueFor("evasion_proc_damage_reduction_pct")
-end
-
-function modifier_orb_of_wind_guard:GetEffectName()
-	return "particles/items2_fx/pipe_of_insight.vpcf"
-end
-
-function modifier_orb_of_wind_guard:GetEffectAttachType()
 	return PATTACH_ABSORIGIN_FOLLOW
 end

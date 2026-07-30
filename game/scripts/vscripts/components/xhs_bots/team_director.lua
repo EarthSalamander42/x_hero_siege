@@ -51,6 +51,15 @@ local function GetFort()
 		or Entities:FindByName(nil, "base_spawn")
 end
 
+local function IsFinalWaveCombatActive()
+	return CustomTimers ~= nil
+		and CustomTimers.proc_final_wave == true
+		and (
+			CustomTimers.final_wave_kill_counting == true
+			or (tonumber(CustomTimers.final_wave_spawned_kill_limit) or 0) > 0
+		)
+end
+
 local function IsProtectedStructure(unit)
 	if not IsValidEntityHandle(unit) then return false end
 	if unit == GetFort() then return true end
@@ -720,7 +729,15 @@ function XHSBotTeamDirector:CalculateBaseThreat(now)
 	rawScore = rawScore + math.min(0.90, fortDamageRatio * 12)
 
 	local elapsed = math.max(0, now - (tonumber(self.base_threat_last_sample_at) or now))
-	local rememberedScore = math.max(
+	-- Keep the short structure-contact hold above to bridge scan boundaries, but
+	-- once it expires and there is no actionable castle enemy, release the
+	-- strategic emergency immediately. A 1.50 score used to decay for more than
+	-- thirteen seconds, consuming the entire shop/rune window between waves.
+	local noActionableThreat = threatCount <= 0
+		and not structureEmergency
+		and fortTargetCount <= 0
+		and immediateCount <= 0
+	local rememberedScore = noActionableThreat and 0 or math.max(
 		0,
 		(tonumber(self.base_threat_score) or 0) - elapsed * BASE_THREAT_DECAY_PER_SECOND
 	)
@@ -735,13 +752,18 @@ function XHSBotTeamDirector:CalculateBaseThreat(now)
 			and rawScore >= BASE_THREAT_ENTER_SCORE
 	if responseRequired then
 		self.base_response_hold_until = now + BASE_RESPONSE_MINIMUM_HOLD
+	elseif noActionableThreat then
+		self.base_response_hold_until = 0
 	elseif now < (tonumber(self.base_response_hold_until) or 0) then
 		-- Do not bounce base -> lane -> base while the last castle contact is
 		-- only briefly outside a scan/visibility boundary.
 		responseRequired = true
 	end
 	local active = self.base_threat_active == true
-	if rawScore >= BASE_THREAT_ENTER_SCORE then
+	if noActionableThreat then
+		active = false
+		self.base_threat_hold_until = 0
+	elseif rawScore >= BASE_THREAT_ENTER_SCORE then
 		active = true
 		self.base_threat_hold_until = now + BASE_THREAT_MINIMUM_HOLD
 	elseif active and score <= BASE_THREAT_EXIT_SCORE
@@ -791,6 +813,71 @@ function XHSBotTeamDirector:CalculateBaseThreat(now)
 		closest_distance = closestDistance < math.huge and closestDistance or 0,
 		fort_damage_ratio = fortDamageRatio,
 	}
+end
+
+function XHSBotTeamDirector:SelectBaseResponders(playerIDs, snapshot)
+	local selected = {}
+	local baseThreat = snapshot and snapshot.base_threat or nil
+	if baseThreat == nil or baseThreat.response_required ~= true then
+		return selected, 0
+	end
+
+	local candidates = {}
+	for _, playerID in ipairs(playerIDs or {}) do
+		local hero = XHSBotPlayerRegistry:GetBotHero(playerID)
+		if IsValidEntityHandle(hero) and hero:IsAlive() then
+			local healthRatio =
+				hero:GetHealth() / math.max(1, hero:GetMaxHealth())
+			local distance = Distance2D(
+				hero:GetAbsOrigin(),
+				baseThreat.anchor or Vector(0, 0, 0)
+			)
+			local existing = self.assignments[playerID]
+			table.insert(candidates, {
+				player_id = playerID,
+				score = distance
+					+ (1 - healthRatio) * 1200
+					- (existing ~= nil and existing.goal == "defend_base"
+						and 900 or 0),
+			})
+		end
+	end
+
+	local participantCount = #(playerIDs or {})
+	local strategicEmergency =
+		baseThreat.structure_emergency == true
+		or (tonumber(baseThreat.special_count) or 0) > 0
+		or (tonumber(baseThreat.dragon_count) or 0) > 0
+		or (tonumber(baseThreat.boss_count) or 0) > 0
+	local desired = #candidates
+	if not strategicEmergency and participantCount >= 2 then
+		-- An ordinary castle spill is not a team-wide distress signal. Keep
+		-- lane ownership intact at every roster size while the closest healthy
+		-- half clears it; special waves, dragons, bosses and real structure
+		-- emergencies still recall the full available team.
+		desired = math.min(
+			#candidates,
+			math.max(1, math.ceil(participantCount * 0.5))
+		)
+	end
+	table.sort(candidates, function(left, right)
+		if left.score == right.score then
+			return left.player_id < right.player_id
+		end
+		return left.score < right.score
+	end)
+	for index = 1, desired do
+		selected[candidates[index].player_id] = true
+	end
+	return selected, desired
+end
+
+function XHSBotTeamDirector:IsSelectedBaseResponder(snapshot, playerID)
+	local selected = snapshot and snapshot.base_responder_ids or nil
+	-- Tests and external callers can build a partial snapshot without the
+	-- allocation pass. Preserve conservative all-respond behavior in that case.
+	if selected == nil then return true end
+	return selected[tonumber(playerID)] == true
 end
 
 function XHSBotTeamDirector:GetHumanPresence(position, radius)
@@ -949,6 +1036,45 @@ function XHSBotTeamDirector:GetFarmEventAnchor(playerID)
 	return IsValidEntityHandle(point) and point:GetAbsOrigin() or nil
 end
 
+function XHSBotTeamDirector:IsStrategicShoppingDowntime(playerID, hero)
+	if not IsValidEntityHandle(hero) or not hero:IsAlive()
+		or GameMode == nil then
+		return false
+	end
+	-- The 60-second final-wave countdown has already stopped and cleared all
+	-- lane creeps, but proc_final_wave is set before the first final enemy
+	-- exists. Treat that empty interval as team-wide preparation time.
+	if CustomTimers ~= nil
+		and CustomTimers.proc_final_wave == true
+		and CustomTimers.final_wave_kill_counting ~= true
+		and (tonumber(CustomTimers.final_wave_spawned_kill_limit) or 0) <= 0 then
+		return true
+	end
+	if GameMode.SpecialArena_occuring == true and SpecialEvents ~= nil then
+		return tonumber(SpecialEvents.active_arena_player_id)
+			~= tonumber(playerID)
+	end
+	if GameMode.Muradin_occuring == true then
+		return XHSBotEncounterDirector == nil
+			or XHSBotEncounterDirector.IsMuradinSurvivalActive == nil
+			or not XHSBotEncounterDirector:IsMuradinSurvivalActive(hero)
+	end
+	return false
+end
+
+function XHSBotTeamDirector:IsRecoveryGearShopping(record)
+	if type(record) ~= "table"
+		or type(record.shopping_goal) ~= "table"
+		or record.shopping_goal.force_gear ~= true then
+		return false
+	end
+	return math.max(
+		0,
+		(tonumber(record.deaths) or 0)
+			- (tonumber(record.last_gear_purchase_deaths) or 0)
+	) >= 2
+end
+
 function XHSBotTeamDirector:IsShoppingGoalEligible(record, hero)
 	if type(record) ~= "table"
 		or type(record.shopping_goal) ~= "table"
@@ -958,15 +1084,46 @@ function XHSBotTeamDirector:IsShoppingGoalEligible(record, hero)
 		return false
 	end
 	local healthRatio = hero:GetHealth() / math.max(1, hero:GetMaxHealth())
+	local shopDistance = Distance2D(
+		hero:GetAbsOrigin(),
+		record.shopping_goal.anchor
+	)
 	-- An empty health reserve is a survival assignment, not a downtime purchase.
 	-- It bypasses both the normal health band and the combat target gate.
 	if record.shopping_goal.emergency_health_resupply == true then return true end
+	-- Reaching the final reincarnation charge turns the next death into
+	-- permanent elimination. Route it before ordinary lane pressure can consume
+	-- the registered hero handle for the rest of the run.
+	if record.shopping_goal.life_insurance == true then return true end
+	-- Two deaths without a gear purchase prove that the current loadout cannot
+	-- sustain its assignment. This is bounded by the normal shopper allowlist,
+	-- but combat/base pressure may no longer postpone it indefinitely.
+	if self:IsRecoveryGearShopping(record) then return true end
+	-- Heroes left outside a sealed optional arena have no combat assignment.
+	-- Ignore stale targets and urgency from the frozen wave, but never abandon
+	-- a real structure emergency or send a critically wounded hero travelling.
+	if self:IsStrategicShoppingDowntime(record.player_id, hero)
+		and record.base_structure_emergency ~= true
+		and healthRatio >= 0.35 then
+		return true
+	end
+	-- Buying while already inside the requested shop volume costs no lane travel.
+	-- In particular, a bot defending the castle must be allowed to spend between
+	-- attacks instead of carrying 50k through an endless death/respawn loop.
+	if shopDistance <= 850 then return true end
 	if record.shopping_goal.urgent == true then
 		if record.shopping_goal.force_home == true then return true end
-		local shopDistance = Distance2D(hero:GetAbsOrigin(), record.shopping_goal.anchor)
 		if healthRatio <= 0.60 or shopDistance <= 1200 then
 			return true
 		end
+	end
+	if record.shopping_goal.force_gear == true then
+		local safeToSpend = healthRatio >= 0.70
+			and record.was_in_active_danger ~= true
+			and (tonumber(record.combat_threat) or 0) <= 0.30
+			and (tonumber(record.base_threat_score) or 0) < 0.65
+			and (tonumber(record.assignment_urgency) or 0) < 0.90
+		if safeToSpend then return true end
 	end
 
 	-- Ordinary shopping remains a downtime action. Combat, current telegraphs
@@ -996,6 +1153,15 @@ function XHSBotTeamDirector:RefreshShoppingAllowlist(playerIDs)
 				urgent = record.shopping_goal.urgent == true,
 				emergency_health =
 					record.shopping_goal.emergency_health_resupply == true,
+				life_insurance =
+					record.shopping_goal.life_insurance == true,
+				in_shop_range = Distance2D(
+					hero:GetAbsOrigin(),
+					record.shopping_goal.anchor
+				) <= 850,
+				force_gear = record.shopping_goal.force_gear == true,
+				strategic_downtime =
+					self:IsStrategicShoppingDowntime(playerID, hero),
 				requested_at = tonumber(record.shopping_goal.requested_at) or math.huge,
 			})
 		end
@@ -1005,8 +1171,20 @@ function XHSBotTeamDirector:RefreshShoppingAllowlist(playerIDs)
 		if left.emergency_health ~= right.emergency_health then
 			return left.emergency_health
 		end
+		if left.life_insurance ~= right.life_insurance then
+			return left.life_insurance
+		end
+		if left.in_shop_range ~= right.in_shop_range then
+			return left.in_shop_range
+		end
+		if left.strategic_downtime ~= right.strategic_downtime then
+			return left.strategic_downtime
+		end
 		if left.urgent ~= right.urgent then
 			return left.urgent
+		end
+		if left.force_gear ~= right.force_gear then
+			return left.force_gear
 		end
 		if left.requested_at ~= right.requested_at then
 			return left.requested_at < right.requested_at
@@ -1024,9 +1202,12 @@ function XHSBotTeamDirector:RefreshShoppingAllowlist(playerIDs)
 	local ordinaryShoppers = 0
 	for _, candidate in ipairs(candidates) do
 		-- A concurrency cap is useful for planned gear trips, but limiting an
-		-- empty-potion emergency to one or two bots simply chooses which other
-		-- bots are allowed to die and consume Ankhs.
-		if candidate.emergency_health == true then
+		-- empty-potion emergency or final-Ankh replacement simply chooses which
+		-- other bots are allowed to disappear permanently.
+		if candidate.emergency_health == true
+			or candidate.life_insurance == true
+			or candidate.in_shop_range == true
+			or candidate.strategic_downtime == true then
 			self.shopping_allowed[candidate.player_id] = true
 		elseif ordinaryShoppers < maximumShoppers then
 			self.shopping_allowed[candidate.player_id] = true
@@ -1156,6 +1337,15 @@ function XHSBotTeamDirector:BuildAssignment(playerID, slot, phase, now, snapshot
 	end
 
 	local shoppingGoal = record and record.shopping_goal or nil
+	local campaignObjective = assignment.goal == nil
+		and XHSBotCampaignDirector ~= nil
+		and XHSBotCampaignDirector.GetObjective ~= nil
+		and XHSBotCampaignDirector:GetObjective(playerID, hero)
+		or nil
+	if campaignObjective ~= nil
+		and self:IsShoppingAssignmentAllowed(playerID, record, hero) then
+		campaignObjective = nil
+	end
 	local farmAnchor = assignment.goal == nil and self:GetFarmEventAnchor(playerID) or nil
 	if farmAnchor ~= nil then
 		-- FarmEvent is initiated by the game/human flow and creates a per-player
@@ -1168,6 +1358,18 @@ function XHSBotTeamDirector:BuildAssignment(playerID, slot, phase, now, snapshot
 		assignment.chase_radius = 1250
 		assignment.anchor_leash = 1400
 		assignment.label = "FARM EVENT (PASSIVE JOIN)"
+	elseif assignment.goal == nil and campaignObjective ~= nil then
+		assignment.goal = campaignObjective.goal
+		assignment.anchor = CopyPosition(campaignObjective.anchor)
+		assignment.target_entindex = campaignObjective.target_entindex
+		assignment.urgency = tonumber(campaignObjective.urgency) or 1
+		assignment.chase_radius = 4200
+		assignment.anchor_leash = 4600
+		assignment.reached_distance =
+			tonumber(campaignObjective.reached_distance) or 300
+		assignment.label = tostring(
+			campaignObjective.label or "ADVANCING CAMPAIGN"
+		)
 	elseif assignment.goal == nil
 		and self:IsShoppingAssignmentAllowed(playerID, record, hero) then
 		assignment.goal = "shop"
@@ -1175,17 +1377,60 @@ function XHSBotTeamDirector:BuildAssignment(playerID, slot, phase, now, snapshot
 		assignment.shopping_urgent = shoppingGoal.urgent == true
 		assignment.shopping_emergency_health_resupply =
 			shoppingGoal.emergency_health_resupply == true
+		assignment.shopping_life_insurance =
+			shoppingGoal.life_insurance == true
 		assignment.shopping_inventory_logistics = shoppingGoal.inventory_logistics == true
+		assignment.shopping_force_gear = shoppingGoal.force_gear == true
+		assignment.shopping_strategic_downtime =
+			self:IsStrategicShoppingDowntime(playerID, hero)
 		assignment.anchor = CopyPosition(shoppingGoal.anchor)
 		assignment.urgency =
 			shoppingGoal.emergency_health_resupply == true and 1
-			or shoppingGoal.urgent == true and 0.88 or 0.35
+			or shoppingGoal.life_insurance == true and 0.96
+			or shoppingGoal.urgent == true and 0.88
+			or shoppingGoal.force_gear == true and 0.72 or 0.35
 		assignment.chase_radius = 650
 		assignment.anchor_leash = 850
-		assignment.label = shoppingGoal.inventory_logistics == true
+		assignment.label = assignment.shopping_strategic_downtime == true
+			and "DOWNTIME SHOPPING: "
+				.. string.upper(tostring(shoppingGoal.item))
+			or shoppingGoal.inventory_logistics == true
 			and "COLLECTING STASH"
+			or shoppingGoal.life_insurance == true
+				and "REPLACING ANKH"
+			or shoppingGoal.force_gear == true
+				and "SPENDING EXCESS GOLD: "
+					.. string.upper(tostring(shoppingGoal.item))
 			or (shoppingGoal.urgent == true and "EMERGENCY RESTOCK: " or "SHOPPING: ")
 				.. string.upper(tostring(shoppingGoal.item))
+		if assignment.shopping_strategic_downtime == true then
+			local arenaTrigger = SpecialEvents ~= nil
+				and tonumber(SpecialEvents.Ramero_trigger) or 0
+			local arenaName = arenaTrigger == 1 and "ramero_baristol"
+				or arenaTrigger == 2 and "sogat"
+				or GameMode ~= nil and GameMode.Muradin_occuring == true
+					and "muradin" or "optional_event"
+			local preparationSignature = tostring(arenaName)
+				.. ":" .. tostring(shoppingGoal.item)
+			if record.arena_downtime_shop_signature
+				~= preparationSignature then
+				record.arena_downtime_shop_signature =
+					preparationSignature
+				record.arena_downtime_shop_count =
+					(record.arena_downtime_shop_count or 0) + 1
+				if XHSBotDecisionAudit ~= nil
+					and XHSBotDecisionAudit.RecordArenaPreparation ~= nil then
+					XHSBotDecisionAudit:RecordArenaPreparation(
+						playerID,
+						"downtime_shopper",
+						arenaName,
+						"assigned",
+						record,
+						0
+					)
+				end
+			end
+		end
 	elseif assignment.goal ~= nil then
 		-- Selecting/dead assignments intentionally do not consume a lane load.
 	elseif phase == 1 or phase == 2 then
@@ -1287,12 +1532,28 @@ function XHSBotTeamDirector:BuildAssignment(playerID, slot, phase, now, snapshot
 	)
 	local structureEmergencyOrCapable =
 		structureEmergency or canRespondToStructure
+	-- An empty/critical potion reserve is already the result of failed
+	-- sustain. Sending that hero back into a structure defence merely burns
+	-- Ankhs and delays the same mandatory trip. Other selected responders hold
+	-- the base while this bot completes its short resupply route.
 	local preserveEmergencyShopping = emergencyHealthShopping
-		and not canRespondToStructure
+	local preserveStrategicDowntimeShopping = assignment.goal == "shop"
+		and assignment.shopping_strategic_downtime == true
+		and not structureEmergency
+	local preserveRecoveryGearShopping = assignment.goal == "shop"
+		and self:IsRecoveryGearShopping(record)
+	local selectedBaseResponder =
+		self:IsSelectedBaseResponder(snapshot, playerID)
+	local campaignControls = campaignObjective ~= nil
+		and string.find(tostring(assignment.goal), "^campaign_") ~= nil
 	if IsValidEntityHandle(hero) and hero:IsAlive()
 		and baseThreat ~= nil and baseThreat.active == true
 		and baseThreat.response_required == true
+		and selectedBaseResponder
 		and not preserveEmergencyShopping
+		and not preserveRecoveryGearShopping
+		and not preserveStrategicDowntimeShopping
+		and (not campaignControls or structureEmergency)
 		and (not structureEmergency or canRespondToStructure) then
 		assignment.goal = "defend_base"
 		assignment.anchor = CopyPosition(baseThreat.anchor)
@@ -1319,8 +1580,10 @@ function XHSBotTeamDirector:BuildAssignment(playerID, slot, phase, now, snapshot
 	end
 
 	if IsValidEntityHandle(hero) and hero:IsAlive()
-		and CustomTimers ~= nil and CustomTimers.proc_final_wave == true
-		and not emergencyHealthShopping then
+		and IsFinalWaveCombatActive()
+		and not emergencyHealthShopping
+		and not preserveRecoveryGearShopping
+		and not campaignControls then
 		local fort = GetFort()
 		assignment.goal = "defend_base"
 		assignment.anchor = IsValidEntityHandle(fort) and fort:GetAbsOrigin() or assignment.anchor
@@ -1379,6 +1642,7 @@ function XHSBotTeamDirector:BuildAssignment(playerID, slot, phase, now, snapshot
 		record.base_threat_active = baseThreat and baseThreat.active == true or false
 		record.base_response_required = baseThreat
 			and baseThreat.response_required == true or false
+		record.base_response_selected = selectedBaseResponder == true
 		record.base_threat_count = baseThreat and baseThreat.threat_count or 0
 		record.base_special_count = baseThreat and baseThreat.special_count or 0
 		record.base_dragon_count = baseThreat and baseThreat.dragon_count or 0
@@ -1421,12 +1685,30 @@ function XHSBotTeamDirector:ShouldReplaceAssignment(existing, phase, now, snapsh
 		and snapshot.base_threat.response_required == true
 	local structureEmergency = baseResponseRequired
 		and snapshot.base_threat.structure_emergency == true
-	local finalWaveActive = CustomTimers ~= nil and CustomTimers.proc_final_wave == true
+	local finalWaveActive = IsFinalWaveCombatActive()
 	local forcedGoal = record and record.forced_goal or nil
 	local emergencyShoppingActive = record ~= nil
 		and type(record.shopping_goal) == "table"
 		and record.shopping_goal.emergency_health_resupply == true
 		and self:IsShoppingAssignmentAllowed(record.player_id, record, hero)
+	local recoveryGearShoppingActive = record ~= nil
+		and self:IsRecoveryGearShopping(record)
+		and self:IsShoppingAssignmentAllowed(record.player_id, record, hero)
+	local campaignObjective = XHSBotCampaignDirector ~= nil
+		and XHSBotCampaignDirector.GetObjective ~= nil
+		and XHSBotCampaignDirector:GetObjective(
+			record and record.player_id or -1,
+			hero
+		) or nil
+	local campaignShoppingAllowed =
+		self:IsShoppingAssignmentAllowed(
+			record and record.player_id,
+			record,
+			hero
+		)
+	local campaignGoal = type(campaignObjective) == "table"
+		and campaignObjective.goal or nil
+	if campaignShoppingAllowed then campaignGoal = nil end
 	local profile = IsValidEntityHandle(hero)
 		and XHSBotHeroProfiles:Get(hero:GetUnitName()) or nil
 	local canRespondToStructure = structureEmergency
@@ -1436,15 +1718,28 @@ function XHSBotTeamDirector:ShouldReplaceAssignment(existing, phase, now, snapsh
 			snapshot.base_threat
 		)
 	local preserveEmergencyShopping = emergencyShoppingActive
-		and not canRespondToStructure
+	local strategicDowntimeShoppingActive = existing.goal == "shop"
+		and self:IsStrategicShoppingDowntime(
+			record and record.player_id or -1,
+			hero
+		)
+		and not structureEmergency
 	local baseThreatControls = baseResponseRequired
+		and self:IsSelectedBaseResponder(
+			snapshot,
+			record and record.player_id or -1
+		)
 		and not preserveEmergencyShopping
+		and not recoveryGearShoppingActive
+		and not strategicDowntimeShoppingActive
 		and (not structureEmergency or canRespondToStructure)
 		and forcedGoal == nil
 		and IsValidEntityHandle(hero)
 		and hero:IsAlive()
 	if baseThreatControls and existing.goal ~= "defend_base" then return true end
-	if not baseThreatControls and not finalWaveActive and forcedGoal ~= "defend_base"
+	if not baseThreatControls
+		and (not finalWaveActive or campaignGoal ~= nil)
+		and forcedGoal ~= "defend_base"
 		and existing.goal == "defend_base" then
 		return true
 	end
@@ -1453,7 +1748,14 @@ function XHSBotTeamDirector:ShouldReplaceAssignment(existing, phase, now, snapsh
 		and farmEventActive ~= (existing.goal == "participate_event") then
 		return true
 	end
-	if finalWaveActive and not emergencyShoppingActive
+	if campaignGoal ~= nil and existing.goal ~= campaignGoal then return true end
+	if campaignGoal == nil
+		and string.find(tostring(existing.goal or ""), "^campaign_") ~= nil then
+		return true
+	end
+	if finalWaveActive and campaignGoal == nil
+		and not emergencyShoppingActive
+		and not recoveryGearShoppingActive
 		and existing.goal ~= "defend_base" then
 		return true
 	end
@@ -1463,18 +1765,20 @@ function XHSBotTeamDirector:ShouldReplaceAssignment(existing, phase, now, snapsh
 		return true
 	end
 
-	local shoppingAllowed =
-		self:IsShoppingAssignmentAllowed(record and record.player_id, record, hero)
+	local shoppingAllowed = campaignShoppingAllowed
 	local shoppingActive = not farmEventActive
+		and campaignGoal == nil
 		and forcedGoal == nil
 		and not baseThreatControls
 		and shoppingAllowed
 		and (emergencyShoppingActive
+			or recoveryGearShoppingActive
 			or not finalWaveActive and not baseResponseRequired)
 	if shoppingActive ~= (existing.goal == "shop") then return true end
 	if shoppingActive and existing.shopping_item ~= record.shopping_goal.item then return true end
 
-	if phase == 3 and not farmEventActive and not finalWaveActive
+	if phase == 3 and campaignGoal == nil
+		and not farmEventActive and not finalWaveActive
 		and not baseResponseRequired and forcedGoal == nil
 		and not shoppingActive then
 		local bossVisible = IsValidEntityHandle(self.visible_boss)
@@ -1532,6 +1836,8 @@ function XHSBotTeamDirector:Update(force)
 	self.next_update = now + replanInterval
 
 	local snapshot = self:BuildStrategicSnapshot(phase)
+	snapshot.base_responder_ids, snapshot.base_responder_count =
+		self:SelectBaseResponders(ids, snapshot)
 	for _, playerID in ipairs(ids) do
 		local record = XHSBotPlayerRegistry:GetBot(playerID)
 		if record ~= nil then
@@ -1539,6 +1845,10 @@ function XHSBotTeamDirector:Update(force)
 			record.base_threat_active = snapshot.base_threat.active == true
 			record.base_response_required =
 				snapshot.base_threat.response_required == true
+			record.base_response_selected =
+				snapshot.base_responder_ids[playerID] == true
+			record.base_responder_count =
+				tonumber(snapshot.base_responder_count) or 0
 			record.base_threat_count = snapshot.base_threat.threat_count or 0
 			record.base_special_count = snapshot.base_threat.special_count or 0
 			record.base_dragon_count = snapshot.base_threat.dragon_count or 0

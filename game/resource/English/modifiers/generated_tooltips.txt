@@ -327,11 +327,9 @@
 "DOTA_Tooltip_modifier_orb_of_earth"		"Orb of Earth"
 "DOTA_Tooltip_modifier_orb_of_earth_Description"		"Attack damage: %dMODIFIER_PROPERTY_PREATTACK_BONUS_DAMAGE%."
 "DOTA_Tooltip_modifier_orb_of_wind_active"		"Orb of Wind"
-"DOTA_Tooltip_modifier_orb_of_wind_active_Description"		"Wind Orb is enabled. Evading attacks can trigger Zephyr and Tempest Guard."
+"DOTA_Tooltip_modifier_orb_of_wind_active_Description"		"Wind Orb is enabled. Evading attacks triggers Zephyr; Tempest Aegis also adds Tempest Guard's damage reduction to the same buff."
 "DOTA_Tooltip_modifier_orb_of_wind_zephyr"		"Zephyr"
-"DOTA_Tooltip_modifier_orb_of_wind_zephyr_Description"		"Move speed: %dMODIFIER_PROPERTY_MOVESPEED_BONUS_PERCENTAGE%%%."
-"DOTA_Tooltip_modifier_orb_of_wind_guard"		"Tempest Guard"
-"DOTA_Tooltip_modifier_orb_of_wind_guard_Description"		"Damage taken: %dMODIFIER_PROPERTY_INCOMING_DAMAGE_PERCENTAGE%%%."
+"DOTA_Tooltip_modifier_orb_of_wind_zephyr_Description"		"Move speed: %dMODIFIER_PROPERTY_MOVESPEED_BONUS_PERCENTAGE%%%. Damage taken: %dMODIFIER_PROPERTY_INCOMING_DAMAGE_PERCENTAGE%%%."
 "DOTA_Tooltip_modifier_xhs_brewmaster_drunken_haze_burn"		"Burn!"
 "DOTA_Tooltip_modifier_xhs_brewmaster_drunken_haze_burn_Description"		"Taking periodic damage."
 "DOTA_Tooltip_modifier_xhs_brewmaster_drunken_haze_debuff"		"Drunken Haze"
@@ -382,3 +380,7 @@
 "DOTA_Tooltip_modifier_xhs_spiked_carapace_active_Description"		"Incoming damage is reduced. Every third attack received releases an area spike pulse."
 "DOTA_Tooltip_modifier_xhs_frenzy_of_the_hive"		"Frenzy of the Hive"
 "DOTA_Tooltip_modifier_xhs_frenzy_of_the_hive_Description"		"Attack and movement speed are increased."
+
+// Rifleman Bloodlust
+"DOTA_Tooltip_modifier_rifleman_bloodlust"		"Bloodlust"
+"DOTA_Tooltip_modifier_rifleman_bloodlust_Description"		"Movement speed: %dMODIFIER_PROPERTY_MOVESPEED_BONUS_PERCENTAGE%%%. Attack speed: %dMODIFIER_PROPERTY_ATTACKSPEED_BONUS_CONSTANT%. Outgoing attack damage: %dMODIFIER_PROPERTY_BASEDAMAGEOUTGOING_PERCENTAGE%%%."

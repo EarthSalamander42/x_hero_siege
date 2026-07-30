@@ -488,6 +488,7 @@ function CDOTA_BaseNPC:IncrementAttributes(amount, options)
 		or "particles/generic_hero_status/hero_levelup.vpcf"
 	local particle1 = ParticleManager:CreateParticle(levelupParticle, PATTACH_ABSORIGIN_FOLLOW, self)
 	ParticleManager:SetParticleControl(particle1, 0, self:GetAbsOrigin())
+	XHSDestroyParticleAfter(particle1, 5.0, false)
 
 	if playSound == true then
 		self:EmitSound("ui.trophy_levelup")

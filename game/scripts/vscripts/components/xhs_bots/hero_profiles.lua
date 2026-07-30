@@ -426,6 +426,11 @@ local PROFILE_BY_HERO = {
 		retreat_health = 0.24,
 		target_priority = { "caster", "boss", "nearest" },
 		item_affinities = ITEM_AFFINITIES.npc_dota_hero_elder_titan,
+		redundant_items = {
+			-- Chieftain wants enemies hittable; an ethereal target works
+			-- against his physical frontline/control job.
+			item_staff_of_mastery = true,
+		},
 		skill_build = {
 			"holdout_lightning_stroke",
 			"holdout_pulverize",

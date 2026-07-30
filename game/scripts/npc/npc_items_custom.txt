@@ -1574,6 +1574,7 @@
 		// General
 		//-------------------------------------------------------------------------------------------------------------
 		"BaseClass"						"item_lua"
+		"AllowedInBackpack"				"0"
 		"ScriptFile"					"items/item_orb_of_wind.lua"
 		"ID"							"2523"
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET"
@@ -1615,6 +1616,7 @@
 	"item_zephyr_gem"
 	{
 		"BaseClass"						"item_lua"
+		"AllowedInBackpack"				"0"
 		"ScriptFile"					"items/item_orb_of_wind.lua"
 		"ID"							"2552"
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET"
@@ -1670,6 +1672,7 @@
 	"item_tempest_aegis"
 	{
 		"BaseClass"						"item_lua"
+		"AllowedInBackpack"				"0"
 		"ScriptFile"					"items/item_orb_of_wind.lua"
 		"ID"							"2554"
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET"
@@ -1688,7 +1691,6 @@
 		"SecretShop"					"1"
 		"ItemBaseLevel"					"3"
 		"MaxUpgradeLevel"				"3"
-		"AllowedInBackpack"				"0"
 
 		"AbilityValues"
 		{

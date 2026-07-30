@@ -87,6 +87,9 @@ function modifier_healing_ward_datadriven:OnCreated()
 	self.regenFlat = tonumber(self.regenFlat)
 	self.regenPct = tonumber(self.regenPct)
 	self.effectiveRegen = tonumber(self.effectiveRegen)
+	if self.isStrongestSource == nil then
+		self.isStrongestSource = true
+	end
 
 	if not IsServer() then
 		if (self.regenFlat or 0) <= 0 or (self.regenPct or 0) <= 0 then
@@ -124,6 +127,7 @@ function modifier_healing_ward_datadriven:AddCustomTransmitterData()
 		regen_flat = self.regenFlat or 0,
 		regen_pct = self.regenPct or 0,
 		effective_regen = self.effectiveRegen or 0,
+		is_strongest = self.isStrongestSource == false and 0 or 1,
 	}
 end
 
@@ -131,6 +135,7 @@ function modifier_healing_ward_datadriven:HandleCustomTransmitterData(data)
 	self.regenFlat = tonumber(data.regen_flat) or 0
 	self.regenPct = tonumber(data.regen_pct) or 0
 	self.effectiveRegen = tonumber(data.effective_regen) or 0
+	self.isStrongestSource = tonumber(data.is_strongest) ~= 0
 	if self.effectiveRegen <= 0 and (self.regenFlat > 0 or self.regenPct > 0) then
 		self.effectiveRegen = self:CalculateEffectiveRegeneration()
 	end
@@ -145,11 +150,21 @@ function modifier_healing_ward_datadriven:RefreshClientRegeneration(force)
 	if not IsServer() then return end
 
 	local effective = self:CalculateEffectiveRegeneration()
-	if force ~= true and math.abs(effective - (self.effectiveRegen or 0)) < 0.01 then return end
+	local isStrongest = self:ComputeIsStrongestSource()
+	local strongestChanged = isStrongest ~= self.isStrongestSource
+	if force ~= true
+		and not strongestChanged
+		and math.abs(effective - (self.effectiveRegen or 0)) < 0.01 then
+		return
+	end
 
 	self.effectiveRegen = effective
+	self.isStrongestSource = isStrongest
 	self:SendBuffRefreshToClients()
-	self:GetParent():CalculateStatBonus(true)
+	local parent = self:GetParent()
+	if parent ~= nil and parent.CalculateStatBonus ~= nil then
+		parent:CalculateStatBonus(true)
+	end
 end
 
 function modifier_healing_ward_datadriven:OnIntervalThink()
@@ -177,8 +192,9 @@ function modifier_healing_ward_datadriven:GetEffectiveRegeneration()
 	return self:CalculateEffectiveRegeneration()
 end
 
-function modifier_healing_ward_datadriven:IsStrongestSource()
+function modifier_healing_ward_datadriven:ComputeIsStrongestSource()
 	local parent = self:GetParent()
+	if parent == nil or parent.FindAllModifiers == nil then return true end
 	local modifiers = {}
 	for _, modifier in pairs(parent:FindAllModifiers() or {}) do
 		local modifierName = modifier:GetName()
@@ -204,6 +220,17 @@ function modifier_healing_ward_datadriven:IsStrongestSource()
 	end
 
 	return best == self
+end
+
+function modifier_healing_ward_datadriven:IsStrongestSource()
+	-- FindAllModifiers is server-only. Property and tooltip callbacks also run
+	-- in the client VM, where the server's transmitted winner is authoritative.
+	if not IsServer() then
+		return self.isStrongestSource ~= false
+	end
+
+	self.isStrongestSource = self:ComputeIsStrongestSource()
+	return self.isStrongestSource
 end
 
 function modifier_healing_ward_datadriven:DeclareFunctions()

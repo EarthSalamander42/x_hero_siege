@@ -792,6 +792,18 @@ ListenToGameEvent('dota_player_gained_level', function(keys)
 
 	if hero:GetUnitName() == "npc_dota_hero_sniper" then
 		if hero_level == 20 then
+			local rocket_launcher = hero:FindAbilityByName("holdout_rocket_launcher")
+			local plasma_rifle = hero:FindAbilityByName("holdout_plasma_rifle")
+
+			if rocket_launcher ~= nil and not rocket_launcher:IsNull() and rocket_launcher:GetToggleState() then
+				rocket_launcher:ToggleAbility()
+			end
+			if plasma_rifle ~= nil and not plasma_rifle:IsNull() and plasma_rifle:GetToggleState() then
+				plasma_rifle:ToggleAbility()
+			end
+
+			hero:RemoveModifierByName("modifier_rocket_launcher")
+			hero:RemoveModifierByName("modifier_plasma_rifle")
 			hero:RemoveAbility("holdout_rocket_launcher")
 			hero:RemoveAbility("holdout_plasma_rifle")
 		end
@@ -999,7 +1011,13 @@ ListenToGameEvent("player_chat", function(keys)
 						local hero = PlayerResource:GetPlayer(Frozen):GetAssignedHero()
 						hero:AddNewModifier(hero, nil, "modifier_pause_creeps", {})
 						hero:AddNewModifier(hero, nil, "modifier_invulnerable", {})
-						PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(), hero)
+						CameraMotion:Follow(hero:GetPlayerOwnerID(), hero, {
+							from = hero,
+							duration = 0,
+							owner = "admin_freeze",
+							priority = 200,
+							policy = "replace",
+						})
 						Notifications:TopToAll({
 							duration = 6.0,
 							segments = {
@@ -1015,7 +1033,11 @@ ListenToGameEvent("player_chat", function(keys)
 						hero:RemoveModifierByName("modifier_pause_creeps")
 						hero:RemoveModifierByName("modifier_invulnerable")
 						hero:RemoveModifierByName("modifier_command_restricted")
-						PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(), nil)
+						CameraMotion:Release(hero:GetPlayerOwnerID(), {
+							owner = "admin_freeze",
+							mode = "free",
+							reason = "admin freeze ended",
+						})
 						Notifications:TopToAll({
 							duration = 6.0,
 							segments = {
@@ -2079,13 +2101,54 @@ function GameMode:OnQuestFocusRequested(_, event)
 	end
 
 	if targetUnit ~= nil then
-		CustomGameEventManager:Send_ServerToPlayer(player, "set_player_camera", {
-			hPosition = targetUnit:GetAbsOrigin(),
-			iSpeed = 0.55,
-			return_to_hero_after = 2.25,
-			return_speed = 0.65,
+		CameraMotion:Sequence(playerID, {
+			{
+				type = "move",
+				to = targetUnit,
+				from = playerHero,
+				duration = 0.55,
+				easing = "smootherstep",
+			},
+			{ type = "hold", duration = 1.70 },
+			{
+				type = "return",
+				to = function()
+					return PlayerResource:GetSelectedHeroEntity(playerID)
+				end,
+				duration = 0.65,
+				easing = "smootherstep",
+			},
+			{ type = "release", mode = "free" },
+		}, {
+			owner = "quest_focus:" .. tostring(questName),
+			priority = 10,
+			policy = "replace",
 		})
 	end
+end
+
+function GameMode:OnCameraFocusEntityRequested(_, event)
+	local playerID = event and tonumber(event.PlayerID) or -1
+	local entIndex = event and math.floor(tonumber(event.entindex) or -1) or -1
+	if playerID < 0 or entIndex <= 0 or CameraMotion == nil then return end
+	if not PlayerResource:IsValidPlayerID(playerID) or PlayerResource:GetPlayer(playerID) == nil then return end
+
+	local target = EntIndexToHScript(entIndex)
+	if target == nil or not IsValidEntity(target) or target:IsNull() or target.GetAbsOrigin == nil then return end
+
+	CameraMotion:Move(playerID, target, {
+		from = PlayerResource:GetSelectedHeroEntity(playerID),
+		duration = 0.4,
+		easing = "smootherstep",
+		owner = "manual_entity_focus",
+		priority = 10,
+		policy = "replace",
+		-- This is a user-initiated move from a freely panned client camera.
+		-- Always wait for the fresh client look-at handshake, even if another
+		-- camera request still considers its dummy captured.
+		origin_mode = "provider",
+		release = "free",
+	})
 end
 
 ---------------------------------------------------------

@@ -9,6 +9,32 @@ let adsDismissedThisSession = false;
 let adsForceOpened = false;
 let adsLastSentHidden = null;
 
+function IsAdsLocalSpectator() {
+	if (typeof Players === "undefined" || !Players.GetLocalPlayer || !Players.GetTeam) {
+		return false;
+	}
+
+	const playerID = Players.GetLocalPlayer();
+	if (playerID < 0) {
+		return false;
+	}
+
+	// DOTA_TEAM_NOTEAM (1) is the spectator team in custom games.
+	return Number(Players.GetTeam(playerID)) === 1;
+}
+
+function EnforceAdsTeamVisibility() {
+	const spectator = IsAdsLocalSpectator();
+	FIX_CG_ROOT.SetHasClass("XHSSpectatorHidden", spectator);
+
+	if (spectator) {
+		adsForceOpened = false;
+		FIX_CG_ROOT.SetHasClass("show", false);
+	}
+
+	return spectator;
+}
+
 function GetAdsConfig() {
 	if (typeof GameUI !== "undefined" && GameUI.CustomUIConfig) {
 		return GameUI.CustomUIConfig();
@@ -187,6 +213,10 @@ function SetAdsCheckboxChecked(value) {
 }
 
 function SetAdsPanelVisible(forceShow) {
+	if (EnforceAdsTeamVisibility()) {
+		return;
+	}
+
 	if (forceShow !== true && (adsDoNotShowAgain || GetResolvedAdsHiddenPreference() || adsDismissedThisSession)) {
 		FIX_CG_ROOT.SetHasClass("show", false);
 		return;
@@ -201,6 +231,10 @@ function OpenFixGame() {
 }
 
 function OpenXHSIngameAdvertize() {
+	if (EnforceAdsTeamVisibility()) {
+		return;
+	}
+
 	adsForceOpened = true;
 	adsDoNotShowAgain = GetResolvedAdsHiddenPreference();
 	SetAdsCheckboxChecked(adsDoNotShowAgain);
@@ -208,7 +242,7 @@ function OpenXHSIngameAdvertize() {
 }
 
 function IsXHSIngameAdvertizeOpen() {
-	return FIX_CG_ROOT && FIX_CG_ROOT.BHasClass && FIX_CG_ROOT.BHasClass("show");
+	return !IsAdsLocalSpectator() && FIX_CG_ROOT && FIX_CG_ROOT.BHasClass && FIX_CG_ROOT.BHasClass("show");
 }
 
 function HideXHSIngameAdvertizeToggle() {
@@ -256,7 +290,7 @@ function ApplyAdsBackendPreference(data) {
 	StoreAdsHidden(adsDoNotShowAgain, false);
 
 	if (adsForceOpened) {
-		FIX_CG_ROOT.SetHasClass("show", true);
+		SetAdsPanelVisible(true);
 		return;
 	}
 
@@ -326,4 +360,9 @@ function OpenAdsDiscord() {
 			});
 		}
 	});
+
+	(function WatchAdsTeam() {
+		EnforceAdsTeamVisibility();
+		$.Schedule(1.0, WatchAdsTeam);
+	})();
 })();

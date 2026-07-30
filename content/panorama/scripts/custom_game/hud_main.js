@@ -947,7 +947,6 @@ SetPlayersCameraPosition({
 })
 */
 
-var XHSCameraMoveSequence = 0;
 var XHSHeroSelectionHealthFrameHidden = false;
 var XHSHeroSelectionHealthPanels = [];
 
@@ -1032,68 +1031,9 @@ function SetXHSHeroSelectionTransition( data )
 	}
 }
 
-function SetPlayersCameraPosition(keys) {
-	if (!keys.iSpeed)
-		keys.iSpeed = 2.0;
-
-	if (!keys.hPosition) {
-		$.Msg("ERROR: MISSING CAMERA POSITION!!")
-		return;
-	}
-
-//	if (keys && keys.bStopLoop) {
-
-//		return;
-//	} else {
-		if (keys && keys.hPosition) {
-			keys.hPosition = keys.hPosition.split(" ");
-			var targetPosition = [keys.hPosition[0], keys.hPosition[1], keys.hPosition[2]];
-			var cinematicConfig = GameUI.CustomUIConfig ? GameUI.CustomUIConfig() : null;
-			var cinematicApi = cinematicConfig && cinematicConfig.XHSCinematics;
-			var cinematicActive = cinematicApi
-				&& cinematicApi.isActive
-				&& cinematicApi.isActive();
-			// A cinematic owns the camera until it ends. Teleports, quest focus
-			// returns and other legacy camera events must not replace its boss
-			// target with the local hero or an arena arrival point.
-			if (!cinematicActive) {
-				GameUI.SetCameraTargetPosition(targetPosition, keys.iSpeed);
-			}
-			var sequence = ++XHSCameraMoveSequence;
-			var returnDelay = Number(keys.return_to_hero_after) || 0;
-			if (returnDelay > 0) {
-				$.Schedule(returnDelay, function () {
-					if (sequence !== XHSCameraMoveSequence) {
-						return;
-					}
-
-					var hero = Players.GetPlayerHeroEntityIndex(Players.GetLocalPlayer());
-					if (hero === -1) {
-						return;
-					}
-
-					var heroPosition = Entities.GetAbsOrigin(hero);
-					if (heroPosition) {
-						var cinematicStillActive = cinematicApi
-							&& cinematicApi.isActive
-							&& cinematicApi.isActive();
-						if (!cinematicStillActive) {
-							GameUI.SetCameraTargetPosition(heroPosition, Number(keys.return_speed) || 0.65);
-						}
-					}
-				});
-			}
-//			$.Schedule(0.03, function() {
-//				SetPlayersCameraPosition(keys);
-//			});
-		}
-//	}
-}
-
 (function(){
 	GameEvents.Subscribe("hide_ui", HideUI);
 	GameEvents.Subscribe("dotacraft_error_message", CreateErrorMessage)
-	GameEvents.Subscribe("set_player_camera", SetPlayersCameraPosition)
 	GameEvents.Subscribe("xhs_hero_selection_transition", SetXHSHeroSelectionTransition)
 	var tomeButton = GetXHSBuyTomeButton();
 	if ( tomeButton )

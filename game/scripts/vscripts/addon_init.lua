@@ -14,6 +14,9 @@ if IsClient() then
 	LinkLuaModifier("modifier_orb_of_arcane", "items/item_orb_of_arcane.lua", LUA_MODIFIER_MOTION_NONE)
 	LinkLuaModifier("modifier_orb_of_arcane_active", "items/item_orb_of_arcane.lua", LUA_MODIFIER_MOTION_NONE)
 	LinkLuaModifier("modifier_orb_of_arcane_exposure", "items/item_orb_of_arcane.lua", LUA_MODIFIER_MOTION_NONE)
+	LinkLuaModifier("modifier_orb_of_lightning_active", "items/item_orb_of_lightning.lua", LUA_MODIFIER_MOTION_NONE)
+	LinkLuaModifier("modifier_orb_of_lightning_passive", "items/item_orb_of_lightning.lua", LUA_MODIFIER_MOTION_NONE)
+	LinkLuaModifier("modifier_orb_of_lightning_purge", "items/item_orb_of_lightning.lua", LUA_MODIFIER_MOTION_NONE)
 
 	local xhsRuneModifierScript = "components/runes/modifiers.lua"
 	LinkLuaModifier("modifier_xhs_rune_healing", xhsRuneModifierScript, LUA_MODIFIER_MOTION_NONE)

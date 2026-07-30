@@ -24,6 +24,7 @@
 		"fragment_quests",
 		"custom_polls",
 		"xhs_quest_state",
+		"xhs_phase_one_spawn_budget",
 		"xhs_devtools",
 		"xhs_bots",
 		"vips",

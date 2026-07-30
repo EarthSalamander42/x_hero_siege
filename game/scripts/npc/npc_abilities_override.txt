@@ -807,61 +807,6 @@
 	}
 
 	//=================================================================================================================
-	// Ogre Magi: Bloodlust
-	//=================================================================================================================
-	"ogre_magi_bloodlust"
-	{
-		// Casting
-		//-------------------------------------------------------------------------------------------------------------
-		"AbilityCastRange"				"600"
-		"AbilityCastPoint"				"0.45"
-		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_UNIT_TARGET"
-		"MaxLevel"						"1"
-		"AbilityTextureName"			"custom/ogre_magi_bloodlust"
-		
-		// Time		
-		//-------------------------------------------------------------------------------------------------------------
-		"AbilityCooldown"				"25"
-
-		// Cost
-		//-------------------------------------------------------------------------------------------------------------
-		"AbilityManaCost"				"50"
-
-		// Special
-		//-------------------------------------------------------------------------------------------------------------
-		"AbilitySpecial"
-		{
-			"01"
-			{
-				"var_type"			"FIELD_FLOAT"
-				"modelscale"		"30"
-			}	
-			"02"
-			{
-				"var_type"				"FIELD_INTEGER"
-				"bonus_movement_speed"		"20"
-			}
-			"03"
-			{
-				"var_type"				"FIELD_INTEGER"
-				"bonus_attack_speed"	"60"
-				"LinkedSpecialBonus"	"special_bonus_unique_ogre_magi"
-			}
-			"04"
-			{
-				"var_type"				"FIELD_INTEGER"
-				"self_bonus"			"60"
-				"LinkedSpecialBonus"	"special_bonus_unique_ogre_magi"
-			}
-			"05"
-			{
-				"var_type"				"FIELD_FLOAT"
-				"duration"				"20"
-			}
-		}
-	}
-
-	//=================================================================================================================
 	// Centurion: Necromastery
 	//=================================================================================================================
 	"nevermore_necromastery"

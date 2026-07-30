@@ -10,6 +10,22 @@ local MANA_POTION_BURST = "particles/items3_fx/mango_active.vpcf"
 local LIGHT_POTION_BURST = "particles/items2_fx/mekanism.vpcf"
 local POTION_PARTICLE_LIFETIME = 1.5
 
+local POTION_WORLD_CP_PROFILES = {
+	["particles/econ/items/necrolyte/necronub_death_pulse/necrolyte_pulse_ka_friend.vpcf"] = {
+		0,
+		1,
+	},
+	["particles/units/heroes/hero_oracle/oracle_scepter_rain_of_destiny_heal_motes_cast.vpcf"] = {
+		0,
+		2,
+	},
+	["particles/units/heroes/hero_keeper_of_the_light/keeper_mana_leak_impact.vpcf"] = {
+		0,
+		1,
+		2,
+	},
+}
+
 local POTION_CHANNEL_ALLOWLIST = {
 	health = {
 		["particles/econ/events/ti7/bottle_ti7.vpcf"] = true,
@@ -79,14 +95,22 @@ end
 local function PlayParticle(hero, particlePath, lifetime)
 	if not IsValidEntity(hero) or not IsParticlePath(particlePath) then return nil end
 
+	local origin = hero:GetAbsOrigin()
+	local worldControlPoints = POTION_WORLD_CP_PROFILES[string.lower(particlePath)]
 	local particle = ParticleManager:CreateParticle(
 		particlePath,
-		PATTACH_ABSORIGIN_FOLLOW,
-		hero
+		worldControlPoints ~= nil and PATTACH_WORLDORIGIN or PATTACH_ABSORIGIN_FOLLOW,
+		worldControlPoints ~= nil and nil or hero
 	)
 	if particle == nil or particle < 0 then return nil end
 
-	ParticleManager:SetParticleControl(particle, 0, hero:GetAbsOrigin())
+	if worldControlPoints ~= nil then
+		for _, controlPoint in ipairs(worldControlPoints) do
+			ParticleManager:SetParticleControl(particle, controlPoint, origin)
+		end
+	else
+		ParticleManager:SetParticleControl(particle, 0, origin)
+	end
 	if lifetime ~= nil and lifetime > 0 and Timers ~= nil then
 		Timers:CreateTimer(lifetime, function()
 			ParticleManager:DestroyParticle(particle, false)

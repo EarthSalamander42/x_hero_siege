@@ -392,7 +392,7 @@ var XHSSupporterPass = (function () {
 	function GetRewardComposition(item) {
 		var type = NormalizeRewardType(item && (item.type || item.item_type || item.slot_id));
 		if (type === "Potion FX") {
-			return Text("xhs_sp_composition_potion", "Health + Mana");
+			return Text("xhs_sp_composition_potion", "Health + Mana + Light");
 		}
 		if (type === "Immolation") {
 			return Text("xhs_sp_composition_immolation", "Owner + Targets");

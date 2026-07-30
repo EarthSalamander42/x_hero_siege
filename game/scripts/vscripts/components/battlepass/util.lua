@@ -127,19 +127,16 @@ function Battlepass:ApplySupporterTag(hero, enabled)
 end
 
 function CDOTA_BaseNPC:CenterCameraOnEntity(hTarget, iDuration)
-	PlayerResource:SetCameraTarget(self:GetPlayerID(), hTarget)
 	if iDuration == nil then iDuration = FrameTime() end
-	if iDuration ~= -1 then
-		Timers:CreateTimer(iDuration, function()
-			PlayerResource:SetCameraTarget(self:GetPlayerID(), nil)
-			Timers:CreateTimer(FrameTime(), function() --fail-safe
-				PlayerResource:SetCameraTarget(self:GetPlayerID(), nil)
-			end)
-			Timers:CreateTimer(FrameTime() * 3, function() --fail-safe
-				PlayerResource:SetCameraTarget(self:GetPlayerID(), nil)
-			end)
-		end)
-	end
+	CameraMotion:Follow(self:GetPlayerID(), hTarget, {
+		from = self,
+		duration = 0,
+		lock_duration = iDuration ~= -1 and math.max(0, iDuration) or nil,
+		owner = "center_camera_on_entity",
+		priority = 30,
+		policy = "replace",
+		release = iDuration ~= -1 and "free" or nil,
+	})
 end
 
 function Battlepass:ToggleDonatorTag(event_source_index, event)
@@ -1232,11 +1229,10 @@ function Battlepass:ApplySupporterDevTestItem(playerID, state, hero, reapply)
 		return true
 	end
 
-	local function NotifyPotionChannel(channel, index)
+	local function NotifyPotionChannel(channel)
 		local payload = {
 			text = string.format(
-				"[Battle Pass] Potion %d/3 - %s - %s (#%s)",
-				index,
+				"[Battle Pass] %s POTION - %s (#%s)",
 				string.upper(channel),
 				tostring(item.name or item.item_name or "Potion bundle"),
 				tostring(state.item_id or item.item_id or "")
@@ -1270,7 +1266,7 @@ function Battlepass:ApplySupporterDevTestItem(playerID, state, hero, reapply)
 		)
 		local particle = ParticleManager:CreateParticle(particlePath, PATTACH_ABSORIGIN_FOLLOW, hero)
 		ParticleManager:SetParticleControl(particle, 0, hero:GetAbsOrigin())
-		ParticleManager:ReleaseParticleIndex(particle)
+		XHSDestroyParticleAfter(particle, 5.0, false)
 		hero:EmitSound("ui.trophy_levelup")
 		return true
 	elseif slot == "kill_effect" then
@@ -1307,27 +1303,16 @@ function Battlepass:ApplySupporterDevTestItem(playerID, state, hero, reapply)
 		return true
 	elseif slot == "potion" then
 		if SupporterRecoveryEffects == nil then return false, "#xhs_sp_dev_test_error_asset" end
-		NotifyPotionChannel("health", 1)
-		local healthPlayed = SupporterRecoveryEffects:PlayPotion(
+		local channel = state.preview_channel
+		if channel ~= "health" and channel ~= "mana" and channel ~= "light" then
+			return false, "#xhs_sp_dev_test_error_type"
+		end
+		NotifyPotionChannel(channel)
+		return SupporterRecoveryEffects:PlayPotion(
 			hero,
-			"health",
-			item.health_pfx
-		)
-		Timers:CreateTimer(1.25, function()
-			if self.SUPPORTER_DEV_TESTS[playerID] == state and state.cancelled ~= true then
-				NotifyPotionChannel("mana", 2)
-				SupporterRecoveryEffects:PlayPotion(hero, "mana", item.mana_pfx)
-			end
-			return nil
-		end)
-		Timers:CreateTimer(2.50, function()
-			if self.SUPPORTER_DEV_TESTS[playerID] == state and state.cancelled ~= true then
-				NotifyPotionChannel("light", 3)
-				SupporterRecoveryEffects:PlayPotion(hero, "light", item.light_pfx)
-			end
-			return nil
-		end)
-		return healthPlayed ~= nil
+			channel,
+			item[channel .. "_pfx"]
+		) ~= nil
 	elseif slot == "rebirth" then
 		return SupporterRecoveryEffects ~= nil
 			and SupporterRecoveryEffects:PlayRebirth(hero, item.pfx) ~= nil
@@ -1500,6 +1485,11 @@ function Battlepass:SupporterPassDevTestReward(event_source_index, event)
 	local requestID = tostring(event.request_id or "")
 	local itemID = tostring(event.item_id or "")
 	local slot = NormalizeSupporterSlot(event.slot_id)
+	local previewChannel = tostring(event.preview_channel or ""):lower()
+	if slot ~= "potion"
+		or (previewChannel ~= "health" and previewChannel ~= "mana" and previewChannel ~= "light") then
+		previewChannel = nil
+	end
 	local trustedDevTools = event.xhs_devtools_trusted == true and IsInToolsMode()
 
 	if not trustedDevTools and not self:IsSupporterDevTestAllowed(playerID) then
@@ -1541,6 +1531,7 @@ function Battlepass:SupporterPassDevTestReward(event_source_index, event)
 		item = item,
 		item_id = itemID,
 		slot = slot,
+		preview_channel = previewChannel,
 		request_id = requestID,
 		persistent = persistent,
 		transient = not persistent,
@@ -1568,7 +1559,7 @@ function Battlepass:SupporterPassDevTestReward(event_source_index, event)
 			elseif slot == "attack_lifesteal" then
 				duration = 3.25
 			elseif slot == "potion" then
-				duration = 4.2
+				duration = 5.5
 			elseif slot == "regen_aura"
 				or slot == "immolation"
 				or slot == "high_five" then

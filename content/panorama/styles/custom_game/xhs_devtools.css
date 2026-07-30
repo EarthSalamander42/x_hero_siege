@@ -7,6 +7,7 @@
 .XHSDevToolsHost {
 	width: 100%;
 	height: 100%;
+	flow-children: down;
 	visibility: collapse;
 	z-index: 9000;
 }
@@ -27,8 +28,6 @@
 	height: 30px;
 	horizontal-align: right;
 	vertical-align: top;
-	margin-top: 48px;
-	margin-right: 48px;
 	background-color: #111a22ee;
 	border: 1px solid #69d7ff88;
 	box-shadow: fill #000000aa 0px 0px 8px 0px;
@@ -53,13 +52,26 @@
 	text-shadow: 0px 1px 3px 2 #000000;
 }
 
+#XHSDevToolsButtons {
+	width: fit-children;
+	height: fit-children;
+	visibility: visible;
+	flow-children: right;
+	horizontal-align: right;
+	vertical-align: top;
+	margin-top: 48px;
+	margin-right: 48px;
+	flow-children: right;
+	z-index: 9010;
+}
+
 .XHSDevToolsSpectator {
 	width: 410px;
 	height: 38px;
 	horizontal-align: right;
 	vertical-align: top;
-	margin-top: 6px;
-	margin-right: 106px;
+	margin-top: 30px;
+	margin-right: 10px;
 	flow-children: right;
 	visibility: collapse;
 	background-color: #09151fee;
@@ -195,8 +207,6 @@
 	height: 30px;
 	horizontal-align: right;
 	vertical-align: top;
-	margin-top: 48px;
-	margin-right: 106px;
 	flow-children: right;
 	visibility: collapse;
 	z-index: 9010;
@@ -246,7 +256,7 @@
 	width: 342px;
 	horizontal-align: right;
 	vertical-align: top;
-	margin-top: 84px;
+	margin-top: 10px;
 	margin-right: 48px;
 	flow-children: down;
 	background-color: #0b1218ee;
@@ -579,7 +589,8 @@
 	width: 760px;
 	height: 780px;
 	horizontal-align: right;
-	vertical-align: center;
+	vertical-align: top;
+	margin-top: 8px;
 	margin-right: 18px;
 	background-color: #091017f4;
 	border: 1px solid #7ddcff66;

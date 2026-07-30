@@ -11,6 +11,44 @@ var scoreboard_supporter_hover_player_id = -1;
 var scoreboard_hud_layer_applied = false;
 var scoreboard_hud_layer_retry_scheduled = false;
 
+function SuppressVanillaFlyoutScoreboard() {
+	try {
+		if (typeof GameUI !== "undefined"
+			&& typeof DotaDefaultUIElement_t !== "undefined"
+			&& typeof GameUI.SetDefaultUIEnabled === "function") {
+			GameUI.SetDefaultUIEnabled(
+				DotaDefaultUIElement_t.DOTA_DEFAULT_UI_FLYOUT_SCOREBOARD,
+				false
+			);
+		}
+	} catch (error) {
+		// Some spectator HUD panels are created after custom_ui_manifest.
+		// Reasserting this on scoreboard events is safe; failure must not block XHS UI.
+	}
+}
+
+function IsLocalPlayerSpectating() {
+	var localPlayerInfo = ScoreboardSafeCall(function () {
+		return Game.GetLocalPlayerInfo();
+	}, null);
+	var localPlayerId = localPlayerInfo && localPlayerInfo.player_id !== undefined
+		? Number(localPlayerInfo.player_id)
+		: ScoreboardSafeCall(function () {
+			return Game.GetLocalPlayerID();
+		}, -1);
+	var localTeam = localPlayerInfo && localPlayerInfo.player_team_id !== undefined
+		? Number(localPlayerInfo.player_team_id)
+		: ScoreboardSafeCall(function () {
+			return Players.GetTeam(localPlayerId);
+		}, -1);
+
+	return localPlayerId < 0
+		|| localTeam === 1
+		|| ScoreboardSafeCall(function () {
+			return Players.IsSpectator(localPlayerId);
+		}, false);
+}
+
 function GetScoreboardHudAncestor(panel) {
 	var current = panel;
 	while (current) {
@@ -45,6 +83,15 @@ function ScheduleScoreboardHudLayerRetry() {
 }
 
 function EnsureScoreboardAboveHudElements() {
+	SuppressVanillaFlyoutScoreboard();
+
+	// Valve owns a separate spectator scoreboard layer. Moving the XHS panel out
+	// of its FlyoutScoreboard host lets that vanilla layer appear behind it.
+	// Spectators keep the normal host while still receiving the XHS flyout event.
+	if (IsLocalPlayerSpectating()) {
+		return true;
+	}
+
 	if (scoreboard_hud_layer_applied) {
 		return true;
 	}
@@ -101,17 +148,68 @@ function ToggleMute( nRowID )
 	}
 }
 
+function GetScoreboardPlayerZoneEntry(playerId) {
+	if (playerId === undefined || playerId === null || playerId < 0) {
+		return null;
+	}
+
+	return GetScoreboardNetTableValue("player_zone_locations", playerId);
+}
+
+function GetScoreboardPlayerIds() {
+	var playerIds = ScoreboardSafeCall(function () {
+		return Game.GetAllPlayerIDs();
+	}, null);
+
+	if (playerIds && typeof playerIds.length === "number") {
+		return playerIds;
+	}
+
+	// XHS supports eight active participants plus a Tools spectator controller.
+	return [0, 1, 2, 3, 4, 5, 6, 7, 8];
+}
+
 function GetLocalPlayerId() {
 	var localPlayerId = 0;
 	var localPlayerInfo = Game.GetLocalPlayerInfo();
 
-	if(typeof(localPlayerInfo) !== "undefined") {
+	if (typeof localPlayerInfo !== "undefined" && localPlayerInfo) {
 		localPlayerId = localPlayerInfo.player_id;
 	}
 
-	if (Players.IsLocalPlayerInPerspectiveCamera()) {
-		//get local player info for selected portrait unit
-		localPlayerId = Players.GetPerspectivePlayerId();
+	var perspectivePlayerId = ScoreboardSafeCall(function () {
+		return Players.GetPerspectivePlayerId();
+	}, -1);
+	var isPerspectiveCamera = ScoreboardSafeCall(function () {
+		return Players.IsLocalPlayerInPerspectiveCamera();
+	}, false);
+
+	if (isPerspectiveCamera
+		&& IsScoreboardPlayerValid(perspectivePlayerId)
+		&& GetScoreboardPlayerZoneEntry(perspectivePlayerId)) {
+		return perspectivePlayerId;
+	}
+
+	if (IsScoreboardPlayerValid(localPlayerId)
+		&& GetScoreboardPlayerZoneEntry(localPlayerId)) {
+		return localPlayerId;
+	}
+
+	// A spectator has no player_zone_locations entry. Use the followed player
+	// when possible, otherwise the first active participant, so the custom
+	// scoreboard still has a valid zone and player row in free-camera mode.
+	if (IsScoreboardPlayerValid(perspectivePlayerId)
+		&& GetScoreboardPlayerZoneEntry(perspectivePlayerId)) {
+		return perspectivePlayerId;
+	}
+
+	var playerIds = GetScoreboardPlayerIds();
+	for (var index = 0; index < playerIds.length; index++) {
+		var candidatePlayerId = Number(playerIds[index]);
+		if (IsScoreboardPlayerValid(candidatePlayerId)
+			&& GetScoreboardPlayerZoneEntry(candidatePlayerId)) {
+			return candidatePlayerId;
+		}
 	}
 
 	return localPlayerId;
@@ -183,13 +281,24 @@ function ScoreboardSafeCall(callback, fallbackValue) {
 
 function IsScoreboardPlayerValid(playerID) {
 	playerID = Number(playerID);
-	if (isNaN(playerID) || playerID < 0 || playerID > 7) {
+	if (isNaN(playerID) || playerID < 0 || playerID > 63) {
 		return false;
 	}
 
-	return !!ScoreboardSafeCall(function () {
+	var playerInfo = ScoreboardSafeCall(function () {
 		return Game.GetPlayerInfo(playerID);
 	}, null);
+	if (!playerInfo) {
+		return false;
+	}
+
+	var isSpectator = ScoreboardSafeCall(function () {
+		return Players.IsSpectator(playerID);
+	}, false);
+	var team = ScoreboardSafeCall(function () {
+		return Players.GetTeam(playerID);
+	}, -1);
+	return !isSpectator && team !== 1;
 }
 
 function GetScoreboardNetTableValue(tableName, key) {
@@ -399,7 +508,7 @@ function UpdatePlayerImages() {
 		SetScoreboardDisplaySlotVisible(displaySlot, false);
 	}
 
-	for(var i = 0; i < 8; i++) {
+	for(var i = 0; i < 9; i++) {
 		var player_info = GetScoreboardNetTableValue("supporter_pass_player", i);
 
 		if(i == localPlayerId)
@@ -547,7 +656,7 @@ function UpdateKillEventHints(zoneData, localPlayerId) {
 	UpdateKillEventHint(0, localPlayerId, localKills);
 
 	var displaySlot = 1;
-	for (var playerId = 0; playerId < 8; playerId++) {
+	for (var playerId = 0; playerId < 9; playerId++) {
 		if (playerId === localPlayerId) {
 			continue;
 		}
@@ -765,10 +874,10 @@ function UpdateZoneScores( zoneName )
 		{
 			var tablePropertyName = exposedTableProperties[key]
 			var keyTotal = 0;
-			var playerValues = [0, 0, 0, 0, 0, 0, 0, 0];
+			var playerValues = [0, 0, 0, 0, 0, 0, 0, 0, 0];
 //			var playerValues = [0, 0, 0, 0];
 			//go through table values and sum them into totals
-			for (var i = 0; i < 8; i++) 
+			for (var i = 0; i < 9; i++)
 			{
 				if(typeof(zoneData[i]) != "undefined") 
 				{
@@ -789,7 +898,7 @@ function UpdateZoneScores( zoneName )
 			teamContainer.SetDialogVariableInt(tablePropertyName.toLowerCase(), keyTotal);
 
 			var iNonPlayerCalculated = 1;
-			for(var i = 0; i < 8; i++)
+			for(var i = 0; i < 9; i++)
 			{
 				if (i !== localPlayerId && (!IsScoreboardPlayerValid(i) || iNonPlayerCalculated > 7)) {
 					continue;
@@ -1080,6 +1189,7 @@ function SetScoreboardZoneButtonEnabled(buttonName, enabled) {
 
 function SetFlyoutScoreboardVisible( bVisible )
 {
+	SuppressVanillaFlyoutScoreboard();
 	EnsureScoreboardAboveHudElements();
 
 	if(bVisible === true)
@@ -1166,6 +1276,7 @@ function SetFlyoutScoreboardChangeZone( nDir )
 (function()
 {	
 	//InitializeScoreboard();
+	SuppressVanillaFlyoutScoreboard();
 	EnsureScoreboardAboveHudElements();
 	SetFlyoutScoreboardVisible(false);
 	UpdateFragmentQuests(CustomNetTables.GetTableValue("fragment_quests", "state"));

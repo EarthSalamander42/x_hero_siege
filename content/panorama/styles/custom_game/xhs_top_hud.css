@@ -16,6 +16,144 @@
 	z-index: 80;
 }
 
+.XHSWavePressurePanel
+{
+	width: 430px;
+	height: 76px;
+	horizontal-align: center;
+	margin-top: 6px;
+	padding: 8px 13px 8px 9px;
+	flow-children: right;
+	visibility: collapse;
+	opacity: 0;
+	background-color: gradient(linear, 0% 0%, 100% 0%, from(#081321f2), color-stop(.72, #102336ed), to(#172c3eed));
+	border: 1px solid #78b5c04a;
+	border-left: 3px solid #e9b758;
+	box-shadow: fill #000000a8 0px 0px 16px 0px, #e2aa3840 0px 0px 11px 0px;
+	transition-property: opacity, transform;
+	transition-duration: .18s;
+	transform: translateY(-5px);
+	z-index: 89;
+}
+
+.XHSWavePressurePanel.Active
+{
+	visibility: visible;
+	opacity: 1;
+	transform: translateY(0px);
+}
+
+.XHSWavePressureMark
+{
+	width: 42px;
+	height: 42px;
+	margin: 8px 11px 0px 0px;
+	background-color: gradient(radial, 50% 50%, 0% 0%, 50% 50%, from(#f1c86d), to(#7b4511));
+	border: 1px solid #ffe7a2a8;
+	border-radius: 50%;
+	box-shadow: #e7ae4966 0px 0px 10px 0px;
+}
+
+.XHSWavePressureMark Label
+{
+	width: 100%;
+	height: 100%;
+	color: #101927;
+	font-size: 28px;
+	font-weight: bold;
+	text-align: center;
+	vertical-align: center;
+	text-shadow: 0px 1px 1px #ffffff59;
+}
+
+.XHSWavePressureCopy
+{
+	width: fill-parent-flow(1);
+	height: 100%;
+	flow-children: down;
+}
+
+.XHSWavePressureHeader
+{
+	width: 100%;
+	height: 16px;
+	flow-children: right;
+}
+
+.XHSWavePressureEyebrow
+{
+	width: fill-parent-flow(1);
+	color: #e9ba62;
+	font-size: 11px;
+	font-weight: bold;
+	letter-spacing: 1.6px;
+}
+
+.XHSWavePressureCount
+{
+	color: #f6dfac;
+	font-size: 13px;
+	font-weight: bold;
+	text-align: right;
+}
+
+.XHSWavePressureTitle
+{
+	width: 100%;
+	height: 22px;
+	color: #f4f8ff;
+	font-size: 18px;
+	font-weight: semi-bold;
+	text-shadow: 0px 2px 3px #000000;
+}
+
+.XHSWavePressureDetail
+{
+	width: 100%;
+	height: 17px;
+	color: #b9c8d3;
+	font-size: 11px;
+	text-overflow: shrink;
+}
+
+.XHSWavePressureTrack
+{
+	width: 100%;
+	height: 5px;
+	margin-top: 2px;
+	background-color: #02070dbd;
+	border: 1px solid #45617270;
+	overflow: clip;
+}
+
+.XHSWavePressureFill
+{
+	width: 0%;
+	height: 100%;
+	background-color: gradient(linear, 0% 0%, 100% 0%, from(#388b9d), color-stop(.78, #d9a546), to(#f06b47));
+	box-shadow: #f2bd5660 0px 0px 6px 0px;
+	transition-property: width;
+	transition-duration: .25s;
+}
+
+.XHSWavePressurePanel.Limited
+{
+	border-color: #efb4547d;
+	background-color: gradient(linear, 0% 0%, 100% 0%, from(#101724f2), color-stop(.72, #2b2117ed), to(#3b2416ed));
+}
+
+.XHSWavePressurePanel.Critical
+{
+	border-left-color: #ff6b54;
+	box-shadow: fill #000000b8 0px 0px 18px 0px, #ef553b59 0px 0px 14px 0px;
+}
+
+.XHSWavePressurePanel.Critical .XHSWavePressureMark
+{
+	background-color: gradient(radial, 50% 50%, 0% 0%, 50% 50%, from(#ffb26e), to(#8c2418));
+	border-color: #ffd0b0;
+}
+
 #XHSOverheadRoot {
 	width: 100%;
 	height: 100%;
@@ -501,11 +639,13 @@
 }
 
 .XHSOverheadBotActivity {
-	width: 130px;
+	width: fit-children;
+	min-width: 130px;
+	max-width: 420px;
 	height: 13px;
 	ignore-parent-flow: true;
 	horizontal-align: center;
-	margin-top: 1px;
+	margin-top: -2px;
 	flow-children: right;
 	padding: 0px 5px;
 	background-color: gradient( linear, 0% 0%, 100% 0%, from( #07111be8 ), color-stop( 0.5, #102235f5 ), to( #07111be8 ) );
@@ -514,6 +654,53 @@
 	visibility: collapse;
 	opacity: 0;
 	z-index: 20;
+}
+
+.XHSOverheadBotNextPurchase {
+	width: fit-children;
+	min-width: 130px;
+	max-width: 420px;
+	height: 12px;
+	ignore-parent-flow: true;
+	horizontal-align: center;
+	margin-top: -16px;
+	flow-children: right;
+	padding: 0px 5px;
+	background-color: gradient( linear, 0% 0%, 100% 0%, from( #120f05e8 ), color-stop( 0.5, #2c2409f2 ), to( #120f05e8 ) );
+	border: 1px solid #d8b84c66;
+	box-shadow: fill #000000aa 0px 1px 4px 0px, fill #e9c74a20 0px 0px 5px 0px;
+	visibility: collapse;
+	opacity: 0;
+	z-index: 21;
+}
+
+.XHSOverheadBotNextPurchaseNode {
+	width: 4px;
+	height: 4px;
+	vertical-align: center;
+	margin-right: 4px;
+	background-color: #f2cf58;
+	box-shadow: fill #e9c74aaa 0px 0px 5px 0px;
+}
+
+.XHSOverheadBotNextPurchaseLabel {
+	width: fit-children;
+	min-width: 110px;
+	max-width: 390px;
+	height: 11px;
+	color: #fff0a8;
+	font-size: 8px;
+	font-weight: bold;
+	letter-spacing: 0.4px;
+	text-align: center center;
+	text-overflow: shrink;
+	text-transform: uppercase;
+	text-shadow: 0px 1px 2px #000000, 0px 0px 4px #000000;
+}
+
+.XHSOverheadLabel.XHSOverheadBotNextPurchaseVisible .XHSOverheadBotNextPurchase {
+	visibility: visible;
+	opacity: 1;
 }
 
 .XHSOverheadBotActivityNode {
@@ -526,7 +713,9 @@
 }
 
 .XHSOverheadBotActivityLabel {
-	width: fill-parent-flow( 1 );
+	width: fit-children;
+	min-width: 110px;
+	max-width: 390px;
 	height: 12px;
 	color: #d8edf7;
 	font-size: 9px;

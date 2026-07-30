@@ -15,6 +15,20 @@ function PrintTable(t, indent)
 	end
 end
 
+-- ReleaseParticleIndex only releases the Lua handle; it does not stop a
+-- looping particle system. Seasonal cosmetic particles are not guaranteed to
+-- terminate on their own, so transient effects must always have an explicit
+-- lifetime to avoid accumulating client-side particle simulations.
+function XHSDestroyParticleAfter(particle, duration, immediate)
+	if particle == nil then return end
+
+	GameRules:GetGameModeEntity():SetContextThink(DoUniqueString("xhs_transient_particle"), function()
+		ParticleManager:DestroyParticle(particle, immediate == true)
+		ParticleManager:ReleaseParticleIndex(particle)
+		return nil
+	end, math.max(FrameTime(), tonumber(duration) or 5.0))
+end
+
 local XHS_BASE_SPAWN_LOCAL_OFFSETS = {
 	[0] = Vector(-180, -120, 0),
 	[1] = Vector(180, -120, 0),
@@ -162,16 +176,6 @@ local function GetDoorCinematicCenter(doorNames)
 	return center / count
 end
 
-local function SendDoorCameraPosition(playerID, position, duration)
-	local player = PlayerResource:GetPlayer(playerID)
-	if player == nil or position == nil then return end
-
-	CustomGameEventManager:Send_ServerToPlayer(player, "set_player_camera", {
-		hPosition = position,
-		iSpeed = duration,
-	})
-end
-
 -- Moves every active player's camera to a door group, executes the opening once
 -- the camera has arrived, then smoothly returns each player to their own hero.
 function XHSPlayDoorOpeningCinematic(doorNames, onCameraArrived, options)
@@ -190,59 +194,54 @@ function XHSPlayDoorOpeningCinematic(doorNames, onCameraArrived, options)
 	_G.XHSDoorCinematicSerial = (_G.XHSDoorCinematicSerial or 0) + 1
 	local serial = _G.XHSDoorCinematicSerial
 	local cinematicId = "xhs_door_camera_" .. tostring(serial)
-	local usingCinematicController = XHSCinematics ~= nil
-
-	if usingCinematicController then
-		if _G.XHSDoorCinematicId ~= nil then
-			XHSCinematics:EndForAll(_G.XHSDoorCinematicId)
-		end
-		_G.XHSDoorCinematicId = cinematicId
-		XHSCinematics:BeginForAll(cinematicId, {
-			duration = moveDuration + holdDuration,
-			hide_hud = false,
-			hide_health_bars = true,
-			lock_orders = false,
-			camera_position = target,
-			camera_speed = moveDuration,
-			native_camera = options.native_camera == true,
-			return_camera = options.return_camera ~= false,
-			letterbox_pct = 0,
-			transition = 0.1,
-		})
+	if XHSCinematics == nil then
+		if onCameraArrived ~= nil then onCameraArrived() end
+		return
 	end
+	if _G.XHSDoorCinematicId ~= nil then
+		XHSCinematics:EndForAll(_G.XHSDoorCinematicId)
+	end
+	_G.XHSDoorCinematicId = cinematicId
 
-	if not usingCinematicController then
-		for playerID = 0, maxPlayers - 1 do
-			if PlayerResource:IsValidPlayerID(playerID) and PlayerResource:GetPlayer(playerID) ~= nil then
-				SendDoorCameraPosition(playerID, target, moveDuration)
-			end
+	local expectedPlayers = 0
+	for playerID = 0, maxPlayers - 1 do
+		if PlayerResource:IsValidPlayerID(playerID) and PlayerResource:GetPlayer(playerID) ~= nil then
+			expectedPlayers = expectedPlayers + 1
 		end
 	end
-
-	Timers:CreateTimer(moveDuration, function()
+	local arrivedPlayers = 0
+	local arrivalHandled = false
+	local function OnAllCamerasArrived()
+		if arrivalHandled then return end
+		arrivedPlayers = arrivedPlayers + 1
+		if arrivedPlayers < math.max(1, expectedPlayers) then return end
+		arrivalHandled = true
 		if serial ~= _G.XHSDoorCinematicSerial then return end
 		if onCameraArrived ~= nil then onCameraArrived() end
 
 		Timers:CreateTimer(holdDuration, function()
 			if serial ~= _G.XHSDoorCinematicSerial then return end
-			if usingCinematicController then
-				XHSCinematics:EndForAll(cinematicId)
-				if _G.XHSDoorCinematicId == cinematicId then
-					_G.XHSDoorCinematicId = nil
-				end
-			end
-			if options.return_camera == false then return end
-
-			for playerID = 0, maxPlayers - 1 do
-				if PlayerResource:IsValidPlayerID(playerID) and PlayerResource:GetPlayer(playerID) ~= nil then
-					local hero = PlayerResource:GetSelectedHeroEntity(playerID)
-					if hero ~= nil and IsValidEntity(hero) and not hero:IsNull() then
-						SendDoorCameraPosition(playerID, hero:GetAbsOrigin(), returnDuration)
-					end
-				end
+			XHSCinematics:EndForAll(cinematicId)
+			if _G.XHSDoorCinematicId == cinematicId then
+				_G.XHSDoorCinematicId = nil
 			end
 		end)
-	end)
+	end
+
+	XHSCinematics:BeginForAll(cinematicId, {
+		duration = 0,
+		hide_hud = false,
+		hide_health_bars = true,
+		lock_orders = false,
+		camera_position = target,
+		camera_speed = moveDuration,
+		return_camera_speed = returnDuration,
+		return_camera = options.return_camera ~= false,
+		on_camera_arrive = OnAllCamerasArrived,
+		letterbox_pct = 0,
+		transition = 0.1,
+	})
+	if expectedPlayers == 0 then OnAllCamerasArrived() end
 end
 
 function XHSOpenDoorsWithCinematic(doorNames, obstructionNames, animationName, onOpened, options)
@@ -595,6 +594,7 @@ function BuyMaxSmallTomesForPlayer(playerID, options)
 			or "particles/generic_hero_status/hero_levelup.vpcf"
 		local pfx = ParticleManager:CreateParticle(levelupParticle, PATTACH_ABSORIGIN_FOLLOW, hero)
 		ParticleManager:SetParticleControl(pfx, 0, hero:GetAbsOrigin())
+		XHSDestroyParticleAfter(pfx, 5.0, false)
 
 		i = i + 1
 		if i >= numberOfTomes then
@@ -1210,10 +1210,15 @@ function CreateXHSReturnMarker(hero, position)
 end
 
 local XHS_TELEPORT_MIN_ANIMATION_DURATION = 0.65
+-- The removed Panorama camera handler used 2.0 whenever callers
+-- omitted iCameraSpeed. Preserve that public TeleportHero contract: dozens of
+-- legacy two/three-argument calls intentionally rely on the default travelling
+-- camera rather than an instant snap.
+local XHS_TELEPORT_DEFAULT_CAMERA_DURATION = 2.0
 
 function TeleportHero(hero, point, delay, iCameraSpeed)
-	if not hero.GetPlayerID then return end
-	if hero:GetPlayerID() == -1 then return end
+	if hero == nil or not IsValidEntity(hero) or hero:IsNull() or point == nil then return end
+	local playerID = hero.GetPlayerID ~= nil and hero:GetPlayerID() or -1
 	if delay == nil then delay = 0 end
 	local pos = hero:GetAbsOrigin()
 	--	local pos = hero:GetAbsOrigin() + RandomVector(400)
@@ -1253,7 +1258,24 @@ function TeleportHero(hero, point, delay, iCameraSpeed)
 
 	hero:AddNewModifier(hero, nil, "modifier_command_restricted", {})
 
-	CustomGameEventManager:Send_ServerToPlayer(hero:GetPlayerOwner(), "set_player_camera", { hPosition = point, iSpeed = iCameraSpeed })
+	-- An unassigned hero (notably `-createhero wisp`) still needs the gameplay
+	-- teleport and the final modifier cleanup. It simply has no player camera
+	-- to animate.
+	if playerID ~= nil and playerID >= 0 and CameraMotion ~= nil then
+		local cameraDuration = tonumber(iCameraSpeed)
+		if cameraDuration == nil then
+			cameraDuration = XHS_TELEPORT_DEFAULT_CAMERA_DURATION
+		end
+		CameraMotion:Move(playerID, point, {
+			from = hero,
+			duration = cameraDuration,
+			easing = "smootherstep",
+			owner = "hero_teleport",
+			priority = 30,
+			policy = "replace",
+			release = "free",
+		})
+	end
 
 	Timers:CreateTimer(delay, function()
 		EmitSoundOnLocationWithCaster(pos, "Portal.Hero_Disappear", hero)
@@ -1901,16 +1923,73 @@ function IsNearEntity(entity_class, location, distance)
 end
 
 function TeleportAllHeroes(sEvent, iInvulnDelay, iTPDelay)
+	local heroes = {}
 	for _, hero in pairs(HeroList:GetAllHeroes()) do
-		if hero:IsRealHero() and hero:GetTeam() == DOTA_TEAM_GOODGUYS then
-			local id = hero:GetPlayerID()
-			if hero:GetPlayerID() ~= -1 then
-				local point = Entities:FindByName(nil, sEvent .. tostring(id)) -- might cause error with Dark Fundamental?
+		if hero:IsRealHero()
+			and not hero:IsIllusion()
+			and hero:GetTeam() == DOTA_TEAM_GOODGUYS
+			and hero:GetPlayerID() >= 0 then
+			table.insert(heroes, hero)
+		end
+	end
 
-				TeleportHero(hero, point:GetAbsOrigin(), iTPDelay)
-				hero:AddNewModifier(hero, nil, "modifier_pause_creeps", { duration = iInvulnDelay, IsHidden = true })
-				hero:AddNewModifier(hero, nil, "modifier_invulnerable", { duration = iInvulnDelay, IsHidden = true })
+	table.sort(heroes, function(left, right)
+		return left:GetPlayerID() < right:GetPlayerID()
+	end)
+
+	local prefix = tostring(sEvent or "")
+	local points = {}
+	local maxPlayers = DOTA_MAX_TEAM_PLAYERS or 24
+	for index = 0, maxPlayers - 1 do
+		local point = Entities:FindByName(nil, prefix .. tostring(index))
+		if point ~= nil and not point:IsNull() then
+			points[index] = point
+		end
+	end
+
+	local assignments = {}
+	local usedPoints = {}
+	for _, hero in ipairs(heroes) do
+		local playerID = hero:GetPlayerID()
+		if points[playerID] ~= nil then
+			assignments[hero:entindex()] = points[playerID]
+			usedPoints[playerID] = true
+		end
+	end
+
+	for _, hero in ipairs(heroes) do
+		if assignments[hero:entindex()] == nil then
+			for index = 0, maxPlayers - 1 do
+				if points[index] ~= nil and usedPoints[index] ~= true then
+					assignments[hero:entindex()] = points[index]
+					usedPoints[index] = true
+					break
+				end
 			end
+		end
+	end
+
+	for _, hero in ipairs(heroes) do
+		local point = assignments[hero:entindex()]
+		local ok, message = pcall(function()
+			if point ~= nil then
+				TeleportHero(hero, point:GetAbsOrigin(), iTPDelay)
+			else
+				print(string.format(
+					"[XHS TeleportAllHeroes] No destination for player %d with prefix '%s'; continuing encounter.",
+					hero:GetPlayerID(),
+					prefix
+				))
+			end
+			hero:AddNewModifier(hero, nil, "modifier_pause_creeps", { duration = iInvulnDelay, IsHidden = true })
+			hero:AddNewModifier(hero, nil, "modifier_invulnerable", { duration = iInvulnDelay, IsHidden = true })
+		end)
+		if not ok then
+			print(string.format(
+				"[XHS TeleportAllHeroes] Player %d teleport failed: %s",
+				hero:GetPlayerID(),
+				tostring(message)
+			))
 		end
 	end
 end
@@ -2236,13 +2315,9 @@ function StartingItems(hero, newHero, options)
 		-- TeleportHero(newHero, base_bad:GetAbsOrigin(), 3.0)
 	end
 
-	if options.deferOldHeroCleanup ~= true then
-		Timers:CreateTimer(0.1, function()
-			if not hero:IsNull() then
-				UTIL_Remove(hero)
-			end
-		end)
-	end
+	-- Old-hero lifetime is owned by XHSPrecache:ReplaceHeroWith. Keeping the
+	-- cleanup in one place prevents two delayed removals from racing on a
+	-- recycled Source 2 entity handle.
 
 	Timers:CreateTimer(1.0, function()
 		for k, v in pairs(HeroList:GetAllHeroes()) do

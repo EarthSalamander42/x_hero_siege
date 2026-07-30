@@ -27,6 +27,7 @@ local BOT_NAMES = {
 	"Bramble",
 	"Willow",
 	"Clover",
+	"Hawthorn",
 }
 
 local function ProvisionLogValue(value)
@@ -39,9 +40,19 @@ local function ProvisionLog(eventName, fields)
 	-- Intentionally silent: provisioning state is exposed through XHSBots.
 end
 
-function XHSBotProvisioner:GetDisplayName(slot)
+function XHSBotProvisioner:GetLaneNumberForSlot(slot)
 	slot = math.max(1, math.floor(tonumber(slot) or 1))
-	return BOT_NAMES[slot] or ("XHS Bot " .. tostring(slot))
+	local humanCount = XHSBotPlayerRegistry ~= nil
+		and XHSBotPlayerRegistry:GetHumanCount()
+		or 0
+	return humanCount + slot
+end
+
+function XHSBotProvisioner:GetDisplayName(slot, lane)
+	slot = math.max(1, math.floor(tonumber(slot) or 1))
+	lane = math.max(1, math.floor(tonumber(lane) or self:GetLaneNumberForSlot(slot)))
+	local botName = BOT_NAMES[slot] or ("Bot" .. tostring(slot))
+	return "[BOT] " .. botName .. "_L" .. tostring(lane)
 end
 
 local function IsValidHero(hero)
@@ -92,21 +103,25 @@ function XHSBotProvisioner:GetVerificationCounts()
 end
 
 function XHSBotProvisioner:IsAvailable()
-	return IsInToolsMode()
+	return XHSBots ~= nil
+		and XHSBots.enabled == true
+		and XHSBots.setup_approved == true
 		and GameRules ~= nil
 		and GameRules.AddBotPlayerWithEntityScript ~= nil
 end
 
 function XHSBotProvisioner:BuildMetadata(slot, configuration)
 	self.next_request_id = self.next_request_id + 1
-	local displayName = self:GetDisplayName(slot)
+	local lane = self:GetLaneNumberForSlot(slot)
+	local displayName = self:GetDisplayName(slot, lane)
 	local requestToken = "g" .. tostring(self.request_generation)
 		.. "_s" .. tostring(slot)
 		.. "_r" .. tostring(self.next_request_id)
 	return {
 		slot = slot,
+		lane = lane,
 		name = displayName,
-		request_name = "XHS_" .. displayName .. "_" .. requestToken,
+		request_name = displayName,
 		request_token = requestToken,
 		request_state = "created",
 		request_attempted = false,
@@ -253,7 +268,10 @@ function XHSBotProvisioner:Provision(configuration)
 	end
 
 	configuration = configuration or {}
-	local requested = math.max(0, math.min(7, math.floor(tonumber(configuration.count) or 0)))
+	local requested = math.max(0, math.min(
+		XHSBotConfig.MAX_BOTS,
+		math.floor(tonumber(configuration.count) or 0)
+	))
 	local previousRequested = self.requested_count
 	if previousRequested ~= requested then
 		if next(self.pending_slots) ~= nil then
@@ -410,7 +428,9 @@ function XHSBotProvisioner:OnEntityScriptSpawn(hero)
 		hero_entindex = IsValidHero(hero) and hero:entindex() or -1,
 		player_id = IsValidHero(hero) and hero:GetPlayerID() or -1,
 	})
-	if not IsInToolsMode() or not IsValidHero(hero) then return end
+	if XHSBots == nil or XHSBots.enabled ~= true
+		or XHSBots.setup_approved ~= true
+		or not IsValidHero(hero) then return end
 	local playerID = hero:GetPlayerID()
 	if playerID == nil or playerID < 0 then return end
 
@@ -568,6 +588,21 @@ function XHSBotProvisioner:CompleteHeroAssignment(
 	end
 	if XHSBots ~= nil and XHSBots.OnBotHeroReady ~= nil then
 		XHSBots:OnBotHeroReady(playerID, newHero)
+	end
+	local counts = self:GetHeroAssignmentCounts()
+	if counts.total > 0 and counts.assigned == counts.total
+		and XHSBotOnlyAutonomyAllowed ~= nil
+		and XHSBotOnlyAutonomyAllowed()
+		and XHSCleanupHeroSelectionShowcase ~= nil then
+		local cleanupOK, removed, cleanupReason = pcall(
+			XHSCleanupHeroSelectionShowcase,
+			"all_bot_heroes_assigned"
+		)
+		ProvisionLog("selection_showcase_cleanup", {
+			ok = cleanupOK,
+			removed = removed,
+			reason = cleanupReason,
+		})
 	end
 end
 

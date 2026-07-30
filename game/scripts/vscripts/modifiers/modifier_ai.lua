@@ -108,6 +108,13 @@ function modifier_ai:OnCreated(params)
 	self.next_spell_check = 0
 	self.ability_ready_at = {}
 	self.ancient = nil
+	if XHSCreepOrderOwnership ~= nil then
+		XHSCreepOrderOwnership:Claim(
+			self.parent,
+			XHSCreepOrderOwnership.OWNER_MODIFIER_AI,
+			true
+		)
+	end
 
 	if XHSCreepAIDirector ~= nil then
 		XHSCreepAIDirector:Register(self)
@@ -119,8 +126,16 @@ function modifier_ai:OnCreated(params)
 end
 
 function modifier_ai:OnDestroy()
-	if IsServer() and XHSCreepAIDirector ~= nil then
-		XHSCreepAIDirector:Unregister(self)
+	if IsServer() then
+		if XHSCreepAIDirector ~= nil then
+			XHSCreepAIDirector:Unregister(self)
+		end
+		if XHSCreepOrderOwnership ~= nil then
+			XHSCreepOrderOwnership:Release(
+				self.parent,
+				XHSCreepOrderOwnership.OWNER_MODIFIER_AI
+			)
+		end
 	end
 end
 
@@ -135,6 +150,19 @@ function modifier_ai:GetAncient()
 	return self.ancient
 end
 
+function modifier_ai:IssueMovementOrder(order, minimumInterval)
+	if XHSCreepOrderOwnership ~= nil then
+		return XHSCreepOrderOwnership:Issue(
+			self.parent,
+			XHSCreepOrderOwnership.OWNER_MODIFIER_AI,
+			order,
+			minimumInterval
+		)
+	end
+	ExecuteOrderFromTable(order)
+	return true
+end
+
 function modifier_ai:MovePastBreakable()
 	local ancient = self:GetAncient()
 	if not IsValidEntityHandle(ancient) then return end
@@ -146,11 +174,11 @@ function modifier_ai:MovePastBreakable()
 		self.parent:SetAttacking(nil)
 	end
 	self.parent:Stop()
-	ExecuteOrderFromTable({
+	self:IssueMovementOrder({
 		UnitIndex = self.parent:entindex(),
 		OrderType = DOTA_UNIT_ORDER_MOVE_TO_POSITION,
 		Position = ancient:GetAbsOrigin(),
-	})
+	}, 1.0)
 end
 
 function modifier_ai:GetFallbackProfile()
@@ -261,15 +289,22 @@ function modifier_ai:MaintainFarmEvent()
 		return false
 	end
 
+	if self.parent.SetIdleAcquire ~= nil then
+		self.parent:SetIdleAcquire(true)
+	end
 	local attackTarget = self.parent:GetAttackTarget()
 	local stalled = not self.parent:IsMoving() and not self.parent:IsAttacking()
 	if not IsLivingTarget(attackTarget) or attackTarget ~= hero or stalled then
 		self.parent:SetForceAttackTarget(hero)
-		ExecuteOrderFromTable({
-			UnitIndex = self.parent:entindex(),
-			OrderType = DOTA_UNIT_ORDER_ATTACK_TARGET,
-			TargetIndex = hero:entindex(),
-		})
+		if self.parent.MoveToTargetToAttack ~= nil then
+			self.parent:MoveToTargetToAttack(hero)
+		else
+			ExecuteOrderFromTable({
+				UnitIndex = self.parent:entindex(),
+				OrderType = DOTA_UNIT_ORDER_ATTACK_TARGET,
+				TargetIndex = hero:entindex(),
+			})
+		end
 	end
 	return true
 end
@@ -279,7 +314,20 @@ function modifier_ai:MaintainMovement(now)
 		return self:MaintainFarmEvent()
 	end
 
-	if self.parent.xhs_wave_order_controller == true then
+	if self.parent.xhs_wave_order_controller == true
+		and self.parent.xhs_wave_unit ~= true then
+		-- Hot-reload migration for waves spawned before ownership was explicit.
+		self.parent.xhs_wave_unit = true
+	end
+	if self.parent.xhs_wave_unit == true then
+		self.parent.xhs_wave_order_controller = false
+		if XHSCreepOrderOwnership ~= nil then
+			XHSCreepOrderOwnership:Claim(
+				self.parent,
+				XHSCreepOrderOwnership.OWNER_MODIFIER_AI,
+				true
+			)
+		end
 		if XHSPerformanceCounters ~= nil then
 			XHSPerformanceCounters:Increment("wave_thinks", 1)
 		end
@@ -336,11 +384,11 @@ function modifier_ai:MaintainMovement(now)
 			if IsValidEntityHandle(vip)
 				and (self.parent:GetAbsOrigin() - vip:GetAbsOrigin()):Length2D() < attackRange then
 				self.parent:SetForceAttackTarget(nil)
-				ExecuteOrderFromTable({
+				self:IssueMovementOrder({
 					UnitIndex = self.parent:entindex(),
 					OrderType = DOTA_UNIT_ORDER_MOVE_TO_POSITION,
 					Position = ancientPosition,
-				})
+				}, 1.0)
 				self.last_movement = now
 				return false
 			end
@@ -348,11 +396,11 @@ function modifier_ai:MaintainMovement(now)
 
 		if not self.parent:IsMoving() or now - self.last_movement >= 3 then
 			self.parent:SetForceAttackTarget(nil)
-			ExecuteOrderFromTable({
+			self:IssueMovementOrder({
 				UnitIndex = self.parent:entindex(),
 				OrderType = DOTA_UNIT_ORDER_ATTACK_MOVE,
 				Position = ancientPosition,
-			})
+			}, 2.5)
 			self.last_movement = now
 		end
 	elseif self.ai_state == 3 then
@@ -362,22 +410,22 @@ function modifier_ai:MaintainMovement(now)
 			and not self.parent:IsAttacking() then
 			local waypoint = Entities:FindByName(nil, "roshan_wp_" .. randomGoal)
 			if IsValidEntityHandle(waypoint) then
-				ExecuteOrderFromTable({
+				self:IssueMovementOrder({
 					UnitIndex = self.parent:entindex(),
 					OrderType = DOTA_UNIT_ORDER_ATTACK_MOVE,
 					Position = waypoint:GetAbsOrigin(),
-				})
+				}, 1.0)
 				self.last_goal = randomGoal
 			end
 		end
 	elseif self.ai_state == 4 and not hasTarget then
 		local ancient = self:GetAncient()
 		if IsValidEntityHandle(ancient) and not self.parent:IsMoving() then
-			ExecuteOrderFromTable({
+			self:IssueMovementOrder({
 				UnitIndex = self.parent:entindex(),
 				OrderType = DOTA_UNIT_ORDER_ATTACK_MOVE,
 				Position = ancient:GetAbsOrigin(),
-			})
+			}, 2.5)
 		end
 	end
 	return hasTarget

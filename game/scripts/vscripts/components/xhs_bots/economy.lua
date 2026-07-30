@@ -14,9 +14,11 @@ XHSBotEconomy.STASH_CAPACITY = 6
 XHSBotEconomy.STASH_COLLECTION_THRESHOLD = 4
 XHSBotEconomy.SCAN_LAST_SLOT = XHSBotEconomy.STASH_LAST_SLOT
 XHSBotEconomy.ANKH_ITEM_NAME = "item_ankh_of_reincarnation"
--- Purchases are direct server transactions, so their geometric invariant is
--- deliberately stricter than the engine's generous shop-volume edge. A bot
--- must visibly enter the shop area instead of buying from a lane midpoint.
+-- Purchases are direct server transactions. Home/base inventory may be bought
+-- remotely exactly like a player purchase, but it is moved immediately into
+-- a stash slot (9-14) and remains inactive until the bot returns home.
+-- Secret-shop inventory still
+-- requires the bot to enter the real castle-shop volume.
 XHSBotEconomy.BASE_SHOP_RADIUS = 650
 XHSBotEconomy.LANE_SHOP_RADIUS = 550
 XHSBotEconomy.SECRET_SHOP_RADIUS = 550
@@ -84,6 +86,30 @@ function XHSBotEconomy:CastNamedActiveItem(hero, name, action, record)
 			request.ability = item
 			if XHSBotExecutor:Cast(hero, request, record, 0) then
 				record.last_item_action = "use:" .. name
+				return true
+			end
+		end
+	end
+	return false
+end
+
+function XHSBotEconomy:UseLootedTomes(hero, record)
+	if not IsValidEntityHandle(hero) or not hero:IsAlive() then return false end
+	for slot = 0, self.ACTIVE_LAST_SLOT do
+		local item = hero:GetItemInSlot(slot)
+		local name = ItemName(item)
+		local tome = name ~= nil and XHSBotItemCatalog:GetTome(name) or nil
+		local canUsePowerTome = name ~= "item_tome_of_power"
+			or (tonumber(hero:GetLevel()) or 0) < 30
+		if tome ~= nil and canUsePowerTome and IsCastable(item) then
+			if XHSBotExecutor:Cast(hero, {
+				ability = item,
+				mode = "no_target",
+				reason = "consume looted " .. name,
+			}, record, 0) then
+				record.looted_tomes_used = (record.looted_tomes_used or 0) + 1
+				record.last_item_action = "use_loot:" .. name
+				record.last_loot_item = name
 				return true
 			end
 		end
@@ -323,6 +349,13 @@ function XHSBotEconomy:UseConsumables(hero, record, difficulty, profile, encount
 				record.consumables_used = (record.consumables_used or 0) + 1
 				record.preferred_heal_spell = ""
 				record.last_item_action = "use:" .. name
+				if name == "item_health_potion" then
+					record.last_health_potion_used_at =
+						GameRules:GetGameTime()
+				elseif name == "item_mana_potion" then
+					record.last_mana_potion_used_at =
+						GameRules:GetGameTime()
+				end
 				if name == "item_health_potion" then
 					local chargesBefore = item.GetCurrentCharges ~= nil
 						and math.max(0, tonumber(item:GetCurrentCharges()) or 0)
@@ -663,6 +696,30 @@ function XHSBotEconomy:RemoveGrantedItem(hero, item)
 	end
 end
 
+function XHSBotEconomy:GetItemSlot(hero, item)
+	if not IsValidEntityHandle(hero) or not IsValidEntityHandle(item) then
+		return nil
+	end
+	for slot = 0, self.SCAN_LAST_SLOT do
+		if hero:GetItemInSlot(slot) == item then return slot end
+	end
+	return nil
+end
+
+function XHSBotEconomy:MovePurchasedItemToStash(hero, item)
+	local sourceSlot = self:GetItemSlot(hero, item)
+	if sourceSlot == nil then return false, "purchased item slot missing" end
+	if sourceSlot >= self.STASH_FIRST_SLOT then return true end
+	local stashSlot =
+		self:FindFreeSlot(hero, self.STASH_FIRST_SLOT, self.STASH_LAST_SLOT)
+	if stashSlot == nil then return false, "stash full" end
+	local swapped = pcall(function() hero:SwapItems(sourceSlot, stashSlot) end)
+	if not swapped or hero:GetItemInSlot(stashSlot) ~= item then
+		return false, "stash delivery swap failed"
+	end
+	return true
+end
+
 function XHSBotEconomy:GetAnkhPassiveCharges(hero)
 	if not IsValidEntityHandle(hero) or hero.FindModifierByName == nil then return 0 end
 	local modifier = hero:FindModifierByName("modifier_ankh_passives")
@@ -682,17 +739,39 @@ function XHSBotEconomy:GrantPurchasedItem(
 	entry,
 	unitsBefore,
 	chargesBefore,
-	requiredShop
+	requiredShop,
+	deliverToStash
 )
 	requiredShop = tostring(requiredShop or self:GetRequiredShop(entry))
-	local shopKind, shopDistance, shopRejection =
-		self:GetCurrentShopKind(hero, requiredShop)
-	if shopKind == nil then
-		return false,
-			"shop invariant rejected " .. tostring(entry.name)
-			.. " for " .. requiredShop .. ": " .. tostring(shopRejection),
-			nil,
-			shopDistance
+	deliverToStash = deliverToStash == true
+	local shopKind = nil
+	local shopDistance = math.huge
+	if deliverToStash then
+		if requiredShop == "secret" then
+			return false,
+				"remote stash cannot satisfy secret shop for "
+					.. tostring(entry.name),
+				nil,
+				shopDistance
+		end
+		local baseAnchor = self:GetShopAnchor("base", hero)
+		shopKind = "remote_stash"
+		shopDistance = baseAnchor ~= nil
+			and (hero:GetAbsOrigin() - baseAnchor):Length2D() or math.huge
+		if self:GetStashItemCount(hero) >= self.STASH_CAPACITY then
+			return false, "stash full", shopKind, shopDistance
+		end
+	else
+		local shopRejection = nil
+		shopKind, shopDistance, shopRejection =
+			self:GetCurrentShopKind(hero, requiredShop)
+		if shopKind == nil then
+			return false,
+				"shop invariant rejected " .. tostring(entry.name)
+				.. " for " .. requiredShop .. ": " .. tostring(shopRejection),
+				nil,
+				shopDistance
+		end
 	end
 	local purchaseName = tostring(entry.purchase_name or entry.name)
 	local ok, item = pcall(function()
@@ -708,7 +787,6 @@ function XHSBotEconomy:GrantPurchasedItem(
 	if item.SetPurchaseTime ~= nil then
 		pcall(function() item:SetPurchaseTime(GameRules:GetGameTime()) end)
 	end
-
 	local cost = math.max(0, tonumber(entry.cost) or 0)
 	if not self:WithdrawGold(playerID, cost) then
 		self:RemoveGrantedItem(hero, item)
@@ -724,6 +802,32 @@ function XHSBotEconomy:GrantPurchasedItem(
 		self:RefundGold(playerID, cost)
 		return false, "AddItem failed for " .. purchaseName, shopKind, shopDistance
 	end
+	-- Some XHS items merge, combine, or are converted into a passive charge
+	-- synchronously inside AddItem. In those cases Source invalidates or removes
+	-- the newly-created handle before it can be moved to a stash slot. The
+	-- inventory/passive delta is the transaction truth: never refund a grant
+	-- that the hero has already received.
+	local unitsAfterAdd, chargesAfterAdd =
+		self:GetEntryInventoryTotals(hero, entry)
+	local completedDuringAdd = unitsAfterAdd > (unitsBefore or 0)
+		or chargesAfterAdd > (chargesBefore or 0)
+	local purchasedItemSlot = self:GetItemSlot(hero, item)
+	local mergedBeforeStash = deliverToStash
+		and completedDuringAdd
+		and (
+			not IsValidEntityHandle(item)
+				or purchasedItemSlot == nil
+		)
+	if deliverToStash then
+		if not mergedBeforeStash then
+			local stashed, stashReason = self:MovePurchasedItemToStash(hero, item)
+			if not stashed then
+				self:RemoveGrantedItem(hero, item)
+				self:RefundGold(playerID, cost)
+				return false, stashReason, shopKind, shopDistance
+			end
+		end
+	end
 
 	local unitsAfter, chargesAfter = self:GetEntryInventoryTotals(hero, entry)
 	local completed = unitsAfter > (unitsBefore or 0)
@@ -736,7 +840,11 @@ function XHSBotEconomy:GrantPurchasedItem(
 			shopKind,
 			shopDistance
 	end
-	return true, purchaseName, shopKind, shopDistance
+	return true,
+		mergedBeforeStash and purchaseName .. ":merged_before_stash"
+			or purchaseName,
+		shopKind,
+		shopDistance
 end
 
 function XHSBotEconomy:GetInventoryTotals(hero, wantedName, lastSlot)
@@ -900,6 +1008,7 @@ function XHSBotEconomy:GetItemEquipPriority(item, snapshot, plan)
 	if name == nil then return -1000 end
 	if name == self.ANKH_ITEM_NAME then return 1200 end
 	local catalog = XHSBotItemCatalog:Get(name) or {}
+	if XHSBotItemCatalog:GetTome(name) ~= nil then return 1090 end
 	if tonumber(catalog.equip_priority) ~= nil then
 		return tonumber(catalog.equip_priority)
 	end
@@ -1153,6 +1262,175 @@ function XHSBotEconomy:CommitInventoryReplacement(playerID, retired, entry, reco
 	record.replacement_watch_started_at = nil
 end
 
+function XHSBotEconomy:UpdateBasicPotionRetirementWatch(
+	hero,
+	record,
+	snapshot
+)
+	local now = GameRules:GetGameTime()
+	local phase = CustomTimers ~= nil
+		and tonumber(CustomTimers.game_phase) or 1
+	local maximumHealth = math.max(1, hero:GetMaxHealth())
+	local sustain = math.max(
+		0,
+		tonumber(record.survival_sustain_per_second) or 0
+	)
+	local lastPotionUse = math.max(
+		tonumber(record.last_health_potion_used_at) or -math.huge,
+		tonumber(record.last_mana_potion_used_at) or -math.huge
+	)
+	local lastRespawn = tonumber(record.last_respawn_at) or -math.huge
+	local stable = phase >= 3
+		and maximumHealth >= 30000
+		and sustain >= math.max(180, maximumHealth * 0.004)
+		and now - lastPotionUse >= 180
+		and now - lastRespawn >= 150
+		and record.was_in_active_danger ~= true
+		and (tonumber(record.combat_threat) or 0) <= 0.22
+		and (tonumber(record.base_threat_score) or 0) <= 0.25
+		and snapshot.in_combat ~= true
+
+	if not stable then
+		record.basic_potion_retirement_watch_started_at = nil
+		record.basic_potions_obsolete = false
+		return false
+	end
+	record.basic_potion_retirement_watch_started_at =
+		record.basic_potion_retirement_watch_started_at or now
+	record.basic_potions_obsolete =
+		now - record.basic_potion_retirement_watch_started_at >= 90
+	return record.basic_potions_obsolete
+end
+
+function XHSBotEconomy:GetRetirementCredit(item, catalog)
+	if not IsValidEntityHandle(item) or type(catalog) ~= "table" then return 0 end
+	local cost = math.max(
+		0,
+		tonumber(catalog.total_cost) or tonumber(catalog.cost) or 0
+	)
+	if tonumber(catalog.charges) ~= nil and item.GetCurrentCharges ~= nil then
+		local charges = math.max(0, tonumber(item:GetCurrentCharges()) or 0)
+		cost = cost * charges / math.max(1, tonumber(catalog.charges))
+	end
+	return math.floor(cost * 0.5)
+end
+
+function XHSBotEconomy:FindSafeRetirementCandidate(
+	hero,
+	record,
+	profile,
+	snapshot
+)
+	if not IsValidEntityHandle(hero) or type(record) ~= "table"
+		or type(snapshot) ~= "table" then
+		return nil
+	end
+	local atShop = self:IsAtRequiredShop(hero, "home")
+		or self:IsAtRequiredShop(hero, "secret")
+	if not atShop
+		or snapshot.in_combat == true
+		or (tonumber(snapshot.health_ratio) or 0) < 0.82
+		or record.was_in_active_danger == true
+		or record.base_structure_emergency == true
+		or (tonumber(record.assignment_urgency) or 0) >= 0.82 then
+		return nil
+	end
+
+	local ownsGreaterPotion =
+		tonumber(snapshot.owned and snapshot.owned.item_potion_full) or 0
+	local redundant = type(profile) == "table"
+		and type(profile.redundant_items) == "table"
+		and profile.redundant_items or {}
+	for slot = 0, self.SCAN_LAST_SLOT do
+		local item = hero:GetItemInSlot(slot)
+		local name = ItemName(item)
+		local reason = nil
+		if name ~= nil and redundant[name] == true then
+			reason = "hero_profile_redundant"
+		elseif record.basic_potions_obsolete == true
+			and ownsGreaterPotion > 0
+			and (name == "item_health_potion"
+				or name == "item_mana_potion") then
+			reason = "greater_potion_replaces_basic_sustain"
+		end
+		if reason ~= nil then
+			local catalog = XHSBotItemCatalog:Get(name)
+			if type(catalog) == "table" then
+				return {
+					item = item,
+					name = name,
+					slot = slot,
+					catalog = catalog,
+					reason = reason,
+					credit = self:GetRetirementCredit(item, catalog),
+				}
+			end
+		end
+	end
+	return nil
+end
+
+function XHSBotEconomy:RetireUnusedItem(
+	playerID,
+	hero,
+	record,
+	profile,
+	snapshot
+)
+	local candidate = self:FindSafeRetirementCandidate(
+		hero,
+		record,
+		profile,
+		snapshot
+	)
+	if candidate == nil then return false end
+	local now = GameRules:GetGameTime()
+	local signature = candidate.name .. ":" .. candidate.reason
+	if record.item_retirement_watch_signature ~= signature then
+		record.item_retirement_watch_signature = signature
+		record.item_retirement_watch_started_at = now
+		return false
+	end
+	if now - (tonumber(record.item_retirement_watch_started_at) or now) < 30 then
+		return false
+	end
+
+	local retired = {
+		name = candidate.name,
+		charges = candidate.item.GetCurrentCharges ~= nil
+			and math.max(
+				0,
+				tonumber(candidate.item:GetCurrentCharges()) or 0
+			) or 0,
+	}
+	self:RemoveGrantedItem(hero, candidate.item)
+	if hero:GetItemInSlot(candidate.slot) == candidate.item then
+		record.last_item_rejection =
+			"safe retirement failed to remove " .. candidate.name
+		return false
+	end
+	if candidate.credit > 0
+		and not self:RefundGold(playerID, candidate.credit) then
+		self:RestoreRetiredItem(hero, retired)
+		record.last_item_rejection =
+			"safe retirement refund failed for " .. candidate.name
+		return false
+	end
+
+	record.items_sold = (record.items_sold or 0) + 1
+	record.item_sale_gold_recovered =
+		(record.item_sale_gold_recovered or 0) + candidate.credit
+	record.last_sold_item = candidate.name
+	record.last_sold_item_reason = candidate.reason
+	record.last_sold_item_at = now
+	record.last_item_action = "sell:" .. candidate.name
+		.. ":" .. candidate.reason
+	record.item_retirement_watch_signature = nil
+	record.item_retirement_watch_started_at = nil
+	record.next_economy_think = 0
+	return true
+end
+
 function XHSBotEconomy:IsBuildEntryApplicable(entry)
 	local gameDifficulty = GameRules:GetCustomGameDifficulty()
 	if tonumber(entry.minimum_game_difficulty) ~= nil
@@ -1306,6 +1584,11 @@ function XHSBotEconomy:BuildPlannerSnapshot(playerID, hero, record)
 		local ok, value = pcall(function() return hero:GetAttacksPerSecond() end)
 		if ok then attacksPerSecond = math.max(0.1, tonumber(value) or 1) end
 	end
+	local isRangedAttacker = nil
+	if hero.IsRangedAttacker ~= nil then
+		local ok, value = pcall(function() return hero:IsRangedAttacker() end)
+		if ok then isRangedAttacker = value == true end
+	end
 	return {
 		owned = owned,
 		allied_item_counts = alliedItemCounts,
@@ -1319,7 +1602,24 @@ function XHSBotEconomy:BuildPlannerSnapshot(playerID, hero, record)
 		gold = self:GetGold(playerID),
 		item_gold_spent = tonumber(record.item_gold_spent) or 0,
 		tomes_bought = tonumber(record.tomes_bought) or 0,
+		deaths = tonumber(record.deaths) or 0,
+		deaths_since_gear = math.max(
+			0,
+			(tonumber(record.deaths) or 0)
+				- (tonumber(record.last_gear_purchase_deaths) or 0)
+		),
 		game_time = now,
+		shopping_goal_age = type(record.shopping_goal) == "table"
+			and math.max(
+				0,
+				now - (tonumber(record.shopping_goal.requested_at) or now)
+			) or 0,
+		shopping_goal_shop = type(record.shopping_goal) == "table"
+			and tostring(record.shopping_goal.shop or "home") or "none",
+		shopping_goal_item = type(record.shopping_goal) == "table"
+			and tostring(record.shopping_goal.item or "none") or "none",
+		last_blocked_shop_tome_at =
+			tonumber(record.last_blocked_shop_tome_at) or -math.huge,
 		game_difficulty = GameRules:GetCustomGameDifficulty(),
 		health_ratio = hero:GetHealth() / math.max(1, hero:GetMaxHealth()),
 		mana_ratio = hero:GetMana() / math.max(1, hero:GetMaxMana()),
@@ -1337,6 +1637,8 @@ function XHSBotEconomy:BuildPlannerSnapshot(playerID, hero, record)
 			tonumber(record.survival_net_incoming_dps) or 0,
 		survival_sustain_per_second =
 			tonumber(record.survival_sustain_per_second) or 0,
+		basic_potions_obsolete =
+			record.basic_potions_obsolete == true,
 		survival_time_to_die =
 			tonumber(record.survival_time_to_die) or -1,
 		survival_fatal_before_escape =
@@ -1359,6 +1661,7 @@ function XHSBotEconomy:BuildPlannerSnapshot(playerID, hero, record)
 		attack_damage = attackDamage,
 		attacks_per_second = attacksPerSecond,
 		attack_dps = attackDamage * attacksPerSecond,
+		is_ranged_attacker = isRangedAttacker,
 		lane_anchor_distance = tonumber(record.lane_anchor_distance) or 0,
 		stuck_recoveries = tonumber(record.stuck_recoveries) or 0,
 		at_home_shop = self:IsAtRequiredShop(hero, "base"),
@@ -1419,6 +1722,9 @@ end
 function XHSBotEconomy:RecordPlan(record, snapshot, plan)
 	record.economy_phase = plan.phase
 	record.economy_reserve_gold = plan.reserve_gold
+	record.tome_reserve_gold = plan.tome_reserve_gold or 0
+	record.surplus_tome_conversion =
+		plan.surplus_tome_conversion == true
 	record.planned_item = plan.next_entry and plan.next_entry.name or ""
 	record.planned_item_family = plan.next_family or ""
 	record.planned_item_score = plan.next_score or 0
@@ -1490,19 +1796,47 @@ function XHSBotEconomy:BuildPlannedPurchases(snapshot, plan)
 	local function Add(entry)
 		if entry ~= nil then table.insert(purchases, entry) end
 	end
-	if self:ShouldRestockPotion("health", snapshot, plan) then
+	local healthRestock = self:ShouldRestockPotion("health", snapshot, plan)
+	local healthCharges = math.max(
+		0,
+		tonumber(snapshot.health_potion_charges) or 0
+	)
+	local healthTrigger = math.max(
+		0,
+		tonumber(plan.health_potion_restock) or 3
+	)
+	local criticalHealthRestock = healthRestock
+		and healthCharges <= healthTrigger
+	local function AddHealthRestock()
 		local entry = XHSBotItemCatalog:CopyEntry("item_health_potion")
 		entry.desired_charges = plan.health_potion_target
 		entry.preserve_gold = plan.reserve_gold
 		Add(entry)
 	end
+	-- Once the reserve reaches its emergency threshold, consumable sustain is
+	-- the life-insurance purchase. Route it before an Ankh: otherwise the Ankh
+	-- goal can overwrite the potion goal and feed the same death loop.
+	if criticalHealthRestock then AddHealthRestock() end
+	-- The final banked reincarnation charge is a lifecycle boundary: if it is
+	-- consumed before its replacement is purchased, Source removes the bot's
+	-- hero handle for the rest of the match. Put this paid, shop-bound purchase
+	-- ahead of non-critical top-ups, while a critical health reserve remains
+	-- the one survival exception.
+	if self:GetAnkhChargesFromSnapshot(snapshot) <= 1
+		and self:GetAnkhChargesFromSnapshot(snapshot) < (plan.ankh_target or 0) then
+		local entry = XHSBotItemCatalog:CopyEntry(self.ANKH_ITEM_NAME)
+		entry.maximum = plan.ankh_target
+		Add(entry)
+	end
+	if healthRestock and not criticalHealthRestock then AddHealthRestock() end
 	if self:ShouldRestockPotion("mana", snapshot, plan) then
 		local entry = XHSBotItemCatalog:CopyEntry("item_mana_potion")
 		entry.desired_charges = plan.mana_potion_target
 		entry.preserve_gold = plan.reserve_gold
 		Add(entry)
 	end
-	if self:GetAnkhChargesFromSnapshot(snapshot) < (plan.ankh_target or 0) then
+	if self:GetAnkhChargesFromSnapshot(snapshot) > 1
+		and self:GetAnkhChargesFromSnapshot(snapshot) < (plan.ankh_target or 0) then
 		local entry = XHSBotItemCatalog:CopyEntry(self.ANKH_ITEM_NAME)
 		entry.maximum = plan.ankh_target
 		Add(entry)
@@ -1533,7 +1867,9 @@ end
 
 function XHSBotEconomy:PurchasePlan(playerID, hero, difficulty, record, snapshot, plan)
 	snapshot.ankh_charges = self:GetAnkhCharges(hero)
-	for _, entry in ipairs(self:BuildPlannedPurchases(snapshot, plan)) do
+	local purchases = self:BuildPlannedPurchases(snapshot, plan)
+	self:ReconcileShoppingGoal(record, purchases)
+	for _, entry in ipairs(purchases) do
 		local result = self:TryPurchaseBuildEntry(
 			playerID,
 			hero,
@@ -1546,6 +1882,24 @@ function XHSBotEconomy:PurchasePlan(playerID, hero, difficulty, record, snapshot
 		if result == "purchased" or result == "travel" then return result end
 	end
 	return nil
+end
+
+function XHSBotEconomy:ReconcileShoppingGoal(record, purchases)
+	local goal = type(record) == "table" and record.shopping_goal or nil
+	if type(goal) ~= "table"
+		or goal.emergency_health_resupply == true
+		or goal.inventory_logistics == true then
+		return
+	end
+
+	for _, entry in ipairs(purchases or {}) do
+		if type(entry) == "table" and entry.name == goal.item then return end
+	end
+
+	record.shopping_goal = nil
+	record.shopping_goal_reconciliations =
+		(record.shopping_goal_reconciliations or 0) + 1
+	record.team_director_replan_requested = true
 end
 
 function XHSBotEconomy:GetShopAnchors(shop)
@@ -1699,7 +2053,15 @@ function XHSBotEconomy:ClearShoppingGoal(record, itemName)
 	end
 end
 
-function XHSBotEconomy:SetShoppingGoal(record, entry, anchor, now, urgent, reason)
+function XHSBotEconomy:SetShoppingGoal(
+	record,
+	entry,
+	anchor,
+	now,
+	urgent,
+	reason,
+	forceGear
+)
 	local existing = type(record.shopping_goal) == "table"
 		and record.shopping_goal or nil
 	local emergencyHealth = entry.consumable == "health" and urgent == true
@@ -1720,6 +2082,7 @@ function XHSBotEconomy:SetShoppingGoal(record, entry, anchor, now, urgent, reaso
 		force_home = continuingEmergency and existing.force_home == true or false,
 		emergency_health_resupply = emergencyHealth,
 		emergency_started_at = emergencyHealth and startedAt or nil,
+		force_gear = forceGear == true,
 		reason = tostring(reason or ""),
 	}
 	if emergencyHealth then
@@ -1853,7 +2216,13 @@ function XHSBotEconomy:RefreshEmergencyHealthResupply(hero, record, difficulty)
 	return false
 end
 
-function XHSBotEconomy:SetStashCollectionGoal(record, hero, now)
+function XHSBotEconomy:SetStashCollectionGoal(
+	record,
+	hero,
+	now,
+	forcePickup,
+	purchasedItem
+)
 	if type(record.shopping_goal) == "table"
 		and record.shopping_goal.emergency_health_resupply == true then
 		return false
@@ -1899,12 +2268,22 @@ function XHSBotEconomy:SetStashCollectionGoal(record, hero, now)
 		return false
 	end
 
-	local forceHome = hasAnkh or stashCount >= self.STASH_COLLECTION_THRESHOLD
+	forcePickup = forcePickup == true
+	purchasedItem = tostring(purchasedItem or "")
 	local existing = type(record.shopping_goal) == "table"
 		and record.shopping_goal.inventory_logistics == true
 		and record.shopping_goal or nil
+	local pendingRemotePurchase = forcePickup
+		or existing ~= nil and existing.remote_purchase == true
+	local pendingRemoteItem = purchasedItem ~= "" and purchasedItem
+		or pendingRemotePurchase and existing ~= nil
+			and tostring(existing.item or "") or ""
+	local forceHome = pendingRemotePurchase
+		or hasAnkh
+		or stashCount >= self.STASH_COLLECTION_THRESHOLD
 	record.shopping_goal = {
-		item = hasAnkh and self.ANKH_ITEM_NAME
+		item = pendingRemoteItem ~= "" and pendingRemoteItem
+			or hasAnkh and self.ANKH_ITEM_NAME
 			or priorityItem
 			or "stash_pickup",
 		shop = "home",
@@ -1913,7 +2292,10 @@ function XHSBotEconomy:SetStashCollectionGoal(record, hero, now)
 		urgent = forceHome,
 		force_home = forceHome,
 		inventory_logistics = true,
-		reason = hasAnkh and "equip reincarnation charge"
+		remote_purchase = pendingRemotePurchase,
+		reason = pendingRemotePurchase and pendingRemoteItem ~= ""
+			and "collect remote purchase: " .. pendingRemoteItem
+			or hasAnkh and "equip reincarnation charge"
 			or stashCount >= self.STASH_CAPACITY and "stash full"
 			or priorityItem ~= nil and "equip priority stash item"
 			or "collect purchased items",
@@ -1925,7 +2307,27 @@ function XHSBotEconomy:CanPurchaseNow(playerID, hero)
 	if not IsValidEntityHandle(hero) or not hero:IsAlive() then return false, "hero unavailable" end
 	if GameRules:IsGamePaused() then return false, "game paused" end
 	if CustomTimers ~= nil and CustomTimers.timers_paused == 1 then
-		return false, "shop disabled by game flow"
+		local strategicDowntime = false
+		if GameMode ~= nil and GameMode.SpecialArena_occuring == true then
+			strategicDowntime = XHSBotEncounterDirector == nil
+				or XHSBotEncounterDirector.IsArenaParticipant == nil
+				or not XHSBotEncounterDirector:IsArenaParticipant(playerID, hero)
+		elseif GameMode ~= nil and GameMode.FarmEvent_occuring == true then
+			local progress = SpecialEvents ~= nil
+				and type(SpecialEvents.hero_farm_event) == "table"
+				and (
+					SpecialEvents.hero_farm_event[tonumber(playerID)]
+					or SpecialEvents.hero_farm_event[tostring(playerID)]
+				) or nil
+			strategicDowntime = type(progress) ~= "table"
+		elseif GameMode ~= nil and GameMode.Muradin_occuring == true then
+			strategicDowntime = XHSBotEncounterDirector == nil
+				or XHSBotEncounterDirector.IsMuradinSurvivalActive == nil
+				or not XHSBotEncounterDirector:IsMuradinSurvivalActive(hero)
+		end
+		if not strategicDowntime then
+			return false, "shop disabled by game flow"
+		end
 	end
 	if IsPlayerXHSReincarnating ~= nil and IsPlayerXHSReincarnating(playerID) then
 		return false, "reincarnation inventory locked"
@@ -1953,6 +2355,138 @@ function XHSBotEconomy:CanPurchaseTomesNow(playerID, hero)
 	end
 	return PlayerResource ~= nil
 		and PlayerResource:IsValidPlayerID(playerID), "invalid player"
+end
+
+function XHSBotEconomy:GetSpecialArenaPreparation(playerID, hero)
+	if not IsValidEntityHandle(hero) or not hero:IsAlive()
+		or GameMode == nil or GameMode.SpecialArena_occuring ~= true
+		or SpecialEvents == nil then
+		return nil
+	end
+	local participantPlayerID = tonumber(SpecialEvents.active_arena_player_id)
+	if participantPlayerID == nil
+		or participantPlayerID ~= tonumber(playerID) then
+		return nil
+	end
+	local trigger = tonumber(SpecialEvents.Ramero_trigger) or 0
+	local encounter = trigger == 1 and "ramero_baristol"
+		or trigger == 2 and "sogat" or nil
+	if encounter == nil then return nil end
+
+	-- The milestone starts a 5.5-second cinematic before the bosses exist.
+	-- The chosen hero cannot legitimately reach a shop in that interval, but
+	-- the normal player-facing tome transaction remains legal. Once a boss
+	-- exists, combat owns every tick and preparation stops immediately.
+	local boss = XHSBotEncounterDirector ~= nil
+		and XHSBotEncounterDirector.GetArenaBoss ~= nil
+		and XHSBotEncounterDirector:GetArenaBoss(encounter)
+		or nil
+	if IsValidEntityHandle(boss) and boss:IsAlive() then return nil end
+	return {
+		id = encounter,
+		trigger = trigger,
+	}
+end
+
+function XHSBotEconomy:PrepareSpecialArena(
+	playerID,
+	hero,
+	record,
+	difficulty,
+	plan,
+	preparation
+)
+	if type(preparation) ~= "table" or type(record) ~= "table"
+		or type(plan) ~= "table" then
+		return 0
+	end
+	local trigger = tonumber(preparation.trigger) or 0
+	if record.arena_preparation_trigger ~= trigger then
+		record.arena_preparation_trigger = trigger
+		record.arena_preparation_event = tostring(preparation.id or "")
+		record.arena_preparation_tomes = 0
+		record.arena_preparation_started_at = GameRules:GetGameTime()
+		record.arena_preparation_result = "started"
+		if XHSBotDecisionAudit ~= nil
+			and XHSBotDecisionAudit.RecordArenaPreparation ~= nil then
+			XHSBotDecisionAudit:RecordArenaPreparation(
+				playerID,
+				"participant",
+				preparation.id,
+				"started",
+				record,
+				0
+			)
+		end
+	end
+
+	local cap = math.max(
+		0,
+		math.floor(tonumber(difficulty.pre_arena_tome_cap) or 0)
+	)
+	local boughtAlready = math.max(
+		0,
+		math.floor(tonumber(record.arena_preparation_tomes) or 0)
+	)
+	local remaining = math.max(0, cap - boughtAlready)
+	if remaining <= 0 then
+		record.arena_preparation_result = "cap_reached"
+		return 0
+	end
+
+	local batchDifficulty = {}
+	for key, value in pairs(difficulty or {}) do
+		batchDifficulty[key] = value
+	end
+	batchDifficulty.max_tomes_per_think = math.max(
+		1,
+		math.min(
+			remaining,
+			math.floor(
+				tonumber(difficulty.pre_arena_tomes_per_think)
+					or tonumber(difficulty.max_tomes_per_think)
+					or 1
+			)
+		)
+	)
+	local bought = self:BuyTomes(
+		playerID,
+		hero,
+		math.max(0, tonumber(plan.reserve_gold) or 0),
+		batchDifficulty,
+		remaining
+	)
+	if bought > 0 then
+		record.arena_preparation_tomes = boughtAlready + bought
+		record.tomes_bought = (record.tomes_bought or 0) + bought
+		record.last_item_action = "pre_arena_tomes:" .. tostring(bought)
+		record.arena_preparation_result = "tomes_bought"
+		if XHSBotDecisionAudit ~= nil
+			and XHSBotDecisionAudit.RecordArenaPreparation ~= nil then
+			XHSBotDecisionAudit:RecordArenaPreparation(
+				playerID,
+				"participant",
+				preparation.id,
+				"tomes_bought",
+				record,
+				bought
+			)
+		end
+	elseif record.arena_preparation_result == "started" then
+		record.arena_preparation_result = "reserve_preserved"
+		if XHSBotDecisionAudit ~= nil
+			and XHSBotDecisionAudit.RecordArenaPreparation ~= nil then
+			XHSBotDecisionAudit:RecordArenaPreparation(
+				playerID,
+				"participant",
+				preparation.id,
+				"reserve_preserved",
+				record,
+				0
+			)
+		end
+	end
+	return bought
 end
 
 function XHSBotEconomy:ResolvePendingPurchase(hero, record)
@@ -2020,6 +2554,10 @@ function XHSBotEconomy:TryPurchaseBuildEntry(
 			or type(record.shopping_goal) == "table"
 			and record.shopping_goal.emergency_health_resupply == true
 		)
+	-- Route before the final charge is consumed. Waiting for zero is too late:
+	-- the next death deletes the registered bot hero before economy can think.
+	local replacingLastAnkh = entry.name == self.ANKH_ITEM_NAME
+		and self:GetAnkhCharges(hero) <= 1
 
 	local canPurchase, reason = self:CanPurchaseNow(playerID, hero)
 	if not canPurchase then
@@ -2042,7 +2580,26 @@ function XHSBotEconomy:TryPurchaseBuildEntry(
 			or "cannot afford " .. entry.name
 		return "wait"
 	end
-	if not self:IsAtRequiredShop(hero, requiredShop) then
+	local nonConsumableGear = entry.consumable == nil
+		and entry.name ~= self.ANKH_ITEM_NAME
+	local deathsSinceGear = math.max(
+		0,
+		(tonumber(record.deaths) or 0)
+			- (tonumber(record.last_gear_purchase_deaths) or 0)
+	)
+	local purchaseAge = now - (tonumber(record.last_gear_purchase_at) or 0)
+	local forceGear = nonConsumableGear
+		and (
+			self:GetGold(playerID) >= math.max(
+				cost + preserveGold,
+				math.max(25000, cost * 2.5)
+			)
+			or deathsSinceGear >= 1 and purchaseAge >= 18
+		)
+	local atRequiredShop = self:IsAtRequiredShop(hero, requiredShop)
+	local remoteStashDelivery = not atRequiredShop
+		and requiredShop ~= "secret"
+	if not atRequiredShop and not remoteStashDelivery then
 		local shop = requiredShop
 		local anchor = continuingHealthRestock
 			and self:GetShopAnchor("base", hero)
@@ -2053,11 +2610,18 @@ function XHSBotEconomy:TryPurchaseBuildEntry(
 				entry,
 				anchor,
 				now,
-				continuingHealthRestock,
+				continuingHealthRestock or replacingLastAnkh,
 				continuingHealthRestock
-				and "health potion reserve reached"
-				or "scheduled build restock"
+					and "health potion reserve reached"
+				or replacingLastAnkh
+					and "replace consumed reincarnation charge"
+				or forceGear and "forced gear spending window"
+				or "scheduled build restock",
+				forceGear
 			)
+			if replacingLastAnkh then
+				record.shopping_goal.life_insurance = true
+			end
 			if continuingHealthRestock then
 				record.shopping_goal.force_home = true
 				record.shopping_goal.anchor = CopyPosition(anchor)
@@ -2076,7 +2640,18 @@ function XHSBotEconomy:TryPurchaseBuildEntry(
 		record.item_retry_after[entry.name] = now + (difficulty.shop_retry_interval or 15)
 		return "wait"
 	end
-	if entry.consumable ~= nil then
+	if remoteStashDelivery
+		and self:GetStashItemCount(hero) >= self.STASH_CAPACITY then
+		self:SetStashCollectionGoal(record, hero, now, true, entry.name)
+		record.last_item_rejection =
+			"stash full; collect purchases before buying " .. entry.name
+		record.item_retry_after[entry.name] = now + math.min(
+			5,
+			difficulty.shop_retry_interval or 15
+		)
+		return "travel"
+	end
+	if entry.consumable ~= nil and not remoteStashDelivery then
 		local anchor = continuingHealthRestock
 			and self:GetShopAnchor("base", hero)
 			or self:GetShopAnchor(requiredShop, hero)
@@ -2096,11 +2671,12 @@ function XHSBotEconomy:TryPurchaseBuildEntry(
 				record.shopping_goal.anchor = CopyPosition(anchor)
 			end
 		end
-	else
+	elseif not remoteStashDelivery then
 		self:ClearShoppingGoal(record, entry.name)
 	end
 	local retired = nil
-	if not self:HasFreeInventorySlot(hero)
+	if not remoteStashDelivery
+		and not self:HasFreeInventorySlot(hero)
 		and unitsBefore <= 0
 		and entry.combines ~= true then
 		local stashFull =
@@ -2144,7 +2720,8 @@ function XHSBotEconomy:TryPurchaseBuildEntry(
 			entry,
 			unitsBefore,
 			chargesBefore,
-			requiredShop
+			requiredShop,
+			remoteStashDelivery
 		)
 	record.last_purchase_item = tostring(entry.name)
 	record.last_purchase_shop = requiredShop
@@ -2172,6 +2749,18 @@ function XHSBotEconomy:TryPurchaseBuildEntry(
 		self:ClearShoppingGoal(record, entry.name)
 		record.last_item_rejection = purchaseResult
 		record.item_retry_after[entry.name] = now + (difficulty.shop_retry_interval or 15)
+		if XHSBotDecisionAudit ~= nil then
+			XHSBotDecisionAudit:RecordPurchase(
+				playerID,
+				false,
+				entry,
+				record,
+				requiredShop,
+				purchaseShopKind,
+				purchaseShopDistance,
+				purchaseResult
+			)
+		end
 		return "wait"
 	end
 
@@ -2182,10 +2771,16 @@ function XHSBotEconomy:TryPurchaseBuildEntry(
 	record.shop_purchase_counts[purchaseShopKind] =
 		(record.shop_purchase_counts[purchaseShopKind] or 0) + 1
 	record.last_item_rejection = nil
+	if nonConsumableGear then
+		record.last_gear_purchase_at = now
+		record.last_gear_purchase_deaths = tonumber(record.deaths) or 0
+	end
 	if retired ~= nil then
 		self:CommitInventoryReplacement(playerID, retired, entry, record)
 	else
-		record.last_item_action = "buy:" .. entry.name
+		record.last_item_action = remoteStashDelivery
+			and "buy_to_stash:" .. entry.name
+			or "buy:" .. entry.name
 	end
 	local stillNeeded = self:NeedsBuildEntry(hero, entry, difficulty)
 	if entry.consumable ~= nil and stillNeeded == true then
@@ -2212,7 +2807,25 @@ function XHSBotEconomy:TryPurchaseBuildEntry(
 		record.next_economy_think = 0
 	else
 		self:ClearShoppingGoal(record, entry.name)
-		self:SetStashCollectionGoal(record, hero, now)
+		self:SetStashCollectionGoal(
+			record,
+			hero,
+			now,
+			remoteStashDelivery,
+			remoteStashDelivery and entry.name or nil
+		)
+	end
+	if XHSBotDecisionAudit ~= nil then
+		XHSBotDecisionAudit:RecordPurchase(
+			playerID,
+			true,
+			entry,
+			record,
+			requiredShop,
+			purchaseShopKind,
+			purchaseShopDistance,
+			purchaseResult
+		)
 	end
 	return "purchased"
 end
@@ -2268,6 +2881,19 @@ function XHSBotEconomy:BuyTomes(playerID, hero, reserveGold, difficulty, maximum
 		self:RefundGold(playerID, tomeCost)
 		return 0
 	end
+	if XHSBotDecisionAudit ~= nil then
+		XHSBotDecisionAudit:RecordPurchase(
+			playerID,
+			true,
+			tomeEntry,
+			XHSBotPlayerRegistry ~= nil
+				and XHSBotPlayerRegistry:GetBot(playerID) or nil,
+			"direct",
+			"direct",
+			0,
+			"count:" .. tostring(count)
+		)
+	end
 	return count
 end
 
@@ -2312,6 +2938,15 @@ function XHSBotEconomy:Think(playerID, hero, record, profile, difficulty)
 
 	local now = GameRules:GetGameTime()
 	self:RefreshEmergencyHealthResupply(hero, record, difficulty)
+	local arenaPreparation =
+		self:GetSpecialArenaPreparation(playerID, hero)
+	if arenaPreparation ~= nil
+		and record.arena_preparation_trigger
+			~= tonumber(arenaPreparation.trigger) then
+		-- Wake the economy immediately when the kill milestone starts. Easy's
+		-- normal 2.75-second cadence could otherwise miss most of the intro.
+		record.next_economy_think = 0
+	end
 	local pendingResult = self:ResolvePendingPurchase(hero, record)
 	if pendingResult == "pending" or pendingResult == "purchased" then
 		return "shopping"
@@ -2330,17 +2965,60 @@ function XHSBotEconomy:Think(playerID, hero, record, profile, difficulty)
 	record.stash_item_count = self:GetStashItemCount(hero)
 	record.ankh_charges = self:GetAnkhCharges(hero)
 	local stashTravelRequired = self:SetStashCollectionGoal(record, hero, now)
-	if stashTravelRequired and not atHomeShop then
-		return "shopping"
-	end
 
 	record.ability_points_spent = (record.ability_points_spent or 0)
 		+ self:SpendAbilityPoints(hero, profile)
 	local snapshot = self:BuildPlannerSnapshot(playerID, hero, record)
 	snapshot.ankh_charges = record.ankh_charges
+	self:UpdateBasicPotionRetirementWatch(hero, record, snapshot)
+	snapshot.basic_potions_obsolete =
+		record.basic_potions_obsolete == true
 	local plan = XHSBotItemPlanner:Plan(snapshot, profile, difficulty)
 	plan = self:StabilizePlan(record, plan, now)
 	self:RecordPlan(record, snapshot, plan)
+
+	-- Tomes mirror the legal player command: they are an immediate background
+	-- stat purchase, not a shop visit, inventory operation, or movement goal.
+	-- Evaluate them before stash travel and combat-item actions so a pending
+	-- reserve pickup can never starve tome progression for an entire match.
+	local backgroundTomes = 0
+	if arenaPreparation ~= nil then
+		backgroundTomes = self:PrepareSpecialArena(
+			playerID,
+			hero,
+			record,
+			difficulty,
+			plan,
+			arenaPreparation
+		)
+	elseif plan.tome_allowance > 0 then
+		backgroundTomes = self:BuyTomes(
+			playerID,
+			hero,
+			math.max(0, tonumber(plan.tome_reserve_gold) or 0),
+			difficulty,
+			plan.tome_allowance
+		)
+		if backgroundTomes > 0 then
+			record.tomes_bought =
+				(record.tomes_bought or 0) + backgroundTomes
+			if plan.surplus_tome_conversion == true then
+				record.surplus_tomes_bought =
+					(record.surplus_tomes_bought or 0) + backgroundTomes
+			end
+			record.last_item_action = snapshot.in_farm_event
+				and "farm_event_tomes:" .. tostring(backgroundTomes)
+				or "background_tomes:" .. tostring(backgroundTomes)
+			if plan.blocked_shop_tome_due == true then
+				record.last_blocked_shop_tome_at = now
+			end
+		end
+	end
+
+	if stashTravelRequired and not atHomeShop then
+		return "shopping"
+	end
+
 	record.defer_potion_for_spell_now = false
 	if self:UseEmergencyTacticalItems(hero, record) then return "item" end
 	local inventoryOptimized =
@@ -2354,27 +3032,23 @@ function XHSBotEconomy:Think(playerID, hero, record, profile, difficulty)
 	if inventoryOptimized then
 		return "inventory"
 	end
+	if self:RetireUnusedItem(
+		playerID,
+		hero,
+		record,
+		profile,
+		snapshot
+	) then
+		return "inventory"
+	end
+	if self:UseLootedTomes(hero, record) then
+		return "item"
+	end
 	if self:UseConsumables(hero, record, difficulty, profile, encounter) then
 		return "healing"
 	end
 	if record.defer_potion_for_spell_now == true then return nil end
 	if self:UseTacticalItems(hero, record, encounter) then return "item" end
-	if snapshot.in_farm_event and plan.tome_allowance > 0 then
-		-- Farm Event intentionally converts its isolated combat income into
-		-- stats, but the planner still caps each transaction.
-		local farmTomes = self:BuyTomes(
-			playerID,
-			hero,
-			0,
-			difficulty,
-			plan.tome_allowance
-		)
-		if farmTomes > 0 then
-			record.tomes_bought = (record.tomes_bought or 0) + farmTomes
-			record.last_item_action = "farm_event_tomes:" .. tostring(farmTomes)
-			return "shopping"
-		end
-	end
 	local buildResult = self:PurchasePlan(
 		playerID,
 		hero,
@@ -2389,21 +3063,8 @@ function XHSBotEconomy:Think(playerID, hero, record, profile, difficulty)
 	if buildResult == "travel" then
 		-- Travel must reach the Brain on this same tick so the newly forced
 		-- emergency assignment can issue movement immediately. It also prevents
-		-- a tome purchase from consuming the potion reserve while en route.
+		-- an ordinary inventory action from delaying the route.
 		return "travel"
-	end
-
-	local bought = self:BuyTomes(
-		playerID,
-		hero,
-		plan.reserve_gold,
-		difficulty,
-		plan.tome_allowance
-	)
-	if bought > 0 then
-		record.tomes_bought = (record.tomes_bought or 0) + bought
-		record.last_item_action = "buy_tomes:" .. tostring(bought)
-		return "shopping"
 	end
 	return nil
 end

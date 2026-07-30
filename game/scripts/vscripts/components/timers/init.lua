@@ -524,6 +524,9 @@ end
 
 function CustomTimers:IncrementGamePhase()
 	CustomTimers.game_phase = CustomTimers.game_phase + 1
+	if ResetPhaseOneSpawnBudget ~= nil then
+		ResetPhaseOneSpawnBudget(CustomTimers.game_phase == 1)
+	end
 
 	if CustomTimers.game_phase == 3 and RespawnDeadHeroesForPhase3Start ~= nil then
 		RespawnDeadHeroesForPhase3Start()
@@ -702,6 +705,9 @@ function SpecialWave(iCardinalPoint, force)
 	for j = 1, 10 do
 		local spawned_unit = CreateUnitByName(unit[waveIndex], real_point:GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_1)
 		if spawned_unit ~= nil then
+			if RegisterPhaseOneBudgetEnemy ~= nil then
+				RegisterPhaseOneBudgetEnemy(spawned_unit)
+			end
 			wave.units[spawned_unit:entindex()] = true
 			CustomTimers.active_special_wave_units[spawned_unit:entindex()] = wave
 		end

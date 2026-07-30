@@ -1014,7 +1014,7 @@
 		}
 	}
 
-	"29" // Techies Arcana blast
+	"29" // Lion Arcana Finger of Death
 	{
 		"item_id"					"16315"
 		"item_name"					"battlepass_kill_effect_radiant_tower"
@@ -1030,7 +1030,7 @@
 			{
 				"type"			"particle"
 				"asset"			"particles/kill_effect/default_target.vpcf"
-				"modifier"		"particles/econ/items/techies/techies_arcana/techies_suicide_kills_arcana.vpcf"
+				"modifier"		"particles/econ/items/lion/lion_ti8/lion_spell_finger_death_arcana.vpcf"
 			}
 		}
 	}
@@ -1064,7 +1064,7 @@
 		}
 	}
 
-	"31" // Spectre Arcana kill effect (free version)
+	"31" // Queen of Pain Arcana target death
 	{
 		"item_id"					"16315"
 		"item_name"					"battlepass_kill_effect_spectre_free"
@@ -1080,7 +1080,7 @@
 			{
 				"type"			"particle"
 				"asset"			"particles/kill_effect/default_target.vpcf"
-				"modifier"		"particles/econ/items/spectre/spectre_arcana/spectre_arcana_illusion_killed_flame.vpcf"
+				"modifier"		"particles/econ/items/queen_of_pain/qop_arcana/qop_arcana_tgt_death.vpcf"
 			}
 		}
 	}

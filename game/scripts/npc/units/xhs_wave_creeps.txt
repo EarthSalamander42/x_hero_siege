@@ -2319,16 +2319,16 @@
 	}
 
 	//=================================================================================
-	// Creature: Mini Enchantresses
+	// Creature: Mega Radiant Bird Creeps
 	//=================================================================================
 	"npc_xhs_elf_creep_ranged_4"
 	{
 		// General
 		"BaseClass"					"npc_dota_creature"	// Class of entity of link to.
-		"Model"						"models/heroes/enchantress/enchantress.vmdl"	// Model.
-		"ModelScale"				"0.95"
+		"Model"						"models/creeps/lane_creeps/creep_bird_radiant/creep_bird_radiant_ranged_mega.vmdl"	// Model.
+		"ModelScale"				"1.08"
 		"Level"						"1"
-		"SoundSet"					"Hero_Enchantress"
+		"SoundSet"					"Creep_Good_Range"
 		"UseAI"						"1"
 
 		// Abilities
@@ -2352,7 +2352,7 @@
 		"AttackAnimationPoint"		"0.40"						// Normalized time in animation cycle to attack.
 		"AttackAcquisitionRange"	"1500"						// Range within a target can be acquired.
 		"AttackRange"				"600"						// Range within a target can be attacked.
-		"ProjectileModel"			"particles/units/heroes/hero_enchantress/enchantress_base_attack.vpcf"							// Particle system model for projectile.
+		"ProjectileModel"			"particles/base_attacks/ranged_goodguy.vpcf"							// Particle system model for projectile.
 		"ProjectileSpeed"			"1100"							// Speed of projectile.
 
 		// Bounty

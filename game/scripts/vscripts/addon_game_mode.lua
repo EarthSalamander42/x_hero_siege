@@ -1,3 +1,4 @@
+require('libraries/camera_motion')
 require('internal/util')
 require('components/precache/init')
 require('internal/vanilla_extension')

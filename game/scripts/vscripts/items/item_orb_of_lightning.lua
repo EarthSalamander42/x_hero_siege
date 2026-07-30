@@ -182,7 +182,7 @@ function modifier_orb_of_lightning_active:OnAttackLanded(params)
 			if RandomInt(1, 100) <= self.purge_chance then
 				if ability:IsCooldownReady() then
 					if not params.target:IsBuilding() then
-						params.target:AddNewModifier(caster, ability, "modifier_orb_of_lightning_purge", { duration = self.duration })
+						params.target:AddNewModifier(params.attacker, ability, "modifier_orb_of_lightning_purge", { duration = self.duration })
 						StartLightningOrbsCooldown(params.attacker, self.purge_cooldown)
 					end
 				end

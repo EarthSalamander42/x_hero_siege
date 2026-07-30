@@ -146,7 +146,7 @@ function XHSBotUtility:Build(context)
 	end
 
 	local retreatThreshold = context.retreat_threshold or 0.25
-	if context.base_last_stand == true then
+	if context.base_last_stand == true and context.shopping ~= true then
 		-- The Ancient is the hard retreat limit, but the campfire is not a
 		-- generic destination. Fight where contact happens; only a freshly
 		-- respawned bot already surrounded at spawn treats this as a local hold.
@@ -188,6 +188,7 @@ function XHSBotUtility:Build(context)
 	end
 
 	if context.at_ancient_retreat_limit == true
+		and context.shopping ~= true
 		and context.target == nil
 		and context.health_ratio <= retreatThreshold then
 		for _, abilityAction in ipairs(context.ability_actions or {}) do
@@ -203,7 +204,20 @@ function XHSBotUtility:Build(context)
 				)
 			end
 		end
-		AddAction(actions, "hold", 120, {}, "recover in place at Ancient")
+		local nearbyAttackers = (tonumber(context.close_enemies) or 0) > 0
+		local lastStandPosition = context.strategic_threat_position
+			or context.retreat_position
+		if nearbyAttackers and lastStandPosition ~= nil then
+			AddAction(
+				actions,
+				"attack_move",
+				145,
+				{ position = lastStandPosition },
+				"Ancient last stand: clear nearby attackers"
+			)
+		else
+			AddAction(actions, "hold", 120, {}, "recover in place at Ancient")
+		end
 		return self:Sort(actions)
 	end
 
@@ -268,7 +282,8 @@ function XHSBotUtility:Build(context)
 			or threatenedRetreat
 			or forecastFatal
 		)
-	if shouldRetreat then
+	if shouldRetreat
+		and (tonumber(context.retreat_distance) or math.huge) > 160 then
 		local forecastMargin = math.max(
 			0,
 			(tonumber(context.escape_time) or 0)
@@ -386,6 +401,51 @@ function XHSBotUtility:Build(context)
 				.. tostring(context.rune_type or "nearby") .. " rune"
 		)
 		return self:Sort(actions)
+	end
+
+	if not shouldRetreat and context.loot_entity ~= nil then
+		if context.loot_kind == "drop"
+			or context.loot_kind == "shared_tome" then
+			local sharedTome = context.loot_kind == "shared_tome"
+			AddAction(
+				actions,
+				"pickup_loot",
+				sharedTome
+					and Clamp(
+						132 - (tonumber(context.loot_distance) or 0) / 70,
+						116,
+						132
+					)
+					or Clamp(
+						118 - (tonumber(context.loot_distance) or 0) / 80,
+						104,
+						118
+					),
+				{
+					target = context.loot_entity,
+					position = context.loot_position,
+					objective = sharedTome and "shared_tome" or "crate_loot",
+					item_name = context.loot_item,
+				},
+				sharedTome
+					and "pick up shared tome "
+						.. tostring(context.loot_item or "")
+					or "pick up crate loot "
+						.. tostring(context.loot_item or "")
+			)
+		elseif context.loot_kind == "crate" then
+			AddAction(
+				actions,
+				"break_crate",
+				Clamp(76 - (tonumber(context.loot_distance) or 0) / 100, 67, 76),
+				{
+					target = context.loot_entity,
+					maximum_distance = 900,
+					objective = "crate",
+				},
+				"break nearby loot crate"
+			)
+		end
 	end
 
 	for _, abilityAction in ipairs(context.ability_actions or {}) do

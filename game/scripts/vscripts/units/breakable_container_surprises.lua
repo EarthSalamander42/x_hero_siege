@@ -97,6 +97,8 @@ function GameMode:CreateBreakableContainerCommonItemDrop( hAttacker, hBreakableE
 		local nRandomIndex = RandomInt( 1, #hBreakableEnt.CommonItems )
 		local newItem = CreateItem( hBreakableEnt.CommonItems[ nRandomIndex ], nil, nil )
 		local drop = CreateItemOnPositionForLaunch( hBreakableEnt:GetAbsOrigin(), newItem )
+		drop.xhs_breakable_loot = true
+		newItem.xhs_breakable_loot = true
 
 		local vPos = self:GetBreakableRewardSpawnPos( hBreakableEnt )
 
@@ -117,6 +119,8 @@ function GameMode:CreateBreakableContainerRareItemDrop( hAttacker, hBreakableEnt
 		local nRandomIndex = RandomInt( 1, #hBreakableEnt.RareItems )
 		local newItem = CreateItem( hBreakableEnt.RareItems[ nRandomIndex ], nil, nil )
 		local drop = CreateItemOnPositionForLaunch( hBreakableEnt:GetAbsOrigin(), newItem )
+		drop.xhs_breakable_loot = true
+		newItem.xhs_breakable_loot = true
 
 		local vPos = self:GetBreakableRewardSpawnPos( hBreakableEnt )
 
@@ -148,6 +152,8 @@ function GameMode:CreateBreakableContainerGoldDrop( hAttacker, hBreakableEnt )
 		newItem:SetPurchaseTime(0)
 		newItem:SetCurrentCharges( nGoldToDrop )
 		local drop = CreateItemOnPositionSync( hBreakableEnt:GetAbsOrigin(), newItem )
+		drop.xhs_breakable_loot = true
+		newItem.xhs_breakable_loot = true
 
 		local vPos = self:GetBreakableRewardSpawnPos( hBreakableEnt )
 

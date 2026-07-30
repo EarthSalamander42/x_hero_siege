@@ -161,6 +161,9 @@ ListenToGameEvent('npc_spawned', function(event)
 
 		Timers:CreateTimer(0.1, function()
 			if npc and not npc:IsNull() then
+				if SupporterHighFive and SupporterHighFive.EnsureAbility then
+					SupporterHighFive:EnsureAbility(npc)
+				end
 				Battlepass:ApplySupporterLoadout(npc:GetPlayerID(), npc)
 				if Battlepass.ReapplySupporterDevTest then
 					Battlepass:ReapplySupporterDevTest(npc:GetPlayerID(), npc)

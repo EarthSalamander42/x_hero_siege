@@ -253,6 +253,47 @@ function XHSBotExecutor:Toggle(hero, ability, desiredState, record, allowPerAtta
 	return true
 end
 
+function XHSBotExecutor:PickupItem(hero, drop, record)
+	if DOTA_UNIT_ORDER_PICKUP_ITEM == nil or not IsValidEntityHandle(hero)
+		or not IsValidEntityHandle(drop)
+		or drop.GetContainedItem == nil
+		or not IsValidEntityHandle(drop:GetContainedItem()) then
+		return self:Reject(record, "invalid supported loot pickup")
+	end
+	local item = drop:GetContainedItem()
+	local itemName = item.GetAbilityName ~= nil and item:GetAbilityName() or "unknown"
+	local sharedTome = XHSBotItemCatalog ~= nil
+		and XHSBotItemCatalog.GetTome ~= nil
+		and XHSBotItemCatalog:GetTome(itemName) ~= nil
+	if drop.xhs_breakable_loot ~= true and not sharedTome then
+		return self:Reject(record, "unsupported ground item pickup")
+	end
+	if Distance2D(hero:GetAbsOrigin(), drop:GetAbsOrigin()) > 1100 then
+		return self:Reject(record, "ground loot beyond pickup leash")
+	end
+	local signature = "pickup_loot:" .. tostring(drop:entindex())
+	if not self:CanIssue(record, signature, 0.75) then return false end
+	ExecuteOrderFromTable({
+		UnitIndex = hero:entindex(),
+		OrderType = DOTA_UNIT_ORDER_PICKUP_ITEM,
+		TargetIndex = drop:entindex(),
+		Queue = false,
+	})
+	self:Record(
+		record,
+		signature,
+		sharedTome and "pick up shared tome " .. itemName
+			or "pick up crate loot " .. itemName,
+		0.30
+	)
+	record.last_movement_destination = drop:GetAbsOrigin()
+	record.last_movement_order_at = GameTime()
+	record.last_movement_kind = "pickup_loot"
+	record.loot_pickup_orders = (record.loot_pickup_orders or 0) + 1
+	record.last_loot_item = itemName
+	return true
+end
+
 function XHSBotExecutor:ToggleAutocast(hero, ability, desiredState, record)
 	if not IsValidEntityHandle(hero)
 		or not IsValidEntityHandle(ability)
@@ -450,6 +491,14 @@ function XHSBotExecutor:Execute(hero, action, record, difficulty)
 			record,
 			action.data.maximum_distance or difficulty.max_chase_distance
 		)
+	elseif action.id == "break_crate" then
+		local issued = self:Attack(hero, action.data.target, record, 900)
+		if issued then
+			record.crates_targeted = (record.crates_targeted or 0) + 1
+		end
+		return issued
+	elseif action.id == "pickup_loot" then
+		return self:PickupItem(hero, action.data.target, record)
 	elseif action.id == "cast_ability" then
 		return self:Cast(hero, action.data, record, jitter * 0.35)
 	elseif action.id == "hold" then

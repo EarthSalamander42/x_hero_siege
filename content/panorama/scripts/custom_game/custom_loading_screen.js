@@ -10,6 +10,7 @@ var api_local_player_retry_seconds = 0.25;
 var api_local_player_max_attempts = 40;
 var active_vote_sequence = [];
 var active_vote_index = 0;
+var vote_progress_category = "difficulty";
 var vote_modal_mode = "settings";
 var custom_poll_state = { polls: [] };
 var custom_poll_active_poll_id = "";
@@ -185,6 +186,7 @@ var vote_tooltips = {};
 var vote_array = {
 	"XHS": {
 		"difficulty": 5,
+		"ai_allies": 2,
 	},
 	"PW": {
 		"gamemode": 4,
@@ -205,6 +207,7 @@ var XHS_DIFFICULTY_VOTE_STATS = {
 var vote_fallbacks = {
 	loading_screen_bot_setup_title: "AI ALLIES",
 	loading_screen_bot_setup_dev_feature: "DEV / TOOLS ONLY",
+	loading_screen_bot_setup_public_feature: "UNANIMOUS OPT-IN",
 	loading_screen_bot_setup_count: "Allies",
 	loading_screen_bot_setup_difficulty: "Difficulty",
 	loading_screen_bot_setup_composition: "Composition",
@@ -220,6 +223,7 @@ var vote_fallbacks = {
 	loading_screen_bot_setup_spectator_note: "Spectator mode: AI allies own every active lane while you observe.",
 	loading_screen_bot_setup_confirm: "Apply AI setup",
 	loading_screen_bot_setup_waiting: "Waiting for the bot controller...",
+	loading_screen_bot_setup_vote_waiting: "AI allies unlock after every human votes Yes ({yes}/{total}).",
 	loading_screen_bot_setup_controller: "You control this setup.",
 	loading_screen_bot_setup_controller_only: "Only the first human player can edit AI allies.",
 	loading_screen_bot_setup_locked: "AI setup is locked for this launch.",
@@ -230,6 +234,16 @@ var vote_fallbacks = {
 	loading_screen_ai_ally_status: "AI ALLY / {difficulty}",
 	loading_screen_ai_ready_status: "AI READY / {difficulty}",
 	loading_screen_ai_bot_name: "XHS Bot {number}",
+	loading_screen_vote_tab_game_mode: "Game Mode",
+	loading_screen_ai_vote_unanimity_rule: "Unanimous approval required. One No disables AI allies.",
+	loading_screen_ai_vote_pending: "Waiting for unanimity: {yes}/{total} Yes.",
+	loading_screen_ai_vote_rejected: "AI allies disabled: at least one player voted No.",
+	loading_screen_ai_vote_approved: "Unanimous vote confirmed. The host can configure AI allies.",
+	vote_ai_allies: "AI Allies",
+	vote_ai_allies_1: "Yes, enable AI allies",
+	vote_ai_allies_1_description: "Allow the host to add and configure allied bots for this match.",
+	vote_ai_allies_2: "No AI allies",
+	vote_ai_allies_2_description: "Keep this match human-only. AI allies require unanimous approval.",
 };
 
 var link_targets = "";
@@ -298,12 +312,16 @@ function LocalizeTemplate(token, values) {
 }
 
 function IsXHSBotSetupAllowed() {
-	return typeof Game !== "undefined" &&
-		typeof Game.IsInToolsMode === "function" &&
-		Game.IsInToolsMode() &&
-		game_options !== undefined &&
+	return game_options !== undefined &&
 		game_options !== null &&
 		String(game_options.game_type) === "XHS";
+}
+
+function XHSBotSetupHasUnanimousApproval() {
+	return IsXHSBotSetupAllowed() &&
+		!!xhs_bot_setup_config &&
+		IsTruthy(xhs_bot_setup_config.vote_approved) &&
+		IsTruthy(xhs_bot_setup_config.available);
 }
 
 function XHSBotSetupSafeJSON(value) {
@@ -322,8 +340,8 @@ function XHSBotSetupGetEditBlockReason() {
 	if (!xhs_bot_setup_config) {
 		return "config_missing";
 	}
-	if (!IsTruthy(xhs_bot_setup_config.available)) {
-		return "server_unavailable";
+	if (!XHSBotSetupHasUnanimousApproval()) {
+		return "unanimous_vote_required";
 	}
 	if (!XHSBotSetupIsController()) {
 		return "not_controller";
@@ -353,6 +371,8 @@ function XHSBotSetupSnapshot() {
 		controller_player_id: controller_player_id,
 		is_controller: XHSBotSetupIsController(),
 		available: !!(config && IsTruthy(config.available)),
+		vote_approved: !!(config && IsTruthy(config.vote_approved)),
+		unanimously_approved: XHSBotSetupHasUnanimousApproval(),
 		locked: !!(config && IsTruthy(config.locked)),
 		pending: xhs_bot_setup_pending,
 		dirty: xhs_bot_setup_dirty,
@@ -365,6 +385,8 @@ function XHSBotSetupSnapshot() {
 			revision: Math.floor(ToNumber(config.revision, -1)),
 			bot_count: Math.floor(ToNumber(config.bot_count, 0)),
 			max_bots: Math.floor(ToNumber(config.max_bots, 0)),
+			max_play_bots: Math.floor(ToNumber(config.max_play_bots, 0)),
+			max_spectator_bots: Math.floor(ToNumber(config.max_spectator_bots, 0)),
 			ai_difficulty: String(config.ai_difficulty || ""),
 			composition: String(config.composition || ""),
 			spectator_mode: IsTruthy(config.spectator_mode),
@@ -465,11 +487,16 @@ function XHSBotSetupMakeButton(parent, id, text, class_name, callback) {
 }
 
 function XHSBotSetupMaxBots() {
+	var spectator_mode = !!xhs_bot_setup_draft.spectator_mode;
 	if (!xhs_bot_setup_config) {
-		return 7;
+		return spectator_mode ? 8 : 7;
 	}
-	var maximum = Math.floor(ToNumber(xhs_bot_setup_config.max_bots, 7));
-	return Math.max(0, Math.min(7, maximum));
+	var mode_maximum = spectator_mode
+		? xhs_bot_setup_config.max_spectator_bots
+		: xhs_bot_setup_config.max_play_bots;
+	var fallback = Math.floor(ToNumber(xhs_bot_setup_config.max_bots, spectator_mode ? 8 : 7));
+	var maximum = Math.floor(ToNumber(mode_maximum, fallback));
+	return Math.max(0, Math.min(8, maximum));
 }
 
 function XHSBotSetupSyncDraftFromConfig() {
@@ -486,6 +513,7 @@ function XHSBotSetupSyncDraftFromConfig() {
 		composition: xhs_bot_setup_draft.composition,
 		spectator_mode: xhs_bot_setup_draft.spectator_mode,
 	};
+	xhs_bot_setup_draft.spectator_mode = IsTruthy(xhs_bot_setup_config.spectator_mode);
 	xhs_bot_setup_draft.bot_count = Math.max(
 		0,
 		Math.min(XHSBotSetupMaxBots(), Math.floor(ToNumber(xhs_bot_setup_config.bot_count, 0)))
@@ -499,7 +527,6 @@ function XHSBotSetupSyncDraftFromConfig() {
 		composition = "balanced";
 	}
 	xhs_bot_setup_draft.composition = composition;
-	xhs_bot_setup_draft.spectator_mode = IsTruthy(xhs_bot_setup_config.spectator_mode);
 	xhs_bot_setup_synced = true;
 	XHSBotSetupLog("draft_synced_from_config", {
 		previous_draft: previous_draft,
@@ -521,7 +548,9 @@ function XHSBotSetupIsController() {
 }
 
 function XHSBotSetupWatchIdentity() {
-	if (!xhs_bot_setup_initialized) {
+	if (!xhs_bot_setup_initialized ||
+		!xhs_bot_setup_ui.card ||
+		!XHSBotSetupHasUnanimousApproval()) {
 		xhs_bot_setup_identity_watch_running = false;
 		return;
 	}
@@ -696,13 +725,17 @@ function XHSBotSetupSelectSpectatorMode(enabled) {
 		return;
 	}
 	enabled = !!enabled;
-	if (enabled && xhs_bot_setup_draft.bot_count < 1) {
-		xhs_bot_setup_draft.bot_count = Math.min(1, XHSBotSetupMaxBots());
-	}
 	if (xhs_bot_setup_draft.spectator_mode === enabled) {
 		return;
 	}
 	xhs_bot_setup_draft.spectator_mode = enabled;
+	if (enabled && xhs_bot_setup_draft.bot_count < 1) {
+		xhs_bot_setup_draft.bot_count = Math.min(1, XHSBotSetupMaxBots());
+	}
+	xhs_bot_setup_draft.bot_count = Math.min(
+		XHSBotSetupMaxBots(),
+		Math.max(0, Math.floor(ToNumber(xhs_bot_setup_draft.bot_count, 0)))
+	);
 	xhs_bot_setup_dirty = true;
 	XHSBotSetupRender("spectator_mode_select");
 }
@@ -776,6 +809,12 @@ function XHSBotSetupBuildCard() {
 		});
 		return false;
 	}
+	if (!XHSBotSetupHasUnanimousApproval()) {
+		XHSBotSetupLog("card_build_rejected", {
+			reason: "unanimous_vote_required",
+		});
+		return false;
+	}
 
 	var sidebar = $("#PlayerLoadingSidebar");
 	var player_list = $("#PlayerLoadingList");
@@ -791,11 +830,20 @@ function XHSBotSetupBuildCard() {
 	XHSBotSetupLog("card_build_started", {});
 	var card = $.CreatePanel("Panel", sidebar, "XHSBotSetupCard");
 	card.AddClass("xhs-bot-setup-card");
+	card.style.visibility = "collapse";
+	card.hittest = false;
+	card.hittestchildren = false;
 
 	var header = $.CreatePanel("Panel", card, "");
 	header.AddClass("xhs-bot-setup-header");
 	XHSBotSetupMakeLabel(header, "xhs-bot-setup-title", L("loading_screen_bot_setup_title"));
-	XHSBotSetupMakeLabel(header, "xhs-bot-setup-dev-badge", L("loading_screen_bot_setup_dev_feature"));
+	xhs_bot_setup_ui.feature_badge = XHSBotSetupMakeLabel(
+		header,
+		"xhs-bot-setup-dev-badge",
+		Game.IsInToolsMode()
+			? L("loading_screen_bot_setup_dev_feature")
+			: L("loading_screen_bot_setup_public_feature")
+	);
 
 	var count_row = $.CreatePanel("Panel", card, "");
 	count_row.AddClass("xhs-bot-setup-field-row");
@@ -850,6 +898,7 @@ function XHSBotSetupBuildCard() {
 
 	var spectator_row = $.CreatePanel("Panel", card, "");
 	spectator_row.AddClass("xhs-bot-setup-field-row");
+	xhs_bot_setup_ui.spectator_row = spectator_row;
 	XHSBotSetupMakeLabel(spectator_row, "xhs-bot-setup-field-label", L("loading_screen_bot_setup_observer"));
 	var spectator_controls = $.CreatePanel("Panel", spectator_row, "");
 	spectator_controls.AddClass("xhs-bot-setup-inline-controls");
@@ -896,6 +945,38 @@ function XHSBotSetupBuildCard() {
 	return true;
 }
 
+function XHSBotSetupDestroyCard(reason) {
+	var card = xhs_bot_setup_ui.card;
+	if (!card) {
+		return;
+	}
+
+	card.style.visibility = "collapse";
+	card.hittest = false;
+	card.hittestchildren = false;
+	xhs_bot_setup_ui = {};
+	if (typeof card.DeleteAsync === "function") {
+		card.DeleteAsync(0.0);
+	}
+	XHSBotSetupLog("card_destroyed", {
+		reason: String(reason || "unanimous_vote_missing"),
+	});
+}
+
+function XHSBotSetupSyncCard(reason) {
+	UpdateAIVoteUnanimityUI();
+	if (!XHSBotSetupHasUnanimousApproval()) {
+		XHSBotSetupDestroyCard(reason);
+		return;
+	}
+
+	if (!xhs_bot_setup_ui.card && !XHSBotSetupBuildCard()) {
+		return;
+	}
+	XHSBotSetupStartIdentityWatch();
+	XHSBotSetupRender(reason);
+}
+
 function XHSBotSetupRender(reason) {
 	if (!IsXHSBotSetupAllowed() || !xhs_bot_setup_ui.card) {
 		XHSBotSetupLog("render_skipped", {
@@ -906,7 +987,16 @@ function XHSBotSetupRender(reason) {
 		return;
 	}
 
-	var available = !!(xhs_bot_setup_config && IsTruthy(xhs_bot_setup_config.available));
+	var available = XHSBotSetupHasUnanimousApproval();
+	if (!available) {
+		XHSBotSetupDestroyCard(reason);
+		return;
+	}
+	xhs_bot_setup_ui.card.style.visibility = "visible";
+	xhs_bot_setup_ui.card.hittest = true;
+	xhs_bot_setup_ui.card.hittestchildren = true;
+	UpdateAIVoteUnanimityUI();
+
 	var controller = available && XHSBotSetupIsController();
 	var locked = available && IsTruthy(xhs_bot_setup_config.locked);
 	var can_edit = !!XHSBotSetupCanEdit();
@@ -926,6 +1016,10 @@ function XHSBotSetupRender(reason) {
 	xhs_bot_setup_ui.card.SetHasClass("IsReadOnly", available && !controller);
 	xhs_bot_setup_ui.card.SetHasClass("IsLocked", locked);
 	xhs_bot_setup_ui.card.SetHasClass("IsPending", xhs_bot_setup_pending);
+	var tools_mode = typeof Game !== "undefined" &&
+		typeof Game.IsInToolsMode === "function" &&
+		Game.IsInToolsMode();
+	xhs_bot_setup_ui.spectator_row.style.visibility = tools_mode ? "visible" : "collapse";
 
 	xhs_bot_setup_ui.count_value.text = count + " / " + maximum;
 	XHSBotSetupSetButtonEnabled(xhs_bot_setup_ui.count_minus, can_edit && count > 0);
@@ -957,9 +1051,7 @@ function XHSBotSetupRender(reason) {
 		composition: composition_text,
 	});
 
-	if (!available) {
-		xhs_bot_setup_ui.controller.text = L("loading_screen_bot_setup_waiting");
-	} else if (xhs_bot_setup_pending) {
+	if (xhs_bot_setup_pending) {
 		xhs_bot_setup_ui.controller.text = L("loading_screen_bot_setup_pending");
 	} else if (locked) {
 		xhs_bot_setup_ui.controller.text = L("loading_screen_bot_setup_locked");
@@ -1034,7 +1126,7 @@ function XHSBotSetupOnNetTableChanged(table_name, key, data) {
 			was_pending: was_pending,
 			received_revision: received_revision,
 		});
-		XHSBotSetupRender("nettable_config");
+		XHSBotSetupSyncCard("nettable_config");
 		return;
 	}
 
@@ -1044,7 +1136,7 @@ function XHSBotSetupOnNetTableChanged(table_name, key, data) {
 			count: Math.floor(ToNumber(xhs_bot_setup_roster.count, 0)),
 			data: data || null,
 		});
-		XHSBotSetupRender("nettable_roster");
+		XHSBotSetupSyncCard("nettable_roster");
 		return;
 	}
 	XHSBotSetupLog("nettable_change_ignored", {
@@ -1062,16 +1154,7 @@ function MaybeInitializeXHSBotSetup() {
 		return;
 	}
 	XHSBotSetupLog("initialize_started", {});
-	if (!XHSBotSetupBuildCard()) {
-		XHSBotSetupLog("initialize_deferred", {
-			reason: "card_build_failed",
-		});
-		return;
-	}
-
 	xhs_bot_setup_initialized = true;
-	XHSBotSetupLog("initialize_card_ready", {});
-	XHSBotSetupStartIdentityWatch();
 
 	if (typeof CustomNetTables !== "undefined" && CustomNetTables) {
 		XHSBotSetupLog("nettable_subscribe_started", {
@@ -1103,7 +1186,7 @@ function MaybeInitializeXHSBotSetup() {
 	} else {
 		XHSBotSetupLog("nettable_unavailable", {});
 	}
-	XHSBotSetupRender("initialize");
+	XHSBotSetupSyncCard("initialize");
 	XHSBotSetupLog("initialize_completed", {});
 }
 
@@ -4743,7 +4826,9 @@ function ShowCurrentVoteCategory() {
 		return;
 	}
 
-	ShowOnlyVoteCategory(active_vote_sequence[active_vote_index]);
+	vote_progress_category = active_vote_sequence[active_vote_index];
+	ShowOnlyVoteCategory(vote_progress_category);
+	UpdateVoteProgressTabs();
 }
 
 function SetVoteSummaryValue(panel_id, category, vote_index) {
@@ -4771,6 +4856,7 @@ function SetVoteSummaryValue(panel_id, category, vote_index) {
 
 function UpdateVoteSelectionSummary() {
 	SetVoteSummaryValue("VoteSelectionDifficulty", "difficulty", local_votes["difficulty"]);
+	SetVoteSummaryValue("VoteSelectionAIAllies", "ai_allies", local_votes["ai_allies"]);
 }
 
 function GetVoteCategoryCount(category) {
@@ -4838,7 +4924,7 @@ function UpdateVoteProgressTab(category, root_id, rows_id) {
 	}
 
 	var vote_count = GetVoteCategoryCount(category);
-	root.visible = vote_count > 0;
+	root.visible = vote_count > 0 && vote_progress_category == category;
 
 	if (vote_count <= 0) {
 		return;
@@ -4884,11 +4970,61 @@ function UpdateVoteProgressTab(category, root_id, rows_id) {
 		}
 	}
 
-	root.SetHasClass("IsActive", active_vote_sequence[active_vote_index] == category);
+	root.SetHasClass("IsActive", vote_progress_category == category);
+}
+
+function UpdateAIVoteUnanimityUI() {
+	var rule = $("#VoteProgressAIAlliesRule");
+	var status_panel = $("#VoteProgressAIAlliesStatus");
+	if (rule) {
+		rule.text = L("loading_screen_ai_vote_unanimity_rule");
+	}
+	if (!status_panel) {
+		return;
+	}
+
+	var config = xhs_bot_setup_config || {};
+	var approved = IsTruthy(config.vote_approved) && IsTruthy(config.available);
+	var server_status = String(config.status || "awaiting_unanimous_vote");
+	var rejected = !approved && server_status == "unanimity_required";
+	var vote_yes = Math.max(0, Math.floor(ToNumber(config.vote_yes, 0)));
+	var vote_total = Math.max(0, Math.floor(ToNumber(config.vote_total, 0)));
+	var status_text = approved
+		? L("loading_screen_ai_vote_approved")
+		: rejected
+			? L("loading_screen_ai_vote_rejected")
+			: LocalizeTemplate("loading_screen_ai_vote_pending", {
+				yes: vote_yes.toString(),
+				total: vote_total.toString(),
+			});
+
+	status_panel.text = status_text;
+	status_panel.SetHasClass("IsApproved", approved);
+	status_panel.SetHasClass("IsRejected", rejected);
+	status_panel.SetHasClass("IsPending", !approved && !rejected);
 }
 
 function UpdateVoteProgressTabs() {
+	if (GetVoteCategoryCount(vote_progress_category) <= 0) {
+		vote_progress_category = GetVoteCategoryCount("difficulty") > 0 ? "difficulty" : "ai_allies";
+	}
+
 	UpdateVoteProgressTab("difficulty", "VoteProgressDifficulty", "VoteProgressDifficultyRows");
+	UpdateVoteProgressTab("ai_allies", "VoteProgressAIAllies", "VoteProgressAIAlliesRows");
+	UpdateAIVoteUnanimityUI();
+
+	var difficulty_tab = $("#VoteCategoryTabDifficulty");
+	var ai_allies_tab = $("#VoteCategoryTabAIAllies");
+
+	if (difficulty_tab) {
+		difficulty_tab.visible = GetVoteCategoryCount("difficulty") > 0;
+		difficulty_tab.SetHasClass("IsActive", vote_progress_category == "difficulty");
+	}
+
+	if (ai_allies_tab) {
+		ai_allies_tab.visible = GetVoteCategoryCount("ai_allies") > 0;
+		ai_allies_tab.SetHasClass("IsActive", vote_progress_category == "ai_allies");
+	}
 }
 
 function ShowVoteProgressCategory(category) {
@@ -4896,21 +5032,45 @@ function ShowVoteProgressCategory(category) {
 		return;
 	}
 
-	vote_modal_mode = "settings";
-	for (var i = 0; i < active_vote_sequence.length; i++) {
-		SetVoteCategoryVisible(active_vote_sequence[i], active_vote_sequence[i] == category);
-	}
-
-	var category_index = active_vote_sequence.indexOf(category);
-	if (category_index >= 0) {
-		active_vote_index = category_index;
-	}
-
+	vote_progress_category = category;
 	UpdateVoteProgressTabs();
 }
 
+function GetFirstUnsubmittedVoteCategory() {
+	for (var i = 0; i < active_vote_sequence.length; i++) {
+		var category = active_vote_sequence[i];
+		if (local_votes[category] === undefined || local_votes[category] === null) {
+			return category;
+		}
+	}
+	return "";
+}
+
+function UpdateMainVoteButtonState() {
+	var main_vote_button = $("#MainVoteButton");
+	if (!main_vote_button) {
+		return;
+	}
+
+	var next_category = GetFirstUnsubmittedVoteCategory();
+	var can_vote = next_category !== "";
+	main_vote_button.enabled = can_vote;
+	main_vote_button.style.visibility = can_vote ? "visible" : "collapse";
+	main_vote_button.style.opacity = can_vote ? "1" : "0";
+}
+
 function OpenSettingsVoteContainer() {
+	var next_category = GetFirstUnsubmittedVoteCategory();
+	if (!next_category) {
+		UpdateMainVoteButtonState();
+		return;
+	}
+
 	vote_modal_mode = "settings";
+	var category_index = active_vote_sequence.indexOf(next_category);
+	if (category_index >= 0) {
+		active_vote_index = category_index;
+	}
 	ToggleVoteContainer(true);
 }
 
@@ -4944,6 +5104,7 @@ function AllPlayersLoaded() {
 	const vote_categories = Object.keys(vote_config);
 	active_vote_sequence = vote_categories.slice(0);
 	active_vote_index = 0;
+	vote_progress_category = vote_categories.length > 0 ? vote_categories[0] : "difficulty";
 	const vote_title = $.GetContextPanel().FindChildrenWithClassTraverse("vote-content-title");
 	const vote_dialog = $.GetContextPanel().FindChildrenWithClassTraverse("vote-content");
 
@@ -5030,8 +5191,9 @@ function AllPlayersLoaded() {
 				}
 
 				button.SetPanelEvent("onactivate", function () {
-					OnVoteButtonPressed(vote_type, i);
-					HideVoteCategory(vote_type);
+					if (OnVoteButtonPressed(vote_type, i)) {
+						HideVoteCategory(vote_type);
+					}
 				})
 			})(choice_card, vote_type, i);
 		}
@@ -5045,11 +5207,7 @@ function AllPlayersLoaded() {
 	UpdateVoteProgressTabs();
 
 	const has_vote_options = vote_categories.length > 0;
-
-	if (main_vote_button) {
-		main_vote_button.enabled = has_vote_options;
-		main_vote_button.style.opacity = has_vote_options ? "1" : "0.45";
-	}
+	UpdateMainVoteButtonState();
 
 	ToggleVoteContainer(has_vote_options);
 	if (has_vote_options) {
@@ -5323,14 +5481,20 @@ function OnVoteButtonPressed(category, vote) {
 	// var gamemode_name = $.Localize("#vote_" + category);
 
 	// $("#VoteGameModeCheck").text = "You have voted for " + gamemode_name + ".";
+	if (local_votes[category] !== undefined && local_votes[category] !== null) {
+		return false;
+	}
+
 	local_votes[category] = vote;
 	local_vote_confirmed[category] = false;
 	RefreshLocalVoteCategoryUI(category);
 	UpdateVoteSelectionSummary();
+	UpdateMainVoteButtonState();
 	if (typeof GameEvents !== "undefined" && GameEvents && typeof GameEvents.SendCustomGameEventToServer === "function") {
 		GameEvents.SendCustomGameEventToServer("setting_vote", { "category": category, "vote": vote, "PlayerID": Game.GetLocalPlayerID() });
 	} else {
 	}
+	return true;
 }
 
 function GetVoteCounterFromTable(vote_table) {
@@ -5396,6 +5560,12 @@ function OnVotesReceived(data) {
 	var category = data.category;
 	var vote_table = data.table || {};
 	vote_payload_cache[category] = vote_table;
+	var local_entry = FindPlayerVoteEntry(vote_table, GetLocalPlayerIDSafe());
+	var server_vote = GetVoteChoiceFromEntry(local_entry);
+	if (server_vote > 0) {
+		local_votes[category] = server_vote;
+		local_vote_confirmed[category] = true;
+	}
 	ApplyVoteCountsToLabels(category, vote_table);
 
 	// Modify tooltips based on voted gamemode
@@ -5418,6 +5588,7 @@ function OnVotesReceived(data) {
 	RefreshLocalVoteCategoryUI(category);
 	UpdateVoteSelectionSummary();
 	UpdateVoteProgressTabs();
+	UpdateMainVoteButtonState();
 }
 
 function DisableVoting() {

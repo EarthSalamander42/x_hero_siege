@@ -343,7 +343,7 @@ _G.innate_abilities = {
 	"holdout_magic_shield",
 	"holdout_anubarak_claw",
 	"undead_burrow",
-	"ogre_magi_bloodlust",
+	"rifleman_bloodlust",
 	"holdout_beastmaster_misc",
 	"holdout_frostmourne_hungers",
 	"holdout_battlecry_alt2",

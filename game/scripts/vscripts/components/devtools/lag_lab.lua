@@ -33,7 +33,8 @@ local EXPERIMENTS = {
 
 local METRICS = {
 	"client_fps",
-	"server_frame_ms",
+	"server_sim_lag_ms",
+	"server_sim_health_pct",
 	"creeps",
 	"total_units",
 	"scan_ms",
@@ -111,16 +112,18 @@ function XHSLagLab:HideRenderEntity(entity)
 	if not IsValidEntity(entity) or entity.entindex == nil then return end
 	local entindex = entity:entindex()
 
-	local alphaRecord = self.changed_alpha[entindex]
-	if alphaRecord == nil or alphaRecord.unit ~= entity then
-		local alpha = 255
-		if entity.GetRenderAlpha ~= nil then
-			local ok, value = pcall(function() return entity:GetRenderAlpha() end)
-			if ok and value ~= nil then alpha = value end
+	if entity.SetRenderAlpha ~= nil then
+		local alphaRecord = self.changed_alpha[entindex]
+		if alphaRecord == nil or alphaRecord.unit ~= entity then
+			local alpha = 255
+			if entity.GetRenderAlpha ~= nil then
+				local ok, value = pcall(function() return entity:GetRenderAlpha() end)
+				if ok and value ~= nil then alpha = value end
+			end
+			self.changed_alpha[entindex] = { unit = entity, alpha = alpha }
 		end
-		self.changed_alpha[entindex] = { unit = entity, alpha = alpha }
+		pcall(function() entity:SetRenderAlpha(0) end)
 	end
-	if entity.SetRenderAlpha ~= nil then entity:SetRenderAlpha(0) end
 
 	local noDrawRecord = self.changed_no_draw[entindex]
 	if noDrawRecord == nil or noDrawRecord.unit ~= entity then
@@ -359,8 +362,10 @@ function XHSLagLab:RestoreEffects()
 		end
 	end
 	for _, record in pairs(self.changed_alpha or {}) do
-		if IsValidEntity(record.unit) then
-			record.unit:SetRenderAlpha(tonumber(record.alpha) or 255)
+		if IsValidEntity(record.unit) and record.unit.SetRenderAlpha ~= nil then
+			pcall(function()
+				record.unit:SetRenderAlpha(tonumber(record.alpha) or 255)
+			end)
 		end
 	end
 	for _, record in pairs(self.changed_no_draw or {}) do
@@ -416,7 +421,8 @@ function XHSLagLab:CaptureMetrics()
 	end
 	return {
 		client_fps = fpsCount > 0 and fpsSum / fpsCount or -1,
-		server_frame_ms = tonumber(snapshot.frame_ms) or 0,
+		server_sim_lag_ms = tonumber(snapshot.sim_lag_ms) or 0,
+		server_sim_health_pct = tonumber(snapshot.sim_health_pct) or 100,
 		creeps = tonumber(snapshot.creeps) or 0,
 		total_units = tonumber(snapshot.total_units) or 0,
 		scan_ms = tonumber(snapshot.scan_ms) or 0,
@@ -534,9 +540,9 @@ function XHSLagLab:Start(experimentID, source, keepActive)
 
 	self:Restore("replaced")
 	self.state = {
-		running = true,
+		running = keepActive ~= true,
 		effect_active = false,
-		stage = "baseline",
+		stage = keepActive == true and "latched" or "baseline",
 		experiment_id = experimentID,
 		label = experiment.label,
 		source = source or "",
@@ -544,6 +550,14 @@ function XHSLagLab:Start(experimentID, source, keepActive)
 	}
 	self.baseline = EmptyAccumulator()
 	self.test = EmptyAccumulator()
+	if keepActive == true then
+		self:ApplyExperiment()
+		self.stage_ends_at = nil
+		self.next_sample_at = nil
+		self.next_publish_at = nil
+		self:Publish()
+		return "Lag Lab enabled: " .. experiment.label
+	end
 	self:SetStage("baseline", BASELINE_SECONDS)
 	return "Lag Lab baseline started: " .. experiment.label
 end
@@ -600,6 +614,28 @@ function XHSLagLab:Think()
 	end
 end
 
+function XHSLagLab:ApplyToSpawnedUnit(unitIndex)
+	local function ApplyWhenReady()
+		if self.state == nil or self.state.effect_active ~= true then return nil end
+		local ok, unit = pcall(EntIndexToHScript, unitIndex)
+		if ok and IsValidEntity(unit) then
+			self:ApplyToUnit(unit)
+		end
+		return nil
+	end
+
+	if Timers == nil then
+		ApplyWhenReady()
+		return
+	end
+
+	-- npc_spawned can fire before IsAlive/team/creep state is fully initialized.
+	-- Retry only this entity; avoid a global scan that would contaminate Lag Lab data.
+	for _, delay in ipairs({ 0, 0.1, 0.5 }) do
+		Timers:CreateTimer(delay, ApplyWhenReady)
+	end
+end
+
 function XHSLagLab:Init()
 	if self.initialized then
 		self.state = self.state or { running = false, effect_active = false, stage = "idle" }
@@ -622,8 +658,7 @@ function XHSLagLab:Init()
 		if XHSLagLab.state == nil or XHSLagLab.state.effect_active ~= true then return end
 		local unitIndex = event and tonumber(event.entindex) or nil
 		if unitIndex == nil then return end
-		local ok, unit = pcall(EntIndexToHScript, unitIndex)
-		if ok then XHSLagLab:ApplyToUnit(unit) end
+		XHSLagLab:ApplyToSpawnedUnit(unitIndex)
 	end, nil)
 	GameRules:GetGameModeEntity():SetContextThink("XHSLagLabRunner", function()
 		if GameRules:State_Get() >= DOTA_GAMERULES_STATE_POST_GAME then

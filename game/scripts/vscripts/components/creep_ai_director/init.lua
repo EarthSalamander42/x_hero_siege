@@ -10,6 +10,16 @@ local DEFAULT_RETRY = 1.0
 local HARD_DISABLE_RETRY = 0.4
 local ACTION_LOCK_RETRY = 0.2
 
+local function ProfileNow()
+	if os ~= nil and os.clock ~= nil then
+		local ok, value = pcall(os.clock)
+		if ok and tonumber(value) ~= nil then return tonumber(value) end
+	end
+	if Time ~= nil then return Time() end
+	if RealTime ~= nil then return RealTime() end
+	return GameRules:GetGameTime()
+end
+
 local function IsValidEntityHandle(entity)
 	return entity ~= nil
 		and (entity.IsNull == nil or not entity:IsNull())
@@ -256,9 +266,18 @@ function XHSCreepAIDirector:ProcessRecord(record)
 	end
 
 	Counter("ai_agents_processed")
+	local startedAt = ProfileNow()
 	local ok, nextDelay = xpcall(function()
 		return modifier:RunDirectorThink(record.profile, GameRules:GetGameTime())
 	end, Traceback)
+	local elapsedMs = math.max(0, (ProfileNow() - startedAt) * 1000)
+	record.profile.think_calls = (record.profile.think_calls or 0) + 1
+	record.profile.think_cost_total_ms =
+		(record.profile.think_cost_total_ms or 0) + elapsedMs
+	record.profile.think_cost_max_ms = math.max(
+		record.profile.think_cost_max_ms or 0,
+		elapsedMs
+	)
 	if not ok then
 		print("[XHSCreepAIDirector] " .. tostring(nextDelay))
 		nextDelay = DEFAULT_RETRY
@@ -291,6 +310,7 @@ function XHSCreepAIDirector:GetState()
 	local cachedProfiles = 0
 	local profilesWithoutActives = 0
 	local activeAbilityAgents = 0
+	local activeProfileCounts = {}
 	for _, profile in pairs(self.profile_cache or {}) do
 		cachedProfiles = cachedProfiles + 1
 		if profile.has_active_abilities ~= true then
@@ -298,18 +318,52 @@ function XHSCreepAIDirector:GetState()
 		end
 	end
 	for _, record in pairs(self.records or {}) do
-		if record.active == true
-			and record.profile ~= nil
-			and record.profile.has_active_abilities == true then
-			activeAbilityAgents = activeAbilityAgents + 1
+		if record.active == true and record.profile ~= nil then
+			local profile = record.profile
+			local unitName = tostring(profile.unit_name or "unknown")
+			local profileCount = activeProfileCounts[unitName]
+			if profileCount == nil then
+				local abilityNames = {}
+				for _, ability in ipairs(profile.active_abilities or {}) do
+					table.insert(abilityNames, tostring(ability.name or "unknown"))
+				end
+				table.sort(abilityNames)
+				profileCount = {
+					unit_name = unitName,
+					agents = 0,
+					abilities = abilityNames,
+					think_calls = tonumber(profile.think_calls) or 0,
+					think_cost_average_ms = (tonumber(profile.think_calls) or 0) > 0
+						and (tonumber(profile.think_cost_total_ms) or 0)
+							/ tonumber(profile.think_calls)
+						or 0,
+					think_cost_max_ms = tonumber(profile.think_cost_max_ms) or 0,
+				}
+				activeProfileCounts[unitName] = profileCount
+			end
+			profileCount.agents = profileCount.agents + 1
+			if profile.has_active_abilities == true then
+				activeAbilityAgents = activeAbilityAgents + 1
+			end
 		end
 	end
+	local activeProfiles = {}
+	for _, profileCount in pairs(activeProfileCounts) do
+		table.insert(activeProfiles, profileCount)
+	end
+	table.sort(activeProfiles, function(left, right)
+		if left.agents == right.agents then
+			return left.unit_name < right.unit_name
+		end
+		return left.agents > right.agents
+	end)
 	return {
 		active_agents = self.active_count or 0,
 		active_ability_agents = activeAbilityAgents,
 		queued_agents = #(self.heap or {}),
 		cached_profiles = cachedProfiles,
 		profiles_without_actives = profilesWithoutActives,
+		active_profiles = activeProfiles,
 		budget = self:GetBudget(),
 	}
 end

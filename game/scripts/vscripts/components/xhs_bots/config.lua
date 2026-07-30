@@ -2,8 +2,11 @@ if XHSBotConfig == nil then
 	XHSBotConfig = {}
 end
 
+-- The lobby reserves one ninth identity slot for the Tools-only observer.
+-- Radiant remains capped at eight actual combat participants.
+XHSBotConfig.MAX_SESSION_SIZE = 9
 XHSBotConfig.MAX_TEAM_SIZE = 8
-XHSBotConfig.MAX_BOTS = 7
+XHSBotConfig.MAX_BOTS = 8
 XHSBotConfig.DEFAULTS = {
 	enabled = false,
 	count = 0,
@@ -62,6 +65,8 @@ XHSBotConfig.DIFFICULTIES = {
 		target_mana_potion_charges = 15,
 		health_resupply_trigger_charges = 3,
 		max_tomes_per_think = 1,
+		pre_arena_tome_cap = 8,
+		pre_arena_tomes_per_think = 4,
 	},
 	normal = {
 		id = "normal",
@@ -112,6 +117,8 @@ XHSBotConfig.DIFFICULTIES = {
 		target_mana_potion_charges = 15,
 		health_resupply_trigger_charges = 3,
 		max_tomes_per_think = 3,
+		pre_arena_tome_cap = 12,
+		pre_arena_tomes_per_think = 6,
 	},
 }
 
@@ -174,7 +181,7 @@ end
 
 function XHSBotConfig:Normalize(raw, humanCount)
 	raw = type(raw) == "table" and raw or {}
-	humanCount = ClampInteger(humanCount, 0, self.MAX_TEAM_SIZE)
+	humanCount = ClampInteger(humanCount, 0, self.MAX_SESSION_SIZE)
 
 	local difficulty = string.lower(tostring(raw.difficulty or self.DEFAULTS.difficulty))
 	if self.DIFFICULTIES[difficulty] == nil then
@@ -191,13 +198,24 @@ function XHSBotConfig:Normalize(raw, humanCount)
 		and XHSBotHeroProfiles.GetCertifiedHeroCount ~= nil then
 		certifiedHeroCapacity = XHSBotHeroProfiles:GetCertifiedHeroCount()
 	end
-	local maximumBots = math.min(
+	local wantsSpectator = IsTruthy(raw.spectator_mode)
+	local playHumanCount = math.min(self.MAX_TEAM_SIZE, humanCount)
+	local spectatorHumanCount = math.max(0, playHumanCount - 1)
+	local maximumPlayBots = math.min(
 		self.MAX_BOTS,
 		certifiedHeroCapacity,
-		math.max(0, self.MAX_TEAM_SIZE - humanCount)
+		math.max(0, self.MAX_TEAM_SIZE - playHumanCount)
 	)
+	local maximumSpectatorBots = math.min(
+		self.MAX_BOTS,
+		certifiedHeroCapacity,
+		math.max(0, self.MAX_TEAM_SIZE - spectatorHumanCount)
+	)
+	local maximumBots = wantsSpectator
+		and maximumSpectatorBots
+		or maximumPlayBots
 	local count = ClampInteger(raw.count, 0, maximumBots)
-	local spectatorMode = IsTruthy(raw.spectator_mode) and count > 0
+	local spectatorMode = wantsSpectator and count > 0
 
 	return {
 		enabled = count > 0,
@@ -206,7 +224,10 @@ function XHSBotConfig:Normalize(raw, humanCount)
 		composition = composition,
 		spectator_mode = spectatorMode,
 		human_count = humanCount,
+		combat_human_count = spectatorMode and spectatorHumanCount or playHumanCount,
 		maximum_bots = maximumBots,
+		maximum_play_bots = maximumPlayBots,
+		maximum_spectator_bots = maximumSpectatorBots,
 	}
 end
 

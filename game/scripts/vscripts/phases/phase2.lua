@@ -300,11 +300,27 @@ local function PlayShalReleaseCamera(towers)
 		local targetTower = GetClosestEntity(hero:GetAbsOrigin(), towers)
 		local player = hero:GetPlayerOwner()
 		if targetTower ~= nil and player ~= nil then
-			CustomGameEventManager:Send_ServerToPlayer(player, "set_player_camera", {
-				hPosition = targetTower:GetAbsOrigin(),
-				iSpeed = SHAL_RELEASE_CAMERA_MOVE_DURATION,
-				return_to_hero_after = SHAL_RELEASE_CAMERA_MOVE_DURATION + SHAL_RELEASE_CAMERA_HOLD_DURATION,
-				return_speed = 0.85,
+			local playerID = hero:GetPlayerOwnerID()
+			CameraMotion:Sequence(playerID, {
+				{
+					type = "move",
+					to = targetTower,
+					from = hero,
+					duration = SHAL_RELEASE_CAMERA_MOVE_DURATION,
+					easing = "smootherstep",
+				},
+				{ type = "hold", duration = SHAL_RELEASE_CAMERA_HOLD_DURATION },
+				{
+					type = "return",
+					to = function() return PlayerResource:GetSelectedHeroEntity(playerID) end,
+					duration = 0.85,
+					easing = "smootherstep",
+				},
+				{ type = "release", mode = "free" },
+			}, {
+				owner = "shal_release",
+				priority = 70,
+				policy = "replace",
 			})
 		end
 	end
@@ -340,11 +356,27 @@ function XHSFocusPlayersOnShalLightbinder()
 		local player = hero:GetPlayerOwner()
 		if shal ~= nil and player ~= nil then
 			AddFOWViewer(DOTA_TEAM_GOODGUYS, shal:GetAbsOrigin(), SHAL_RELEASE_FOW_RADIUS, SHAL_RELEASE_FOW_DURATION, false)
-			CustomGameEventManager:Send_ServerToPlayer(player, "set_player_camera", {
-				hPosition = shal:GetAbsOrigin(),
-				iSpeed = 0.65,
-				return_to_hero_after = 3.0,
-				return_speed = 0.75,
+			local playerID = hero:GetPlayerOwnerID()
+			CameraMotion:Sequence(playerID, {
+				{
+					type = "move",
+					to = shal,
+					from = hero,
+					duration = 0.65,
+					easing = "smootherstep",
+				},
+				{ type = "hold", duration = 2.35 },
+				{
+					type = "return",
+					to = function() return PlayerResource:GetSelectedHeroEntity(playerID) end,
+					duration = 0.75,
+					easing = "smootherstep",
+				},
+				{ type = "release", mode = "free" },
+			}, {
+				owner = "shal_lightbinder_focus",
+				priority = 70,
+				policy = "replace",
 			})
 		end
 	end
@@ -600,9 +632,14 @@ end
 local function SendFinalWaveCamera(position, speed)
 	for _, hero in pairs(HeroList:GetAllHeroes()) do
 		if hero:IsRealHero() and hero:GetTeam() == DOTA_TEAM_GOODGUYS then
-			CustomGameEventManager:Send_ServerToPlayer(hero:GetPlayerOwner(), "set_player_camera", {
-				hPosition = position,
-				iSpeed = speed or 0.65,
+			CameraMotion:Move(hero:GetPlayerOwnerID(), position, {
+				from = hero,
+				duration = speed or 0.65,
+				easing = "smootherstep",
+				owner = "final_wave_intro",
+				priority = 100,
+				policy = "replace",
+				persistent = true,
 			})
 		end
 	end
@@ -797,9 +834,16 @@ function FinalWave(force)
 
 		for _, hero in pairs(HeroList:GetAllHeroes()) do
 			if hero:IsRealHero() and hero:GetTeam() == DOTA_TEAM_GOODGUYS then
-				CustomGameEventManager:Send_ServerToPlayer(hero:GetPlayerOwner(), "set_player_camera", {
-					hPosition = hero:GetAbsOrigin(),
-					iSpeed = 0.85,
+				local playerID = hero:GetPlayerOwnerID()
+				CameraMotion:Return(playerID, function()
+					return PlayerResource:GetSelectedHeroEntity(playerID)
+				end, {
+					duration = 0.85,
+					easing = "smootherstep",
+					owner = "final_wave_intro",
+					priority = 100,
+					policy = "replace",
+					release = "free",
 				})
 			end
 		end

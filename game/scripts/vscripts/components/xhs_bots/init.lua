@@ -1,11 +1,14 @@
 require("components/xhs_bots/config")
 require("components/xhs_bots/player_registry")
+require("components/xhs_bots/audit")
+require("components/xhs_bots/loot")
 require("components/xhs_bots/hero_profiles")
 require("components/xhs_bots/item_catalog")
 require("components/xhs_bots/item_planner")
 require("components/xhs_bots/world_model")
 require("components/xhs_bots/danger_registry")
 require("components/xhs_bots/provisioner")
+require("components/xhs_bots/campaign_director")
 require("components/xhs_bots/team_director")
 require("components/xhs_bots/utility")
 require("components/xhs_bots/executor")
@@ -26,6 +29,11 @@ XHSBots.revision = 0
 XHSBots.status = "disabled"
 XHSBots.error = ""
 XHSBots.configuration = XHSBotConfig:CopyDefaults()
+XHSBots.setup_approved = false
+XHSBots.setup_vote_locked = false
+XHSBots.setup_votes = {}
+XHSBots.setup_vote_yes = 0
+XHSBots.setup_vote_total = 0
 XHSBots.next_roster_push = 0
 XHSBots.next_debug_push = 0
 XHSBots.launch_retry_count = 0
@@ -42,6 +50,10 @@ XHSBots.controller_refresh_retry_limit = 40
 XHSBots.controller_refresh_retry_interval = 0.25
 XHSBots.spectator_controller_player_id = -1
 XHSBots.spectator_provision_generation = 0
+XHSBots.spectator_follow_enabled = false
+XHSBots.spectator_follow_player_id = -1
+XHSBots.spectator_follow_entindex = -1
+XHSBots.spectator_follow_monitor_generation = 0
 XHSBots.first_human_pick_seen = false
 XHSBots.unique_hero_count_finalized = false
 XHSBots.safe_error_state = XHSBots.safe_error_state or {}
@@ -57,6 +69,9 @@ XHSBots.qa_economy_audit_watch_running = false
 XHSBots.qa_economy_audit_watch_interval = 1
 XHSBots.qa_economy_audit_watch_context =
 	"xhs_bots_economy_audit_watch"
+XHSBots.qa_auto_soak_convar = "xhs_bots_qa_auto_soak"
+XHSBots.qa_auto_soak_context = "xhs_bots_qa_auto_soak"
+XHSBots.qa_auto_soak_running = false
 
 local function IsTruthy(value)
 	return value == true or value == 1 or value == "1" or value == "true"
@@ -234,32 +249,55 @@ function XHSBots:RecordDamageType(victim, damageType, amount)
 	record.damage_type_last_hit_at = now
 end
 
+function XHSBots:GetSetupHumanIdentityCount()
+	local humanCount = XHSBotPlayerRegistry:GetHumanCount()
+	local spectatorController = tonumber(self.spectator_controller_player_id) or -1
+	if spectatorController >= 0
+		and not XHSBotPlayerRegistry:IsHumanPlayerID(spectatorController)
+		and PlayerResource ~= nil
+		and PlayerResource.IsValidPlayerID ~= nil
+		and PlayerResource:IsValidPlayerID(spectatorController)
+		and not XHSBotPlayerRegistry:IsXHSBotPlayerID(spectatorController) then
+		humanCount = humanCount + 1
+	end
+	-- The setup UI always has a human controller, even during the short
+	-- connection window where PlayerResource has not exposed that identity yet.
+	-- Fail conservatively to the Play cap (7 bots), never the observer cap (8).
+	return math.max(1, math.min(XHSBotConfig.MAX_SESSION_SIZE, humanCount))
+end
+
 function XHSBots:Init()
 	SetupLog("init_called", {
 		already_initialized = self.initialized,
 		tools_mode = IsInToolsMode(),
 	})
+	self:RegisterQAAutoSoakConvar()
 	if self.initialized then
+		-- Script reloads preserve the XHSBots table. Re-register versioned QA
+		-- commands before returning so a command added during a Tools session
+		-- cannot remain silently absent until the next addon restart.
+		self:RegisterQACommands()
 		SetupLog("init_reused", {
 			revision = self.revision,
 			status = self.status,
 		})
 		self:PushConfiguration()
+		self:StartQAAutoSoakIfArmed()
 		return
 	end
 	self.initialized = true
-	self.enabled = IsInToolsMode()
+	-- The component is available in production, but remains inert with a zero
+	-- bot configuration until every persistent human explicitly opts in. Tools
+	-- mode bypasses only that vote so local QA can still launch immediately.
+	self.enabled = true
+	self.setup_approved = IsInToolsMode()
+	self.setup_vote_locked = IsInToolsMode()
+	self.setup_votes = {}
 
-	-- Do not register client activation events or start thinkers in production.
-	if not self.enabled then
-		SetupLog("init_disabled", {
-			reason = "outside_tools",
-		})
-	end
-	if not self.enabled then return end
-
-	self.configuration = XHSBotConfig:Normalize({}, XHSBotPlayerRegistry:GetHumanCount())
-	self.status = "ready"
+	self.configuration = XHSBotConfig:Normalize({}, self:GetSetupHumanIdentityCount())
+	self.configuration.count = 0
+	self.configuration.spectator_mode = false
+	self.status = self.setup_approved and "ready" or "awaiting_unanimous_vote"
 	self.controller_player_id = self:FindControllerPlayerID()
 
 	self:RegisterQACommands()
@@ -287,6 +325,9 @@ function XHSBots:Init()
 				event_user_id = event and event.userid,
 			})
 			XHSBots:StartControllerRefresh("player_connect_full")
+			if not IsInToolsMode() and not XHSBots.setup_vote_locked then
+				XHSBots:RefreshSetupVoteState()
+			end
 		end)
 	end, nil)
 	ListenToGameEvent("npc_spawned", function(event)
@@ -298,12 +339,133 @@ function XHSBots:Init()
 	self:PushConfiguration()
 	self:PushRoster()
 	self:StartControllerRefresh("init")
+	if not IsInToolsMode() then
+		self:RefreshSetupVoteState()
+	end
+	self:StartQAAutoSoakIfArmed()
 	SetupLog("init_completed", {
 		controller_player_id = self.controller_player_id,
 		human_count = XHSBotPlayerRegistry:GetHumanCount(),
 		revision = self.revision,
 		status = self.status,
 	})
+end
+
+function XHSBots:RegisterQAAutoSoakConvar()
+	if not IsInToolsMode() or Convars == nil
+		or Convars.RegisterConvar == nil then return false end
+	if self.qa_auto_soak_convar_registered == true then return true end
+	local flags = (FCVAR_CHEAT or 0)
+		+ (FCVAR_CLIENTCMD_CAN_EXECUTE or 1073741824)
+	local ok = pcall(function()
+		Convars:RegisterConvar(
+			self.qa_auto_soak_convar,
+			"0",
+			"Tools-only one-shot: configure 8 Easy Random spectator bots on next custom setup",
+			flags
+		)
+	end)
+	self.qa_auto_soak_convar_registered = ok
+	return ok
+end
+
+function XHSBots:IsQAAutoSoakArmed()
+	if not IsInToolsMode() or Convars == nil then return false end
+	local ok, armed = pcall(function()
+		if Convars.GetBool ~= nil then
+			return Convars:GetBool(self.qa_auto_soak_convar)
+		end
+		if Convars.GetInt ~= nil then
+			return Convars:GetInt(self.qa_auto_soak_convar) ~= 0
+		end
+		return tostring(Convars:GetStr(self.qa_auto_soak_convar)) == "1"
+	end)
+	return ok and armed == true
+end
+
+function XHSBots:DisarmQAAutoSoak()
+	if Convars ~= nil and Convars.SetInt ~= nil then
+		local ok = pcall(function()
+			Convars:SetInt(self.qa_auto_soak_convar, 0)
+		end)
+		if ok then return true end
+	end
+	if Convars ~= nil and Convars.SetStr ~= nil then
+		local ok = pcall(function()
+			Convars:SetStr(self.qa_auto_soak_convar, "0")
+		end)
+		if ok then return true end
+	end
+	return false
+end
+
+function XHSBots:StartQAAutoSoakIfArmed()
+	if not self:IsQAAutoSoakArmed()
+		or self.qa_auto_soak_running == true then return false end
+	local gameModeEntity = GameRules ~= nil
+		and GameRules.GetGameModeEntity ~= nil
+		and GameRules:GetGameModeEntity() or nil
+	if gameModeEntity == nil or gameModeEntity.SetContextThink == nil then
+		return false
+	end
+
+	self.qa_auto_soak_running = true
+	local startedAt = self:GetSafeRuntimeTime()
+	gameModeEntity:SetContextThink(self.qa_auto_soak_context, function()
+		if XHSBots.qa_auto_soak_running ~= true then return nil end
+		if not XHSBots:IsQAAutoSoakArmed() then
+			XHSBots.qa_auto_soak_running = false
+			return nil
+		end
+		local state = GameRules:State_Get()
+		local setupActive = state == DOTA_GAMERULES_STATE_CUSTOM_GAME_SETUP
+			and GameMode ~= nil
+			and GameMode.CustomSetupState ~= nil
+			and GameMode.CustomSetupState.active == true
+		if setupActive then
+			local ok, message = XHSBots:ApplyConfiguration({
+				count = 8,
+				difficulty = "easy",
+				composition = "random",
+				spectator_mode = true,
+			})
+			if ok then
+				XHSBots:DisarmQAAutoSoak()
+				XHSBots.qa_auto_soak_running = false
+				XHSBots:PrintQAResult(
+					"xhs_bots_qa_auto_soak",
+					true,
+					"configuration_applied",
+					"count=8 difficulty=easy composition=random spectator=1"
+				)
+				local launched, launchMessage =
+					XHSBots:TestLaunchFromConsole()
+				XHSBots:PrintQAResult(
+					"xhs_bots_qa_auto_soak",
+					launched,
+					launchMessage
+				)
+				return nil
+			end
+			XHSBots.qa_auto_soak_last_error = tostring(message or "")
+		end
+		if XHSBots:GetSafeRuntimeTime() - startedAt >= 25 then
+			XHSBots:DisarmQAAutoSoak()
+			XHSBots.qa_auto_soak_running = false
+			XHSBots:PrintQAResult(
+				"xhs_bots_qa_auto_soak",
+				false,
+				"configuration_timeout",
+				"error=" .. XHSBots:FormatQALogValue(
+					XHSBots.qa_auto_soak_last_error or "custom_setup_not_ready",
+					160
+				)
+			)
+			return nil
+		end
+		return 0.1
+	end, 0)
+	return true
 end
 
 function XHSBots:FindControllerPlayerID()
@@ -317,6 +479,78 @@ function XHSBots:FindControllerPlayerID()
 	end
 	local humans = XHSBotPlayerRegistry:GetHumanPlayerIDs()
 	return humans[1] or -1
+end
+
+function XHSBots:GetEligibleSetupVoters()
+	return XHSBotPlayerRegistry:GetHumanPlayerIDs()
+end
+
+function XHSBots:RefreshSetupVoteState()
+	if IsInToolsMode() then
+		self.setup_approved = true
+		self.setup_vote_locked = true
+		self.status = self.locked and self.status or "ready"
+		self.setup_vote_yes = 1
+		self.setup_vote_total = 1
+		self:PushConfiguration()
+		return true
+	end
+
+	local voters = self:GetEligibleSetupVoters()
+	local yesCount = 0
+	local noCount = 0
+	for _, playerID in ipairs(voters) do
+		local vote = tonumber(self.setup_votes[playerID])
+		if vote == 1 then
+			yesCount = yesCount + 1
+		elseif vote == 2 then
+			noCount = noCount + 1
+		end
+	end
+
+	self.setup_vote_yes = yesCount
+	self.setup_vote_total = #voters
+	local wasApproved = self.setup_approved == true
+	local unanimous = #voters > 0 and yesCount == #voters
+	self.setup_approved = unanimous
+	self.setup_vote_locked = self.locked == true
+	if unanimous then
+		self.status = "ready"
+		self.error = ""
+		self.controller_player_id = self:FindControllerPlayerID()
+	else
+		self.status = noCount > 0
+			and "unanimity_required"
+			or "awaiting_unanimous_vote"
+		self.configuration.count = 0
+		self.configuration.enabled = false
+		self.configuration.spectator_mode = false
+		if wasApproved then
+			self.revision = self.revision + 1
+		end
+	end
+
+	self:PushConfiguration()
+	self:PushRoster()
+	return self.setup_approved
+end
+
+function XHSBots:OnSetupEnableVote(playerID, vote)
+	if not self.enabled or self.locked or self.setup_vote_locked then return false end
+	if GameRules:State_Get() ~= DOTA_GAMERULES_STATE_CUSTOM_GAME_SETUP then
+		return false
+	end
+
+	playerID = tonumber(playerID) or -1
+	vote = tonumber(vote)
+	if not XHSBotPlayerRegistry:IsHumanPlayerID(playerID)
+		or (vote ~= 1 and vote ~= 2) then
+		return false
+	end
+
+	self.setup_votes[playerID] = vote
+	self:RefreshSetupVoteState()
+	return true
 end
 
 function XHSBots:IsAuthorizedSetupSender(playerID)
@@ -334,6 +568,9 @@ end
 function XHSBots:SetControllerSpectatorMode(playerID, enabled)
 	playerID = tonumber(playerID) or -1
 	enabled = enabled == true
+	if enabled and not IsInToolsMode() then
+		return false, "Spectator bot setup is available in Tools mode only"
+	end
 	if playerID < 0
 		or PlayerResource == nil
 		or PlayerResource.IsValidPlayerID == nil
@@ -346,9 +583,18 @@ function XHSBots:SetControllerSpectatorMode(playerID, enabled)
 	local currentTeam = PlayerResource.GetTeam ~= nil
 		and PlayerResource:GetTeam(playerID)
 		or nil
-	if not enabled and PlayerResource.SetCameraTarget ~= nil then
+	if not enabled and CameraMotion ~= nil then
+		self.spectator_follow_enabled = false
+		self.spectator_follow_player_id = -1
+		self.spectator_follow_entindex = -1
+		self.spectator_follow_monitor_generation =
+			(tonumber(self.spectator_follow_monitor_generation) or 0) + 1
 		pcall(function()
-			PlayerResource:SetCameraTarget(playerID, nil)
+			CameraMotion:Release(playerID, {
+				owner = "spectator_follow",
+				mode = "free",
+				reason = "spectator mode disabled",
+			})
 		end)
 	end
 	if currentTeam ~= targetTeam then
@@ -370,6 +616,142 @@ function XHSBots:SetControllerSpectatorMode(playerID, enabled)
 	return true
 end
 
+function XHSBots:GetFirstSpectatorBotPlayerID()
+	local candidates = {}
+	for _, playerID in ipairs(XHSBotPlayerRegistry:GetXHSBotPlayerIDs()) do
+		local record = XHSBotPlayerRegistry:GetBot(playerID)
+		table.insert(candidates, {
+			player_id = playerID,
+			slot = tonumber(record and record.slot) or 999,
+		})
+	end
+	table.sort(candidates, function(a, b)
+		if a.slot ~= b.slot then return a.slot < b.slot end
+		return a.player_id < b.player_id
+	end)
+	return candidates[1] and candidates[1].player_id or -1
+end
+
+function XHSBots:PushSpectatorCameraState(reason, active)
+	local spectatorPlayerID =
+		tonumber(self.spectator_controller_player_id) or -1
+	if spectatorPlayerID < 0 or PlayerResource == nil then return end
+	local player = PlayerResource:GetPlayer(spectatorPlayerID)
+	if player == nil then return end
+
+	CustomGameEventManager:Send_ServerToPlayer(
+		player,
+		"xhs_bot_spectator_camera_state",
+		{
+			following = self.spectator_follow_enabled and 1 or 0,
+			active = active == true and 1 or 0,
+			target_player_id =
+				tonumber(self.spectator_follow_player_id) or -1,
+			hero_entindex =
+				tonumber(self.spectator_follow_entindex) or -1,
+			reason = tostring(reason or ""),
+		}
+	)
+end
+
+function XHSBots:TrySpectatorFollow(reason)
+	if not self.spectator_follow_enabled
+		or self.configuration.spectator_mode ~= true
+		or CameraMotion == nil then
+		return false, "spectator follow disabled"
+	end
+
+	local spectatorPlayerID =
+		tonumber(self.spectator_controller_player_id) or -1
+	if spectatorPlayerID < 0 then
+		return false, "spectator controller unavailable"
+	end
+
+	local targetPlayerID = tonumber(self.spectator_follow_player_id) or -1
+	if targetPlayerID < 0 then
+		targetPlayerID = self:GetFirstSpectatorBotPlayerID()
+		if targetPlayerID < 0 then return false, "waiting for first bot" end
+		self.spectator_follow_player_id = targetPlayerID
+	end
+	if not XHSBotPlayerRegistry:IsXHSBotPlayerID(targetPlayerID) then
+		return false, "invalid spectator bot target"
+	end
+
+	local targetHero = XHSBotPlayerRegistry:GetBotHero(targetPlayerID)
+	if not IsValidHero(targetHero) then
+		return false, "waiting for bot hero"
+	end
+	local targetEntIndex = targetHero:entindex()
+	local cameraState = CameraMotion:GetState(spectatorPlayerID)
+	if tonumber(self.spectator_follow_entindex) == targetEntIndex
+		and cameraState ~= nil
+		and cameraState.active == true
+		and cameraState.owner == "spectator_follow" then
+		return true
+	end
+
+	local handle, errorMessage = CameraMotion:Follow(
+		spectatorPlayerID,
+		targetHero,
+		{
+			duration = 0.35,
+			easing = "smootherstep",
+			owner = "spectator_follow",
+			priority = 40,
+			policy = "replace",
+			persistent = true,
+			invalid_target = "release",
+			origin_mode = "provider",
+			on_cancel = function()
+				if XHSBots.spectator_follow_enabled
+					and tonumber(XHSBots.spectator_follow_player_id)
+						== targetPlayerID
+					and tonumber(XHSBots.spectator_follow_entindex)
+						== targetEntIndex then
+					XHSBots.spectator_follow_entindex = -1
+					XHSBots:PushSpectatorCameraState(
+						"spectator follow temporarily interrupted",
+						false
+					)
+				end
+			end,
+		}
+	)
+	if handle == nil then
+		self.spectator_follow_entindex = -1
+		self:PushSpectatorCameraState(errorMessage or reason, false)
+		return false, errorMessage
+	end
+
+	self.spectator_follow_entindex = targetEntIndex
+	self:PushSpectatorCameraState(reason or "spectator follow active", true)
+	return true
+end
+
+function XHSBots:StartSpectatorFollowMonitor(reason)
+	if not self.spectator_follow_enabled
+		or Timers == nil
+		or Timers.CreateTimer == nil then
+		return
+	end
+	self.spectator_follow_monitor_generation =
+		(tonumber(self.spectator_follow_monitor_generation) or 0) + 1
+	local generation = self.spectator_follow_monitor_generation
+
+	Timers:CreateTimer(0, function()
+		if generation ~= XHSBots.spectator_follow_monitor_generation
+			or not XHSBots.spectator_follow_enabled
+			or XHSBots.configuration.spectator_mode ~= true then
+			return nil
+		end
+		if GameRules:State_Get() >= DOTA_GAMERULES_STATE_POST_GAME then
+			return nil
+		end
+		XHSBots:TrySpectatorFollow(reason or "spectator follow monitor")
+		return 0.25
+	end)
+end
+
 function XHSBots:OnSpectatorCamera(sourceIndex, event)
 	if not self.enabled or not IsInToolsMode() then return end
 
@@ -384,20 +766,33 @@ function XHSBots:OnSpectatorCamera(sourceIndex, event)
 		or senderPlayerID ~= spectatorPlayerID
 		or self.configuration.spectator_mode ~= true
 		or senderTeam ~= XHS_SPECTATOR_TEAM
-		or PlayerResource.SetCameraTarget == nil then
+		or PlayerResource == nil
+		or CameraMotion == nil then
 		return
 	end
 
 	local targetPlayerID = math.floor(tonumber(event and event.target_player_id) or -1)
 	if targetPlayerID < 0 then
-		PlayerResource:SetCameraTarget(senderPlayerID, nil)
+		self.spectator_follow_enabled = false
+		self.spectator_follow_player_id = -1
+		self.spectator_follow_entindex = -1
+		self.spectator_follow_monitor_generation =
+			(tonumber(self.spectator_follow_monitor_generation) or 0) + 1
+		CameraMotion:Release(senderPlayerID, {
+			owner = "spectator_follow",
+			mode = "free",
+			reason = "spectator follow cleared",
+		})
+		self:PushSpectatorCameraState("free camera", false)
 		return
 	end
 	if not XHSBotPlayerRegistry:IsXHSBotPlayerID(targetPlayerID) then return end
 
-	local targetHero = XHSBotPlayerRegistry:GetBotHero(targetPlayerID)
-	if not IsValidHero(targetHero) then return end
-	PlayerResource:SetCameraTarget(senderPlayerID, targetHero)
+	self.spectator_follow_enabled = true
+	self.spectator_follow_player_id = targetPlayerID
+	self.spectator_follow_entindex = -1
+	self:TrySpectatorFollow("spectator UI request")
+	self:StartSpectatorFollowMonitor("spectator UI follow retry")
 end
 
 function XHSBots:RefreshController(reason)
@@ -405,14 +800,19 @@ function XHSBots:RefreshController(reason)
 	local previousPlayerID = tonumber(self.controller_player_id) or -1
 	local nextPlayerID = self:FindControllerPlayerID()
 	if nextPlayerID < 0 then return false end
-	if nextPlayerID == previousPlayerID then return true end
 
+	self.configuration = XHSBotConfig:Normalize(
+		self.configuration,
+		self:GetSetupHumanIdentityCount()
+	)
 	self.controller_player_id = nextPlayerID
-	SetupLog("controller_updated", {
-		previous_player_id = previousPlayerID,
-		controller_player_id = nextPlayerID,
-		reason = reason,
-	})
+	if nextPlayerID ~= previousPlayerID then
+		SetupLog("controller_updated", {
+			previous_player_id = previousPlayerID,
+			controller_player_id = nextPlayerID,
+			reason = reason,
+		})
+	end
 	self:PushConfiguration()
 	return true
 end
@@ -516,10 +916,15 @@ function XHSBots:PrintQAResult(command, ok, message, fields)
 		line = line .. " " .. string.sub(safeFields, 1, 768)
 	end
 	line = string.sub(line, 1, 960)
-	if NativePrint ~= nil then
-		pcall(NativePrint, line)
-	elseif print ~= nil then
-		pcall(print, line)
+	local emitted = false
+	if type(NativePrint) == "function" then
+		emitted = pcall(NativePrint, line)
+	end
+	if not emitted and type(print) == "function" then
+		emitted = pcall(print, line)
+	end
+	if not emitted and type(Warning) == "function" then
+		pcall(Warning, line .. "\n")
 	end
 	return line
 end
@@ -532,17 +937,53 @@ function XHSBots:FormatQALogValue(value, maximumLength)
 	return string.sub(text, 1, tonumber(maximumLength) or 96)
 end
 
+function XHSBots:RunDecisionAuditConsoleCommand(action, command)
+	command = tostring(command or "xhs_bots_audit")
+	action = string.lower(tostring(action or "status"))
+	self:PrintQAResult(
+		command,
+		true,
+		"audit_command_received",
+		"action=" .. self:FormatQALogValue(action, 24)
+	)
+	local callOK, ok, message, fields = pcall(
+		self.TestDecisionAuditFromConsole,
+		self,
+		action
+	)
+	if not callOK then
+		self:PrintQAResult(
+			command,
+			false,
+			"audit_command_exception",
+			"action=" .. self:FormatQALogValue(action, 24)
+				.. " error=" .. self:FormatQALogValue(ok, 320)
+		)
+		return false
+	end
+	self:PrintQAResult(command, ok, message, fields)
+	return ok
+end
+
 function XHSBots:RegisterQACommands()
-	if not self.enabled or Convars == nil or Convars.RegisterCommand == nil then return end
-	local commandFlags = FCVAR_CHEAT or 0
+	if not self.enabled or not IsInToolsMode()
+		or Convars == nil or Convars.RegisterCommand == nil then return end
+	local registrationRevision = 5
+	if self.qa_command_registration_revision == registrationRevision then return end
+	local auditCommandFlags = FCVAR_CLIENTCMD_CAN_EXECUTE or 1073741824
+	local commandFlags = (FCVAR_CHEAT or 0) + auditCommandFlags
+	-- These two audit commands are intentionally callable from the local
+	-- VConsole client. Without CLIENTCMD_CAN_EXECUTE the engine accepts the
+	-- typed text client-side but never dispatches the Lua server callback.
 
 	Convars:RegisterCommand(
 		"xhs_bots_test_config",
-		function(_, count, difficulty, composition)
+		function(_, count, difficulty, composition, spectatorMode)
 			local ok, message = XHSBots:ApplyConfiguration({
 				count = count,
 				difficulty = difficulty,
 				composition = composition,
+				spectator_mode = spectatorMode,
 			})
 			XHSBots:PrintQAResult(
 				"xhs_bots_test_config",
@@ -551,10 +992,11 @@ function XHSBots:RegisterQACommands()
 				"count=" .. tostring(count)
 					.. " difficulty=" .. tostring(difficulty)
 					.. " composition=" .. tostring(composition)
+					.. " spectator=" .. tostring(spectatorMode)
 			)
 			return ok
 		end,
-		"Tools-only: xhs_bots_test_config <count> <easy|normal> <composition>",
+		"Tools-only: xhs_bots_test_config <count> <easy|normal> <composition> [0|1 spectator]",
 		commandFlags
 	)
 
@@ -629,6 +1071,61 @@ function XHSBots:RegisterQACommands()
 		"Tools-only: xhs_bots_test_economy_audit <start|check|watch|stop|reset>",
 		commandFlags
 	)
+
+	-- The bot component and handler are already Tools-only. Keeping this command
+	-- independent from FCVAR_CHEAT makes capture reliable from VConsole even
+	-- when cheats were not toggled for the lobby.
+	Convars:RegisterCommand(
+		"xhs_bots_audit",
+		function(_, action)
+			return XHSBots:RunDecisionAuditConsoleCommand(
+				action,
+				"xhs_bots_audit"
+			)
+		end,
+		"Tools-only: xhs_bots_audit <start|status|dump|stop|reset>",
+		auditCommandFlags
+	)
+	Convars:RegisterCommand(
+		"xhs_bots_audit_dump",
+		function()
+			return XHSBots:RunDecisionAuditConsoleCommand(
+				"dump",
+				"xhs_bots_audit_dump"
+			)
+		end,
+		"Tools-only: dump the complete chronological XHS bot decision audit",
+		auditCommandFlags
+	)
+	self.qa_command_registration_revision = registrationRevision
+end
+
+function XHSBots:TestDecisionAuditFromConsole(action)
+	if not IsInToolsMode() or not self.enabled then
+		return false, "unavailable_outside_tools"
+	end
+	if XHSBotDecisionAudit == nil then
+		return false, "audit_module_unavailable"
+	end
+
+	action = string.lower(tostring(action or "status"))
+	if action == "start" then
+		XHSBotDecisionAudit:Start("manual_command")
+		XHSBotDecisionAudit:SampleAll(true)
+		return true, "audit_recording",
+			"filter=[XHSBots][AUDIT] auto_dump=post_game"
+	elseif action == "status" then
+		return XHSBotDecisionAudit:Status()
+	elseif action == "dump" then
+		return XHSBotDecisionAudit:Dump("manual_dump")
+	elseif action == "stop" then
+		return XHSBotDecisionAudit:Stop("manual_stop", true)
+	elseif action == "reset" then
+		XHSBotDecisionAudit:Reset()
+		return true, "audit_reset", "events=0"
+	end
+	return false, "unsupported_audit_action",
+		"action=" .. self:FormatQALogValue(action, 24)
 end
 
 function XHSBots:TestScenarioFromConsole(scenarioName)
@@ -891,6 +1388,8 @@ function XHSBots:StartEconomyAudit(playerIDs)
 				items_purchased = tonumber(record.items_purchased) or 0,
 				item_gold_spent = tonumber(record.item_gold_spent) or 0,
 				tomes_bought = tonumber(record.tomes_bought) or 0,
+				surplus_tomes_bought =
+					tonumber(record.surplus_tomes_bought) or 0,
 				plan_switches = tonumber(record.economy_plan_switches) or 0,
 				inventory_full_events =
 					tonumber(record.inventory_full_events) or 0,
@@ -928,13 +1427,17 @@ function XHSBots:GetQAPurchaseShopIssue(record, auditStartedAt)
 
 	local requiredShop = tostring(record.last_purchase_shop or "")
 	local actualShop = tostring(record.last_purchase_shop_kind or "")
-	local validKind = requiredShop == "secret" and actualShop == "secret"
+	local remoteStash = actualShop == "remote_stash"
+	local validKind = remoteStash
+			and (requiredShop == "home" or requiredShop == "base")
+		or requiredShop == "secret" and actualShop == "secret"
 		or requiredShop == "base" and actualShop == "base"
 		or requiredShop == "home"
 			and (actualShop == "base" or actualShop == "lane")
 	if not validKind then
 		return "shop_mismatch:" .. requiredShop .. ":" .. actualShop
 	end
+	if remoteStash then return nil end
 
 	local maximumDistance = actualShop == "base"
 		and XHSBotEconomy.BASE_SHOP_RADIUS
@@ -1129,13 +1632,17 @@ function XHSBots:EvaluateEconomyAudit(emitBotLines)
 				(tonumber(record.opening_tome_target) or 0)
 					- (tonumber(baseline.tomes_bought) or 0)
 			)
-			if tomeDelta > openingTomesRemaining
+			local surplusTomeDelta =
+				Delta(record, "surplus_tomes_bought", baseline)
+			if tomeDelta > openingTomesRemaining + surplusTomeDelta
 				and (record.economy_phase == "sustain"
 					or record.economy_phase == "core_1") then
 				Add(
 					issues,
 					"early_tome_spend:" .. tostring(tomeDelta)
-						.. "/" .. tostring(openingTomesRemaining)
+						.. "/" .. tostring(
+							openingTomesRemaining + surplusTomeDelta
+						)
 				)
 			end
 		end
@@ -1515,11 +2022,11 @@ function XHSBots:ApplyConfiguration(configuration)
 		revision = self.revision,
 		tools_mode = IsInToolsMode(),
 	})
-	if not IsInToolsMode() or not self.enabled then
+	if not self.enabled or not self.setup_approved then
 		SetupLog("apply_configuration_rejected", {
-			reason = "outside_tools_or_disabled",
+			reason = "disabled_or_vote_pending",
 		})
-		return false, "AI allies are unavailable outside Tools mode"
+		return false, "AI allies require unanimous approval from every human player"
 	end
 	if GameRules:State_Get() ~= DOTA_GAMERULES_STATE_CUSTOM_GAME_SETUP then
 		self.error = "AI settings can only change during custom setup"
@@ -1543,17 +2050,16 @@ function XHSBots:ApplyConfiguration(configuration)
 	self.unique_hero_count_finalized = false
 	local wantsSpectator = IsTruthy(configuration.spectator_mode)
 		and math.floor(tonumber(configuration.count) or 0) > 0
+	if wantsSpectator and not IsInToolsMode() then
+		self.error = "Spectator bot setup is available in Tools mode only"
+		self:PushConfiguration()
+		return false, self.error
+	end
 	local currentlySpectating = self.controller_player_id >= 0
 		and self.controller_player_id == (tonumber(self.spectator_controller_player_id) or -1)
-	local prospectiveHumanCount = XHSBotPlayerRegistry:GetHumanCount()
-	if wantsSpectator and not currentlySpectating then
-		prospectiveHumanCount = math.max(0, prospectiveHumanCount - 1)
-	elseif not wantsSpectator and currentlySpectating then
-		prospectiveHumanCount = prospectiveHumanCount + 1
-	end
 	local normalizedConfiguration = XHSBotConfig:Normalize(
 		configuration,
-		prospectiveHumanCount
+		self:GetSetupHumanIdentityCount()
 	)
 	if normalizedConfiguration.spectator_mode ~= currentlySpectating then
 		local teamChanged, teamError = self:SetControllerSpectatorMode(
@@ -1572,6 +2078,15 @@ function XHSBots:ApplyConfiguration(configuration)
 		end
 	end
 	self.configuration = normalizedConfiguration
+	if self.configuration.spectator_mode == true then
+		-- Spectator mode starts attached to the first bot in roster order.
+		-- The monitor waits through provisioning, hero replacement and any
+		-- higher-priority cinematic, then reacquires the current hero entity.
+		self.spectator_follow_enabled = true
+		self.spectator_follow_player_id = -1
+		self.spectator_follow_entindex = -1
+		self:StartSpectatorFollowMonitor("default first bot follow")
+	end
 	self.revision = self.revision + 1
 	self.status = "ready"
 	self.error = ""
@@ -1582,6 +2097,8 @@ function XHSBots:ApplyConfiguration(configuration)
 		composition = self.configuration.composition,
 		spectator_mode = self.configuration.spectator_mode,
 		maximum_bots = self.configuration.maximum_bots,
+		maximum_play_bots = self.configuration.maximum_play_bots,
+		maximum_spectator_bots = self.configuration.maximum_spectator_bots,
 		revision = self.revision,
 	})
 	self:PushConfiguration()
@@ -1613,11 +2130,13 @@ function XHSBots:OnConfigure(sourceIndex, event)
 		game_state = GameRules:State_Get(),
 		tools_mode = IsInToolsMode(),
 	})
-	if not IsInToolsMode() or not self.enabled then
+	if not self.enabled or not self.setup_approved then
 		SetupLog("configure_event_rejected", {
-			reason = "outside_tools_or_disabled",
+			reason = "disabled_or_vote_pending",
 			sender_player_id = senderPlayerID,
 		})
+		self.error = "AI allies require unanimous approval from every human player"
+		self:PushConfiguration()
 		return
 	end
 	if GameRules:State_Get() ~= DOTA_GAMERULES_STATE_CUSTOM_GAME_SETUP then
@@ -1669,9 +2188,17 @@ end
 function XHSBots:BuildConfigurationNetTable()
 	local configuration = self.configuration or XHSBotConfig:CopyDefaults()
 	return {
-		available = self.enabled and 1 or 0,
+		available = self.enabled and self.setup_approved and 1 or 0,
+		vote_required = not IsInToolsMode() and 1 or 0,
+		vote_approved = self.setup_approved and 1 or 0,
+		vote_locked = self.setup_vote_locked and 1 or 0,
+		vote_yes = tonumber(self.setup_vote_yes) or 0,
+		vote_total = tonumber(self.setup_vote_total) or 0,
+		tools_mode = IsInToolsMode() and 1 or 0,
 		bot_count = tonumber(configuration.count) or 0,
 		max_bots = tonumber(configuration.maximum_bots) or 0,
+		max_play_bots = tonumber(configuration.maximum_play_bots) or 0,
+		max_spectator_bots = tonumber(configuration.maximum_spectator_bots) or 0,
 		ai_difficulty = configuration.difficulty or "normal",
 		composition = configuration.composition or "balanced",
 		spectator_mode = configuration.spectator_mode and 1 or 0,
@@ -1703,6 +2230,8 @@ function XHSBots:PushConfiguration()
 		available = payload.available,
 		bot_count = payload.bot_count,
 		max_bots = payload.max_bots,
+		max_play_bots = payload.max_play_bots,
+		max_spectator_bots = payload.max_spectator_bots,
 		difficulty = payload.ai_difficulty,
 		composition = payload.composition,
 		spectator_mode = payload.spectator_mode,
@@ -1747,10 +2276,14 @@ function XHSBots:BuildRosterNetTable()
 		local playerID = slotEntry and slotEntry.player_id or nil
 		local record = slotEntry and slotEntry.record or nil
 		if playerID == nil then
-			while nextPreviewPlayerID <= 7 and usedPlayerIDs[nextPreviewPlayerID] do
+			local maximumPreviewPlayerID = XHSBotConfig.MAX_SESSION_SIZE - 1
+			while nextPreviewPlayerID <= maximumPreviewPlayerID
+				and usedPlayerIDs[nextPreviewPlayerID] do
 				nextPreviewPlayerID = nextPreviewPlayerID + 1
 			end
-			playerID = nextPreviewPlayerID <= 7 and nextPreviewPlayerID or (100 + slot)
+			playerID = nextPreviewPlayerID <= maximumPreviewPlayerID
+				and nextPreviewPlayerID
+				or (100 + slot)
 			usedPlayerIDs[playerID] = true
 			nextPreviewPlayerID = nextPreviewPlayerID + 1
 		end
@@ -1798,9 +2331,10 @@ function XHSBots:BeforeCustomSetupFinish(launchReason, callback)
 	self.controller_player_id = self:FindControllerPlayerID()
 	self.configuration = XHSBotConfig:Normalize(
 		self.configuration,
-		XHSBotPlayerRegistry:GetHumanCount()
+		self:GetSetupHumanIdentityCount()
 	)
 	self.locked = true
+	self.setup_vote_locked = true
 	self.unique_hero_count_finalized = false
 	self.status = self.configuration.count > 0
 		and (self.configuration.spectator_mode
@@ -1864,6 +2398,14 @@ function XHSBots:FinalizeUniqueHeroCount()
 	self.configuration.enabled = finalCount > 0
 	self.configuration.maximum_bots = math.min(
 		tonumber(self.configuration.maximum_bots) or capacity,
+		capacity
+	)
+	self.configuration.maximum_play_bots = math.min(
+		tonumber(self.configuration.maximum_play_bots) or capacity,
+		capacity
+	)
+	self.configuration.maximum_spectator_bots = math.min(
+		tonumber(self.configuration.maximum_spectator_bots) or capacity,
 		capacity
 	)
 	self.unique_hero_count_finalized = true
@@ -2025,7 +2567,7 @@ function XHSBots:OnGameRulesStateChange()
 		self.controller_player_id = self:FindControllerPlayerID()
 		self.configuration = XHSBotConfig:Normalize(
 			self.configuration,
-			XHSBotPlayerRegistry:GetHumanCount()
+			self:GetSetupHumanIdentityCount()
 		)
 		SetupLog("custom_setup_entered", {
 			controller_player_id = self.controller_player_id,
@@ -2059,6 +2601,9 @@ function XHSBots:OnGameRulesStateChange()
 		and self.configuration.count > 0 then
 		self:StartThinker()
 	elseif state >= DOTA_GAMERULES_STATE_POST_GAME then
+		self:RunSafely("audit:post_game", function()
+			XHSBotDecisionAudit:Finalize("post_game")
+		end, nil, nil)
 		self:Stop()
 	end
 end
@@ -2202,6 +2747,7 @@ function XHSBots:StartThinker()
 		provisioned = XHSBotProvisioner.provisioned,
 	})
 	if self.thinker_running or not self.enabled or self.configuration.count <= 0 then return end
+	XHSBotDecisionAudit:EnsureStarted("thinker_start")
 	self.thinker_running = true
 	XHSBotDangerRegistry:SetEnabled(true)
 
@@ -2230,6 +2776,10 @@ function XHSBots:VerifyBotRecord(playerID, record)
 end
 
 function XHSBots:TelemetryClock()
+	if os ~= nil and os.clock ~= nil then
+		local ok, value = pcall(os.clock)
+		if ok and tonumber(value) ~= nil then return tonumber(value) end
+	end
 	if Time ~= nil then
 		local ok, value = pcall(Time)
 		if ok and tonumber(value) ~= nil then return tonumber(value) end
@@ -2320,6 +2870,9 @@ function XHSBots:Think()
 
 	local state = GameRules:State_Get()
 	if state > DOTA_GAMERULES_STATE_GAME_IN_PROGRESS then
+		self:RunSafely("audit:thinker_finalize", function()
+			XHSBotDecisionAudit:Finalize("thinker_post_game")
+		end, nil, nil)
 		self:Stop()
 		self:RecordThinkCost(thinkStartedAt)
 		return nil
@@ -2345,6 +2898,7 @@ function XHSBots:Think()
 		end, record, nil)
 	end
 	self:RunSafely("team_director", function()
+		XHSBotCampaignDirector:Update(false)
 		XHSBotTeamDirector:Update(false)
 	end, nil, nil)
 	local difficulty = XHSBotConfig:GetDifficulty(self.configuration.difficulty)
@@ -2355,6 +2909,9 @@ function XHSBots:Think()
 			self:ThinkBot(playerID, now, difficulty)
 		end, record, nil)
 	end
+	self:RunSafely("audit:sample", function()
+		XHSBotDecisionAudit:SampleAll(false)
+	end, nil, nil)
 
 	if now >= self.next_roster_push then
 		self.next_roster_push = now + 1
@@ -2424,6 +2981,13 @@ function XHSBots:PushDebugState()
 			rune_progression_critical =
 				CustomTimers ~= nil and (tonumber(CustomTimers.creep_level) or 1) >= 2
 					and 1 or 0,
+			loot_kind = record.loot_kind or "",
+			loot_item = record.loot_item or "",
+			loot_distance = record.loot_distance or -1,
+			crates_targeted = record.crates_targeted or 0,
+			loot_pickup_orders = record.loot_pickup_orders or 0,
+			looted_tomes_used = record.looted_tomes_used or 0,
+			last_loot_item = record.last_loot_item or "",
 			follow_human_player_id = assignment and assignment.follow_human_player_id or -1,
 			target = GetDebugEntityName(target),
 			target_entindex = record.target_entindex or -1,
@@ -2727,6 +3291,9 @@ function XHSBots:ResetForTools()
 	if not self.enabled then return false end
 	self:Stop()
 	self.qa_economy_audit = nil
+	XHSBotDecisionAudit:Reset()
+	XHSBotLoot:Reset()
+	XHSBotCampaignDirector:Reset()
 	XHSBotTeamDirector:Reset()
 	XHSBotDangerRegistry:Clear()
 	for _, playerID in ipairs(XHSBotPlayerRegistry:GetXHSBotPlayerIDs()) do

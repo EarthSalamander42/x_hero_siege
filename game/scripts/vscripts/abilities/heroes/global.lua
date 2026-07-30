@@ -94,7 +94,17 @@ function CastleMuradin(event)
 		Muradin:EmitSound("MountainKing.Avatar")
 
 		for _, hero in pairs(heroes) do
-			CustomGameEventManager:Send_ServerToPlayer(hero:GetPlayerOwner(), "set_player_camera", { hPosition = Muradin:GetAbsOrigin() })
+			if hero:GetPlayerOwnerID() >= 0 then
+				CameraMotion:Move(hero:GetPlayerOwnerID(), Muradin, {
+					from = hero,
+					duration = 0.55,
+					easing = "smootherstep",
+					owner = "castle_muradin",
+					priority = 70,
+					policy = "replace",
+					release = "free",
+				})
+			end
 
 			hero:AddNewModifier(hero, nil, "modifier_pause_creeps", { Duration = 10, IsHidden = true })
 			hero:AddNewModifier(hero, nil, "modifier_invulnerable", { Duration = 10, IsHidden = true })

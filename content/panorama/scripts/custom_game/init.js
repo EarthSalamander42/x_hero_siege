@@ -994,30 +994,43 @@ function ShowXHSEnemyAbilityTooltip(image) {
 			abilityName = liveAbilityName;
 			image._xhsAbilityName = liveAbilityName;
 		}
-		if (liveAbilityLevel > 0) {
-			abilityLevel = liveAbilityLevel;
-			image._xhsAbilityLevel = liveAbilityLevel;
-		}
+		abilityLevel = liveAbilityLevel;
+		image._xhsAbilityLevel = liveAbilityLevel;
 	}
 
-	if (abilityName && abilityLevel > 0) {
-		// Enemy ability levels are already networked through the ability entity.
-		// Passing the level explicitly avoids Valve resolving the same slot on
-		// the local hero, which produced "Level ?" and selected no KV value.
+	if (abilityName) {
 		image._xhsTooltipRetryCount = 0;
 		image._xhsTooltipShownAbilityName = abilityName;
 		image._xhsTooltipShownAbilityLevel = abilityLevel;
 		image._xhsTooltipShownAbilityEntityIndex = abilityEntityIndex;
-		$.DispatchEvent("DOTAShowAbilityTooltipForLevel", image, abilityName, abilityLevel);
+
+		if (abilityLevel > 0) {
+			// Force the inspected ability's current level into the tooltip.
+			// The entity-index variant can retain stale level formatting when
+			// moving quickly between two already-open enemy ability tooltips.
+			$.DispatchEvent(
+				"DOTAShowAbilityTooltipForLevel",
+				image,
+				abilityName,
+				abilityLevel
+			);
+		} else if (abilityEntityIndex >= 0) {
+			// Level-zero abilities still need their real entity context: the
+			// level-only event otherwise builds an incomplete "Level ?" tooltip.
+			$.DispatchEvent(
+				"DOTAShowAbilityTooltipForEntityIndex",
+				image,
+				abilityName,
+				abilityEntityIndex
+			);
+		} else {
+			$.DispatchEvent("DOTAShowAbilityTooltipForLevel", image, abilityName, abilityLevel);
+		}
 		return;
 	}
 
-	// Do not let Valve build a partial tooltip with "Level ?". Keep the hover
-	// alive and retry for a few frames while the newly selected unit networks.
-	if (abilityName) {
-		$.DispatchEvent("DOTAHideAbilityTooltip", image);
-		ScheduleXHSEnemyAbilityTooltipRetry(image);
-	}
+	$.DispatchEvent("DOTAHideAbilityTooltip", image);
+	ScheduleXHSEnemyAbilityTooltipRetry(image);
 }
 
 function HideXHSEnemyAbilityTooltip(image) {
@@ -1049,6 +1062,27 @@ function IsXHSEnemyPortraitUnit(unit) {
 	var localTeam = Players.GetTeam(localPlayer);
 	var unitTeam = Entities.GetTeamNumber(unit);
 	return localTeam >= 0 && unitTeam >= 0 && localTeam !== unitTeam;
+}
+
+function IsXHSLocalPlayerSpectator() {
+	var localPlayer = Game.GetLocalPlayerID ?
+		Game.GetLocalPlayerID() :
+		Players.GetLocalPlayer();
+	var localTeam = localPlayer >= 0 ? Number(Players.GetTeam(localPlayer)) : -1;
+	var botConfig = typeof CustomNetTables !== "undefined" && CustomNetTables ?
+		CustomNetTables.GetTableValue("xhs_bots", "config") :
+		null;
+	var configuredSpectator = botConfig &&
+		(botConfig.spectator_mode === true ||
+			Number(botConfig.spectator_mode || 0) === 1);
+	var localHero = localPlayer >= 0 && Players.GetPlayerHeroEntityIndex ?
+		Players.GetPlayerHeroEntityIndex(localPlayer) :
+		-1;
+	return localPlayer < 0 ||
+		localTeam === 1 ||
+		configuredSpectator ||
+		localHero < 0 ||
+		(Players.IsSpectator && Players.IsSpectator(localPlayer));
 }
 
 function GetXHSAbilityPanels() {
@@ -1184,6 +1218,21 @@ function GetOrCreateXHSEnemyManaLabel(panel) {
 	return label;
 }
 
+function HideXHSEnemyManaLabel(panel) {
+	var container = panel.FindChildTraverse("XHSEnemyManaCostContainer");
+	var label = panel.FindChildTraverse("XHSEnemyManaCost");
+	if (container) {
+		container.visible = false;
+	}
+	if (label) {
+		label.visible = false;
+		label.text = "";
+		if (!container || label.GetParent() !== container) {
+			label.DeleteAsync(0);
+		}
+	}
+}
+
 function GetOrCreateXHSEnemyCooldownLabel(panel) {
 	var cooldownContainer = GetXHSCooldownLabelHost(panel);
 	var label = panel.FindChildTraverse("XHSEnemyCooldownTimer");
@@ -1227,6 +1276,31 @@ function GetOrCreateXHSEnemyCooldownOverlay(panel) {
 	overlay.style.verticalAlign = "center";
 	overlay.style.backgroundColor = "#000000c8";
 	overlay.style.zIndex = "60";
+	return overlay;
+}
+
+function GetOrCreateXHSEnemyUnlearnedOverlay(panel) {
+	var overlay = panel.FindChildTraverse("XHSEnemyUnlearnedOverlay");
+	var iconContainer = GetXHSAbilityIconHost(panel);
+	if (overlay && overlay.GetParent() === iconContainer) {
+		return overlay;
+	}
+	if (overlay) {
+		overlay.SetParent(iconContainer);
+		return overlay;
+	}
+
+	// This mask covers both the stock DOTAAbilityImage and our plain enemy
+	// image. Styling only the child image can leave Valve's bright icon visible
+	// underneath its transparent pixels.
+	overlay = $.CreatePanel("Panel", iconContainer, "XHSEnemyUnlearnedOverlay");
+	overlay.hittest = false;
+	overlay.style.width = "100%";
+	overlay.style.height = "100%";
+	overlay.style.horizontalAlign = "center";
+	overlay.style.verticalAlign = "center";
+	overlay.style.backgroundColor = "#05080cc8";
+	overlay.style.zIndex = "58";
 	return overlay;
 }
 
@@ -1315,17 +1389,74 @@ function SetXHSEnemyAbilityImageReveal(panel, reveal) {
 	}
 }
 
+function CountXHSActiveAbilityLevelPips(panel) {
+	if (!panel) {
+		return 0;
+	}
+
+	var activePips = panel.BHasClass && panel.BHasClass("active_level") ? 1 : 0;
+	for (var i = 0; i < panel.GetChildCount(); i++) {
+		activePips += CountXHSActiveAbilityLevelPips(panel.GetChild(i));
+	}
+	return activePips;
+}
+
+function GetXHSDisplayedAbilityLevel(panel, fallbackLevel) {
+	var levelContainer = panel && panel.FindChildTraverse("AbilityLevelContainer");
+	if (!levelContainer) {
+		return fallbackLevel;
+	}
+
+	// Once Valve exposes a level container, its visible pips are authoritative.
+	// Several custom abilities start at entity level 1 while their HUD slot has
+	// no learned level. An empty container therefore means level 0, not fallback.
+	return CountXHSActiveAbilityLevelPips(levelContainer);
+}
+
+function IsXHSPlayerHeroUnit(unit) {
+	if (unit === undefined || unit === null || unit < 0 ||
+		!Entities.GetPlayerOwnerID || !Players.GetPlayerHeroEntityIndex) {
+		return false;
+	}
+
+	var playerID = Number(Entities.GetPlayerOwnerID(unit));
+	return playerID >= 0 && Players.GetPlayerHeroEntityIndex(playerID) === unit;
+}
+
+function ApplyXHSEnemyAbilityLevelStyle(panel, enemyImage, abilityLevel, panelIndex, ownerUnit) {
+	// Valve's level pips and `no_level` class are authoritative only for an
+	// actual player's hero. Creep and boss panels reuse those stock slots but
+	// do not populate their pips, even though the ability entity has a valid
+	// networked level.
+	var playerHero = IsXHSPlayerHeroUnit(ownerUnit);
+	var useNetworkedLevel = panelIndex >= 6 || !playerHero;
+	var displayedLevel = useNetworkedLevel ?
+		abilityLevel :
+		GetXHSDisplayedAbilityLevel(panel, 0);
+	var stockPanelIsUnlearned = playerHero && panel && panel.BHasClass &&
+		panel.BHasClass("no_level");
+	var isUnlearned = displayedLevel <= 0 || stockPanelIsUnlearned;
+	var unlearnedOverlay = GetOrCreateXHSEnemyUnlearnedOverlay(panel);
+
+	// Match Valve's native `.no_level #AbilityImage` treatment. The enemy icon
+	// is a plain Image, so the stock selector cannot apply to it automatically.
+	// On player heroes, the active pips remain authoritative because some
+	// custom abilities report a non-zero entity level before a skill point was
+	// actually spent.
+	enemyImage.style.saturation = isUnlearned ? "0" : "1";
+	enemyImage.style.brightness = "1";
+	enemyImage.style.washColor = isUnlearned ? "#666666ff" : "#ffffffff";
+	unlearnedOverlay.visible = isUnlearned;
+}
+
 function HideXHSEnemyAbilityPanel(panel) {
 	SetXHSEnemyAbilityImageReveal(panel, false);
 	var enemyImage = panel.FindChildTraverse("XHSEnemyAbilityIcon");
 	var legacyAbilityImage = panel.FindChildTraverse("XHSEnemyAbilityImage");
-	var manaContainer = panel.FindChildTraverse("XHSEnemyManaCostContainer");
-	var manaLabel = panel.FindChildTraverse("XHSEnemyManaCost");
 	var cooldownLabel = panel.FindChildTraverse("XHSEnemyCooldownTimer");
 	var cooldownOverlay = panel.FindChildTraverse("XHSEnemyCooldownOverlay");
-	if (manaContainer) {
-		manaContainer.visible = false;
-	}
+	var unlearnedOverlay = panel.FindChildTraverse("XHSEnemyUnlearnedOverlay");
+	HideXHSEnemyManaLabel(panel);
 	if (enemyImage) {
 		enemyImage.visible = false;
 	}
@@ -1333,15 +1464,14 @@ function HideXHSEnemyAbilityPanel(panel) {
 		legacyAbilityImage.visible = false;
 		legacyAbilityImage.hittest = false;
 	}
-	if (manaLabel && (!manaContainer || manaLabel.GetParent() !== manaContainer)) {
-		manaLabel.visible = false;
-		manaLabel.DeleteAsync(0);
-	}
 	if (cooldownLabel) {
 		cooldownLabel.visible = false;
 	}
 	if (cooldownOverlay) {
 		cooldownOverlay.visible = false;
+	}
+	if (unlearnedOverlay) {
+		unlearnedOverlay.visible = false;
 	}
 }
 
@@ -1424,7 +1554,7 @@ function UpdateXHSFriendlyCooldownLabels(unit) {
 	}
 }
 
-function UpdateXHSEnemyAbilityPanel(panel, ability, ownerUnit) {
+function UpdateXHSEnemyAbilityPanel(panel, ability, ownerUnit, panelIndex) {
 	if (ability === undefined || ability === null || ability < 0) {
 		HideXHSEnemyAbilityPanel(panel);
 		return;
@@ -1446,10 +1576,10 @@ function UpdateXHSEnemyAbilityPanel(panel, ability, ownerUnit) {
 	enemyImage._xhsAbilityLevel = abilityLevel;
 	enemyImage._xhsAbilityOwner = ownerUnit;
 	enemyImage._xhsAbilityEntityIndex = ability;
+	ApplyXHSEnemyAbilityLevelStyle(panel, enemyImage, abilityLevel, panelIndex, ownerUnit);
 	enemyImage.visible = true;
 
 	if (enemyImage._xhsTooltipHovered &&
-		abilityLevel > 0 &&
 		(enemyImage._xhsTooltipShownAbilityName !== abilityName ||
 			enemyImage._xhsTooltipShownAbilityLevel !== abilityLevel ||
 			enemyImage._xhsTooltipShownAbilityEntityIndex !== ability)) {
@@ -1465,6 +1595,7 @@ function UpdateXHSEnemyAbilityPanel(panel, ability, ownerUnit) {
 	var timer = GetOrCreateXHSEnemyCooldownLabel(panel);
 	var cooldownPanel = panel.FindChildTraverse("Cooldown");
 	var stockTimer = panel.FindChildTraverse("CooldownTimer");
+	var stockOverlay = panel.FindChildTraverse("CooldownOverlay");
 
 	if (cooldownPanel) {
 		// Enemy portrait panels can leave Valve's cooldown host collapsed. The
@@ -1475,6 +1606,12 @@ function UpdateXHSEnemyAbilityPanel(panel, ability, ownerUnit) {
 	}
 	if (stockTimer) {
 		stockTimer.visible = false;
+	}
+	if (stockOverlay) {
+		// Valve's panel is still bound to a different portrait slot and can
+		// leave a stale radial mask over an otherwise learned enemy ability.
+		// XHSEnemyCooldownOverlay below owns the real inspected cooldown.
+		stockOverlay.visible = false;
 	}
 	if (timer) {
 		timer.visible = inCooldown;
@@ -1494,12 +1631,18 @@ function UpdateXHSEnemyAbilityPanel(panel, ability, ownerUnit) {
 		Abilities.GetManaCost(ability);
 	manaCost = Math.max(0, Number(manaCost) || 0);
 
+	if (IsXHSLocalPlayerSpectator() || manaCost <= 0) {
+		HideXHSEnemyManaLabel(panel);
+		return;
+	}
+
 	var manaLabel = GetOrCreateXHSEnemyManaLabel(panel);
 	var manaContainer = panel.FindChildTraverse("XHSEnemyManaCostContainer");
 	if (manaContainer) {
-		manaContainer.visible = manaCost > 0;
+		manaContainer.visible = true;
 	}
-	manaLabel.text = manaCost > 0 ? String(Math.floor(manaCost + 0.5)) : "";
+	manaLabel.visible = true;
+	manaLabel.text = String(Math.floor(manaCost + 0.5));
 }
 
 function UpdateXHSEnemyAbilityCooldowns() {
@@ -1519,7 +1662,7 @@ function UpdateXHSEnemyAbilityCooldowns() {
 	var displayedAbilities = GetXHSDisplayedAbilities(unit);
 	for (var i = 0; i < panels.length; i++) {
 		var ability = GetXHSPanelAbility(panels[i], i, unit, displayedAbilities);
-		UpdateXHSEnemyAbilityPanel(panels[i], ability, unit);
+		UpdateXHSEnemyAbilityPanel(panels[i], ability, unit, i);
 	}
 }
 

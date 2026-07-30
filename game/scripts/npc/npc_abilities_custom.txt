@@ -13346,18 +13346,18 @@
 		"AbilityUnitTargetTeam"		"DOTA_UNIT_TARGET_TEAM_FRIENDLY"
 		"AbilityUnitTargetType"		"DOTA_UNIT_TARGET_HERO | DOTA_UNIT_TARGET_BASIC"
 		"SpellImmunityType"			"SPELL_IMMUNITY_ALLIES_YES"
-		"MaxLevel"					"4"
+		"MaxLevel"					"1"
 		"AbilityTextureName"			"custom/ogre_magi_bloodlust"
 		"AbilityCastRange"			"700"
 		"AbilityCastPoint"			"0.25"
-		"AbilityCooldown"			"18 17 16 15"
-		"AbilityManaCost"			"40 45 50 55"
+		"AbilityCooldown"			"18"
+		"AbilityManaCost"			"40"
 		"AbilityValues"
 		{
 			"duration"					"30"
-			"bonus_movement_speed"		"20 22 24 26"
-			"bonus_attack_speed"		"90 110 130 150"
-			"bonus_attack_damage_pct"	"20 30 40 50"
+			"bonus_movement_speed"		"20"
+			"bonus_attack_speed"		"150"
+			"bonus_attack_damage_pct"	"20"
 		}
 	}
 
@@ -26207,6 +26207,29 @@
 			"CalculateSpellDamageTooltip"	"1"
 			"marked_bonus_pct"		"55"
 			"cast_point"			"2.60 2.40 2.20 2.00 1.80"
+		}
+	}
+
+	//=================================================================================================================
+	// Supporter High Five
+	//=================================================================================================================
+	"xhs_high_five"
+	{
+		"BaseClass"					"ability_lua"
+		"ScriptFile"				"components/battlepass/high_five.lua"
+		"AbilityBehavior"			"DOTA_ABILITY_BEHAVIOR_NO_TARGET | DOTA_ABILITY_BEHAVIOR_HIDDEN | DOTA_ABILITY_BEHAVIOR_NOT_LEARNABLE | DOTA_ABILITY_BEHAVIOR_DONT_RESUME_ATTACK"
+		"AbilityTextureName"		"high_five"
+		"MaxLevel"					"1"
+		"AbilityCastPoint"			"0"
+		"AbilityCooldown"			"60"
+		"AbilityManaCost"			"0"
+		"IsOnCastBar"				"0"
+		"AbilityValues"
+		{
+			"duration"				"10"
+			"radius"				"900"
+			"speed"					"700"
+			"successful_cooldown"	"1"
 		}
 	}
 

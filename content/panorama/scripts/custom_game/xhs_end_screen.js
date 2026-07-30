@@ -393,6 +393,19 @@ var XHSEndScreen = (function () {
 			"debuffs",
 			"shop",
 		];
+		var localPlayerID = Safe(function () {
+			return Players.GetLocalPlayer();
+		}, -1);
+		var isToolsSpectator = Safe(function () {
+			return typeof Game.IsInToolsMode === "function"
+				&& Game.IsInToolsMode()
+				&& localPlayerID >= 0
+				&& Number(Players.GetTeam(localPlayerID)) === 1;
+		}, false);
+		if (isToolsSpectator) {
+			ids.push("GameInfoButton");
+			ids.push("spectator_options");
+		}
 
 		for (var i = 0; i < ids.length; i++) {
 			var panel = root && root.FindChildTraverse(ids[i]);
@@ -694,7 +707,10 @@ var XHSEndScreen = (function () {
 		var models = [];
 
 		for (var i = 0; i < playerIDs.length; i++) {
-			models.push(BuildPlayerModel(data, playerIDs[i]));
+			var model = BuildPlayerModel(data, playerIDs[i]);
+			if (Number(model.team) !== 1) {
+				models.push(model);
+			}
 		}
 
 		models.sort(function (a, b) {

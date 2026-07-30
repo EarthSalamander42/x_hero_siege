@@ -54,9 +54,13 @@ function Wearable:Init()
 	local npc_heroes = LoadKeyValues("scripts/npc/npc_heroes.txt")
 	Wearable.items_game = LoadKeyValues("scripts/items/items_game.txt")
 
-	Wearable.asset_modifier = LoadKeyValues("scripts/items/asset_modifier.txt")
-	Wearable.control_points = LoadKeyValues("scripts/items/control_points.txt")
-	Wearable.respawn_items = LoadKeyValues("scripts/items/respawn_items.txt")
+	-- we don't need this in XHS, it will use ram for nothing
+	-- Wearable.asset_modifier = LoadKeyValues("scripts/items/asset_modifier.txt")
+	-- Wearable.control_points = LoadKeyValues("scripts/items/control_points.txt")
+	-- Wearable.respawn_items = LoadKeyValues("scripts/items/respawn_items.txt")
+	Wearable.asset_modifier = {}
+	Wearable.control_points = {}
+	Wearable.respawn_items = {}
 
 	Wearable.heroes = {} -- 英雄槽位信息
 	Wearable.Index2Name = {}

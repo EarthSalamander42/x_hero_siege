@@ -141,7 +141,13 @@ function modifier_xhs_trueshot_aura:GetModifierAura()
 end
 
 function modifier_xhs_trueshot_aura:GetAuraEntityReject(target)
-	return IsXHSRuneUnit and IsXHSRuneUnit(target)
+	if target == nil or (IsXHSRuneUnit and IsXHSRuneUnit(target)) then
+		return true
+	end
+	-- Trueshot is strictly a ranged-attack aura. Attack range alone is not a
+	-- reliable discriminator in XHS because melee heroes can gain range from
+	-- items/modifiers; use the engine attack capability instead.
+	return target.IsRangedAttacker == nil or not target:IsRangedAttacker()
 end
 
 modifier_xhs_trueshot = modifier_xhs_trueshot or class({})
@@ -160,6 +166,14 @@ function modifier_xhs_trueshot:DeclareFunctions()
 end
 
 function modifier_xhs_trueshot:GetModifierPreAttack_BonusDamage()
+	local parent = self:GetParent()
+	if parent == nil
+		or parent.IsRangedAttacker == nil
+		or not parent:IsRangedAttacker() then
+		self:SetStackCount(0)
+		return 0
+	end
+
 	if self:GetCaster().GetAgility then
 		self:SetStackCount(self:GetCaster():GetAgility() / 100 * self:GetAbility():GetSpecialValueFor("trueshot_ranged_damage"))
 	end

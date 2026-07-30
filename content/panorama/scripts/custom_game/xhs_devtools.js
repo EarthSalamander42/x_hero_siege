@@ -7,6 +7,7 @@ var XHSDevToolsBotConfig = {};
 var XHSDevToolsBotRoster = { count: 0, players: {} };
 var XHSDevToolsBotDebug = {};
 var XHSDevToolsPerformance = {};
+var XHSDevToolsPerformanceAccess = null;
 var XHSDevToolsLagLab = {};
 var XHSDevToolsLagLabPending = "";
 var XHSDevToolsFPSFrames = 0;
@@ -15,8 +16,15 @@ var XHSDevToolsFPSLastSentAt = 0;
 var XHSDevToolsLocalFPS = -1;
 var XHSDevToolsSpectatorState = {
 	currentPlayerID: -1,
-	following: false,
+	// Spectator mode is follow-first by default. The server confirms the
+	// current target and retries after provisioning/cinematics as necessary.
+	following: true,
 	lastFollowEntIndex: -1,
+	lastInspectedEntIndex: -1,
+	pendingFollowEntIndex: -1,
+	lastFollowRequestAt: 0,
+	radiantFogApplied: false,
+	radiantFogConfirmations: 0,
 	wasVisible: false
 };
 var XHSDevToolsPerformanceColumns = {
@@ -146,8 +154,13 @@ function XHSDevToolsCanViewPerformanceLog() {
 	if (XHSDevToolsIsToolsMode()) {
 		return true;
 	}
+	if (XHSDevToolsPerformanceAccess &&
+		XHSDevToolsPerformanceAccess.allowed !== undefined) {
+		return XHSDevToolsPerformanceAccess.allowed === true ||
+			Number(XHSDevToolsPerformanceAccess.allowed) === 1;
+	}
 	var status = XHSDevToolsGetLocalDonatorStatus();
-	return status === 1 || status === 2;
+	return status === 1;
 }
 
 function XHSDevToolsMatchHasPerformanceViewer() {
@@ -166,7 +179,7 @@ function XHSDevToolsMatchHasPerformanceViewer() {
 			status = entry.status !== undefined ? entry.status : entry.donator_status;
 		}
 		status = Math.floor(XHSDevToolsPerformanceNumber(status));
-		if (status === 1 || status === 2) {
+		if (status === 1) {
 			return true;
 		}
 	}
@@ -383,8 +396,7 @@ function XHSDevToolsSetCompactMetric(id, value, low, critical) {
 
 function XHSDevToolsRenderCompactPerformance(data) {
 	data = data || {};
-	var frameMs = XHSDevToolsPerformanceNumber(data.frame_ms);
-	var serverFPS = frameMs > 0 ? Math.max(0, Math.min(500, Math.round(1000 / frameMs))) : -1;
+	var simHealth = XHSDevToolsPerformanceNumber(data.sim_health_pct);
 	var creeps = XHSDevToolsPerformanceNumber(data.creeps);
 	var localFPS = XHSDevToolsLocalFPS >= 0 ? Math.round(XHSDevToolsLocalFPS) : -1;
 
@@ -395,16 +407,16 @@ function XHSDevToolsRenderCompactPerformance(data) {
 		localFPS >= 0 && localFPS < 30
 	);
 	XHSDevToolsSetCompactMetric(
-		"#XHSDevToolsServerFPS",
-		serverFPS >= 0 ? String(serverFPS) : "--",
-		serverFPS >= 0 && serverFPS < 28,
-		serverFPS >= 0 && serverFPS < 20
+		"#XHSDevToolsServerHealth",
+		simHealth > 0 ? Math.round(simHealth) + "%" : "--",
+		simHealth > 0 && simHealth < 90,
+		simHealth > 0 && simHealth < 70
 	);
 	XHSDevToolsSetCompactMetric(
 		"#XHSDevToolsCreepCount",
 		String(creeps),
-		creeps >= 150,
-		creeps >= 300
+		creeps >= 100,
+		creeps >= 125
 	);
 }
 
@@ -653,6 +665,12 @@ function XHSDevToolsRenderActivityPerformance(activity) {
 	);
 	var orders = XHSDevToolsPerformanceNumber(activity.orders_per_second);
 	var repeatedOrders = XHSDevToolsPerformanceNumber(activity.repeated_orders_per_second);
+	var creepOrdersAI = XHSDevToolsPerformanceNumber(activity.creep_orders_modifier_ai_per_second);
+	var creepOrdersWave = XHSDevToolsPerformanceNumber(activity.creep_orders_wave_per_second);
+	var ownerConflicts = XHSDevToolsPerformanceNumber(activity.creep_order_owner_conflicts_per_second);
+	var blockedWrongOwner = XHSDevToolsPerformanceNumber(activity.creep_orders_blocked_wrong_owner_per_second);
+	var deduplicatedOrders = XHSDevToolsPerformanceNumber(activity.creep_orders_deduplicated_per_second);
+	var ownerHandoffs = XHSDevToolsPerformanceNumber(activity.creep_order_owner_handoffs_per_second);
 	var aiThinks = XHSDevToolsPerformanceNumber(activity.ai_thinks_per_second);
 	var waveThinks = XHSDevToolsPerformanceNumber(activity.wave_thinks_per_second);
 	var abilityThinks = XHSDevToolsPerformanceNumber(activity.ability_loop_thinks_per_second);
@@ -669,6 +687,9 @@ function XHSDevToolsRenderActivityPerformance(activity) {
 	XHSDevToolsSetPerformanceText("#XHSPerfZoneSearches", zoneSearches.toFixed(0) + " / " + zoneResults.toFixed(0));
 	XHSDevToolsSetPerformanceText("#XHSPerfZoneCost", zoneCost.toFixed(1) + " / " + zoneMaximum.toFixed(1));
 	XHSDevToolsSetPerformanceText("#XHSPerfOrders", orders.toFixed(0) + " / " + repeatedOrders.toFixed(0));
+	XHSDevToolsSetPerformanceText("#XHSPerfCreepOrders", creepOrdersAI.toFixed(0) + " / " + creepOrdersWave.toFixed(0));
+	XHSDevToolsSetPerformanceText("#XHSPerfOrderConflicts", ownerConflicts.toFixed(0) + " / " + blockedWrongOwner.toFixed(0));
+	XHSDevToolsSetPerformanceText("#XHSPerfOrderDedup", deduplicatedOrders.toFixed(0) + " / " + ownerHandoffs.toFixed(0));
 	XHSDevToolsSetPerformanceText("#XHSPerfThinks", aiThinks.toFixed(0) + " / " + waveThinks.toFixed(0));
 	XHSDevToolsSetPerformanceText("#XHSPerfAbilityThinks", abilityThinks.toFixed(0));
 	XHSDevToolsSetPerformanceText("#XHSPerfCombat", damage.toFixed(0) + " / " + casts.toFixed(0));
@@ -696,6 +717,7 @@ function XHSDevToolsRenderActivityPerformance(activity) {
 	XHSDevToolsSetPerformanceStatus("#XHSPerfZoneSearches", zoneSearches >= 500, zoneSearches >= 1000);
 	XHSDevToolsSetPerformanceStatus("#XHSPerfZoneCost", zoneCost >= 10, zoneCost >= 25);
 	XHSDevToolsSetPerformanceStatus("#XHSPerfOrders", orders >= 200 || repeatedOrders >= 50, repeatedOrders >= 150);
+	XHSDevToolsSetPerformanceStatus("#XHSPerfOrderConflicts", ownerConflicts > 0 || blockedWrongOwner > 0, ownerConflicts >= 5 || blockedWrongOwner >= 5);
 	XHSDevToolsSetPerformanceStatus("#XHSPerfThinks", waveThinks >= 800 || aiThinks >= 300, waveThinks >= 1600);
 	XHSDevToolsSetPerformanceStatus("#XHSPerfCombat", damage >= 500, damage >= 1000);
 	XHSDevToolsSetPerformanceStatus("#XHSPerfProjectiles", linearProjectiles + trackingProjectiles >= 100, linearProjectiles + trackingProjectiles >= 250);
@@ -709,15 +731,34 @@ function XHSDevToolsRenderPerformance() {
 
 	var data = XHSDevToolsPerformance || {};
 	var creeps = XHSDevToolsPerformanceNumber(data.creeps);
-	var frameMs = XHSDevToolsPerformanceNumber(data.frame_ms);
-	panel.SetHasClass("Warning", (creeps >= 150 || frameMs >= 40) && creeps < 300 && frameMs < 60);
-	panel.SetHasClass("Critical", creeps >= 300 || frameMs >= 60);
+	var simLagMs = XHSDevToolsPerformanceNumber(data.sim_lag_ms);
+	var simHealth = XHSDevToolsPerformanceNumber(data.sim_health_pct);
+	panel.SetHasClass("Warning", (creeps >= 100 || simLagMs >= 15 || (simHealth > 0 && simHealth < 90)) && creeps < 125 && simLagMs < 30 && (simHealth <= 0 || simHealth >= 70));
+	panel.SetHasClass("Critical", creeps >= 125 || simLagMs >= 30 || (simHealth > 0 && simHealth < 70));
 
 	XHSDevToolsRenderCompactPerformance(data);
 	XHSDevToolsSetPerformanceText("#XHSPerfTotalUnits", String(XHSDevToolsPerformanceNumber(data.total_units)));
+	var phaseOneBudget = data.phase_one_spawn_budget || {};
+	var phaseOneActive = XHSDevToolsPerformanceNumber(phaseOneBudget.active_units);
+	var phaseOneHardCap = XHSDevToolsPerformanceNumber(phaseOneBudget.hard_cap);
+	var phaseOneSpawned = XHSDevToolsPerformanceNumber(phaseOneBudget.spawned);
+	var phaseOneSkipped = XHSDevToolsPerformanceNumber(phaseOneBudget.skipped);
+	XHSDevToolsSetPerformanceText("#XHSPerfPhaseOneBudget", phaseOneActive + " / " + phaseOneHardCap);
+	XHSDevToolsSetPerformanceText("#XHSPerfPhaseOneWave", phaseOneSpawned + " / " + phaseOneSkipped);
+	XHSDevToolsSetPerformanceStatus(
+		"#XHSPerfPhaseOneBudget",
+		phaseOneActive >= XHSDevToolsPerformanceNumber(phaseOneBudget.soft_cap),
+		phaseOneHardCap > 0 && phaseOneActive >= phaseOneHardCap
+	);
+	XHSDevToolsSetPerformanceStatus("#XHSPerfPhaseOneWave", phaseOneSkipped > 0, phaseOneSkipped > 0 && phaseOneSpawned <= 0);
 	XHSDevToolsSetPerformanceText("#XHSPerfWaveLoops", String(XHSDevToolsPerformanceNumber(data.wave_checks_per_second)));
 	XHSDevToolsSetPerformanceText("#XHSPerfAITicks", String(XHSDevToolsPerformanceNumber(data.ai_ticks_per_second)));
 	XHSDevToolsSetPerformanceText("#XHSPerfAbilityLoops", String(XHSDevToolsPerformanceNumber(data.ability_checks_per_second)));
+	XHSDevToolsSetPerformanceText(
+		"#XHSPerfMovementOwners",
+		XHSDevToolsPerformanceNumber(data.movement_owner_ai) + " / " +
+			XHSDevToolsPerformanceNumber(data.movement_owner_wave)
+	);
 	XHSDevToolsSetPerformanceText("#XHSPerfThinkers", String(XHSDevToolsPerformanceNumber(data.thinkers)));
 	XHSDevToolsSetPerformanceText(
 		"#XHSPerfHeroesBosses",
@@ -728,7 +769,11 @@ function XHSDevToolsRenderPerformance() {
 		"#XHSPerfOther",
 		XHSDevToolsPerformanceNumber(data.breakables) + " / " + XHSDevToolsPerformanceNumber(data.other_units)
 	);
-	XHSDevToolsSetPerformanceText("#XHSPerfFrame", frameMs.toFixed(1) + " ms");
+	XHSDevToolsSetPerformanceText(
+		"#XHSPerfSimulation",
+		simLagMs.toFixed(1) + " ms / " + Math.round(simHealth) + "% / " +
+			XHSDevToolsPerformanceNumber(data.server_observer_interval_ms).toFixed(0) + " ms tick"
+	);
 	XHSDevToolsSetPerformanceText(
 		"#XHSPerfCost",
 		XHSDevToolsPerformanceNumber(data.scan_ms).toFixed(2) + " ms"
@@ -851,6 +896,100 @@ function XHSDevToolsIsLocalSpectator() {
 	return localPlayerID >= 0 && Number(Players.GetTeam(localPlayerID)) === 1;
 }
 
+function XHSDevToolsSetVanillaSpectatorPanelHidden(panelID, hidden) {
+	if (typeof FindDotaHudElement !== "function") {
+		return;
+	}
+
+	var panel = null;
+	try {
+		panel = FindDotaHudElement(panelID);
+	} catch (error) {
+		panel = null;
+	}
+	if (!panel) {
+		return;
+	}
+
+	if (hidden) {
+		panel._xhsToolsSpectatorHidden = true;
+		panel.style.visibility = "collapse";
+	} else if (panel._xhsToolsSpectatorHidden === true) {
+		panel.style.visibility = null;
+		panel._xhsToolsSpectatorHidden = false;
+	}
+}
+
+function XHSDevToolsUpdateVanillaSpectatorUI() {
+	var hidden = XHSDevToolsIsLocalSpectator();
+	XHSDevToolsSetVanillaSpectatorPanelHidden("GameInfoButton", hidden);
+	XHSDevToolsSetVanillaSpectatorPanelHidden("spectator_options", hidden);
+	XHSDevToolsApplyDefaultRadiantFog(hidden);
+	if (
+		GameUI.SetDefaultUIEnabled
+		&& typeof DotaDefaultUIElement_t !== "undefined"
+		&& DotaDefaultUIElement_t.DOTA_DEFAULT_UI_FLYOUT_SCOREBOARD !== undefined
+	) {
+		// init.js disables the flyout for players. Tools spectators still need the
+		// normal scoreboard command so the custom FlyoutScoreboard can open.
+		GameUI.SetDefaultUIEnabled(
+			DotaDefaultUIElement_t.DOTA_DEFAULT_UI_FLYOUT_SCOREBOARD,
+			hidden
+		);
+	}
+}
+
+function XHSDevToolsApplyDefaultRadiantFog(isSpectator) {
+	if (!isSpectator) {
+		XHSDevToolsSpectatorState.radiantFogApplied = false;
+		XHSDevToolsSpectatorState.radiantFogConfirmations = 0;
+		return;
+	}
+	if (XHSDevToolsSpectatorState.radiantFogApplied ||
+		typeof FindDotaHudElement !== "function") {
+		return;
+	}
+
+	var fogDropDown = null;
+	try {
+		fogDropDown = FindDotaHudElement("FogDropDown");
+	} catch (error) {
+		fogDropDown = null;
+	}
+	if (!fogDropDown || typeof fogDropDown.SetSelected !== "function") {
+		return;
+	}
+
+	var selected = null;
+	try {
+		selected = typeof fogDropDown.GetSelected === "function"
+			? fogDropDown.GetSelected()
+			: null;
+	} catch (error) {
+		selected = null;
+	}
+	if (selected && selected.id === "FogRadiant") {
+		XHSDevToolsSpectatorState.radiantFogConfirmations++;
+		if (XHSDevToolsSpectatorState.radiantFogConfirmations >= 2) {
+			// Apply only as the entry default. Once confirmed, never override a
+			// spectator who deliberately selects another FoW perspective.
+			XHSDevToolsSpectatorState.radiantFogApplied = true;
+		}
+		return;
+	}
+
+	XHSDevToolsSpectatorState.radiantFogConfirmations = 0;
+	try {
+		// Valve's native spectator panel maps FogRadiant to
+		// dota_spectator_fog_of_war 2. Selecting the existing native option
+		// keeps its internal state and the actual client convar synchronized.
+		fogDropDown.SetSelected("FogRadiant");
+	} catch (error) {
+		// The native spectator options may still be initializing. The regular
+		// spectator tick retries until two consecutive confirmations succeed.
+	}
+}
+
 function XHSDevToolsSpectatorBots() {
 	var bots = [];
 	var rosterEntries = XHSDevToolsBotTableValues(XHSDevToolsBotRoster.players || {});
@@ -912,12 +1051,44 @@ function XHSDevToolsSpectatorFormatGold(value) {
 }
 
 function XHSDevToolsSpectatorSendCamera(playerID) {
+	var targetPlayerID = Number(playerID);
+	var bots = XHSDevToolsSpectatorBots();
+	var pendingEntIndex = -1;
+	for (var i = 0; i < bots.length; i++) {
+		if (bots[i].playerID === targetPlayerID) {
+			pendingEntIndex = XHSDevToolsSpectatorHeroEntIndex(bots[i]);
+			break;
+		}
+	}
+	XHSDevToolsSpectatorState.pendingFollowEntIndex = pendingEntIndex;
+	XHSDevToolsSpectatorState.lastFollowRequestAt = Date.now();
 	GameEvents.SendCustomGameEventToServer("xhs_bot_spectator_camera", {
-		target_player_id: Number(playerID)
+		target_player_id: targetPlayerID
 	});
 }
 
-function XHSDevToolsSpectatorInspect(moveCamera) {
+function XHSDevToolsOnSpectatorCameraState(event) {
+	event = event || {};
+	var following = Number(event.following || 0) === 1;
+	var targetPlayerID = Number(event.target_player_id);
+	var heroEntIndex = Number(event.hero_entindex);
+
+	XHSDevToolsSpectatorState.following = following;
+	if (following && !isNaN(targetPlayerID) && targetPlayerID >= 0) {
+		XHSDevToolsSpectatorState.currentPlayerID = targetPlayerID;
+	}
+	var active = following && Number(event.active || 0) === 1;
+	XHSDevToolsSpectatorState.lastFollowEntIndex =
+		active && !isNaN(heroEntIndex) ? heroEntIndex : -1;
+	XHSDevToolsSpectatorState.pendingFollowEntIndex =
+		active ? -1 : XHSDevToolsSpectatorHeroEntIndex(
+			XHSDevToolsSpectatorCurrentBot().bot
+		);
+	XHSDevToolsSpectatorState.lastFollowRequestAt = Date.now();
+	XHSDevToolsRenderSpectator();
+}
+
+function XHSDevToolsSpectatorInspect() {
 	var current = XHSDevToolsSpectatorCurrentBot();
 	var bot = current.bot;
 	if (!bot) {
@@ -930,14 +1101,9 @@ function XHSDevToolsSpectatorInspect(moveCamera) {
 	}
 
 	GameUI.SelectUnit(entIndex, false);
+	XHSDevToolsSpectatorState.lastInspectedEntIndex = entIndex;
 	if (XHSDevToolsSpectatorState.following) {
 		XHSDevToolsSpectatorSendCamera(bot.playerID);
-		XHSDevToolsSpectatorState.lastFollowEntIndex = entIndex;
-	} else if (moveCamera && GameUI.SetCameraTargetPosition) {
-		var position = Entities.GetAbsOrigin(entIndex);
-		if (position) {
-			GameUI.SetCameraTargetPosition(position, 0.25);
-		}
 	}
 }
 
@@ -956,7 +1122,7 @@ function XHSDevToolsSpectatorStep(direction) {
 	}
 	XHSDevToolsSpectatorState.currentPlayerID = bots[nextIndex].playerID;
 	XHSDevToolsSpectatorState.lastFollowEntIndex = -1;
-	XHSDevToolsSpectatorInspect(true);
+	XHSDevToolsSpectatorInspect();
 	XHSDevToolsRenderSpectator();
 }
 
@@ -969,7 +1135,7 @@ function XHSDevToolsSpectatorToggleFollow() {
 	XHSDevToolsSpectatorState.following = !XHSDevToolsSpectatorState.following;
 	XHSDevToolsSpectatorState.lastFollowEntIndex = -1;
 	if (XHSDevToolsSpectatorState.following) {
-		XHSDevToolsSpectatorInspect(true);
+		XHSDevToolsSpectatorSendCamera(current.bot.playerID);
 	} else {
 		XHSDevToolsSpectatorSendCamera(-1);
 	}
@@ -988,8 +1154,10 @@ function XHSDevToolsRenderSpectator() {
 		if (XHSDevToolsSpectatorState.wasVisible && XHSDevToolsSpectatorState.following) {
 			XHSDevToolsSpectatorSendCamera(-1);
 		}
-		XHSDevToolsSpectatorState.following = false;
+		XHSDevToolsSpectatorState.following = true;
 		XHSDevToolsSpectatorState.lastFollowEntIndex = -1;
+		XHSDevToolsSpectatorState.lastInspectedEntIndex = -1;
+		XHSDevToolsSpectatorState.pendingFollowEntIndex = -1;
 		XHSDevToolsSpectatorState.wasVisible = false;
 		return;
 	}
@@ -1060,9 +1228,18 @@ function XHSDevToolsRenderSpectator() {
 
 	if (XHSDevToolsSpectatorState.following) {
 		var entIndex = XHSDevToolsSpectatorHeroEntIndex(bot);
-		if (entIndex >= 0 && entIndex !== XHSDevToolsSpectatorState.lastFollowEntIndex) {
+		if (entIndex >= 0 &&
+			entIndex !== XHSDevToolsSpectatorState.lastInspectedEntIndex) {
+			GameUI.SelectUnit(entIndex, false);
+			XHSDevToolsSpectatorState.lastInspectedEntIndex = entIndex;
+		}
+		var requestExpired =
+			Date.now() - XHSDevToolsSpectatorState.lastFollowRequestAt >= 500;
+		if (entIndex >= 0 &&
+			entIndex !== XHSDevToolsSpectatorState.lastFollowEntIndex &&
+			(entIndex !== XHSDevToolsSpectatorState.pendingFollowEntIndex ||
+				requestExpired)) {
 			XHSDevToolsSpectatorSendCamera(bot.playerID);
-			XHSDevToolsSpectatorState.lastFollowEntIndex = entIndex;
 		}
 	}
 }
@@ -1087,12 +1264,13 @@ function XHSDevToolsBindSpectator() {
 	}
 	if (identity) {
 		identity.SetPanelEvent("onactivate", function() {
-			XHSDevToolsSpectatorInspect(true);
+			XHSDevToolsSpectatorInspect();
 		});
 	}
 }
 
 function XHSDevToolsSpectatorTick() {
+	XHSDevToolsUpdateVanillaSpectatorUI();
 	XHSDevToolsRenderSpectator();
 	$.Schedule(0.25, XHSDevToolsSpectatorTick);
 }
@@ -2152,7 +2330,8 @@ var XHS_DEVTOOLS_LAG_LAB_EXPERIMENTS = [
 
 var XHS_DEVTOOLS_LAG_LAB_METRICS = [
 	{ id: "client_fps", label: "Client FPS", higher: true },
-	{ id: "server_frame_ms", label: "Server frame ms", higher: false },
+	{ id: "server_sim_lag_ms", label: "Simulation lag ms", higher: false },
+	{ id: "server_sim_health_pct", label: "Simulation health %", higher: true },
 	{ id: "creeps", label: "Creeps", neutral: true },
 	{ id: "total_units", label: "Total units", neutral: true },
 	{ id: "scan_ms", label: "Profiler scan ms", higher: false },
@@ -2171,10 +2350,10 @@ var XHS_DEVTOOLS_LAG_LAB_METRICS = [
 function XHSDevToolsLagLabStart(experiment, source) {
 	source = source || "";
 	if (XHSDevToolsLagLabIsActive(experiment, source)) {
-		XHSDevToolsLagLabPending = "Turning OFF: " + String(experiment || "unknown");
+		XHSDevToolsLagLabPending = "Disabling: " + String(experiment || "unknown");
 		XHSDevToolsSend("lag_lab_restore", {});
 	} else {
-		XHSDevToolsLagLabPending = "Turning ON: " + String(experiment || "unknown");
+		XHSDevToolsLagLabPending = "Enabling immediately: " + String(experiment || "unknown");
 		XHSDevToolsSend("lag_lab_start", {
 			experiment: experiment,
 			source: source,
@@ -2263,7 +2442,7 @@ function XHSDevToolsRenderLagLab(parent) {
 	XHSDevToolsMakeLabel(
 		status,
 		"XHSDevToolsMuted",
-		"Toggle ON: 10s baseline, 3s warmup, 10s test, then the effect stays active. Toggle OFF or RESTORE ALL to remove it."
+		"Toggle ON applies the isolation immediately and keeps it active. Toggle it OFF or use RESTORE ALL to remove it."
 	);
 	var statusRow = $.CreatePanel("Panel", status, "");
 	statusRow.AddClass("XHSDevToolsLagLabStatus");
@@ -2425,6 +2604,13 @@ function XHSDevToolsRender() {
 }
 
 function XHSDevToolsOnState(tableName, key, data) {
+	var localAccessKey = "performance_access_" + Game.GetLocalPlayerID();
+	if (key === localAccessKey) {
+		XHSDevToolsPerformanceAccess = data || { allowed: false };
+		XHSDevToolsApplyAccess();
+		return;
+	}
+
 	if (key === "performance") {
 		XHSDevToolsPerformance = data || {};
 		if (XHSDevToolsCanViewPerformanceLog()) {
@@ -2537,6 +2723,10 @@ function XHSDevToolsOnGameOptions(tableName, key, data) {
 	CustomNetTables.SubscribeNetTableListener("game_options", XHSDevToolsOnGameOptions);
 		XHSDevToolsPerformance = CustomNetTables.GetTableValue("xhs_devtools", "performance") || {};
 		XHSDevToolsLagLab = CustomNetTables.GetTableValue("xhs_devtools", "lag_lab") || {};
+	XHSDevToolsPerformanceAccess = CustomNetTables.GetTableValue(
+		"xhs_devtools",
+		"performance_access_" + Game.GetLocalPlayerID()
+	);
 	XHSDevToolsBindPerformanceToggle();
 	XHSDevToolsBindSpectator();
 	XHSDevToolsApplyPerformanceColumns();
@@ -2544,6 +2734,10 @@ function XHSDevToolsOnGameOptions(tableName, key, data) {
 	XHSDevToolsClientFPSTick();
 
 	if (XHSDevToolsIsToolsMode()) {
+		GameEvents.Subscribe(
+			"xhs_bot_spectator_camera_state",
+			XHSDevToolsOnSpectatorCameraState
+		);
 		CustomNetTables.SubscribeNetTableListener("xhs_bots", XHSDevToolsOnBots);
 		var state = CustomNetTables.GetTableValue("xhs_devtools", "state");
 		if (state) {

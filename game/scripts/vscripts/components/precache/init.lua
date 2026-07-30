@@ -145,15 +145,40 @@ function XHSPrecache:ReplaceHeroWith(playerID, heroName, gold, xp, oldHero, opti
 
 		if newHero ~= nil and not newHero:IsNull() then
 			newHero.xhs_player_id = playerID
+			-- Selection-display heroes use this flag and are deleted once every
+			-- player has picked. A replacement must never inherit that identity.
+			newHero.is_fake_hero = nil
 		end
 
 		if options.startingItems == true and oldHero ~= nil and newHero ~= nil then
+			-- XHSPrecache owns old-hero cleanup. StartingItems used to schedule a
+			-- second UTIL_Remove for the same handle, creating a race where a
+			-- recycled Source 2 handle could delete the replacement at random.
+			local previousDeferCleanup = options.deferOldHeroCleanup
+			options.deferOldHeroCleanup = true
 			StartingItems(oldHero, newHero, options)
+			options.deferOldHeroCleanup = previousDeferCleanup
 		end
 
-		if options.cleanupOld ~= false and oldHero ~= nil then
+		if options.cleanupOld ~= false and oldHero ~= nil and oldHero ~= newHero then
+			local oldEntIndex = oldHero.entindex ~= nil and oldHero:entindex() or -1
+			local newEntIndex = newHero ~= nil and not newHero:IsNull()
+				and newHero.entindex ~= nil and newHero:entindex() or -1
 			Timers:CreateTimer(options.cleanupDelay or 0.1, function()
-				if oldHero ~= nil and IsValidEntity(oldHero) and not oldHero:IsNull() then
+				local assignedHero = PlayerResource:GetSelectedHeroEntity(playerID)
+				local assignedEntIndex = assignedHero ~= nil
+					and IsValidEntity(assignedHero)
+					and not assignedHero:IsNull()
+					and assignedHero.entindex ~= nil
+					and assignedHero:entindex() or -1
+				if oldEntIndex >= 0
+					and oldEntIndex ~= newEntIndex
+					and oldEntIndex ~= assignedEntIndex
+					and oldHero ~= nil
+					and IsValidEntity(oldHero)
+					and not oldHero:IsNull()
+					and oldHero.entindex ~= nil
+					and oldHero:entindex() == oldEntIndex then
 					UTIL_Remove(oldHero)
 				end
 			end)
@@ -657,6 +682,7 @@ XHSPrecache:RegisterGroup("waves", {
 		"models/creeps/lane_creeps/creep_bad_ranged/lane_dire_ranged.vmdl",
 		"models/creeps/neutral_creeps/n_creep_troll_dark_a/n_creep_troll_dark_a.vmdl",
 		"models/creeps/lane_creeps/creep_bird_radiant/creep_bird_radiant_ranged.vmdl",
+		"models/creeps/lane_creeps/creep_bird_radiant/creep_bird_radiant_ranged_mega.vmdl",
 		"models/creeps/lane_creeps/creep_dc_radiant/creep_dc_radiant_ranged.vmdl",
 		"models/creeps/lane_creeps/creep_dc_radiant/creep_dc_radiant_ranged_mega.vmdl",
 		"models/items/lone_druid/true_form/form_of_the_atniw/form_of_the_atniw.vmdl",

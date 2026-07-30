@@ -7,6 +7,7 @@ require('events')
 require('constants') -- in cause?
 require('components/creep_passives/init')
 require('components/creep_ai_director/init')
+require('components/creep_order_ownership/init')
 
 require('libraries/notifications')
 require('libraries/animations')
@@ -29,9 +30,9 @@ require('zones/zones')
 require('units/breakable_container_surprises')
 require('units/treasure_chest_surprises')
 require('triggers')
-if IsInToolsMode() then
-	pcall(require, 'components/xhs_bots/init')
-end
+-- The runtime is always loaded, but remains inert at zero bots until its
+-- server-authoritative unanimous setup vote succeeds. QA commands stay Tools-only.
+pcall(require, 'components/xhs_bots/init')
 require('components/api/init')
 require('components/item_builds/init')
 require('components/performance_counters/init')
@@ -101,7 +102,9 @@ end
 
 function GameMode:OnHeroInGame(hero)
 	local id = hero:GetPlayerID()
-	local point = Entities:FindByName(nil, "hero_selection_" .. id)
+	local point = id ~= nil and id >= 0
+		and Entities:FindByName(nil, "hero_selection_" .. id)
+		or nil
 	local is_engine_bot = id ~= nil and id >= 0
 		and PlayerResource ~= nil
 		and PlayerResource.IsFakeClient ~= nil
@@ -121,6 +124,23 @@ function GameMode:OnHeroInGame(hero)
 		hero:SetAbilityPoints(0)
 		hero:SetGold(0, false)
 
+		-- `-createhero wisp` can create an unassigned real hero (player id -1).
+		-- In Tools mode, route it to the first human selection pad just like the
+		-- forced selection Wisp, but do not steal that player's camera because
+		-- the debug unit itself has no player owner.
+		if point == nil and IsInToolsMode() then
+			for playerID = 0, DOTA_MAX_TEAM_PLAYERS - 1 do
+				local isValidPlayer = PlayerResource:IsValidPlayerID(playerID)
+					and PlayerResource:GetPlayer(playerID) ~= nil
+				local isFakeClient = PlayerResource.IsFakeClient ~= nil
+					and PlayerResource:IsFakeClient(playerID)
+				if isValidPlayer and not isFakeClient then
+					point = Entities:FindByName(nil, "hero_selection_" .. playerID)
+					if point ~= nil then break end
+				end
+			end
+		end
+
 		-- Player bots are replaced by XHSBotProvisioner and do not own one of
 		-- the map's human hero-selection pads. Never dereference a missing pad.
 		if not is_engine_bot and point ~= nil then
@@ -129,10 +149,17 @@ function GameMode:OnHeroInGame(hero)
 
 			hero:SetContextThink("delay_to_fix_camera_not_centering_lul", function()
 				if point ~= nil and not point:IsNull() then
-					TeleportHero(hero, point:GetAbsOrigin(), 3.0)
+					-- Keep the camera travelling for most of the teleport. The
+					-- old three-argument call became an instant camera move
+					-- when TeleportHero was migrated from Panorama.
+					TeleportHero(hero, point:GetAbsOrigin(), 3.0, 2.50)
 				end
 				return nil
 			end, delay)
+		else
+			-- Never leave a Wisp command-restricted merely because no selection
+			-- pad exists (engine bot, malformed map, or debug spawn).
+			hero:RemoveModifierByName("modifier_command_restricted")
 		end
 	elseif hero:GetUnitName() == "npc_dota_hero_terrorblade" then
 		if IsInToolsMode() then
@@ -306,6 +333,7 @@ function GameMode:InitGameMode()
 	-- mode:SetModifierGainedFilter(Dynamic_Wrap(GameMode, "ModifierFilter"), GameMode)
 
 	if IsInToolsMode() then
+		if CameraMotion ~= nil then CameraMotion:RegisterDebugCommands() end
 		Convars:RegisterCommand("muradin_event", function(keys) return SpecialEvents:MuradinEvent(10) end, "Test Farm Event", FCVAR_CHEAT)
 		Convars:RegisterCommand("r&b", function(keys) return SpecialEvents:StartRameroAndBaristolEvent() end, "Test Ramero and Baristol Arena", FCVAR_CHEAT)
 		Convars:RegisterCommand("farm_event", function(keys) return SpecialEvents:FarmEvent(10) end, "Test Farm Event", FCVAR_CHEAT)
@@ -344,6 +372,7 @@ function GameMode:InitGameMode()
 	CustomGameEventManager:RegisterListener("dialog_confirm_expire",
 		function(...) return GameMode:OnDialogConfirmExpired(...) end)
 	CustomGameEventManager:RegisterListener("xhs_quest_focus", function(...) return GameMode:OnQuestFocusRequested(...) end)
+	CustomGameEventManager:RegisterListener("xhs_camera_focus_entity", function(...) return GameMode:OnCameraFocusEntityRequested(...) end)
 	CustomGameEventManager:RegisterListener("xhs_buy_tomes", function(...) return GameMode:OnBuyTomesRequested(...) end)
 	CustomGameEventManager:RegisterListener("xhs_toggle_auto_buy_tomes", function(...) return GameMode:OnToggleAutoBuyTomesRequested(...) end)
 
@@ -1283,6 +1312,8 @@ function GameMode:OnDotaItemPickedUp(event)
 end
 
 local HERO_IMAGE_INTRO_DURATION = 5.0
+local HERO_IMAGE_ENTRY_TELEPORT_DURATION = 3.0
+local HERO_IMAGE_ENTRY_CAMERA_DURATION = 1.25
 
 function GameMode:HeroImage(event)
 	local PlayerID = event.pID
@@ -1363,7 +1394,12 @@ function GameMode:HeroImage(event)
 				DisableItems(hero, SPECIAL_ARENA_DURATION + HERO_IMAGE_INTRO_DURATION)
 				Notifications:Bottom(hero:GetPlayerOwnerID(),
 					{ text = "Special Event: Kill Hero Image for +250 Stats. You have 2 minutes.", duration = 5.0 })
-				TeleportHero(hero, point_hero:GetAbsOrigin())
+				TeleportHero(
+					hero,
+					point_hero:GetAbsOrigin(),
+					HERO_IMAGE_ENTRY_TELEPORT_DURATION,
+					HERO_IMAGE_ENTRY_CAMERA_DURATION
+				)
 			end
 		end
 
@@ -2017,8 +2053,9 @@ function GameMode:RefreshSettingVotePower(pid)
 	local vote_power = GetPlayerVotePower(pid)
 	for category, votes in pairs(self.VoteTable) do
 		local player_vote = type(votes) == "table" and votes[pid] or nil
-		if category ~= "gamemode" and type(player_vote) == "table" and player_vote[2] ~= vote_power then
-			player_vote[2] = vote_power
+		if category ~= "gamemode" and type(player_vote) == "table"
+			and player_vote[2] ~= (category == "ai_allies" and 1 or vote_power) then
+			player_vote[2] = category == "ai_allies" and 1 or vote_power
 			CustomGameEventManager:Send_ServerToAllClients("send_votes", {
 				category = category,
 				vote = player_vote[1],
@@ -2064,16 +2101,44 @@ function GameMode:OnSettingVote(event_source_index, keys)
 	if category == "gamemode" then
 		return
 	end
+	if category == "ai_allies" then
+		local difficultyVotes = GameMode.VoteTable
+			and GameMode.VoteTable.difficulty or nil
+		if type(difficultyVotes) ~= "table"
+			or type(difficultyVotes[pid]) ~= "table" then
+			return
+		end
+	end
 
 	if not GameMode.VoteTable then GameMode.VoteTable = {} end
 	if not GameMode.VoteTable[category] then GameMode.VoteTable[category] = {} end
+
+	local existingVote = GameMode.VoteTable[category][pid]
+	if (category == "difficulty" or category == "ai_allies")
+		and type(existingVote) == "table"
+		and tonumber(existingVote[1]) ~= nil then
+		CustomGameEventManager:Send_ServerToAllClients("send_votes", {
+			category = category,
+			vote = existingVote[1],
+			table = GameMode.VoteTable[category],
+		})
+		return
+	end
 
 	if pid >= 0 then
 		if not GameMode.VoteTable[category][pid] then GameMode.VoteTable[category][pid] = {} end
 
 		GameMode.VoteTable[category][pid][1] = vote
 
-		GameMode.VoteTable[category][pid][2] = GetPlayerVotePower(pid)
+		-- AI allies are a consent gate, not a supporter-weighted preference.
+		GameMode.VoteTable[category][pid][2] =
+			category == "ai_allies" and 1 or GetPlayerVotePower(pid)
+	end
+
+	if category == "ai_allies"
+		and XHSBots ~= nil
+		and XHSBots.OnSetupEnableVote ~= nil then
+		XHSBots:OnSetupEnableVote(pid, vote)
 	end
 
 	-- TODO: Finish votes show up

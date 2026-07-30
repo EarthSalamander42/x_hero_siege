@@ -2,6 +2,7 @@ if XHSBotBrain == nil then
 	XHSBotBrain = {}
 end
 XHSBotBrain.rune_claims = XHSBotBrain.rune_claims or {}
+XHSBotBrain.enemy_query_cache = XHSBotBrain.enemy_query_cache or {}
 
 local function IsValidEntityHandle(entity)
 	return entity ~= nil and IsValidEntity(entity) and not entity:IsNull()
@@ -27,6 +28,10 @@ local function Distance2D(left, right)
 end
 
 local function ClockSeconds()
+	if os ~= nil and os.clock ~= nil then
+		local ok, value = pcall(os.clock)
+		if ok and tonumber(value) ~= nil then return tonumber(value) end
+	end
 	if Time ~= nil then
 		local ok, value = pcall(Time)
 		if ok and tonumber(value) ~= nil then return tonumber(value) end
@@ -73,6 +78,11 @@ local BASE_LAST_STAND_RADIUS = 1300
 local RUNE_MAX_ROUTE_DISTANCE = 12000
 local RUNE_CLAIM_TTL = 3.0
 local STRATEGIC_SPECIAL_WAVE_RADIUS = 5200
+local BOT_QUERY_BUCKET_SIZE = 700
+local BOT_QUERY_BUCKET_PADDING = 500
+local BOT_QUERY_RADIUS_STEP = 250
+local BOT_ENEMY_QUERY_CACHE_TTL = 0.18
+local BOT_QUERY_CACHE_PRUNE_INTERVAL = 2.0
 
 local DEFENSIVE_STRUCTURE_NAMES = {
 	npc_dota_defender_fort = true,
@@ -96,6 +106,87 @@ function XHSBotBrain:IsTeamVisible(hero, unit)
 	return false
 end
 
+function XHSBotBrain:IncrementSpatialCacheCounter(name)
+	if XHSPerformanceCounters ~= nil
+		and XHSPerformanceCounters.Increment ~= nil then
+		XHSPerformanceCounters:Increment(name, 1)
+	end
+end
+
+function XHSBotBrain:PruneEnemyQueryCache(now)
+	if now < (tonumber(self.next_enemy_query_cache_prune_at) or 0) then return end
+	self.next_enemy_query_cache_prune_at = now + BOT_QUERY_CACHE_PRUNE_INTERVAL
+	for key, entry in pairs(self.enemy_query_cache or {}) do
+		if type(entry) ~= "table"
+			or now >= (tonumber(entry.expires_at) or 0) then
+			self.enemy_query_cache[key] = nil
+		end
+	end
+end
+
+function XHSBotBrain:BeginQueryContext(hero)
+	self.query_context = {
+		hero_entindex = IsValidEntityHandle(hero) and hero:entindex() or -1,
+		friendly_radius = 0,
+		friendly_units = nil,
+	}
+end
+
+function XHSBotBrain:EndQueryContext(hero)
+	local context = self.query_context
+	if context == nil then return end
+	if not IsValidEntityHandle(hero)
+		or context.hero_entindex == hero:entindex() then
+		self.query_context = nil
+	end
+end
+
+function XHSBotBrain:GetFriendlyQueryUnits(hero, radius)
+	radius = math.max(0, tonumber(radius) or 0)
+	local context = self.query_context
+	local canCache = context ~= nil
+		and IsValidEntityHandle(hero)
+		and context.hero_entindex == hero:entindex()
+	if canCache
+		and context.friendly_units ~= nil
+		and radius <= (tonumber(context.friendly_radius) or 0) then
+		self:IncrementSpatialCacheCounter("spatial_cache_hits")
+		return context.friendly_units
+	end
+
+	self:IncrementSpatialCacheCounter("spatial_cache_misses")
+	local units = FindUnitsInRadius(
+		hero:GetTeamNumber(),
+		hero:GetAbsOrigin(),
+		nil,
+		radius,
+		DOTA_UNIT_TARGET_TEAM_FRIENDLY,
+		DOTA_UNIT_TARGET_HERO + DOTA_UNIT_TARGET_BASIC,
+		DOTA_UNIT_TARGET_FLAG_NONE or 0,
+		FIND_ANY_ORDER,
+		false
+	)
+	if canCache then
+		context.friendly_radius = radius
+		context.friendly_units = units
+	end
+	return units
+end
+
+function XHSBotBrain:FilterFriendlyQueryUnits(hero, units, radius, heroesOnly)
+	local filtered = {}
+	local origin = hero:GetAbsOrigin()
+	for _, unit in pairs(units or {}) do
+		if IsValidEntityHandle(unit)
+			and Distance2D(origin, unit:GetAbsOrigin()) <= radius
+			and (not heroesOnly or unit:IsHero())
+			and (not heroesOnly or unit.IsIllusion == nil or not unit:IsIllusion()) then
+			table.insert(filtered, unit)
+		end
+	end
+	return filtered
+end
+
 function XHSBotBrain:FindEnemies(hero, radius)
 	if GameMode ~= nil
 		and GameMode.FarmEvent_occuring == true
@@ -114,19 +205,71 @@ function XHSBotBrain:FindEnemies(hero, radius)
 		return enemies
 	end
 
-	return FindUnitsInRadius(
-		hero:GetTeamNumber(),
-		hero:GetAbsOrigin(),
-		nil,
-		radius,
-		DOTA_UNIT_TARGET_TEAM_ENEMY,
-		DOTA_UNIT_TARGET_HERO + DOTA_UNIT_TARGET_BASIC,
-		DOTA_UNIT_TARGET_FLAG_FOW_VISIBLE
-			+ DOTA_UNIT_TARGET_FLAG_NO_INVIS
-			+ DOTA_UNIT_TARGET_FLAG_MAGIC_IMMUNE_ENEMIES,
-		FIND_CLOSEST,
-		false
-	)
+	radius = math.max(0, tonumber(radius) or 0)
+	local origin = hero:GetAbsOrigin()
+	local now = GameRules:GetGameTime()
+	self:PruneEnemyQueryCache(now)
+
+	local bucketX = math.floor((origin.x + BOT_QUERY_BUCKET_SIZE * 0.5)
+		/ BOT_QUERY_BUCKET_SIZE)
+	local bucketY = math.floor((origin.y + BOT_QUERY_BUCKET_SIZE * 0.5)
+		/ BOT_QUERY_BUCKET_SIZE)
+	local queryRadius = math.ceil(radius / BOT_QUERY_RADIUS_STEP)
+		* BOT_QUERY_RADIUS_STEP
+	local key = table.concat({
+		tostring(hero:GetTeamNumber()),
+		tostring(bucketX),
+		tostring(bucketY),
+		tostring(queryRadius),
+	}, ":")
+	local entry = self.enemy_query_cache[key]
+	local cacheHit = type(entry) == "table"
+		and now < (tonumber(entry.expires_at) or 0)
+		and type(entry.units) == "table"
+	if not cacheHit then
+		local queryOrigin = Vector(
+			bucketX * BOT_QUERY_BUCKET_SIZE,
+			bucketY * BOT_QUERY_BUCKET_SIZE,
+			origin.z
+		)
+		entry = {
+			expires_at = now + BOT_ENEMY_QUERY_CACHE_TTL,
+			units = FindUnitsInRadius(
+				hero:GetTeamNumber(),
+				queryOrigin,
+				nil,
+				queryRadius + BOT_QUERY_BUCKET_PADDING,
+				DOTA_UNIT_TARGET_TEAM_ENEMY,
+				DOTA_UNIT_TARGET_HERO + DOTA_UNIT_TARGET_BASIC,
+				DOTA_UNIT_TARGET_FLAG_FOW_VISIBLE
+					+ DOTA_UNIT_TARGET_FLAG_NO_INVIS
+					+ DOTA_UNIT_TARGET_FLAG_MAGIC_IMMUNE_ENEMIES,
+				FIND_ANY_ORDER,
+				false
+			),
+		}
+		self.enemy_query_cache[key] = entry
+		self:IncrementSpatialCacheCounter("spatial_cache_misses")
+	else
+		self:IncrementSpatialCacheCounter("spatial_cache_hits")
+	end
+
+	local enemies = {}
+	local distances = {}
+	for _, unit in pairs(entry.units or {}) do
+		if IsValidEntityHandle(unit)
+			and unit:IsAlive()
+			and Distance2D(origin, unit:GetAbsOrigin()) <= radius
+			and (unit.IsInvisible == nil or not unit:IsInvisible()) then
+			table.insert(enemies, unit)
+			distances[unit:entindex()] = Distance2D(origin, unit:GetAbsOrigin())
+		end
+	end
+	table.sort(enemies, function(left, right)
+		return (distances[left:entindex()] or math.huge)
+			< (distances[right:entindex()] or math.huge)
+	end)
+	return enemies
 end
 
 function XHSBotBrain:IsCombatTarget(unit)
@@ -135,6 +278,13 @@ function XHSBotBrain:IsCombatTarget(unit)
 	if name == "npc_dota_crate"
 		or name == "npc_dota_chest"
 		or name == "npc_dota_vase"
+		or name == "item_lua"
+		or name == ""
+		or unit.GetClassname ~= nil
+			and (
+				unit:GetClassname() == "dota_item_drop"
+				or unit:GetClassname() == "dota_item_physical"
+			)
 		or string.find(name, "dummy", 1, true) ~= nil then
 		return false
 	end
@@ -325,29 +475,21 @@ function XHSBotBrain:SelectTarget(playerID, hero, profile, record, assignment, d
 end
 
 function XHSBotBrain:GetAllies(hero, radius)
-	return FindUnitsInRadius(
-		hero:GetTeamNumber(),
-		hero:GetAbsOrigin(),
-		nil,
+	radius = math.max(0, tonumber(radius) or 0)
+	return self:FilterFriendlyQueryUnits(
+		hero,
+		self:GetFriendlyQueryUnits(hero, radius),
 		radius,
-		DOTA_UNIT_TARGET_TEAM_FRIENDLY,
-		DOTA_UNIT_TARGET_HERO,
-		DOTA_UNIT_TARGET_FLAG_NOT_ILLUSIONS,
-		FIND_ANY_ORDER,
-		false
+		true
 	)
 end
 
 function XHSBotBrain:GetNearbyFriendlyCover(hero, radius)
-	return FindUnitsInRadius(
-		hero:GetTeamNumber(),
-		hero:GetAbsOrigin(),
-		nil,
+	radius = math.max(0, tonumber(radius) or 0)
+	return self:FilterFriendlyQueryUnits(
+		hero,
+		self:GetFriendlyQueryUnits(hero, radius),
 		radius,
-		DOTA_UNIT_TARGET_TEAM_FRIENDLY,
-		DOTA_UNIT_TARGET_HERO + DOTA_UNIT_TARGET_BASIC,
-		DOTA_UNIT_TARGET_FLAG_NONE or 0,
-		FIND_ANY_ORDER,
 		false
 	)
 end
@@ -2414,6 +2556,23 @@ function XHSBotBrain:BuildContext(playerID, hero, profile, difficulty, record, a
 		1,
 		tonumber(CustomTimers and CustomTimers.creep_level) or 1
 	)
+	local lootAllowed = encounter == nil
+		and not returningToLane
+		and assignmentGoal ~= "shop"
+		and assignmentGoal ~= "defend_base"
+		and threat.score <= 0.65
+		and threat.recent_damage_ratio <= 0.12
+		and HealthRatio(hero) > dynamicRetreatThreshold + 0.10
+		and rawDanger <= 0
+	local lootOpportunity = XHSBotLoot:FindOpportunity(
+		playerID,
+		hero,
+		record,
+		lootAllowed
+	)
+	record.loot_kind = lootOpportunity and lootOpportunity.kind or ""
+	record.loot_item = lootOpportunity and lootOpportunity.item_name or ""
+	record.loot_distance = lootOpportunity and math.floor(lootOpportunity.distance) or -1
 	local urgentShopping = assignmentGoal == "shop"
 		and assignment ~= nil
 		and assignment.shopping_urgent == true
@@ -2473,6 +2632,8 @@ function XHSBotBrain:BuildContext(playerID, hero, profile, difficulty, record, a
 		health_ratio = HealthRatio(hero),
 		retreat_threshold = dynamicRetreatThreshold,
 		retreat_position = retreatPosition,
+		retreat_distance = retreatPosition ~= nil
+			and Distance2D(hero:GetAbsOrigin(), retreatPosition) or math.huge,
 		retreat_cover = retreatCover,
 		last_stand = lastStand,
 		base_last_stand = baseLastStand,
@@ -2560,6 +2721,11 @@ function XHSBotBrain:BuildContext(playerID, hero, profile, difficulty, record, a
 		rune_pre_wave = preWaveRune,
 		special_wave_eta = specialWaveETA,
 		creep_level = creepLevel,
+		loot_kind = lootOpportunity and lootOpportunity.kind or nil,
+		loot_entity = lootOpportunity and lootOpportunity.entity or nil,
+		loot_position = lootOpportunity and lootOpportunity.position or nil,
+		loot_distance = lootOpportunity and lootOpportunity.distance or nil,
+		loot_item = lootOpportunity and lootOpportunity.item_name or nil,
 	}
 end
 
@@ -2612,6 +2778,8 @@ function XHSBotBrain:ActionState(action, assignment, target, encounter)
 		and action.data ~= nil and action.data.objective == "rune" then
 		return "COLLECTING_RUNE"
 	end
+	if action.id == "break_crate" then return "BREAKING_CRATE" end
+	if action.id == "pickup_loot" then return "PICKING_UP_LOOT" end
 	local states = {
 		dead = "DEAD",
 		wait = "DISABLED",
@@ -2644,6 +2812,7 @@ end
 function XHSBotBrain:Think(playerID, hero, record, assignment, difficulty)
 	local startedAt = ClockSeconds()
 	local function FinishDecision()
+		self:EndQueryContext(hero)
 		local elapsedMs = math.max(0, (ClockSeconds() - startedAt) * 1000)
 		record.decision_ticks = (record.decision_ticks or 0) + 1
 		record.decision_cost_total_ms = (record.decision_cost_total_ms or 0) + elapsedMs
@@ -2660,6 +2829,10 @@ function XHSBotBrain:Think(playerID, hero, record, assignment, difficulty)
 	end
 	if not hero:IsAlive() then
 		self:ReleaseRuneClaim(playerID, record)
+		if record.alive ~= false then
+			record.deaths = (tonumber(record.deaths) or 0) + 1
+			record.last_death_at = GameRules:GetGameTime()
+		end
 		record.death_started_at = record.death_started_at or GameRules:GetGameTime()
 		record.alive = false
 		record.state = "DEAD"
@@ -2672,6 +2845,7 @@ function XHSBotBrain:Think(playerID, hero, record, assignment, difficulty)
 		return
 	end
 	record.alive = true
+	self:BeginQueryContext(hero)
 	local encounter = XHSBotEncounterDirector:Build(
 		playerID,
 		hero,
@@ -2755,6 +2929,15 @@ function XHSBotBrain:Think(playerID, hero, record, assignment, difficulty)
 		record.pending_decision_signature = signature
 		record.pending_decision = best
 		record.pending_decision_at = now + RandomFloat(difficulty.reaction_min, difficulty.reaction_max)
+		if XHSBotDecisionAudit ~= nil then
+			XHSBotDecisionAudit:RecordDecision(
+				playerID,
+				"planned",
+				best,
+				record,
+				assignment
+			)
+		end
 		FinishDecision()
 		return
 	end
@@ -2766,7 +2949,22 @@ function XHSBotBrain:Think(playerID, hero, record, assignment, difficulty)
 		return
 	end
 
-	if XHSBotExecutor:Execute(hero, record.pending_decision, record, difficulty) then
+	local executed = XHSBotExecutor:Execute(
+		hero,
+		record.pending_decision,
+		record,
+		difficulty
+	)
+	if XHSBotDecisionAudit ~= nil then
+		XHSBotDecisionAudit:RecordDecision(
+			playerID,
+			executed and "executed" or "rejected",
+			best,
+			record,
+			assignment
+		)
+	end
+	if executed then
 		record.state = record.planned_state
 		record.last_decision = best.id
 		record.last_decision_reason = best.reason

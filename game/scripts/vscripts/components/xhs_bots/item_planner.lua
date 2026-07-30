@@ -138,6 +138,25 @@ function XHSBotItemPlanner:GetFamilyLimit(profile, familyName)
 	return math.max(0, math.floor(configured or 1))
 end
 
+function XHSBotItemPlanner:IsRangedAttacker(snapshot, profile)
+	if snapshot ~= nil and snapshot.is_ranged_attacker ~= nil then
+		return snapshot.is_ranged_attacker == true
+	end
+	-- Offline planners and old snapshots do not own a hero handle. Their
+	-- preferred combat range is the conservative compatibility fallback.
+	return (tonumber(profile and profile.preferred_range) or 999) > 250
+end
+
+function XHSBotItemPlanner:IsFamilyCompatible(snapshot, profile, familyName)
+	if tostring(familyName or "") == "fire"
+		and self:IsRangedAttacker(snapshot, profile) then
+		-- XHS Fire orbs implement melee cleave and have no effect on ranged
+		-- attacks. This is a hard purchase invariant, not a score penalty.
+		return false, "ranged_fire_incompatible"
+	end
+	return true, nil
+end
+
 function XHSBotItemPlanner:GetMinimumCoreScore(profile)
 	return math.max(0, tonumber(profile and profile.minimum_core_score) or 40)
 end
@@ -681,6 +700,9 @@ end
 
 function XHSBotItemPlanner:ScoreFamily(snapshot, profile, familyName, family, entry)
 	local affinities = profile and profile.item_affinities or {}
+	local compatible, incompatibility =
+		self:IsFamilyCompatible(snapshot, profile, familyName)
+	if not compatible then return -1000, { incompatibility } end
 	local score = 20
 	local reasons = {}
 	local strongestTag = nil
@@ -1032,6 +1054,7 @@ end
 
 function XHSBotItemPlanner:GetDesiredAnkhCharges(snapshot, phase, nextItemReserve)
 	local gold = math.max(0, tonumber(snapshot.gold) or 0)
+	local currentCharges = math.max(0, tonumber(snapshot.ankh_charges) or 0)
 	local deathSeconds = math.max(
 		tonumber(snapshot.last_death_duration) or 0,
 		tonumber(snapshot.expected_respawn_seconds) or 0
@@ -1044,6 +1067,15 @@ function XHSBotItemPlanner:GetDesiredAnkhCharges(snapshot, phase, nextItemReserv
 	end
 	if phase ~= "sustain" and gold >= 1500 + math.min(10000, nextItemReserve or 0) then
 		desired = math.max(desired, 1)
+	end
+	-- Reincarnation is the lifecycle boundary for a registered XHS bot. The
+	-- engine removes its hero handle after the last charge is consumed, so a
+	-- bot must replace the reserve while one charge still remains. This is not
+	-- optional tactical insurance: without it the slot disappears permanently
+	-- and cannot participate in later phases. Buy exactly one charge ahead as
+	-- soon as its real wallet can afford the 1500 gold cost.
+	if currentCharges <= 1 and gold >= 1500 then
+		desired = math.max(desired, currentCharges + 1)
 	end
 	local extreme = (tonumber(snapshot.game_difficulty) or 0) >= 4
 		and ((tonumber(snapshot.combat_threat) or 0) >= 1.10
@@ -1089,6 +1121,10 @@ function XHSBotItemPlanner:GetTacticalPurchase(snapshot, profile, phase, coreRes
 
 	-- Cheap sustain may interrupt a core when the alternative is a likely
 	-- death or a collapsing castle. Stable lanes preserve the core reserve.
+	if snapshot.basic_potions_obsolete == true then
+		Add("item_potion_full", 154,
+			"late-game replacement for obsolete basic potions", false)
+	end
 	if highThreat and (healthRatio <= 0.55 or manaRatio <= 0.16)
 		and (tonumber(snapshot.max_health) or 0) >= 9000 then
 		Add("item_potion_full", 118 + (1 - healthRatio) * 35,
@@ -1165,17 +1201,40 @@ function XHSBotItemPlanner:GetTomeAllowance(
 	difficulty,
 	opening
 )
+	local batchLimit = math.max(
+		1,
+		math.min(8, tonumber(difficulty.max_tomes_per_think) or 1)
+	)
 	if snapshot.in_farm_event == true then
-		return math.max(1, math.min(8, tonumber(difficulty.max_tomes_per_think) or 1))
+		return batchLimit
 	end
+	if self:IsBlockedShopTomeDue(snapshot, nextItemReserve) then
+		return 1
+	end
+	-- The player-facing tome command is legal everywhere and does not occupy an
+	-- inventory slot. Convert a clearly excessive wallet in the background even
+	-- when an opening/core item or a stash pickup is still pending. Preserve a
+	-- useful 50k logistics buffer plus the complete price of the next item.
+	local gold = math.max(0, tonumber(snapshot.gold) or 0)
+	local tomeReserve = math.max(
+		50000,
+		math.max(0, tonumber(nextItemReserve) or 0)
+	)
 	if opening ~= nil and opening.complete ~= true then
-		return opening.tome_due == true and 1 or 0
+		if opening.tome_due == true then return 1 end
+		if gold >= math.max(100000, tomeReserve + 10000) then
+			return batchLimit
+		end
+		return 0
 	end
 	local bought = math.max(0, tonumber(snapshot.tomes_bought) or 0)
 	local spendable = math.max(
 		0,
 		(tonumber(snapshot.gold) or 0) - math.max(0, tonumber(nextItemReserve) or 0)
 	)
+	if gold >= math.max(100000, tomeReserve + 10000) then
+		return batchLimit
+	end
 	if phase == "sustain" or phase == "core_1" then return 0 end
 	if phase == "core_2" then
 		return bought < 1 and spendable >= 20000 and 1 or 0
@@ -1184,6 +1243,31 @@ function XHSBotItemPlanner:GetTomeAllowance(
 		return bought < 2 and spendable >= 20000 and 1 or 0
 	end
 	return math.max(0, math.min(3, tonumber(difficulty.max_tomes_per_think) or 1))
+end
+
+function XHSBotItemPlanner:IsBlockedShopTomeDue(snapshot, nextItemReserve)
+	local gold = math.max(0, tonumber(snapshot.gold) or 0)
+	local reserve = math.max(0, tonumber(nextItemReserve) or 0)
+	local baseThreat = math.max(0, tonumber(snapshot.base_threat_score) or 0)
+	local urgency = math.max(0, tonumber(snapshot.assignment_urgency) or 0)
+	local deaths = math.max(0, tonumber(snapshot.deaths) or 0)
+	local deathsSinceGear = math.max(
+		0,
+		tonumber(snapshot.deaths_since_gear) or deaths
+	)
+	local deathPressure = deaths >= 2 or deathsSinceGear >= 2
+	local now = math.max(0, tonumber(snapshot.game_time) or 0)
+	local lastConversion =
+		tonumber(snapshot.last_blocked_shop_tome_at) or -math.huge
+	return tostring(snapshot.shopping_goal_shop or "none") ~= "none"
+		and (tonumber(snapshot.shopping_goal_age) or 0)
+			>= (deathPressure and 12 or 30)
+		and (deathPressure or baseThreat >= 0.65 or urgency >= 0.85)
+		-- Preserve the complete blocked item plus one 10k tome. This lets a
+		-- repeatedly dying 25-30k bot buy permanent strength without abandoning
+		-- the Mask/orb it is still trying to collect.
+		and gold >= math.max(25000, reserve + 10000)
+		and now - lastConversion >= 10
 end
 
 function XHSBotItemPlanner:Plan(snapshot, profile, difficulty)
@@ -1273,6 +1357,16 @@ function XHSBotItemPlanner:Plan(snapshot, profile, difficulty)
 		difficulty,
 		opening
 	)
+	local tomeReserveFloor = math.max(50000, reserve)
+	plan.surplus_tome_conversion = snapshot.in_farm_event ~= true
+		and plan.opening_tome_due ~= true
+		and (tonumber(snapshot.gold) or 0)
+			>= math.max(100000, tomeReserveFloor + 10000)
+	plan.tome_reserve_gold = snapshot.in_farm_event == true and 0
+		or plan.surplus_tome_conversion and tomeReserveFloor
+		or reserve
+	plan.blocked_shop_tome_due =
+		self:IsBlockedShopTomeDue(snapshot, reserve)
 	return plan
 end
 

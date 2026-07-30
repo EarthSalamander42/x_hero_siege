@@ -73,7 +73,9 @@ local BATTLEPASS_DEV_FAMILY_ORDER = {
 	"emblem",
 	"companion",
 	"effigy",
-	"potion",
+	"health_potion",
+	"mana_potion",
+	"light_potion",
 	"rebirth",
 	"attack_lifesteal",
 	"spell_lifesteal",
@@ -89,7 +91,9 @@ local BATTLEPASS_DEV_FAMILY_LABELS = {
 	emblem = "Emblem",
 	companion = "Companion",
 	effigy = "Effigy",
-	potion = "Potion",
+	health_potion = "Health Potion",
+	mana_potion = "Mana Potion",
+	light_potion = "Light Potion",
 	rebirth = "Rebirth",
 	attack_lifesteal = "Attack Lifesteal",
 	spell_lifesteal = "Spell Lifesteal",
@@ -103,7 +107,13 @@ for _, family in ipairs(BATTLEPASS_DEV_FAMILY_ORDER) do
 	BATTLEPASS_DEV_FAMILY_SET[family] = true
 end
 
-local BATTLEPASS_DEV_SEQUENCE_DELAY = 5.0
+local BATTLEPASS_DEV_POTION_FAMILIES = {
+	health_potion = "health",
+	mana_potion = "mana",
+	light_potion = "light",
+}
+
+local BATTLEPASS_DEV_SEQUENCE_DELAY = 8.0
 
 local function FormatBattlepassDevRewardName(name, family)
 	local value = tostring(name or "")
@@ -143,6 +153,16 @@ end
 
 local PERFORMANCE_UPDATE_INTERVAL = 1.0
 local CLIENT_FPS_TIMEOUT = 5.0
+
+local function PerformanceProfileNow()
+	if os ~= nil and os.clock ~= nil then
+		local ok, value = pcall(os.clock)
+		if ok and tonumber(value) ~= nil then return tonumber(value) end
+	end
+	if Time ~= nil then return Time() end
+	return GameRules:GetGameTime()
+end
+
 local PERFORMANCE_BREAKABLES = {
 	npc_dota_crate = true,
 	npc_dota_chest = true,
@@ -196,7 +216,7 @@ function XHSDevTools:IsPerformanceViewer(playerID)
 	end
 
 	local status = tonumber(api:GetDonatorStatus(playerID)) or 0
-	return status == 1 or status == 2
+	return status == 1
 end
 
 function XHSDevTools:HasPerformanceViewer()
@@ -271,20 +291,29 @@ function XHSDevTools:BuildClientFPSState()
 end
 
 function XHSDevTools:BuildPerformanceState()
-	local startedAt = Time ~= nil and Time() or 0
+	local startedAt = PerformanceProfileNow()
+	local pacing = XHSPerformanceTelemetry ~= nil
+		and XHSPerformanceTelemetry.GetServerPacingSnapshot ~= nil
+		and XHSPerformanceTelemetry:GetServerPacingSnapshot()
+		or {}
 	local snapshot = {
 		creeps = 0,
 		total_units = 0,
 		ai_controllers = 0,
 		wave_controllers = 0,
 		ability_controllers = 0,
+		movement_owner_ai = 0,
+		movement_owner_wave = 0,
 		heroes = 0,
 		bosses = 0,
 		summons = 0,
 		breakables = 0,
 		other_units = 0,
 		thinkers = 0,
-		frame_ms = math.max(0, FrameTime() * 1000 / math.max(0.01, self.host_timescale or 1)),
+		sim_lag_ms = tonumber(pacing.lag_p95_ms) or 0,
+		sim_health_pct = tonumber(pacing.health_average_pct) or 100,
+		server_observer_interval_ms =
+			tonumber(pacing.observer_interval_p95_ms) or 0,
 		scan_ms = 0,
 		players = self:BuildClientFPSState(),
 	}
@@ -313,6 +342,11 @@ function XHSDevTools:BuildPerformanceState()
 			end
 			if unit.xhs_wave_order_controller == true then
 				snapshot.wave_controllers = snapshot.wave_controllers + 1
+			end
+			if unit.xhs_movement_order_owner == "modifier_ai" then
+				snapshot.movement_owner_ai = snapshot.movement_owner_ai + 1
+			elseif unit.xhs_movement_order_owner == "wave" then
+				snapshot.movement_owner_wave = snapshot.movement_owner_wave + 1
 			end
 			if isDummy or isRune then
 				snapshot.other_units = snapshot.other_units + 1
@@ -351,10 +385,11 @@ function XHSDevTools:BuildPerformanceState()
 		tonumber(snapshot.activity.wave_thinks_per_second) or 0
 	snapshot.ability_checks_per_second =
 		tonumber(snapshot.activity.ability_loop_thinks_per_second) or 0
+	snapshot.phase_one_spawn_budget = GetPhaseOneSpawnBudgetState ~= nil
+		and GetPhaseOneSpawnBudgetState()
+		or {}
 
-	if Time ~= nil then
-		snapshot.scan_ms = math.max(0, (Time() - startedAt) * 1000)
-	end
+	snapshot.scan_ms = math.max(0, (PerformanceProfileNow() - startedAt) * 1000)
 
 	return snapshot
 end
@@ -362,6 +397,30 @@ end
 function XHSDevTools:PublishPerformanceState()
 	if CustomNetTables == nil or not self:HasPerformanceViewer() then return end
 	CustomNetTables:SetTableValue("xhs_devtools", "performance", self:BuildPerformanceState())
+end
+
+function XHSDevTools:PublishPerformanceAccessState()
+	if CustomNetTables == nil or PlayerResource == nil then return end
+	self.performance_access_state = self.performance_access_state or {}
+	local maxPlayers = DOTA_MAX_TEAM_PLAYERS or 24
+	for playerID = 0, maxPlayers - 1 do
+		if PlayerResource:IsValidPlayerID(playerID)
+			and (PlayerResource.IsFakeClient == nil
+				or not PlayerResource:IsFakeClient(playerID)) then
+			local allowed = self:IsPerformanceViewer(playerID)
+			if self.performance_access_state[playerID] ~= allowed then
+				self.performance_access_state[playerID] = allowed
+				CustomNetTables:SetTableValue(
+					"xhs_devtools",
+					"performance_access_" .. tostring(playerID),
+					{
+						allowed = allowed,
+						log_only = allowed and not IsInToolsMode(),
+					}
+				)
+			end
+		end
+	end
 end
 
 function XHSDevTools:StartPerformanceMonitor()
@@ -378,6 +437,7 @@ function XHSDevTools:StartPerformanceMonitor()
 		local now = Time ~= nil and Time() or GameRules:GetGameTime()
 		if now >= (self.next_performance_update_at or 0) then
 			self.next_performance_update_at = now + PERFORMANCE_UPDATE_INTERVAL
+			self:PublishPerformanceAccessState()
 			self:PublishPerformanceState()
 		end
 		return 0.1
@@ -387,6 +447,7 @@ end
 function XHSDevTools:Init()
 	self.enabled = IsInToolsMode()
 	self.client_fps = self.client_fps or {}
+	self.performance_access_state = self.performance_access_state or {}
 	self:RegisterPerformanceListeners()
 	XHSLagLab:Init()
 
@@ -1456,9 +1517,14 @@ function XHSDevTools:FocusAllPlayers(unit)
 
 	for _, hero in pairs(HeroList:GetAllHeroes()) do
 		if hero ~= nil and hero:IsRealHero() and hero:GetTeamNumber() == DOTA_TEAM_GOODGUYS and hero:GetPlayerOwner() ~= nil then
-			CustomGameEventManager:Send_ServerToPlayer(hero:GetPlayerOwner(), "set_player_camera", {
-				hPosition = unit:GetAbsOrigin(),
-				iSpeed = 0.55,
+			CameraMotion:Move(hero:GetPlayerOwnerID(), unit, {
+				from = hero,
+				duration = 0.55,
+				easing = "smootherstep",
+				owner = "devtools_focus",
+				priority = 200,
+				policy = "replace",
+				release = "free",
 			})
 		end
 	end
@@ -1490,21 +1556,29 @@ function XHSDevTools:BuildBattlepassDevCatalog()
 					or reward.reward_item_id
 					or reward.id
 				itemID = itemID ~= nil and tostring(itemID) or ""
-				local identity = family .. ":" .. itemID
-				if BATTLEPASS_DEV_FAMILY_SET[family] == true
-					and itemID ~= ""
-					and not seen[identity] then
-					seen[identity] = true
-					local name = tostring(reward.name or reward.item_name or itemID)
-					table.insert(grouped[family], {
-						item_id = itemID,
-						family = family,
-						name = name,
-						display_name = FormatBattlepassDevRewardName(name, family),
-						rarity = tostring(reward.rarity or reward.item_rarity or ""),
-						track = tostring(reward.track or trackData.id),
-						level = tonumber(reward.level) or 0,
-					})
+				local devFamilies = { family }
+				if family == "potion" then
+					devFamilies = { "health_potion", "mana_potion", "light_potion" }
+				end
+				for _, devFamily in ipairs(devFamilies) do
+					local identity = devFamily .. ":" .. itemID
+					if BATTLEPASS_DEV_FAMILY_SET[devFamily] == true
+						and itemID ~= ""
+						and not seen[identity] then
+						seen[identity] = true
+						local name = tostring(reward.name or reward.item_name or itemID)
+						table.insert(grouped[devFamily], {
+							item_id = itemID,
+							family = devFamily,
+							slot_id = family,
+							preview_channel = BATTLEPASS_DEV_POTION_FAMILIES[devFamily],
+							name = name,
+							display_name = FormatBattlepassDevRewardName(name, family),
+							rarity = tostring(reward.rarity or reward.item_rarity or ""),
+							track = tostring(reward.track or trackData.id),
+							level = tonumber(reward.level) or 0,
+						})
+					end
 				end
 			end
 		end
@@ -1625,7 +1699,8 @@ function XHSDevTools:RunBattlepassDevReward(sourceIndex, playerID, reward, reque
 	)
 	Battlepass:SupporterPassDevTestReward(sourceIndex, {
 		item_id = reward.item_id,
-		slot_id = reward.family,
+		slot_id = reward.slot_id or reward.family,
+		preview_channel = reward.preview_channel,
 		action = "test",
 		request_id = requestID,
 		xhs_devtools_trusted = true,
@@ -1710,7 +1785,8 @@ function XHSDevTools:TestBattlepassFamily(event)
 		)
 		Battlepass:SupporterPassDevTestReward(sequence.source_index, {
 			item_id = reward.item_id,
-			slot_id = reward.family,
+			slot_id = reward.slot_id or reward.family,
+			preview_channel = reward.preview_channel,
 			action = "test",
 			xhs_devtools_trusted = true,
 			request_id = string.format(

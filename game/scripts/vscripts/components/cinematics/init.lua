@@ -23,11 +23,6 @@ local function BuildPayload(cinematicId, options)
 		transition = tonumber(options.transition) or 0.7,
 		hide_hud = options.hide_hud == false and 0 or 1,
 		allow_dialog_ui = options.allow_dialog_ui == true and 1 or 0,
-		camera_entindex = tonumber(options.camera_entindex) or -1,
-		camera_position = options.camera_position or "",
-		camera_speed = tonumber(options.camera_speed) or 0.55,
-		native_camera = options.native_camera == true and 1 or 0,
-		return_camera = options.return_camera == false and 0 or 1,
 		music = tostring(options.music or ""),
 		music_layers = math.max(1, math.floor(tonumber(options.music_layers) or 1)),
 		title = tostring(options.title or ""),
@@ -43,6 +38,75 @@ end
 
 local function IsValidUnit(unit)
 	return unit ~= nil and IsValidEntity(unit) and not unit:IsNull()
+end
+
+local function ParseCameraPosition(value)
+	if type(value) ~= "string" then return value end
+	local x, y, z = string.match(value, "^%s*([%+%-%.%d]+)%s+([%+%-%.%d]+)%s+([%+%-%.%d]+)%s*$")
+	if x == nil then return nil end
+	return Vector(tonumber(x) or 0, tonumber(y) or 0, tonumber(z) or 0)
+end
+
+local function ResolveCinematicTarget(options)
+	local entIndex = math.floor(tonumber(options.camera_entindex) or -1)
+	if entIndex > 0 then
+		local entity = EntIndexToHScript(entIndex)
+		if IsValidUnit(entity) then return entity, "follow" end
+	end
+	local position = ParseCameraPosition(options.camera_position)
+	if position ~= nil then return position, "snapshot" end
+	return nil, nil
+end
+
+local function SelectedHeroResolver(context)
+	return PlayerResource:GetSelectedHeroEntity(context.player_id)
+end
+
+function XHSCinematics:StartPlayerCamera(playerID, cinematicId, options)
+	if CameraMotion == nil then return nil end
+	local target, targetMode = ResolveCinematicTarget(options)
+	if target == nil then return nil end
+	local origin = PlayerResource:GetSelectedHeroEntity(playerID)
+	if not IsValidUnit(origin) then origin = target end
+	local handle, err = CameraMotion:Move(playerID, target, {
+		from = origin,
+		duration = math.max(0, tonumber(options.camera_speed) or 0.55),
+		easing = options.camera_easing or "smootherstep",
+		target_mode = targetMode,
+		persistent = true,
+		owner = "cinematic:" .. tostring(cinematicId),
+		priority = tonumber(options.camera_priority) or 100,
+		policy = "replace",
+		interruptible = true,
+		on_arrive = options.on_camera_arrive,
+	})
+	if handle == nil then
+		print("[XHS][Cinematic] Camera start failed for player " .. tostring(playerID) .. ": " .. tostring(err))
+	end
+	return handle
+end
+
+function XHSCinematics:EndPlayerCamera(playerID, state)
+	if CameraMotion == nil or state == nil or state.camera_handle == nil
+		or not state.camera_handle:IsActive() then
+		return
+	end
+	if state.return_camera == false then
+		CameraMotion:Release(playerID, {
+			owner = state.camera_owner,
+			mode = "free",
+			reason = "cinematic ended without return",
+		})
+		return
+	end
+	CameraMotion:Return(playerID, SelectedHeroResolver, {
+		duration = state.return_speed,
+		easing = "smootherstep",
+		owner = state.camera_owner,
+		priority = state.camera_priority,
+		policy = "replace",
+		release = "free",
+	})
 end
 
 function XHSCinematics:ShouldHideHealthBars()
@@ -186,11 +250,17 @@ function XHSCinematics:BeginForPlayer(player, cinematicId, options)
 	cinematicId = tostring(cinematicId or "default")
 	self.serial = self.serial + 1
 	self.active_players[playerID] = self.active_players[playerID] or {}
-	self.active_players[playerID][cinematicId] = {
+	local state = {
 		lock_orders = options.lock_orders ~= false,
 		hide_health_bars = options.hide_health_bars ~= false,
 		serial = self.serial,
+		return_camera = options.return_camera ~= false,
+		return_speed = math.max(0, tonumber(options.return_camera_speed) or 0.65),
+		camera_owner = "cinematic:" .. cinematicId,
+		camera_priority = tonumber(options.camera_priority) or 100,
 	}
+	state.camera_handle = self:StartPlayerCamera(playerID, cinematicId, options)
+	self.active_players[playerID][cinematicId] = state
 	CustomGameEventManager:Send_ServerToPlayer(player, "xhs_cinematic_begin", BuildPayload(cinematicId, options))
 	self:RefreshPlayerLocks()
 	self:RefreshHealthBarVisibility()
@@ -201,11 +271,22 @@ function XHSCinematics:BeginForAll(cinematicId, options)
 	options = options or {}
 	cinematicId = tostring(cinematicId or "default")
 	self.serial = self.serial + 1
-	self.active_all[cinematicId] = {
+	local state = {
 		lock_orders = options.lock_orders ~= false,
 		hide_health_bars = options.hide_health_bars ~= false,
 		serial = self.serial,
+		return_camera = options.return_camera ~= false,
+		return_speed = math.max(0, tonumber(options.return_camera_speed) or 0.65),
+		camera_owner = "cinematic:" .. cinematicId,
+		camera_priority = tonumber(options.camera_priority) or 100,
+		camera_handles = {},
 	}
+	for playerID = 0, (DOTA_MAX_TEAM_PLAYERS or 24) - 1 do
+		if PlayerResource:IsValidPlayerID(playerID) and PlayerResource:GetPlayer(playerID) ~= nil then
+			state.camera_handles[playerID] = self:StartPlayerCamera(playerID, cinematicId, options)
+		end
+	end
+	self.active_all[cinematicId] = state
 	CustomGameEventManager:Send_ServerToAllClients("xhs_cinematic_begin", BuildPayload(cinematicId, options))
 	self:RefreshPlayerLocks()
 	self:RefreshHealthBarVisibility()
@@ -219,6 +300,8 @@ function XHSCinematics:EndForPlayer(player, cinematicId)
 	if player == nil then return end
 
 	cinematicId = tostring(cinematicId or "default")
+	local state = self.active_players[playerID] ~= nil and self.active_players[playerID][cinematicId] or nil
+	if state ~= nil then self:EndPlayerCamera(playerID, state) end
 	if self.active_players[playerID] ~= nil then
 		self.active_players[playerID][cinematicId] = nil
 	end
@@ -229,6 +312,19 @@ end
 
 function XHSCinematics:EndForAll(cinematicId)
 	cinematicId = tostring(cinematicId or "default")
+	local state = self.active_all[cinematicId]
+	if state ~= nil then
+		for playerID, handle in pairs(state.camera_handles or {}) do
+			local playerState = {
+				camera_handle = handle,
+				return_camera = state.return_camera,
+				return_speed = state.return_speed,
+				camera_owner = state.camera_owner,
+				camera_priority = state.camera_priority,
+			}
+			self:EndPlayerCamera(playerID, playerState)
+		end
+	end
 	self.active_all[cinematicId] = nil
 	CustomGameEventManager:Send_ServerToAllClients("xhs_cinematic_end", { id = cinematicId })
 	self:RefreshPlayerLocks()

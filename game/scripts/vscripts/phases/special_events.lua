@@ -39,7 +39,7 @@ local FARM_EVENT_ABILITY_BY_UNIT = {
 	npc_dota_creature_razormane = "creature_war_stomp",
 	npc_dota_creature_revenant = "xhs_farm_howling_blast",
 	npc_dota_creature_tuskarr = "xhs_creep_crippling_strike",
-	npc_dota_creature_satyrr = "ogre_magi_bloodlust",
+	npc_dota_creature_satyrr = "rifleman_bloodlust",
 }
 local FARM_EVENT_ACTIVE_ABILITIES = {
 	creature_war_stomp = {
@@ -47,11 +47,11 @@ local FARM_EVENT_ACTIVE_ABILITIES = {
 		trigger_range = 340,
 		shared_lock = 4.0,
 	},
-	ogre_magi_bloodlust = {
+	rifleman_bloodlust = {
 		cast_type = "friendly_target",
 		trigger_range = 650,
 		shared_lock = 0.75,
-		modifier = "modifier_ogre_magi_bloodlust",
+		modifier = "modifier_rifleman_bloodlust",
 	},
 }
 local FARM_EVENT_REWARDS = {
@@ -505,6 +505,15 @@ function SpecialEvents:MuradinEvent(time)
 	Muradin:AddNewModifier(Muradin, nil, "modifier_cinematic_pause", { duration = stun_duration, ramp_duration = SPECIAL_EVENT_CINEMATIC_PAUSE_RAMP })
 	Muradin:SetAngles(0, 270, 0)
 	PlayMuradinTeleportIn(Muradin, muradin_spawn_position)
+	-- Muradin uses a bespoke multi-player teleport instead of
+	-- StartSpecialArenaCinematicIntro, so its arena focus must be started here.
+	-- Release at the arena after the heroes have teleported; returning to their
+	-- pre-event positions would pull the view out just as Muradin appears.
+	FocusAllPlayersOnSpecialArena(
+		muradin_spawn_position,
+		MURADIN_TELEPORT_IN_DELAY,
+		false
+	)
 	Notifications:TopToAll({
 		duration = stun_duration,
 		segments = {
@@ -1032,6 +1041,25 @@ function SpecialEvents:PrepareFarmEventWave(playerID, round, level)
 	end)
 end
 
+function SpecialEvents:OrderFarmEventUnitToAttack(unit, playerID)
+	if not IsValidAliveUnit(unit) or unit.xhs_farm_staged == true then return false end
+	local hero = GetFarmEventHero(tonumber(playerID))
+	if hero == nil then return false end
+
+	if unit.SetIdleAcquire ~= nil then unit:SetIdleAcquire(true) end
+	unit:SetForceAttackTarget(hero)
+	if unit.MoveToTargetToAttack ~= nil then
+		unit:MoveToTargetToAttack(hero)
+	else
+		ExecuteOrderFromTable({
+			UnitIndex = unit:entindex(),
+			OrderType = DOTA_UNIT_ORDER_ATTACK_TARGET,
+			TargetIndex = hero:entindex(),
+		})
+	end
+	return true
+end
+
 function SpecialEvents:ActivateFarmEventWave(playerID, round, level)
 	local progress = self.hero_farm_event[playerID]
 	if progress == nil or progress.point == nil then return end
@@ -1070,25 +1098,34 @@ function SpecialEvents:ActivateFarmEventWave(playerID, round, level)
 			if unit:GetUnitName() == "npc_dota_creature_polar_furbolg" then
 				unit:AddNewModifier(unit, nil, "modifier_xhs_farm_wave_damage", {
 					damage_pct = FARM_EVENT_WAVE_DAMAGE[
-						math.min(#FARM_EVENT_WAVE_DAMAGE, math.max(1, GameRules:GetCustomGameDifficulty()))
+					math.min(#FARM_EVENT_WAVE_DAMAGE, math.max(1, GameRules:GetCustomGameDifficulty()))
 					],
 				})
 			end
 			if not unit:HasModifier("modifier_ai") then
 				unit:AddNewModifier(unit, nil, "modifier_ai", { state = 5 })
 			end
-			local hero = GetFarmEventHero(playerID)
-			if hero ~= nil then
-				unit:SetForceAttackTarget(hero)
-				ExecuteOrderFromTable({
-					UnitIndex = unit:entindex(),
-					OrderType = DOTA_UNIT_ORDER_ATTACK_TARGET,
-					TargetIndex = hero:entindex(),
-				})
-			end
+			self:OrderFarmEventUnitToAttack(unit, playerID)
 			table.insert(progress.active_units, unit)
 		end
 	end
+
+	-- A staged unit leaves OUT_OF_GAME/COMMAND_RESTRICTED in the same frame.
+	-- Source can reject that frame's first order, so wake the whole wave once
+	-- more after state propagation. modifier_ai remains the long-term fail-safe.
+	local generation = self.farm_event_generation
+	Timers:CreateTimer(0.1, function()
+		if GameMode.FarmEvent_occuring ~= true
+			or self.farm_event_generation ~= generation
+			or progress.round ~= round
+			or progress.level ~= level then
+			return nil
+		end
+		for _, unit in ipairs(progress.active_units or {}) do
+			self:OrderFarmEventUnitToAttack(unit, playerID)
+		end
+		return nil
+	end)
 
 	progress.remaining = #progress.active_units
 	self.farm_leaderboard_dirty = true
@@ -1303,7 +1340,6 @@ function SpecialEvents:FarmEvent(time)
 		SpecialEvents:EndFarmEvent()
 		return nil
 	end, time + FARM_EVENT_CELEBRATION_DURATION)
-
 end
 
 function SpecialEvents:EndFarmEvent()

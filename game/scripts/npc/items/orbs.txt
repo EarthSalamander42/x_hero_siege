@@ -7,6 +7,7 @@
 	{
 		"ID"							"2516"
 		"BaseClass"						"item_lua"
+		"AllowedInBackpack"				"0"
 		"ScriptFile"					"items/item_orb_of_lightning.lua"
 		"AbilityTextureName"			"custom/orb_of_lightning"
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET"
@@ -58,6 +59,7 @@
 	{
 		"ID"							"2541"
 		"BaseClass"						"item_lua"
+		"AllowedInBackpack"				"0"
 		"ScriptFile"					"items/item_orb_of_lightning.lua"
 		"AbilityTextureName"			"custom/orb_of_lightning2"
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET"
@@ -192,6 +194,7 @@
 	{
 		"ID"							"2517"
 		"BaseClass"						"item_lua"
+		"AllowedInBackpack"				"0"
 		"ScriptFile"					"items/item_orb_of_fire.lua"
 		"AbilityTextureName"			"custom/orb_of_fire"
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET"
@@ -239,6 +242,7 @@
 	{
 		"ID"							"2538"
 		"BaseClass"						"item_lua"
+		"AllowedInBackpack"				"0"
 		"ScriptFile"					"items/item_orb_of_fire.lua"
 		"AbilityTextureName"			"custom/orb_of_fire2"
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET"
@@ -395,6 +399,7 @@
 		//-------------------------------------------------------------------------------------------------------------
 		"ID"							"2501"
 		"BaseClass"						"item_lua"
+		"AllowedInBackpack"				"0"
 		"ScriptFile"					"items/item_orb_of_fire.lua"
 		"AbilityTextureName" 			"custom/searing_blade"
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET"
@@ -418,7 +423,6 @@
 		"SecretShop"					"1"
 		"ItemBaseLevel"					"3"
 		"MaxUpgradeLevel"				"3"
-		"AllowedInBackpack"				"0"
 
 		"AbilityValues"
 		{
@@ -543,6 +547,7 @@
 	{
 		"ID"							"2535"
 		"BaseClass"                     "item_datadriven"
+		"AllowedInBackpack"				"0"
 		"AbilityTextureName"			"orb_of_frost"
 		"AbilityBehavior"               "DOTA_ABILITY_BEHAVIOR_NO_TARGET"
 		"AbilityCooldown"				"1.0"
@@ -714,6 +719,7 @@
 	{
 		"ID"							"2537"
 		"BaseClass"                     "item_lua"
+		"AllowedInBackpack"				"0"
 		"ScriptFile"					"items/item_orb_of_earth.lua"
 		"AbilityTextureName"			"custom/orb_of_earth"
 		"AbilityBehavior"               "DOTA_ABILITY_BEHAVIOR_NO_TARGET"
@@ -764,6 +770,7 @@
 	{
 		"ID"							"2548"
 		"BaseClass"                     "item_lua"
+		"AllowedInBackpack"				"0"
 		"ScriptFile"					"items/item_orb_of_earth.lua"
 		"AbilityTextureName"			"custom/orb_of_earth3"
 		"AbilityBehavior"               "DOTA_ABILITY_BEHAVIOR_NO_TARGET"
@@ -840,6 +847,7 @@
 	{
 		"ID"							"2550"
 		"BaseClass"                     "item_lua"
+		"AllowedInBackpack"				"0"
 		"ScriptFile"					"items/item_orb_of_earth.lua"
 		"AbilityTextureName"			"custom/orb_of_earth2"
 		"AbilityBehavior"               "DOTA_ABILITY_BEHAVIOR_NO_TARGET"
@@ -862,7 +870,6 @@
 		"SecretShop"					"1"
 		"ItemBaseLevel"					"3"
 		"MaxUpgradeLevel"				"3"
-		"AllowedInBackpack"				"0"
 
 		"Model"							"models/props_gameplay/red_box.vmdl"
 		"Effect"						"particles/units/heroes/hero_earth_spirit/espirit_geomagentic_target_sphere.vpcf"
@@ -919,6 +926,7 @@
 	{
 		"ID"							"2518"
 		"BaseClass"						"item_lua"
+		"AllowedInBackpack"				"0"
 		"ScriptFile"					"items/item_orb_of_darkness.lua"
 		"AbilityTextureName"			"custom/orb_of_darkness"
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_PASSIVE"
@@ -965,6 +973,7 @@
 	{
 		"ID"							"2543"
 		"BaseClass"						"item_lua"
+		"AllowedInBackpack"				"0"
 		"ScriptFile"					"items/item_orb_of_darkness.lua"
 		"AbilityTextureName"			"custom/orb_of_darkness2"
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_PASSIVE"
@@ -1044,6 +1053,7 @@
 		//-------------------------------------------------------------------------------------------------------------
 		"ID"							"2511"
 		"BaseClass"						"item_lua"
+		"AllowedInBackpack"				"0"
 		"ScriptFile"					"items/item_orb_of_darkness.lua"
 		"AbilityTextureName"			"custom/bracer_of_the_void"		
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_PASSIVE"
@@ -1069,7 +1079,6 @@
 		"SecretShop"					"1"
 		"ItemBaseLevel"					"3"
 		"MaxUpgradeLevel"				"3"
-		"AllowedInBackpack"				"0"
 
 		"AbilityValues"
 		{
@@ -1121,6 +1130,7 @@
 	{
 		"ID"							"2556"
 		"BaseClass"						"item_lua"
+		"AllowedInBackpack"				"0"
 		"ScriptFile"					"items/item_orb_of_arcane.lua"
 		"AbilityTextureName"			"custom/orb_of_arcane"
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET"
@@ -1164,6 +1174,7 @@
 	{
 		"ID"							"2557"
 		"BaseClass"						"item_lua"
+		"AllowedInBackpack"				"0"
 		"ScriptFile"					"items/item_orb_of_arcane.lua"
 		"AbilityTextureName"			"custom/mystic_gem"
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET"
@@ -1226,6 +1237,7 @@
 	{
 		"ID"							"2559"
 		"BaseClass"						"item_lua"
+		"AllowedInBackpack"				"0"
 		"ScriptFile"					"items/item_orb_of_arcane.lua"
 		"AbilityTextureName"			"custom/astral_core"
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET"
@@ -1243,7 +1255,6 @@
 		"SecretShop"					"1"
 		"ItemBaseLevel"					"3"
 		"MaxUpgradeLevel"				"3"
-		"AllowedInBackpack"				"0"
 
 		"ItemCost"						"50000"
 		"ItemPurchasable"				"1"
@@ -1291,6 +1302,7 @@
 	{
 		"ID"							"2561"
 		"BaseClass"						"item_lua"
+		"AllowedInBackpack"				"0"
 		"ScriptFile"					"items/item_orb_of_venom_xhs.lua"
 		"AbilityTextureName"			"custom/orb_of_venom"
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET"
@@ -1335,6 +1347,7 @@
 	{
 		"ID"							"2562"
 		"BaseClass"						"item_lua"
+		"AllowedInBackpack"				"0"
 		"ScriptFile"					"items/item_orb_of_venom_xhs.lua"
 		"AbilityTextureName"			"custom/viridian_gem"
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET"
@@ -1398,6 +1411,7 @@
 	{
 		"ID"							"2564"
 		"BaseClass"						"item_lua"
+		"AllowedInBackpack"				"0"
 		"ScriptFile"					"items/item_orb_of_venom_xhs.lua"
 		"AbilityTextureName"			"custom/plagueheart"
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET"
@@ -1415,7 +1429,6 @@
 		"SecretShop"					"1"
 		"ItemBaseLevel"					"3"
 		"MaxUpgradeLevel"				"3"
-		"AllowedInBackpack"				"0"
 
 		"ItemCost"						"50000"
 		"ItemPurchasable"				"1"

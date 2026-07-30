@@ -542,6 +542,25 @@ var XHSTopHud = (function () {
 			playerInfo.player_connection_state === DOTAConnectionState_t.DOTA_CONNECTION_STATE_ABANDONED;
 	}
 
+	var recentUnitSelections = {};
+	var queuedUnitSelectionSerial = 0;
+	var queuedUnitSelectionToken = 0;
+	var suppressedUnitSelections = {};
+
+	function SelectUnitWithoutVanillaDoubleCenter(entIndex) {
+		var key = String(entIndex);
+		if (recentUnitSelections[key]) {
+			return false;
+		}
+
+		recentUnitSelections[key] = true;
+		$.Schedule(0.35, function () {
+			delete recentUnitSelections[key];
+		});
+		GameUI.SelectUnit(entIndex, false);
+		return true;
+	}
+
 	function SelectUnitOrCast(entIndex) {
 		if (!IsValidEntityIndex(entIndex)) {
 			return;
@@ -551,7 +570,7 @@ var XHSTopHud = (function () {
 		if (clickBehavior === CLICK_BEHAVIORS.DOTA_CLICK_BEHAVIOR_CAST) {
 			var abilityIndex = Abilities.GetLocalPlayerActiveAbility();
 			if (!IsValidEntityIndex(abilityIndex)) {
-				GameUI.SelectUnit(entIndex, false);
+				SelectUnitWithoutVanillaDoubleCenter(entIndex);
 				return;
 			}
 
@@ -569,21 +588,50 @@ var XHSTopHud = (function () {
 			}
 		}
 
-		GameUI.SelectUnit(entIndex, false);
+		SelectUnitWithoutVanillaDoubleCenter(entIndex);
+	}
+
+	function QueueUnitSelectionOrCast(entIndex) {
+		if (!IsValidEntityIndex(entIndex)) {
+			return;
+		}
+
+		var key = String(entIndex);
+		if (suppressedUnitSelections[key]) {
+			return;
+		}
+
+		var token = ++queuedUnitSelectionSerial;
+		queuedUnitSelectionToken = token;
+		$.Schedule(0.35, function () {
+			if (queuedUnitSelectionToken !== token || suppressedUnitSelections[key]) {
+				return;
+			}
+			queuedUnitSelectionToken = 0;
+			SelectUnitOrCast(entIndex);
+		});
+	}
+
+	function CancelQueuedUnitSelection(entIndex) {
+		queuedUnitSelectionToken = ++queuedUnitSelectionSerial;
+		var key = String(entIndex);
+		var suppressionToken = queuedUnitSelectionSerial;
+		suppressedUnitSelections[key] = suppressionToken;
+		$.Schedule(0.40, function () {
+			if (suppressedUnitSelections[key] === suppressionToken) {
+				delete suppressedUnitSelections[key];
+			}
+		});
 	}
 
 	function MoveCameraToUnit(entIndex) {
 		if (!IsValidEntityIndex(entIndex)) {
 			return;
 		}
-
-		var position = SafeValue(function () {
-			return Entities.GetAbsOrigin(entIndex);
-		}, null);
-
-		if (position) {
-			GameUI.SetCameraTargetPosition([position[0], position[1], position[2]], 0.4);
-		}
+		CancelQueuedUnitSelection(entIndex);
+		GameEvents.SendCustomGameEventToServer("xhs_camera_focus_entity", {
+			entindex: entIndex,
+		});
 	}
 
 	function CreateProgressBar(parent, id, className, height) {
@@ -736,6 +784,7 @@ var XHSTopHud = (function () {
 
 		AddPanelOverheadBlocker(blockers, "XHSTopHudBar", rootPosition, 8);
 		AddPanelOverheadBlocker(blockers, "XHSFocusTimers", rootPosition, 8);
+		AddPanelOverheadBlocker(blockers, "XHSWavePressurePanel", rootPosition, 8);
 		AddPanelOverheadBlocker(blockers, "XHSDifficultyAltPanel", rootPosition, 8);
 		AddPanelOverheadBlocker(blockers, "XHSFragmentQuestIntro", rootPosition, 10);
 		// The vanilla shop is outside the custom HUD tree, so register it explicitly.
@@ -1014,6 +1063,13 @@ var XHSTopHud = (function () {
 		if (state === "COLLECTING_RUNE" || data.decision_objective === "rune") {
 			return BotActivity("GOING TO RUNE", "Move");
 		}
+		if (state === "BREAKING_CRATE" || decision === "break_crate") {
+			return BotActivity("BREAKING CRATE", "Economy");
+		}
+		if (state === "PICKING_UP_LOOT" || decision === "pickup_loot") {
+			var lootItem = FormatBotAbilityName(data.loot_item || data.decision_target);
+			return BotActivity(lootItem ? "PICKING UP: " + lootItem : "PICKING UP LOOT", "Economy");
+		}
 		if (state === "EVADING_DANGER" || decision === "evade_danger") {
 			return BotActivity("DODGING DANGER", "Danger");
 		}
@@ -1174,10 +1230,18 @@ var XHSTopHud = (function () {
 
 		var activityPanel = label.FindChildTraverse("XHSOverheadBotActivity_" + playerID);
 		var activityLabel = label.FindChildTraverse("XHSOverheadBotActivityLabel_" + playerID);
+		var nextPurchasePanel = label.FindChildTraverse("XHSOverheadBotNextPurchase_" + playerID);
+		var nextPurchaseLabel = label.FindChildTraverse("XHSOverheadBotNextPurchaseLabel_" + playerID);
 		var debugState = botActivityStates[playerID];
 		var visible = !!debugState;
+		var plannedItem = visible ? FormatBotItemName(debugState.planned_item) : "";
+		var nextPurchaseVisible = plannedItem !== "";
 
 		label.SetHasClass("XHSOverheadBotActivityVisible", visible);
+		label.SetHasClass("XHSOverheadBotNextPurchaseVisible", nextPurchaseVisible);
+		if (nextPurchasePanel && nextPurchaseLabel) {
+			nextPurchaseLabel.text = nextPurchaseVisible ? "NEXT: " + plannedItem : "";
+		}
 		if (!activityPanel || !activityLabel) {
 			return;
 		}
@@ -1342,6 +1406,18 @@ var XHSTopHud = (function () {
 
 		// Bot intent is a separate world-space caption.  It must never become
 		// a child of XHSOverheadBars: doing so changes the health/mana layout.
+		var botNextPurchase = $.CreatePanel("Panel", label, "XHSOverheadBotNextPurchase_" + playerID);
+		botNextPurchase.AddClass("XHSOverheadBotNextPurchase");
+		botNextPurchase.hittest = false;
+
+		var botNextPurchaseNode = $.CreatePanel("Panel", botNextPurchase, "XHSOverheadBotNextPurchaseNode_" + playerID);
+		botNextPurchaseNode.AddClass("XHSOverheadBotNextPurchaseNode");
+		botNextPurchaseNode.hittest = false;
+
+		var botNextPurchaseLabel = $.CreatePanel("Label", botNextPurchase, "XHSOverheadBotNextPurchaseLabel_" + playerID);
+		botNextPurchaseLabel.AddClass("XHSOverheadBotNextPurchaseLabel");
+		botNextPurchaseLabel.hittest = false;
+
 		var botActivity = $.CreatePanel("Panel", label, "XHSOverheadBotActivity_" + playerID);
 		botActivity.AddClass("XHSOverheadBotActivity");
 		botActivity.hittest = false;
@@ -2291,6 +2367,7 @@ var XHSTopHud = (function () {
 		card.SetAttributeInt("player_id", playerID);
 		card.SetAttributeInt("ent_index", -1);
 		card.SetAttributeInt("roster_side", isRightSide ? 1 : 0);
+		card.SetAttributeInt("roster_index", rosterIndex);
 		card.hittest = true;
 
 		var colorStrip = $.CreatePanel("Panel", card, "XHSAllyColorStrip_" + playerID);
@@ -2365,7 +2442,7 @@ var XHSTopHud = (function () {
 		ankhCount.hittest = false;
 
 		card.SetPanelEvent("onactivate", function () {
-			SelectUnitOrCast(card.GetAttributeInt("ent_index", -1));
+			QueueUnitSelectionOrCast(card.GetAttributeInt("ent_index", -1));
 		});
 
 		card.SetPanelEvent("ondblclick", function () {
@@ -2414,9 +2491,44 @@ var XHSTopHud = (function () {
 
 		var unique = {};
 		var normalized = [];
+		var goodGuysTeam = typeof DOTATeam_t !== "undefined" &&
+			DOTATeam_t.DOTA_TEAM_GOODGUYS !== undefined
+			? Number(DOTATeam_t.DOTA_TEAM_GOODGUYS)
+			: 2;
 		for (var i = 0; i < ids.length; i++) {
 			var playerID = parseInt(ids[i], 10);
 			if (isNaN(playerID) || playerID < 0 || unique[playerID]) {
+				continue;
+			}
+
+			var playerInfo = SafeValue(function () {
+				return Game.GetPlayerInfo(playerID);
+			}, null);
+			var playerTeam = SafeValue(function () {
+				return Players.GetTeam(playerID);
+			}, playerInfo ? playerInfo.player_team_id : -1);
+			if ((playerTeam === undefined || playerTeam === null) && playerInfo) {
+				playerTeam = playerInfo.player_team_id;
+			}
+			if (Number(playerTeam) !== goodGuysTeam) {
+				continue;
+			}
+
+			var entIndex = SafeValue(function () {
+				return Players.GetPlayerHeroEntityIndex(playerID);
+			}, -1);
+			var heroName = NormalizeTextValue(SafeValue(function () {
+				return IsValidEntityIndex(entIndex) ? Entities.GetUnitName(entIndex) : "";
+			}, ""));
+			if (!heroName) {
+				heroName = NormalizeTextValue(SafeValue(function () {
+					return Players.GetPlayerSelectedHero(playerID);
+				}, ""));
+			}
+			// Radiant Wisps are real roster occupants during hero selection
+			// (and in spectator bot setups), so they must retain their top-bar
+			// slot until ReplaceHeroWith updates that same player.
+			if (!IsValidEntityIndex(entIndex)) {
 				continue;
 			}
 
@@ -2859,7 +2971,11 @@ var XHSTopHud = (function () {
 		for (var i = 0; i < playerIDs.length; i++) {
 			var playerID = playerIDs[i];
 			var playerInfo = Game.GetPlayerInfo(playerID);
-			var slotIndex = GetFixedRosterSlotIndex(playerID, playerInfo);
+			// The top bar is a compact roster of actual Radiant heroes, not a
+			// mirror of global PlayerIDs. Spectators can own player 0 and receive
+			// a short-lived Wisp placeholder, so pack valid Radiant players from
+			// the first slot instead of preserving that empty global slot.
+			var slotIndex = i;
 			if (slotIndex < 0) {
 				continue;
 			}
@@ -2877,7 +2993,10 @@ var XHSTopHud = (function () {
 			}
 
 			var expectedSide = slotIndex >= 4 ? 1 : 0;
-			if (allyCards[playerID] && allyCards[playerID].GetAttributeInt("roster_side", -1) !== expectedSide) {
+			if (allyCards[playerID] && (
+				allyCards[playerID].GetAttributeInt("roster_side", -1) !== expectedSide ||
+				allyCards[playerID].GetAttributeInt("roster_index", -1) !== slotIndex
+			)) {
 				DeleteAllyCard(playerID);
 			}
 
@@ -2954,7 +3073,7 @@ var XHSTopHud = (function () {
 		name.AddClass("XHSVipName");
 
 		card.SetPanelEvent("onactivate", function () {
-			SelectUnitOrCast(card.GetAttributeInt("ent_index", -1));
+			QueueUnitSelectionOrCast(card.GetAttributeInt("ent_index", -1));
 		});
 
 		card.SetPanelEvent("ondblclick", function () {
@@ -3234,6 +3353,71 @@ var XHSTopHud = (function () {
 		$.Schedule(SLOW_REFRESH_SECONDS, StartSlowRefreshLoop);
 	}
 
+	function LocalizeWavePressure(token, replacements) {
+		var localized = $.Localize(token);
+		if (!localized || localized === token) {
+			localized = token;
+		}
+		for (var key in replacements) {
+			if (replacements.hasOwnProperty(key)) {
+				localized = localized.replace("{" + key + "}", String(replacements[key]));
+			}
+		}
+		return localized;
+	}
+
+	function UpdateWavePressurePanel() {
+		var panel = Panel("XHSWavePressurePanel");
+		if (!panel) {
+			return;
+		}
+
+		var data = CustomNetTables.GetTableValue("xhs_phase_one_spawn_budget", "state") || {};
+		var phaseActive = Number(data.phase_active) > 0;
+		var pressureActive = phaseActive && Number(data.pressure_active) > 0;
+		var activeUnits = Math.max(0, Math.floor(Number(data.active_units) || 0));
+		var softCap = Math.max(1, Math.floor(Number(data.soft_cap) || 100));
+		var hardCap = Math.max(softCap, Math.floor(Number(data.hard_cap) || 125));
+		var spawned = Math.max(0, Math.floor(Number(data.spawned) || 0));
+		var skipped = Math.max(0, Math.floor(Number(data.skipped) || 0));
+		var limited = skipped > 0 || Number(data.limited) > 0;
+		var blocked = limited && spawned <= 0;
+
+		panel.SetHasClass("Active", pressureActive);
+		panel.SetHasClass("Limited", limited);
+		panel.SetHasClass("Critical", activeUnits >= hardCap || blocked);
+
+		var count = Panel("XHSWavePressureCount");
+		var title = Panel("XHSWavePressureTitle");
+		var detail = Panel("XHSWavePressureDetail");
+		var fill = Panel("XHSWavePressureFill");
+		if (count) {
+			count.text = activeUnits + " / " + hardCap;
+		}
+		if (title) {
+			title.text = LocalizeWavePressure(
+				blocked
+					? "#xhs_phase_one_spawn_budget_blocked"
+					: limited
+						? "#xhs_phase_one_spawn_budget_reduced"
+						: "#xhs_phase_one_spawn_budget_rising",
+				{}
+			);
+		}
+		if (detail) {
+			detail.text = LocalizeWavePressure(
+				limited
+					? "#xhs_phase_one_spawn_budget_detail_limited"
+					: "#xhs_phase_one_spawn_budget_detail_normal",
+				{ count: skipped, soft: softCap }
+			);
+		}
+		if (fill) {
+			fill.style.width = Math.min(100, activeUnits / hardCap * 100) + "%";
+		}
+		InvalidateOverheadBlockers();
+	}
+
 	function Initialize() {
 		SubscribeTimerEvents();
 		EnsureTopHudBelowShop();
@@ -3245,8 +3429,10 @@ var XHSTopHud = (function () {
 			RefreshAllyRoster();
 		});
 		CustomNetTables.SubscribeNetTableListener("xhs_bots", OnXHSBotsNetTableChanged);
+		CustomNetTables.SubscribeNetTableListener("xhs_phase_one_spawn_budget", UpdateWavePressurePanel);
 
 		UpdateFocusTimersVisibility();
+		UpdateWavePressurePanel();
 		RefreshBotActivityStates();
 		EnsureAllyRosterSlots();
 		BuildOverheadMockups();
