@@ -40,6 +40,7 @@ var XHSTopHud = (function () {
 	var allyCards = {};
 	var vipCards = {};
 	var overheadLabels = {};
+	var cloneOverheadKeys = {};
 	var botActivityStates = {};
 	var overheadUiBlockerRects = [];
 	var overheadUiBlockerRefreshAt = 0;
@@ -543,9 +544,6 @@ var XHSTopHud = (function () {
 	}
 
 	var recentUnitSelections = {};
-	var queuedUnitSelectionSerial = 0;
-	var queuedUnitSelectionToken = 0;
-	var suppressedUnitSelections = {};
 
 	function SelectUnitWithoutVanillaDoubleCenter(entIndex) {
 		var key = String(entIndex);
@@ -591,44 +589,10 @@ var XHSTopHud = (function () {
 		SelectUnitWithoutVanillaDoubleCenter(entIndex);
 	}
 
-	function QueueUnitSelectionOrCast(entIndex) {
-		if (!IsValidEntityIndex(entIndex)) {
-			return;
-		}
-
-		var key = String(entIndex);
-		if (suppressedUnitSelections[key]) {
-			return;
-		}
-
-		var token = ++queuedUnitSelectionSerial;
-		queuedUnitSelectionToken = token;
-		$.Schedule(0.35, function () {
-			if (queuedUnitSelectionToken !== token || suppressedUnitSelections[key]) {
-				return;
-			}
-			queuedUnitSelectionToken = 0;
-			SelectUnitOrCast(entIndex);
-		});
-	}
-
-	function CancelQueuedUnitSelection(entIndex) {
-		queuedUnitSelectionToken = ++queuedUnitSelectionSerial;
-		var key = String(entIndex);
-		var suppressionToken = queuedUnitSelectionSerial;
-		suppressedUnitSelections[key] = suppressionToken;
-		$.Schedule(0.40, function () {
-			if (suppressedUnitSelections[key] === suppressionToken) {
-				delete suppressedUnitSelections[key];
-			}
-		});
-	}
-
 	function MoveCameraToUnit(entIndex) {
 		if (!IsValidEntityIndex(entIndex)) {
 			return;
 		}
-		CancelQueuedUnitSelection(entIndex);
 		GameEvents.SendCustomGameEventToServer("xhs_camera_focus_entity", {
 			entindex: entIndex,
 		});
@@ -1082,6 +1046,10 @@ var XHSTopHud = (function () {
 		if (state === "SEARCHING_LAST_SEEN" || decision === "move_to_last_seen") {
 			return BotActivity("CHECKING LAST SEEN", "Move");
 		}
+		if ((state === "PATROLLING_ANCIENT" || macroState === "PATROLLING_ANCIENT") &&
+			(decision === "move_to_objective" || decision === "attack_move" || decision === "hold")) {
+			return BotActivity("PATROLLING ANCIENT", "Defense");
+		}
 
 		switch (decision) {
 			case "cast_ability":
@@ -1204,6 +1172,9 @@ var XHSTopHud = (function () {
 		}
 		if (macroState === "DEFENDING_BASE") {
 			return BotActivity("DEFENDING ANCIENT", "Defense");
+		}
+		if (macroState === "PATROLLING_ANCIENT") {
+			return BotActivity("PATROLLING ANCIENT", "Defense");
 		}
 		if (macroState === "DEFENDING_LANE") {
 			return BotActivity("DEFENDING LANE" + laneSuffix, "Defense");
@@ -2013,7 +1984,7 @@ var XHSTopHud = (function () {
 		return overheadLabels[playerID];
 	}
 
-	function SetOverheadAccent(label, playerID, data) {
+	function SetOverheadAccent(label, playerID, data, colorPlayerID) {
 		if (!label) {
 			return;
 		}
@@ -2021,7 +1992,9 @@ var XHSTopHud = (function () {
 		var supporterTier = data ? ToNumber(data.tier, 0) : 0;
 		var supporterColor = data ? NormalizeColorString(data.tierColor) : "";
 		var supporterAccent = supporterTier > 0 && supporterColor ? supporterColor : "#5ad0ff";
-		var playerAccent = GetPlayerColorString(playerID);
+		var playerAccent = GetPlayerColorString(
+			colorPlayerID === undefined || colorPlayerID === null ? playerID : colorPlayerID
+		);
 		var playerGlow = ColorWithAlpha(playerAccent, "88");
 		var supporterGlow = ColorWithAlpha(supporterAccent, "88");
 		var content = label.FindChildTraverse("XHSOverheadContent_" + playerID);
@@ -2160,8 +2133,9 @@ var XHSTopHud = (function () {
 		return data.localHeroName || data.heroDisplayName || FormatUnitNameFallback(data.heroName) || "";
 	}
 
-	function UpdateOverheadLabelData(playerID, entIndex) {
-		var label = EnsureOverheadLabel(playerID);
+	function UpdateOverheadLabelData(playerID, entIndex, labelKey) {
+		var overheadKey = labelKey === undefined || labelKey === null ? playerID : labelKey;
+		var label = EnsureOverheadLabel(overheadKey);
 		if (!label || !IsValidEntityIndex(entIndex)) {
 			return;
 		}
@@ -2169,6 +2143,7 @@ var XHSTopHud = (function () {
 		var data = GetSupporterPlayerData(playerID, entIndex);
 		var displayName = ResolvePlayerIdentity(playerID, entIndex, data);
 
+		label.SetAttributeInt("player_id", playerID);
 		label.SetAttributeInt("ent_index", entIndex);
 		label.SetHasClass("XHSOverheadLocalPlayer", playerID === GetLocalPlayerID());
 		label.SetHasClass("IsDisconnected", !!data.disconnected);
@@ -2176,33 +2151,36 @@ var XHSTopHud = (function () {
 		ClearSupporterTierClasses(label);
 		label.AddClass("XHSSupporterTier" + data.tier);
 		label.AddClass("XHSOverheadFrameTier" + data.tier);
-		SetOverheadAccent(label, playerID, data);
+		SetOverheadAccent(label, overheadKey, data, playerID);
 
 		var tierOverline = FormatOverheadTierOverline(data);
 		label.SetHasClass("XHSOverheadHasTierOverline", tierOverline !== "");
 		label.SetAttributeString("xhs_overhead_hero_label", displayName);
 
-		SetChildText(label, "XHSOverheadName_" + playerID, displayName);
-		SetChildText(label, "XHSOverheadTierOverline_" + playerID, tierOverline);
-		SetChildText(label, "XHSOverheadGameplayStatus_" + playerID, FormatOverheadGameplayStatus(data));
-		SetChildText(label, "XHSOverheadAltStatus_" + playerID, FormatOverheadAltStatus(data));
-		SetChildText(label, "XHSOverheadHealthLevel_" + playerID, Math.max(1, ToNumber(data.heroLevel, 1)).toString());
-		ApplyOverheadStatusEffect(label, playerID, GetOverheadStatusEffect(entIndex));
-		ApplyBotActivityToOverhead(playerID);
+		SetChildText(label, "XHSOverheadName_" + overheadKey, displayName);
+		SetChildText(label, "XHSOverheadTierOverline_" + overheadKey, tierOverline);
+		SetChildText(label, "XHSOverheadGameplayStatus_" + overheadKey, FormatOverheadGameplayStatus(data));
+		SetChildText(label, "XHSOverheadAltStatus_" + overheadKey, FormatOverheadAltStatus(data));
+		SetChildText(label, "XHSOverheadHealthLevel_" + overheadKey, Math.max(1, ToNumber(data.heroLevel, 1)).toString());
+		ApplyOverheadStatusEffect(label, overheadKey, GetOverheadStatusEffect(entIndex));
+		if (overheadKey === playerID) {
+			ApplyBotActivityToOverhead(playerID);
+		}
 
-		var portrait = label.FindChildTraverse("XHSOverheadHeroPortrait_" + playerID);
+		var portrait = label.FindChildTraverse("XHSOverheadHeroPortrait_" + overheadKey);
 		SetOverheadHeroImage(portrait, data.heroName);
 	}
 
-	function UpdateOverheadLabelVitals(playerID, entIndex, healthPercent, manaPercent, health, maxHealth, hasMana) {
-		var label = EnsureOverheadLabel(playerID);
+	function UpdateOverheadLabelVitals(playerID, entIndex, healthPercent, manaPercent, health, maxHealth, hasMana, labelKey) {
+		var overheadKey = labelKey === undefined || labelKey === null ? playerID : labelKey;
+		var label = EnsureOverheadLabel(overheadKey);
 		if (!label || !IsValidEntityIndex(entIndex)) {
 			return;
 		}
 
-		var value = label.FindChildTraverse("XHSOverheadValue_" + playerID);
-		var healthFill = label.FindChildTraverse("XHSOverheadHealthFill_" + playerID);
-		var manaFill = label.FindChildTraverse("XHSOverheadManaFill_" + playerID);
+		var value = label.FindChildTraverse("XHSOverheadValue_" + overheadKey);
+		var healthFill = label.FindChildTraverse("XHSOverheadHealthFill_" + overheadKey);
+		var manaFill = label.FindChildTraverse("XHSOverheadManaFill_" + overheadKey);
 		var clampedHealth = Clamp(ToNumber(healthPercent, 0), 0, 100);
 		var currentHealth = Math.max(0, Math.floor(ToNumber(health, 0)));
 		var currentMaxHealth = Math.max(1, Math.floor(ToNumber(maxHealth, 1)));
@@ -2217,8 +2195,8 @@ var XHSTopHud = (function () {
 		if (healthFill) {
 			healthFill.style.width = clampedHealth + "%";
 		}
-		UpdateOverheadHealthLag(label, playerID, clampedHealth);
-		UpdateOverheadHealthTicks(label, playerID, currentMaxHealth);
+		UpdateOverheadHealthLag(label, overheadKey, clampedHealth);
+		UpdateOverheadHealthTicks(label, overheadKey, currentMaxHealth);
 		if (manaFill) {
 			manaFill.style.width = Clamp(ToNumber(manaPercent, 0), 0, 100) + "%";
 		}
@@ -2228,10 +2206,10 @@ var XHSTopHud = (function () {
 		label.SetHasClass("XHSOverheadLowHealth", clampedHealth > 0 && clampedHealth <= 30);
 		label.SetHasClass("XHSNoMana", !hasMana);
 		label.SetAttributeInt("death_hidden", shouldHideDeadOverhead ? 1 : 0);
-		ApplyOverheadStatusEffect(label, playerID, GetOverheadStatusEffect(entIndex));
+		ApplyOverheadStatusEffect(label, overheadKey, GetOverheadStatusEffect(entIndex));
 
 		if (reincarnationState.active) {
-			SetChildText(label, "XHSOverheadGameplayStatus_" + playerID, FormatReincarnationStatus(reincarnationState));
+			SetChildText(label, "XHSOverheadGameplayStatus_" + overheadKey, FormatReincarnationStatus(reincarnationState));
 		}
 
 		if (shouldHideDeadOverhead) {
@@ -2442,7 +2420,10 @@ var XHSTopHud = (function () {
 		ankhCount.hittest = false;
 
 		card.SetPanelEvent("onactivate", function () {
-			QueueUnitSelectionOrCast(card.GetAttributeInt("ent_index", -1));
+			// Select immediately. SelectUnitWithoutVanillaDoubleCenter already
+			// deduplicates the second activation of a double-click, so delaying
+			// this action only makes single-click selection unreliable.
+			SelectUnitOrCast(card.GetAttributeInt("ent_index", -1));
 		});
 
 		card.SetPanelEvent("ondblclick", function () {
@@ -3073,7 +3054,7 @@ var XHSTopHud = (function () {
 		name.AddClass("XHSVipName");
 
 		card.SetPanelEvent("onactivate", function () {
-			QueueUnitSelectionOrCast(card.GetAttributeInt("ent_index", -1));
+			SelectUnitOrCast(card.GetAttributeInt("ent_index", -1));
 		});
 
 		card.SetPanelEvent("ondblclick", function () {
@@ -3320,8 +3301,89 @@ var XHSTopHud = (function () {
 		$.Schedule(HERO_REFRESH_SECONDS, StartHeroRefreshLoop);
 	}
 
+	function RefreshCloneOverheads() {
+		var state = CustomNetTables.GetTableValue("xhs_clone_units", "state") || {};
+		var clones = state.clones || {};
+		var activeKeys = {};
+
+		for (var cloneID in clones) {
+			if (!clones.hasOwnProperty(cloneID)) {
+				continue;
+			}
+
+			var record = clones[cloneID] || {};
+			var entIndex = parseInt(record.entindex !== undefined ? record.entindex : cloneID, 10);
+			var ownerPlayerID = parseInt(record.owner_player_id, 10);
+			if (!IsValidEntityIndex(entIndex) || isNaN(ownerPlayerID) || ownerPlayerID < 0) {
+				continue;
+			}
+
+			var isAlive = SafeValue(function () {
+				return Entities.IsAlive(entIndex);
+			}, false);
+			if (!isAlive) {
+				continue;
+			}
+
+			// Player IDs are non-negative, so a negative entity-derived key gives
+			// each clone a collision-free copy of the normal XHS overhead frame.
+			var overheadKey = -(entIndex + 1);
+			activeKeys[overheadKey] = true;
+			cloneOverheadKeys[overheadKey] = true;
+
+			UpdateOverheadLabelData(ownerPlayerID, entIndex, overheadKey);
+			var label = overheadLabels[overheadKey];
+			if (!label) {
+				continue;
+			}
+
+			label.AddClass("XHSOverheadClone");
+			var cloneName = LocalizeUnitName(SafeValue(function () {
+				return Entities.GetUnitName(entIndex);
+			}, ""));
+			if (!cloneName) {
+				cloneName = "CLONE";
+			} else {
+				cloneName += " CLONE";
+			}
+			label.SetAttributeString("xhs_overhead_hero_label", cloneName);
+			SetChildText(label, "XHSOverheadName_" + overheadKey, cloneName);
+			SetChildText(label, "XHSOverheadGameplayStatus_" + overheadKey, "CLONE");
+			SetChildText(label, "XHSOverheadAltStatus_" + overheadKey, "CLONE");
+
+			var health = SafeValue(function () { return Entities.GetHealth(entIndex); }, 0);
+			var maxHealth = SafeValue(function () { return Entities.GetMaxHealth(entIndex); }, 1);
+			var healthPercent = SafeValue(function () { return Entities.GetHealthPercent(entIndex); }, 0);
+			var maxMana = SafeValue(function () { return Entities.GetMaxMana(entIndex); }, 0);
+			var hasMana = maxMana > 0;
+			var manaPercent = SafeValue(function () {
+				return hasMana ? 100.0 * Entities.GetMana(entIndex) / maxMana : 0;
+			}, 0);
+
+			UpdateOverheadLabelVitals(
+				ownerPlayerID,
+				entIndex,
+				healthPercent,
+				manaPercent,
+				health,
+				maxHealth,
+				hasMana,
+				overheadKey
+			);
+		}
+
+		for (var staleKey in cloneOverheadKeys) {
+			if (!cloneOverheadKeys.hasOwnProperty(staleKey) || activeKeys[staleKey]) {
+				continue;
+			}
+			ClearOverheadLabel(staleKey);
+			delete cloneOverheadKeys[staleKey];
+		}
+	}
+
 	function StartVitalsRefreshLoop() {
 		RefreshAllyVitals();
+		RefreshCloneOverheads();
 		$.Schedule(VITALS_REFRESH_SECONDS, StartVitalsRefreshLoop);
 	}
 
@@ -3430,9 +3492,11 @@ var XHSTopHud = (function () {
 		});
 		CustomNetTables.SubscribeNetTableListener("xhs_bots", OnXHSBotsNetTableChanged);
 		CustomNetTables.SubscribeNetTableListener("xhs_phase_one_spawn_budget", UpdateWavePressurePanel);
+		CustomNetTables.SubscribeNetTableListener("xhs_clone_units", RefreshCloneOverheads);
 
 		UpdateFocusTimersVisibility();
 		UpdateWavePressurePanel();
+		RefreshCloneOverheads();
 		RefreshBotActivityStates();
 		EnsureAllyRosterSlots();
 		BuildOverheadMockups();

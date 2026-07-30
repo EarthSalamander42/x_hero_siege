@@ -251,6 +251,39 @@ local function FocusAllPlayersOnSpecialArena(point, intro_duration, return_camer
 	})
 end
 
+local function ReturnSpecialArenaAllyCameras(arenaPlayerID)
+	if CameraMotion == nil then return end
+
+	arenaPlayerID = tonumber(arenaPlayerID) or -1
+	for playerID = 0, (DOTA_MAX_TEAM_PLAYERS or 24) - 1 do
+		if playerID ~= arenaPlayerID
+			and PlayerResource:IsValidPlayerID(playerID)
+			and PlayerResource:GetPlayer(playerID) ~= nil
+			and PlayerResource:HasSelectedHero(playerID)
+		then
+			local hero = PlayerResource:GetSelectedHeroEntity(playerID)
+			if hero ~= nil
+				and IsValidEntity(hero)
+				and not hero:IsNull()
+				and hero:GetTeamNumber() == DOTA_TEAM_GOODGUYS
+			then
+				local cameraPlayerID = playerID
+				CameraMotion:Return(playerID, function()
+					return PlayerResource:GetSelectedHeroEntity(cameraPlayerID)
+				end, {
+					duration = SPECIAL_EVENT_CAMERA_RETURN_DURATION,
+					easing = "smootherstep",
+					owner = "special_arena_end",
+					priority = 100,
+					policy = "replace",
+					origin_mode = "provider",
+					release = "free",
+				})
+			end
+		end
+	end
+end
+
 local function DestroyMuradinTeleportParticle(particle)
 	if particle == nil then return end
 	ParticleManager:DestroyParticle(particle, false)
@@ -1521,6 +1554,7 @@ function SpecialEvents:EndRameroAndBaristolEvent(bWin)
 
 	if _G.RAMERO_ARTIFACT_PICKED == true then return end
 
+	local arenaPlayerID = SpecialEvents.active_arena_player_id
 	bWin = bWin == true or (SpecialEvents.RameroDead == true and SpecialEvents.BaristolDead == true)
 	_G.RAMERO_ARTIFACT_PICKED = true
 	SpecialEvents.active_arena_player_id = nil
@@ -1577,7 +1611,7 @@ function SpecialEvents:EndRameroAndBaristolEvent(bWin)
 		BT_ENABLED = 1
 	end, teleport_time)
 
-	SpecialEvents:ReturnFromSpecialArena()
+	SpecialEvents:ReturnFromSpecialArena(arenaPlayerID)
 end
 
 function SpecialEvents:StartSogatEvent(hero)
@@ -1605,7 +1639,7 @@ function SpecialEvents:StartSogatEvent(hero)
 
 	StartSpecialArenaCinematicIntro(hero, point, "xhs_sogat_creep_pause_watch", function()
 		SpecialEvents:SogatEvent(120.0, hero)
-	end)
+	end, false)
 end
 
 function SpecialEvents:SogatEvent(time, hero) -- 500 kills
@@ -1641,6 +1675,7 @@ end
 function SpecialEvents:EndSogatEvent(bWin)
 	-- if _G.SOGAT_ARTIFACT_PICKED == true then return end -- if timer is not removed, uncomment this
 
+	local arenaPlayerID = SpecialEvents.active_arena_player_id
 	_G.SOGAT_ARTIFACT_PICKED = true
 	SpecialEvents.active_arena_player_id = nil
 	if FragmentQuests ~= nil then
@@ -1692,7 +1727,7 @@ function SpecialEvents:EndSogatEvent(bWin)
 		BT_ENABLED = 1
 	end, teleport_time)
 
-	SpecialEvents:ReturnFromSpecialArena()
+	SpecialEvents:ReturnFromSpecialArena(arenaPlayerID)
 end
 
 function SpecialEvents:DuelEvent()
@@ -1881,9 +1916,10 @@ function SpecialEvents:DuelRanked()
 	end)
 end
 
-function SpecialEvents:ReturnFromSpecialArena()
+function SpecialEvents:ReturnFromSpecialArena(arenaPlayerID)
 	CustomTimers.timers_paused = 0
 	CustomGameEventManager:Send_ServerToAllClients("hide_timer_special_arena", {})
+	ReturnSpecialArenaAllyCameras(arenaPlayerID)
 
 	local SpecialArenaCheck = FindUnitsInRadius(DOTA_TEAM_GOODGUYS, Entities:FindByName(nil, "npc_dota_muradin_boss"):GetAbsOrigin(), nil, 2000, DOTA_UNIT_TARGET_TEAM_FRIENDLY, DOTA_UNIT_TARGET_HERO, DOTA_UNIT_TARGET_FLAG_INVULNERABLE, FIND_ANY_ORDER, false)
 	local returnedHero = false

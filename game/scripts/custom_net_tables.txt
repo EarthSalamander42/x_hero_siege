@@ -32,5 +32,6 @@
 		"xhs_lua_modifiers",
 		"xhs_farm_leaderboard",
 		"xhs_castle_bar",
+		"xhs_clone_units",
 	]
 }

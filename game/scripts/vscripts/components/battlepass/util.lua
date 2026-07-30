@@ -772,6 +772,14 @@ function Battlepass:GetSupporterPlayerID(subject)
 end
 
 function Battlepass:GetPlayerParticle(subject, key, fallback)
+	-- Seasonal level-up replacements are unsafe for XHS tome bursts. In
+	-- particular, the golden star-trail variants can keep emitting and stack
+	-- into a severe client-side performance leak. Level-up feedback is now a
+	-- deliberately small, finite vanilla burst for every player.
+	if key == "levelup_pfx" then
+		return "particles/generic_hero_status/hero_levelup.vpcf"
+	end
+
 	local playerID = self:GetSupporterPlayerID(subject)
 	if playerID == nil then return fallback end
 
@@ -1266,7 +1274,7 @@ function Battlepass:ApplySupporterDevTestItem(playerID, state, hero, reapply)
 		)
 		local particle = ParticleManager:CreateParticle(particlePath, PATTACH_ABSORIGIN_FOLLOW, hero)
 		ParticleManager:SetParticleControl(particle, 0, hero:GetAbsOrigin())
-		XHSDestroyParticleAfter(particle, 5.0, false)
+		XHSDestroyParticleAfter(particle, 1.5, false)
 		hero:EmitSound("ui.trophy_levelup")
 		return true
 	elseif slot == "kill_effect" then

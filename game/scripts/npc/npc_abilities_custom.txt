@@ -6431,8 +6431,8 @@
 		"AbilityValues"
 		{
 			"radius"					"250 325 400 475"
-			"cleave_pct"				"50"
-			"bonus_damage"				"125 300 550 800"
+			"cleave_pct"				"40"
+			"bonus_damage"				"125 300 500 800"
 		}
 
 		"Modifiers"

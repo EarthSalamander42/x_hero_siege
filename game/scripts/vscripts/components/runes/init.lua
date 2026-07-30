@@ -945,7 +945,7 @@ function Runes:PlayHeroRuneEffect(hero, category, playSound)
 		or "particles/generic_hero_status/hero_levelup.vpcf"
 	local particle = ParticleManager:CreateParticle(levelupParticle, PATTACH_ABSORIGIN_FOLLOW, hero)
 	ParticleManager:SetParticleControl(particle, 0, hero:GetAbsOrigin())
-	XHSDestroyParticleAfter(particle, 5.0, false)
+	XHSDestroyParticleAfter(particle, 1.5, false)
 	if playSound == true then
 		self:PlayRunePickupSound(hero)
 	end

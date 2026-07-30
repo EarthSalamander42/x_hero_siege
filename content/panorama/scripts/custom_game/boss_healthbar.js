@@ -2,8 +2,10 @@
 
 var BossBarState = {};
 var BossBarIdentity = {};
+var RetiredBossBarIdentity = {};
 var BossCastState = {};
 var MAX_BOSS_BARS = 4;
+var BOSS_BAR_RETIRE_SECONDS = 3.0;
 var DEFAULT_BOSS_FILL_BACKGROUND = "gradient( linear, 0% 0%, 100% 0%, from( #2a0610 ), color-stop( 0.55, #c72542 ), to( #f5fff7 ) )";
 
 function GetBossPanels(index) {
@@ -101,10 +103,39 @@ function GetBossBarIdentity(args) {
 	return String(args.boss_bar_id);
 }
 
+function GetBossBarIdentityTime() {
+	return typeof Game !== "undefined" && Game.GetGameTime ? Game.GetGameTime() : Date.now() / 1000;
+}
+
+function RetireBossBarIdentity(identity) {
+	if (!identity || identity.indexOf("slot_") === 0) {
+		return;
+	}
+
+	RetiredBossBarIdentity[identity] = GetBossBarIdentityTime() + BOSS_BAR_RETIRE_SECONDS;
+}
+
+function IsBossBarIdentityRetired(identity) {
+	if (!identity || RetiredBossBarIdentity[identity] === undefined) {
+		return false;
+	}
+
+	if (RetiredBossBarIdentity[identity] <= GetBossBarIdentityTime()) {
+		delete RetiredBossBarIdentity[identity];
+		return false;
+	}
+
+	return true;
+}
+
 function ShouldAcceptBossBarEvent(index, args) {
 	var identity = GetBossBarIdentity(args);
 	if (!identity) {
 		return true;
+	}
+
+	if (IsBossBarIdentityRetired(identity)) {
+		return false;
 	}
 
 	if (!BossBarIdentity[index]) {
@@ -487,6 +518,11 @@ function SetBossBarMarkers(panels, markers) {
 
 function ShowBossBar(args) {
 	if (args.boss_count) {
+		var identity = GetBossBarIdentity(args);
+		if (IsBossBarIdentityRetired(identity)) {
+			return;
+		}
+
 		var index = GetBossBarIndex(args);
 		var panels = GetBossPanels(index);
 		var health = Number(args.boss_health) || 0;
@@ -496,6 +532,9 @@ function ShowBossBar(args) {
 			return;
 		}
 
+		if (BossBarIdentity[index] && BossBarIdentity[index] !== identity) {
+			RetireBossBarIdentity(BossBarIdentity[index]);
+		}
 		ResetBossPanels(index, panels);
 		SetBossBarIdentity(index, args);
 		SetBossIcon(panels, args.boss_icon);
@@ -558,6 +597,10 @@ function HideBossBar(args) {
 			return;
 		}
 
+		if (Number(args.boss_bar_retire) === 1) {
+			var hiddenIdentity = GetBossBarIdentity(args) || BossBarIdentity[index];
+			RetireBossBarIdentity(hiddenIdentity);
+		}
 		ResetBossPanels(index, panels);
 		UpdateBossBarLayout();
 	}

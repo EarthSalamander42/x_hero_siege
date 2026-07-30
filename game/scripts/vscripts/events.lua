@@ -374,6 +374,9 @@ ListenToGameEvent('npc_spawned', function(keys)
 		if npc:IsRealHero() and npc:GetTeamNumber() == DOTA_TEAM_GOODGUYS then
 			if npc.bFirstSpawnComplete == nil then
 				npc:AddNewModifier(npc, nil, "modifier_custom_mechanics", {})
+				if npc:GetUnitName() == "npc_dota_hero_rattletrap" then
+					npc:AddNewModifier(npc, nil, "modifier_xhs_space_marine_attack_sound", {})
+				end
 
 				if npc:IsFakeHero() and AbilitiesHeroes_XX[npc:GetUnitName()] then
 					npc:AddAbility("ability_level_20"):SetLevel(1)

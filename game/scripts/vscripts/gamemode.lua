@@ -8,6 +8,7 @@ require('constants') -- in cause?
 require('components/creep_passives/init')
 require('components/creep_ai_director/init')
 require('components/creep_order_ownership/init')
+require('components/wave_stager/init')
 
 require('libraries/notifications')
 require('libraries/animations')
@@ -403,6 +404,10 @@ function GameMode:InitGameMode()
 
 	if XHSCreepAIDirector ~= nil then
 		XHSCreepAIDirector:Init()
+	end
+
+	if XHSWaveStager ~= nil then
+		XHSWaveStager:Init()
 	end
 
 	if XHSPerformanceTelemetry ~= nil then

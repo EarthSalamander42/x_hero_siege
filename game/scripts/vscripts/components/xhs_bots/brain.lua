@@ -437,6 +437,7 @@ function XHSBotBrain:SelectTarget(playerID, hero, profile, record, assignment, d
 	local now = GameRules:GetGameTime()
 	local committed = EntityFromIndex(record.target_entindex)
 	if self:IsCombatTarget(committed)
+		and committed:GetTeamNumber() ~= hero:GetTeamNumber()
 		and now < (record.target_committed_until or 0)
 		and self:IsTeamVisible(hero, committed)
 		and self:IsTargetAllowedByAssignment(playerID, hero, committed, assignment, difficulty) then
@@ -447,6 +448,7 @@ function XHSBotBrain:SelectTarget(playerID, hero, profile, record, assignment, d
 	if assignment ~= nil and assignment.target_entindex ~= nil then
 		local assignedTarget = EntityFromIndex(assignment.target_entindex)
 		if self:IsCombatTarget(assignedTarget)
+			and assignedTarget:GetTeamNumber() ~= hero:GetTeamNumber()
 			and self:IsTeamVisible(hero, assignedTarget)
 			and self:IsTargetAllowedByAssignment(playerID, hero, assignedTarget, assignment, difficulty) then
 			self:RememberVisibleTarget(record, assignedTarget, difficulty, now)
@@ -2252,7 +2254,15 @@ function XHSBotBrain:GetRepositionPosition(
 	local away = hero:GetAbsOrigin() - target:GetAbsOrigin()
 	away.z = 0
 	if away:Length2D() <= 1 then away = RandomVector(1) end
-	local position = hero:GetAbsOrigin() + away:Normalized() * math.max(220, profile.safety_distance)
+	-- Reposition is a short combat step, not a replacement for attacking. The
+	-- former full safety-distance stride let equal-speed creeps chase a ranged
+	-- hero forever while every new think selected another retreating move.
+	local repositionStep = math.max(
+		220,
+		math.min(420, tonumber(profile.safety_distance) or 300)
+	)
+	local position =
+		hero:GetAbsOrigin() + away:Normalized() * repositionStep
 
 	if anchor ~= nil and Distance2D(position, anchor) > 2200 then
 		position = PositionToward(position, anchor, 300)
@@ -2624,6 +2634,25 @@ function XHSBotBrain:BuildContext(playerID, hero, profile, difficulty, record, a
 		record.rune_target_type = nil
 		record.rune_target_distance = nil
 	end
+	local repositionThreshold = math.max(
+		180,
+		math.min(
+			420,
+			(tonumber(profile.safety_distance) or 300) * 0.68
+		)
+	)
+	local repositionDanger = targetDistance ~= nil
+		and (
+			targetDistance <= 190
+			or threat.focused_by >= 1
+			or threat.close_enemies >= 2
+			or threat.score >= 0.45
+		)
+	local repositionReady =
+		now >= (tonumber(record.next_reposition_at) or 0)
+	record.reposition_threshold = math.floor(repositionThreshold)
+	record.reposition_ready = repositionReady
+	record.reposition_danger = repositionDanger == true
 	return {
 		alive = hero:IsAlive(),
 		disabled = hero:IsStunned()
@@ -2674,7 +2703,9 @@ function XHSBotBrain:BuildContext(playerID, hero, profile, difficulty, record, a
 		too_close = (encounter == nil or encounter.no_reposition ~= true)
 			and not lastStand and targetDistance ~= nil
 			and profile.preferred_range >= 450
-			and targetDistance < profile.safety_distance,
+			and targetDistance < repositionThreshold
+			and repositionDanger
+			and repositionReady,
 		reposition_position = self:GetRepositionPosition(
 			hero,
 			target,
@@ -2744,6 +2775,9 @@ function XHSBotBrain:MacroState(assignment, encounter)
 			return encounterStates[encounter.id]
 		end
 	end
+	if assignment ~= nil and assignment.ancient_patrol == true then
+		return "PATROLLING_ANCIENT"
+	end
 	local goal = assignment and assignment.goal or "regroup"
 	if goal == "defend_lane" and assignment.returning_to_lane == true then
 		return "RETURNING_TO_LANE"
@@ -2780,6 +2814,14 @@ function XHSBotBrain:ActionState(action, assignment, target, encounter)
 	end
 	if action.id == "break_crate" then return "BREAKING_CRATE" end
 	if action.id == "pickup_loot" then return "PICKING_UP_LOOT" end
+	if assignment ~= nil and assignment.ancient_patrol == true
+		and (
+			action.id == "move_to_objective"
+			or action.id == "attack_move"
+			or action.id == "hold"
+		) then
+		return "PATROLLING_ANCIENT"
+	end
 	local states = {
 		dead = "DEAD",
 		wait = "DISABLED",
@@ -2968,6 +3010,12 @@ function XHSBotBrain:Think(playerID, hero, record, assignment, difficulty)
 		record.state = record.planned_state
 		record.last_decision = best.id
 		record.last_decision_reason = best.reason
+		if best.id == "reposition" then
+			-- Guarantee an attack/cast opportunity after every kite step. This
+			-- hysteresis prevents Archmage and other ranged bots from spending
+			-- an entire engagement in REPOSITIONING.
+			record.next_reposition_at = now + 1.10
+		end
 		record.rune_committed = best.data ~= nil
 			and best.data.objective == "rune"
 		if best.id == "hold" then

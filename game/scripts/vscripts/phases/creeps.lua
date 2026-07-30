@@ -487,177 +487,383 @@ function ReissueWaveCreepOrders(delay)
 	end)
 end
 
-function SpawnCreeps(force)
-	if force ~= true and XHSDevTools ~= nil and XHSDevTools:IsSandboxActive() then return end
+local PHASE_ONE_STAGE_JOB = "phase_one_next_wave"
+local PHASE_ONE_STAGE_OWNER = "phase_one"
+local PHASE_ONE_STAGE_WINDOW = 20
 
-	local waveLevel = math.max(1, math.min(4, tonumber(CustomTimers and CustomTimers.creep_level) or 1))
-	if GameMode.phase_one_scaling_level ~= waveLevel then
-		GameMode.phase_one_scaling_level = waveLevel
-		GameMode.phase_one_scaling_wave = 0
-	end
-
-	local wavesPerLevel = math.max(2, math.floor(XHS_CREEPS_UPGRADE_INTERVAL / XHS_CREEPS_INTERVAL) + 1)
-	local waveIndex = math.max(0, tonumber(GameMode.phase_one_scaling_wave) or 0)
-	local waveProgress = math.min(1, waveIndex / (wavesPerLevel - 1))
-	GameMode.phase_one_scaling_progress = waveProgress
-
-	if GameMode.creep_roll["race"] < 4 then
-		GameMode.creep_roll["race"] = GameMode.creep_roll["race"] + 1
-	else
-		GameMode.creep_roll["race"] = 1
-	end
-
-	local melee_1 = {
+local PHASE_ONE_MELEE_BY_LEVEL = {
+	{
 		"npc_xhs_undead_creep_melee_1",
 		"npc_xhs_orc_creep_melee_1",
 		"npc_xhs_elf_creep_melee_1",
-		"npc_xhs_human_creep_melee_1"
-	}
-
-	local ranged_1 = {
-		"npc_xhs_undead_creep_ranged_1",
-		"npc_xhs_orc_creep_ranged_1",
-		"npc_xhs_elf_creep_ranged_1",
-		"npc_xhs_human_creep_ranged_1"
-	}
-
-	local melee_2 = {
+		"npc_xhs_human_creep_melee_1",
+	},
+	{
 		"npc_xhs_undead_creep_melee_2",
 		"npc_xhs_orc_creep_melee_2",
 		"npc_xhs_elf_creep_melee_2",
-		"npc_xhs_human_creep_melee_2"
-	}
-
-	local ranged_2 = {
-		"npc_xhs_undead_creep_ranged_2",
-		"npc_xhs_orc_creep_ranged_2",
-		"npc_xhs_elf_creep_ranged_2",
-		"npc_xhs_human_creep_ranged_2"
-	}
-
-	local melee_3 = {
+		"npc_xhs_human_creep_melee_2",
+	},
+	{
 		"npc_xhs_undead_creep_melee_3",
 		"npc_xhs_orc_creep_melee_3",
 		"npc_xhs_elf_creep_melee_3",
-		"npc_xhs_human_creep_melee_3"
-	}
-
-	local ranged_3 = {
-		"npc_xhs_undead_creep_ranged_3",
-		"npc_xhs_orc_creep_ranged_3",
-		"npc_xhs_elf_creep_ranged_3",
-		"npc_xhs_human_creep_ranged_3"
-	}
-
-	local melee_4 = {
+		"npc_xhs_human_creep_melee_3",
+	},
+	{
 		"npc_xhs_undead_creep_melee_4",
 		"npc_xhs_orc_creep_melee_4",
 		"npc_xhs_elf_creep_melee_4",
-		"npc_xhs_human_creep_melee_4"
-	}
+		"npc_xhs_human_creep_melee_4",
+	},
+}
 
-	local ranged_4 = {
+local PHASE_ONE_RANGED_BY_LEVEL = {
+	{
+		"npc_xhs_undead_creep_ranged_1",
+		"npc_xhs_orc_creep_ranged_1",
+		"npc_xhs_elf_creep_ranged_1",
+		"npc_xhs_human_creep_ranged_1",
+	},
+	{
+		"npc_xhs_undead_creep_ranged_2",
+		"npc_xhs_orc_creep_ranged_2",
+		"npc_xhs_elf_creep_ranged_2",
+		"npc_xhs_human_creep_ranged_2",
+	},
+	{
+		"npc_xhs_undead_creep_ranged_3",
+		"npc_xhs_orc_creep_ranged_3",
+		"npc_xhs_elf_creep_ranged_3",
+		"npc_xhs_human_creep_ranged_3",
+	},
+	{
 		"npc_xhs_undead_creep_ranged_4",
 		"npc_xhs_orc_creep_ranged_4",
 		"npc_xhs_elf_creep_ranged_4",
-		"npc_xhs_human_creep_ranged_4"
+		"npc_xhs_human_creep_ranged_4",
+	},
+}
+
+local function GetNextPhaseOneRace()
+	local current = tonumber(GameMode.creep_roll and GameMode.creep_roll.race) or 0
+	return current < 4 and current + 1 or 1
+end
+
+local function GetPlannedPhaseOneLevel(releaseDelay)
+	local level = math.max(
+		1,
+		math.min(4, tonumber(CustomTimers and CustomTimers.creep_level) or 1)
+	)
+	local remaining = tonumber(
+		CustomTimers
+			and CustomTimers.current_time
+			and CustomTimers.current_time.creep_level
+	) or math.huge
+	if (tonumber(releaseDelay) or 0) > 0
+		and level < 4
+		and remaining > 0
+		and remaining <= (tonumber(releaseDelay) or 0) then
+		level = level + 1
+	end
+	return level
+end
+
+local function GetLaneWaveCapacity(lane)
+	local meleeCount = 4
+	local rangedCount = 2
+	if CREEP_LANES_TYPE == 2 then
+		if lane % 2 == 1 then
+			rangedCount = 0
+		else
+			meleeCount = 0
+		end
+	end
+	return meleeCount, rangedCount
+end
+
+local function IsPhaseOneLaneActive(lane, point)
+	return point ~= nil
+		and point.disabled ~= true
+		and CREEP_LANES[lane] ~= nil
+		and CREEP_LANES[lane][1] == 1
+		and CREEP_LANES[lane][3] == 1
+end
+
+local function BuildPhaseOneWavePlan(releaseDelay)
+	local waveLevel = GetPlannedPhaseOneLevel(releaseDelay)
+	local scalingLevel = tonumber(GameMode.phase_one_scaling_level)
+	local waveIndex = scalingLevel == waveLevel
+		and math.max(0, tonumber(GameMode.phase_one_scaling_wave) or 0)
+		or 0
+	local wavesPerLevel = math.max(
+		2,
+		math.floor(XHS_CREEPS_UPGRADE_INTERVAL / XHS_CREEPS_INTERVAL) + 1
+	)
+	local waveProgress = math.min(1, waveIndex / (wavesPerLevel - 1))
+	local race = GetNextPhaseOneRace()
+	local plan = {
+		wave_level = waveLevel,
+		wave_index = waveIndex,
+		wave_progress = waveProgress,
+		race = race,
+		lane_plans = {},
+		lane_set = {},
+		descriptors = {},
+		planned_units = 0,
 	}
 
-	local meleeByLevel = { melee_1, melee_2, melee_3, melee_4 }
-	local rangedByLevel = { ranged_1, ranged_2, ranged_3, ranged_4 }
-	local lanePlans = {}
-	local plannedUnits = 0
+	for lane = 1, 8 do
+		local point = Entities:FindByName(nil, "npc_dota_spawner_" .. lane)
+		local waypoint = Entities:FindByName(nil, "creep_path_" .. lane)
+		if IsPhaseOneLaneActive(lane, point) then
+			local meleeCount, rangedCount = GetLaneWaveCapacity(lane)
+			local laneLevel = math.max(
+				waveLevel,
+				math.max(1, math.min(4, tonumber(CREEP_LANES[lane][2]) or waveLevel))
+			)
+			local lanePlan = {
+				lane = lane,
+				point = point,
+				waypoint = waypoint,
+				level = laneLevel,
+				melee_count = meleeCount,
+				ranged_count = rangedCount,
+				capacity = meleeCount + rangedCount,
+				descriptor_indices = {},
+			}
+			table.insert(plan.lane_plans, lanePlan)
+			plan.lane_set[lane] = true
+			plan.planned_units = plan.planned_units + lanePlan.capacity
 
-	for c = 1, 8 do
-		local point = Entities:FindByName(nil, "npc_dota_spawner_" .. c)
-		local waypoint = Entities:FindByName(nil, "creep_path_" .. c)
-
-		if point ~= nil and not point.disabled then
-			if CREEP_LANES[c][1] == 1 then -- Lane Activated?
-				if CREEP_LANES[c][3] == 1 then -- Barrack Alive?
-					local meleeCount = 4
-					local rangedCount = 2
-
-					-- The 4-player map keeps two visual lanes per player: the first
-					-- lane carries melee creeps and the second carries ranged creeps.
-					if CREEP_LANES_TYPE == 2 then
-						if c % 2 == 1 then
-							rangedCount = 0
-						else
-							meleeCount = 0
-						end
-					end
-
-					local laneLevel = math.max(1, math.min(4, tonumber(CREEP_LANES[c][2]) or waveLevel))
-					local capacity = meleeCount + rangedCount
-					table.insert(lanePlans, {
-						lane = c,
+			local function AddDescriptors(kind, count)
+				for ordinal = 1, count do
+					local names = kind == "melee"
+						and PHASE_ONE_MELEE_BY_LEVEL
+						or PHASE_ONE_RANGED_BY_LEVEL
+					local descriptor = {
+						unit_name = names[laneLevel][race],
+						team = DOTA_TEAM_CUSTOM_1,
+						spawn_position = point:GetAbsOrigin(),
+						lane = lane,
+						kind = kind,
+						ordinal = ordinal,
+						level = laneLevel,
+						wave_progress = waveProgress,
 						point = point,
 						waypoint = waypoint,
-						level = laneLevel,
-						melee_count = meleeCount,
-						ranged_count = rangedCount,
-						capacity = capacity,
-					})
-					plannedUnits = plannedUnits + capacity
+					}
+					table.insert(plan.descriptors, descriptor)
+					table.insert(lanePlan.descriptor_indices, #plan.descriptors)
 				end
 			end
-		else
-			print("Barracks: Spawner " .. c .. " disabled.")
+			AddDescriptors("melee", meleeCount)
+			AddDescriptors("ranged", rangedCount)
+		end
+	end
+	return plan
+end
+
+local function IsPhaseOnePlanCurrent(plan)
+	if plan == nil
+		or CustomTimers == nil
+		or CustomTimers.game_phase ~= 1
+		or plan.race ~= GetNextPhaseOneRace()
+		or plan.wave_level ~= GetPlannedPhaseOneLevel(0) then
+		return false
+	end
+	for lane = 1, 8 do
+		local point = Entities:FindByName(nil, "npc_dota_spawner_" .. lane)
+		if IsPhaseOneLaneActive(lane, point)
+			and plan.lane_set[lane] ~= true then
+			return false
+		end
+	end
+	for _, descriptor in ipairs(plan.descriptors) do
+		local lane = descriptor.lane
+		if IsPhaseOneLaneActive(lane, descriptor.point) then
+			local expectedLevel = math.max(
+				plan.wave_level,
+				math.max(1, math.min(4, tonumber(CREEP_LANES[lane][2]) or 1))
+			)
+			if descriptor.level ~= expectedLevel then return false end
+		end
+	end
+	return true
+end
+
+local function GetPhaseOneReleaseSelection(plan)
+	local activeLanePlans = {}
+	local plannedUnits = 0
+	for _, lanePlan in ipairs(plan.lane_plans) do
+		if IsPhaseOneLaneActive(lanePlan.lane, lanePlan.point) then
+			table.insert(activeLanePlans, lanePlan)
+			plannedUnits = plannedUnits + lanePlan.capacity
 		end
 	end
 
-	local allowance = CalculatePhaseOneWaveAllowance(plannedUnits)
-	local quotas = BuildFairLaneQuotas(lanePlans, allowance)
-	local spawnedUnits = 0
-	local race = GameMode.creep_roll["race"]
-
-	for _, plan in ipairs(lanePlans) do
-		local quota = math.max(0, math.min(plan.capacity, quotas[plan.lane] or 0))
-		local meleeToSpawn = 0
-		local rangedToSpawn = 0
-
-		if plan.ranged_count <= 0 then
-			meleeToSpawn = math.min(plan.melee_count, quota)
-		elseif plan.melee_count <= 0 then
-			rangedToSpawn = math.min(plan.ranged_count, quota)
+	local allowance, activeUnits = CalculatePhaseOneWaveAllowance(plannedUnits)
+	if XHSWaveStager ~= nil then
+		local otherStaged = math.max(
+			0,
+			XHSWaveStager:GetStagedCount()
+				- XHSWaveStager:GetStagedCount(PHASE_ONE_STAGE_OWNER)
+		)
+		allowance = math.min(
+			allowance,
+			math.max(0, PHASE_ONE_SPAWN_HARD_CAP - activeUnits - otherStaged)
+		)
+	end
+	local quotas = BuildFairLaneQuotas(activeLanePlans, allowance)
+	local selected = {}
+	for _, lanePlan in ipairs(activeLanePlans) do
+		local quota = math.max(
+			0,
+			math.min(lanePlan.capacity, quotas[lanePlan.lane] or 0)
+		)
+		local meleeToRelease = 0
+		local rangedToRelease = 0
+		if lanePlan.ranged_count <= 0 then
+			meleeToRelease = math.min(lanePlan.melee_count, quota)
+		elseif lanePlan.melee_count <= 0 then
+			rangedToRelease = math.min(lanePlan.ranged_count, quota)
 		else
-			meleeToSpawn = math.min(plan.melee_count, math.ceil(quota * 2 / 3))
-			rangedToSpawn = math.min(plan.ranged_count, quota - meleeToSpawn)
-			while meleeToSpawn + rangedToSpawn < quota and meleeToSpawn < plan.melee_count do
-				meleeToSpawn = meleeToSpawn + 1
+			meleeToRelease = math.min(
+				lanePlan.melee_count,
+				math.ceil(quota * 2 / 3)
+			)
+			rangedToRelease = math.min(
+				lanePlan.ranged_count,
+				quota - meleeToRelease
+			)
+			while meleeToRelease + rangedToRelease < quota
+				and meleeToRelease < lanePlan.melee_count do
+				meleeToRelease = meleeToRelease + 1
 			end
-			while meleeToSpawn + rangedToSpawn < quota and rangedToSpawn < plan.ranged_count do
-				rangedToSpawn = rangedToSpawn + 1
+			while meleeToRelease + rangedToRelease < quota
+				and rangedToRelease < lanePlan.ranged_count do
+				rangedToRelease = rangedToRelease + 1
 			end
 		end
 
-		for _ = 1, meleeToSpawn do
-			if SpawnWaveCreep(
-				meleeByLevel[plan.level][race],
-				plan.point,
-				plan.waypoint,
-				plan.level,
-				waveProgress
-			) ~= nil then
-				spawnedUnits = spawnedUnits + 1
-			end
-		end
-		for _ = 1, rangedToSpawn do
-			if SpawnWaveCreep(
-				rangedByLevel[plan.level][race],
-				plan.point,
-				plan.waypoint,
-				plan.level,
-				waveProgress
-			) ~= nil then
-				spawnedUnits = spawnedUnits + 1
+		for _, descriptorIndex in ipairs(lanePlan.descriptor_indices) do
+			local descriptor = plan.descriptors[descriptorIndex]
+			if (
+				descriptor.kind == "melee"
+					and descriptor.ordinal <= meleeToRelease
+			) or (
+				descriptor.kind == "ranged"
+					and descriptor.ordinal <= rangedToRelease
+			) then
+				selected[descriptorIndex] = true
 			end
 		end
 	end
+	return selected, plannedUnits
+end
 
-	RecordPhaseOneWaveBudget(plannedUnits, spawnedUnits, waveIndex + 1)
-	GameMode.phase_one_scaling_wave = waveIndex + 1
+local function CommitPhaseOnePlan(plan)
+	GameMode.creep_roll.race = plan.race
+	GameMode.phase_one_scaling_level = plan.wave_level
+	GameMode.phase_one_scaling_progress = plan.wave_progress
+end
+
+local function SpawnPhaseOnePlanImmediately(plan)
+	local selected, plannedUnits = GetPhaseOneReleaseSelection(plan)
+	CommitPhaseOnePlan(plan)
+	local spawned = 0
+	for index, descriptor in ipairs(plan.descriptors) do
+		if selected[index] == true then
+			local unit = SpawnWaveCreep(
+				descriptor.unit_name,
+				descriptor.point,
+				descriptor.waypoint,
+				descriptor.level,
+				descriptor.wave_progress
+			)
+			if unit ~= nil then spawned = spawned + 1 end
+		end
+	end
+	RecordPhaseOneWaveBudget(plannedUnits, spawned, plan.wave_index + 1)
+	GameMode.phase_one_scaling_wave = plan.wave_index + 1
+	return spawned
+end
+
+local function PrepareNextPhaseOneWave()
+	if XHSWaveStager == nil
+		or CustomTimers == nil
+		or CustomTimers.game_phase ~= 1 then
+		return false
+	end
+	local plan = BuildPhaseOneWavePlan(PHASE_ONE_STAGE_WINDOW)
+	GameMode.phase_one_staged_plan = plan
+	XHSWaveStager:StartJob(PHASE_ONE_STAGE_JOB, plan.descriptors, {
+		owner = PHASE_ONE_STAGE_OWNER,
+		window = PHASE_ONE_STAGE_WINDOW,
+		wake_spread = 0.25,
+		is_valid = function()
+			return CustomTimers ~= nil
+				and CustomTimers.game_phase == 1
+				and CustomTimers.proc_final_wave ~= true
+		end,
+		can_stage = function()
+			return CountPhaseOneBudgetEnemies()
+				+ XHSWaveStager:GetStagedCount() < PHASE_ONE_SPAWN_HARD_CAP
+		end,
+		configure = function(_, unit, descriptor)
+			ApplyPhaseOneWaveScaling(
+				unit,
+				descriptor.level,
+				descriptor.wave_progress
+			)
+		end,
+		activate = function(_, unit, descriptor)
+			RegisterPhaseOneBudgetEnemy(unit)
+			OrderWaveCreep(unit, descriptor.waypoint)
+		end,
+	})
+	return true
+end
+
+local function ReleasePreparedPhaseOneWave()
+	local plan = GameMode.phase_one_staged_plan
+	local job = XHSWaveStager ~= nil
+		and XHSWaveStager:GetJob(PHASE_ONE_STAGE_JOB)
+		or nil
+	if job == nil or not IsPhaseOnePlanCurrent(plan) then
+		if XHSWaveStager ~= nil then
+			XHSWaveStager:CancelJob(PHASE_ONE_STAGE_JOB, "phase_one_plan_changed")
+		end
+		GameMode.phase_one_staged_plan = nil
+		return nil
+	end
+
+	local selected, plannedUnits = GetPhaseOneReleaseSelection(plan)
+	CommitPhaseOnePlan(plan)
+	local released = XHSWaveStager:ActivateJob(PHASE_ONE_STAGE_JOB, {
+		should_release = function(_, _, index)
+			return selected[index] == true
+		end,
+	})
+	GameMode.phase_one_staged_plan = nil
+	RecordPhaseOneWaveBudget(plannedUnits, released, plan.wave_index + 1)
+	GameMode.phase_one_scaling_wave = plan.wave_index + 1
+	return released
+end
+
+function SpawnCreeps(force)
+	if force ~= true
+		and XHSDevTools ~= nil
+		and XHSDevTools:IsSandboxActive() then
+		return
+	end
+
+	local spawned = ReleasePreparedPhaseOneWave()
+	if spawned == nil then
+		spawned = SpawnPhaseOnePlanImmediately(BuildPhaseOneWavePlan(0))
+	end
+	PrepareNextPhaseOneWave()
+	return spawned
 end
 
 function CreepLevels(level)

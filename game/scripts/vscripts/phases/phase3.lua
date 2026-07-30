@@ -95,6 +95,7 @@ local function FaceUnitTowardsPosition(unit, position)
 end
 
 local PHASE3_BOSS_CINEMATIC_DURATION = 3.5
+local BANEHALLOW_CINEMATIC_DURATION = PHASE3_BOSS_CINEMATIC_DURATION * 2
 local PHASE3_BOSS_PREP_DURATION = 2.5
 local PHASE3_BOSS_CAMERA_MOVE_DURATION = 0.20
 
@@ -156,7 +157,10 @@ local function SpawnBanehallowRevenant(spawnerName, banehallow, pauseDuration)
 	local revenant = CreateUnitByName("npc_death_revenant_banehallow", spawner:GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_2)
 	local targetPosition = banehallow ~= nil and not banehallow:IsNull() and banehallow:GetAbsOrigin() or nil
 	FaceUnitTowardsPosition(revenant, targetPosition)
-	revenant:AddNewModifier(revenant, nil, "modifier_pause_creeps", { duration = pauseDuration, IsHidden = true })
+	local pauseModifier = revenant:AddNewModifier(revenant, nil, "modifier_pause_creeps", { duration = pauseDuration, IsHidden = true })
+	if pauseModifier ~= nil then
+		pauseModifier:SetStackCount(1)
+	end
 	revenant:AddNewModifier(revenant, nil, "modifier_invulnerable", { duration = pauseDuration, IsHidden = true }):SetStackCount(1)
 	revenant:SetRenderColor(20, 200, 20)
 	RegisterXHSDevSpawn(revenant)
@@ -696,7 +700,13 @@ function StartBanehallowArena()
 		banehallow.zone = "xhs_holdout"
 		ApplyLatePhase3BossDefenseScaling(banehallow)
 		RegisterXHSDevSpawn(banehallow)
-		PlayPhase3BossSpawnCinematic(banehallow, "xhs_boss_spawn_banehallow", "BANEHALLOW", "THE NIGHT HUNGERS")
+		PlayPhase3BossSpawnCinematic(
+			banehallow,
+			"xhs_boss_spawn_banehallow",
+			"BANEHALLOW",
+			"THE NIGHT HUNGERS",
+			BANEHALLOW_CINEMATIC_DURATION
+		)
 		CustomGameEventManager:Send_ServerToAllClients("xhs_boss_counter_update", {
 			boss_count = 1,
 			label = "Ghost Revenants",

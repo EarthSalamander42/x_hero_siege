@@ -11,6 +11,15 @@ local function ActivatePhase2CreepTimer()
 end
 
 local PHASE_2_WAVE_COUNTS = { left = 0, right = 0 }
+local PHASE_2_STAGE_WINDOW = 20
+local PHASE_2_STAGE_JOB = {
+	left = "phase_two_left_next_wave",
+	right = "phase_two_right_next_wave",
+}
+local PHASE_2_WAVE_INTERVAL = {
+	left = XHS_CREEPS_INTERVAL,
+	right = 30,
+}
 local PHASE_2_SIDES = {
 	left = {
 		unit_name = "npc_ghul_II",
@@ -29,6 +38,10 @@ local PHASE_2_SIDES = {
 function ResetPhase2CreepWaveCounts()
 	PHASE_2_WAVE_COUNTS.left = 0
 	PHASE_2_WAVE_COUNTS.right = 0
+	if XHSWaveStager ~= nil then
+		XHSWaveStager:CancelJob(PHASE_2_STAGE_JOB.left, "phase_two_reset")
+		XHSWaveStager:CancelJob(PHASE_2_STAGE_JOB.right, "phase_two_reset")
+	end
 end
 
 local function GetPhase2Sides(side)
@@ -76,42 +89,154 @@ function OpenPhase2Doors(side, cinematic, callback)
 	return true
 end
 
+local function ConfigurePhase2Creep(unit, sideName, waveCount, registerDevUnit)
+	local difficulty = math.max(1, math.min(5, GameRules:GetCustomGameDifficulty() or 1))
+	unit:SetBaseDamageMin(
+		unit:GetRealDamageDone(unit)
+			+ PHASE_2_UPGRADE.damage[difficulty] * waveCount
+	)
+	unit:SetBaseDamageMax(
+		unit:GetRealDamageDone(unit)
+			+ PHASE_2_UPGRADE.damage[difficulty] * waveCount * 1.1
+	)
+	unit:SetMaxHealth(
+		unit:GetMaxHealth()
+			+ PHASE_2_UPGRADE.health[difficulty] * waveCount
+	)
+	unit:SetBaseMaxHealth(
+		unit:GetMaxHealth()
+			+ PHASE_2_UPGRADE.health[difficulty] * waveCount
+	)
+	unit:SetHealth(unit:GetMaxHealth())
+	unit:SetPhysicalArmorBaseValue(
+		unit:GetPhysicalArmorValue(false)
+			+ PHASE_2_UPGRADE.armor[difficulty] * waveCount
+	)
+	ApplyGrowthOverheadMarker(unit, waveCount)
+	if registerDevUnit == true and XHSDevTools ~= nil then
+		XHSDevTools:RegisterSpawnedUnit(unit)
+	end
+end
+
+local function IsPhase2SideActive(sideName)
+	local config = PHASE_2_SIDES[sideName]
+	local towerIndex = sideName == "left" and 1 or 2
+	local tower = Entities:FindByName(nil, "npc_tower_cold_" .. towerIndex)
+	return config ~= nil
+		and CustomTimers ~= nil
+		and CustomTimers.game_phase == 2
+		and CustomTimers.proc_final_wave ~= true
+		and tower ~= nil
+		and not tower:IsNull()
+		and tower:IsAlive()
+end
+
+local function BuildPhase2WaveDescriptors(sideName, waveCount)
+	local config = PHASE_2_SIDES[sideName]
+	local spawner = config ~= nil
+		and Entities:FindByName(nil, config.spawner_name)
+		or nil
+	if spawner == nil then
+		error("Missing Phase 2 spawner: " .. tostring(config and config.spawner_name))
+	end
+	local descriptors = {}
+	local point = spawner:GetAbsOrigin()
+	for index = 1, 8 do
+		descriptors[index] = {
+			unit_name = config.unit_name,
+			team = DOTA_TEAM_CUSTOM_1,
+			spawn_position = point + RandomVector(RandomInt(0, 50)),
+			side = sideName,
+			wave_count = waveCount,
+		}
+	end
+	return descriptors
+end
+
+local function PreparePhase2CreepWave(sideName)
+	if XHSWaveStager == nil or not IsPhase2SideActive(sideName) then return false end
+	local waveCount = PHASE_2_WAVE_COUNTS[sideName] + 1
+	local descriptors = BuildPhase2WaveDescriptors(sideName, waveCount)
+	local interval = PHASE_2_WAVE_INTERVAL[sideName]
+	XHSWaveStager:StartJob(PHASE_2_STAGE_JOB[sideName], descriptors, {
+		owner = "phase_two_" .. sideName,
+		window = PHASE_2_STAGE_WINDOW,
+		start_delay = math.max(0, interval - PHASE_2_STAGE_WINDOW),
+		wave_count = waveCount,
+		is_valid = function()
+			return IsPhase2SideActive(sideName)
+				and PHASE_2_WAVE_COUNTS[sideName] + 1 == waveCount
+		end,
+		configure = function(_, unit)
+			ConfigurePhase2Creep(unit, sideName, waveCount, false)
+		end,
+	})
+	return true
+end
+
+local function SpawnPhase2SideImmediately(sideName, registerDevUnits)
+	local waveCount = PHASE_2_WAVE_COUNTS[sideName] + 1
+	local descriptors = BuildPhase2WaveDescriptors(sideName, waveCount)
+	local spawned = 0
+	for _, descriptor in ipairs(descriptors) do
+		local unit = CreateUnitByName(
+			descriptor.unit_name,
+			descriptor.spawn_position,
+			true,
+			nil,
+			nil,
+			DOTA_TEAM_CUSTOM_1
+		)
+		if unit ~= nil then
+			ConfigurePhase2Creep(
+				unit,
+				sideName,
+				waveCount,
+				registerDevUnits
+			)
+			spawned = spawned + 1
+		end
+	end
+	PHASE_2_WAVE_COUNTS[sideName] = waveCount
+	return spawned
+end
+
+local function ReleasePreparedPhase2Side(sideName)
+	if XHSWaveStager == nil then return nil end
+	local job = XHSWaveStager:GetJob(PHASE_2_STAGE_JOB[sideName])
+	local expectedWave = PHASE_2_WAVE_COUNTS[sideName] + 1
+	if job == nil or tonumber(job.options.wave_count) ~= expectedWave then
+		XHSWaveStager:CancelJob(
+			PHASE_2_STAGE_JOB[sideName],
+			"phase_two_wave_mismatch"
+		)
+		return nil
+	end
+	local released = XHSWaveStager:ActivateJob(PHASE_2_STAGE_JOB[sideName])
+	PHASE_2_WAVE_COUNTS[sideName] = expectedWave
+	return released
+end
+
 function SpawnPhase2CreepWave(side, register_dev_units)
 	local sides = GetPhase2Sides(side)
 	if sides == nil then return 0 end
-
-	local difficulty = math.max(1, math.min(5, GameRules:GetCustomGameDifficulty() or 1))
 	local spawned = 0
-
-	for _, side_name in ipairs(sides) do
-		local config = PHASE_2_SIDES[side_name]
-		local spawner = Entities:FindByName(nil, config.spawner_name)
-		if spawner == nil then
-			error("Missing Phase 2 spawner: " .. config.spawner_name)
+	for _, sideName in ipairs(sides) do
+		local sideSpawned = nil
+		if register_dev_units ~= true then
+			sideSpawned = ReleasePreparedPhase2Side(sideName)
 		end
-
-		PHASE_2_WAVE_COUNTS[side_name] = PHASE_2_WAVE_COUNTS[side_name] + 1
-		local wave_count = PHASE_2_WAVE_COUNTS[side_name]
-		local point = spawner:GetAbsOrigin()
-
-		for _ = 1, 8 do
-			local unit = CreateUnitByName(config.unit_name, point + RandomVector(RandomInt(0, 50)), true, nil, nil, DOTA_TEAM_CUSTOM_1)
-			if unit ~= nil then
-				unit:SetBaseDamageMin(unit:GetRealDamageDone(unit) + (PHASE_2_UPGRADE["damage"][difficulty] * wave_count))
-				unit:SetBaseDamageMax(unit:GetRealDamageDone(unit) + (PHASE_2_UPGRADE["damage"][difficulty] * wave_count) * 1.1)
-				unit:SetMaxHealth(unit:GetMaxHealth() + (PHASE_2_UPGRADE["health"][difficulty] * wave_count))
-				unit:SetBaseMaxHealth(unit:GetMaxHealth() + (PHASE_2_UPGRADE["health"][difficulty] * wave_count))
-				unit:SetHealth(unit:GetMaxHealth())
-				unit:SetPhysicalArmorBaseValue(unit:GetPhysicalArmorValue(false) + (PHASE_2_UPGRADE["armor"][difficulty] * wave_count))
-				ApplyGrowthOverheadMarker(unit, wave_count)
-				if register_dev_units == true and XHSDevTools ~= nil then
-					XHSDevTools:RegisterSpawnedUnit(unit)
-				end
-				spawned = spawned + 1
-			end
+		if sideSpawned == nil then
+			sideSpawned = SpawnPhase2SideImmediately(
+				sideName,
+				register_dev_units == true
+			)
+		end
+		spawned = spawned + sideSpawned
+		if register_dev_units ~= true then
+			PreparePhase2CreepWave(sideName)
 		end
 	end
-
 	return spawned
 end
 

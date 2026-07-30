@@ -580,21 +580,30 @@ function BuyMaxSmallTomesForPlayer(playerID, options)
 		XHSRecordTomeStatsForPlayer(playerID, numberOfTomes * 50)
 	end
 
+	-- A bulk purchase used to create two seasonal level-up particles per tome,
+	-- ten times per second. Some Valve event particles keep emitting star trails
+	-- until explicitly stopped, so a large purchase could leave hundreds of
+	-- expensive simulations attached to the hero. Celebrate the transaction
+	-- once and keep the stat increments silent/particle-free.
+	local levelupParticle = XHSGetBattlepassParticle ~= nil
+		and XHSGetBattlepassParticle(hero, "levelup_pfx", "particles/generic_hero_status/hero_levelup.vpcf")
+		or "particles/generic_hero_status/hero_levelup.vpcf"
+	local pfx = ParticleManager:CreateParticle(levelupParticle, PATTACH_ABSORIGIN_FOLLOW, hero)
+	ParticleManager:SetParticleControl(pfx, 0, hero:GetAbsOrigin())
+	XHSDestroyParticleAfter(pfx, 1.5, false)
+	if not silent then
+		hero:EmitSound("ui.trophy_levelup")
+	end
+
 	local i = 0
 	GameRules:GetGameModeEntity():SetContextThink(DoUniqueString("XHSBuyTomes"), function()
 		if hero == nil or hero:IsNull() then return nil end
 
-		hero:IncrementAttributes(50, { record_stats = false })
-		if not silent then
-			hero:EmitSound("ui.trophy_levelup")
-		end
-
-		local levelupParticle = XHSGetBattlepassParticle ~= nil
-			and XHSGetBattlepassParticle(hero, "levelup_pfx", "particles/generic_hero_status/hero_levelup.vpcf")
-			or "particles/generic_hero_status/hero_levelup.vpcf"
-		local pfx = ParticleManager:CreateParticle(levelupParticle, PATTACH_ABSORIGIN_FOLLOW, hero)
-		ParticleManager:SetParticleControl(pfx, 0, hero:GetAbsOrigin())
-		XHSDestroyParticleAfter(pfx, 5.0, false)
+		hero:IncrementAttributes(50, {
+			record_stats = false,
+			play_sound = false,
+			play_effect = false,
+		})
 
 		i = i + 1
 		if i >= numberOfTomes then

@@ -1,14 +1,21 @@
+local function IsValidRiflemanHandle(handle)
+	return handle ~= nil and not handle:IsNull()
+end
+
 function ToggleAbilities(keys)
 local caster = keys.caster
 local ability = keys.ability
 local ability_aux = keys.ability_aux
-local ability2 = caster:FindAbilityByName(ability_aux)
 local projectile_model = keys.projectile_model
 
-	-- debug
+	if not IsValidRiflemanHandle(caster) or not IsValidRiflemanHandle(ability) then
+		return
+	end
+
+	local ability2 = caster:FindAbilityByName(ability_aux)
 	caster:SetRangedProjectileName(projectile_model)
 
-	if ability:GetToggleState() == true and ability:GetToggleState() == ability2:GetToggleState() then
+	if IsValidRiflemanHandle(ability2) and ability:GetToggleState() == true and ability:GetToggleState() == ability2:GetToggleState() then
 		ability2:ToggleAbility()
 		caster:SetRangedProjectileName(projectile_model)
 	end
@@ -18,20 +25,35 @@ function SetOriginal(keys)
 local caster = keys.caster
 local projectile_model = "particles/units/heroes/hero_sniper/sniper_base_attack.vpcf"
 
+	if not IsValidRiflemanHandle(caster) then
+		return
+	end
+
 	caster:SetRangedProjectileName(projectile_model)
 end
 
 function PreRifleOrb(keys)
 local caster = keys.caster
 local ability = keys.ability
-local ability_level = ability:GetLevel() - 1
-local mana = ability:GetManaCost(ability_level)
 local sound = keys.sound
 
-	if caster:GetMana() > ability:GetManaCost(ability_level) and ability:GetToggleState() == true then
-		EmitSoundOn(sound, caster)
+	if not IsValidRiflemanHandle(caster) or not IsValidRiflemanHandle(ability) then
+		return
+	end
+
+	local ability_level = math.max(ability:GetLevel() - 1, 0)
+	local mana = ability:GetManaCost(ability_level)
+
+	if not ability:GetToggleState() then
+		return
+	end
+
+	if caster:GetMana() >= mana then
+		if sound ~= nil and sound ~= "" then
+			EmitSoundOn(sound, caster)
+		end
 		caster:SpendMana(mana, ability)
-	elseif caster:GetMana() < ability:GetManaCost(ability_level) and ability:GetToggleState() == true then
+	else
 		ability:ToggleAbility() -- Remove modifier
 	end
 end
@@ -40,11 +62,14 @@ function RifleOrb(keys)
 local caster = keys.caster
 local target = keys.target
 local ability = keys.ability
-local ability_level = ability:GetLevel() - 1
-local damage = ability:GetLevelSpecialValueFor("bonus_damage", ability_level)
 local sound = keys.sound
 
-	if caster:GetMana() > ability:GetManaCost(ability_level) and ability:GetToggleState() == true then
+	if not IsValidRiflemanHandle(caster) or not IsValidRiflemanHandle(target) or not IsValidRiflemanHandle(ability) then
+		return
+	end
+
+	local ability_level = math.max(ability:GetLevel() - 1, 0)
+	if caster:GetMana() > ability:GetManaCost(ability_level) and ability:GetToggleState() == true and sound ~= nil and sound ~= "" then
 		EmitSoundOn(sound, target)
 	end
 end

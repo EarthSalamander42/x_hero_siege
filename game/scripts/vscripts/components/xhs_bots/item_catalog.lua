@@ -290,7 +290,8 @@ local TOME_ITEMS = {
 		behavior = "instant_no_target",
 		stacking = "charges",
 		script_file = "items/tomes.lua",
-		bot_transaction = "not_selected",
+		bot_transaction = "direct_stats_gift",
+		bot_record_stats = false,
 		stats = { stat_bonus = 250 },
 	},
 	item_tome_of_power = {
@@ -316,6 +317,27 @@ local TOME_ITEMS = {
 -- from ITEMS so the planner can never spend gold on them.  They still need
 -- semantic metadata for inventory optimization after a bot earns one.
 local EQUIP_ONLY_ITEMS = {
+	item_lightning_sword = {
+		kind = "reward",
+		source = "ramero_baristol_arena",
+		purchasable = false,
+		requires_active_slot = true,
+		backpack_usable = false,
+		equip_priority = 1170,
+		behavior = "passive_on_equip",
+		stacking = "unique_lifesteal",
+		replaces = "item_lifesteal_mask",
+		tags = {
+			right_click = 1.0,
+			sustain = 1.0,
+			survival = 0.55,
+			damage = 1.0,
+		},
+		stats = {
+			lifesteal_pct = 50,
+			bonus_damage = 3000,
+		},
+	},
 	item_ring_of_superiority = {
 		kind = "reward",
 		source = "sogat_arena",

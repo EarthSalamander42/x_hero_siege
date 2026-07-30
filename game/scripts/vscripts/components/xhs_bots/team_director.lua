@@ -22,6 +22,8 @@ XHSBotTeamDirector.last_structure_emergency_anchor =
 	XHSBotTeamDirector.last_structure_emergency_anchor or nil
 XHSBotTeamDirector.last_structure_emergency_threat_position =
 	XHSBotTeamDirector.last_structure_emergency_threat_position or nil
+XHSBotTeamDirector.last_structure_participant_lane =
+	XHSBotTeamDirector.last_structure_participant_lane or nil
 XHSBotTeamDirector.structure_emergency_hold_until =
 	XHSBotTeamDirector.structure_emergency_hold_until or 0
 
@@ -33,6 +35,11 @@ local BASE_RESPONSE_MINIMUM_HOLD = 5
 local BASE_THREAT_DECAY_PER_SECOND = 0.09
 local STRUCTURE_EMERGENCY_HOLD = 3
 local LANE_DOOR_HOLD_DISTANCE = 260
+local ANCIENT_PATROL_QUIET_DELAY = 5
+local ANCIENT_PATROL_REACHED_DISTANCE = 190
+local ANCIENT_PATROL_BASE_RADIUS = 720
+local ANCIENT_PATROL_RING_VARIANCE = 110
+local ANCIENT_PATROL_STEP_DEGREES = 38
 local PHASE_FOLLOW_RADIUS = 600
 local PHASE_FOLLOW_SECOND_RING_RADIUS = 750
 local PHASE_FOLLOW_GOLDEN_ANGLE = 137.5
@@ -89,6 +96,76 @@ end
 
 local function Distance2D(left, right)
 	return (left - right):Length2D()
+end
+
+function XHSBotTeamDirector:GetAncientPatrolAnchor(
+	playerID,
+	hero,
+	record,
+	now
+)
+	if not IsValidEntityHandle(hero) or type(record) ~= "table" then
+		return nil
+	end
+	local fort = GetFort()
+	if not IsValidEntityHandle(fort) then return nil end
+
+	local current = record.ancient_patrol_target
+	if current ~= nil then
+		local currentDistance = Distance2D(hero:GetAbsOrigin(), current)
+		if currentDistance > ANCIENT_PATROL_REACHED_DISTANCE
+			or now < (tonumber(record.ancient_patrol_next_step_at) or 0) then
+			return CopyPosition(current)
+		end
+	end
+
+	local ordinal =
+		XHSBotPlayerRegistry.GetCombatParticipantOrdinal ~= nil
+			and XHSBotPlayerRegistry:GetCombatParticipantOrdinal(playerID)
+			or (tonumber(playerID) or 0) + 1
+	local participantCount =
+		XHSBotPlayerRegistry.GetCombatParticipantCount ~= nil
+			and XHSBotPlayerRegistry:GetCombatParticipantCount()
+			or 1
+	participantCount = math.max(1, tonumber(participantCount) or 1)
+	local step = (tonumber(record.ancient_patrol_step) or -1) + 1
+	local baseAngle = (ordinal - 1) * (360 / participantCount)
+	local fortPosition = fort:GetAbsOrigin()
+	local heroPosition = hero:GetAbsOrigin()
+	local selected = nil
+
+	-- Each participant keeps its own angular offset, so a full bot roster
+	-- patrols as a spaced ring rather than crossing through one another.
+	for attempt = 0, 7 do
+		local angle = math.rad(
+			baseAngle + step * ANCIENT_PATROL_STEP_DEGREES + attempt * 45
+		)
+		local radius = ANCIENT_PATROL_BASE_RADIUS
+			+ ((ordinal + step + attempt) % 3) * ANCIENT_PATROL_RING_VARIANCE
+		local candidate = fortPosition + Vector(
+			math.cos(angle) * radius,
+			math.sin(angle) * radius,
+			0
+		)
+		local pathable = true
+		if GridNav ~= nil and GridNav.CanFindPath ~= nil then
+			local ok, canFindPath = pcall(function()
+				return GridNav:CanFindPath(heroPosition, candidate)
+			end)
+			pathable = not ok or canFindPath == true
+		end
+		if pathable then
+			selected = candidate
+			break
+		end
+	end
+	if selected == nil then return CopyPosition(current or fortPosition) end
+
+	record.ancient_patrol_step = step
+	record.ancient_patrol_target = CopyPosition(selected)
+	record.ancient_patrol_next_step_at = now
+		+ 8 + ((ordinal + step) % 4)
+	return CopyPosition(selected)
 end
 
 local function GetUnitAttacksPerSecond(unit)
@@ -200,6 +277,32 @@ function XHSBotTeamDirector:GetPhysicalLanesForParticipantLane(participantLane)
 		if physicalLane <= 8 then table.insert(lanes, physicalLane) end
 	end
 	return lanes
+end
+
+function XHSBotTeamDirector:GetStructureParticipantLane(structure)
+	if not IsValidEntityHandle(structure) or structure == GetFort() then
+		return nil
+	end
+	for physicalLane = 1, 8 do
+		local towerName = "dota_badguys_tower" .. tostring(physicalLane)
+		local towers = {}
+		if Entities.FindAllByName ~= nil then
+			towers = Entities:FindAllByName(towerName) or {}
+		elseif Entities.FindByName ~= nil then
+			local tower = Entities:FindByName(nil, towerName)
+			if tower ~= nil then towers = { tower } end
+		end
+		for _, tower in pairs(towers) do
+			if tower == structure then
+				local lanesPerParticipant =
+					tonumber(CREEP_LANES_TYPE) == 2 and 2 or 1
+				return math.floor(
+					(physicalLane - 1) / lanesPerParticipant
+				) + 1
+			end
+		end
+	end
+	return nil
 end
 
 function XHSBotTeamDirector:GetLaneDoorAnchor(physicalLane, fort)
@@ -441,6 +544,7 @@ function XHSBotTeamDirector:CalculateBaseThreat(now)
 			fort_target_count = 0,
 			structure_target_count = 0,
 			structure_emergency = false,
+			structure_participant_lane = nil,
 			objective_loss_seconds = -1,
 			objective_incoming_dps = 0,
 			objective_forecast_confidence = 0,
@@ -466,6 +570,7 @@ function XHSBotTeamDirector:CalculateBaseThreat(now)
 			fort_target_count = 0,
 			structure_target_count = 0,
 			structure_emergency = false,
+			structure_participant_lane = nil,
 			objective_loss_seconds = -1,
 			objective_incoming_dps = 0,
 			objective_forecast_confidence = 0,
@@ -713,6 +818,8 @@ function XHSBotTeamDirector:CalculateBaseThreat(now)
 		if IsValidEntityHandle(objectiveForecastTarget) then
 			self.last_structure_emergency_anchor =
 				CopyPosition(objectiveForecastTarget:GetAbsOrigin())
+			self.last_structure_participant_lane =
+				self:GetStructureParticipantLane(objectiveForecastTarget)
 		end
 	elseif now < (tonumber(self.structure_emergency_hold_until) or 0)
 		and self.last_structure_emergency_anchor ~= nil then
@@ -800,6 +907,8 @@ function XHSBotTeamDirector:CalculateBaseThreat(now)
 		fort_target_count = fortTargetCount,
 		structure_target_count = structureTargetCount,
 		structure_emergency = structureEmergency,
+		structure_participant_lane = structureEmergency
+			and self.last_structure_participant_lane or nil,
 		objective_loss_seconds = objectiveForecast ~= nil
 			and objectiveForecast.loss_time or -1,
 		objective_incoming_dps = objectiveForecast ~= nil
@@ -813,6 +922,35 @@ function XHSBotTeamDirector:CalculateBaseThreat(now)
 		closest_distance = closestDistance < math.huge and closestDistance or 0,
 		fort_damage_ratio = fortDamageRatio,
 	}
+end
+
+function XHSBotTeamDirector:IsLaneOwnerStruggling(
+	ownerPlayerID,
+	baseThreat
+)
+	if ownerPlayerID == nil then return true end
+	local player = PlayerResource:GetPlayer(ownerPlayerID)
+	local hero = XHSBotPlayerRegistry:GetBotHero(ownerPlayerID)
+		or player ~= nil and player:GetAssignedHero() or nil
+	if not IsValidEntityHandle(hero) or not hero:IsAlive() then
+		return true
+	end
+
+	local healthRatio = hero:GetHealth() / math.max(1, hero:GetMaxHealth())
+	if healthRatio <= 0.45 then return true end
+
+	local lossTime = tonumber(
+		baseThreat and baseThreat.objective_loss_seconds
+	) or -1
+	if lossTime > 0 and lossTime <= 8 then return true end
+
+	local record = XHSBotPlayerRegistry:GetBot(ownerPlayerID)
+	if type(record) ~= "table" then return false end
+	if record.survival_fatal_before_escape == true then return true end
+	local timeToDie = tonumber(record.survival_time_to_die) or math.huge
+	if timeToDie > 0 and timeToDie <= 8 then return true end
+	return (tonumber(record.combat_threat) or 0) >= 0.80
+		and (tonumber(record.survival_net_incoming_dps) or 0) > 0
 end
 
 function XHSBotTeamDirector:SelectBaseResponders(playerIDs, snapshot)
@@ -841,6 +979,47 @@ function XHSBotTeamDirector:SelectBaseResponders(playerIDs, snapshot)
 						and 900 or 0),
 			})
 		end
+	end
+
+	local structureLane = tonumber(baseThreat.structure_participant_lane)
+	if baseThreat.structure_emergency == true
+		and structureLane ~= nil and structureLane >= 1 then
+		local participants =
+			XHSBotPlayerRegistry:GetCombatParticipantPlayerIDs()
+		local ownerPlayerID = participants[structureLane]
+		baseThreat.structure_owner_player_id = ownerPlayerID
+		local candidateByPlayerID = {}
+		for _, candidate in ipairs(candidates) do
+			candidateByPlayerID[candidate.player_id] = candidate
+		end
+
+		local desired = 0
+		if candidateByPlayerID[ownerPlayerID] ~= nil then
+			selected[ownerPlayerID] = true
+			desired = 1
+		end
+		local needsReinforcement = self:IsLaneOwnerStruggling(
+			ownerPlayerID,
+			baseThreat
+		)
+		baseThreat.structure_reinforcement_required =
+			needsReinforcement
+		if needsReinforcement then
+			table.sort(candidates, function(left, right)
+				if left.score == right.score then
+					return left.player_id < right.player_id
+				end
+				return left.score < right.score
+			end)
+			for _, candidate in ipairs(candidates) do
+				if candidate.player_id ~= ownerPlayerID then
+					selected[candidate.player_id] = true
+					desired = desired + 1
+					break
+				end
+			end
+		end
+		return selected, desired
 	end
 
 	local participantCount = #(playerIDs or {})
@@ -1361,7 +1540,10 @@ function XHSBotTeamDirector:BuildAssignment(playerID, slot, phase, now, snapshot
 	elseif assignment.goal == nil and campaignObjective ~= nil then
 		assignment.goal = campaignObjective.goal
 		assignment.anchor = CopyPosition(campaignObjective.anchor)
-		assignment.target_entindex = campaignObjective.target_entindex
+		assignment.target_entindex =
+			campaignObjective.non_combat == true
+				and nil or campaignObjective.target_entindex
+		assignment.attack_move = campaignObjective.attack_move ~= false
 		assignment.urgency = tonumber(campaignObjective.urgency) or 1
 		assignment.chase_radius = 4200
 		assignment.anchor_leash = 4600
@@ -1570,12 +1752,25 @@ function XHSBotTeamDirector:BuildAssignment(playerID, slot, phase, now, snapshot
 		assignment.base_immediate_count = baseThreat.immediate_count
 		assignment.base_structure_emergency =
 			baseThreat.structure_emergency == true
+		assignment.base_structure_participant_lane =
+			baseThreat.structure_participant_lane
+		assignment.base_structure_owner_player_id =
+			baseThreat.structure_owner_player_id
 		assignment.objective_loss_seconds =
 			baseThreat.objective_loss_seconds
 		assignment.objective_incoming_dps =
 			baseThreat.objective_incoming_dps
 		assignment.label = structureEmergencyOrCapable and structureEmergency
-			and "STRUCTURE UNDER ATTACK"
+			and baseThreat.structure_owner_player_id == playerID
+				and "DEFENDING OWN TOWER"
+			or structureEmergencyOrCapable and structureEmergency
+				and baseThreat.structure_participant_lane ~= nil
+				and (
+					"REINFORCING L"
+						.. tostring(baseThreat.structure_participant_lane)
+				)
+			or structureEmergencyOrCapable and structureEmergency
+				and "STRUCTURE UNDER ATTACK"
 			or string.format("BASE THREAT %.2f", baseThreat.score or 0)
 	end
 
@@ -1629,6 +1824,49 @@ function XHSBotTeamDirector:BuildAssignment(playerID, slot, phase, now, snapshot
 		assignment.label = "FORCED: HOLD"
 	end
 
+	local activeSpecialCount = CustomTimers ~= nil
+		and tonumber(CustomTimers.active_special_wave_count) or 0
+	local ancientPatrolQuiet = assignment.goal == "defend_base"
+		and forcedGoal == nil
+		and not campaignControls
+		and not structureEmergency
+		and (baseThreat == nil
+			or (tonumber(baseThreat.threat_count) or 0) <= 0)
+		and activeSpecialCount <= 0
+		and record ~= nil
+		and record.target_entindex == nil
+		and record.was_in_active_danger ~= true
+		and (tonumber(record.combat_threat) or 0) <= 0.12
+		and (tonumber(record.recent_damage_ratio) or 0) <= 0.04
+	if ancientPatrolQuiet then
+		record.ancient_patrol_quiet_since =
+			record.ancient_patrol_quiet_since or now
+		if now - record.ancient_patrol_quiet_since
+			>= ANCIENT_PATROL_QUIET_DELAY then
+			local patrolAnchor = self:GetAncientPatrolAnchor(
+				playerID,
+				hero,
+				record,
+				now
+			)
+			if patrolAnchor ~= nil then
+				assignment.anchor = patrolAnchor
+				assignment.ancient_patrol = true
+				assignment.attack_move = true
+				assignment.urgency = 0.18
+				assignment.chase_radius = 1200
+				assignment.anchor_leash = 1500
+				assignment.label = "PATROLLING ANCIENT"
+			end
+		end
+	else
+		if record ~= nil then
+			record.ancient_patrol_quiet_since = nil
+			record.ancient_patrol_target = nil
+			record.ancient_patrol_next_step_at = nil
+		end
+	end
+
 	if record ~= nil then
 		record.role = assignment.role
 		record.goal = assignment.goal
@@ -1659,6 +1897,8 @@ function XHSBotTeamDirector:BuildAssignment(playerID, slot, phase, now, snapshot
 			and math.floor(
 				(baseThreat.objective_forecast_confidence or 0) * 100
 			) / 100 or 0
+		record.ancient_patrol_active =
+			assignment.ancient_patrol == true
 	end
 	return assignment
 end

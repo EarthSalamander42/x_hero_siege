@@ -238,7 +238,9 @@ local function PlayProcFeedback(source, target, particle_name, sound_name)
 	if (source.xhs_creep_feedback_ready_at or 0) > now then return end
 	source.xhs_creep_feedback_ready_at = now + 0.5
 	local particle = ParticleManager:CreateParticle(particle_name, PATTACH_ABSORIGIN_FOLLOW, target)
-	ParticleManager:ReleaseParticleIndex(particle)
+	-- Proc feedback must be finite. ReleaseParticleIndex only releases Lua's
+	-- handle and does not stop a looping particle system.
+	XHSDestroyParticleAfter(particle, 1.0, false)
 	target:EmitSound(sound_name)
 end
 
@@ -475,7 +477,11 @@ function modifier_xhs_creep_passive:OnAttackLanded(params)
 	local proc_chance = Special(ability, "proc_chance")
 	if bonus > 0 and RollPseudoRandomPercentage(proc_chance, 1972, parent) then
 		ApplyDamage({ victim = target, attacker = parent, ability = ability, damage = parent:GetAverageTrueAttackDamage(target) * bonus * 0.01, damage_type = DAMAGE_TYPE_PHYSICAL })
-		PlayProcFeedback(parent, target, "particles/units/heroes/hero_sniper/sniper_headshot_slow.vpcf", "DOTA_Item.SkullBasher")
+		-- sniper_headshot_slow is the looping visual of Sniper's slow modifier.
+		-- Creating it as a free-standing impact made one emitter survive every
+		-- proc, producing the accumulating golden star orbits. Skull Basher is a
+		-- lightweight one-shot impact and is already part of XHS precache.
+		PlayProcFeedback(parent, target, "particles/items_fx/skull_basher.vpcf", "DOTA_Item.SkullBasher")
 	end
 
 	local mana_burn = Special(ability, "mana_burn_pct")

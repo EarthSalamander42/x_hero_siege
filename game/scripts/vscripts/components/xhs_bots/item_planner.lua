@@ -138,6 +138,29 @@ function XHSBotItemPlanner:GetFamilyLimit(profile, familyName)
 	return math.max(0, math.floor(configured or 1))
 end
 
+function XHSBotItemPlanner:GetMaximumOrbSlots(profile)
+	-- Three terminal orbs leave a real six-slot loadout for sustain, one
+	-- artifact/reward and one situational active. Exceptional hero profiles may
+	-- deliberately opt into four, but no bot may turn all six active slots into
+	-- orbs and strand its potions in the backpack.
+	local configured = tonumber(profile and profile.maximum_orb_slots) or 3
+	return math.max(0, math.min(4, math.floor(configured)))
+end
+
+function XHSBotItemPlanner:GetOwnedOrbSlotCount(snapshot)
+	local count = 0
+	for _, family in pairs(XHSBotItemCatalog:GetFamilies()) do
+		for _, level in ipairs(family.levels or {}) do
+			count = count + Count(snapshot, level.name)
+		end
+	end
+	return count
+end
+
+function XHSBotItemPlanner:HasSuperiorLifestealReward(snapshot)
+	return Count(snapshot, "item_lightning_sword") > 0
+end
+
 function XHSBotItemPlanner:IsRangedAttacker(snapshot, profile)
 	if snapshot ~= nil and snapshot.is_ranged_attacker ~= nil then
 		return snapshot.is_ranged_attacker == true
@@ -414,6 +437,10 @@ end
 function XHSBotItemPlanner:BuildOpeningOrbCandidates(snapshot, profile)
 	local candidates = {}
 	local orbCount = self:GetOwnedOrbFamilyCount(snapshot)
+	if self:GetOwnedOrbSlotCount(snapshot)
+		>= self:GetMaximumOrbSlots(profile) then
+		return candidates
+	end
 	local openingOrder = profile and profile.opening_orb_order or nil
 	local expectedFamily = type(openingOrder) == "table"
 		and openingOrder[orbCount + 1] or nil
@@ -499,6 +526,7 @@ function XHSBotItemPlanner:GetOpeningPackage(snapshot, profile, minimumCoreScore
 	local orbCount = self:GetOwnedOrbFamilyCount(snapshot)
 	local tomesBought = math.max(0, tonumber(snapshot.tomes_bought) or 0)
 	local maskOwned = Count(snapshot, "item_lifesteal_mask") > 0
+		or self:HasSuperiorLifestealReward(snapshot)
 	local maskRedundant = self:IsItemRedundant(profile, "item_lifesteal_mask")
 		or self:HasIntrinsicLifesteal(profile)
 	local maskAvailable = snapshot.secret_shop_available ~= false
@@ -597,6 +625,10 @@ function XHSBotItemPlanner:GetNextFamilyEntry(snapshot, profile, familyName, fam
 		if owned > 0 then
 			return XHSBotItemCatalog:CopyEntry(family.levels[tier + 1].name)
 		end
+	end
+	if self:GetOwnedOrbSlotCount(snapshot)
+		>= self:GetMaximumOrbSlots(profile) then
+		return nil
 	end
 	return XHSBotItemCatalog:CopyEntry(family.levels[1].name)
 end
@@ -946,6 +978,7 @@ function XHSBotItemPlanner:BuildTargetLoadout(snapshot, profile)
 	end
 	local lifestealEntry = XHSBotItemCatalog:CopyEntry("item_lifesteal_mask")
 	if lifestealEntry ~= nil
+		and not self:HasSuperiorLifestealReward(snapshot)
 		and not self:IsItemRedundant(profile, lifestealEntry.name)
 		and not self:HasIntrinsicLifesteal(profile) then
 		local lifestealScore, rightClick, sustainPerSecond =
@@ -979,18 +1012,24 @@ function XHSBotItemPlanner:BuildTargetLoadout(snapshot, profile)
 	local itemScores = {}
 	local familyScores = {}
 	local details = {}
-	for index = 1, math.min(6, #slots) do
-		local slot = slots[index]
-		table.insert(loadout, slot.name)
-		table.insert(details, slot)
-		itemScores[slot.name] = math.max(
-			tonumber(itemScores[slot.name]) or -math.huge,
-			slot.score
-		)
-		familyScores[slot.family] = math.max(
-			tonumber(familyScores[slot.family]) or -math.huge,
-			slot.score
-		)
+	local selectedOrbSlots = 0
+	local maximumOrbSlots = self:GetMaximumOrbSlots(profile)
+	for _, slot in ipairs(slots) do
+		local isOrb = XHSBotItemCatalog:GetFamily(slot.family) ~= nil
+		if #loadout < 6
+			and (not isOrb or selectedOrbSlots < maximumOrbSlots) then
+			table.insert(loadout, slot.name)
+			table.insert(details, slot)
+			if isOrb then selectedOrbSlots = selectedOrbSlots + 1 end
+			itemScores[slot.name] = math.max(
+				tonumber(itemScores[slot.name]) or -math.huge,
+				slot.score
+			)
+			familyScores[slot.family] = math.max(
+				tonumber(familyScores[slot.family]) or -math.huge,
+				slot.score
+			)
+		end
 	end
 	return loadout, itemScores, familyScores, details
 end
@@ -1342,6 +1381,7 @@ function XHSBotItemPlanner:Plan(snapshot, profile, difficulty)
 			and opening.mask_unavailable == true,
 		opening_orb_target = opening and opening.desired_orbs or 0,
 		opening_tome_target = opening and opening.desired_tomes or 0,
+		maximum_orb_slots = self:GetMaximumOrbSlots(profile),
 	}
 	plan.health_potion_restock = self:GetPotionRestockThreshold(
 		"health", snapshot, profile, difficulty

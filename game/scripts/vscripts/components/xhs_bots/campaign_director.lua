@@ -6,6 +6,8 @@ XHSBotCampaignDirector.next_update = 0
 XHSBotCampaignDirector.objective = nil
 XHSBotCampaignDirector.stage = "inactive"
 XHSBotCampaignDirector.shal_confirmed = false
+XHSBotCampaignDirector.shal_entindex =
+	XHSBotCampaignDirector.shal_entindex or nil
 
 local SHAL_NAME = "npc_xhs_paladin"
 local MAGTHERIDON_NAME = "npc_dota_hero_magtheridon"
@@ -117,14 +119,42 @@ function XHSBotCampaignDirector:FindShal()
 		FIND_ANY_ORDER,
 		false
 	)
+	local candidates = {}
 	for _, unit in pairs(units or {}) do
 		if IsValidEntityHandle(unit)
 			and unit:GetUnitName() == SHAL_NAME
 			and unit.xhs_freed_shal_lightbinder == true then
-			return unit
+			if unit:entindex() == self.shal_entindex then
+				return unit
+			end
+			table.insert(candidates, unit)
 		end
 	end
-	return nil
+	local best = nil
+	local bestDistance = math.huge
+	for _, unit in ipairs(candidates) do
+		local distance = math.huge
+		for _, playerID in ipairs(
+			XHSBotPlayerRegistry:GetXHSBotPlayerIDs()
+		) do
+			local hero = XHSBotPlayerRegistry:GetBotHero(playerID)
+			if IsValidCombatUnit(hero) then
+				distance = math.min(
+					distance,
+					(hero:GetAbsOrigin() - unit:GetAbsOrigin()):Length2D()
+				)
+			end
+		end
+		if best == nil or distance < bestDistance
+			or distance == bestDistance
+				and unit:entindex() < best:entindex() then
+			best = unit
+			bestDistance = distance
+		end
+	end
+	self.shal_entindex =
+		IsValidEntityHandle(best) and best:entindex() or nil
+	return best
 end
 
 function XHSBotCampaignDirector:AnyBotReached(position, distance)
@@ -145,7 +175,6 @@ function XHSBotCampaignDirector:ConfirmShalDialog(shal)
 		or not IsQuestActive("teleport_top") then
 		return false
 	end
-	self.shal_confirmed = true
 	local completed = false
 	for _, zone in pairs(GameMode.Zones or {}) do
 		if zone ~= nil and zone.OnDialogAllConfirmed ~= nil then
@@ -159,6 +188,7 @@ function XHSBotCampaignDirector:ConfirmShalDialog(shal)
 		"[XHSBots][Campaign] action=confirm_shal_dialog result="
 			.. tostring(completed)
 	)
+	self.shal_confirmed = completed
 	return completed
 end
 
@@ -187,6 +217,8 @@ function XHSBotCampaignDirector:Update(force)
 			goal = "campaign_shal",
 			anchor = position,
 			target_entindex = shal:entindex(),
+			non_combat = true,
+			attack_move = false,
 			label = "TALKING TO SHAL LIGHTBINDER",
 			urgency = 0.92,
 			reached_distance = SHAL_REACHED_DISTANCE,
@@ -291,6 +323,7 @@ function XHSBotCampaignDirector:Reset()
 	self.objective = nil
 	self.stage = "inactive"
 	self.shal_confirmed = false
+	self.shal_entindex = nil
 end
 
 return XHSBotCampaignDirector

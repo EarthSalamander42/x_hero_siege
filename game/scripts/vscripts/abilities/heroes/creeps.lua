@@ -51,7 +51,13 @@ function modifier_campfire:OnCreated(kv)
 
 		EmitSoundOn("Campfire.Warmth.Loop", self:GetParent())
 
-		self:StartIntervalThink(0.25)
+		AddFOWViewer(
+			self:GetParent():GetTeamNumber(),
+			self:GetParent():GetAbsOrigin(),
+			self.aura_radius,
+			99999,
+			false
+		)
 	end
 end
 
@@ -67,18 +73,6 @@ function modifier_campfire:CheckState()
 	end
 
 	return state
-end
-
-function modifier_campfire:OnIntervalThink()
-	if IsServer() then
-		if (not self.nFXIndex) then
-			local vCasterPos = self:GetCaster():GetOrigin()
-			local vOffset = Vector(0, 0, 50)
-
-			self.nFXIndex = ParticleManager:CreateParticle("particles/act_2/campfire_flame.vpcf", PATTACH_ABSORIGIN, self:GetCaster())
-			ParticleManager:SetParticleControl(self.nFXIndex, 2, vCasterPos + vOffset)
-		end
-	end
 end
 
 function modifier_campfire:OnDestroy()

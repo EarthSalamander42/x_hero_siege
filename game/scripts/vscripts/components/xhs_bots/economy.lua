@@ -14,6 +14,14 @@ XHSBotEconomy.STASH_CAPACITY = 6
 XHSBotEconomy.STASH_COLLECTION_THRESHOLD = 4
 XHSBotEconomy.SCAN_LAST_SLOT = XHSBotEconomy.STASH_LAST_SLOT
 XHSBotEconomy.ANKH_ITEM_NAME = "item_ankh_of_reincarnation"
+XHSBotEconomy.LIGHTNING_SWORD_ITEM_NAME = "item_lightning_sword"
+XHSBotEconomy.LIFESTEAL_MASK_ITEM_NAME = "item_lifesteal_mask"
+XHSBotEconomy.RESOURCE_SHARE_WALLET_THRESHOLD = 250000
+XHSBotEconomy.RESOURCE_SHARE_POST_GIFT_RESERVE = 200000
+XHSBotEconomy.RESOURCE_SHARE_POWER_RATIO = 1.50
+XHSBotEconomy.RESOURCE_SHARE_COOLDOWN = 5
+XHSBotEconomy.resource_share_claims =
+	XHSBotEconomy.resource_share_claims or {}
 -- Purchases are direct server transactions. Home/base inventory may be bought
 -- remotely exactly like a player purchase, but it is moved immediately into
 -- a stash slot (9-14) and remains inactive until the bot returns home.
@@ -706,6 +714,18 @@ function XHSBotEconomy:GetItemSlot(hero, item)
 	return nil
 end
 
+function XHSBotEconomy:FindItemSlotByName(hero, wantedName, lastSlot)
+	if not IsValidEntityHandle(hero) then return nil, nil end
+	for slot = 0, math.min(
+		self.SCAN_LAST_SLOT,
+		math.max(0, tonumber(lastSlot) or self.SCAN_LAST_SLOT)
+	) do
+		local item = hero:GetItemInSlot(slot)
+		if ItemName(item) == wantedName then return slot, item end
+	end
+	return nil, nil
+end
+
 function XHSBotEconomy:MovePurchasedItemToStash(hero, item)
 	local sourceSlot = self:GetItemSlot(hero, item)
 	if sourceSlot == nil then return false, "purchased item slot missing" end
@@ -1049,6 +1069,81 @@ function XHSBotEconomy:GetItemEquipPriority(item, snapshot, plan)
 		return 180
 	end
 	return 250
+end
+
+function XHSBotEconomy:ReconcileLightningSwordUpgrade(
+	playerID,
+	hero,
+	record,
+	snapshot
+)
+	if not IsValidEntityHandle(hero) then return false end
+	local swordSlot, sword = self:FindItemSlotByName(
+		hero,
+		self.LIGHTNING_SWORD_ITEM_NAME
+	)
+	if swordSlot == nil or not IsValidEntityHandle(sword) then return false end
+
+	-- Lightning Sword owns the same 50% unique lifesteal as Mask of Death and
+	-- adds 3000 damage. If it is stored while the Mask is active, swap the
+	-- upgrade directly into that exact slot instead of relying on generic item
+	-- scoring over several economy ticks.
+	if swordSlot > self.ACTIVE_LAST_SLOT then
+		local maskActiveSlot = self:FindItemSlotByName(
+			hero,
+			self.LIFESTEAL_MASK_ITEM_NAME,
+			self.ACTIVE_LAST_SLOT
+		)
+		local targetSlot = maskActiveSlot
+			or self:FindFreeSlot(hero, 0, self.ACTIVE_LAST_SLOT)
+		if targetSlot ~= nil then
+			local swapped = pcall(function()
+				hero:SwapItems(targetSlot, swordSlot)
+			end)
+			if swapped
+				and ItemName(hero:GetItemInSlot(targetSlot))
+					== self.LIGHTNING_SWORD_ITEM_NAME then
+				record.inventory_swaps = (record.inventory_swaps or 0) + 1
+				record.last_item_action =
+					"equip:lightning_sword_upgrade"
+				swordSlot = targetSlot
+			end
+		end
+	end
+	if swordSlot > self.ACTIVE_LAST_SLOT then return false end
+
+	local maskSlot, mask = self:FindItemSlotByName(
+		hero,
+		self.LIFESTEAL_MASK_ITEM_NAME
+	)
+	if maskSlot == nil or not IsValidEntityHandle(mask) then return false end
+	self:RemoveGrantedItem(hero, mask)
+	if self:FindItemSlotByName(
+			hero,
+			self.LIFESTEAL_MASK_ITEM_NAME
+		) ~= nil then
+		record.last_item_rejection =
+			"lightning sword could not retire redundant lifesteal mask"
+		return false
+	end
+
+	local maskCatalog =
+		XHSBotItemCatalog:Get(self.LIFESTEAL_MASK_ITEM_NAME) or {}
+	local saleCredit = math.floor(
+		math.max(0, tonumber(maskCatalog.cost) or 0) * 0.5
+	)
+	if saleCredit > 0 then self:RefundGold(playerID, saleCredit) end
+	record.items_sold = (record.items_sold or 0) + 1
+	record.item_sale_gold_recovered =
+		(tonumber(record.item_sale_gold_recovered) or 0) + saleCredit
+	record.last_sold_item = self.LIFESTEAL_MASK_ITEM_NAME
+	record.last_sold_item_reason =
+		"lightning_sword_upgrade"
+	record.last_sold_item_at = GameRules:GetGameTime()
+	record.last_item_action =
+		"sell:lifesteal_mask_for_lightning_sword"
+	record.last_item_rejection = nil
+	return true
 end
 
 function XHSBotEconomy:OptimizeActiveInventory(hero, record, snapshot, plan)
@@ -2897,6 +2992,184 @@ function XHSBotEconomy:BuyTomes(playerID, hero, reserveGold, difficulty, maximum
 	return count
 end
 
+function XHSBotEconomy:GetHeroCombatPower(hero, record)
+	if not IsValidEntityHandle(hero) then return 0 end
+	local function SafeNumber(methodName, fallback)
+		if hero[methodName] == nil then return fallback or 0 end
+		local ok, value = pcall(function() return hero[methodName](hero) end)
+		return ok and math.max(0, tonumber(value) or 0) or fallback or 0
+	end
+	local attributes = SafeNumber("GetStrength", 0)
+		+ SafeNumber("GetAgility", 0)
+		+ SafeNumber("GetIntellect", 0)
+	local attackDamage = 0
+	if hero.GetAverageTrueAttackDamage ~= nil then
+		local ok, value = pcall(function()
+			return hero:GetAverageTrueAttackDamage(hero)
+		end)
+		if ok then attackDamage = math.max(0, tonumber(value) or 0) end
+	end
+	return SafeNumber("GetLevel", 1) * 1000
+		+ attributes * 100
+		+ SafeNumber("GetMaxHealth", 1) * 0.25
+		+ SafeNumber("GetMaxMana", 0) * 0.10
+		+ attackDamage * 8
+		+ math.max(0, tonumber(record and record.item_gold_spent) or 0) * 0.20
+end
+
+function XHSBotEconomy:GetBotEconomicNetWorth(playerID, record)
+	return self:GetGold(playerID)
+		+ math.max(0, tonumber(record and record.item_gold_spent) or 0)
+		+ math.max(0, tonumber(record and record.tomes_bought) or 0) * 10000
+		+ math.max(0, tonumber(record and record.shared_tomes_received) or 0)
+			* 50000
+end
+
+function XHSBotEconomy:GetWeakestShareRecipient(
+	donorPlayerID,
+	donorHero,
+	donorRecord,
+	now
+)
+	local donorPower = self:GetHeroCombatPower(donorHero, donorRecord)
+	local best = nil
+	for _, targetPlayerID in ipairs(
+		XHSBotPlayerRegistry:GetXHSBotPlayerIDs()
+	) do
+		if tonumber(targetPlayerID) ~= tonumber(donorPlayerID) then
+			local targetHero =
+				XHSBotPlayerRegistry:GetBotHero(targetPlayerID)
+			local targetRecord =
+				XHSBotPlayerRegistry:GetBot(targetPlayerID)
+			local claimUntil =
+				tonumber(self.resource_share_claims[targetPlayerID]) or 0
+			if IsValidEntityHandle(targetHero) and targetHero:IsAlive()
+				and type(targetRecord) == "table"
+				and now >= claimUntil then
+				local targetPower =
+					self:GetHeroCombatPower(targetHero, targetRecord)
+				local powerGap = donorPower - targetPower
+				local sufficientlyWeaker = donorPower
+					>= math.max(
+						targetPower * self.RESOURCE_SHARE_POWER_RATIO,
+						targetPower + 75000
+					)
+				if sufficientlyWeaker
+					and (best == nil
+						or targetPower < best.power
+						or targetPower == best.power
+							and targetPlayerID < best.player_id) then
+					best = {
+						player_id = targetPlayerID,
+						hero = targetHero,
+						record = targetRecord,
+						power = targetPower,
+						power_gap = powerGap,
+					}
+				end
+			end
+		end
+	end
+	return best, donorPower
+end
+
+function XHSBotEconomy:TryShareTomeSurplus(
+	playerID,
+	hero,
+	record,
+	plan,
+	now
+)
+	now = tonumber(now) or GameRules:GetGameTime()
+	if not IsValidEntityHandle(hero) or not hero:IsAlive()
+		or type(record) ~= "table"
+		or now < (tonumber(record.next_resource_share_at) or 0) then
+		return false
+	end
+	local tomeEntry = XHSBotItemCatalog:GetTome("item_tome_big")
+	local cost = tomeEntry ~= nil
+		and math.max(0, tonumber(tomeEntry.cost) or 0) or 0
+	local stats = tomeEntry ~= nil and tomeEntry.stats ~= nil
+		and math.max(0, tonumber(tomeEntry.stats.stat_bonus) or 0) or 0
+	local wallet = self:GetGold(playerID)
+	local preserve = math.max(
+		self.RESOURCE_SHARE_POST_GIFT_RESERVE,
+		math.max(0, tonumber(plan and plan.reserve_gold) or 0)
+	)
+	if tomeEntry == nil
+		or tomeEntry.bot_transaction ~= "direct_stats_gift"
+		or cost ~= 50000
+		or stats <= 0
+		or wallet < self.RESOURCE_SHARE_WALLET_THRESHOLD
+		or wallet - cost < preserve
+		or self:GetBotEconomicNetWorth(playerID, record) < 300000 then
+		return false
+	end
+	local canPurchase = self:CanPurchaseTomesNow(playerID, hero)
+	if not canPurchase then return false end
+
+	local recipient, donorPower = self:GetWeakestShareRecipient(
+		playerID,
+		hero,
+		record,
+		now
+	)
+	if recipient == nil or recipient.hero.IncrementAttributes == nil then
+		return false
+	end
+
+	local goldBefore = wallet
+	if not self:WithdrawGold(playerID, cost) then return false end
+	if self:GetGold(playerID) ~= goldBefore - cost then
+		self:SetSynchronizedGold(playerID, goldBefore)
+		return false
+	end
+	local granted = pcall(function()
+		recipient.hero:IncrementAttributes(stats, {
+			record_stats = tomeEntry.bot_record_stats == true,
+			play_sound = false,
+		})
+	end)
+	if not granted then
+		self:RefundGold(playerID, cost)
+		return false
+	end
+
+	self.resource_share_claims[recipient.player_id] =
+		now + self.RESOURCE_SHARE_COOLDOWN
+	record.next_resource_share_at =
+		now + self.RESOURCE_SHARE_COOLDOWN
+	record.tomes_gifted = (tonumber(record.tomes_gifted) or 0) + 1
+	record.resource_gold_shared =
+		(tonumber(record.resource_gold_shared) or 0) + cost
+	record.last_resource_share_target = recipient.player_id
+	record.last_resource_share_power_gap =
+		math.floor(donorPower - recipient.power)
+	record.last_item_action =
+		"gift:big_tome_to_bot_" .. tostring(recipient.player_id)
+	recipient.record.shared_tomes_received =
+		(tonumber(recipient.record.shared_tomes_received) or 0) + 1
+	recipient.record.shared_stats_received =
+		(tonumber(recipient.record.shared_stats_received) or 0) + stats
+	recipient.record.last_resource_donor = playerID
+	recipient.record.last_item_action =
+		"receive:big_tome_from_bot_" .. tostring(playerID)
+
+	if XHSBotDecisionAudit ~= nil then
+		XHSBotDecisionAudit:RecordPurchase(
+			playerID,
+			true,
+			tomeEntry,
+			record,
+			"direct",
+			"gift",
+			0,
+			"recipient:" .. tostring(recipient.player_id)
+		)
+	end
+	return true
+end
+
 function XHSBotEconomy:Think(playerID, hero, record, profile, difficulty)
 	if not IsValidEntityHandle(hero) then return nil end
 	profile = profile or XHSBotHeroProfiles:Get(hero:GetUnitName())
@@ -2981,6 +3254,16 @@ function XHSBotEconomy:Think(playerID, hero, record, profile, difficulty)
 	-- stat purchase, not a shop visit, inventory operation, or movement goal.
 	-- Evaluate them before stash travel and combat-item actions so a pending
 	-- reserve pickup can never starve tome progression for an entire match.
+	-- A truly overpowered donor gets first refusal on one 50k Tome of Stats for
+	-- the weakest bot. The strict post-gift reserve keeps sharing altruistic,
+	-- never self-sabotaging.
+	self:TryShareTomeSurplus(
+		playerID,
+		hero,
+		record,
+		plan,
+		now
+	)
 	local backgroundTomes = 0
 	if arenaPreparation ~= nil then
 		backgroundTomes = self:PrepareSpecialArena(
@@ -3021,6 +3304,14 @@ function XHSBotEconomy:Think(playerID, hero, record, profile, difficulty)
 
 	record.defer_potion_for_spell_now = false
 	if self:UseEmergencyTacticalItems(hero, record) then return "item" end
+	if self:ReconcileLightningSwordUpgrade(
+		playerID,
+		hero,
+		record,
+		snapshot
+	) then
+		return "inventory"
+	end
 	local inventoryOptimized =
 		self:OptimizeActiveInventory(hero, record, snapshot, plan)
 	if atHomeShop then

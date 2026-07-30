@@ -2,6 +2,18 @@
 
 local SPECIAL_WAVE_WARNING_SOUND = "Dungeon.Stinger03"
 local SPECIAL_WAVE_WARNING_DURATION = 30
+local SPECIAL_WAVE_STAGE_JOB = "special_wave_next"
+local SPECIAL_WAVE_UNIT_COUNT = 10
+local SPECIAL_WAVE_UNITS = {
+	"npc_dota_creature_necrolyte_event_1",
+	"npc_dota_creature_naga_siren_event_2",
+	"npc_dota_creature_vengeful_spirit_event_3",
+	"npc_dota_creature_captain_event_4",
+	"npc_dota_creature_slardar_event_5",
+	"npc_dota_creature_chaos_knight_event_6",
+	"npc_dota_creature_luna_event_7",
+	"npc_dota_creature_clockwerk_event_8",
+}
 
 if CustomTimers == nil then
 	CustomTimers = class({})
@@ -47,6 +59,56 @@ if CustomTimers == nil then
 		"Incoming wave of Darkness from the East",
 		"Incoming wave of Darkness from the South"
 	}
+end
+
+local function NormalizeSpecialWaveCardinal(cardinalPoint)
+	cardinalPoint = tonumber(cardinalPoint) or 0
+	if cardinalPoint > 4 then cardinalPoint = cardinalPoint - 4 end
+	return cardinalPoint
+end
+
+local function GetSpecialWaveSpawner(cardinalPoint)
+	local direction = CustomTimers:GetSpecialWavePoint(cardinalPoint)
+	if direction == nil then return nil, nil end
+	return Entities:FindByName(
+		nil,
+		"npc_dota_spawner_" .. direction .. "_event"
+	), direction
+end
+
+function PrepareSpecialWave(cardinalPoint, duration)
+	if XHSWaveStager == nil then return false end
+	local waveIndex = CustomTimers.special_wave
+	if waveIndex == 3 or waveIndex == 6 then return false end
+	local spawner, direction = GetSpecialWaveSpawner(cardinalPoint)
+	local unitName = SPECIAL_WAVE_UNITS[waveIndex]
+	if spawner == nil or unitName == nil then return false end
+
+	local descriptors = {}
+	for index = 1, SPECIAL_WAVE_UNIT_COUNT do
+		descriptors[index] = {
+			unit_name = unitName,
+			team = DOTA_TEAM_CUSTOM_1,
+			spawn_position = spawner:GetAbsOrigin(),
+			wave_index = waveIndex,
+			direction = direction,
+		}
+	end
+
+	XHSWaveStager:StartJob(SPECIAL_WAVE_STAGE_JOB, descriptors, {
+		owner = "special_wave",
+		window = math.max(0.05, tonumber(duration) or SPECIAL_WAVE_WARNING_DURATION),
+		wave_index = waveIndex,
+		direction = direction,
+		is_valid = function()
+			return CustomTimers.game_phase <= 2
+				and CustomTimers.proc_final_wave ~= true
+				and CustomTimers.special_waves_disabled ~= true
+				and CustomTimers.enable_special_wave == true
+				and CustomTimers.special_wave == waveIndex
+		end,
+	})
+	return true
 end
 
 if XHSQuestState == nil then
@@ -296,6 +358,9 @@ function CustomTimers:PrepareFinalWaveCountdown(force)
 	CustomTimers.proc_final_wave = true
 	CustomTimers.final_wave_kill_counting = false
 	CustomTimers.final_wave_spawned_kill_limit = 0
+	if XHSWaveStager ~= nil then
+		XHSWaveStager:CancelJob(SPECIAL_WAVE_STAGE_JOB, "final_wave_countdown")
+	end
 	KillCreeps(DOTA_TEAM_CUSTOM_1)
 
 	for c = 1, 8 do
@@ -374,11 +439,12 @@ function CustomTimers:Think()
 					if CustomTimers.current_time["special_wave"] == 30 then
 						-- print("Special Wave in 30 seconds:", CustomTimers.special_wave_region[cardinal_point], CustomTimers.special_wave)
 						if cardinal_point ~= 3 and cardinal_point ~= 6 then
+							CustomTimers.enable_special_wave = true
+							PrepareSpecialWave(cardinal_point, 30)
 							CustomTimers:ShowSpecialWaveCountdown(cardinal_point, 30)
 							if Runes and Runes.OnSpecialWaveWarning then
 								Runes:OnSpecialWaveWarning(cardinal_point, CustomTimers:GetSpecialWavePoint(cardinal_point))
 							end
-							CustomTimers.enable_special_wave = true
 						end
 					elseif CustomTimers.current_time["special_wave"] == 0 then
 						-- print("Special Wave:", CustomTimers.special_wave_region[cardinal_point], CustomTimers.special_wave)
@@ -618,6 +684,13 @@ function CustomTimers:ResumeSpecialWaveCountdown()
 	if remaining <= 0 or remaining > 30 then return end
 	if CustomTimers.special_wave == 3 or CustomTimers.special_wave == 6 then return end
 
+	local stagedJob = XHSWaveStager ~= nil
+		and XHSWaveStager:GetJob(SPECIAL_WAVE_STAGE_JOB)
+		or nil
+	if stagedJob == nil
+		or tonumber(stagedJob.options.wave_index) ~= CustomTimers.special_wave then
+		PrepareSpecialWave(CustomTimers.special_wave, remaining)
+	end
 	CustomTimers:ShowSpecialWaveCountdown(CustomTimers.special_wave, remaining)
 end
 
@@ -658,24 +731,13 @@ function SpecialWave(iCardinalPoint, force)
 	CustomTimers.current_time["special_wave"] = XHS_SPECIAL_WAVE_INTERVAL + 1
 	local waveIndex = CustomTimers.special_wave
 
-	if iCardinalPoint > 4 then iCardinalPoint = iCardinalPoint - 4 end
+	iCardinalPoint = NormalizeSpecialWaveCardinal(iCardinalPoint)
 
 	local point = {
 		"west",
 		"north",
 		"east",
 		"south"
-	}
-
-	local unit = {
-		"npc_dota_creature_necrolyte_event_1",
-		"npc_dota_creature_naga_siren_event_2",
-		"npc_dota_creature_vengeful_spirit_event_3",
-		"npc_dota_creature_captain_event_4",
-		"npc_dota_creature_slardar_event_5",
-		"npc_dota_creature_chaos_knight_event_6",
-		"npc_dota_creature_luna_event_7",
-		"npc_dota_creature_clockwerk_event_8"
 	}
 
 	local real_point = Entities:FindByName(nil, "npc_dota_spawner_" .. point[iCardinalPoint] .. "_event")
@@ -689,8 +751,8 @@ function SpecialWave(iCardinalPoint, force)
 		id = DoUniqueString("xhs_special_wave"),
 		wave_index = waveIndex,
 		direction = point[iCardinalPoint],
-		total = 10,
-		remaining = 10,
+		total = SPECIAL_WAVE_UNIT_COUNT,
+		remaining = SPECIAL_WAVE_UNIT_COUNT,
 		units = {},
 	}
 	CustomTimers.active_special_waves = CustomTimers.active_special_waves or {}
@@ -702,8 +764,7 @@ function SpecialWave(iCardinalPoint, force)
 		FragmentQuests:OnSpecialWaveStart(waveIndex, wave.direction, wave.total)
 	end
 
-	for j = 1, 10 do
-		local spawned_unit = CreateUnitByName(unit[waveIndex], real_point:GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_1)
+	local function RegisterSpecialWaveUnit(spawned_unit)
 		if spawned_unit ~= nil then
 			if RegisterPhaseOneBudgetEnemy ~= nil then
 				RegisterPhaseOneBudgetEnemy(spawned_unit)
@@ -711,6 +772,38 @@ function SpecialWave(iCardinalPoint, force)
 			wave.units[spawned_unit:entindex()] = true
 			CustomTimers.active_special_wave_units[spawned_unit:entindex()] = wave
 		end
+	end
+
+	local released = nil
+	if XHSWaveStager ~= nil then
+		local stagedJob = XHSWaveStager:GetJob(SPECIAL_WAVE_STAGE_JOB)
+		if stagedJob ~= nil
+			and tonumber(stagedJob.options.wave_index) == waveIndex
+			and stagedJob.options.direction == wave.direction then
+			released = XHSWaveStager:ActivateJob(SPECIAL_WAVE_STAGE_JOB, {
+				activate = function(_, spawnedUnit)
+					RegisterSpecialWaveUnit(spawnedUnit)
+				end,
+			})
+		elseif stagedJob ~= nil then
+			XHSWaveStager:CancelJob(
+				SPECIAL_WAVE_STAGE_JOB,
+				"special_wave_mismatch"
+			)
+		end
+	end
+
+	released = tonumber(released) or 0
+	for _ = released + 1, SPECIAL_WAVE_UNIT_COUNT do
+		local spawned_unit = CreateUnitByName(
+			SPECIAL_WAVE_UNITS[waveIndex],
+			real_point:GetAbsOrigin(),
+			true,
+			nil,
+			nil,
+			DOTA_TEAM_CUSTOM_1
+		)
+		RegisterSpecialWaveUnit(spawned_unit)
 	end
 
 	if CustomTimers:GetVisibleSpecialWave() == wave then

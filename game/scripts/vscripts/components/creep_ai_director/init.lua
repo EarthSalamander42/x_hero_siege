@@ -139,7 +139,7 @@ function XHSCreepAIDirector:InvalidateAbilityProfile(unitName)
 end
 
 function XHSCreepAIDirector:Schedule(record, delay)
-	if record == nil or record.active ~= true then return end
+	if record == nil or record.active ~= true or record.staged == true then return end
 	delay = math.max(TICK_INTERVAL, tonumber(delay) or DEFAULT_RETRY)
 	record.version = (record.version or 0) + 1
 	self.next_sequence = self.next_sequence + 1
@@ -149,6 +149,30 @@ function XHSCreepAIDirector:Schedule(record, delay)
 		version = record.version,
 		sequence = self.next_sequence,
 	})
+end
+
+function XHSCreepAIDirector:SetStaged(unit, staged, wakeDelay)
+	if not IsValidEntityHandle(unit) then return false end
+	local record = self.records[unit:entindex()]
+	if record == nil then return false end
+	staged = staged == true
+	if record.staged == staged then
+		if not staged and wakeDelay ~= nil then
+			self:Schedule(record, wakeDelay)
+		end
+		return true
+	end
+
+	record.staged = staged
+	record.version = (record.version or 0) + 1
+	if staged then
+		self.staged_count = (tonumber(self.staged_count) or 0) + 1
+	else
+		self.staged_count = math.max(0, (tonumber(self.staged_count) or 0) - 1)
+		self:Schedule(record, math.max(TICK_INTERVAL, tonumber(wakeDelay) or TICK_INTERVAL))
+		Counter("wave_stage_ai_wakes")
+	end
+	return true
 end
 
 function XHSCreepAIDirector:Register(modifier)
@@ -199,6 +223,9 @@ function XHSCreepAIDirector:Unregister(modifierOrUnit)
 
 	local record = self.records[unit:entindex()]
 	if record == nil then return end
+	if record.staged == true then
+		self.staged_count = math.max(0, (tonumber(self.staged_count) or 0) - 1)
+	end
 	record.active = false
 	record.version = (record.version or 0) + 1
 	self.records[record.entindex] = nil
@@ -229,7 +256,10 @@ function XHSCreepAIDirector:GetBudget()
 		MIN_BUDGET,
 		math.min(
 			MAX_BUDGET,
-			math.ceil(math.max(1, self.active_count) / AGENTS_PER_BUDGET_SLOT)
+			math.ceil(
+				math.max(1, self.active_count - (tonumber(self.staged_count) or 0))
+					/ AGENTS_PER_BUDGET_SLOT
+			)
 		)
 	)
 end
@@ -248,6 +278,12 @@ function XHSCreepAIDirector:ProcessRecord(record)
 
 	if XHSLagLabIsActive ~= nil and XHSLagLabIsActive("pause_ai") then
 		self:Schedule(record, 0.25)
+		return
+	end
+	if unit.xhs_wave_staged == true and record.staged ~= true then
+		self:SetStaged(unit, true)
+	end
+	if record.staged == true then
 		return
 	end
 
@@ -359,6 +395,7 @@ function XHSCreepAIDirector:GetState()
 	end)
 	return {
 		active_agents = self.active_count or 0,
+		staged_agents = self.staged_count or 0,
 		active_ability_agents = activeAbilityAgents,
 		queued_agents = #(self.heap or {}),
 		cached_profiles = cachedProfiles,
@@ -375,6 +412,7 @@ function XHSCreepAIDirector:Init()
 	self.records = {}
 	self.heap = {}
 	self.active_count = 0
+	self.staged_count = 0
 	self.next_sequence = 0
 
 	GameRules:GetGameModeEntity():SetContextThink("XHSCreepAIDirector", function()

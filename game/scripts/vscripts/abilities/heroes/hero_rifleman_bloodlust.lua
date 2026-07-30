@@ -15,6 +15,9 @@ function rifleman_bloodlust:OnSpellStart()
 
 	target:AddNewModifier(caster, self, "modifier_rifleman_bloodlust", {
 		duration = self:GetSpecialValueFor("duration"),
+		bonus_movement_speed = self:GetSpecialValueFor("bonus_movement_speed"),
+		bonus_attack_speed = self:GetSpecialValueFor("bonus_attack_speed"),
+		bonus_attack_damage_pct = self:GetSpecialValueFor("bonus_attack_damage_pct"),
 	})
 
 	local particle = ParticleManager:CreateParticle(
@@ -52,6 +55,32 @@ function modifier_rifleman_bloodlust:GetEffectAttachType()
 	return PATTACH_ABSORIGIN_FOLLOW
 end
 
+function modifier_rifleman_bloodlust:RefreshSpecialValues(params)
+	params = params or {}
+	self.bonus_movement_speed =
+		tonumber(params.bonus_movement_speed) or self.bonus_movement_speed or 0
+	self.bonus_attack_speed =
+		tonumber(params.bonus_attack_speed) or self.bonus_attack_speed or 0
+	self.bonus_attack_damage_pct =
+		tonumber(params.bonus_attack_damage_pct) or self.bonus_attack_damage_pct or 0
+	local ability = self:GetAbility()
+	if ability == nil or (ability.IsNull ~= nil and ability:IsNull()) then return end
+	self.bonus_movement_speed = ability:GetSpecialValueFor("bonus_movement_speed")
+	self.bonus_attack_speed = ability:GetSpecialValueFor("bonus_attack_speed")
+	self.bonus_attack_damage_pct = ability:GetSpecialValueFor("bonus_attack_damage_pct")
+end
+
+function modifier_rifleman_bloodlust:OnCreated(params)
+	self.bonus_movement_speed = 0
+	self.bonus_attack_speed = 0
+	self.bonus_attack_damage_pct = 0
+	self:RefreshSpecialValues(params)
+end
+
+function modifier_rifleman_bloodlust:OnRefresh(params)
+	self:RefreshSpecialValues(params)
+end
+
 function modifier_rifleman_bloodlust:DeclareFunctions()
 	return {
 		MODIFIER_PROPERTY_MOVESPEED_BONUS_PERCENTAGE,
@@ -61,13 +90,13 @@ function modifier_rifleman_bloodlust:DeclareFunctions()
 end
 
 function modifier_rifleman_bloodlust:GetModifierMoveSpeedBonus_Percentage()
-	return self:GetAbility():GetSpecialValueFor("bonus_movement_speed")
+	return self.bonus_movement_speed or 0
 end
 
 function modifier_rifleman_bloodlust:GetModifierAttackSpeedBonus_Constant()
-	return self:GetAbility():GetSpecialValueFor("bonus_attack_speed")
+	return self.bonus_attack_speed or 0
 end
 
 function modifier_rifleman_bloodlust:GetModifierBaseDamageOutgoing_Percentage()
-	return self:GetAbility():GetSpecialValueFor("bonus_attack_damage_pct")
+	return self.bonus_attack_damage_pct or 0
 end

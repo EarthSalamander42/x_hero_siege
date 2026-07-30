@@ -1,3 +1,88 @@
+local SPACE_MARINE_CLONE_NETTABLE = "xhs_clone_units"
+local SPACE_MARINE_CLONE_STATE_KEY = "state"
+
+XHSSpaceMarineCloneFrames = XHSSpaceMarineCloneFrames or {}
+
+local function PublishSpaceMarineCloneFrames()
+	if CustomNetTables == nil then return end
+
+	local clones = {}
+	for entIndex, record in pairs(XHSSpaceMarineCloneFrames) do
+		local clone = record.unit
+		if clone ~= nil and not clone:IsNull() and clone:IsAlive() then
+			clones[tostring(entIndex)] = {
+				entindex = entIndex,
+				owner_player_id = record.owner_player_id,
+			}
+		else
+			XHSSpaceMarineCloneFrames[entIndex] = nil
+		end
+	end
+
+	CustomNetTables:SetTableValue(
+		SPACE_MARINE_CLONE_NETTABLE,
+		SPACE_MARINE_CLONE_STATE_KEY,
+		{ clones = clones }
+	)
+end
+
+local function UnregisterSpaceMarineClone(clone, publish)
+	if clone == nil then return end
+	local entIndex = clone.entindex ~= nil and clone:entindex() or nil
+	if entIndex ~= nil then
+		XHSSpaceMarineCloneFrames[entIndex] = nil
+	end
+	if publish ~= false then
+		PublishSpaceMarineCloneFrames()
+	end
+end
+
+local function RegisterSpaceMarineClone(clone, ownerPlayerID)
+	if clone == nil or clone:IsNull() then return end
+
+	local entIndex = clone:entindex()
+	XHSSpaceMarineCloneFrames[entIndex] = {
+		unit = clone,
+		owner_player_id = ownerPlayerID,
+	}
+	PublishSpaceMarineCloneFrames()
+
+	clone:SetContextThink(DoUniqueString("xhs_space_marine_clone_frame"), function()
+		if clone == nil or clone:IsNull() or not clone:IsAlive() then
+			XHSSpaceMarineCloneFrames[entIndex] = nil
+			PublishSpaceMarineCloneFrames()
+			return nil
+		end
+		return 0.25
+	end, 0.25)
+end
+
+local function CopyItemState(sourceItem, targetItem)
+	if sourceItem == nil or targetItem == nil then return end
+
+	if sourceItem.GetLevel ~= nil and targetItem.SetLevel ~= nil then
+		targetItem:SetLevel(sourceItem:GetLevel())
+	end
+	if sourceItem.GetCurrentCharges ~= nil and targetItem.SetCurrentCharges ~= nil then
+		targetItem:SetCurrentCharges(sourceItem:GetCurrentCharges())
+	end
+	if sourceItem.GetSecondaryCharges ~= nil and targetItem.SetSecondaryCharges ~= nil then
+		targetItem:SetSecondaryCharges(sourceItem:GetSecondaryCharges())
+	end
+end
+
+local function CopyFinalAttributes(source, clone)
+	clone:CalculateStatBonus(true)
+
+	-- Base attributes alone omit tome stacks and any other permanent stat
+	-- modifiers. Reconcile after abilities and items exist so the clone's
+	-- displayed STR/AGI/INT exactly match the source at cast time.
+	clone:SetBaseStrength(clone:GetBaseStrength() + source:GetStrength() - clone:GetStrength())
+	clone:SetBaseAgility(clone:GetBaseAgility() + source:GetAgility() - clone:GetAgility())
+	clone:SetBaseIntellect(clone:GetBaseIntellect() + source:GetIntellect(false) - clone:GetIntellect(false))
+	clone:CalculateStatBonus(true)
+end
+
 function FanOfRockets(keys)
 	local caster                   = keys.caster
 	local ability                  = keys.ability
@@ -71,9 +156,11 @@ function Clone(keys)
 	-- Kill the old images
 	for k, v in pairs(caster.clones) do
 		if v and IsValidEntity(v) then
+			UnregisterSpaceMarineClone(v, false)
 			v:Kill(nil, nil)
 		end
 	end
+	PublishSpaceMarineCloneFrames()
 
 	-- Start a clean illusion table
 	caster.clones = {}
@@ -110,15 +197,23 @@ function Clone(keys)
 			local itemName = item:GetName()
 			local newItem = CreateItem(itemName, illusion, illusion)
 			illusion:AddItem(newItem)
+			CopyItemState(item, newItem)
 		end
 	end
 
 	illusion:AddNewModifier(caster, ability, "modifier_illusion", { duration = duration, outgoing_damage = outgoingDamage, incoming_damage = incomingDamage })
 	illusion:MakeIllusion()
-	illusion:SetHealth(target:GetHealth())
 	illusion:SetPlayerID(caster:GetPlayerOwnerID())
+	CopyFinalAttributes(target, illusion)
+
+	local healthRatio = target:GetHealth() / math.max(1, target:GetMaxHealth())
+	local manaRatio = target:GetMana() / math.max(1, target:GetMaxMana())
+	illusion:SetHealth(math.max(1, math.floor(illusion:GetMaxHealth() * healthRatio)))
+	illusion:SetMana(math.max(0, illusion:GetMaxMana() * manaRatio))
+
 	-- Add the illusion created to a table within the caster handle, to remove the illusions on the next cast if necessary
 	table.insert(caster.clones, illusion)
+	RegisterSpaceMarineClone(illusion, player)
 end
 
 function ClusterRockets(keys)

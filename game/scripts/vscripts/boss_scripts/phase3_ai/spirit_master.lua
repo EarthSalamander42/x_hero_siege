@@ -154,11 +154,12 @@ local function GetArenaCenter(fallback)
 	return fallback or Vector(0, 0, 0)
 end
 
-local function HideBossBarFor(boss)
+local function HideBossBarFor(boss, retireIdentity)
 	if boss == nil or boss:IsNull() then return end
 	CustomGameEventManager:Send_ServerToAllClients("hide_boss_hp", {
 		boss_count = boss.boss_count or 1,
 		boss_bar_id = GetBossBarId and GetBossBarId(boss) or nil,
+		boss_bar_retire = retireIdentity == true and 1 or 0,
 	})
 end
 
@@ -168,6 +169,23 @@ local function HideSpiritBossBars()
 			boss_count = def.boss_count,
 		})
 	end
+end
+
+local function SuppressAndHideSpiritBossBars(spirits)
+	-- Stop the generic health poller before sending the hide events. Otherwise
+	-- one last queued update can recreate a removed spirit in Panorama and take
+	-- the slot that belongs to the next trio.
+	for _, spirit in pairs(spirits or {}) do
+		if spirit ~= nil and IsValidEntity(spirit) and not spirit:IsNull() then
+			spirit.xhs_boss_bar_suppressed = true
+			if XHSBossCastBar ~= nil then XHSBossCastBar:Hide(spirit) end
+			HideBossBarFor(spirit, true)
+		end
+	end
+
+	-- Finish with an authoritative slot cleanup after the identity-specific
+	-- hides, so all three spirit slots are empty before the master returns.
+	HideSpiritBossBars()
 end
 
 local function HideLegacyMasterBossBar()
@@ -346,7 +364,7 @@ function XHSSpiritMasterEncounter:Reset()
 	local previousMaster = self.master
 	HideBossTimer()
 	HideDormantCounter()
-	HideSpiritBossBars()
+	SuppressAndHideSpiritBossBars(self.spirits)
 	if previousMaster ~= nil and IsValidEntity(previousMaster) and not previousMaster:IsNull() then
 		previousMaster:RemoveModifierByName("modifier_xhs_spirit_master_split_hidden")
 		SetMasterAbilitiesEnabled(previousMaster, true)
@@ -694,11 +712,10 @@ function XHSSpiritMasterEncounter:CompleteSplit()
 	self.phase = "returning"
 	HideBossTimer()
 	HideDormantCounter()
+	SuppressAndHideSpiritBossBars(self.spirits)
 
 	for _, spirit in pairs(self.spirits or {}) do
 		if spirit ~= nil and IsValidEntity(spirit) and not spirit:IsNull() then
-			if XHSBossCastBar ~= nil then XHSBossCastBar:Hide(spirit) end
-			HideBossBarFor(spirit)
 			UTIL_Remove(spirit)
 		end
 	end
@@ -741,7 +758,7 @@ function XHSSpiritMasterEncounter:CompleteFinalSplit(attacker)
 	HideBossTimer()
 	HideDormantCounter()
 	HideLegacyMasterBossBar()
-	HideSpiritBossBars()
+	SuppressAndHideSpiritBossBars(self.spirits)
 
 	local master = self.master
 	if IsValidAlive(master) then
@@ -775,8 +792,6 @@ function XHSSpiritMasterEncounter:CompleteFinalSplit(attacker)
 		local spirit = self.spirits[def.key]
 		local spiritKey = def.key
 		if spirit ~= nil and IsValidEntity(spirit) and not spirit:IsNull() then
-			if XHSBossCastBar ~= nil then XHSBossCastBar:Hide(spirit) end
-			HideBossBarFor(spirit)
 			spirit:RemoveModifierByName("modifier_xhs_boss_cast_protection")
 			spirit:RemoveModifierByName("modifier_xhs_tri_spirit_phase_ai")
 			spirit:Interrupt()

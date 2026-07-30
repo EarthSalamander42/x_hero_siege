@@ -465,10 +465,14 @@ function CDOTA_BaseNPC:IncrementAttributes(amount, options)
 	if not self:IsAlive() then return end
 
 	local playSound = true
+	local playEffect = true
 	if type(options) == "table" and options.play_sound == false then
 		playSound = false
 	elseif options == false then
 		playSound = false
+	end
+	if type(options) == "table" and options.play_effect == false then
+		playEffect = false
 	end
 
 	if self:HasModifier("modifier_tome_of_stats") then
@@ -483,12 +487,14 @@ function CDOTA_BaseNPC:IncrementAttributes(amount, options)
 
 	if not self.GetPlayerID then return end
 
-	local levelupParticle = XHSGetBattlepassParticle ~= nil
-		and XHSGetBattlepassParticle(self, "levelup_pfx", "particles/generic_hero_status/hero_levelup.vpcf")
-		or "particles/generic_hero_status/hero_levelup.vpcf"
-	local particle1 = ParticleManager:CreateParticle(levelupParticle, PATTACH_ABSORIGIN_FOLLOW, self)
-	ParticleManager:SetParticleControl(particle1, 0, self:GetAbsOrigin())
-	XHSDestroyParticleAfter(particle1, 5.0, false)
+	if playEffect == true then
+		local levelupParticle = XHSGetBattlepassParticle ~= nil
+			and XHSGetBattlepassParticle(self, "levelup_pfx", "particles/generic_hero_status/hero_levelup.vpcf")
+			or "particles/generic_hero_status/hero_levelup.vpcf"
+		local particle1 = ParticleManager:CreateParticle(levelupParticle, PATTACH_ABSORIGIN_FOLLOW, self)
+		ParticleManager:SetParticleControl(particle1, 0, self:GetAbsOrigin())
+		XHSDestroyParticleAfter(particle1, 1.5, false)
+	end
 
 	if playSound == true then
 		self:EmitSound("ui.trophy_levelup")

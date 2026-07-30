@@ -25,6 +25,7 @@ var XHSDevToolsSpectatorState = {
 	lastFollowRequestAt: 0,
 	radiantFogApplied: false,
 	radiantFogConfirmations: 0,
+	vanillaFlyoutEnabled: null,
 	wasVisible: false
 };
 var XHSDevToolsPerformanceColumns = {
@@ -920,22 +921,65 @@ function XHSDevToolsSetVanillaSpectatorPanelHidden(panelID, hidden) {
 	}
 }
 
+function XHSDevToolsSetVanillaScoreboardHidden(hidden) {
+	if (typeof FindDotaHudElement !== "function") {
+		return;
+	}
+
+	var radiantTeam = null;
+	try {
+		radiantTeam = FindDotaHudElement("RadiantTeamContainer");
+	} catch (error) {
+		radiantTeam = null;
+	}
+	if (!radiantTeam || !radiantTeam.GetParent) {
+		return;
+	}
+
+	// Valve's dota_hud_scoreboard hierarchy is:
+	// DOTAScoreboard > Background > RadiantTeamContainer.
+	// Hide DOTAScoreboard itself so its own open/close classes can no longer
+	// flash behind XHS' separate CustomUIElement FlyoutScoreboard.
+	var background = radiantTeam.GetParent();
+	var scoreboard = background && background.GetParent
+		? background.GetParent()
+		: null;
+	if (!scoreboard || !scoreboard.FindChildTraverse ||
+		!scoreboard.FindChildTraverse("TeamInventories")) {
+		return;
+	}
+
+	if (hidden) {
+		scoreboard._xhsToolsSpectatorHidden = true;
+		scoreboard.style.visibility = "collapse";
+	} else if (scoreboard._xhsToolsSpectatorHidden === true) {
+		scoreboard.style.visibility = null;
+		scoreboard._xhsToolsSpectatorHidden = false;
+	}
+}
+
 function XHSDevToolsUpdateVanillaSpectatorUI() {
 	var hidden = XHSDevToolsIsLocalSpectator();
 	XHSDevToolsSetVanillaSpectatorPanelHidden("GameInfoButton", hidden);
 	XHSDevToolsSetVanillaSpectatorPanelHidden("spectator_options", hidden);
+	XHSDevToolsSetVanillaScoreboardHidden(hidden);
 	XHSDevToolsApplyDefaultRadiantFog(hidden);
 	if (
 		GameUI.SetDefaultUIEnabled
 		&& typeof DotaDefaultUIElement_t !== "undefined"
 		&& DotaDefaultUIElement_t.DOTA_DEFAULT_UI_FLYOUT_SCOREBOARD !== undefined
 	) {
-		// init.js disables the flyout for players. Tools spectators still need the
-		// normal scoreboard command so the custom FlyoutScoreboard can open.
-		GameUI.SetDefaultUIEnabled(
-			DotaDefaultUIElement_t.DOTA_DEFAULT_UI_FLYOUT_SCOREBOARD,
-			hidden
-		);
+		// init.js disables the flyout for players. Tools spectators still need
+		// its input command so DOTACustomUI_SetFlyoutScoreboardVisible reaches
+		// the custom panel. Change this engine flag only on state transitions;
+		// repeatedly writing it every tick made the vanilla panel flicker.
+		if (XHSDevToolsSpectatorState.vanillaFlyoutEnabled !== hidden) {
+			GameUI.SetDefaultUIEnabled(
+				DotaDefaultUIElement_t.DOTA_DEFAULT_UI_FLYOUT_SCOREBOARD,
+				hidden
+			);
+			XHSDevToolsSpectatorState.vanillaFlyoutEnabled = hidden;
+		}
 	}
 }
 
