@@ -96,10 +96,14 @@ async function getCommitStats(commit) {
 
 		const details = await response.json();
 		if (!details.stats) return null;
+		const files = Array.isArray(details.files) ? details.files : [];
 
 		return {
 			additions: Number(details.stats.additions) || 0,
-			deletions: Number(details.stats.deletions) || 0
+			deletions: Number(details.stats.deletions) || 0,
+			filesChanged: files.length,
+			created: files.filter(file => file.status === "added").length,
+			deleted: files.filter(file => file.status === "removed").length
 		};
 	} catch (error) {
 		console.warn(`Could not load stats for ${shortSha(commit.id)}: ${error.message}`);
@@ -107,9 +111,17 @@ async function getCommitStats(commit) {
 	}
 }
 
+function formatCommitStats(stats) {
+	const created = stats.created ? ` · ${stats.created} created` : "";
+	const deleted = stats.deleted ? ` · ${stats.deleted} deleted` : "";
+	const fileLabel = stats.filesChanged === 1 ? "file" : "files";
+
+	return `\`\`\`diff\n+${stats.additions} additions${created}\n-${stats.deletions} deletions${deleted}\n ${stats.filesChanged} ${fileLabel} changed\n\`\`\``;
+}
+
 async function addStatsToExistingDescription(description) {
 	const withoutStats = String(description || "").replace(
-		/\n```diff\n\+\d+ additions\n-\d+ deletions\n```/g,
+		/\n```diff\n\+\d+ additions(?: · \d+ created)?\n-\d+ deletions(?: · \d+ deleted)?(?:\n \d+ files? changed)?\n```/g,
 		""
 	);
 	const commitUrlPattern = /https:\/\/github\.com\/[^/\s)]+\/[^/\s)]+\/commit\/([0-9a-f]{7,40})/i;
@@ -123,7 +135,7 @@ async function addStatsToExistingDescription(description) {
 
 		const stats = await getCommitStats({ id: match[1] });
 		if (stats) {
-			updatedLines.push(`\`\`\`diff\n+${stats.additions} additions\n-${stats.deletions} deletions\n\`\`\``);
+			updatedLines.push(formatCommitStats(stats));
 		}
 	}
 
@@ -154,9 +166,31 @@ function editableEmbed(embed, description) {
 	return editable;
 }
 
+function wait(milliseconds) {
+	return new Promise(resolve => setTimeout(resolve, milliseconds));
+}
+
+async function discordFetch(url, options = {}, operation = "Discord request") {
+	const maxAttempts = 6;
+
+	for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+		const response = await fetch(url, options);
+		if (response.status !== 429) return response;
+
+		const rateLimit = await response.json().catch(() => ({}));
+		const retryAfterMs = Math.max(250, Math.ceil((Number(rateLimit.retry_after) || 1) * 1000));
+		if (attempt === maxAttempts) {
+			throw new Error(`${operation} is still rate limited after ${maxAttempts} attempts.`);
+		}
+
+		console.warn(`${operation} rate limited; retrying in ${retryAfterMs}ms (attempt ${attempt}/${maxAttempts}).`);
+		await wait(retryAfterMs);
+	}
+}
+
 async function updateDiscordMessage(messageId) {
 	const messageUrl = `${webhookUrl}/messages/${messageId}`;
-	const currentResponse = await fetch(messageUrl);
+	const currentResponse = await discordFetch(messageUrl, {}, `Loading Discord message ${messageId}`);
 	if (!currentResponse.ok) {
 		throw new Error(`Could not load Discord message ${messageId}: ${currentResponse.status} ${await currentResponse.text()}`);
 	}
@@ -169,11 +203,11 @@ async function updateDiscordMessage(messageId) {
 	const embeds = await Promise.all(message.embeds.map(async embed =>
 		editableEmbed(embed, await addStatsToExistingDescription(embed.description))
 	));
-	const updateResponse = await fetch(messageUrl, {
+	const updateResponse = await discordFetch(messageUrl, {
 		method: "PATCH",
 		headers: { "Content-Type": "application/json" },
 		body: JSON.stringify({ embeds })
-	});
+	}, `Updating Discord message ${messageId}`);
 
 	if (!updateResponse.ok) {
 		throw new Error(`Discord message update failed: ${updateResponse.status} ${await updateResponse.text()}`);
@@ -192,8 +226,10 @@ async function updateDiscordMessages() {
 		throw new Error("DISCORD_MESSAGE_ID must contain numeric Discord message IDs separated by commas.");
 	}
 
-	for (const messageId of [...new Set(messageIds)]) {
+	const uniqueMessageIds = [...new Set(messageIds)];
+	for (const [index, messageId] of uniqueMessageIds.entries()) {
 		await updateDiscordMessage(messageId);
+		if (index < uniqueMessageIds.length - 1) await wait(350);
 	}
 }
 
@@ -210,7 +246,7 @@ async function pushEmbed() {
 
 			if (!stats) return summary;
 
-			return `${summary}\n\`\`\`diff\n+${stats.additions} additions\n-${stats.deletions} deletions\n\`\`\``;
+			return `${summary}\n${formatCommitStats(stats)}`;
 		})
 		.join("\n");
 
