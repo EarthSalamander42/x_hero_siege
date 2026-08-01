@@ -73,6 +73,26 @@ function XHSWaveStager:GetJob(id)
 	return self.jobs and self.jobs[tostring(id or "")] or nil
 end
 
+function XHSWaveStager:IsEnabled()
+	return self.enabled ~= false
+end
+
+function XHSWaveStager:SetEnabled(enabled, reason)
+	enabled = enabled ~= false
+	if self.enabled == enabled then return false end
+	self.enabled = enabled
+	if not enabled then
+		local jobIDs = {}
+		for id, _ in pairs(self.jobs or {}) do
+			table.insert(jobIDs, id)
+		end
+		for _, id in ipairs(jobIDs) do
+			self:CancelJob(id, reason or "disabled")
+		end
+	end
+	return true
+end
+
 function XHSWaveStager:QueueCleanup(record, reason)
 	if record == nil or record.cleanup_queued == true then return end
 	record.cleanup_queued = true
@@ -110,6 +130,7 @@ end
 
 function XHSWaveStager:StartJob(id, descriptors, options)
 	self:Init()
+	if not self:IsEnabled() then return nil end
 	id = tostring(id or "")
 	if id == "" then return nil end
 	self:CancelJob(id, "replaced")
@@ -395,6 +416,7 @@ function XHSWaveStager:GetState()
 		pendingUnits = pendingUnits + math.max(0, #job.descriptors - job.cursor + 1)
 	end
 	return {
+		enabled = self:IsEnabled(),
 		active_jobs = activeJobs,
 		staged_units = self:GetStagedCount(),
 		pending_units = pendingUnits,
@@ -410,6 +432,7 @@ function XHSWaveStager:Init()
 	self.jobs = self.jobs or {}
 	self.staged_units = self.staged_units or {}
 	self.cleanup_queue = self.cleanup_queue or {}
+	if self.enabled == nil then self.enabled = true end
 	self.next_generation = self.next_generation or 0
 	self.next_staging_sequence = self.next_staging_sequence or 1
 	self.create_cost_max_ms = self.create_cost_max_ms or 0

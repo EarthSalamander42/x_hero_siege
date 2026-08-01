@@ -31,6 +31,7 @@ var xhs_bot_setup_draft = {
 	ai_difficulty: "normal",
 	composition: "balanced",
 	spectator_mode: false,
+	hero_selections: {},
 };
 var xhs_bot_setup_dirty = false;
 var xhs_bot_setup_pending = false;
@@ -206,8 +207,6 @@ var XHS_DIFFICULTY_VOTE_STATS = {
 
 var vote_fallbacks = {
 	loading_screen_bot_setup_title: "AI ALLIES",
-	loading_screen_bot_setup_dev_feature: "DEV / TOOLS ONLY",
-	loading_screen_bot_setup_public_feature: "UNANIMOUS OPT-IN",
 	loading_screen_bot_setup_count: "Allies",
 	loading_screen_bot_setup_difficulty: "Difficulty",
 	loading_screen_bot_setup_composition: "Composition",
@@ -486,6 +485,160 @@ function XHSBotSetupMakeButton(parent, id, text, class_name, callback) {
 	return button;
 }
 
+function XHSBotSetupCopyHeroSelections(source, maximum_slot) {
+	var copy = {};
+	source = source || {};
+	maximum_slot = Math.max(0, Math.floor(ToNumber(maximum_slot, 8)));
+	for (var slot = 1; slot <= maximum_slot; slot++) {
+		var hero_name = String(source[slot] || source[String(slot)] || "");
+		if (hero_name) {
+			copy[slot] = hero_name;
+		}
+	}
+	return copy;
+}
+
+function XHSBotSetupGetSupportedHeroes() {
+	var source = xhs_bot_setup_config && xhs_bot_setup_config.supported_heroes;
+	var heroes = [];
+	for (var key in (source || {})) {
+		var entry = source[key];
+		var hero_name = typeof entry === "string" ? entry : String((entry && entry.hero) || "");
+		if (!hero_name) {
+			continue;
+		}
+		heroes.push({
+			hero: hero_name,
+			display_name: String((entry && entry.display_name) || hero_name),
+			order: Math.floor(ToNumber(key, heroes.length + 1)),
+		});
+	}
+	heroes.sort(function (left, right) {
+		var left_name = String(left.display_name || left.hero).toLowerCase();
+		var right_name = String(right.display_name || right.hero).toLowerCase();
+		if (left_name < right_name) {
+			return -1;
+		}
+		if (left_name > right_name) {
+			return 1;
+		}
+		return left.hero < right.hero ? -1 : (left.hero > right.hero ? 1 : 0);
+	});
+	return heroes;
+}
+
+function XHSBotSetupCreateHeroOption(dropdown, slot, suffix, hero_name, display_name) {
+	// Native Label options keep Panorama's DropDown click handling intact.
+	var option = $.CreatePanel("Label", dropdown, "XHSBotHeroOption_" + slot + "_" + suffix);
+	option.AddClass("xhs-bot-hero-option");
+	option.xhs_hero_name = hero_name;
+	option.SetAttributeString("xhs_hero_name", hero_name);
+	option.text = display_name;
+	if (hero_name) {
+		option.AddClass("HasHeroIcon");
+		// Valve's square hero-icon resources keep the full KV unit name.
+		option.style.backgroundImage = "url(\"file://{images}/heroes/icons/" + hero_name + ".png\")";
+	}
+	dropdown.AddOption(option);
+	return option;
+}
+
+function XHSBotSetupIsSupportedHero(hero_name) {
+	if (!hero_name) {
+		return true;
+	}
+	var supported = XHSBotSetupGetSupportedHeroes();
+	for (var index = 0; index < supported.length; index++) {
+		if (supported[index].hero === hero_name) {
+			return true;
+		}
+	}
+	return false;
+}
+
+function XHSBotSetupSelectHero(slot, hero_name) {
+	if (XHSBotSetupGetEditBlockReason()) {
+		return;
+	}
+	slot = Math.max(1, Math.floor(ToNumber(slot, 1)));
+	hero_name = String(hero_name || "");
+	if (!XHSBotSetupIsSupportedHero(hero_name)) {
+		return;
+	}
+	var selections = XHSBotSetupCopyHeroSelections(xhs_bot_setup_draft.hero_selections, XHSBotSetupMaxBots());
+	if (hero_name) {
+		selections[slot] = hero_name;
+	} else {
+		delete selections[slot];
+	}
+	xhs_bot_setup_draft.hero_selections = selections;
+	xhs_bot_setup_dirty = true;
+	XHSBotSetupRender("hero_select");
+}
+
+function XHSBotSetupEnsureHeroDropdown(player_row, bot_data) {
+	if (!player_row || !bot_data) {
+		return;
+	}
+	var slot = Math.max(1, Math.floor(ToNumber(bot_data.slot, 1)));
+	var supported = XHSBotSetupGetSupportedHeroes();
+	var options_signature = supported.map(function (entry) {
+		return entry.hero + ":" + entry.display_name;
+	}).join("|");
+	if (!player_row.hero_dropdown || player_row.hero_dropdown_signature !== options_signature) {
+		if (player_row.hero_dropdown) {
+			player_row.hero_dropdown.DeleteAsync(0);
+		}
+		var dropdown = $.CreatePanel("DropDown", player_row.panel, "XHSBotHeroSelector_" + slot);
+		dropdown.AddClass("xhs-bot-hero-dropdown");
+		XHSBotSetupCreateHeroOption(
+			dropdown,
+			slot,
+			"random",
+			"",
+			L("loading_screen_bot_setup_random")
+		);
+		for (var index = 0; index < supported.length; index++) {
+			var hero = supported[index];
+			XHSBotSetupCreateHeroOption(
+				dropdown,
+				slot,
+				String(index),
+				hero.hero,
+				hero.display_name
+			);
+		}
+		dropdown.SetPanelEvent("oninputsubmit", (function (target_slot, target_dropdown) {
+			return function () {
+				var selected = target_dropdown.GetSelected();
+				var hero_name = selected
+					? selected.GetAttributeString("xhs_hero_name", String(selected.xhs_hero_name || ""))
+					: "";
+				XHSBotSetupSelectHero(target_slot, hero_name);
+			};
+		})(slot, dropdown));
+		player_row.hero_dropdown = dropdown;
+		player_row.hero_dropdown_signature = options_signature;
+	}
+
+	var selected_hero = String(
+		(xhs_bot_setup_draft.hero_selections &&
+			(xhs_bot_setup_draft.hero_selections[slot] || xhs_bot_setup_draft.hero_selections[String(slot)]))
+		|| bot_data.hero_selection
+		|| ""
+	);
+	var selected_id = "XHSBotHeroOption_" + slot + "_random";
+	for (var option_index = 0; option_index < supported.length; option_index++) {
+		if (supported[option_index].hero === selected_hero) {
+			selected_id = "XHSBotHeroOption_" + slot + "_" + option_index;
+			break;
+		}
+	}
+	player_row.hero_dropdown.SetSelected(selected_id);
+	player_row.hero_dropdown.enabled = XHSBotSetupCanEdit();
+	player_row.hero_dropdown.SetHasClass("Disabled", !XHSBotSetupCanEdit());
+}
+
 function XHSBotSetupMaxBots() {
 	var spectator_mode = !!xhs_bot_setup_draft.spectator_mode;
 	if (!xhs_bot_setup_config) {
@@ -527,6 +680,10 @@ function XHSBotSetupSyncDraftFromConfig() {
 		composition = "balanced";
 	}
 	xhs_bot_setup_draft.composition = composition;
+	xhs_bot_setup_draft.hero_selections = XHSBotSetupCopyHeroSelections(
+		xhs_bot_setup_config.hero_selections,
+		xhs_bot_setup_draft.bot_count
+	);
 	xhs_bot_setup_synced = true;
 	XHSBotSetupLog("draft_synced_from_config", {
 		previous_draft: previous_draft,
@@ -772,6 +929,7 @@ function XHSBotSetupConfirm() {
 		ai_difficulty: xhs_bot_setup_draft.ai_difficulty,
 		composition: xhs_bot_setup_draft.composition,
 		spectator_mode: xhs_bot_setup_draft.spectator_mode ? 1 : 0,
+		hero_selections: XHSBotSetupCopyHeroSelections(xhs_bot_setup_draft.hero_selections, requested_count),
 	};
 	XHSBotSetupLog("confirm_sending", {
 		request_token: request_token,
@@ -837,13 +995,6 @@ function XHSBotSetupBuildCard() {
 	var header = $.CreatePanel("Panel", card, "");
 	header.AddClass("xhs-bot-setup-header");
 	XHSBotSetupMakeLabel(header, "xhs-bot-setup-title", L("loading_screen_bot_setup_title"));
-	xhs_bot_setup_ui.feature_badge = XHSBotSetupMakeLabel(
-		header,
-		"xhs-bot-setup-dev-badge",
-		Game.IsInToolsMode()
-			? L("loading_screen_bot_setup_dev_feature")
-			: L("loading_screen_bot_setup_public_feature")
-	);
 
 	var count_row = $.CreatePanel("Panel", card, "");
 	count_row.AddClass("xhs-bot-setup-field-row");
@@ -3350,6 +3501,9 @@ function UpdatePlayerLoadingSidebar() {
 			? IsTruthy(bot_data && bot_data.ready)
 			: (player_id >= 0 && IsPlayerMarkedReady(setup_status, player_id));
 		const is_selected = !is_xhs_bot && player_id >= 0 && player_id == GetSelectedProfilePlayerID();
+		if (is_xhs_bot) {
+			XHSBotSetupEnsureHeroDropdown(player_row, bot_data);
+		}
 
 		if (!player_row.spinner) {
 			player_row.spinner = $.CreatePanel("Panel", player_row.panel, "");

@@ -1,5 +1,9 @@
 "use strict";
 
+if (false) {
+	return;
+}
+
 (function () {
 	var SCHEMA_VERSION = 1;
 	var MAX_BUILDS = 3;

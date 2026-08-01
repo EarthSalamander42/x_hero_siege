@@ -210,8 +210,8 @@ _G.ZonesDefinition =
 				nCompleteLimit = 1,
 			},
 			{
-				szQuestName = "teleport_arthas",
-				szQuestType = "Speak",
+				szQuestName = "free_uther",
+				szQuestType = "Kill",
 				Activators =
 				{
 					{
@@ -219,6 +219,18 @@ _G.ZonesDefinition =
 						szQuestName = "kill_proudmoore",
 					},
 				},
+				Completion =
+				{
+					Type = QUEST_EVENT_ON_ENEMY_KILLED,
+					szNPCName = "npc_xhs_uther_ice_prison",
+				},
+				nCompleteLimit = 1,
+			},
+			{
+				szQuestName = "teleport_arthas",
+				szQuestType = "Speak",
+				-- Started explicitly after Uther reaches his original position.
+				Activators = {},
 				Completion =
 				{
 					Type = QUEST_EVENT_ON_DIALOG_ALL_CONFIRMED,

@@ -32,10 +32,90 @@ local HERO_SELECTION_DISPLAYS = {
 	standard = {},
 	vip = {},
 }
+local HERO_SELECTION_MARKERS = {
+	standard = {},
+	vip = {},
+}
+local HERO_SELECTION_MARKER_SEARCH_RADIUS = 224
 local HERO_SELECTION_CLEANED_UP = false
 
 local function IsValidSelectionUnit(unit)
 	return unit ~= nil and IsValidEntity(unit) and not unit:IsNull()
+end
+
+local function GetHeroSelectionPoint(group, index)
+	local pointName = group == "vip"
+		and ("choose_vip_" .. tostring(index) .. "_point")
+		or ("choose_" .. tostring(index) .. "_point")
+	return Entities:FindByName(nil, pointName)
+end
+
+local function IndexHeroSelectionMarkers()
+	if Entities.FindAllByClassname == nil then return 0 end
+	local particles = Entities:FindAllByClassname("info_particle_system") or {}
+	local claimed = {}
+	local indexed = 0
+
+	for group, maximum in pairs({
+		standard = #HEROLIST,
+		vip = #HEROLIST_VIP,
+	}) do
+		HERO_SELECTION_MARKERS[group] = HERO_SELECTION_MARKERS[group] or {}
+		for index = 1, maximum do
+			local current = HERO_SELECTION_MARKERS[group][index]
+			if IsValidSelectionUnit(current) then
+				claimed[current:entindex()] = true
+				indexed = indexed + 1
+			else
+				HERO_SELECTION_MARKERS[group][index] = nil
+				local point = GetHeroSelectionPoint(group, index)
+				local nearest = nil
+				local nearestDistance = HERO_SELECTION_MARKER_SEARCH_RADIUS + 0.01
+				if IsValidSelectionUnit(point) then
+					for _, particle in pairs(particles) do
+						if IsValidSelectionUnit(particle)
+							and particle.xhs_hero_selection_marker_removed ~= true
+							and claimed[particle:entindex()] ~= true then
+							local distance = (
+								particle:GetAbsOrigin() - point:GetAbsOrigin()
+							):Length2D()
+							if distance < nearestDistance then
+								nearest = particle
+								nearestDistance = distance
+							end
+						end
+					end
+				end
+				if IsValidSelectionUnit(nearest) then
+					HERO_SELECTION_MARKERS[group][index] = nearest
+					claimed[nearest:entindex()] = true
+					indexed = indexed + 1
+				end
+			end
+		end
+	end
+	return indexed
+end
+
+local function RemoveHeroSelectionMarker(group, index, removed)
+	local marker = HERO_SELECTION_MARKERS[group]
+		and HERO_SELECTION_MARKERS[group][index]
+		or nil
+	if not IsValidSelectionUnit(marker) and removed == nil then
+		IndexHeroSelectionMarkers()
+		marker = HERO_SELECTION_MARKERS[group]
+			and HERO_SELECTION_MARKERS[group][index]
+			or nil
+	end
+	if not IsValidSelectionUnit(marker) then return 0 end
+	local entindex = marker:entindex()
+	if removed ~= nil and removed[entindex] then return 0 end
+	if removed ~= nil then removed[entindex] = true end
+	marker.xhs_hero_selection_marker_removed = true
+	if marker.Stop ~= nil then pcall(function() marker:Stop() end) end
+	UTIL_Remove(marker)
+	HERO_SELECTION_MARKERS[group][index] = nil
+	return 1
 end
 
 local function RegisterSelectionDisplay(group, index, unit)
@@ -61,17 +141,26 @@ local function RemoveHeroSelectionDisplay(unit, removed)
 	return 1
 end
 
--- Bot assignments do not walk through the physical showcase, so their picks
--- cannot individually consume the corresponding display. Once a bot-only
--- roster is complete, retire the entire gallery in one idempotent pass. Any
--- released ambient particle following a showcase entity is retired with its
--- owner instead of surviving for the rest of the match.
+-- Retire every pick-screen model and map-authored floor marker in one
+-- idempotent pass. This is the universal end-of-selection fail-safe, including
+-- mixed human/bot rosters and Lua reloads.
 function XHSCleanupHeroSelectionShowcase(reason)
 	if HERO_SELECTION_CLEANED_UP then return 0, "already_cleaned" end
 	HERO_SELECTION_CLEANED_UP = true
 
 	local removed = {}
 	local removedCount = 0
+	local removedMarkerCount = 0
+	IndexHeroSelectionMarkers()
+	for group, maximum in pairs({
+		standard = #HEROLIST,
+		vip = #HEROLIST_VIP,
+	}) do
+		for index = 1, maximum do
+			removedMarkerCount = removedMarkerCount
+				+ RemoveHeroSelectionMarker(group, index, removed)
+		end
+	end
 	for _, group in pairs(HERO_SELECTION_DISPLAYS) do
 		for _, displays in pairs(group) do
 			for _, unit in pairs(displays) do
@@ -95,12 +184,56 @@ function XHSCleanupHeroSelectionShowcase(reason)
 	end
 
 	HERO_SELECTION_DISPLAYS = { standard = {}, vip = {} }
+	HERO_SELECTION_MARKERS = { standard = {}, vip = {} }
 	print(
-		"[XHSBots][SelectionCleanup] reason="
+		"[XHS][SelectionCleanup] reason="
 			.. tostring(reason or "bot_only_roster_complete")
-			.. " removed=" .. tostring(removedCount)
+			.. " models=" .. tostring(removedCount)
+			.. " markers=" .. tostring(removedMarkerCount)
 	)
-	return removedCount, "cleaned"
+	return removedCount, "cleaned", removedMarkerCount
+end
+
+-- Bot picks bypass XHSBeginHeroSelectionTransition. Expose the same immediate
+-- marker cleanup without making the bot provisioner depend on local tables.
+function XHSRemoveHeroSelectionMarkerForHero(heroName)
+	local shortName = tostring(heroName or ""):gsub("^npc_dota_hero_", "")
+	for index, candidate in ipairs(HEROLIST) do
+		if candidate == shortName then
+			return RemoveHeroSelectionMarker("standard", index)
+		end
+	end
+	for index, candidate in ipairs(HEROLIST_VIP) do
+		if candidate == shortName then
+			return RemoveHeroSelectionMarker("vip", index)
+		end
+	end
+	return 0
+end
+
+-- XHS performs its physical pick screen during PRE_GAME, so the engine state
+-- cannot tell us when selection is over. The phase is complete only once every
+-- connected Radiant participant (humans and bots, never spectators) owns a
+-- real hero other than the temporary Wisp.
+function XHSTryCleanupHeroSelectionShowcase(reason)
+	if HERO_SELECTION_CLEANED_UP then return false, "already_cleaned" end
+	local participants = 0
+	for playerID = 0, DOTA_MAX_TEAM_PLAYERS - 1 do
+		local isParticipant = PlayerResource:IsValidPlayerID(playerID)
+			and PlayerResource:GetPlayer(playerID) ~= nil
+			and PlayerResource:GetTeam(playerID) == DOTA_TEAM_GOODGUYS
+		if isParticipant then
+			participants = participants + 1
+			local hero = PlayerResource:GetSelectedHeroEntity(playerID)
+			if not IsValidSelectionUnit(hero)
+				or hero:GetUnitName() == "npc_dota_hero_wisp" then
+				return false, "waiting_for_player_" .. tostring(playerID)
+			end
+		end
+	end
+	if participants == 0 then return false, "no_participants" end
+	XHSCleanupHeroSelectionShowcase(reason or "all_participants_selected")
+	return true, "cleaned"
 end
 
 local function GetSelectionDisplays(group, index, point)
@@ -341,6 +474,7 @@ local function AwakenSelectedHero(newHero, baseTransform, destinationParticle, p
 			CameraMotion:Release(playerID, {
 				owner = "hero_selection",
 				mode = "free",
+				reason = "selected hero creation failed",
 			})
 		end
 		return
@@ -382,6 +516,7 @@ local function AwakenSelectedHero(newHero, baseTransform, destinationParticle, p
 			CameraMotion:Release(playerID, {
 				owner = "hero_selection",
 				mode = "free",
+				reason = "hero selection arrival finished",
 			})
 		end
 		return nil
@@ -394,6 +529,11 @@ function XHSBeginHeroSelectionTransition(id, pickedHeroName, oldHero, startingGo
 	local transform = GetSelectionTransform(group, index, pickedHeroName)
 	local baseTransform = GetHeroSelectionBaseTransform(id)
 	if baseTransform == nil then return end
+
+	-- The map-placed Boots of Travel marker is an independent
+	-- info_particle_system, not a child of the showcase hero. Retire it as soon
+	-- as this slot is consumed instead of keeping its client particle alive.
+	RemoveHeroSelectionMarker(group, index)
 
 	if XHSBots ~= nil and XHSBots.OnHumanHeroSelected ~= nil then
 		XHSBots:OnHumanHeroSelected(id, pickedHeroName)
@@ -456,6 +596,7 @@ function XHSBeginHeroSelectionTransition(id, pickedHeroName, oldHero, startingGo
 					CameraMotion:Release(id, {
 						owner = "hero_selection",
 						mode = "free",
+						reason = "hero replacement failed",
 					})
 				end
 				if IsValidSelectionUnit(oldHero) then
@@ -466,14 +607,13 @@ function XHSBeginHeroSelectionTransition(id, pickedHeroName, oldHero, startingGo
 			end
 
 			AwakenSelectedHero(newHero, baseTransform, destinationParticle, player, id)
+			Timers:CreateTimer(HERO_SELECTION_ARRIVAL_DURATION, function()
+				if XHSTryCleanupHeroSelectionShowcase ~= nil then
+					XHSTryCleanupHeroSelectionShowcase("all_participants_selected")
+				end
+				return nil
+			end)
 		end)
-		-- ReplaceHeroWith can reset SetCameraTarget synchronously before its
-		-- completion callback. Reassert once after the call as well as inside
-		-- the callback so neither the synchronous nor asynchronous path can
-		-- detach the camera from its destination dummy.
-		if CameraMotion ~= nil and CameraMotion.RefreshTarget ~= nil then
-			CameraMotion:RefreshTarget(id, "hero_selection")
-		end
 	end
 
 	Timers:CreateTimer(HERO_SELECTION_SOURCE_HOLD, function()
@@ -494,7 +634,8 @@ function XHSBeginHeroSelectionTransition(id, pickedHeroName, oldHero, startingGo
 				owner = "hero_selection",
 				priority = 70,
 				policy = "replace",
-				persistent = true,
+				hold = HERO_SELECTION_CAMERA_SETTLE + HERO_SELECTION_ARRIVAL_DURATION,
+				release = "free",
 				on_arrive = function()
 					-- Dummy arrival is server-authoritative, but the rendered
 					-- camera needs a short settling window to catch the moving
@@ -574,6 +715,7 @@ function SpawnHeroLoadout(hero_count)
 end
 
 function SpawnHeroesBis()
+	IndexHeroSelectionMarkers()
 	local hero_count = 1
 	local hero_vip_count = 1
 

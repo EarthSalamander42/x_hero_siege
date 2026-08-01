@@ -460,16 +460,43 @@ local function FindFreedShalLightbinders()
 		FIND_UNITS_EVERYWHERE,
 		DOTA_UNIT_TARGET_TEAM_FRIENDLY,
 		DOTA_UNIT_TARGET_ALL,
-		DOTA_UNIT_TARGET_FLAG_MAGIC_IMMUNE_ENEMIES,
+		DOTA_UNIT_TARGET_FLAG_INVULNERABLE
+			+ DOTA_UNIT_TARGET_FLAG_MAGIC_IMMUNE_ENEMIES,
 		FIND_ANY_ORDER,
 		false
 	)
 	for _, unit in pairs(units) do
-		if IsValidPhase2Entity(unit) and unit:IsAlive() and unit:GetUnitName() == SHAL_LIGHTBINDER_UNIT_NAME then
+		if IsValidPhase2Entity(unit)
+			and unit:IsAlive()
+			and unit:GetUnitName() == SHAL_LIGHTBINDER_UNIT_NAME
+			and unit.xhs_freed_shal_lightbinder == true then
 			table.insert(shals, unit)
 		end
 	end
 	return shals
+end
+
+function XHSRemoveFreedShalLightbinder()
+	local shals = FindFreedShalLightbinders()
+	if #shals == 0 then return 0 end
+
+	local removeLookup = {}
+	for _, shal in ipairs(shals) do
+		removeLookup[shal] = true
+	end
+	if CDungeonZone ~= nil and type(CDungeonZone.VIPsAlive) == "table" then
+		for index = #CDungeonZone.VIPsAlive, 1, -1 do
+			if removeLookup[CDungeonZone.VIPsAlive[index]] == true then
+				table.remove(CDungeonZone.VIPsAlive, index)
+			end
+		end
+	end
+
+	for _, shal in ipairs(shals) do
+		if IsValidPhase2Entity(shal) then UTIL_Remove(shal) end
+	end
+	RefreshPhase2VIPNetTable()
+	return #shals
 end
 
 function XHSFocusPlayersOnShalLightbinder()
@@ -526,25 +553,31 @@ function EndPhase2()
 	local allMainTowers = {}
 	local activeMainTowers = {}
 	local releaseRecords = {}
+	local laneOneTower = nil
 	for towerIndex = 1, 2 do
 		local tower = Entities:FindByName(nil, "npc_tower_cold_" .. towerIndex)
 		if IsValidPhase2Entity(tower) then
 			table.insert(allMainTowers, tower)
+			if towerIndex == 1 then laneOneTower = tower end
 			if activeTowerLookup[towerIndex] == true then
 				table.insert(activeMainTowers, tower)
 				AddFOWViewer(DOTA_TEAM_GOODGUYS, tower:GetAbsOrigin(), SHAL_RELEASE_FOW_RADIUS, SHAL_RELEASE_FOW_DURATION, false)
-				table.insert(releaseRecords, {
-					tower = tower,
-					origin = tower:GetAbsOrigin(),
-					forward = tower:GetForwardVector(),
-					shal = SpawnHiddenShalAtTower(tower),
-				})
 			end
 		end
 	end
+	if IsValidPhase2Entity(laneOneTower) then
+		table.insert(releaseRecords, {
+			tower = laneOneTower,
+			origin = laneOneTower:GetAbsOrigin(),
+			forward = laneOneTower:GetForwardVector(),
+			shal = SpawnHiddenShalAtTower(laneOneTower),
+		})
+	end
 
 	RefreshPhase2VIPNetTable()
-	PlayShalReleaseCamera(activeMainTowers)
+	PlayShalReleaseCamera(
+		IsValidPhase2Entity(laneOneTower) and { laneOneTower } or {}
+	)
 
 	Timers:CreateTimer(SHAL_RELEASE_CAMERA_MOVE_DURATION, function()
 		if CustomTimers.shal_lightbinder_released ~= true then return nil end

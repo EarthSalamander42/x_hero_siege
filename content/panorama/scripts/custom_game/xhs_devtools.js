@@ -25,9 +25,11 @@ var XHSDevToolsSpectatorState = {
 	lastFollowRequestAt: 0,
 	radiantFogApplied: false,
 	radiantFogConfirmations: 0,
-	vanillaFlyoutEnabled: null,
+	cameraModeConfirmations: 0,
 	wasVisible: false
 };
+var XHS_SPECTATOR_CAMERA_MODE_CHASE = 2;
+var XHS_SPECTATOR_CAMERA_MODE_FREE = 1;
 var XHSDevToolsPerformanceColumns = {
 	client: true,
 	server: true,
@@ -399,6 +401,8 @@ function XHSDevToolsRenderCompactPerformance(data) {
 	data = data || {};
 	var simHealth = XHSDevToolsPerformanceNumber(data.sim_health_pct);
 	var creeps = XHSDevToolsPerformanceNumber(data.creeps);
+	var simHealthLow = data.sim_health_low_pct === undefined ? -1 : XHSDevToolsPerformanceNumber(data.sim_health_low_pct);
+	var creepsHigh = data.creeps_high === undefined ? -1 : XHSDevToolsPerformanceNumber(data.creeps_high);
 	var localFPS = XHSDevToolsLocalFPS >= 0 ? Math.round(XHSDevToolsLocalFPS) : -1;
 
 	XHSDevToolsSetCompactMetric(
@@ -418,6 +422,18 @@ function XHSDevToolsRenderCompactPerformance(data) {
 		String(creeps),
 		creeps >= 100,
 		creeps >= 125
+	);
+	XHSDevToolsSetCompactMetric(
+		"#XHSDevToolsServerHealthLow",
+		simHealthLow >= 0 ? "LOW " + Math.round(simHealthLow) + "%" : "LOW --",
+		simHealthLow >= 0 && simHealthLow < 90,
+		simHealthLow >= 0 && simHealthLow < 70
+	);
+	XHSDevToolsSetCompactMetric(
+		"#XHSDevToolsCreepCountHigh",
+		creepsHigh >= 0 ? "HIGH " + String(creepsHigh) : "HIGH --",
+		creepsHigh >= 100,
+		creepsHigh >= 125
 	);
 }
 
@@ -672,6 +688,14 @@ function XHSDevToolsRenderActivityPerformance(activity) {
 	var blockedWrongOwner = XHSDevToolsPerformanceNumber(activity.creep_orders_blocked_wrong_owner_per_second);
 	var deduplicatedOrders = XHSDevToolsPerformanceNumber(activity.creep_orders_deduplicated_per_second);
 	var ownerHandoffs = XHSDevToolsPerformanceNumber(activity.creep_order_owner_handoffs_per_second);
+	var stageCreated = XHSDevToolsPerformanceNumber(activity.wave_stage_units_created_per_second);
+	var stageFallback = XHSDevToolsPerformanceNumber(activity.wave_stage_units_fallback_created_per_second);
+	var stageReleased = XHSDevToolsPerformanceNumber(activity.wave_stage_units_released_per_second);
+	var stageCancelled = XHSDevToolsPerformanceNumber(activity.wave_stage_units_cancelled_per_second);
+	var stageFailures = XHSDevToolsPerformanceNumber(activity.wave_stage_create_failures_per_second);
+	var stageMissing = XHSDevToolsPerformanceNumber(activity.wave_stage_release_missing_per_second);
+	var stageCost = XHSDevToolsPerformanceNumber(activity.wave_stage_create_cost_ms_per_second);
+	var stageAIWakes = XHSDevToolsPerformanceNumber(activity.wave_stage_ai_wakes_per_second);
 	var aiThinks = XHSDevToolsPerformanceNumber(activity.ai_thinks_per_second);
 	var waveThinks = XHSDevToolsPerformanceNumber(activity.wave_thinks_per_second);
 	var abilityThinks = XHSDevToolsPerformanceNumber(activity.ability_loop_thinks_per_second);
@@ -691,6 +715,10 @@ function XHSDevToolsRenderActivityPerformance(activity) {
 	XHSDevToolsSetPerformanceText("#XHSPerfCreepOrders", creepOrdersAI.toFixed(0) + " / " + creepOrdersWave.toFixed(0));
 	XHSDevToolsSetPerformanceText("#XHSPerfOrderConflicts", ownerConflicts.toFixed(0) + " / " + blockedWrongOwner.toFixed(0));
 	XHSDevToolsSetPerformanceText("#XHSPerfOrderDedup", deduplicatedOrders.toFixed(0) + " / " + ownerHandoffs.toFixed(0));
+	XHSDevToolsSetPerformanceText("#XHSPerfStageCreated", stageCreated.toFixed(1) + " / " + stageFallback.toFixed(1));
+	XHSDevToolsSetPerformanceText("#XHSPerfStageReleased", stageReleased.toFixed(1) + " / " + stageCancelled.toFixed(1));
+	XHSDevToolsSetPerformanceText("#XHSPerfStageFailures", stageFailures.toFixed(1) + " / " + stageMissing.toFixed(1));
+	XHSDevToolsSetPerformanceText("#XHSPerfStageCost", stageCost.toFixed(2) + " ms / " + stageAIWakes.toFixed(1));
 	XHSDevToolsSetPerformanceText("#XHSPerfThinks", aiThinks.toFixed(0) + " / " + waveThinks.toFixed(0));
 	XHSDevToolsSetPerformanceText("#XHSPerfAbilityThinks", abilityThinks.toFixed(0));
 	XHSDevToolsSetPerformanceText("#XHSPerfCombat", damage.toFixed(0) + " / " + casts.toFixed(0));
@@ -719,6 +747,7 @@ function XHSDevToolsRenderActivityPerformance(activity) {
 	XHSDevToolsSetPerformanceStatus("#XHSPerfZoneCost", zoneCost >= 10, zoneCost >= 25);
 	XHSDevToolsSetPerformanceStatus("#XHSPerfOrders", orders >= 200 || repeatedOrders >= 50, repeatedOrders >= 150);
 	XHSDevToolsSetPerformanceStatus("#XHSPerfOrderConflicts", ownerConflicts > 0 || blockedWrongOwner > 0, ownerConflicts >= 5 || blockedWrongOwner >= 5);
+	XHSDevToolsSetPerformanceStatus("#XHSPerfStageFailures", stageFailures > 0 || stageMissing > 0, stageFailures >= 1 || stageMissing >= 1);
 	XHSDevToolsSetPerformanceStatus("#XHSPerfThinks", waveThinks >= 800 || aiThinks >= 300, waveThinks >= 1600);
 	XHSDevToolsSetPerformanceStatus("#XHSPerfCombat", damage >= 500, damage >= 1000);
 	XHSDevToolsSetPerformanceStatus("#XHSPerfProjectiles", linearProjectiles + trackingProjectiles >= 100, linearProjectiles + trackingProjectiles >= 250);
@@ -759,6 +788,28 @@ function XHSDevToolsRenderPerformance() {
 		"#XHSPerfMovementOwners",
 		XHSDevToolsPerformanceNumber(data.movement_owner_ai) + " / " +
 			XHSDevToolsPerformanceNumber(data.movement_owner_wave)
+	);
+	var waveStager = data.wave_stager || {};
+	var stagedUnits = XHSDevToolsPerformanceNumber(waveStager.staged_units);
+	var stageCap = XHSDevToolsPerformanceNumber(waveStager.global_cap);
+	XHSDevToolsSetPerformanceText(
+		"#XHSPerfStagedUnits",
+		stagedUnits + " / " + stageCap + (waveStager.enabled === false ? " OFF" : "")
+	);
+	XHSDevToolsSetPerformanceText(
+		"#XHSPerfStageQueue",
+		XHSDevToolsPerformanceNumber(waveStager.active_jobs) + " / " +
+			XHSDevToolsPerformanceNumber(waveStager.pending_units)
+	);
+	XHSDevToolsSetPerformanceText(
+		"#XHSPerfStageCleanup",
+		XHSDevToolsPerformanceNumber(waveStager.cleanup_units) + " / " +
+			XHSDevToolsPerformanceNumber(waveStager.create_cost_max_ms).toFixed(2) + " ms"
+	);
+	XHSDevToolsSetPerformanceStatus(
+		"#XHSPerfStagedUnits",
+		stageCap > 0 && stagedUnits >= stageCap * 0.8,
+		stageCap > 0 && stagedUnits >= stageCap
 	);
 	XHSDevToolsSetPerformanceText("#XHSPerfThinkers", String(XHSDevToolsPerformanceNumber(data.thinkers)));
 	XHSDevToolsSetPerformanceText(
@@ -894,7 +945,18 @@ function XHSDevToolsIsLocalSpectator() {
 		return false;
 	}
 	var localPlayerID = Game.GetLocalPlayerID();
-	return localPlayerID >= 0 && Number(Players.GetTeam(localPlayerID)) === 1;
+	if (localPlayerID < 0) {
+		return false;
+	}
+	if (Number(Players.GetTeam(localPlayerID)) === 1) {
+		return true;
+	}
+
+	// During custom setup/loading, Players.GetTeam can lag one frame behind the
+	// server assignment. The authoritative bot configuration already identifies
+	// the one client that is becoming XHS' spectator controller.
+	return Number((XHSDevToolsBotConfig || {}).spectator_mode || 0) === 1
+		&& Number((XHSDevToolsBotConfig || {}).controller_player_id) === localPlayerID;
 }
 
 function XHSDevToolsSetVanillaSpectatorPanelHidden(panelID, hidden) {
@@ -913,12 +975,128 @@ function XHSDevToolsSetVanillaSpectatorPanelHidden(panelID, hidden) {
 	}
 
 	if (hidden) {
+		if (panel._xhsToolsSpectatorHidden !== true) {
+			panel._xhsToolsSpectatorPreviousOpacity = panel.style.opacity;
+			panel._xhsToolsSpectatorPreviousHitTest = panel.hittest;
+		}
 		panel._xhsToolsSpectatorHidden = true;
+		panel.visible = false;
+		panel.hittest = false;
 		panel.style.visibility = "collapse";
+		// Valve rebuilds and re-opens DOTASpectatorOptions after a runtime team
+		// assignment. Opacity guards the frame before our next 250 ms tick too.
+		panel.style.opacity = "0";
 	} else if (panel._xhsToolsSpectatorHidden === true) {
+		panel.visible = true;
 		panel.style.visibility = null;
+		panel.style.opacity = panel._xhsToolsSpectatorPreviousOpacity || null;
+		panel.hittest = panel._xhsToolsSpectatorPreviousHitTest !== undefined
+			? panel._xhsToolsSpectatorPreviousHitTest
+			: true;
 		panel._xhsToolsSpectatorHidden = false;
 	}
+}
+
+function XHSDevToolsAccessDropDownMenu(dropDown) {
+	if (!dropDown || typeof dropDown.AccessDropDownMenu !== "function") {
+		return null;
+	}
+	try {
+		return dropDown.AccessDropDownMenu();
+	} catch (error) {
+		return null;
+	}
+}
+
+function XHSDevToolsSelectDropDownOption(dropDown, option) {
+	if (!dropDown || !option || !option.id) {
+		return false;
+	}
+	try {
+		dropDown.SetSelected(option.id);
+		$.DispatchEvent("DropDownMenuItemSelected", dropDown, option);
+		return true;
+	} catch (error) {
+		return false;
+	}
+}
+
+function XHSDevToolsFindCameraModeOption(dropDown, mode) {
+	var menu = XHSDevToolsAccessDropDownMenu(dropDown);
+	if (!menu) {
+		return null;
+	}
+
+	var knownIDs = mode === XHS_SPECTATOR_CAMERA_MODE_CHASE
+		? ["CameraFollow", "CameraChase", "CameraHeroChase", "HeroChase", "SpectatorCameraChase"]
+		: ["CameraFree", "CameraRoaming", "FreeCamera", "SpectatorCameraFree"];
+	for (var knownIndex = 0; knownIndex < knownIDs.length; knownIndex++) {
+		var knownOption = menu.FindChildTraverse(knownIDs[knownIndex]);
+		if (knownOption) {
+			return knownOption;
+		}
+	}
+
+	var attributeNames = ["camera", "camera_mode", "mode", "value"];
+	var pending = [menu];
+	while (pending.length > 0) {
+		var panel = pending.shift();
+		if (!panel) {
+			continue;
+		}
+		for (var attributeIndex = 0; attributeIndex < attributeNames.length; attributeIndex++) {
+			try {
+				if (panel.GetAttributeInt(attributeNames[attributeIndex], -999) === mode) {
+					return panel;
+				}
+			} catch (error) {
+				// Native entries vary slightly between Dota builds.
+			}
+		}
+		for (var childIndex = 0; childIndex < panel.GetChildCount(); childIndex++) {
+			pending.push(panel.GetChild(childIndex));
+		}
+	}
+	return null;
+}
+
+function XHSDevToolsApplySpectatorCameraMode(following) {
+	if (!XHSDevToolsIsLocalSpectator() || typeof FindDotaHudElement !== "function") {
+		XHSDevToolsSpectatorState.cameraModeConfirmations = 0;
+		return false;
+	}
+
+	var cameraDropDown = null;
+	try {
+		cameraDropDown = FindDotaHudElement("CameraDropDown");
+	} catch (error) {
+		cameraDropDown = null;
+	}
+	if (!cameraDropDown) {
+		return false;
+	}
+
+	var desiredMode = following
+		? XHS_SPECTATOR_CAMERA_MODE_CHASE
+		: XHS_SPECTATOR_CAMERA_MODE_FREE;
+	var option = XHSDevToolsFindCameraModeOption(cameraDropDown, desiredMode);
+	if (!option) {
+		return false;
+	}
+
+	var selected = null;
+	try {
+		selected = cameraDropDown.GetSelected();
+	} catch (error) {
+		selected = null;
+	}
+	if (!selected || selected.id !== option.id) {
+		XHSDevToolsSpectatorState.cameraModeConfirmations = 0;
+		return XHSDevToolsSelectDropDownOption(cameraDropDown, option);
+	}
+
+	XHSDevToolsSpectatorState.cameraModeConfirmations++;
+	return true;
 }
 
 function XHSDevToolsSetVanillaScoreboardHidden(hidden) {
@@ -960,26 +1138,29 @@ function XHSDevToolsSetVanillaScoreboardHidden(hidden) {
 
 function XHSDevToolsUpdateVanillaSpectatorUI() {
 	var hidden = XHSDevToolsIsLocalSpectator();
+	// Popup options are hosted in separate *DropDownMenu panels. Resolve and
+	// apply them before collapsing the native spectator parent.
+	XHSDevToolsApplyDefaultRadiantFog(hidden);
+	if (hidden) {
+		XHSDevToolsApplySpectatorCameraMode(XHSDevToolsSpectatorState.following);
+	}
 	XHSDevToolsSetVanillaSpectatorPanelHidden("GameInfoButton", hidden);
 	XHSDevToolsSetVanillaSpectatorPanelHidden("spectator_options", hidden);
+	XHSDevToolsSetVanillaSpectatorPanelHidden("SpectatorOptionsContainer", hidden);
+	XHSDevToolsSetVanillaSpectatorPanelHidden("SpectatorOptionsVisibilityButton", hidden);
 	XHSDevToolsSetVanillaScoreboardHidden(hidden);
-	XHSDevToolsApplyDefaultRadiantFog(hidden);
 	if (
 		GameUI.SetDefaultUIEnabled
 		&& typeof DotaDefaultUIElement_t !== "undefined"
 		&& DotaDefaultUIElement_t.DOTA_DEFAULT_UI_FLYOUT_SCOREBOARD !== undefined
 	) {
-		// init.js disables the flyout for players. Tools spectators still need
-		// its input command so DOTACustomUI_SetFlyoutScoreboardVisible reaches
-		// the custom panel. Change this engine flag only on state transitions;
-		// repeatedly writing it every tick made the vanilla panel flicker.
-		if (XHSDevToolsSpectatorState.vanillaFlyoutEnabled !== hidden) {
-			GameUI.SetDefaultUIEnabled(
-				DotaDefaultUIElement_t.DOTA_DEFAULT_UI_FLYOUT_SCOREBOARD,
-				hidden
-			);
-			XHSDevToolsSpectatorState.vanillaFlyoutEnabled = hidden;
-		}
+		// The FlyoutScoreboard CustomUIElement receives its event independently.
+		// Re-enabling this flag for spectators was what resurrected Valve's
+		// scoreboard behind the XHS scoreboard.
+		GameUI.SetDefaultUIEnabled(
+			DotaDefaultUIElement_t.DOTA_DEFAULT_UI_FLYOUT_SCOREBOARD,
+			false
+		);
 	}
 }
 
@@ -1025,9 +1206,16 @@ function XHSDevToolsApplyDefaultRadiantFog(isSpectator) {
 	XHSDevToolsSpectatorState.radiantFogConfirmations = 0;
 	try {
 		// Valve's native spectator panel maps FogRadiant to
-		// dota_spectator_fog_of_war 2. Selecting the existing native option
-		// keeps its internal state and the actual client convar synchronized.
-		fogDropDown.SetSelected("FogRadiant");
+		// dota_spectator_fog_of_war 2. Dispatch the dropdown selection event as
+		// well as changing its visual selection: SetSelected alone can update
+		// the label without submitting the client convar during HUD startup.
+		var fogMenu = XHSDevToolsAccessDropDownMenu(fogDropDown);
+		var radiantOption = fogMenu && fogMenu.FindChildTraverse
+			? fogMenu.FindChildTraverse("FogRadiant")
+			: null;
+		if (radiantOption) {
+			XHSDevToolsSelectDropDownOption(fogDropDown, radiantOption);
+		}
 	} catch (error) {
 		// The native spectator options may still be initializing. The regular
 		// spectator tick retries until two consecutive confirmations succeed.
@@ -1107,7 +1295,8 @@ function XHSDevToolsSpectatorSendCamera(playerID) {
 	XHSDevToolsSpectatorState.pendingFollowEntIndex = pendingEntIndex;
 	XHSDevToolsSpectatorState.lastFollowRequestAt = Date.now();
 	GameEvents.SendCustomGameEventToServer("xhs_bot_spectator_camera", {
-		target_player_id: targetPlayerID
+		target_player_id: targetPlayerID,
+		local_player_id: Game.GetLocalPlayerID()
 	});
 }
 
@@ -1144,6 +1333,9 @@ function XHSDevToolsSpectatorInspect() {
 		return;
 	}
 
+	if (XHSDevToolsSpectatorState.following) {
+		XHSDevToolsApplySpectatorCameraMode(true);
+	}
 	GameUI.SelectUnit(entIndex, false);
 	XHSDevToolsSpectatorState.lastInspectedEntIndex = entIndex;
 	if (XHSDevToolsSpectatorState.following) {
@@ -1178,6 +1370,8 @@ function XHSDevToolsSpectatorToggleFollow() {
 
 	XHSDevToolsSpectatorState.following = !XHSDevToolsSpectatorState.following;
 	XHSDevToolsSpectatorState.lastFollowEntIndex = -1;
+	XHSDevToolsSpectatorState.cameraModeConfirmations = 0;
+	XHSDevToolsApplySpectatorCameraMode(XHSDevToolsSpectatorState.following);
 	if (XHSDevToolsSpectatorState.following) {
 		XHSDevToolsSpectatorSendCamera(current.bot.playerID);
 	} else {
@@ -2365,6 +2559,7 @@ var XHS_DEVTOOLS_LAG_LAB_EXPERIMENTS = [
 	{ id: "pause_bots", label: "Pause bots", hint: "Stops allied XHS bot decisions during the test window." },
 	{ id: "pause_waves", label: "Pause waves", hint: "Stops lane controller ticks." },
 	{ id: "pause_abilities", label: "Pause abilities", hint: "Stops periodic creep spell checks." },
+	{ id: "disable_wave_staging", label: "No wave pre-spawn", hint: "Cancels dormant staged units and restores synchronous wave creation for a direct A/B comparison." },
 	{ id: "suppress_orders", label: "Suppress orders", hint: "Drops new creep engine orders." },
 	{ id: "root_creeps", label: "Root creeps", hint: "Keeps AI alive while removing movement." },
 	{ id: "no_collision", label: "No collision", hint: "Tests pathing/crowd collision cost." },
@@ -2378,6 +2573,7 @@ var XHS_DEVTOOLS_LAG_LAB_METRICS = [
 	{ id: "server_sim_health_pct", label: "Simulation health %", higher: true },
 	{ id: "creeps", label: "Creeps", neutral: true },
 	{ id: "total_units", label: "Total units", neutral: true },
+	{ id: "staged_units", label: "Dormant staged units", neutral: true },
 	{ id: "scan_ms", label: "Profiler scan ms", higher: false },
 	{ id: "zone_searches_s", label: "Spatial queries/s", higher: false },
 	{ id: "zone_cost_ms_s", label: "Spatial cost ms/s", higher: false },
@@ -2388,7 +2584,10 @@ var XHS_DEVTOOLS_LAG_LAB_METRICS = [
 	{ id: "ability_thinks_s", label: "Ability thinks/s", higher: false },
 	{ id: "damage_s", label: "Damage events/s", higher: false },
 	{ id: "projectiles_s", label: "Projectiles/s", higher: false },
-	{ id: "target_changes_s", label: "Target changes/s", higher: false }
+	{ id: "target_changes_s", label: "Target changes/s", higher: false },
+	{ id: "unit_spawns_s", label: "Unit spawns/s", higher: false },
+	{ id: "stage_fallback_s", label: "Synchronous fallback/s", higher: false },
+	{ id: "stage_create_cost_ms_s", label: "Staging create cost ms/s", neutral: true }
 ];
 
 function XHSDevToolsLagLabStart(experiment, source) {

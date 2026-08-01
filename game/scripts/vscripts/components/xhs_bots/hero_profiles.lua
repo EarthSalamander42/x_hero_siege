@@ -711,6 +711,22 @@ function XHSBotHeroProfiles:GetCertifiedHeroes(composition)
 	return CopyArray(COMPOSITION_ORDER[composition] or COMPOSITION_ORDER.balanced)
 end
 
+function XHSBotHeroProfiles:GetCertifiedHeroOptions()
+	local options = {}
+	local seen = {}
+	for _, heroName in ipairs(COMPOSITION_ORDER.balanced) do
+		local profile = self:Get(heroName)
+		if profile ~= nil and profile.certified == true and seen[heroName] ~= true then
+			table.insert(options, {
+				hero = heroName,
+				display_name = profile.display_name or heroName,
+			})
+			seen[heroName] = true
+		end
+	end
+	return options
+end
+
 function XHSBotHeroProfiles:GetCertifiedHeroCount()
 	local count = 0
 	for _, profile in pairs(PROFILE_BY_HERO) do

@@ -55,11 +55,17 @@
 					</Panel>
 					<Panel class="XHSDevToolsPerformanceCompactMetric">
 						<Label class="CompactName" text="SIM" />
-						<Label id="XHSDevToolsServerHealth" class="CompactValue" text="--" />
+						<Panel class="CompactValueStack">
+							<Label id="XHSDevToolsServerHealth" class="CompactValue" text="--" />
+							<Label id="XHSDevToolsServerHealthLow" class="CompactExtreme" text="LOW --" />
+						</Panel>
 					</Panel>
 					<Panel class="XHSDevToolsPerformanceCompactMetric">
 						<Label class="CompactName" text="CREEPS" />
-						<Label id="XHSDevToolsCreepCount" class="CompactValue" text="--" />
+						<Panel class="CompactValueStack">
+							<Label id="XHSDevToolsCreepCount" class="CompactValue" text="--" />
+							<Label id="XHSDevToolsCreepCountHigh" class="CompactExtreme" text="HIGH --" />
+						</Panel>
 					</Panel>
 					<Label class="XHSDevToolsPerformanceArrow CollapsedArrow" text="+" />
 					<Label class="XHSDevToolsPerformanceArrow ExpandedArrow" text="-" />
@@ -88,6 +94,9 @@
 						<Panel class="XHSDevToolsPerformanceRow"><Label text="AI ticks / sec" /><Label id="XHSPerfAITicks" class="Value" text="--" /></Panel>
 						<Panel class="XHSDevToolsPerformanceRow"><Label text="Ability loops / sec" /><Label id="XHSPerfAbilityLoops" class="Value" text="--" /></Panel>
 						<Panel class="XHSDevToolsPerformanceRow"><Label text="Movement owners AI / wave" /><Label id="XHSPerfMovementOwners" class="Value" text="--" /></Panel>
+						<Panel class="XHSDevToolsPerformanceRow"><Label text="Staged / cap" /><Label id="XHSPerfStagedUnits" class="Value" text="--" /></Panel>
+						<Panel class="XHSDevToolsPerformanceRow"><Label text="Stage jobs / pending" /><Label id="XHSPerfStageQueue" class="Value" text="--" /></Panel>
+						<Panel class="XHSDevToolsPerformanceRow"><Label text="Stage cleanup / create max" /><Label id="XHSPerfStageCleanup" class="Value" text="--" /></Panel>
 						<Panel class="XHSDevToolsPerformanceRow"><Label text="Thinkers" /><Label id="XHSPerfThinkers" class="Value" text="--" /></Panel>
 						<Panel class="XHSDevToolsPerformanceRow"><Label text="Heroes / bosses" /><Label id="XHSPerfHeroesBosses" class="Value" text="--" /></Panel>
 						<Panel class="XHSDevToolsPerformanceRow"><Label text="Summons" /><Label id="XHSPerfSummons" class="Value" text="--" /></Panel>
@@ -104,6 +113,10 @@
 						<Panel class="XHSDevToolsPerformanceRow"><Label text="Creep orders AI / wave" /><Label id="XHSPerfCreepOrders" class="Value WideValue" text="--" /></Panel>
 						<Panel class="XHSDevToolsPerformanceRow"><Label text="Owner conflicts / blocked" /><Label id="XHSPerfOrderConflicts" class="Value WideValue" text="--" /></Panel>
 						<Panel class="XHSDevToolsPerformanceRow"><Label text="Deduplicated / handoffs" /><Label id="XHSPerfOrderDedup" class="Value WideValue" text="--" /></Panel>
+						<Panel class="XHSDevToolsPerformanceRow"><Label text="Stage created / fallback" /><Label id="XHSPerfStageCreated" class="Value WideValue" text="--" /></Panel>
+						<Panel class="XHSDevToolsPerformanceRow"><Label text="Stage released / cancelled" /><Label id="XHSPerfStageReleased" class="Value WideValue" text="--" /></Panel>
+						<Panel class="XHSDevToolsPerformanceRow"><Label text="Stage failures / missing" /><Label id="XHSPerfStageFailures" class="Value WideValue" text="--" /></Panel>
+						<Panel class="XHSDevToolsPerformanceRow"><Label text="Stage cost / AI wakes" /><Label id="XHSPerfStageCost" class="Value WideValue" text="--" /></Panel>
 						<Panel class="XHSDevToolsPerformanceRow"><Label text="AI / wave thinks" /><Label id="XHSPerfThinks" class="Value WideValue" text="--" /></Panel>
 						<Panel class="XHSDevToolsPerformanceRow"><Label text="Ability loops" /><Label id="XHSPerfAbilityThinks" class="Value" text="--" /></Panel>
 						<Panel class="XHSDevToolsPerformanceRow"><Label text="Damage / casts" /><Label id="XHSPerfCombat" class="Value WideValue" text="--" /></Panel>

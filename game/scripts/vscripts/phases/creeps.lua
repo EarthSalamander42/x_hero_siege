@@ -329,16 +329,25 @@ local function MoveCreepPastBreakable(unit, destination)
 	}, 1.0)
 end
 
-local function OrderWaveCreep(unit, waypoint)
-	if unit == nil or unit:IsNull() then return end
-	unit.xhs_wave_unit = true
-	SetWaveMovementOwner(unit)
-
+local function ConfigureWaveCreepAbilities(unit)
+	if unit == nil
+		or unit:IsNull()
+		or unit.xhs_wave_abilities_configured == true then
+		return
+	end
+	unit.xhs_wave_abilities_configured = true
 	ForEachUnitAbility(unit, function(ability)
 		if ability ~= nil and ability:GetLevel() <= 0 then
 			ability:SetLevel(1)
 		end
 	end)
+end
+
+local function OrderWaveCreep(unit, waypoint)
+	if unit == nil or unit:IsNull() then return end
+	unit.xhs_wave_unit = true
+	SetWaveMovementOwner(unit)
+	ConfigureWaveCreepAbilities(unit)
 
 	if unit:GetUnitName() == "npc_magnataur_destroyer_crypt" then
 		local thunderClap = unit:FindAbilityByName("creature_thunder_clap_low")
@@ -816,6 +825,7 @@ local function PrepareNextPhaseOneWave()
 				descriptor.level,
 				descriptor.wave_progress
 			)
+			ConfigureWaveCreepAbilities(unit)
 		end,
 		activate = function(_, unit, descriptor)
 			RegisterPhaseOneBudgetEnemy(unit)

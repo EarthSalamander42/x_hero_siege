@@ -13,19 +13,23 @@
 
 	<Panel class="XHSFarmLeaderboardHost" hittest="false" hittestchildren="true">
 		<Panel id="XHSFarmLeaderboard" class="XHSFarmLeaderboard" hittest="false" hittestchildren="true">
-			<Panel class="XHSFarmLeaderboardHeader" hittest="false" hittestchildren="true">
+			<Panel id="XHSFarmLeaderboardHeader" class="XHSFarmLeaderboardHeader" hittest="false" hittestchildren="true">
 				<Panel class="XHSFarmLeaderboardHeaderAccent" />
 				<Panel class="XHSFarmLeaderboardHeaderCopy">
 					<Label id="XHSFarmLeaderboardEyebrow" class="XHSFarmLeaderboardEyebrow" text="FARM EVENT" />
 					<Label id="XHSFarmLeaderboardTitle" class="XHSFarmLeaderboardTitle" text="LIVE LEADERBOARD" />
 				</Panel>
-				<Button id="XHSFarmLeaderboardCollapse" class="XHSFarmLeaderboardCollapse" hittest="true">
+				<Panel id="XHSFarmLeaderboardCollapse" class="XHSFarmLeaderboardCollapse" hittest="false">
 					<Label id="XHSFarmLeaderboardCollapseLabel" text="&#x25B2;" />
-				</Button>
+				</Panel>
 				<Panel class="XHSFarmLeaderboardLive">
 					<Panel class="XHSFarmLeaderboardLiveDot" />
 					<Label id="XHSFarmLeaderboardStatus" text="LIVE" />
 				</Panel>
+				<Button id="XHSFarmLeaderboardHeaderToggle" class="XHSFarmLeaderboardHeaderToggle" hittest="true" />
+				<Button id="XHSFarmLeaderboardHide" class="XHSFarmLeaderboardHide" hittest="true">
+					<Label text="&#x203A;" />
+				</Button>
 			</Panel>
 
 			<Panel id="XHSFarmWinnerCelebration" class="XHSFarmWinnerCelebration" hittest="false">

@@ -90,42 +90,6 @@ function Battlepass:HasArcana(ID, hero_name)
 	return nil
 end
 
-function CDOTA_BaseNPC:RemoveHealthBarLabel()
-	if self.SetCustomHealthLabel then
-		self:SetCustomHealthLabel("", 255, 255, 255)
-	end
-end
-
-function CDOTA_BaseNPC:SetupHealthBarLabel(customTag)
-	if not self.GetPlayerOwnerID or not self.SetCustomHealthLabel then return end
-
-	local playerID = self:GetPlayerOwnerID()
-	if not PlayerResource:IsValidPlayerID(playerID) then return end
-	local playerTable = CustomNetTables:GetTableValue("supporter_pass_player", tostring(playerID))
-	if type(playerTable) ~= "table" then return end
-
-	local donatorLevel = tonumber(playerTable.donator_level) or 0
-	if donatorLevel <= 0 then
-		self:RemoveHealthBarLabel()
-		return
-	end
-
-	local visualLevel = GetDonatorVisualStatus ~= nil and GetDonatorVisualStatus(donatorLevel) or donatorLevel
-	local color = DONATOR_COLOR[visualLevel] or DONATOR_COLOR[0] or { 255, 255, 255 }
-	local label = customTag or playerTable.ingame_tag or ("#donator_label_" .. tostring(donatorLevel))
-	self:SetCustomHealthLabel(label, color[1], color[2], color[3])
-end
-
-function Battlepass:ApplySupporterTag(hero, enabled)
-	if hero == nil or hero:IsNull() then return end
-
-	if enabled == true then
-		hero:SetupHealthBarLabel()
-	else
-		hero:RemoveHealthBarLabel()
-	end
-end
-
 function CDOTA_BaseNPC:CenterCameraOnEntity(hTarget, iDuration)
 	if iDuration == nil then iDuration = FrameTime() end
 	CameraMotion:Follow(self:GetPlayerID(), hTarget, {
@@ -146,7 +110,6 @@ function Battlepass:ToggleDonatorTag(event_source_index, event)
 	local hero = player and player:GetAssignedHero() or nil
 
 	Battlepass:UpdatePlayerTable(keys.PlayerID, "toggle_tag", keys.tag)
-	Battlepass:ApplySupporterTag(hero, keys.tag == 1 or keys.tag == true)
 end
 
 function Battlepass:SetDonatorTag(event_source_index, event)
@@ -154,13 +117,6 @@ function Battlepass:SetDonatorTag(event_source_index, event)
 	if keys.PlayerID == nil then return end
 	--	print(keys)
 	local hero = PlayerResource:GetSelectedHeroEntity(keys.PlayerID)
-
-	--	if api.players[steamid].changed_tag_this_game then
-	--		DisplayError(keys.PlayerID, "Don't abuse the fucking feature!")
-	--	else
-	-- api:SetPlayerIngameTag(keys.PlayerID, keys.ingame_tag)
-	-- hero:SetupHealthBarLabel(keys.ingame_tag)
-	--	end
 end
 
 function Battlepass:BattlepassRewards(event_source_index, event)
@@ -443,7 +399,7 @@ function Battlepass:ResolveSupporterItem(playerID, itemID, requestedSlot)
 		item = self:FindOwnedSupporterItem(playerID, resolvedRequestID)
 	end
 	if item == nil and SupporterPass2026 ~= nil
-	and SupporterPass2026.GetBackendCatalogKey ~= nil then
+		and SupporterPass2026.GetBackendCatalogKey ~= nil then
 		local backendCatalogKey =
 			SupporterPass2026:GetBackendCatalogKey(resolvedRequestID)
 		if backendCatalogKey ~= nil then
@@ -670,7 +626,7 @@ Battlepass.Player = Battlepass.Player or {}
 local SUPPORTER_PLAYER_PARTICLE_CHANNELS = {
 	teleport = {
 		{ key = "teleport_start_pfx", field = "start_pfx", anchor = "particles/items2_fx/teleport_start.vpcf" },
-		{ key = "teleport_end_pfx", field = "end_pfx", anchor = "particles/items2_fx/teleport_end.vpcf" },
+		{ key = "teleport_end_pfx",   field = "end_pfx",   anchor = "particles/items2_fx/teleport_end.vpcf" },
 	},
 	levelup = {
 		{ key = "levelup_pfx", field = "pfx", anchor = "particles/generic_hero_status/hero_levelup.vpcf" },
@@ -684,8 +640,8 @@ local SUPPORTER_PLAYER_PARTICLE_CHANNELS = {
 	},
 	potion = {
 		{ key = "health_potion_pfx", field = "health_pfx", anchor = "particles/custom/supporter_pass/health_potion_anchor.vpcf" },
-		{ key = "mana_potion_pfx", field = "mana_pfx", anchor = "particles/custom/supporter_pass/mana_potion_anchor.vpcf" },
-		{ key = "light_potion_pfx", field = "light_pfx", anchor = "particles/custom/supporter_pass/light_potion_anchor.vpcf" },
+		{ key = "mana_potion_pfx",   field = "mana_pfx",   anchor = "particles/custom/supporter_pass/mana_potion_anchor.vpcf" },
+		{ key = "light_potion_pfx",  field = "light_pfx",  anchor = "particles/custom/supporter_pass/light_potion_anchor.vpcf" },
 	},
 	rebirth = {
 		{ key = "rebirth_pfx", field = "pfx", anchor = "particles/custom/supporter_pass/rebirth_anchor.vpcf" },
@@ -700,13 +656,13 @@ local SUPPORTER_PLAYER_PARTICLE_CHANNELS = {
 		{ key = "regen_aura_pfx", field = "pfx", anchor = "particles/custom/supporter_pass/regen_aura_anchor.vpcf" },
 	},
 	immolation = {
-		{ key = "immolation_owner_pfx", field = "owner_pfx", anchor = "particles/custom/supporter_pass/immolation_owner_anchor.vpcf" },
+		{ key = "immolation_owner_pfx",  field = "owner_pfx",  anchor = "particles/custom/supporter_pass/immolation_owner_anchor.vpcf" },
 		{ key = "immolation_target_pfx", field = "target_pfx", anchor = "particles/custom/supporter_pass/immolation_target_anchor.vpcf" },
 	},
 	high_five = {
 		{ key = "high_five_overhead_pfx", field = "overhead_pfx" },
-		{ key = "high_five_travel_pfx", field = "travel_pfx" },
-		{ key = "high_five_impact_pfx", field = "impact_pfx" },
+		{ key = "high_five_travel_pfx",   field = "travel_pfx" },
+		{ key = "high_five_impact_pfx",   field = "impact_pfx" },
 	},
 }
 
@@ -772,14 +728,6 @@ function Battlepass:GetSupporterPlayerID(subject)
 end
 
 function Battlepass:GetPlayerParticle(subject, key, fallback)
-	-- Seasonal level-up replacements are unsafe for XHS tome bursts. In
-	-- particular, the golden star-trail variants can keep emitting and stack
-	-- into a severe client-side performance leak. Level-up feedback is now a
-	-- deliberately small, finite vanilla burst for every player.
-	if key == "levelup_pfx" then
-		return "particles/generic_hero_status/hero_levelup.vpcf"
-	end
-
 	local playerID = self:GetSupporterPlayerID(subject)
 	if playerID == nil then return fallback end
 
@@ -1615,9 +1563,9 @@ function Battlepass:ResolveSupporterUnitSelection(playerID, unitName, expectedSl
 	if item == nil and ItemsGame ~= nil and type(ItemsGame.custom_kv) == "table" then
 		for catalogID, definition in pairs(ItemsGame.custom_kv) do
 			if type(definition) == "table"
-			and NormalizeSupporterSlot(
-				definition.slot_id or definition.item_type or definition.type
-			) == slot then
+				and NormalizeSupporterSlot(
+					definition.slot_id or definition.item_type or definition.type
+				) == slot then
 				local definitionUnit = definition.unit
 					or definition.unit_name
 					or definition.file
@@ -1939,9 +1887,9 @@ function Battlepass:SupporterPassClaimReward(event_source_index, event)
 	local reward, premiumTrack = self:FindSupporterPassReward(event.reward_id)
 	local playerTable = CustomNetTables:GetTableValue("supporter_pass_player", tostring(playerID)) or {}
 	if playerTable.backend_season_ready == false
-	or playerTable.backend_season_ready == 0
-	or playerTable.backend_season_ready == "0"
-	or playerTable.backend_season_ready == "false" then
+		or playerTable.backend_season_ready == 0
+		or playerTable.backend_season_ready == "0"
+		or playerTable.backend_season_ready == "false" then
 		self:SendSupporterPassFailure(playerID, "supporter_pass_claim_failed", "#xhs_sp_error_reward_backend_unavailable", {
 			reward_id = event.reward_id,
 		})
@@ -2097,7 +2045,6 @@ function Battlepass:SupporterPassUpdateSettings(event_source_index, event)
 			if not success then
 				CustomNetTables:SetTableValue("supporter_pass_player", tostring(playerID), previous_table)
 				local hero = PlayerResource:GetSelectedHeroEntity(playerID)
-				Battlepass:ApplySupporterTag(hero, previous_table.toggle_tag == true or previous_table.toggle_tag == 1)
 				Battlepass:ApplySupporterLoadout(playerID, hero)
 				if player then
 					CustomGameEventManager:Send_ServerToPlayer(player, "supporter_pass_settings_failed", {
@@ -2112,9 +2059,7 @@ function Battlepass:SupporterPassUpdateSettings(event_source_index, event)
 			end
 
 			local hero = PlayerResource:GetSelectedHeroEntity(playerID)
-			if settings.toggle_tag ~= nil and hero ~= nil and not hero:IsNull() then
-				Battlepass:ApplySupporterTag(hero, settings.toggle_tag)
-			end
+
 			if settings.pass_rewards ~= nil then
 				Battlepass:ApplySupporterLoadout(playerID, hero)
 			end
@@ -2125,9 +2070,7 @@ function Battlepass:SupporterPassUpdateSettings(event_source_index, event)
 		end)
 	else
 		local hero = PlayerResource:GetSelectedHeroEntity(playerID)
-		if settings.toggle_tag ~= nil and hero ~= nil and not hero:IsNull() then
-			Battlepass:ApplySupporterTag(hero, settings.toggle_tag)
-		end
+
 		if settings.pass_rewards ~= nil then
 			Battlepass:ApplySupporterLoadout(playerID, hero)
 		end

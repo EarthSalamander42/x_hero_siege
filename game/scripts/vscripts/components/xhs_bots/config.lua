@@ -13,6 +13,7 @@ XHSBotConfig.DEFAULTS = {
 	difficulty = "normal",
 	composition = "balanced",
 	spectator_mode = false,
+	hero_selections = {},
 }
 
 XHSBotConfig.DIFFICULTIES = {
@@ -216,6 +217,26 @@ function XHSBotConfig:Normalize(raw, humanCount)
 		or maximumPlayBots
 	local count = ClampInteger(raw.count, 0, maximumBots)
 	local spectatorMode = wantsSpectator and count > 0
+	local heroSelections = {}
+	local selectedHeroes = {}
+	local rawHeroSelections = type(raw.hero_selections) == "table"
+		and raw.hero_selections
+		or {}
+	for slot = 1, count do
+		local heroName = tostring(
+			rawHeroSelections[slot]
+				or rawHeroSelections[tostring(slot)]
+				or ""
+		)
+		if heroName ~= ""
+			and XHSBotHeroProfiles ~= nil
+			and XHSBotHeroProfiles.IsCertified ~= nil
+			and XHSBotHeroProfiles:IsCertified(heroName)
+			and selectedHeroes[heroName] ~= true then
+			heroSelections[slot] = heroName
+			selectedHeroes[heroName] = true
+		end
+	end
 
 	return {
 		enabled = count > 0,
@@ -223,6 +244,7 @@ function XHSBotConfig:Normalize(raw, humanCount)
 		difficulty = difficulty,
 		composition = composition,
 		spectator_mode = spectatorMode,
+		hero_selections = heroSelections,
 		human_count = humanCount,
 		combat_human_count = spectatorMode and spectatorHumanCount or playHumanCount,
 		maximum_bots = maximumBots,

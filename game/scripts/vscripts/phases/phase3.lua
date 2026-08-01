@@ -94,8 +94,8 @@ local function FaceUnitTowardsPosition(unit, position)
 	unit:FaceTowards(position)
 end
 
-local PHASE3_BOSS_CINEMATIC_DURATION = 3.5
-local BANEHALLOW_CINEMATIC_DURATION = PHASE3_BOSS_CINEMATIC_DURATION * 2
+local PHASE3_BOSS_CINEMATIC_DURATION = 5
+local BANEHALLOW_CINEMATIC_DURATION = 10
 local PHASE3_BOSS_PREP_DURATION = 2.5
 local PHASE3_BOSS_CAMERA_MOVE_DURATION = 0.20
 
@@ -148,6 +148,195 @@ local function PlayPhase3BossSpawnCinematic(boss, cinematicId, title, subtitle, 
 	Timers:CreateTimer(cinematicDuration, function()
 		ApplyPostCinematicHeroPrepLock(PHASE3_BOSS_PREP_DURATION)
 	end)
+end
+
+local UTHER_ICE_PRISON_UNIT = "npc_xhs_uther_ice_prison"
+local UTHER_ICE_BREAK_PARTICLE = "particles/units/heroes/hero_crystalmaiden/maiden_freezing_field_explosion.vpcf"
+local UTHER_RELEASE_PARTICLE = "particles/units/heroes/hero_omniknight/omniknight_purification.vpcf"
+local UTHER_RELEASE_CINEMATIC_ID = "xhs_uther_freed"
+local UTHER_RELEASE_CINEMATIC_DURATION = 4.75
+local UTHER_DESTINATION_NAME = "xhs_spawner_paladin_2_vip"
+
+local function IsUsableEntity(entity)
+	return entity ~= nil and IsValidEntity(entity) and not entity:IsNull()
+end
+
+local function FindUtherLightbringer()
+	for _, unit in pairs(FindUnitsInRadius(
+		DOTA_TEAM_GOODGUYS,
+		Vector(0, 0, 0),
+		nil,
+		FIND_UNITS_EVERYWHERE,
+		DOTA_UNIT_TARGET_TEAM_FRIENDLY,
+		DOTA_UNIT_TARGET_ALL,
+		DOTA_UNIT_TARGET_FLAG_INVULNERABLE,
+		FIND_ANY_ORDER,
+		false
+	)) do
+		if unit:GetUnitName() == "npc_xhs_paladin_2" then return unit end
+	end
+	return nil
+end
+
+local function CreateWorldParticle(particleName, position)
+	local particle = ParticleManager:CreateParticle(particleName, PATTACH_WORLDORIGIN, nil)
+	ParticleManager:SetParticleControl(particle, 0, position)
+	ParticleManager:ReleaseParticleIndex(particle)
+end
+
+local function FinishUtherRun()
+	local rescue = GameMode.UtherRescue
+	if rescue == nil or rescue.finished == true or not IsUsableEntity(rescue.uther) then return end
+
+	rescue.finished = true
+	local uther = rescue.uther
+	uther:Stop()
+	FindClearSpaceForUnit(uther, rescue.destination, true)
+	uther:SetMoveCapability(DOTA_UNIT_CAP_MOVE_NONE)
+	uther:AddNewModifier(uther, nil, "modifier_npc_dialog", { duration = -1 })
+	local animation = uther:AddNewModifier(uther, nil, "modifier_stack_count_animation_controller", {})
+	if animation ~= nil then animation:SetStackCount(ACT_DOTA_IDLE) end
+
+	for _, zone in pairs(GameMode.Zones or {}) do
+		if zone.szName == "xhs_holdout" and zone.StartQuestByName ~= nil and not zone:IsQuestActive("teleport_arthas") then
+			zone:StartQuestByName("teleport_arthas")
+			uther:AddNewModifier(uther, nil, "modifier_npc_dialog_notify", {})
+			break
+		end
+	end
+
+	Notifications:TopToAll({
+		text = "Uther Lightbringer is free. Speak with him before facing Arthas.",
+		style = { color = "lightgreen" },
+		duration = 8.0,
+	})
+end
+
+local function BeginUtherRun()
+	local rescue = GameMode.UtherRescue
+	if rescue == nil or not IsUsableEntity(rescue.uther) or rescue.destination == nil then return end
+
+	local uther = rescue.uther
+	uther:FadeGesture(ACT_DOTA_SPAWN)
+	uther:SetMoveCapability(DOTA_UNIT_CAP_MOVE_GROUND)
+	ExecuteOrderFromTable({
+		UnitIndex = uther:entindex(),
+		OrderType = DOTA_UNIT_ORDER_MOVE_TO_POSITION,
+		Position = rescue.destination,
+		Queue = false,
+	})
+
+	local startedAt = GameRules:GetGameTime()
+	Timers:CreateTimer(function()
+		if not IsUsableEntity(uther) then return nil end
+		if (uther:GetAbsOrigin() - rescue.destination):Length2D() <= 90 then
+			FinishUtherRun()
+			return nil
+		end
+		if GameRules:GetGameTime() - startedAt >= 25.0 then
+			-- Do not soft-lock the campaign if a future map revision blocks this path.
+			FinishUtherRun()
+			return nil
+		end
+		return 0.1
+	end)
+end
+
+function XHSSetupUtherIcePrison(proudmoore)
+	if GameMode.UtherRescue ~= nil or not IsUsableEntity(proudmoore) then return end
+
+	local uther = FindUtherLightbringer()
+	local destinationEntity = Entities:FindByName(nil, UTHER_DESTINATION_NAME)
+	if not IsUsableEntity(uther) or destinationEntity == nil then
+		print("XHSSetupUtherIcePrison - ERROR: Uther or his destination is missing.")
+		return
+	end
+
+	local destination = destinationEntity:GetAbsOrigin()
+	local direction = destination - proudmoore:GetAbsOrigin()
+	direction.z = 0
+	if direction:Length2D() <= 0 then direction = proudmoore:GetForwardVector() end
+	local prisonOrigin = proudmoore:GetAbsOrigin() + direction:Normalized() * 380
+
+	local prison = CreateUnitByName(UTHER_ICE_PRISON_UNIT, prisonOrigin, true, nil, nil, DOTA_TEAM_CUSTOM_2)
+	if not IsUsableEntity(prison) then
+		print("XHSSetupUtherIcePrison - ERROR: Failed to create Uther's ice prison.")
+		return
+	end
+
+	prison.xhs_uther_ice_prison = true
+	prison.zone = "xhs_holdout"
+	prison:AddNewModifier(prison, nil, "modifier_invulnerable", {})
+	prison:SetRenderAlpha(215)
+	RegisterXHSDevSpawn(prison)
+
+	uther:RemoveModifierByName("modifier_npc_dialog_notify")
+	uther:AddNewModifier(uther, nil, "modifier_invulnerable", {})
+	uther:AddNewModifier(uther, nil, "modifier_phased", {})
+	FindClearSpaceForUnit(uther, prisonOrigin, true)
+	uther:SetAbsOrigin(prisonOrigin)
+	local animation = uther:FindModifierByName("modifier_stack_count_animation_controller")
+	if animation ~= nil then animation:SetStackCount(ACT_DOTA_DISABLED) end
+
+	GameMode.UtherRescue = {
+		uther = uther,
+		prison = prison,
+		destination = destination,
+		activated = false,
+		released = false,
+		finished = false,
+	}
+end
+
+function XHSActivateUtherIcePrison()
+	local rescue = GameMode.UtherRescue
+	if rescue == nil or rescue.activated == true or not IsUsableEntity(rescue.prison) then return end
+
+	rescue.activated = true
+	rescue.prison:RemoveModifierByName("modifier_invulnerable")
+	rescue.prison:SetHealth(rescue.prison:GetMaxHealth())
+	Notifications:TopToAll({
+		text = "Proudmoore's spell is broken. Shatter Uther's ice prison!",
+		style = { color = "lightblue" },
+		duration = 8.0,
+	})
+end
+
+function XHSReleaseUtherFromIce()
+	local rescue = GameMode.UtherRescue
+	if rescue == nil or rescue.released == true or not IsUsableEntity(rescue.uther) then return end
+
+	rescue.released = true
+	local uther = rescue.uther
+	local origin = uther:GetAbsOrigin()
+	CreateWorldParticle(UTHER_ICE_BREAK_PARTICLE, origin)
+	CreateWorldParticle(UTHER_RELEASE_PARTICLE, origin)
+	EmitSoundOnLocationWithCaster(origin, "Hero_Crystal.CrystalNova", uther)
+	EmitSoundOnLocationWithCaster(origin, "Hero_Omniknight.Purification", uther)
+
+	uther:RemoveModifierByName("modifier_stack_count_animation_controller")
+	uther:RemoveModifierByName("modifier_npc_dialog")
+	uther:RemoveModifierByName("modifier_npc_dialog_notify")
+	uther:RemoveModifierByName("modifier_invulnerable")
+	uther:RemoveModifierByName("modifier_phased")
+	StartAnimation(uther, { duration = UTHER_RELEASE_CINEMATIC_DURATION, activity = ACT_DOTA_SPAWN, rate = 0.7 })
+
+	if XHSCinematics ~= nil then
+		XHSCinematics:BeginForAll(UTHER_RELEASE_CINEMATIC_ID, {
+			duration = UTHER_RELEASE_CINEMATIC_DURATION,
+			hide_hud = true,
+			lock_orders = true,
+			camera_entindex = uther:entindex(),
+			camera_speed = 0.55,
+			return_camera_speed = 0.7,
+			transition = 0.35,
+			letterbox_pct = 11,
+			title = "UTHER LIGHTBRINGER",
+			subtitle = "The Light has not abandoned us. I will show you the way to Arthas.",
+		})
+	end
+
+	Timers:CreateTimer(UTHER_RELEASE_CINEMATIC_DURATION, BeginUtherRun)
 end
 
 local function SpawnBanehallowRevenant(spawnerName, banehallow, pauseDuration)
@@ -221,7 +410,16 @@ function StartMagtheridonArena(bConsole)
 
 	RefreshPlayers()
 
-	TeleportAllHeroes("point_teleport_boss_", 10.0 + delay, delay)
+	TeleportAllHeroes(
+		"point_teleport_boss_",
+		10.0 + delay,
+		delay,
+		function()
+			if XHSRemoveFreedShalLightbinder ~= nil then
+				XHSRemoveFreedShalLightbinder()
+			end
+		end
+	)
 
 	Timers:CreateTimer(delay, function()
 		local magtheridon = CreateUnitByName("npc_dota_hero_magtheridon", point_mag, true, nil, nil, DOTA_TEAM_CUSTOM_2)
@@ -344,6 +542,7 @@ function EndMagtheridonArena()
 		if XHSProudmoore_AttachPhase3AI ~= nil then
 			XHSProudmoore_AttachPhase3AI(proudmoore)
 		end
+		XHSSetupUtherIcePrison(proudmoore)
 	end)
 end
 
@@ -795,7 +994,6 @@ function StartLichKingArena()
 			end
 		end)
 	end)
-
 end
 
 function StartSpiritMasterArena()

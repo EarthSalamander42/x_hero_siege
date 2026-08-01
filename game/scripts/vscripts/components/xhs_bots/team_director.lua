@@ -1091,7 +1091,12 @@ function XHSBotTeamDirector:BuildStrategicSnapshot(phase)
 		built_at = GameRules:GetGameTime(),
 	}
 	snapshot.base_threat = self:CalculateBaseThreat(snapshot.built_at)
-	if phase >= 3 and snapshot.base_threat.structure_emergency ~= true then
+	-- Phase 3/4 no longer has a castle-defence objective. The phase-one
+	-- Ancient and towers can remain queryable after the campaign advances,
+	-- and the final-wave timer flags are not guaranteed to be reset. Never
+	-- let those obsolete entities reclaim strategic authority from bosses or
+	-- from the human-led campaign path.
+	if phase >= 3 then
 		snapshot.base_threat.active = false
 		snapshot.base_threat.response_required = false
 		snapshot.base_threat.score = 0
@@ -1540,8 +1545,9 @@ function XHSBotTeamDirector:BuildAssignment(playerID, slot, phase, now, snapshot
 	elseif assignment.goal == nil and campaignObjective ~= nil then
 		assignment.goal = campaignObjective.goal
 		assignment.anchor = CopyPosition(campaignObjective.anchor)
+		assignment.non_combat = campaignObjective.non_combat == true
 		assignment.target_entindex =
-			campaignObjective.non_combat == true
+			assignment.non_combat
 				and nil or campaignObjective.target_entindex
 		assignment.attack_move = campaignObjective.attack_move ~= false
 		assignment.urgency = tonumber(campaignObjective.urgency) or 1
@@ -1729,6 +1735,7 @@ function XHSBotTeamDirector:BuildAssignment(playerID, slot, phase, now, snapshot
 	local campaignControls = campaignObjective ~= nil
 		and string.find(tostring(assignment.goal), "^campaign_") ~= nil
 	if IsValidEntityHandle(hero) and hero:IsAlive()
+		and phase <= 2
 		and baseThreat ~= nil and baseThreat.active == true
 		and baseThreat.response_required == true
 		and selectedBaseResponder
@@ -1775,6 +1782,7 @@ function XHSBotTeamDirector:BuildAssignment(playerID, slot, phase, now, snapshot
 	end
 
 	if IsValidEntityHandle(hero) and hero:IsAlive()
+		and phase <= 2
 		and IsFinalWaveCombatActive()
 		and not emergencyHealthShopping
 		and not preserveRecoveryGearShopping
@@ -1826,7 +1834,8 @@ function XHSBotTeamDirector:BuildAssignment(playerID, slot, phase, now, snapshot
 
 	local activeSpecialCount = CustomTimers ~= nil
 		and tonumber(CustomTimers.active_special_wave_count) or 0
-	local ancientPatrolQuiet = assignment.goal == "defend_base"
+	local ancientPatrolQuiet = phase <= 2
+		and assignment.goal == "defend_base"
 		and forcedGoal == nil
 		and not campaignControls
 		and not structureEmergency
@@ -1925,7 +1934,10 @@ function XHSBotTeamDirector:ShouldReplaceAssignment(existing, phase, now, snapsh
 		and snapshot.base_threat.response_required == true
 	local structureEmergency = baseResponseRequired
 		and snapshot.base_threat.structure_emergency == true
-	local finalWaveActive = IsFinalWaveCombatActive()
+	-- proc_final_wave remains true after the campaign leaves castle defence.
+	-- It is authoritative only during phases 1/2; otherwise it would keep
+	-- replacing every boss/follow assignment with defend_base forever.
+	local finalWaveActive = phase <= 2 and IsFinalWaveCombatActive()
 	local forcedGoal = record and record.forced_goal or nil
 	local emergencyShoppingActive = record ~= nil
 		and type(record.shopping_goal) == "table"

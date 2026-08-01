@@ -21,6 +21,7 @@ local EXPERIMENTS = {
 	pause_bots = { label = "Pause allied bots", kind = "bots" },
 	pause_waves = { label = "Pause wave controllers", kind = "runtime" },
 	pause_abilities = { label = "Pause creep ability loops", kind = "runtime" },
+	disable_wave_staging = { label = "Disable wave pre-spawn", kind = "runtime" },
 	suppress_orders = { label = "Suppress creep orders", kind = "runtime" },
 	root_creeps = { label = "Root creeps", kind = "modifier", modifier = "modifier_xhs_lag_lab_root" },
 	no_collision = { label = "Disable creep collision", kind = "modifier", modifier = "modifier_xhs_lag_lab_no_collision" },
@@ -37,6 +38,7 @@ local METRICS = {
 	"server_sim_health_pct",
 	"creeps",
 	"total_units",
+	"staged_units",
 	"scan_ms",
 	"zone_searches_s",
 	"zone_cost_ms_s",
@@ -50,6 +52,9 @@ local METRICS = {
 	"damage_s",
 	"projectiles_s",
 	"target_changes_s",
+	"unit_spawns_s",
+	"stage_fallback_s",
+	"stage_create_cost_ms_s",
 }
 
 local function RealNow()
@@ -324,6 +329,12 @@ function XHSLagLab:ApplyExperiment()
 		self.bot_pause_state_captured = true
 		self.bots_were_paused = XHSBots ~= nil and XHSBots.paused == true
 		XHSBots:SetPaused(true)
+	elseif self.state.experiment_id == "disable_wave_staging"
+		and XHSWaveStager ~= nil
+		and XHSWaveStager.SetEnabled ~= nil then
+		self.wave_staging_state_captured = true
+		self.wave_staging_was_enabled = XHSWaveStager:IsEnabled()
+		XHSWaveStager:SetEnabled(false, "lag_lab")
 	end
 	local targetCreeps = self:GetTargetCreeps()
 	self.state.affected_units = #targetCreeps
@@ -342,6 +353,13 @@ function XHSLagLab:RestoreEffects()
 	end
 	self.bot_pause_state_captured = false
 	self.bots_were_paused = nil
+	if self.wave_staging_state_captured == true
+		and XHSWaveStager ~= nil
+		and XHSWaveStager.SetEnabled ~= nil then
+		XHSWaveStager:SetEnabled(self.wave_staging_was_enabled ~= false, "lag_lab_restore")
+	end
+	self.wave_staging_state_captured = false
+	self.wave_staging_was_enabled = nil
 
 	for _, modifierName in pairs({
 		"modifier_xhs_lag_lab_root",
@@ -410,6 +428,7 @@ function XHSLagLab:CaptureMetrics()
 	if XHSDevTools == nil or XHSDevTools.BuildPerformanceState == nil then return nil end
 	local snapshot = XHSDevTools:BuildPerformanceState()
 	local activity = snapshot.activity or {}
+	local stager = snapshot.wave_stager or {}
 	local fpsSum = 0
 	local fpsCount = 0
 	for _, player in pairs(snapshot.players or {}) do
@@ -425,6 +444,7 @@ function XHSLagLab:CaptureMetrics()
 		server_sim_health_pct = tonumber(snapshot.sim_health_pct) or 100,
 		creeps = tonumber(snapshot.creeps) or 0,
 		total_units = tonumber(snapshot.total_units) or 0,
+		staged_units = tonumber(stager.staged_units) or 0,
 		scan_ms = tonumber(snapshot.scan_ms) or 0,
 		zone_searches_s = tonumber(
 			activity.spatial_queries_per_second or activity.zone_searches_per_second
@@ -442,6 +462,13 @@ function XHSLagLab:CaptureMetrics()
 		damage_s = tonumber(activity.damage_events_per_second) or 0,
 		projectiles_s = tonumber(activity.projectiles_per_second) or 0,
 		target_changes_s = tonumber(activity.target_changes_per_second) or 0,
+		unit_spawns_s = tonumber(activity.unit_spawns_per_second) or 0,
+		stage_fallback_s = tonumber(
+			activity.wave_stage_units_fallback_created_per_second
+		) or 0,
+		stage_create_cost_ms_s = tonumber(
+			activity.wave_stage_create_cost_ms_per_second
+		) or 0,
 	}
 end
 

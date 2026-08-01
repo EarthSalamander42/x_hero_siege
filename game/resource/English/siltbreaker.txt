@@ -32,6 +32,7 @@
 "kill_illidan"									"Defeat Illidan Stormrage"
 "kill_balanar"									"Defeat Balanar"
 "kill_proudmoore"								"Defeat Admiral Proudmoore"
+"free_uther"									"Shatter Uther's Ice Prison"
 "kill_arthas"									"Defeat Arthas"
 "kill_banehallow"								"Defeat Banehallow"
 "kill_lich_king"								"Defeat Lich King (Undead Arthas)"
@@ -89,6 +90,7 @@
 //VIPS
 "npc_xhs_paladin"						"Shal Lightbinder"
 "npc_xhs_paladin_2"						"Uther Lightbringer"
+"npc_xhs_uther_ice_prison"				"Uther's Ice Prison"
 "Dialog_ForestChief_DefendTheCamp"		"At last... the prison's hold is broken. You have my gratitude, heroes."
 "Dialog_Shal_Lightbinder_2"				"While I was bound, I felt the enemy gathering beyond the gates. The siege was only their first test."
 "Dialog_Shal_Lightbinder_3"				"I can open a path into their realm, but the spell will carry us only once. Gather your strength."

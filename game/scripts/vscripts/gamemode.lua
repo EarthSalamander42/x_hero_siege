@@ -145,18 +145,22 @@ function GameMode:OnHeroInGame(hero)
 		-- Player bots are replaced by XHSBotProvisioner and do not own one of
 		-- the map's human hero-selection pads. Never dereference a missing pad.
 		if not is_engine_bot and point ~= nil then
-			local delay = 2.0
-			hero:AddNewModifier(hero, nil, "modifier_command_restricted", { duration = delay + 0.1 })
-
-			hero:SetContextThink("delay_to_fix_camera_not_centering_lul", function()
-				if point ~= nil and not point:IsNull() then
-					-- Keep the camera travelling for most of the teleport. The
-					-- old three-argument call became an instant camera move
-					-- when TeleportHero was migrated from Panorama.
-					TeleportHero(hero, point:GetAbsOrigin(), 3.0, 2.50)
+			-- Start the selection travel immediately. The legacy implementation
+			-- waited two seconds before acquiring SetCameraTarget, leaving a short
+			-- free-camera window followed by an apparently spontaneous lock while
+			-- an idle Wisp was already visible in the selection area.
+			TeleportHero(hero, point:GetAbsOrigin(), 3.0, 2.50, function()
+				-- Rendered-arrival confirmation may still own the dummy after the
+				-- physical teleport. At this point the Wisp is settled, so guarantee
+				-- that this specific teleport owner hands control back to the player.
+				if CameraMotion ~= nil then
+					CameraMotion:Release(id, {
+						owner = "hero_teleport",
+						mode = "free",
+						reason = "initial hero selection teleport settled",
+					})
 				end
-				return nil
-			end, delay)
+			end)
 		else
 			-- Never leave a Wisp command-restricted merely because no selection
 			-- pad exists (engine bot, malformed map, or debug spawn).
@@ -345,7 +349,25 @@ function GameMode:InitGameMode()
 		Convars:RegisterCommand("lich_king", function(keys) return StartLichKingArena() end, "Test Magtheridon Boss", FCVAR_CHEAT)
 		Convars:RegisterCommand("spirit_master", function(keys) return StartSpiritMasterArena() end, "Test Spirit Master Boss", FCVAR_CHEAT)
 		Convars:RegisterCommand("duel_event", function(keys) return SpecialEvents:DuelEvent() end, "Test Duel Event", FCVAR_CHEAT)
-		Convars:RegisterCommand("win_game", function(keys) return WinGame() end, "End the game", FCVAR_CHEAT)
+		Convars:RegisterCommand("xhs_backend_test_game_time", function(_, seconds)
+			if api == nil or api.SetBackendTestGameTime == nil then
+				print("[XHS Backend Test] API component unavailable")
+				return
+			end
+			local ok, message = api:SetBackendTestGameTime(seconds)
+			print("[XHS Backend Test] " .. (ok and "OK: " or "ERROR: ") .. tostring(message))
+		end, "Tools-only: simulate an authenticated production game time for game-complete", FCVAR_CHEAT)
+		Convars:RegisterCommand("win_game", function(keys)
+			local simulated_time = api ~= nil and api.GetBackendTestGameTime ~= nil
+				and api:GetBackendTestGameTime() or nil
+			local registered_game_id = api ~= nil and api.GetApiGameId ~= nil
+				and tonumber(api:GetApiGameId()) or nil
+			if simulated_time ~= nil and (registered_game_id == nil or registered_game_id <= 0) then
+				print("[XHS Backend Test] ERROR: game-register is not ready; wait for 'game-register: ready' before win_game")
+				return
+			end
+			return WinGame()
+		end, "End the game", FCVAR_CHEAT)
 	end
 
 	mode:SetExecuteOrderFilter(Dynamic_Wrap(GameMode, "FilterExecuteOrder"), GameMode)

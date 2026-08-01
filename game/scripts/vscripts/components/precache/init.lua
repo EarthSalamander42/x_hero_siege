@@ -647,6 +647,7 @@ XHSPrecache:RegisterGroup("bosses", {
 		"npc_dota_hero_illidan",
 		"npc_dota_hero_balanar",
 		"npc_dota_hero_proudmoore",
+		"npc_xhs_uther_ice_prison",
 		"npc_dota_hero_magtheridon",
 		"npc_dota_hero_arthas",
 		"npc_dota_hero_banehallow",

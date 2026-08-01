@@ -145,6 +145,61 @@ function XHSBotUtility:Build(context)
 		)
 	end
 
+	if context.non_combat_objective == true then
+		-- Dialogue/campaign travel is a first-class objective. It must not be
+		-- displaced by nearby neutral/VIP entities, loot, runes or offensive
+		-- casts. Keep lethal telegraph evasion and useful emergency sustain, and
+		-- permit only a close attacker that is actively hitting this bot.
+		for _, abilityAction in ipairs(context.ability_actions or {}) do
+			local selfHeal = abilityAction.is_heal == true
+				and abilityAction.heals_self == true
+				and (tonumber(abilityAction.self_effective_heal_ratio) or 0) >= 0.04
+				and context.health_ratio <= 0.55
+			local personalDefense = (abilityAction.mode == "self_defensive"
+				or abilityAction.mode == "defensive_toggle")
+				and context.health_ratio <= 0.62
+			if selfHeal or personalDefense then
+				local sustainScore = (context.danger or 0) > 0
+					and (selfHeal and 94 or 90)
+					or (selfHeal and 190 or 178)
+				AddAction(
+					actions,
+					"cast_ability",
+					sustainScore,
+					abilityAction,
+					selfHeal and "campaign travel emergency self-heal"
+						or "campaign travel personal defense"
+				)
+			end
+		end
+		if context.target ~= nil then
+			AddAction(
+				actions,
+				"attack_target",
+				185 + (context.target_priority or 0),
+				{
+					target = context.target,
+					maximum_distance = context.max_chase_distance,
+				},
+				"campaign route immediate self-defense"
+			)
+		elseif context.anchor_distance ~= nil
+			and context.anchor_distance
+				> (tonumber(context.objective_reached_distance) or 180) then
+			AddAction(
+				actions,
+				"move_to_objective",
+				(context.danger or 0) > 0 and 80
+					or 145 + (tonumber(context.assignment_urgency) or 0) * 25,
+				{ position = context.anchor },
+				"advance to non-combat campaign objective"
+			)
+		else
+			AddAction(actions, "hold", 120, {}, "await campaign interaction")
+		end
+		return self:Sort(actions)
+	end
+
 	local retreatThreshold = context.retreat_threshold or 0.25
 	if context.base_last_stand == true and context.shopping ~= true then
 		-- The Ancient is the hard retreat limit, but the campfire is not a

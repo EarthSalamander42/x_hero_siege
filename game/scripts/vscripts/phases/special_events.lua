@@ -88,6 +88,15 @@ local function IsValidAliveUnit(unit)
 	return unit ~= nil and not unit:IsNull() and unit:IsAlive()
 end
 
+local function RemoveSpecialArenaDisplayDummy(globalName)
+	local dummy = _G[globalName]
+	_G[globalName] = nil
+
+	if dummy ~= nil and IsValidEntity(dummy) and not dummy:IsNull() then
+		UTIL_Remove(dummy)
+	end
+end
+
 local function GetFarmEventHero(playerID)
 	if playerID == nil or playerID < 0 or not PlayerResource:HasSelectedHero(playerID) then return nil end
 	local hero = PlayerResource:GetSelectedHeroEntity(playerID)
@@ -1477,6 +1486,9 @@ function SpecialEvents:StartRameroAndBaristolEvent(hero)
 		hero = PlayerResource:GetSelectedHeroEntity(0)
 	end
 
+	RemoveSpecialArenaDisplayDummy("RAMERO_DUMMY")
+	RemoveSpecialArenaDisplayDummy("BARISTOL_DUMMY")
+
 	local point = Entities:FindByName(nil, "npc_dota_muradin_player_1"):GetAbsOrigin()
 	local intro_delay = CINEMATIC_EVENT_PRE_TELEPORT_DELAY + CINEMATIC_EVENT_POST_TELEPORT_HOLD
 	StopAllStormEarthFireSounds()
@@ -1568,8 +1580,6 @@ function SpecialEvents:EndRameroAndBaristolEvent(bWin)
 	mode:SetContextThink("RameroAndBaristol", nil, 0)
 
 	RestartCreeps(teleport_time + 3.0)
-	UTIL_Remove(_G.RAMERO_DUMMY)
-	UTIL_Remove(_G.BARISTOL_DUMMY)
 
 	CustomGameEventManager:Send_ServerToAllClients("hide_timer_special_arena", {})
 
@@ -1615,6 +1625,8 @@ function SpecialEvents:EndRameroAndBaristolEvent(bWin)
 end
 
 function SpecialEvents:StartSogatEvent(hero)
+	RemoveSpecialArenaDisplayDummy("RAMERO_BIS_DUMMY")
+
 	local point = Entities:FindByName(nil, "npc_dota_muradin_player_1"):GetAbsOrigin()
 	local intro_delay = CINEMATIC_EVENT_PRE_TELEPORT_DELAY + CINEMATIC_EVENT_POST_TELEPORT_HOLD
 	StopAllStormEarthFireSounds()
@@ -1689,7 +1701,6 @@ function SpecialEvents:EndSogatEvent(bWin)
 
 	RestartCreeps(teleport_time + 3.0)
 	StopAllStormEarthFireSounds()
-	UTIL_Remove(_G.RAMERO_BIS_DUMMY)
 
 	CustomGameEventManager:Send_ServerToAllClients("hide_timer_special_arena", {})
 

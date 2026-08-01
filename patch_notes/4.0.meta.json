@@ -6,12 +6,22 @@
   "releaseRef": "v4.0",
   "compareRange": "master...v4.0",
   "compareUrl": "https://github.com/EarthSalamander42/x_hero_siege/compare/master...v4.0",
-  "generatedAt": "2026-07-29T23:14:47.619Z",
-  "commitCount": 46,
-  "changedFiles": 1095,
-  "insertions": 293806,
-  "deletions": 52824,
+  "generatedAt": "2026-07-31T12:47:11.260Z",
+  "commitCount": 48,
+  "changedFiles": 1116,
+  "insertions": 352617,
+  "deletions": 50988,
   "commits": [
+    {
+      "hash": "6f75984e",
+      "subject": "XHS Road to 4.0 #26",
+      "line": "6f75984e XHS Road to 4.0 #26"
+    },
+    {
+      "hash": "b54f6eb0",
+      "subject": "XHS Road to 4.0 #25",
+      "line": "b54f6eb0 XHS Road to 4.0 #25"
+    },
     {
       "hash": "fb53a5f3",
       "subject": "XHS Road to 4.0 #24",
@@ -2055,6 +2065,46 @@
       "binary": false
     },
     {
+      "status": "A",
+      "statusCode": "A",
+      "oldPath": null,
+      "path": "content/panorama/images/spellicons/modifiers/tempest_aegis.png",
+      "category": "Panorama/UI",
+      "insertions": 0,
+      "deletions": 0,
+      "binary": true
+    },
+    {
+      "status": "A",
+      "statusCode": "A",
+      "oldPath": null,
+      "path": "content/panorama/images/spellicons/modifiers/tempest_aegis_png.vtex",
+      "category": "Panorama/UI",
+      "insertions": 36,
+      "deletions": 0,
+      "binary": false
+    },
+    {
+      "status": "A",
+      "statusCode": "A",
+      "oldPath": null,
+      "path": "content/panorama/images/spellicons/modifiers/zephyr_gem.png",
+      "category": "Panorama/UI",
+      "insertions": 0,
+      "deletions": 0,
+      "binary": true
+    },
+    {
+      "status": "A",
+      "statusCode": "A",
+      "oldPath": null,
+      "path": "content/panorama/images/spellicons/modifiers/zephyr_gem_png.vtex",
+      "category": "Panorama/UI",
+      "insertions": 36,
+      "deletions": 0,
+      "binary": false
+    },
+    {
       "status": "D",
       "statusCode": "D",
       "oldPath": null,
@@ -2080,7 +2130,7 @@
       "oldPath": null,
       "path": "content/panorama/layout/custom_game/custom_loading_screen.xml",
       "category": "Panorama/UI",
-      "insertions": 348,
+      "insertions": 367,
       "deletions": 97,
       "binary": false
     },
@@ -2090,8 +2140,8 @@
       "oldPath": null,
       "path": "content/panorama/layout/custom_game/custom_ui_manifest.xml",
       "category": "Panorama/UI",
-      "insertions": 10,
-      "deletions": 4,
+      "insertions": 14,
+      "deletions": 7,
       "binary": false
     },
     {
@@ -2170,7 +2220,7 @@
       "oldPath": null,
       "path": "content/panorama/layout/custom_game/ingame_advertize/ingame_advertize.css",
       "category": "Panorama/UI",
-      "insertions": 265,
+      "insertions": 269,
       "deletions": 53,
       "binary": false
     },
@@ -2180,7 +2230,7 @@
       "oldPath": null,
       "path": "content/panorama/layout/custom_game/ingame_advertize/ingame_advertize.js",
       "category": "Panorama/UI",
-      "insertions": 313,
+      "insertions": 352,
       "deletions": 2,
       "binary": false
     },
@@ -2240,7 +2290,7 @@
       "oldPath": null,
       "path": "content/panorama/layout/custom_game/xhs_devtools.xml",
       "category": "Panorama/UI",
-      "insertions": 152,
+      "insertions": 161,
       "deletions": 0,
       "binary": false
     },
@@ -2270,7 +2320,7 @@
       "oldPath": null,
       "path": "content/panorama/layout/custom_game/xhs_farm_leaderboard.xml",
       "category": "Panorama/UI",
-      "insertions": 51,
+      "insertions": 54,
       "deletions": 0,
       "binary": false
     },
@@ -2320,7 +2370,7 @@
       "oldPath": null,
       "path": "content/panorama/layout/custom_game/xhs_top_hud.xml",
       "category": "Panorama/UI",
-      "insertions": 92,
+      "insertions": 109,
       "deletions": 0,
       "binary": false
     },
@@ -2350,8 +2400,18 @@
       "oldPath": null,
       "path": "content/panorama/scripts/custom_game/boss_healthbar.js",
       "category": "Panorama/UI",
-      "insertions": 931,
+      "insertions": 974,
       "deletions": 19,
+      "binary": false
+    },
+    {
+      "status": "A",
+      "statusCode": "A",
+      "oldPath": null,
+      "path": "content/panorama/scripts/custom_game/camera_motion.js",
+      "category": "Panorama/UI",
+      "insertions": 37,
+      "deletions": 0,
       "binary": false
     },
     {
@@ -2360,8 +2420,8 @@
       "oldPath": null,
       "path": "content/panorama/scripts/custom_game/custom_loading_screen.js",
       "category": "Panorama/UI",
-      "insertions": 5366,
-      "deletions": 330,
+      "insertions": 5540,
+      "deletions": 333,
       "binary": false
     },
     {
@@ -2370,8 +2430,8 @@
       "oldPath": null,
       "path": "content/panorama/scripts/custom_game/dungeon_scoreboard.js",
       "category": "Panorama/UI",
-      "insertions": 787,
-      "deletions": 53,
+      "insertions": 906,
+      "deletions": 61,
       "binary": false
     },
     {
@@ -2410,8 +2470,8 @@
       "oldPath": null,
       "path": "content/panorama/scripts/custom_game/hud_main.js",
       "category": "Panorama/UI",
-      "insertions": 866,
-      "deletions": 20,
+      "insertions": 821,
+      "deletions": 35,
       "binary": false
     },
     {
@@ -2420,8 +2480,28 @@
       "oldPath": null,
       "path": "content/panorama/scripts/custom_game/init.js",
       "category": "Panorama/UI",
-      "insertions": 1526,
+      "insertions": 1669,
       "deletions": 66,
+      "binary": false
+    },
+    {
+      "status": "M",
+      "statusCode": "M",
+      "oldPath": null,
+      "path": "content/panorama/scripts/custom_game/party_health_bars.js",
+      "category": "Panorama/UI",
+      "insertions": 1,
+      "deletions": 1,
+      "binary": false
+    },
+    {
+      "status": "M",
+      "statusCode": "M",
+      "oldPath": null,
+      "path": "content/panorama/scripts/custom_game/party_portraits.js",
+      "category": "Panorama/UI",
+      "insertions": 51,
+      "deletions": 3,
       "binary": false
     },
     {
@@ -2460,7 +2540,7 @@
       "oldPath": null,
       "path": "content/panorama/scripts/custom_game/xhs_cinematic.js",
       "category": "Panorama/UI",
-      "insertions": 330,
+      "insertions": 215,
       "deletions": 0,
       "binary": false
     },
@@ -2470,7 +2550,7 @@
       "oldPath": null,
       "path": "content/panorama/scripts/custom_game/xhs_devtools.js",
       "category": "Panorama/UI",
-      "insertions": 2558,
+      "insertions": 2796,
       "deletions": 0,
       "binary": false
     },
@@ -2480,7 +2560,7 @@
       "oldPath": null,
       "path": "content/panorama/scripts/custom_game/xhs_end_screen.js",
       "category": "Panorama/UI",
-      "insertions": 1694,
+      "insertions": 1710,
       "deletions": 0,
       "binary": false
     },
@@ -2500,7 +2580,7 @@
       "oldPath": null,
       "path": "content/panorama/scripts/custom_game/xhs_farm_leaderboard.js",
       "category": "Panorama/UI",
-      "insertions": 486,
+      "insertions": 520,
       "deletions": 0,
       "binary": false
     },
@@ -2590,7 +2670,7 @@
       "oldPath": null,
       "path": "content/panorama/scripts/custom_game/xhs_top_hud.js",
       "category": "Panorama/UI",
-      "insertions": 3472,
+      "insertions": 3722,
       "deletions": 0,
       "binary": false
     },
@@ -2630,7 +2710,7 @@
       "oldPath": null,
       "path": "content/panorama/styles/custom_game/custom_loading_screen.css",
       "category": "Panorama/UI",
-      "insertions": 5413,
+      "insertions": 5494,
       "deletions": 76,
       "binary": false
     },
@@ -2700,7 +2780,7 @@
       "oldPath": null,
       "path": "content/panorama/styles/custom_game/xhs_devtools.css",
       "category": "Panorama/UI",
-      "insertions": 1353,
+      "insertions": 1364,
       "deletions": 0,
       "binary": false
     },
@@ -2730,7 +2810,7 @@
       "oldPath": null,
       "path": "content/panorama/styles/custom_game/xhs_farm_leaderboard.css",
       "category": "Panorama/UI",
-      "insertions": 557,
+      "insertions": 596,
       "deletions": 0,
       "binary": false
     },
@@ -2810,7 +2890,7 @@
       "oldPath": null,
       "path": "content/panorama/styles/custom_game/xhs_top_hud.css",
       "category": "Panorama/UI",
-      "insertions": 3254,
+      "insertions": 3443,
       "deletions": 0,
       "binary": false
     },
@@ -5130,7 +5210,7 @@
       "oldPath": null,
       "path": "game/panorama/localization/addon_english.txt",
       "category": "Localization",
-      "insertions": 538,
+      "insertions": 534,
       "deletions": 25,
       "binary": false
     },
@@ -6280,7 +6360,7 @@
       "oldPath": null,
       "path": "game/resource/English/abilities/generated_tooltips.txt",
       "category": "Localization",
-      "insertions": 608,
+      "insertions": 934,
       "deletions": 0,
       "binary": false
     },
@@ -6310,7 +6390,7 @@
       "oldPath": null,
       "path": "game/resource/English/game_notifications.txt",
       "category": "Localization",
-      "insertions": 1,
+      "insertions": 8,
       "deletions": 0,
       "binary": false
     },
@@ -6450,7 +6530,7 @@
       "oldPath": null,
       "path": "game/resource/English/modifiers/generated_tooltips.txt",
       "category": "Localization",
-      "insertions": 384,
+      "insertions": 386,
       "deletions": 0,
       "binary": false
     },
@@ -6472,6 +6552,16 @@
       "category": "Localization",
       "insertions": 12,
       "deletions": 4,
+      "binary": false
+    },
+    {
+      "status": "A",
+      "statusCode": "A",
+      "oldPath": null,
+      "path": "game/resource/English/supporter_pass_2026.txt",
+      "category": "Localization",
+      "insertions": 305,
+      "deletions": 0,
       "binary": false
     },
     {
@@ -6520,8 +6610,8 @@
       "oldPath": null,
       "path": "game/resource/addon_english.txt",
       "category": "Localization",
-      "insertions": 755,
-      "deletions": 2431,
+      "insertions": 2821,
+      "deletions": 358,
       "binary": false
     },
     {
@@ -6530,7 +6620,7 @@
       "oldPath": null,
       "path": "game/resource/addon_french.txt",
       "category": "Localization",
-      "insertions": 618,
+      "insertions": 639,
       "deletions": 2377,
       "binary": false
     },
@@ -8160,7 +8250,7 @@
       "oldPath": null,
       "path": "game/scripts/custom_net_tables.txt",
       "category": "KV data",
-      "insertions": 17,
+      "insertions": 19,
       "deletions": 0,
       "binary": false
     },
@@ -8170,7 +8260,7 @@
       "oldPath": null,
       "path": "game/scripts/npc/abilities/creep_passives.txt",
       "category": "KV data",
-      "insertions": 797,
+      "insertions": 795,
       "deletions": 0,
       "binary": false
     },
@@ -8200,8 +8290,8 @@
       "oldPath": null,
       "path": "game/scripts/npc/items/orbs.txt",
       "category": "KV data",
-      "insertions": 564,
-      "deletions": 16,
+      "insertions": 579,
+      "deletions": 18,
       "binary": false
     },
     {
@@ -8210,7 +8300,7 @@
       "oldPath": null,
       "path": "game/scripts/npc/npc_abilities_custom.txt",
       "category": "KV data",
-      "insertions": 2972,
+      "insertions": 2995,
       "deletions": 952,
       "binary": false
     },
@@ -8220,8 +8310,8 @@
       "oldPath": null,
       "path": "game/scripts/npc/npc_abilities_override.txt",
       "category": "KV data",
-      "insertions": 130,
-      "deletions": 285,
+      "insertions": 127,
+      "deletions": 337,
       "binary": false
     },
     {
@@ -8240,7 +8330,7 @@
       "oldPath": null,
       "path": "game/scripts/npc/npc_items_custom.txt",
       "category": "KV data",
-      "insertions": 210,
+      "insertions": 212,
       "deletions": 149,
       "binary": false
     },
@@ -8252,6 +8342,26 @@
       "category": "KV data",
       "insertions": 14,
       "deletions": 14164,
+      "binary": false
+    },
+    {
+      "status": "A",
+      "statusCode": "A",
+      "oldPath": null,
+      "path": "game/scripts/npc/portraits.txt",
+      "category": "KV data",
+      "insertions": 36982,
+      "deletions": 0,
+      "binary": false
+    },
+    {
+      "status": "A",
+      "statusCode": "A",
+      "oldPath": null,
+      "path": "game/scripts/npc/portraits_custom_game.txt",
+      "category": "KV data",
+      "insertions": 132,
+      "deletions": 0,
       "binary": false
     },
     {
@@ -8450,7 +8560,7 @@
       "oldPath": null,
       "path": "game/scripts/vscripts/abilities/creeps/xhs_creep_passives.lua",
       "category": "Lua gameplay",
-      "insertions": 789,
+      "insertions": 795,
       "deletions": 0,
       "binary": false
     },
@@ -8500,8 +8610,8 @@
       "oldPath": null,
       "path": "game/scripts/vscripts/abilities/heroes/creeps.lua",
       "category": "Lua gameplay",
-      "insertions": 15,
-      "deletions": 7,
+      "insertions": 22,
+      "deletions": 20,
       "binary": false
     },
     {
@@ -8510,8 +8620,8 @@
       "oldPath": null,
       "path": "game/scripts/vscripts/abilities/heroes/global.lua",
       "category": "Lua gameplay",
-      "insertions": 28,
-      "deletions": 3,
+      "insertions": 39,
+      "deletions": 4,
       "binary": false
     },
     {
@@ -8680,7 +8790,7 @@
       "oldPath": null,
       "path": "game/scripts/vscripts/abilities/heroes/hero_enchantress.lua",
       "category": "Lua gameplay",
-      "insertions": 49,
+      "insertions": 63,
       "deletions": 3,
       "binary": false
     },
@@ -8780,8 +8890,8 @@
       "oldPath": null,
       "path": "game/scripts/vscripts/abilities/heroes/hero_marine.lua",
       "category": "Lua gameplay",
-      "insertions": 2,
-      "deletions": 5,
+      "insertions": 98,
+      "deletions": 6,
       "binary": false
     },
     {
@@ -8845,12 +8955,22 @@
       "binary": false
     },
     {
+      "status": "M",
+      "statusCode": "M",
+      "oldPath": null,
+      "path": "game/scripts/vscripts/abilities/heroes/hero_rifleman.lua",
+      "category": "Lua gameplay",
+      "insertions": 36,
+      "deletions": 11,
+      "binary": false
+    },
+    {
       "status": "A",
       "statusCode": "A",
       "oldPath": null,
       "path": "game/scripts/vscripts/abilities/heroes/hero_rifleman_bloodlust.lua",
       "category": "Lua gameplay",
-      "insertions": 73,
+      "insertions": 102,
       "deletions": 0,
       "binary": false
     },
@@ -8960,7 +9080,7 @@
       "oldPath": null,
       "path": "game/scripts/vscripts/addon_game_mode.lua",
       "category": "Lua gameplay",
-      "insertions": 84,
+      "insertions": 86,
       "deletions": 70,
       "binary": false
     },
@@ -8970,7 +9090,7 @@
       "oldPath": null,
       "path": "game/scripts/vscripts/addon_init.lua",
       "category": "Lua gameplay",
-      "insertions": 25,
+      "insertions": 28,
       "deletions": 1,
       "binary": false
     },
@@ -9210,7 +9330,7 @@
       "oldPath": null,
       "path": "game/scripts/vscripts/boss_scripts/phase3_ai/spirit_master.lua",
       "category": "Lua gameplay",
-      "insertions": 1113,
+      "insertions": 1128,
       "deletions": 0,
       "binary": false
     },
@@ -9260,8 +9380,8 @@
       "oldPath": null,
       "path": "game/scripts/vscripts/components/api/init.lua",
       "category": "Lua gameplay",
-      "insertions": 1463,
-      "deletions": 87,
+      "insertions": 1492,
+      "deletions": 88,
       "binary": false
     },
     {
@@ -9310,7 +9430,7 @@
       "oldPath": null,
       "path": "game/scripts/vscripts/components/battlepass/high_five.lua",
       "category": "Lua gameplay",
-      "insertions": 883,
+      "insertions": 684,
       "deletions": 0,
       "binary": false
     },
@@ -9330,7 +9450,7 @@
       "oldPath": null,
       "path": "game/scripts/vscripts/components/battlepass/init.lua",
       "category": "Lua gameplay",
-      "insertions": 99,
+      "insertions": 102,
       "deletions": 49,
       "binary": false
     },
@@ -9340,8 +9460,8 @@
       "oldPath": null,
       "path": "game/scripts/vscripts/components/battlepass/keyvalues/items.txt",
       "category": "Lua gameplay",
-      "insertions": 18,
-      "deletions": 11,
+      "insertions": 20,
+      "deletions": 13,
       "binary": false
     },
     {
@@ -9410,7 +9530,7 @@
       "oldPath": null,
       "path": "game/scripts/vscripts/components/battlepass/recovery_effects.lua",
       "category": "Lua gameplay",
-      "insertions": 135,
+      "insertions": 159,
       "deletions": 0,
       "binary": false
     },
@@ -9450,8 +9570,8 @@
       "oldPath": null,
       "path": "game/scripts/vscripts/components/battlepass/util.lua",
       "category": "Lua gameplay",
-      "insertions": 2051,
-      "deletions": 149,
+      "insertions": 2062,
+      "deletions": 161,
       "binary": false
     },
     {
@@ -9460,7 +9580,7 @@
       "oldPath": null,
       "path": "game/scripts/vscripts/components/cinematics/init.lua",
       "category": "Lua gameplay",
-      "insertions": 238,
+      "insertions": 334,
       "deletions": 0,
       "binary": false
     },
@@ -9480,7 +9600,17 @@
       "oldPath": null,
       "path": "game/scripts/vscripts/components/creep_ai_director/init.lua",
       "category": "Lua gameplay",
-      "insertions": 335,
+      "insertions": 427,
+      "deletions": 0,
+      "binary": false
+    },
+    {
+      "status": "A",
+      "statusCode": "A",
+      "oldPath": null,
+      "path": "game/scripts/vscripts/components/creep_order_ownership/init.lua",
+      "category": "Lua gameplay",
+      "insertions": 97,
       "deletions": 0,
       "binary": false
     },
@@ -9520,7 +9650,7 @@
       "oldPath": null,
       "path": "game/scripts/vscripts/components/devtools/init.lua",
       "category": "Lua gameplay",
-      "insertions": 1870,
+      "insertions": 1946,
       "deletions": 0,
       "binary": false
     },
@@ -9530,7 +9660,7 @@
       "oldPath": null,
       "path": "game/scripts/vscripts/components/devtools/lag_lab.lua",
       "category": "Lua gameplay",
-      "insertions": 677,
+      "insertions": 712,
       "deletions": 0,
       "binary": false
     },
@@ -9590,7 +9720,7 @@
       "oldPath": null,
       "path": "game/scripts/vscripts/components/performance_counters/init.lua",
       "category": "Lua gameplay",
-      "insertions": 356,
+      "insertions": 388,
       "deletions": 0,
       "binary": false
     },
@@ -9600,7 +9730,7 @@
       "oldPath": null,
       "path": "game/scripts/vscripts/components/performance_telemetry/init.lua",
       "category": "Lua gameplay",
-      "insertions": 896,
+      "insertions": 1121,
       "deletions": 0,
       "binary": false
     },
@@ -9610,7 +9740,7 @@
       "oldPath": null,
       "path": "game/scripts/vscripts/components/precache/init.lua",
       "category": "Lua gameplay",
-      "insertions": 756,
+      "insertions": 782,
       "deletions": 0,
       "binary": false
     },
@@ -9640,8 +9770,38 @@
       "oldPath": null,
       "path": "game/scripts/vscripts/components/timers/init.lua",
       "category": "Lua gameplay",
-      "insertions": 514,
-      "deletions": 43,
+      "insertions": 626,
+      "deletions": 56,
+      "binary": false
+    },
+    {
+      "status": "A",
+      "statusCode": "A",
+      "oldPath": null,
+      "path": "game/scripts/vscripts/components/wave_stager/init.lua",
+      "category": "Lua gameplay",
+      "insertions": 425,
+      "deletions": 0,
+      "binary": false
+    },
+    {
+      "status": "A",
+      "statusCode": "A",
+      "oldPath": null,
+      "path": "game/scripts/vscripts/components/wave_stager/modifier_xhs_wave_staged.lua",
+      "category": "Lua gameplay",
+      "insertions": 24,
+      "deletions": 0,
+      "binary": false
+    },
+    {
+      "status": "A",
+      "statusCode": "A",
+      "oldPath": null,
+      "path": "game/scripts/vscripts/components/xhs_bots/audit.lua",
+      "category": "Lua gameplay",
+      "insertions": 1290,
+      "deletions": 0,
       "binary": false
     },
     {
@@ -9650,7 +9810,17 @@
       "oldPath": null,
       "path": "game/scripts/vscripts/components/xhs_bots/brain.lua",
       "category": "Lua gameplay",
-      "insertions": 2785,
+      "insertions": 3031,
+      "deletions": 0,
+      "binary": false
+    },
+    {
+      "status": "A",
+      "statusCode": "A",
+      "oldPath": null,
+      "path": "game/scripts/vscripts/components/xhs_bots/campaign_director.lua",
+      "category": "Lua gameplay",
+      "insertions": 329,
       "deletions": 0,
       "binary": false
     },
@@ -9660,7 +9830,7 @@
       "oldPath": null,
       "path": "game/scripts/vscripts/components/xhs_bots/config.lua",
       "category": "Lua gameplay",
-      "insertions": 217,
+      "insertions": 238,
       "deletions": 0,
       "binary": false
     },
@@ -9680,7 +9850,7 @@
       "oldPath": null,
       "path": "game/scripts/vscripts/components/xhs_bots/economy.lua",
       "category": "Lua gameplay",
-      "insertions": 2411,
+      "insertions": 3363,
       "deletions": 0,
       "binary": false
     },
@@ -9710,7 +9880,7 @@
       "oldPath": null,
       "path": "game/scripts/vscripts/components/xhs_bots/executor.lua",
       "category": "Lua gameplay",
-      "insertions": 464,
+      "insertions": 513,
       "deletions": 0,
       "binary": false
     },
@@ -9720,7 +9890,7 @@
       "oldPath": null,
       "path": "game/scripts/vscripts/components/xhs_bots/hero_profiles.lua",
       "category": "Lua gameplay",
-      "insertions": 803,
+      "insertions": 808,
       "deletions": 0,
       "binary": false
     },
@@ -9730,7 +9900,7 @@
       "oldPath": null,
       "path": "game/scripts/vscripts/components/xhs_bots/init.lua",
       "category": "Lua gameplay",
-      "insertions": 2775,
+      "insertions": 3342,
       "deletions": 0,
       "binary": false
     },
@@ -9740,7 +9910,7 @@
       "oldPath": null,
       "path": "game/scripts/vscripts/components/xhs_bots/item_catalog.lua",
       "category": "Lua gameplay",
-      "insertions": 790,
+      "insertions": 812,
       "deletions": 0,
       "binary": false
     },
@@ -9750,7 +9920,17 @@
       "oldPath": null,
       "path": "game/scripts/vscripts/components/xhs_bots/item_planner.lua",
       "category": "Lua gameplay",
-      "insertions": 1279,
+      "insertions": 1413,
+      "deletions": 0,
+      "binary": false
+    },
+    {
+      "status": "A",
+      "statusCode": "A",
+      "oldPath": null,
+      "path": "game/scripts/vscripts/components/xhs_bots/loot.lua",
+      "category": "Lua gameplay",
+      "insertions": 136,
       "deletions": 0,
       "binary": false
     },
@@ -9760,7 +9940,7 @@
       "oldPath": null,
       "path": "game/scripts/vscripts/components/xhs_bots/player_registry.lua",
       "category": "Lua gameplay",
-      "insertions": 266,
+      "insertions": 330,
       "deletions": 0,
       "binary": false
     },
@@ -9770,7 +9950,7 @@
       "oldPath": null,
       "path": "game/scripts/vscripts/components/xhs_bots/provisioner.lua",
       "category": "Lua gameplay",
-      "insertions": 812,
+      "insertions": 847,
       "deletions": 0,
       "binary": false
     },
@@ -9780,7 +9960,7 @@
       "oldPath": null,
       "path": "game/scripts/vscripts/components/xhs_bots/team_director.lua",
       "category": "Lua gameplay",
-      "insertions": 1711,
+      "insertions": 2261,
       "deletions": 0,
       "binary": false
     },
@@ -9790,7 +9970,7 @@
       "oldPath": null,
       "path": "game/scripts/vscripts/components/xhs_bots/utility.lua",
       "category": "Lua gameplay",
-      "insertions": 512,
+      "insertions": 572,
       "deletions": 0,
       "binary": false
     },
@@ -9810,8 +9990,8 @@
       "oldPath": null,
       "path": "game/scripts/vscripts/constants.lua",
       "category": "Lua gameplay",
-      "insertions": 98,
-      "deletions": 33,
+      "insertions": 99,
+      "deletions": 34,
       "binary": false
     },
     {
@@ -9820,8 +10000,8 @@
       "oldPath": null,
       "path": "game/scripts/vscripts/events.lua",
       "category": "Lua gameplay",
-      "insertions": 1096,
-      "deletions": 180,
+      "insertions": 1164,
+      "deletions": 182,
       "binary": false
     },
     {
@@ -9830,8 +10010,8 @@
       "oldPath": null,
       "path": "game/scripts/vscripts/gamemode.lua",
       "category": "Lua gameplay",
-      "insertions": 1652,
-      "deletions": 113,
+      "insertions": 1724,
+      "deletions": 115,
       "binary": false
     },
     {
@@ -9840,8 +10020,8 @@
       "oldPath": null,
       "path": "game/scripts/vscripts/internal/util.lua",
       "category": "Lua gameplay",
-      "insertions": 1475,
-      "deletions": 113,
+      "insertions": 1571,
+      "deletions": 125,
       "binary": false
     },
     {
@@ -9850,8 +10030,8 @@
       "oldPath": null,
       "path": "game/scripts/vscripts/internal/vanilla_extension.lua",
       "category": "Lua gameplay",
-      "insertions": 430,
-      "deletions": 57,
+      "insertions": 438,
+      "deletions": 58,
       "binary": false
     },
     {
@@ -9870,7 +10050,7 @@
       "oldPath": null,
       "path": "game/scripts/vscripts/items/healing_wards.lua",
       "category": "Lua gameplay",
-      "insertions": 266,
+      "insertions": 293,
       "deletions": 0,
       "binary": false
     },
@@ -9980,8 +10160,8 @@
       "oldPath": null,
       "path": "game/scripts/vscripts/items/item_orb_of_lightning.lua",
       "category": "Lua gameplay",
-      "insertions": 14,
-      "deletions": 5,
+      "insertions": 15,
+      "deletions": 6,
       "binary": false
     },
     {
@@ -10000,7 +10180,7 @@
       "oldPath": null,
       "path": "game/scripts/vscripts/items/item_orb_of_wind.lua",
       "category": "Lua gameplay",
-      "insertions": 173,
+      "insertions": 176,
       "deletions": 0,
       "binary": false
     },
@@ -10102,6 +10282,16 @@
       "category": "Lua gameplay",
       "insertions": 47,
       "deletions": 20,
+      "binary": false
+    },
+    {
+      "status": "A",
+      "statusCode": "A",
+      "oldPath": null,
+      "path": "game/scripts/vscripts/libraries/camera_motion.lua",
+      "category": "Lua gameplay",
+      "insertions": 1420,
+      "deletions": 0,
       "binary": false
     },
     {
@@ -10508,6 +10698,16 @@
       "status": "M",
       "statusCode": "M",
       "oldPath": null,
+      "path": "game/scripts/vscripts/libraries/wearables.lua",
+      "category": "Lua gameplay",
+      "insertions": 7,
+      "deletions": 3,
+      "binary": false
+    },
+    {
+      "status": "M",
+      "statusCode": "M",
+      "oldPath": null,
       "path": "game/scripts/vscripts/modifiers/auras/modifier_command_aura.lua",
       "category": "Lua gameplay",
       "insertions": 3,
@@ -10540,8 +10740,8 @@
       "oldPath": null,
       "path": "game/scripts/vscripts/modifiers/modifier_ai.lua",
       "category": "Lua gameplay",
-      "insertions": 569,
-      "deletions": 179,
+      "insertions": 621,
+      "deletions": 183,
       "binary": false
     },
     {
@@ -10725,6 +10925,16 @@
       "binary": false
     },
     {
+      "status": "A",
+      "statusCode": "A",
+      "oldPath": null,
+      "path": "game/scripts/vscripts/modifiers/modifier_xhs_space_marine_attack_sound.lua",
+      "category": "Lua gameplay",
+      "insertions": 32,
+      "deletions": 0,
+      "binary": false
+    },
+    {
       "status": "M",
       "statusCode": "M",
       "oldPath": null,
@@ -10740,8 +10950,8 @@
       "oldPath": null,
       "path": "game/scripts/vscripts/phases/choose_hero.lua",
       "category": "Lua gameplay",
-      "insertions": 388,
-      "deletions": 34,
+      "insertions": 563,
+      "deletions": 36,
       "binary": false
     },
     {
@@ -10750,8 +10960,8 @@
       "oldPath": null,
       "path": "game/scripts/vscripts/phases/creeps.lua",
       "category": "Lua gameplay",
-      "insertions": 294,
-      "deletions": 23,
+      "insertions": 927,
+      "deletions": 85,
       "binary": false
     },
     {
@@ -10770,8 +10980,8 @@
       "oldPath": null,
       "path": "game/scripts/vscripts/phases/phase2.lua",
       "category": "Lua gameplay",
-      "insertions": 828,
-      "deletions": 135,
+      "insertions": 999,
+      "deletions": 137,
       "binary": false
     },
     {
@@ -10780,7 +10990,7 @@
       "oldPath": null,
       "path": "game/scripts/vscripts/phases/phase3.lua",
       "category": "Lua gameplay",
-      "insertions": 635,
+      "insertions": 645,
       "deletions": 87,
       "binary": false
     },
@@ -10790,8 +11000,18 @@
       "oldPath": null,
       "path": "game/scripts/vscripts/phases/special_events.lua",
       "category": "Lua gameplay",
-      "insertions": 1369,
-      "deletions": 170,
+      "insertions": 1445,
+      "deletions": 174,
+      "binary": false
+    },
+    {
+      "status": "M",
+      "statusCode": "M",
+      "oldPath": null,
+      "path": "game/scripts/vscripts/units/breakable_container_surprises.lua",
+      "category": "Lua gameplay",
+      "insertions": 6,
+      "deletions": 0,
       "binary": false
     },
     {
@@ -10860,7 +11080,7 @@
       "oldPath": null,
       "path": "patch_notes/4.0.meta.json",
       "category": "Other",
-      "insertions": 16640,
+      "insertions": 25497,
       "deletions": 0,
       "binary": false
     },
@@ -11198,9 +11418,9 @@
   "categories": [
     {
       "name": "Lua gameplay",
-      "fileCount": 257,
-      "insertions": 72744,
-      "deletions": 3275,
+      "fileCount": 268,
+      "insertions": 81391,
+      "deletions": 3425,
       "files": [
         {
           "status": "D",
@@ -11218,7 +11438,7 @@
           "oldPath": null,
           "path": "game/scripts/vscripts/abilities/creeps/xhs_creep_passives.lua",
           "category": "Lua gameplay",
-          "insertions": 789,
+          "insertions": 795,
           "deletions": 0,
           "binary": false
         },
@@ -11268,8 +11488,8 @@
           "oldPath": null,
           "path": "game/scripts/vscripts/abilities/heroes/creeps.lua",
           "category": "Lua gameplay",
-          "insertions": 15,
-          "deletions": 7,
+          "insertions": 22,
+          "deletions": 20,
           "binary": false
         },
         {
@@ -11278,8 +11498,8 @@
           "oldPath": null,
           "path": "game/scripts/vscripts/abilities/heroes/global.lua",
           "category": "Lua gameplay",
-          "insertions": 28,
-          "deletions": 3,
+          "insertions": 39,
+          "deletions": 4,
           "binary": false
         },
         {
@@ -11448,7 +11668,7 @@
           "oldPath": null,
           "path": "game/scripts/vscripts/abilities/heroes/hero_enchantress.lua",
           "category": "Lua gameplay",
-          "insertions": 49,
+          "insertions": 63,
           "deletions": 3,
           "binary": false
         },
@@ -11548,8 +11768,8 @@
           "oldPath": null,
           "path": "game/scripts/vscripts/abilities/heroes/hero_marine.lua",
           "category": "Lua gameplay",
-          "insertions": 2,
-          "deletions": 5,
+          "insertions": 98,
+          "deletions": 6,
           "binary": false
         },
         {
@@ -11613,12 +11833,22 @@
           "binary": false
         },
         {
+          "status": "M",
+          "statusCode": "M",
+          "oldPath": null,
+          "path": "game/scripts/vscripts/abilities/heroes/hero_rifleman.lua",
+          "category": "Lua gameplay",
+          "insertions": 36,
+          "deletions": 11,
+          "binary": false
+        },
+        {
           "status": "A",
           "statusCode": "A",
           "oldPath": null,
           "path": "game/scripts/vscripts/abilities/heroes/hero_rifleman_bloodlust.lua",
           "category": "Lua gameplay",
-          "insertions": 73,
+          "insertions": 102,
           "deletions": 0,
           "binary": false
         },
@@ -11728,7 +11958,7 @@
           "oldPath": null,
           "path": "game/scripts/vscripts/addon_game_mode.lua",
           "category": "Lua gameplay",
-          "insertions": 84,
+          "insertions": 86,
           "deletions": 70,
           "binary": false
         },
@@ -11738,7 +11968,7 @@
           "oldPath": null,
           "path": "game/scripts/vscripts/addon_init.lua",
           "category": "Lua gameplay",
-          "insertions": 25,
+          "insertions": 28,
           "deletions": 1,
           "binary": false
         },
@@ -11978,7 +12208,7 @@
           "oldPath": null,
           "path": "game/scripts/vscripts/boss_scripts/phase3_ai/spirit_master.lua",
           "category": "Lua gameplay",
-          "insertions": 1113,
+          "insertions": 1128,
           "deletions": 0,
           "binary": false
         },
@@ -12028,8 +12258,8 @@
           "oldPath": null,
           "path": "game/scripts/vscripts/components/api/init.lua",
           "category": "Lua gameplay",
-          "insertions": 1463,
-          "deletions": 87,
+          "insertions": 1492,
+          "deletions": 88,
           "binary": false
         },
         {
@@ -12078,7 +12308,7 @@
           "oldPath": null,
           "path": "game/scripts/vscripts/components/battlepass/high_five.lua",
           "category": "Lua gameplay",
-          "insertions": 883,
+          "insertions": 684,
           "deletions": 0,
           "binary": false
         },
@@ -12098,7 +12328,7 @@
           "oldPath": null,
           "path": "game/scripts/vscripts/components/battlepass/init.lua",
           "category": "Lua gameplay",
-          "insertions": 99,
+          "insertions": 102,
           "deletions": 49,
           "binary": false
         },
@@ -12108,8 +12338,8 @@
           "oldPath": null,
           "path": "game/scripts/vscripts/components/battlepass/keyvalues/items.txt",
           "category": "Lua gameplay",
-          "insertions": 18,
-          "deletions": 11,
+          "insertions": 20,
+          "deletions": 13,
           "binary": false
         },
         {
@@ -12178,7 +12408,7 @@
           "oldPath": null,
           "path": "game/scripts/vscripts/components/battlepass/recovery_effects.lua",
           "category": "Lua gameplay",
-          "insertions": 135,
+          "insertions": 159,
           "deletions": 0,
           "binary": false
         },
@@ -12218,8 +12448,8 @@
           "oldPath": null,
           "path": "game/scripts/vscripts/components/battlepass/util.lua",
           "category": "Lua gameplay",
-          "insertions": 2051,
-          "deletions": 149,
+          "insertions": 2062,
+          "deletions": 161,
           "binary": false
         },
         {
@@ -12228,7 +12458,7 @@
           "oldPath": null,
           "path": "game/scripts/vscripts/components/cinematics/init.lua",
           "category": "Lua gameplay",
-          "insertions": 238,
+          "insertions": 334,
           "deletions": 0,
           "binary": false
         },
@@ -12248,7 +12478,17 @@
           "oldPath": null,
           "path": "game/scripts/vscripts/components/creep_ai_director/init.lua",
           "category": "Lua gameplay",
-          "insertions": 335,
+          "insertions": 427,
+          "deletions": 0,
+          "binary": false
+        },
+        {
+          "status": "A",
+          "statusCode": "A",
+          "oldPath": null,
+          "path": "game/scripts/vscripts/components/creep_order_ownership/init.lua",
+          "category": "Lua gameplay",
+          "insertions": 97,
           "deletions": 0,
           "binary": false
         },
@@ -12288,7 +12528,7 @@
           "oldPath": null,
           "path": "game/scripts/vscripts/components/devtools/init.lua",
           "category": "Lua gameplay",
-          "insertions": 1870,
+          "insertions": 1946,
           "deletions": 0,
           "binary": false
         },
@@ -12298,7 +12538,7 @@
           "oldPath": null,
           "path": "game/scripts/vscripts/components/devtools/lag_lab.lua",
           "category": "Lua gameplay",
-          "insertions": 677,
+          "insertions": 712,
           "deletions": 0,
           "binary": false
         },
@@ -12358,7 +12598,7 @@
           "oldPath": null,
           "path": "game/scripts/vscripts/components/performance_counters/init.lua",
           "category": "Lua gameplay",
-          "insertions": 356,
+          "insertions": 388,
           "deletions": 0,
           "binary": false
         },
@@ -12368,7 +12608,7 @@
           "oldPath": null,
           "path": "game/scripts/vscripts/components/performance_telemetry/init.lua",
           "category": "Lua gameplay",
-          "insertions": 896,
+          "insertions": 1121,
           "deletions": 0,
           "binary": false
         },
@@ -12378,7 +12618,7 @@
           "oldPath": null,
           "path": "game/scripts/vscripts/components/precache/init.lua",
           "category": "Lua gameplay",
-          "insertions": 756,
+          "insertions": 782,
           "deletions": 0,
           "binary": false
         },
@@ -12408,8 +12648,38 @@
           "oldPath": null,
           "path": "game/scripts/vscripts/components/timers/init.lua",
           "category": "Lua gameplay",
-          "insertions": 514,
-          "deletions": 43,
+          "insertions": 626,
+          "deletions": 56,
+          "binary": false
+        },
+        {
+          "status": "A",
+          "statusCode": "A",
+          "oldPath": null,
+          "path": "game/scripts/vscripts/components/wave_stager/init.lua",
+          "category": "Lua gameplay",
+          "insertions": 425,
+          "deletions": 0,
+          "binary": false
+        },
+        {
+          "status": "A",
+          "statusCode": "A",
+          "oldPath": null,
+          "path": "game/scripts/vscripts/components/wave_stager/modifier_xhs_wave_staged.lua",
+          "category": "Lua gameplay",
+          "insertions": 24,
+          "deletions": 0,
+          "binary": false
+        },
+        {
+          "status": "A",
+          "statusCode": "A",
+          "oldPath": null,
+          "path": "game/scripts/vscripts/components/xhs_bots/audit.lua",
+          "category": "Lua gameplay",
+          "insertions": 1290,
+          "deletions": 0,
           "binary": false
         },
         {
@@ -12418,7 +12688,17 @@
           "oldPath": null,
           "path": "game/scripts/vscripts/components/xhs_bots/brain.lua",
           "category": "Lua gameplay",
-          "insertions": 2785,
+          "insertions": 3031,
+          "deletions": 0,
+          "binary": false
+        },
+        {
+          "status": "A",
+          "statusCode": "A",
+          "oldPath": null,
+          "path": "game/scripts/vscripts/components/xhs_bots/campaign_director.lua",
+          "category": "Lua gameplay",
+          "insertions": 329,
           "deletions": 0,
           "binary": false
         },
@@ -12428,7 +12708,7 @@
           "oldPath": null,
           "path": "game/scripts/vscripts/components/xhs_bots/config.lua",
           "category": "Lua gameplay",
-          "insertions": 217,
+          "insertions": 238,
           "deletions": 0,
           "binary": false
         },
@@ -12448,7 +12728,7 @@
           "oldPath": null,
           "path": "game/scripts/vscripts/components/xhs_bots/economy.lua",
           "category": "Lua gameplay",
-          "insertions": 2411,
+          "insertions": 3363,
           "deletions": 0,
           "binary": false
         },
@@ -12478,7 +12758,7 @@
           "oldPath": null,
           "path": "game/scripts/vscripts/components/xhs_bots/executor.lua",
           "category": "Lua gameplay",
-          "insertions": 464,
+          "insertions": 513,
           "deletions": 0,
           "binary": false
         },
@@ -12488,7 +12768,7 @@
           "oldPath": null,
           "path": "game/scripts/vscripts/components/xhs_bots/hero_profiles.lua",
           "category": "Lua gameplay",
-          "insertions": 803,
+          "insertions": 808,
           "deletions": 0,
           "binary": false
         },
@@ -12498,7 +12778,7 @@
           "oldPath": null,
           "path": "game/scripts/vscripts/components/xhs_bots/init.lua",
           "category": "Lua gameplay",
-          "insertions": 2775,
+          "insertions": 3342,
           "deletions": 0,
           "binary": false
         },
@@ -12508,7 +12788,7 @@
           "oldPath": null,
           "path": "game/scripts/vscripts/components/xhs_bots/item_catalog.lua",
           "category": "Lua gameplay",
-          "insertions": 790,
+          "insertions": 812,
           "deletions": 0,
           "binary": false
         },
@@ -12518,7 +12798,17 @@
           "oldPath": null,
           "path": "game/scripts/vscripts/components/xhs_bots/item_planner.lua",
           "category": "Lua gameplay",
-          "insertions": 1279,
+          "insertions": 1413,
+          "deletions": 0,
+          "binary": false
+        },
+        {
+          "status": "A",
+          "statusCode": "A",
+          "oldPath": null,
+          "path": "game/scripts/vscripts/components/xhs_bots/loot.lua",
+          "category": "Lua gameplay",
+          "insertions": 136,
           "deletions": 0,
           "binary": false
         },
@@ -12528,7 +12818,7 @@
           "oldPath": null,
           "path": "game/scripts/vscripts/components/xhs_bots/player_registry.lua",
           "category": "Lua gameplay",
-          "insertions": 266,
+          "insertions": 330,
           "deletions": 0,
           "binary": false
         },
@@ -12538,7 +12828,7 @@
           "oldPath": null,
           "path": "game/scripts/vscripts/components/xhs_bots/provisioner.lua",
           "category": "Lua gameplay",
-          "insertions": 812,
+          "insertions": 847,
           "deletions": 0,
           "binary": false
         },
@@ -12548,7 +12838,7 @@
           "oldPath": null,
           "path": "game/scripts/vscripts/components/xhs_bots/team_director.lua",
           "category": "Lua gameplay",
-          "insertions": 1711,
+          "insertions": 2261,
           "deletions": 0,
           "binary": false
         },
@@ -12558,7 +12848,7 @@
           "oldPath": null,
           "path": "game/scripts/vscripts/components/xhs_bots/utility.lua",
           "category": "Lua gameplay",
-          "insertions": 512,
+          "insertions": 572,
           "deletions": 0,
           "binary": false
         },
@@ -12578,8 +12868,8 @@
           "oldPath": null,
           "path": "game/scripts/vscripts/constants.lua",
           "category": "Lua gameplay",
-          "insertions": 98,
-          "deletions": 33,
+          "insertions": 99,
+          "deletions": 34,
           "binary": false
         },
         {
@@ -12588,8 +12878,8 @@
           "oldPath": null,
           "path": "game/scripts/vscripts/events.lua",
           "category": "Lua gameplay",
-          "insertions": 1096,
-          "deletions": 180,
+          "insertions": 1164,
+          "deletions": 182,
           "binary": false
         },
         {
@@ -12598,8 +12888,8 @@
           "oldPath": null,
           "path": "game/scripts/vscripts/gamemode.lua",
           "category": "Lua gameplay",
-          "insertions": 1652,
-          "deletions": 113,
+          "insertions": 1724,
+          "deletions": 115,
           "binary": false
         },
         {
@@ -12608,8 +12898,8 @@
           "oldPath": null,
           "path": "game/scripts/vscripts/internal/util.lua",
           "category": "Lua gameplay",
-          "insertions": 1475,
-          "deletions": 113,
+          "insertions": 1571,
+          "deletions": 125,
           "binary": false
         },
         {
@@ -12618,8 +12908,8 @@
           "oldPath": null,
           "path": "game/scripts/vscripts/internal/vanilla_extension.lua",
           "category": "Lua gameplay",
-          "insertions": 430,
-          "deletions": 57,
+          "insertions": 438,
+          "deletions": 58,
           "binary": false
         },
         {
@@ -12638,7 +12928,7 @@
           "oldPath": null,
           "path": "game/scripts/vscripts/items/healing_wards.lua",
           "category": "Lua gameplay",
-          "insertions": 266,
+          "insertions": 293,
           "deletions": 0,
           "binary": false
         },
@@ -12748,8 +13038,8 @@
           "oldPath": null,
           "path": "game/scripts/vscripts/items/item_orb_of_lightning.lua",
           "category": "Lua gameplay",
-          "insertions": 14,
-          "deletions": 5,
+          "insertions": 15,
+          "deletions": 6,
           "binary": false
         },
         {
@@ -12768,7 +13058,7 @@
           "oldPath": null,
           "path": "game/scripts/vscripts/items/item_orb_of_wind.lua",
           "category": "Lua gameplay",
-          "insertions": 173,
+          "insertions": 176,
           "deletions": 0,
           "binary": false
         },
@@ -12870,6 +13160,16 @@
           "category": "Lua gameplay",
           "insertions": 47,
           "deletions": 20,
+          "binary": false
+        },
+        {
+          "status": "A",
+          "statusCode": "A",
+          "oldPath": null,
+          "path": "game/scripts/vscripts/libraries/camera_motion.lua",
+          "category": "Lua gameplay",
+          "insertions": 1420,
+          "deletions": 0,
           "binary": false
         },
         {
@@ -13276,6 +13576,16 @@
           "status": "M",
           "statusCode": "M",
           "oldPath": null,
+          "path": "game/scripts/vscripts/libraries/wearables.lua",
+          "category": "Lua gameplay",
+          "insertions": 7,
+          "deletions": 3,
+          "binary": false
+        },
+        {
+          "status": "M",
+          "statusCode": "M",
+          "oldPath": null,
           "path": "game/scripts/vscripts/modifiers/auras/modifier_command_aura.lua",
           "category": "Lua gameplay",
           "insertions": 3,
@@ -13308,8 +13618,8 @@
           "oldPath": null,
           "path": "game/scripts/vscripts/modifiers/modifier_ai.lua",
           "category": "Lua gameplay",
-          "insertions": 569,
-          "deletions": 179,
+          "insertions": 621,
+          "deletions": 183,
           "binary": false
         },
         {
@@ -13493,6 +13803,16 @@
           "binary": false
         },
         {
+          "status": "A",
+          "statusCode": "A",
+          "oldPath": null,
+          "path": "game/scripts/vscripts/modifiers/modifier_xhs_space_marine_attack_sound.lua",
+          "category": "Lua gameplay",
+          "insertions": 32,
+          "deletions": 0,
+          "binary": false
+        },
+        {
           "status": "M",
           "statusCode": "M",
           "oldPath": null,
@@ -13508,8 +13828,8 @@
           "oldPath": null,
           "path": "game/scripts/vscripts/phases/choose_hero.lua",
           "category": "Lua gameplay",
-          "insertions": 388,
-          "deletions": 34,
+          "insertions": 563,
+          "deletions": 36,
           "binary": false
         },
         {
@@ -13518,8 +13838,8 @@
           "oldPath": null,
           "path": "game/scripts/vscripts/phases/creeps.lua",
           "category": "Lua gameplay",
-          "insertions": 294,
-          "deletions": 23,
+          "insertions": 927,
+          "deletions": 85,
           "binary": false
         },
         {
@@ -13538,8 +13858,8 @@
           "oldPath": null,
           "path": "game/scripts/vscripts/phases/phase2.lua",
           "category": "Lua gameplay",
-          "insertions": 828,
-          "deletions": 135,
+          "insertions": 999,
+          "deletions": 137,
           "binary": false
         },
         {
@@ -13548,7 +13868,7 @@
           "oldPath": null,
           "path": "game/scripts/vscripts/phases/phase3.lua",
           "category": "Lua gameplay",
-          "insertions": 635,
+          "insertions": 645,
           "deletions": 87,
           "binary": false
         },
@@ -13558,8 +13878,18 @@
           "oldPath": null,
           "path": "game/scripts/vscripts/phases/special_events.lua",
           "category": "Lua gameplay",
-          "insertions": 1369,
-          "deletions": 170,
+          "insertions": 1445,
+          "deletions": 174,
+          "binary": false
+        },
+        {
+          "status": "M",
+          "statusCode": "M",
+          "oldPath": null,
+          "path": "game/scripts/vscripts/units/breakable_container_surprises.lua",
+          "category": "Lua gameplay",
+          "insertions": 6,
+          "deletions": 0,
           "binary": false
         },
         {
@@ -13776,9 +14106,9 @@
     },
     {
       "name": "Panorama/UI",
-      "fileCount": 403,
-      "insertions": 52468,
-      "deletions": 1890,
+      "fileCount": 410,
+      "insertions": 53901,
+      "deletions": 1923,
       "files": [
         {
           "status": "A",
@@ -15431,6 +15761,46 @@
           "binary": false
         },
         {
+          "status": "A",
+          "statusCode": "A",
+          "oldPath": null,
+          "path": "content/panorama/images/spellicons/modifiers/tempest_aegis.png",
+          "category": "Panorama/UI",
+          "insertions": 0,
+          "deletions": 0,
+          "binary": true
+        },
+        {
+          "status": "A",
+          "statusCode": "A",
+          "oldPath": null,
+          "path": "content/panorama/images/spellicons/modifiers/tempest_aegis_png.vtex",
+          "category": "Panorama/UI",
+          "insertions": 36,
+          "deletions": 0,
+          "binary": false
+        },
+        {
+          "status": "A",
+          "statusCode": "A",
+          "oldPath": null,
+          "path": "content/panorama/images/spellicons/modifiers/zephyr_gem.png",
+          "category": "Panorama/UI",
+          "insertions": 0,
+          "deletions": 0,
+          "binary": true
+        },
+        {
+          "status": "A",
+          "statusCode": "A",
+          "oldPath": null,
+          "path": "content/panorama/images/spellicons/modifiers/zephyr_gem_png.vtex",
+          "category": "Panorama/UI",
+          "insertions": 36,
+          "deletions": 0,
+          "binary": false
+        },
+        {
           "status": "D",
           "statusCode": "D",
           "oldPath": null,
@@ -15456,7 +15826,7 @@
           "oldPath": null,
           "path": "content/panorama/layout/custom_game/custom_loading_screen.xml",
           "category": "Panorama/UI",
-          "insertions": 348,
+          "insertions": 367,
           "deletions": 97,
           "binary": false
         },
@@ -15466,8 +15836,8 @@
           "oldPath": null,
           "path": "content/panorama/layout/custom_game/custom_ui_manifest.xml",
           "category": "Panorama/UI",
-          "insertions": 10,
-          "deletions": 4,
+          "insertions": 14,
+          "deletions": 7,
           "binary": false
         },
         {
@@ -15546,7 +15916,7 @@
           "oldPath": null,
           "path": "content/panorama/layout/custom_game/ingame_advertize/ingame_advertize.css",
           "category": "Panorama/UI",
-          "insertions": 265,
+          "insertions": 269,
           "deletions": 53,
           "binary": false
         },
@@ -15556,7 +15926,7 @@
           "oldPath": null,
           "path": "content/panorama/layout/custom_game/ingame_advertize/ingame_advertize.js",
           "category": "Panorama/UI",
-          "insertions": 313,
+          "insertions": 352,
           "deletions": 2,
           "binary": false
         },
@@ -15616,7 +15986,7 @@
           "oldPath": null,
           "path": "content/panorama/layout/custom_game/xhs_devtools.xml",
           "category": "Panorama/UI",
-          "insertions": 152,
+          "insertions": 161,
           "deletions": 0,
           "binary": false
         },
@@ -15646,7 +16016,7 @@
           "oldPath": null,
           "path": "content/panorama/layout/custom_game/xhs_farm_leaderboard.xml",
           "category": "Panorama/UI",
-          "insertions": 51,
+          "insertions": 54,
           "deletions": 0,
           "binary": false
         },
@@ -15696,7 +16066,7 @@
           "oldPath": null,
           "path": "content/panorama/layout/custom_game/xhs_top_hud.xml",
           "category": "Panorama/UI",
-          "insertions": 92,
+          "insertions": 109,
           "deletions": 0,
           "binary": false
         },
@@ -15726,8 +16096,18 @@
           "oldPath": null,
           "path": "content/panorama/scripts/custom_game/boss_healthbar.js",
           "category": "Panorama/UI",
-          "insertions": 931,
+          "insertions": 974,
           "deletions": 19,
+          "binary": false
+        },
+        {
+          "status": "A",
+          "statusCode": "A",
+          "oldPath": null,
+          "path": "content/panorama/scripts/custom_game/camera_motion.js",
+          "category": "Panorama/UI",
+          "insertions": 37,
+          "deletions": 0,
           "binary": false
         },
         {
@@ -15736,8 +16116,8 @@
           "oldPath": null,
           "path": "content/panorama/scripts/custom_game/custom_loading_screen.js",
           "category": "Panorama/UI",
-          "insertions": 5366,
-          "deletions": 330,
+          "insertions": 5540,
+          "deletions": 333,
           "binary": false
         },
         {
@@ -15746,8 +16126,8 @@
           "oldPath": null,
           "path": "content/panorama/scripts/custom_game/dungeon_scoreboard.js",
           "category": "Panorama/UI",
-          "insertions": 787,
-          "deletions": 53,
+          "insertions": 906,
+          "deletions": 61,
           "binary": false
         },
         {
@@ -15786,8 +16166,8 @@
           "oldPath": null,
           "path": "content/panorama/scripts/custom_game/hud_main.js",
           "category": "Panorama/UI",
-          "insertions": 866,
-          "deletions": 20,
+          "insertions": 821,
+          "deletions": 35,
           "binary": false
         },
         {
@@ -15796,8 +16176,28 @@
           "oldPath": null,
           "path": "content/panorama/scripts/custom_game/init.js",
           "category": "Panorama/UI",
-          "insertions": 1526,
+          "insertions": 1669,
           "deletions": 66,
+          "binary": false
+        },
+        {
+          "status": "M",
+          "statusCode": "M",
+          "oldPath": null,
+          "path": "content/panorama/scripts/custom_game/party_health_bars.js",
+          "category": "Panorama/UI",
+          "insertions": 1,
+          "deletions": 1,
+          "binary": false
+        },
+        {
+          "status": "M",
+          "statusCode": "M",
+          "oldPath": null,
+          "path": "content/panorama/scripts/custom_game/party_portraits.js",
+          "category": "Panorama/UI",
+          "insertions": 51,
+          "deletions": 3,
           "binary": false
         },
         {
@@ -15836,7 +16236,7 @@
           "oldPath": null,
           "path": "content/panorama/scripts/custom_game/xhs_cinematic.js",
           "category": "Panorama/UI",
-          "insertions": 330,
+          "insertions": 215,
           "deletions": 0,
           "binary": false
         },
@@ -15846,7 +16246,7 @@
           "oldPath": null,
           "path": "content/panorama/scripts/custom_game/xhs_devtools.js",
           "category": "Panorama/UI",
-          "insertions": 2558,
+          "insertions": 2796,
           "deletions": 0,
           "binary": false
         },
@@ -15856,7 +16256,7 @@
           "oldPath": null,
           "path": "content/panorama/scripts/custom_game/xhs_end_screen.js",
           "category": "Panorama/UI",
-          "insertions": 1694,
+          "insertions": 1710,
           "deletions": 0,
           "binary": false
         },
@@ -15876,7 +16276,7 @@
           "oldPath": null,
           "path": "content/panorama/scripts/custom_game/xhs_farm_leaderboard.js",
           "category": "Panorama/UI",
-          "insertions": 486,
+          "insertions": 520,
           "deletions": 0,
           "binary": false
         },
@@ -15966,7 +16366,7 @@
           "oldPath": null,
           "path": "content/panorama/scripts/custom_game/xhs_top_hud.js",
           "category": "Panorama/UI",
-          "insertions": 3472,
+          "insertions": 3722,
           "deletions": 0,
           "binary": false
         },
@@ -16006,7 +16406,7 @@
           "oldPath": null,
           "path": "content/panorama/styles/custom_game/custom_loading_screen.css",
           "category": "Panorama/UI",
-          "insertions": 5413,
+          "insertions": 5494,
           "deletions": 76,
           "binary": false
         },
@@ -16076,7 +16476,7 @@
           "oldPath": null,
           "path": "content/panorama/styles/custom_game/xhs_devtools.css",
           "category": "Panorama/UI",
-          "insertions": 1353,
+          "insertions": 1364,
           "deletions": 0,
           "binary": false
         },
@@ -16106,7 +16506,7 @@
           "oldPath": null,
           "path": "content/panorama/styles/custom_game/xhs_farm_leaderboard.css",
           "category": "Panorama/UI",
-          "insertions": 557,
+          "insertions": 596,
           "deletions": 0,
           "binary": false
         },
@@ -16186,7 +16586,7 @@
           "oldPath": null,
           "path": "content/panorama/styles/custom_game/xhs_top_hud.css",
           "category": "Panorama/UI",
-          "insertions": 3254,
+          "insertions": 3443,
           "deletions": 0,
           "binary": false
         },
@@ -17814,9 +18214,9 @@
     },
     {
       "name": "Localization",
-      "fileCount": 206,
-      "insertions": 51427,
-      "deletions": 31499,
+      "fileCount": 207,
+      "insertions": 54150,
+      "deletions": 29426,
       "files": [
         {
           "status": "M",
@@ -17884,7 +18284,7 @@
           "oldPath": null,
           "path": "game/panorama/localization/addon_english.txt",
           "category": "Localization",
-          "insertions": 538,
+          "insertions": 534,
           "deletions": 25,
           "binary": false
         },
@@ -18004,7 +18404,7 @@
           "oldPath": null,
           "path": "game/resource/English/abilities/generated_tooltips.txt",
           "category": "Localization",
-          "insertions": 608,
+          "insertions": 934,
           "deletions": 0,
           "binary": false
         },
@@ -18034,7 +18434,7 @@
           "oldPath": null,
           "path": "game/resource/English/game_notifications.txt",
           "category": "Localization",
-          "insertions": 1,
+          "insertions": 8,
           "deletions": 0,
           "binary": false
         },
@@ -18174,7 +18574,7 @@
           "oldPath": null,
           "path": "game/resource/English/modifiers/generated_tooltips.txt",
           "category": "Localization",
-          "insertions": 384,
+          "insertions": 386,
           "deletions": 0,
           "binary": false
         },
@@ -18196,6 +18596,16 @@
           "category": "Localization",
           "insertions": 12,
           "deletions": 4,
+          "binary": false
+        },
+        {
+          "status": "A",
+          "statusCode": "A",
+          "oldPath": null,
+          "path": "game/resource/English/supporter_pass_2026.txt",
+          "category": "Localization",
+          "insertions": 305,
+          "deletions": 0,
           "binary": false
         },
         {
@@ -18244,8 +18654,8 @@
           "oldPath": null,
           "path": "game/resource/addon_english.txt",
           "category": "Localization",
-          "insertions": 755,
-          "deletions": 2431,
+          "insertions": 2821,
+          "deletions": 358,
           "binary": false
         },
         {
@@ -18254,7 +18664,7 @@
           "oldPath": null,
           "path": "game/resource/addon_french.txt",
           "category": "Localization",
-          "insertions": 618,
+          "insertions": 639,
           "deletions": 2377,
           "binary": false
         },
@@ -19882,9 +20292,9 @@
     },
     {
       "name": "KV data",
-      "fileCount": 28,
-      "insertions": 22207,
-      "deletions": 15589,
+      "fileCount": 30,
+      "insertions": 59358,
+      "deletions": 15643,
       "files": [
         {
           "status": "M",
@@ -19892,7 +20302,7 @@
           "oldPath": null,
           "path": "game/scripts/custom_net_tables.txt",
           "category": "KV data",
-          "insertions": 17,
+          "insertions": 19,
           "deletions": 0,
           "binary": false
         },
@@ -19902,7 +20312,7 @@
           "oldPath": null,
           "path": "game/scripts/npc/abilities/creep_passives.txt",
           "category": "KV data",
-          "insertions": 797,
+          "insertions": 795,
           "deletions": 0,
           "binary": false
         },
@@ -19932,8 +20342,8 @@
           "oldPath": null,
           "path": "game/scripts/npc/items/orbs.txt",
           "category": "KV data",
-          "insertions": 564,
-          "deletions": 16,
+          "insertions": 579,
+          "deletions": 18,
           "binary": false
         },
         {
@@ -19942,7 +20352,7 @@
           "oldPath": null,
           "path": "game/scripts/npc/npc_abilities_custom.txt",
           "category": "KV data",
-          "insertions": 2972,
+          "insertions": 2995,
           "deletions": 952,
           "binary": false
         },
@@ -19952,8 +20362,8 @@
           "oldPath": null,
           "path": "game/scripts/npc/npc_abilities_override.txt",
           "category": "KV data",
-          "insertions": 130,
-          "deletions": 285,
+          "insertions": 127,
+          "deletions": 337,
           "binary": false
         },
         {
@@ -19972,7 +20382,7 @@
           "oldPath": null,
           "path": "game/scripts/npc/npc_items_custom.txt",
           "category": "KV data",
-          "insertions": 210,
+          "insertions": 212,
           "deletions": 149,
           "binary": false
         },
@@ -19984,6 +20394,26 @@
           "category": "KV data",
           "insertions": 14,
           "deletions": 14164,
+          "binary": false
+        },
+        {
+          "status": "A",
+          "statusCode": "A",
+          "oldPath": null,
+          "path": "game/scripts/npc/portraits.txt",
+          "category": "KV data",
+          "insertions": 36982,
+          "deletions": 0,
+          "binary": false
+        },
+        {
+          "status": "A",
+          "statusCode": "A",
+          "oldPath": null,
+          "path": "game/scripts/npc/portraits_custom_game.txt",
+          "category": "KV data",
+          "insertions": 132,
+          "deletions": 0,
           "binary": false
         },
         {
@@ -21665,7 +22095,7 @@
     {
       "name": "Other",
       "fileCount": 54,
-      "insertions": 84201,
+      "insertions": 93058,
       "deletions": 522,
       "files": [
         {
@@ -22144,7 +22574,7 @@
           "oldPath": null,
           "path": "patch_notes/4.0.meta.json",
           "category": "Other",
-          "insertions": 16640,
+          "insertions": 25497,
           "deletions": 0,
           "binary": false
         },
@@ -22491,6 +22921,10 @@
     " D content/panorama/images/spellicons/modifiers/mystic_gem_png.vtex",
     " D content/panorama/images/spellicons/modifiers/orb_of_arcane.png",
     " D content/panorama/images/spellicons/modifiers/orb_of_arcane_png.vtex",
+    " D content/panorama/images/spellicons/modifiers/tempest_aegis.png",
+    " D content/panorama/images/spellicons/modifiers/tempest_aegis_png.vtex",
+    " D content/panorama/images/spellicons/modifiers/zephyr_gem.png",
+    " D content/panorama/images/spellicons/modifiers/zephyr_gem_png.vtex",
     " D content/panorama/layout/custom_game/boss_healthbar.xml",
     " D content/panorama/layout/custom_game/custom_loading_screen.xml",
     " D content/panorama/layout/custom_game/custom_ui_manifest.xml",
@@ -22539,6 +22973,7 @@
     " D content/panorama/layout/custom_game/xhs_top_hud.xml",
     " D content/panorama/layout/custom_game/xhs_ui_recovery.xml",
     " D content/panorama/scripts/custom_game/boss_healthbar.js",
+    " D content/panorama/scripts/custom_game/camera_motion.js",
     " D content/panorama/scripts/custom_game/custom_loading_screen.js",
     " D content/panorama/scripts/custom_game/dungeon_scoreboard.js",
     " D content/panorama/scripts/custom_game/frostrose_end_screen.js",
@@ -24279,6 +24714,7 @@
     " D game/resource/English/modifiers/generated_tooltips.txt",
     " D game/resource/English/muradin.txt",
     " D game/resource/English/siltbreaker.txt",
+    " D game/resource/English/supporter_pass_2026.txt",
     " D game/resource/English/units/companions.txt",
     " D game/resource/English/units/creeps_and_bosses.txt",
     " D game/resource/English/units/heroes.txt",
@@ -25117,6 +25553,8 @@
     " D game/scripts/npc/npc_heroes_custom.txt",
     " D game/scripts/npc/npc_items_custom.txt",
     " D game/scripts/npc/npc_units_custom.txt",
+    " D game/scripts/npc/portraits.txt",
+    " D game/scripts/npc/portraits_custom_game.txt",
     " D game/scripts/npc/units/allies_and_vips.txt",
     " D game/scripts/npc/units/bosses.txt",
     " D game/scripts/npc/units/buildings.txt",
@@ -25295,6 +25733,7 @@
     " D game/scripts/vscripts/components/cinematics/init.lua",
     " D game/scripts/vscripts/components/cinematics/modifier_hide_health_bars.lua",
     " D game/scripts/vscripts/components/creep_ai_director/init.lua",
+    " D game/scripts/vscripts/components/creep_order_ownership/init.lua",
     " D game/scripts/vscripts/components/creep_passives/init.lua",
     " D game/scripts/vscripts/components/custom_polls/init.lua",
     " D game/scripts/vscripts/components/demo/events.lua",
@@ -25312,7 +25751,11 @@
     " D game/scripts/vscripts/components/runes/init.lua",
     " D game/scripts/vscripts/components/runes/modifiers.lua",
     " D game/scripts/vscripts/components/timers/init.lua",
+    " D game/scripts/vscripts/components/wave_stager/init.lua",
+    " D game/scripts/vscripts/components/wave_stager/modifier_xhs_wave_staged.lua",
+    " D game/scripts/vscripts/components/xhs_bots/audit.lua",
     " D game/scripts/vscripts/components/xhs_bots/brain.lua",
+    " D game/scripts/vscripts/components/xhs_bots/campaign_director.lua",
     " D game/scripts/vscripts/components/xhs_bots/config.lua",
     " D game/scripts/vscripts/components/xhs_bots/danger_registry.lua",
     " D game/scripts/vscripts/components/xhs_bots/economy.lua",
@@ -25323,6 +25766,7 @@
     " D game/scripts/vscripts/components/xhs_bots/init.lua",
     " D game/scripts/vscripts/components/xhs_bots/item_catalog.lua",
     " D game/scripts/vscripts/components/xhs_bots/item_planner.lua",
+    " D game/scripts/vscripts/components/xhs_bots/loot.lua",
     " D game/scripts/vscripts/components/xhs_bots/player_registry.lua",
     " D game/scripts/vscripts/components/xhs_bots/provisioner.lua",
     " D game/scripts/vscripts/components/xhs_bots/team_director.lua",
@@ -25363,6 +25807,7 @@
     " D game/scripts/vscripts/libraries/adv_log.lua",
     " D game/scripts/vscripts/libraries/animations.lua",
     " D game/scripts/vscripts/libraries/attachments.lua",
+    " D game/scripts/vscripts/libraries/camera_motion.lua",
     " D game/scripts/vscripts/libraries/corpse_cleanup.lua",
     " D game/scripts/vscripts/libraries/corpses.lua",
     " D game/scripts/vscripts/libraries/fun.lua",
@@ -25434,6 +25879,7 @@
     " D game/scripts/vscripts/modifiers/modifier_xhs_growth_overhead.lua",
     " D game/scripts/vscripts/modifiers/modifier_xhs_late_phase3_defense.lua",
     " D game/scripts/vscripts/modifiers/modifier_xhs_phase_one_wave_scaling.lua",
+    " D game/scripts/vscripts/modifiers/modifier_xhs_space_marine_attack_sound.lua",
     " D game/scripts/vscripts/npc_abilities/cant_die.lua",
     " D game/scripts/vscripts/npc_abilities/forest_boss_basic_skill.lua",
     " D game/scripts/vscripts/phases/choose_hero.lua",
@@ -25481,17 +25927,14 @@
     " D game/sounds/thunderboltmissiledeath.vsnd_c",
     " D game/sounds/trap_trigger.vsnd_c",
     " M patch_notes/4.0.md",
-    " M patch_notes/4.0.meta.json",
-    "?? output/",
-    "?? scripts/analyze_xhs_vmap.js",
-    "?? scripts/generate_xhs_core_graybox.js"
+    " M patch_notes/4.0.meta.json"
   ],
-  "diffFooter": "Diff analyzed: 1,095 files, 46 commits, +293,806 / -52,824 lines.",
+  "diffFooter": "Diff analyzed: 1,116 files, 48 commits, +352,617 / -50,988 lines.",
   "diffStats": {
-    "changedFiles": 1095,
-    "commitCount": 46,
-    "insertions": 293806,
-    "deletions": 52824,
-    "footer": "Diff analyzed: 1,095 files, 46 commits, +293,806 / -52,824 lines."
+    "changedFiles": 1116,
+    "commitCount": 48,
+    "insertions": 352617,
+    "deletions": 50988,
+    "footer": "Diff analyzed: 1,116 files, 48 commits, +352,617 / -50,988 lines."
   }
 }

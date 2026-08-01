@@ -310,6 +310,38 @@
 	text-align: right;
 }
 
+.XHSDevToolsPerformanceCompactMetric .CompactValueStack {
+	width: fill-parent-flow(1);
+	height: 28px;
+	vertical-align: center;
+	flow-children: down;
+}
+
+.XHSDevToolsPerformanceCompactMetric .CompactValueStack .CompactValue {
+	width: 100%;
+	height: 16px;
+	font-size: 12px;
+	text-align: right;
+}
+
+.XHSDevToolsPerformanceCompactMetric .CompactExtreme {
+	width: 100%;
+	height: 11px;
+	color: #7899a5;
+	font-size: 8px;
+	font-weight: bold;
+	letter-spacing: 0.5px;
+	text-align: right;
+}
+
+.XHSDevToolsPerformanceCompactMetric .CompactExtreme.Low {
+	color: #ffd27e;
+}
+
+.XHSDevToolsPerformanceCompactMetric .CompactExtreme.Critical {
+	color: #ff8d84;
+}
+
 .XHSDevToolsPerformanceCompactMetric .CompactValue.Low {
 	color: #ffd27e;
 }

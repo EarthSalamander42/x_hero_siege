@@ -2,6 +2,7 @@
 CustomNetTables.SubscribeNetTableListener( "zone_scores", ZoneScoresReceived )
 CustomNetTables.SubscribeNetTableListener( "player_zone_locations", UpdatePlayerZones )
 CustomNetTables.SubscribeNetTableListener( "fragment_quests", FragmentQuestsReceived )
+CustomNetTables.SubscribeNetTableListener( "supporter_pass_player", ScoreboardSupporterPassReceived )
 GameEvents.Subscribe( "zone_complete", OnZoneCompleted );
 
 var KILL_EVENT_THRESHOLDS = [100, 200, 400, 500, 750];
@@ -25,28 +26,6 @@ function SuppressVanillaFlyoutScoreboard() {
 		// Some spectator HUD panels are created after custom_ui_manifest.
 		// Reasserting this on scoreboard events is safe; failure must not block XHS UI.
 	}
-}
-
-function IsLocalPlayerSpectating() {
-	var localPlayerInfo = ScoreboardSafeCall(function () {
-		return Game.GetLocalPlayerInfo();
-	}, null);
-	var localPlayerId = localPlayerInfo && localPlayerInfo.player_id !== undefined
-		? Number(localPlayerInfo.player_id)
-		: ScoreboardSafeCall(function () {
-			return Game.GetLocalPlayerID();
-		}, -1);
-	var localTeam = localPlayerInfo && localPlayerInfo.player_team_id !== undefined
-		? Number(localPlayerInfo.player_team_id)
-		: ScoreboardSafeCall(function () {
-			return Players.GetTeam(localPlayerId);
-		}, -1);
-
-	return localPlayerId < 0
-		|| localTeam === 1
-		|| ScoreboardSafeCall(function () {
-			return Players.IsSpectator(localPlayerId);
-		}, false);
 }
 
 function GetScoreboardHudAncestor(panel) {
@@ -84,13 +63,6 @@ function ScheduleScoreboardHudLayerRetry() {
 
 function EnsureScoreboardAboveHudElements() {
 	SuppressVanillaFlyoutScoreboard();
-
-	// Valve owns a separate spectator scoreboard layer. Moving the XHS panel out
-	// of its FlyoutScoreboard host lets that vanilla layer appear behind it.
-	// Spectators keep the normal host while still receiving the XHS flyout event.
-	if (IsLocalPlayerSpectating()) {
-		return true;
-	}
 
 	if (scoreboard_hud_layer_applied) {
 		return true;
@@ -473,6 +445,33 @@ function SetScoreboardDisplaySlotVisible(displaySlot, visible) {
 	}
 }
 
+function GetScoreboardSupporterInfo(playerId) {
+	var playerInfo = GetScoreboardNetTableValue("supporter_pass_player", playerId);
+	if (playerInfo) {
+		return playerInfo;
+	}
+
+	// Participants provisioned after the first Supporter Pass publication must
+	// not retain the legacy XML placeholder (Rookie, 0 / 500).
+	return {
+		XP: 0,
+		MaxXP: 1000,
+		Lvl: 1,
+		season_xp: 0,
+		season_xp_max: 1000,
+		season_level: 1,
+		title: "Supporter Pass",
+		title_color: "#9eb0c9",
+		tier_id: 0
+	};
+}
+
+function ScoreboardSupporterPassReceived(tableName, key, data) {
+	if (/^\d+$/.test(String(key || ""))) {
+		UpdatePlayerImages();
+	}
+}
+
 function UpdatePlayerImages() {
 	var teamContainer = $("#ScoreboardTeamContainer");
 	if (!teamContainer) {
@@ -498,10 +497,10 @@ function UpdatePlayerImages() {
 //	friendlyBarImage.heroname = Players.GetPlayerSelectedHero( localPlayerId );
 
 	var actualPlayerInfo = 1;
-	var localSupporterInfo = GetScoreboardNetTableValue("supporter_pass_player", localPlayerId);
+	var localSupporterInfo = GetScoreboardSupporterInfo(localPlayerId);
 	ApplyScoreboardSupporterVisuals(localPlayerId, 0, localSupporterInfo);
 	var localXPPanel = $.GetContextPanel().FindChildTraverse("es-player-xp0");
-	if (localXPPanel != undefined && localSupporterInfo != undefined) {
+	if (localXPPanel != undefined) {
 		_ScoreboardUpdater_UpdatePlayerPanelXP(0, localXPPanel, localSupporterInfo);
 	}
 	for (var displaySlot = 1; displaySlot <= 7; displaySlot++) {
@@ -509,7 +508,7 @@ function UpdatePlayerImages() {
 	}
 
 	for(var i = 0; i < 9; i++) {
-		var player_info = GetScoreboardNetTableValue("supporter_pass_player", i);
+		var player_info = GetScoreboardSupporterInfo(i);
 
 		if(i == localPlayerId)
 		{
@@ -523,7 +522,7 @@ function UpdatePlayerImages() {
 
 		var ImbaXP_Panel = $.GetContextPanel().FindChildTraverse("es-player-xp" + actualPlayerInfo);
 
-		if (ImbaXP_Panel != undefined && player_info != undefined) {
+		if (ImbaXP_Panel != undefined) {
 			// set xp values for the display slot occupied by this player.
 			_ScoreboardUpdater_UpdatePlayerPanelXP(actualPlayerInfo, ImbaXP_Panel, player_info);
 		}

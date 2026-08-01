@@ -19,6 +19,17 @@ local function IsValidCombatUnit(unit)
 		and not unit:IsInvulnerable()
 end
 
+local NON_COMBAT_CAMPAIGN_UNITS = {
+	npc_xhs_paladin = true,
+	npc_xhs_paladin_2 = true,
+}
+
+local function IsNonCombatCampaignUnit(unit)
+	if not IsValidEntityHandle(unit) then return false end
+	return NON_COMBAT_CAMPAIGN_UNITS[unit:GetUnitName()] == true
+		or unit.xhs_freed_shal_lightbinder == true
+end
+
 local function Distance2D(left, right)
 	return (left - right):Length2D()
 end
@@ -348,13 +359,19 @@ function XHSBotEncounterDirector:Build(playerID, hero, record, assignment)
 			max_chase_distance = 2800,
 		}
 	elseif phase >= 3 then
+		local nonCombatObjective = assignment ~= nil and assignment.non_combat == true
 		local assignedTarget = assignment
 			and GetEntityByIndex(assignment.target_entindex)
 			or nil
 		return {
 			id = "phase_3",
+			no_combat = nonCombatObjective,
 			anchor = assignment and CopyPosition(assignment.anchor) or hero:GetAbsOrigin(),
-			forced_target = IsValidCombatUnit(assignedTarget) and assignedTarget or nil,
+			forced_target = not nonCombatObjective
+				and IsValidCombatUnit(assignedTarget)
+				and not IsNonCombatCampaignUnit(assignedTarget)
+				and assignedTarget
+				or nil,
 			max_chase_distance = assignment and assignment.chase_radius or 3200,
 		}
 	end
@@ -365,6 +382,7 @@ function XHSBotEncounterDirector:IsTargetAllowed(policy, playerID, target)
 	if policy == nil then return true end
 	if policy.no_combat == true then return false end
 	if not IsValidCombatUnit(target) then return false end
+	if IsNonCombatCampaignUnit(target) then return false end
 
 	if policy.id == "ramero_baristol" then
 		-- This is a strict kill order, not merely a preference. Allowing both

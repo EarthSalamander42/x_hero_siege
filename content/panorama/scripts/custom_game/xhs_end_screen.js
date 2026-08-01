@@ -43,6 +43,12 @@ var XHSEndScreen = (function () {
 	var hasRenderedEndGame = false;
 	var fallbackTimerStarted = false;
 	var shownRewardKeys = {};
+	var rewardQueue = [];
+	var activeReward = null;
+	var rewardRevealScheduled = false;
+	var rewardBatchTotal = 0;
+	var rewardBatchAccepted = 0;
+	var rewardPanelSequence = 0;
 	var lastEndGameData = null;
 	var farmLeaderboardVisible = false;
 
@@ -575,6 +581,13 @@ var XHSEndScreen = (function () {
 			apiData.supporter_xp_change,
 			apiData.season_xp_change
 		);
+		var durationXP = FirstDefined(season.duration_xp, supporterPass.duration_xp, apiData.duration_xp);
+		var victoryXPBonus = FirstDefined(season.victory_xp_bonus, supporterPass.victory_xp_bonus, apiData.victory_xp_bonus);
+		var baseXPChange = FirstDefined(season.base_xp_change, supporterPass.base_xp_change, apiData.base_xp_change);
+		var xpBoost = FirstDefined(season.xp_boost, supporterPass.xp_boost, apiData.xp_boost);
+		var xpBonus = FirstDefined(season.xp_bonus, supporterPass.xp_bonus, apiData.xp_bonus);
+		var xpEligible = FirstDefined(season.xp_eligible, supporterPass.xp_eligible, apiData.xp_eligible);
+		var xpIneligibleReason = FirstDefined(season.xp_ineligible_reason, supporterPass.xp_ineligible_reason, apiData.xp_ineligible_reason);
 
 		if (seasonLevel !== undefined) {
 			merged.season_level = seasonLevel;
@@ -591,6 +604,27 @@ var XHSEndScreen = (function () {
 		if (seasonChange !== undefined) {
 			merged.season_xp_change = seasonChange;
 			merged.XP_change = seasonChange;
+		}
+		if (durationXP !== undefined) {
+			merged.duration_xp = durationXP;
+		}
+		if (victoryXPBonus !== undefined) {
+			merged.victory_xp_bonus = victoryXPBonus;
+		}
+		if (baseXPChange !== undefined) {
+			merged.base_xp_change = baseXPChange;
+		}
+		if (xpBoost !== undefined) {
+			merged.xp_boost = xpBoost;
+		}
+		if (xpBonus !== undefined) {
+			merged.xp_bonus = xpBonus;
+		}
+		if (xpEligible !== undefined) {
+			merged.xp_eligible = xpEligible;
+		}
+		if (xpIneligibleReason !== undefined && xpIneligibleReason !== null) {
+			merged.xp_ineligible_reason = xpIneligibleReason;
 		}
 
 		merged.title = merged.title || "Supporter Pass";
@@ -697,6 +731,8 @@ var XHSEndScreen = (function () {
 			supporterTierColor: supporterTier.color,
 			supportGold: ToNumber(server.gold_spent_on_support, 0),
 			abandon: !!server.abandon,
+			victory: IsPlayerVictory(data),
+			gameTime: ToNumber(data.game_time, Safe(function () { return Game.GetDOTATime(false, false); }, 0)),
 			api: api,
 			battlepass: battlepass,
 		};
@@ -1209,6 +1245,18 @@ var XHSEndScreen = (function () {
 		var accountLine = $.CreatePanel("Label", cell, "");
 		accountLine.AddClass("XHSAccountXpLine");
 
+		var xpBreakdown = $.CreatePanel("Panel", cell, "");
+		xpBreakdown.AddClass("XHSXPBreakdown");
+
+		var durationLine = $.CreatePanel("Label", xpBreakdown, "");
+		durationLine.AddClass("XHSXPBreakdownBase");
+
+		var victoryLine = $.CreatePanel("Label", xpBreakdown, "");
+		victoryLine.AddClass("XHSXPBreakdownVictory");
+
+		var supporterLine = $.CreatePanel("Label", xpBreakdown, "");
+		supporterLine.AddClass("XHSXPBreakdownSupporter");
+
 		var battlepass = model.battlepass || {};
 		var xpEnabled = battlepass.player_xp !== 0 && battlepass.player_xp !== "0" && battlepass.player_xp !== false;
 		var supporter = NormalizeSupporterProgress(battlepass);
@@ -1218,6 +1266,19 @@ var XHSEndScreen = (function () {
 			0
 		);
 		var xhsProgress = GetXHSAccountProgress(model.api, battlepass);
+		var xpBonus = Math.max(0, ToNumber(battlepass.xp_bonus, 0));
+		var xpBoost = Math.max(0, ToNumber(battlepass.xp_boost, 0));
+		var baseXPChange = Math.max(0, ToNumber(battlepass.base_xp_change, supporterChange - xpBonus));
+		var durationXP = Math.max(0, ToNumber(battlepass.duration_xp, baseXPChange));
+		var victoryXPBonus = Math.max(0, ToNumber(battlepass.victory_xp_bonus, 0));
+		var xpIneligibleReason = (battlepass.xp_ineligible_reason || "").toString();
+		if (battlepass.duration_xp === undefined && battlepass.victory_xp_bonus === undefined && model.victory && baseXPChange > 0) {
+			var durationEstimate = Math.max(Math.round(Math.max(model.gameTime, 0) / 6), 0);
+			if (durationEstimate > 0 && baseXPChange >= durationEstimate) {
+				durationXP = durationEstimate;
+				victoryXPBonus = baseXPChange - durationEstimate;
+			}
+		}
 
 		if (!xpEnabled) {
 			level.text = "N/A";
@@ -1225,6 +1286,7 @@ var XHSEndScreen = (function () {
 			progressPanel.style.width = "0%";
 			diffPanel.style.width = "0%";
 			accountLine.text = "XHS N/A";
+			xpBreakdown.style.visibility = "collapse";
 			return;
 		}
 
@@ -1245,6 +1307,21 @@ var XHSEndScreen = (function () {
 		earned.text = FormatSignedNumber(supporterChange);
 		earned.SetHasClass("IsNegative", supporterChange < 0);
 		accountLine.text = FormatXHSAccountProgress(xhsProgress);
+		var ineligibleMessages = {
+			cheat_mode: "No XP - cheats enabled",
+			cheat_mode_not_whitelisted: "No XP - cheats enabled",
+			match_too_short: "No XP - match under 40 minutes",
+			abandoned: "No XP - abandoned match",
+			disconnected: "No XP - disconnected"
+		};
+		durationLine.text = xpIneligibleReason
+			? (ineligibleMessages[xpIneligibleReason] || "No XP - ineligible match")
+			: "+" + FormatNumber(durationXP) + " match";
+		xpBreakdown.SetHasClass("IsIneligible", !!xpIneligibleReason);
+		victoryLine.text = "+" + FormatNumber(victoryXPBonus) + " victory";
+		victoryLine.style.visibility = !xpIneligibleReason && victoryXPBonus > 0 ? "visible" : "collapse";
+		supporterLine.text = "+" + FormatNumber(xpBonus) + " Supporter (" + xpBoost + "%)";
+		supporterLine.style.visibility = !xpIneligibleReason && xpBonus > 0 && xpBoost > 0 ? "visible" : "collapse";
 
 		var progress = Clamp(Math.floor((supporter.xp / supporter.max) * 100), 0, 100);
 		var diff = Clamp(Math.floor((supporterChange / supporter.max) * 100), 0, 100);
@@ -1253,6 +1330,19 @@ var XHSEndScreen = (function () {
 		diffPanel.style.marginLeft = Math.max(0, progress - 1) + "%";
 
 		var tooltip = "Supporter Pass: Level " + supporter.level + " - " + FormatNumber(supporter.xp) + "/" + FormatNumber(supporter.max) + " XP";
+		if (xpIneligibleReason) {
+			tooltip += "\n" + (ineligibleMessages[xpIneligibleReason] || "No XP - ineligible match");
+		}
+		if (supporterChange > 0) {
+			tooltip += "\nMatch XP: +" + FormatNumber(durationXP);
+			if (victoryXPBonus > 0) {
+				tooltip += "\nVictory bonus: +" + FormatNumber(victoryXPBonus);
+			}
+			if (xpBonus > 0 && xpBoost > 0) {
+				tooltip += "\nSupporter boost (" + xpBoost + "%): +" + FormatNumber(xpBonus);
+			}
+			tooltip += "\nTotal: " + FormatSignedNumber(supporterChange) + " XP";
+		}
 		if (xhsProgress.hasData) {
 			tooltip += "\n" + FormatXHSAccountProgress(xhsProgress);
 		}
@@ -1495,54 +1585,172 @@ var XHSEndScreen = (function () {
 		}
 	}
 
-	function CreateBattlepassRewardCard(level, levelupCount, track, reward) {
+	function SetRewardOverlayVisible(visible) {
+		var container = Panel("XHSEndScreenRewardContainer");
+		if (container) {
+			container.SetHasClass("IsVisible", visible);
+		}
+		var root = $.GetContextPanel();
+		if (root) {
+			root.SetHasClass("HasPendingRewards", visible);
+		}
+	}
+
+	function QueueBattlepassReward(level, levelupCount, track, reward) {
 		if (!reward) {
 			return;
 		}
+		rewardQueue.push({
+			level: level,
+			levelupCount: levelupCount,
+			track: track,
+			reward: reward,
+		});
+		rewardBatchTotal++;
+		SetRewardOverlayVisible(true);
 
-		var rewardName = reward.name || reward.item_name || reward.reward_id || "xhs_sp_reward";
-		var rarity = (reward.rarity || reward.item_rarity || "common").toString().toLowerCase();
-		var rewardType = DisplaySupporterRewardType(reward);
+		if (!rewardRevealScheduled) {
+			rewardRevealScheduled = true;
+			$.Schedule(0.0, function () {
+				rewardRevealScheduled = false;
+				ShowNextQueuedReward();
+			});
+		}
+	}
+
+	function ShowNextQueuedReward() {
+		if (activeReward) {
+			return;
+		}
+
 		var container = Panel("XHSEndScreenRewardContainer");
-
 		if (!container) {
 			return;
 		}
 
-		var panel = $.CreatePanel("Panel", container, "XHSEndScreenRewardPanel_" + levelupCount + "_" + track);
+		ClearPanel(container);
+		if (rewardQueue.length === 0) {
+			SetRewardOverlayVisible(false);
+			rewardBatchTotal = 0;
+			rewardBatchAccepted = 0;
+			return;
+		}
+
+		activeReward = rewardQueue.shift();
+		var level = activeReward.level;
+		var track = activeReward.track;
+		var reward = activeReward.reward;
+
+		var rewardName = reward.name || reward.item_name || reward.reward_id || "xhs_sp_reward";
+		var rarity = (reward.rarity || reward.item_rarity || "common").toString().toLowerCase();
+		var rewardType = DisplaySupporterRewardType(reward);
+		var revealTier = rarity === "mythical" ? 1
+			: (rarity === "legendary" ? 2
+				: ((rarity === "immortal" || rarity === "arcana" || rarity === "ancient") ? 3 : 0));
+
+		if (revealTier > 0) {
+			var revealEffects = $.CreatePanel("Panel", container, "");
+			revealEffects.AddClass("XHSRewardRevealEffects");
+			revealEffects.AddClass("RevealTier" + revealTier);
+			revealEffects.AddClass("level-" + rarity);
+
+			var burst = $.CreatePanel("Panel", revealEffects, "");
+			burst.AddClass("XHSRewardRevealBurst");
+
+			if (revealTier >= 2) {
+				var rays = $.CreatePanel("Panel", revealEffects, "");
+				rays.AddClass("XHSRewardRevealRays");
+				var raysCross = $.CreatePanel("Panel", revealEffects, "");
+				raysCross.AddClass("XHSRewardRevealRays");
+				raysCross.AddClass("Cross");
+			}
+
+			if (revealTier >= 3) {
+				var flash = $.CreatePanel("Panel", revealEffects, "");
+				flash.AddClass("XHSRewardRevealFlash");
+			}
+		}
+
+		var panel = $.CreatePanel("Panel", container, "XHSEndScreenRewardPanel_" + (++rewardPanelSequence));
 		panel.AddClass("XHSEndScreenRewardPanel");
 		panel.AddClass("level-" + rarity);
+		if (revealTier > 0) {
+			panel.AddClass("RevealTier" + revealTier);
+		}
 		panel.SetHasClass("IsPremiumReward", track === "premium");
+
+		var accent = $.CreatePanel("Panel", panel, "");
+		accent.AddClass("XHSRewardAccent");
+
+		var header = $.CreatePanel("Panel", panel, "");
+		header.AddClass("XHSRewardHeader");
+
+		var unlocked = $.CreatePanel("Label", header, "");
+		unlocked.AddClass("XHSRewardUnlocked");
+		unlocked.text = "REWARD UNLOCKED";
+
+		var queueProgress = $.CreatePanel("Label", header, "");
+		queueProgress.AddClass("XHSRewardQueueProgress");
+		queueProgress.text = (rewardBatchAccepted + 1) + " / " + rewardBatchTotal;
 
 		var description = $.CreatePanel("Label", panel, "");
 		description.AddClass("XHSRewardDescription");
 		description.text = Localize(track === "premium" ? "#xhs_sp_supporter_track" : "#xhs_sp_free_track") +
 			" · " + Localize("#xhs_sp_level_value").replace("{level}", level);
 
-		var name = $.CreatePanel("Label", panel, "");
-		name.AddClass("XHSRewardName");
-		name.text = rewardType + ": " + LocalizeMaybeKey(rewardName);
+		var imageFrame = $.CreatePanel("Panel", panel, "");
+		imageFrame.AddClass("XHSRewardImageFrame");
 
-		var rarityPanel = $.CreatePanel("Label", panel, "");
-		rarityPanel.AddClass("XHSRewardRarity");
-		rarityPanel.AddClass(rarity);
-		rarityPanel.text = rarity;
+		var imageGlow = $.CreatePanel("Panel", imageFrame, "");
+		imageGlow.AddClass("XHSRewardImageGlow");
+		imageGlow.AddClass(rarity);
 
-		var image = $.CreatePanel("Panel", panel, "");
+		var image = $.CreatePanel("Panel", imageFrame, "");
 		image.AddClass("XHSRewardImage");
 		image.style.backgroundImage = 'url("' + ResolveRewardImageURL(reward.image || reward.image_inventory || reward.icon || reward.icon_path) + '")';
 		image.style.backgroundSize = "contain";
 		image.style.backgroundPosition = "50% 50%";
 		image.style.backgroundRepeat = "no-repeat";
 
+		var type = $.CreatePanel("Label", panel, "");
+		type.AddClass("XHSRewardType");
+		type.text = rewardType;
+
+		var name = $.CreatePanel("Label", panel, "");
+		name.AddClass("XHSRewardName");
+		name.text = LocalizeMaybeKey(rewardName);
+
+		var rarityPanel = $.CreatePanel("Label", panel, "");
+		rarityPanel.AddClass("XHSRewardRarity");
+		rarityPanel.AddClass(rarity);
+		rarityPanel.text = rarity;
+
 		var button = $.CreatePanel("Button", panel, "");
 		button.AddClass("XHSRewardButton");
+		var accepting = false;
 		button.SetPanelEvent("onactivate", function () {
-			panel.DeleteAsync(0);
+			if (!activeReward || accepting) {
+				return;
+			}
+			accepting = true;
+			button.AddClass("IsAccepting");
+			panel.AddClass("IsLeaving");
+			Game.EmitSound("ui_generic_button_click");
+			$.Schedule(0.18, function () {
+				rewardBatchAccepted++;
+				activeReward = null;
+				ShowNextQueuedReward();
+			});
 		});
 
 		var label = $.CreatePanel("Label", button, "");
-		label.text = Localize("#xhs_sp_accept");
+		label.text = rewardQueue.length > 0 ? Localize("#xhs_sp_accept") + "  ›" : Localize("#xhs_sp_accept");
+
+		var remaining = $.CreatePanel("Label", panel, "");
+		remaining.AddClass("XHSRewardRemaining");
+		remaining.text = rewardQueue.length > 0
+			? rewardQueue.length + (rewardQueue.length === 1 ? " reward remaining" : " rewards remaining")
+			: "Final reward";
 
 		var sounds = {
 			common: "Loot_Drop_Sfx",
@@ -1564,9 +1772,9 @@ var XHSEndScreen = (function () {
 		if (level < 1 || level > 50) {
 			return;
 		}
-		CreateBattlepassRewardCard(level, levelupCount, "free", GetSupporterRewardAtLevel("free", level));
+		QueueBattlepassReward(level, levelupCount, "free", GetSupporterRewardAtLevel("free", level));
 		if (includePremium) {
-			CreateBattlepassRewardCard(level, levelupCount, "premium", GetSupporterRewardAtLevel("premium", level));
+			QueueBattlepassReward(level, levelupCount, "premium", GetSupporterRewardAtLevel("premium", level));
 		}
 	}
 
@@ -1634,7 +1842,7 @@ var XHSEndScreen = (function () {
 	}
 
 	function RenderEndGameData(data) {
-		if (!data || hasRenderedEndGame) {
+		if (!data) {
 			return;
 		}
 

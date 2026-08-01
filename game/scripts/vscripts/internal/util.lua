@@ -1225,7 +1225,7 @@ local XHS_TELEPORT_MIN_ANIMATION_DURATION = 0.65
 -- camera rather than an instant snap.
 local XHS_TELEPORT_DEFAULT_CAMERA_DURATION = 2.0
 
-function TeleportHero(hero, point, delay, iCameraSpeed)
+function TeleportHero(hero, point, delay, iCameraSpeed, onTeleported)
 	if hero == nil or not IsValidEntity(hero) or hero:IsNull() or point == nil then return end
 	local playerID = hero.GetPlayerID ~= nil and hero:GetPlayerID() or -1
 	if delay == nil then delay = 0 end
@@ -1325,6 +1325,17 @@ function TeleportHero(hero, point, delay, iCameraSpeed)
 			ParticleManager:DestroyParticle(TeleportEffectEnd, false)
 			ParticleManager:ReleaseParticleIndex(TeleportEffect)
 			ParticleManager:ReleaseParticleIndex(TeleportEffectEnd)
+		end
+
+		if type(onTeleported) == "function" then
+			local ok, message = pcall(onTeleported, hero)
+			if not ok then
+				print(string.format(
+					"[XHS TeleportHero] Completion callback failed for player %d: %s",
+					playerID or -1,
+					tostring(message)
+				))
+			end
 		end
 	end)
 end
@@ -1931,7 +1942,7 @@ function IsNearEntity(entity_class, location, distance)
 	return false
 end
 
-function TeleportAllHeroes(sEvent, iInvulnDelay, iTPDelay)
+function TeleportAllHeroes(sEvent, iInvulnDelay, iTPDelay, onComplete)
 	local heroes = {}
 	for _, hero in pairs(HeroList:GetAllHeroes()) do
 		if hero:IsRealHero()
@@ -1978,11 +1989,38 @@ function TeleportAllHeroes(sEvent, iInvulnDelay, iTPDelay)
 		end
 	end
 
+	local pendingTeleports = 0
+	local completionFired = false
+	local function CompleteGroupTeleport()
+		if completionFired or pendingTeleports > 0 then return end
+		completionFired = true
+		if type(onComplete) ~= "function" then return end
+		local ok, message = pcall(onComplete, heroes)
+		if not ok then
+			print("[XHS TeleportAllHeroes] Completion callback failed: "
+				.. tostring(message))
+		end
+	end
+
 	for _, hero in ipairs(heroes) do
 		local point = assignments[hero:entindex()]
+		local teleportSettled = false
+		local function OnHeroTeleported()
+			if teleportSettled then return end
+			teleportSettled = true
+			pendingTeleports = math.max(0, pendingTeleports - 1)
+			CompleteGroupTeleport()
+		end
 		local ok, message = pcall(function()
 			if point ~= nil then
-				TeleportHero(hero, point:GetAbsOrigin(), iTPDelay)
+				pendingTeleports = pendingTeleports + 1
+				TeleportHero(
+					hero,
+					point:GetAbsOrigin(),
+					iTPDelay,
+					nil,
+					OnHeroTeleported
+				)
 			else
 				print(string.format(
 					"[XHS TeleportAllHeroes] No destination for player %d with prefix '%s'; continuing encounter.",
@@ -1994,6 +2032,7 @@ function TeleportAllHeroes(sEvent, iInvulnDelay, iTPDelay)
 			hero:AddNewModifier(hero, nil, "modifier_invulnerable", { duration = iInvulnDelay, IsHidden = true })
 		end)
 		if not ok then
+			if point ~= nil then OnHeroTeleported() end
 			print(string.format(
 				"[XHS TeleportAllHeroes] Player %d teleport failed: %s",
 				hero:GetPlayerID(),
@@ -2001,6 +2040,7 @@ function TeleportAllHeroes(sEvent, iInvulnDelay, iTPDelay)
 			))
 		end
 	end
+	CompleteGroupTeleport()
 end
 
 function GiveTomeToAllHeroes(iCount)

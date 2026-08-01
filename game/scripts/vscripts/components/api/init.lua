@@ -796,6 +796,15 @@ function api:MergeSupporterPassResponse(steamid, data)
 	local supporter_pass = player.supporter_pass
 	local profile = data.profile or data.supporter_pass or {}
 	local season = data.season or profile.season or supporter_pass.season or {}
+	local function FirstNonNil(...)
+		for index = 1, select("#", ...) do
+			local value = select(index, ...)
+			if value ~= nil then
+				return value
+			end
+		end
+		return nil
+	end
 	local season_id = season.season_id or season.id or season.key
 	if season_id ~= nil and tostring(season_id) ~= "" then
 		supporter_pass.season = supporter_pass.season or {}
@@ -833,6 +842,11 @@ function api:MergeSupporterPassResponse(steamid, data)
 	local base_xp_change = season.base_xp_change or profile.base_xp_change or data.base_xp_change
 	local xp_boost = season.xp_boost or profile.xp_boost or data.xp_boost
 	local xp_bonus = season.xp_bonus or profile.xp_bonus or data.xp_bonus
+	local duration_xp = FirstNonNil(season.duration_xp, profile.duration_xp, data.duration_xp)
+	local victory_xp_bonus = FirstNonNil(season.victory_xp_bonus, profile.victory_xp_bonus, data.victory_xp_bonus)
+	local xp_eligible = FirstNonNil(season.xp_eligible, profile.xp_eligible, data.xp_eligible)
+	local xp_ineligible_reason = FirstNonNil(season.xp_ineligible_reason, profile.xp_ineligible_reason, data.xp_ineligible_reason)
+	local xp_eligibility_reason = FirstNonNil(season.xp_eligibility_reason, profile.xp_eligibility_reason, data.xp_eligibility_reason)
 	if season_xp ~= nil then
 		supporter_pass.season_xp = season_xp
 		supporter_pass.current_exp = season_xp
@@ -861,6 +875,31 @@ function api:MergeSupporterPassResponse(steamid, data)
 		supporter_pass.xp_bonus = xp_bonus
 		supporter_pass.season = supporter_pass.season or {}
 		supporter_pass.season.xp_bonus = xp_bonus
+	end
+	if duration_xp ~= nil then
+		supporter_pass.duration_xp = duration_xp
+		supporter_pass.season = supporter_pass.season or {}
+		supporter_pass.season.duration_xp = duration_xp
+	end
+	if victory_xp_bonus ~= nil then
+		supporter_pass.victory_xp_bonus = victory_xp_bonus
+		supporter_pass.season = supporter_pass.season or {}
+		supporter_pass.season.victory_xp_bonus = victory_xp_bonus
+	end
+	if xp_eligible ~= nil then
+		supporter_pass.xp_eligible = xp_eligible
+		supporter_pass.season = supporter_pass.season or {}
+		supporter_pass.season.xp_eligible = xp_eligible
+	end
+	if xp_ineligible_reason ~= nil then
+		supporter_pass.xp_ineligible_reason = xp_ineligible_reason
+		supporter_pass.season = supporter_pass.season or {}
+		supporter_pass.season.xp_ineligible_reason = xp_ineligible_reason
+	end
+	if xp_eligibility_reason ~= nil then
+		supporter_pass.xp_eligibility_reason = xp_eligibility_reason
+		supporter_pass.season = supporter_pass.season or {}
+		supporter_pass.season.xp_eligibility_reason = xp_eligibility_reason
 	end
 
 	if data.entitlements ~= nil then
@@ -1393,6 +1432,50 @@ function api:IsCheatGame()
 	return false
 end
 
+function api:HasLocalBackendKey()
+	if not IsInToolsMode() or IsDedicatedServer() then
+		return false
+	end
+
+	local key_values = LoadKeyValues("scripts/vscripts/components/api/backend_key.kv")
+	local server_key = type(key_values) == "table" and key_values.server_key or nil
+	return type(server_key) == "string" and string.len(server_key) > 0
+end
+
+function api:SetBackendTestGameTime(value)
+	if not self:HasLocalBackendKey() then
+		self.backend_test_game_time = nil
+		return false, "local backend key missing; simulation disabled"
+	end
+
+	local seconds = tonumber(value)
+	if seconds == nil then
+		return false, "usage: xhs_backend_test_game_time <seconds>; use 0 to disable"
+	end
+
+	seconds = math.floor(seconds)
+	if seconds <= 0 then
+		self.backend_test_game_time = nil
+		return true, "production XP simulation disabled"
+	end
+
+	self.backend_test_game_time = math.min(seconds, 28800)
+	return true, "production XP simulation enabled with game_time="
+		.. tostring(self.backend_test_game_time)
+end
+
+function api:GetBackendTestGameTime()
+	if not self:HasLocalBackendKey() then
+		return nil
+	end
+
+	local seconds = tonumber(self.backend_test_game_time)
+	if seconds == nil or seconds <= 0 then
+		return nil
+	end
+	return math.floor(seconds)
+end
+
 function api:GetWinnerTeam()
 	return GAME_WINNER_TEAM
 end
@@ -1627,6 +1710,8 @@ end
 
 -- Core
 function api:Request(endpoint, okCallback, failCallback, method, payload)
+	local request_started_at = Time()
+	local encoded_payload_size = 0
 	if okCallback == nil then
 		okCallback = function()
 		end
@@ -1676,6 +1761,7 @@ function api:Request(endpoint, okCallback, failCallback, method, payload)
 			end
 		else
 			local encoded = json.encode(payload)
+			encoded_payload_size = string.len(encoded or "")
 			request:SetHTTPRequestRawPostBody("application/json", encoded)
 		end
 	end
@@ -1683,6 +1769,15 @@ function api:Request(endpoint, okCallback, failCallback, method, payload)
 	request:Send(function(result)
 		-- print(result)
 		local code = result.StatusCode;
+		local response_body = tostring(result.Body or "")
+		if endpoint == "game-register" or endpoint == "game-complete" or endpoint == "performance" then
+			local elapsed_ms = math.floor(math.max(Time() - request_started_at, 0) * 1000)
+			print("[XHS HTTP] endpoint=" .. tostring(endpoint)
+				.. " status=" .. tostring(code or 0)
+				.. " elapsed_ms=" .. tostring(elapsed_ms)
+				.. " request_bytes=" .. tostring(encoded_payload_size)
+				.. " response_bytes=" .. tostring(string.len(response_body)))
+		end
 
 		local fail = function(message)
 			if (code == nil) then
@@ -1745,8 +1840,17 @@ function api:RegisterGame(callback)
 		return false, "xhs_bot_session"
 	end
 
+	self.game_register_state = "pending"
 	self:Request("game-register", function(data)
 		api.game_id = tonumber(data.game_id)
+		if api.game_id == nil or api.game_id <= 0 then
+			api.game_id = nil
+			api.game_register_state = "failed"
+			print("game-register: backend returned an invalid game_id")
+			return
+		end
+		api.game_register_state = "ready"
+		print("game-register: ready with game_id=" .. tostring(api.game_id))
 		api.players = data.players
 		api.companions = data.companions or nil
 		api.emblems = data.emblems or nil
@@ -1801,7 +1905,11 @@ function api:RegisterGame(callback)
 		if callback ~= nil then
 			callback(data)
 		end
-	end, function()
+	end, function(error_data)
+		api.game_id = nil
+		api.game_register_state = "failed"
+		print("game-register: failed; persistent completion disabled for this match ("
+			.. tostring(error_data and error_data.message or "unknown error") .. ")")
 		-- fail-safe if http request can't reach backend
 		--		GameRules:SetCustomGameSetupRemainingTime(20.0)
 	end, "POST", {
@@ -1903,7 +2011,10 @@ function api:ProcessCompletedGame(data, payload, skipWinner)
 	-- CustomGameEventManager:Send_ServerToAllClients("end_game", full_data)
 
 	if not skipWinner then
-		GameRules:SetGameWinner(GAME_WINNER_TEAM, true)
+		local winner_team = GAME_WINNER_TEAM
+		Timers:CreateTimer(0.5, function()
+			GameRules:SetGameWinner(winner_team, true)
+		end)
 	end
 end
 
@@ -2048,6 +2159,8 @@ function api:CompleteGame()
 			local kills_done_to_hero = {}
 			local items_bought = {}
 			local abandon = false
+			local connection_state = tonumber(PlayerResource:GetConnectionState(id)) or 0
+			local disconnected = connection_state ~= 2
 			local leaderboard = {}
 			local support_items = {}
 			local abilities_level_up_order = {}
@@ -2148,6 +2261,8 @@ function api:CompleteGame()
 				increment_pa_arcana_kills = increment_pa_arcana_kills,
 				pa_arcana_kills = api:GetPhantomAssassinArcanaKills(id),
 				abandon = abandon,
+				connection_state = connection_state,
+				disconnected = disconnected,
 				leaderboard = leaderboard,
 				participant_kind = is_xhs_bot and "xhs_bot" or (is_persistent_player and "human" or "non_persistent"),
 				is_xhs_bot = is_xhs_bot and 1 or 0,
@@ -2181,9 +2296,9 @@ function api:CompleteGame()
 
 	--	print(rosh_lvl, rosh_hp, rosh_max_hp)
 
-	local api_game_id = self:GetApiGameId()
-	if api_game_id == nil or api_game_id == 0 then
-		api_game_id = self:GetMatchID()
+	local api_game_id = tonumber(self:GetApiGameId())
+	if api_game_id ~= nil and api_game_id <= 0 then
+		api_game_id = nil
 	end
 
 	local fragment_quests = FragmentQuests ~= nil and FragmentQuests:BuildAnalyticsPayload() or nil
@@ -2245,10 +2360,17 @@ function api:CompleteGame()
 	end
 	backend_payload.players = backend_players
 	backend_payload.fragment_quests = backend_fragment_quests
-
-	-- Publish the complete local snapshot immediately. The backend response below
-	-- enriches this table later, but must never block the EndScreen from appearing.
-	self:ProcessCompletedGame({}, payload, true)
+	local backend_test_game_time = self:GetBackendTestGameTime()
+	if backend_test_game_time ~= nil then
+		backend_payload.game_time = backend_test_game_time
+		print("game-complete: authenticated game time override enabled with game_time="
+			.. tostring(backend_test_game_time))
+	end
+	local completed_display_payload = {}
+	for key, value in pairs(payload) do
+		completed_display_payload[key] = value
+	end
+	completed_display_payload.game_time = backend_payload.game_time
 
 	-- A private Tools bot run must not alter account XP, win rate, quests, or
 	-- any other persistent human result. Keep the complete marked local
@@ -2271,12 +2393,56 @@ function api:CompleteGame()
 		return
 	end
 
+	if api_game_id == nil then
+		print("game-complete: skipped backend request because game-register has no valid game_id (state="
+			.. tostring(self.game_register_state or "unknown") .. ").")
+		if FragmentQuests ~= nil then
+			FragmentQuests:OnBackendComplete(false, { code = "game_not_registered" })
+		end
+		self:ProcessCompletedGame({}, payload)
+		return
+	end
+
+	local outbound_players = {}
+	for steamid, player_data in pairs(backend_players) do
+		outbound_players[tostring(steamid)] = {
+			team = player_data.team,
+			abandon = player_data.abandon,
+			disconnected = player_data.disconnected,
+			connection_state = player_data.connection_state,
+		}
+	end
+	print("[XHS game-complete] outbound " .. json.encode({
+		game_id = backend_payload.game_id,
+		game_time = backend_payload.game_time,
+		winner = backend_payload.winner,
+		cheat_mode = backend_payload.cheat_mode,
+		players = outbound_players,
+	}))
+
 	self:Request("game-complete", function(data)
 			print("game-complete: Game complete successful!")
+			local inbound_players = {}
+			for steamid, player_data in pairs(data.players or {}) do
+				inbound_players[tostring(steamid)] = {
+					xp = player_data.xp,
+					xp_change = player_data.xp_change,
+					duration_xp = player_data.duration_xp,
+					victory_xp_bonus = player_data.victory_xp_bonus,
+					xp_boost = player_data.xp_boost,
+					xp_bonus = player_data.xp_bonus,
+					xp_eligible = player_data.xp_eligible,
+					xp_ineligible_reason = player_data.xp_ineligible_reason,
+				}
+			end
+			print("[XHS game-complete] inbound " .. json.encode({
+				completion = data.completion,
+				players = inbound_players,
+			}))
 			if FragmentQuests ~= nil then
 				FragmentQuests:OnBackendComplete(true, data)
 			end
-			api:ProcessCompletedGame(data, payload)
+			api:ProcessCompletedGame(data, completed_display_payload)
 		end,
 
 		function(data)

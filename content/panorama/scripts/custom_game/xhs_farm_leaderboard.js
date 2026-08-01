@@ -6,12 +6,16 @@
 	var ROW_HEIGHT = 50;
 	var ROW_GAP = 4;
 	var ROW_STRIDE = ROW_HEIGHT + ROW_GAP;
+	var ROWS_VERTICAL_PADDING = 8;
 	var cards = {};
 	var layerApplied = false;
 	var moveToken = 0;
 	var lastPhase = "";
 	var archiveExpanded = false;
 	var leaderboardCollapsed = false;
+	var leaderboardHidden = false;
+	var leaderboardArchived = false;
+	var leaderboardPlayerCount = 0;
 	var leaderboardWasActive = false;
 
 	function Panel(id) {
@@ -346,11 +350,45 @@
 			leaderboard.SetHasClass("IsReopened", archiveExpanded);
 		}
 		if (toggle) {
-			toggle.SetHasClass("IsExpanded", archiveExpanded);
+			toggle.SetHasClass("IsExpanded", archiveExpanded && !leaderboardHidden);
 		}
 		if (toggleLabel) {
-			toggleLabel.text = archiveExpanded ? "\u203A" : "\u2039";
+			toggleLabel.text = archiveExpanded && !leaderboardHidden ? "\u203A" : "\u2039";
 		}
+		RefreshExternalToggle();
+	}
+
+	function RefreshExternalToggle() {
+		var toggle = Panel("XHSFarmLeaderboardToggle");
+		if (toggle) {
+			toggle.SetHasClass("IsVisible", leaderboardHidden || (leaderboardArchived && !archiveExpanded));
+		}
+	}
+
+	function UpdateRowsHeight() {
+		var rows = Panel("XHSFarmLeaderboardRows");
+		if (rows) {
+			rows.style.height = leaderboardCollapsed
+				? "50px"
+				: String(Math.max(64, leaderboardPlayerCount * ROW_STRIDE + ROWS_VERTICAL_PADDING)) + "px";
+		}
+	}
+
+	function SetLeaderboardHidden(hidden) {
+		leaderboardHidden = hidden === true;
+		var leaderboard = Panel("XHSFarmLeaderboard");
+		var toggle = Panel("XHSFarmLeaderboardToggle");
+		var toggleLabel = Panel("XHSFarmLeaderboardToggleLabel");
+		if (leaderboard) {
+			leaderboard.SetHasClass("IsFullyHidden", leaderboardHidden);
+		}
+		if (toggle) {
+			toggle.SetHasClass("IsExpanded", false);
+		}
+		if (toggleLabel && leaderboardHidden) {
+			toggleLabel.text = "\u2039";
+		}
+		RefreshExternalToggle();
 	}
 
 	function SetLeaderboardCollapsed(collapsed) {
@@ -367,6 +405,7 @@
 		if (collapseLabel) {
 			collapseLabel.text = leaderboardCollapsed ? "\u25BC" : "\u25B2";
 		}
+		UpdateRowsHeight();
 	}
 
 	function UpdateCelebration(data, players, phase) {
@@ -431,20 +470,20 @@
 		var available = IsTruthy(data.available);
 		var phase = (data.phase || (active ? "active" : "archived")).toString();
 		var archived = available && !active;
-		var toggle = Panel("XHSFarmLeaderboardToggle");
+		leaderboardArchived = archived;
 
 		leaderboard.SetHasClass("IsArchived", archived);
-		if (toggle) {
-			toggle.SetHasClass("IsVisible", archived);
-		}
+		RefreshExternalToggle();
 		if (!active && !available) {
 			leaderboard.SetHasClass("IsVisible", false);
+			SetLeaderboardHidden(false);
 			leaderboardWasActive = false;
 			return;
 		}
 		if (active) {
 			if (!leaderboardWasActive) {
 				SetLeaderboardCollapsed(false);
+				SetLeaderboardHidden(false);
 			}
 			archiveExpanded = false;
 			leaderboard.SetHasClass("IsVisible", true);
@@ -452,6 +491,7 @@
 		} else {
 			if (leaderboardWasActive) {
 				SetLeaderboardCollapsed(false);
+				SetLeaderboardHidden(false);
 			}
 			SetArchiveExpanded(archiveExpanded);
 		}
@@ -478,8 +518,9 @@
 		}
 
 		RemoveMissingCards(activePlayerIDs);
+		leaderboardPlayerCount = players.length;
 		rows.SetHasClass("IsWaiting", players.length === 0);
-		rows.style.height = String(Math.max(54, players.length * ROW_STRIDE)) + "px";
+		UpdateRowsHeight();
 		lastPhase = phase;
 		leaderboardWasActive = active;
 	}
@@ -495,14 +536,25 @@
 		var toggle = Panel("XHSFarmLeaderboardToggle");
 		if (toggle) {
 			toggle.SetPanelEvent("onactivate", function () {
-				SetArchiveExpanded(!archiveExpanded);
+				if (leaderboardHidden) {
+					SetLeaderboardHidden(false);
+				} else {
+					SetArchiveExpanded(!archiveExpanded);
+				}
 				Game.EmitSound("ui_generic_button_click");
 			});
 		}
-		var collapseButton = Panel("XHSFarmLeaderboardCollapse");
-		if (collapseButton) {
-			collapseButton.SetPanelEvent("onactivate", function () {
+		var headerToggle = Panel("XHSFarmLeaderboardHeaderToggle");
+		if (headerToggle) {
+			headerToggle.SetPanelEvent("onactivate", function () {
 				SetLeaderboardCollapsed(!leaderboardCollapsed);
+				Game.EmitSound("ui_generic_button_click");
+			});
+		}
+		var hideButton = Panel("XHSFarmLeaderboardHide");
+		if (hideButton) {
+			hideButton.SetPanelEvent("onactivate", function () {
+				SetLeaderboardHidden(true);
 				Game.EmitSound("ui_generic_button_click");
 			});
 		}

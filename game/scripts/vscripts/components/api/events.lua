@@ -204,6 +204,7 @@ CDOTAGameRules.SetGameWinner = function(self, iTeamNumber, bSkipRecord)
 	end
 	api.end_game_started = true
 	api:CompleteGame()
-	-- The Panorama EndScreen must not depend on the backend response time.
-	return original_SetGameWinner(self, iTeamNumber)
+	-- CompleteGame publishes the final/fallback payload first, then calls this
+	-- wrapper with bSkipRecord=true after the nettable had time to replicate.
+	return
 end

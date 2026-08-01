@@ -5931,17 +5931,6 @@
 	text-shadow: 0px 1px 3px 2 #000000;
 }
 
-.xhs-bot-setup-dev-badge {
-	vertical-align: center;
-	padding: 2px 5px 1px 5px;
-	color: #77ddff;
-	font-size: 9px;
-	font-weight: bold;
-	letter-spacing: 1px;
-	background-color: #0b3444dd;
-	border: 1px solid #61d9ff55;
-}
-
 .xhs-bot-setup-field-row {
 	width: 100%;
 	height: 29px;
@@ -6109,9 +6098,60 @@
 }
 
 .player-loading-row.PlayerLoadingBot {
+	height: 62px;
 	background-color: gradient(linear, 0% 0%, 100% 0%, from(#0b2732ee), to(#101c27ee));
 	border-color: #5bd7ff3d;
 	cursor: default;
+}
+
+DropDownMenu.DropDownMenuVisible {
+	width: 140px;
+}
+
+.xhs-bot-hero-dropdown {
+	width: 140px;
+	height: 22px;
+	position: 52px 33px 0px;
+	padding: 0px 22px 0px 5px;
+	background-color: #081923ee;
+	border: 1px solid #55cfee55;
+	cursor: pointer;
+	transition-property: brightness, border;
+	transition-duration: 0.12s;
+}
+
+.xhs-bot-hero-dropdown:hover {
+	brightness: 1.25;
+	border-color: #7ee7ff99;
+}
+
+.xhs-bot-hero-dropdown.Disabled {
+	brightness: 0.65;
+	saturation: 0.55;
+	cursor: default;
+}
+
+.xhs-bot-hero-option {
+	width: 100%;
+	height: 19px;
+	padding: 1px 4px;
+	color: #c9f4ff;
+	font-family: Reaver;
+	font-size: 12px;
+	text-align: left center;
+	text-overflow: ellipsis;
+	background-size: 16px 16px;
+	background-repeat: no-repeat;
+	background-position: 4px 50%;
+}
+
+.xhs-bot-hero-option.HasHeroIcon {
+	padding-left: 24px;
+}
+
+.xhs-bot-hero-option:hover {
+	color: white;
+	background-color: #31515b;
 }
 
 .player-loading-row.PlayerLoadingBot.PlayerLoadingStatic:hover {

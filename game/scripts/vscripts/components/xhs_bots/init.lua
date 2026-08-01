@@ -281,23 +281,29 @@ function XHSBots:Init()
 			revision = self.revision,
 			status = self.status,
 		})
-		self:PushConfiguration()
+		if not self.locked then
+			-- Older Tools sessions used to force approval. Recompute from the
+			-- real immutable votes when this module is hot-reloaded.
+			self.setup_vote_locked = false
+			self:RefreshSetupVoteState()
+		else
+			self:PushConfiguration()
+		end
 		self:StartQAAutoSoakIfArmed()
 		return
 	end
 	self.initialized = true
-	-- The component is available in production, but remains inert with a zero
-	-- bot configuration until every persistent human explicitly opts in. Tools
-	-- mode bypasses only that vote so local QA can still launch immediately.
+	-- The component remains inert until every persistent human explicitly opts
+	-- in. Tools mode exposes QA commands, but never falsifies the normal vote.
 	self.enabled = true
-	self.setup_approved = IsInToolsMode()
-	self.setup_vote_locked = IsInToolsMode()
+	self.setup_approved = false
+	self.setup_vote_locked = false
 	self.setup_votes = {}
 
 	self.configuration = XHSBotConfig:Normalize({}, self:GetSetupHumanIdentityCount())
 	self.configuration.count = 0
 	self.configuration.spectator_mode = false
-	self.status = self.setup_approved and "ready" or "awaiting_unanimous_vote"
+	self.status = "awaiting_unanimous_vote"
 	self.controller_player_id = self:FindControllerPlayerID()
 
 	self:RegisterQACommands()
@@ -325,7 +331,7 @@ function XHSBots:Init()
 				event_user_id = event and event.userid,
 			})
 			XHSBots:StartControllerRefresh("player_connect_full")
-			if not IsInToolsMode() and not XHSBots.setup_vote_locked then
+			if not XHSBots.setup_vote_locked then
 				XHSBots:RefreshSetupVoteState()
 			end
 		end)
@@ -339,9 +345,7 @@ function XHSBots:Init()
 	self:PushConfiguration()
 	self:PushRoster()
 	self:StartControllerRefresh("init")
-	if not IsInToolsMode() then
-		self:RefreshSetupVoteState()
-	end
+	self:RefreshSetupVoteState()
 	self:StartQAAutoSoakIfArmed()
 	SetupLog("init_completed", {
 		controller_player_id = self.controller_player_id,
@@ -423,6 +427,15 @@ function XHSBots:StartQAAutoSoakIfArmed()
 			and GameMode.CustomSetupState ~= nil
 			and GameMode.CustomSetupState.active == true
 		if setupActive then
+			-- Arming this one-shot command is an explicit Tools-only opt-in.
+			-- Mirror unanimous consent for its unattended QA launch, while the
+			-- ordinary Tools UI continues to obey the loading-screen vote.
+			if not XHSBots.setup_approved then
+				for _, playerID in ipairs(XHSBots:GetEligibleSetupVoters()) do
+					XHSBots.setup_votes[playerID] = 1
+				end
+				XHSBots:RefreshSetupVoteState()
+			end
 			local ok, message = XHSBots:ApplyConfiguration({
 				count = 8,
 				difficulty = "easy",
@@ -486,16 +499,6 @@ function XHSBots:GetEligibleSetupVoters()
 end
 
 function XHSBots:RefreshSetupVoteState()
-	if IsInToolsMode() then
-		self.setup_approved = true
-		self.setup_vote_locked = true
-		self.status = self.locked and self.status or "ready"
-		self.setup_vote_yes = 1
-		self.setup_vote_total = 1
-		self:PushConfiguration()
-		return true
-	end
-
 	local voters = self:GetEligibleSetupVoters()
 	local yesCount = 0
 	local noCount = 0
@@ -753,10 +756,20 @@ function XHSBots:StartSpectatorFollowMonitor(reason)
 end
 
 function XHSBots:OnSpectatorCamera(sourceIndex, event)
-	if not self.enabled or not IsInToolsMode() then return end
+	if not IsInToolsMode() then return end
 
 	local senderPlayerID = self:ResolveSenderPlayerID(sourceIndex)
 	local spectatorPlayerID = tonumber(self.spectator_controller_player_id) or -1
+	-- Observer clients can lack a normal hero/player entity while loading, and
+	-- some Source 2 builds consequently fail both source-index resolution
+	-- paths. This fallback is still locked to the single server-selected
+	-- spectator controller and exists only in Tools mode.
+	if senderPlayerID < 0 then
+		local claimedPlayerID = math.floor(tonumber(event and event.local_player_id) or -1)
+		if claimedPlayerID == spectatorPlayerID then
+			senderPlayerID = claimedPlayerID
+		end
+	end
 	local senderTeam = senderPlayerID >= 0
 		and PlayerResource ~= nil
 		and PlayerResource.GetTeam ~= nil
@@ -779,15 +792,21 @@ function XHSBots:OnSpectatorCamera(sourceIndex, event)
 		self.spectator_follow_monitor_generation =
 			(tonumber(self.spectator_follow_monitor_generation) or 0) + 1
 		CameraMotion:Release(senderPlayerID, {
-			owner = "spectator_follow",
 			mode = "free",
-			reason = "spectator follow cleared",
+			reason = "spectator requested free camera",
 		})
 		self:PushSpectatorCameraState("free camera", false)
 		return
 	end
 	if not XHSBotPlayerRegistry:IsXHSBotPlayerID(targetPlayerID) then return end
 
+	-- A manual FOLLOW click is authoritative user input. Clear any stale camera
+	-- owner first so a cancelled cinematic or old follow cannot reject it on
+	-- owner/priority grounds.
+	CameraMotion:Release(senderPlayerID, {
+		mode = "free",
+		reason = "spectator requested follow",
+	})
 	self.spectator_follow_enabled = true
 	self.spectator_follow_player_id = targetPlayerID
 	self.spectator_follow_entindex = -1
@@ -2176,6 +2195,7 @@ function XHSBots:OnConfigure(sourceIndex, event)
 		difficulty = event and (event.difficulty or event.ai_difficulty),
 		composition = event and event.composition,
 		spectator_mode = event and event.spectator_mode,
+		hero_selections = event and event.hero_selections,
 	})
 	SetupLog("configure_event_completed", {
 		applied = applied,
@@ -2187,9 +2207,13 @@ end
 
 function XHSBots:BuildConfigurationNetTable()
 	local configuration = self.configuration or XHSBotConfig:CopyDefaults()
+	local supportedHeroes = XHSBotHeroProfiles ~= nil
+		and XHSBotHeroProfiles.GetCertifiedHeroOptions ~= nil
+		and XHSBotHeroProfiles:GetCertifiedHeroOptions()
+		or {}
 	return {
 		available = self.enabled and self.setup_approved and 1 or 0,
-		vote_required = not IsInToolsMode() and 1 or 0,
+		vote_required = 1,
 		vote_approved = self.setup_approved and 1 or 0,
 		vote_locked = self.setup_vote_locked and 1 or 0,
 		vote_yes = tonumber(self.setup_vote_yes) or 0,
@@ -2202,6 +2226,8 @@ function XHSBots:BuildConfigurationNetTable()
 		ai_difficulty = configuration.difficulty or "normal",
 		composition = configuration.composition or "balanced",
 		spectator_mode = configuration.spectator_mode and 1 or 0,
+		hero_selections = configuration.hero_selections or {},
+		supported_heroes = supportedHeroes,
 		controller_player_id = tonumber(self.controller_player_id) or -1,
 		revision = self.revision,
 		locked = self.locked and 1 or 0,
@@ -2271,6 +2297,9 @@ function XHSBots:BuildRosterNetTable()
 
 	local nextPreviewPlayerID = 0
 	local requestedCount = math.max(0, math.floor(tonumber(self.configuration.count) or 0))
+	local configuredHeroes = type(self.configuration.hero_selections) == "table"
+		and self.configuration.hero_selections
+		or {}
 	for slot = 1, requestedCount do
 		local slotEntry = recordsBySlot[slot]
 		local playerID = slotEntry and slotEntry.player_id or nil
@@ -2295,7 +2324,10 @@ function XHSBots:BuildRosterNetTable()
 			name = record and record.name
 				or XHSBotProvisioner:GetDisplayName(slot),
 			hero = IsValidHero(hero) and hero:GetUnitName()
-				or (record and record.requested_hero or "npc_dota_hero_wisp"),
+				or (record and record.requested_hero
+					or configuredHeroes[slot]
+					or "npc_dota_hero_wisp"),
+			hero_selection = configuredHeroes[slot] or "",
 			difficulty = record and record.difficulty or self.configuration.difficulty,
 			role = record and record.role or "",
 			ready = 1,
@@ -2727,6 +2759,19 @@ function XHSBots:OnBotHeroReady(playerID, hero)
 	record.hero_assigned = true
 	record.error = nil
 	record.next_think_at = GameRules:GetGameTime() + (record.slot or 1) * 0.07
+	-- Bots can be provisioned after the initial Supporter Pass publication.
+	-- Publish a canonical per-player row now so scoreboards never retain their
+	-- legacy XML placeholders (Rookie, 0 / 500) for these late participants.
+	if SupporterPass ~= nil and SupporterPass.BuildPlayerTable ~= nil then
+		local supporterTable = SupporterPass:BuildPlayerTable(playerID)
+		if type(supporterTable) == "table" then
+			CustomNetTables:SetTableValue(
+				"supporter_pass_player",
+				tostring(playerID),
+				supporterTable
+			)
+		end
+	end
 	self:PushRoster()
 end
 

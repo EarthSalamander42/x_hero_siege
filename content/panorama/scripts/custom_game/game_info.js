@@ -26,31 +26,71 @@
 		}
 	}
 
+	function FindHudAncestor(panel) {
+		for (var current = panel; current; current = current.GetParent ? current.GetParent() : null) {
+			if (current.id === "Hud") {
+				return current;
+			}
+		}
+
+		return null;
+	}
+
+	function GetHudDirectChild(panel, hud) {
+		var current = panel;
+
+		while (current && current.GetParent && current.GetParent() !== hud) {
+			current = current.GetParent();
+		}
+
+		return current && current.GetParent && current.GetParent() === hud ? current : null;
+	}
+
 	function RaiseGameInfoShell(shell) {
 		if (!shell) {
-			return;
+			return false;
 		}
 
-		// GameInfoPanel is Valve's wrapper around this custom layout. Keep the
-		// fix local to that wrapper: moving it to the end of its own sibling
-		// list raises the open drawer above lower_hud and the minimap without
-		// changing the stacking order of any other custom or vanilla HUD root.
+		// GameInfoPanel is Valve's wrapper around this custom layout. The minimap
+		// and lower HUD live in a separate branch, so sibling ordering inside the
+		// original GameInfo host cannot put the drawer above them. Reparent only
+		// this wrapper to Hud and place it immediately after HUDElements. Custom
+		// roots that follow HUDElements keep their existing relative priority.
 		shell.style.zIndex = "1000";
 
-		var parent = shell.GetParent ? shell.GetParent() : null;
-		if (!parent || !parent.GetChildCount || !parent.GetChild || !parent.MoveChildAfter) {
+		var hud = FindHudAncestor(shell);
+		if (!hud || !hud.FindChildTraverse || !hud.MoveChildAfter) {
+			return false;
+		}
+
+		var hudElements = hud.FindChildTraverse("HUDElements");
+		var hudElementsRoot = GetHudDirectChild(hudElements, hud);
+		if (!hudElementsRoot || hudElementsRoot === shell) {
+			return false;
+		}
+
+		if (shell.GetParent() !== hud) {
+			shell.SetParent(hud);
+		}
+
+		if (shell.GetParent() !== hud) {
+			return false;
+		}
+
+		hud.MoveChildAfter(shell, hudElementsRoot);
+		return true;
+	}
+
+	function MaintainGameInfoLayer(shell) {
+		if (!shell || !shell.IsValid || !shell.IsValid()) {
+			$.Schedule(0.25, StyleGameInfoShell);
 			return;
 		}
 
-		var childCount = parent.GetChildCount();
-		if (childCount < 2) {
-			return;
-		}
-
-		var lastSibling = parent.GetChild(childCount - 1);
-		if (lastSibling && lastSibling !== shell) {
-			parent.MoveChildAfter(shell, lastSibling);
-		}
+		RaiseGameInfoShell(shell);
+		$.Schedule(1.0, function() {
+			MaintainGameInfoLayer(shell);
+		});
 	}
 
 	function StyleGameInfoShell() {
@@ -70,6 +110,7 @@
 		AddClass(icon, "XHSGameInfoIcon");
 		AddClass(openClose, "XHSGameInfoOpenClose");
 		RaiseGameInfoShell(shell);
+		MaintainGameInfoLayer(shell);
 
 		// Fallback styles for Valve's wrapper, which lives outside this custom layout.
 		shell.style.width = "600px";

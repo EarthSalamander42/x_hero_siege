@@ -4,7 +4,7 @@
 	"addon_game_name"				"x_hero_siege"
 	"addonversion"					"4.0"
 	"addontagline"					"X HERO SIEGE WARCRAFT 3 MAP"
-	"addonauthor"					"[Bear] Cookies #42"
+	"addonauthor"					"Cookies #42"
 	"addonSteamGroupName"			"X_Hero_Siege"
 	"addonauthorSteamID"			"76561198015161808"
 	"addonContent_Campaign"			"0"
@@ -15,7 +15,7 @@
 
 	"x_hero_siege_8"
 	{
-		"MaxPlayers"			"8"
+		"MaxPlayers"			"9"
 	}
 
 	"x_hero_siege_demo"

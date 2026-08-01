@@ -84,9 +84,9 @@
 						<Label text="{d:player_potions}" class="ScoreLabelValue"/>
 						<Panel id="es-player-xp0" class="es-player-xp">
 							<Panel id="es-player-xp-progress0" class="es-player-xp-progress" />
-							<Label id="es-player-xp-rank-name0" class="es-player-xp-rank-name es-player-line-text es-legend-rank" text="Rookie" /> 
+							<Label id="es-player-xp-rank-name0" class="es-player-xp-rank-name es-player-line-text es-legend-rank" text="Supporter Pass" />
 							<Label id="es-player-xp-level0" class="es-player-xp-level" text="Level: 1" />
-							<Label id="es-player-xp-rank0" class="es-player-xp-rank" text="0 / 500" />
+							<Label id="es-player-xp-rank0" class="es-player-xp-rank" text="0 / 1000" />
 						</Panel> 
 					</Panel>
 				</Panel>
@@ -102,9 +102,9 @@
 						<Label text="{d:ally_potions1}" class="ScoreLabelValue"/>
 						<Panel id="es-player-xp1" class="es-player-xp">
 							<Panel id="es-player-xp-progress1" class="es-player-xp-progress" />
-							<Label id="es-player-xp-rank-name1" class="es-player-xp-rank-name es-player-line-text es-legend-rank" text="Rookie" /> 
+							<Label id="es-player-xp-rank-name1" class="es-player-xp-rank-name es-player-line-text es-legend-rank" text="Supporter Pass" />
 							<Label id="es-player-xp-level1" class="es-player-xp-level" text="Level: 1" />
-							<Label id="es-player-xp-rank1" class="es-player-xp-rank" text="0 / 500" />
+							<Label id="es-player-xp-rank1" class="es-player-xp-rank" text="0 / 1000" />
 						</Panel> 
 					</Panel>
 				</Panel>
@@ -120,9 +120,9 @@
 						<Label text="{d:ally_potions2}" class="ScoreLabelValue"/>
 						<Panel id="es-player-xp2" class="es-player-xp">
 							<Panel id="es-player-xp-progress2" class="es-player-xp-progress" />
-							<Label id="es-player-xp-rank-name2" class="es-player-xp-rank-name es-player-line-text es-legend-rank" text="Rookie" /> 
+							<Label id="es-player-xp-rank-name2" class="es-player-xp-rank-name es-player-line-text es-legend-rank" text="Supporter Pass" />
 							<Label id="es-player-xp-level2" class="es-player-xp-level" text="Level: 1" />
-							<Label id="es-player-xp-rank2" class="es-player-xp-rank" text="0 / 500" />
+							<Label id="es-player-xp-rank2" class="es-player-xp-rank" text="0 / 1000" />
 						</Panel> 
 					</Panel>
 				</Panel>
@@ -138,9 +138,9 @@
 						<Label text="{d:ally_potions3}" class="ScoreLabelValue"/>
 						<Panel id="es-player-xp3" class="es-player-xp">
 							<Panel id="es-player-xp-progress3" class="es-player-xp-progress" />
-							<Label id="es-player-xp-rank-name3" class="es-player-xp-rank-name es-player-line-text es-legend-rank" text="Rookie" /> 
+							<Label id="es-player-xp-rank-name3" class="es-player-xp-rank-name es-player-line-text es-legend-rank" text="Supporter Pass" />
 							<Label id="es-player-xp-level3" class="es-player-xp-level" text="Level: 1" />
-							<Label id="es-player-xp-rank3" class="es-player-xp-rank" text="0 / 500" />
+							<Label id="es-player-xp-rank3" class="es-player-xp-rank" text="0 / 1000" />
 						</Panel> 
 					</Panel>
 				</Panel>
@@ -156,9 +156,9 @@
 						<Label text="{d:ally_potions4}" class="ScoreLabelValue"/>
 						<Panel id="es-player-xp4" class="es-player-xp">
 							<Panel id="es-player-xp-progress4" class="es-player-xp-progress" />
-							<Label id="es-player-xp-rank-name4" class="es-player-xp-rank-name es-player-line-text es-legend-rank" text="Rookie" /> 
+							<Label id="es-player-xp-rank-name4" class="es-player-xp-rank-name es-player-line-text es-legend-rank" text="Supporter Pass" />
 							<Label id="es-player-xp-level4" class="es-player-xp-level" text="Level: 1" />
-							<Label id="es-player-xp-rank4" class="es-player-xp-rank" text="0 / 500" />
+							<Label id="es-player-xp-rank4" class="es-player-xp-rank" text="0 / 1000" />
 						</Panel> 
 					</Panel>
 				</Panel>
@@ -174,9 +174,9 @@
 						<Label text="{d:ally_potions5}" class="ScoreLabelValue"/>
 						<Panel id="es-player-xp5" class="es-player-xp">
 							<Panel id="es-player-xp-progress5" class="es-player-xp-progress" />
-							<Label id="es-player-xp-rank-name5" class="es-player-xp-rank-name es-player-line-text es-legend-rank" text="Rookie" /> 
+							<Label id="es-player-xp-rank-name5" class="es-player-xp-rank-name es-player-line-text es-legend-rank" text="Supporter Pass" />
 							<Label id="es-player-xp-level5" class="es-player-xp-level" text="Level: 1" />
-							<Label id="es-player-xp-rank5" class="es-player-xp-rank" text="0 / 500" />
+							<Label id="es-player-xp-rank5" class="es-player-xp-rank" text="0 / 1000" />
 						</Panel> 
 					</Panel>
 				</Panel>
@@ -192,9 +192,9 @@
 						<Label text="{d:ally_potions6}" class="ScoreLabelValue"/>
 						<Panel id="es-player-xp6" class="es-player-xp">
 							<Panel id="es-player-xp-progress6" class="es-player-xp-progress" />
-							<Label id="es-player-xp-rank-name6" class="es-player-xp-rank-name es-player-line-text es-legend-rank" text="Rookie" /> 
+							<Label id="es-player-xp-rank-name6" class="es-player-xp-rank-name es-player-line-text es-legend-rank" text="Supporter Pass" />
 							<Label id="es-player-xp-level6" class="es-player-xp-level" text="Level: 1" />
-							<Label id="es-player-xp-rank6" class="es-player-xp-rank" text="0 / 500" />
+							<Label id="es-player-xp-rank6" class="es-player-xp-rank" text="0 / 1000" />
 						</Panel> 
 					</Panel>
 				</Panel>
@@ -210,9 +210,9 @@
 						<Label text="{d:ally_potions7}" class="ScoreLabelValue"/>
 						<Panel id="es-player-xp7" class="es-player-xp">
 							<Panel id="es-player-xp-progress7" class="es-player-xp-progress" />
-							<Label id="es-player-xp-rank-name7" class="es-player-xp-rank-name es-player-line-text es-legend-rank" text="Rookie" /> 
+							<Label id="es-player-xp-rank-name7" class="es-player-xp-rank-name es-player-line-text es-legend-rank" text="Supporter Pass" />
 							<Label id="es-player-xp-level7" class="es-player-xp-level" text="Level: 1" />
-							<Label id="es-player-xp-rank7" class="es-player-xp-rank" text="0 / 500" />
+							<Label id="es-player-xp-rank7" class="es-player-xp-rank" text="0 / 1000" />
 						</Panel> 
 					</Panel>
 				</Panel>

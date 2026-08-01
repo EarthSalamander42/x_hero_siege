@@ -125,15 +125,7 @@ ListenToGameEvent('npc_spawned', function(event)
 		end
 	end
 
-	if npc:IsIllusion() or string.find(npc:GetUnitName(), "npc_dota_lone_druid_bear") then
-		if ply_table then
-			if ply_table.toggle_tag ~= nil and ply_table.toggle_tag == 1 or ply_table.toggle_tag ~= nil and ply_table.toggle_tag == true then
-				Battlepass:ApplySupporterTag(npc, true)
-			end
-		end
-
-		return
-	elseif npc:IsRealHero() then
+	if npc:IsRealHero() then
 		if Battlepass.ENTITY_MODEL_OVERRIDE[unit_name] then
 			npc:SetOriginalModel(Battlepass.ENTITY_MODEL_OVERRIDE[unit_name])
 			npc:SetModel(Battlepass.ENTITY_MODEL_OVERRIDE[unit_name])
@@ -141,13 +133,6 @@ ListenToGameEvent('npc_spawned', function(event)
 
 		-- The commented out lines here are what I used to test in tools mode
 		if api:IsDonator(npc:GetPlayerID()) or string.find(GetMapName(), "demo") then
-			-- if api:IsDonator(npc:GetPlayerID()) and PlayerResource:GetConnectionState(npc:GetPlayerID()) ~= 1 or (IsInToolsMode()) then
-			if ply_table then
-				if ply_table.toggle_tag ~= nil and ply_table.toggle_tag == 1 or ply_table.toggle_tag ~= nil and ply_table.toggle_tag == true then
-					Battlepass:ApplySupporterTag(npc, true)
-				end
-			end
-
 			if api:GetDonatorStatus(npc:GetPlayerID()) == 10 then
 				npc:SetOriginalModel("models/items/courier/kanyu_shark/kanyu_shark.vmdl")
 				npc:CenterCameraOnEntity(npc, -1)
@@ -155,7 +140,6 @@ ListenToGameEvent('npc_spawned', function(event)
 				if unit_name ~= "npc_dota_hero_wisp" then
 					npc:AddNewModifier(npc, nil, "modifier_patreon_donator", {})
 				end
-
 			end
 		end
 

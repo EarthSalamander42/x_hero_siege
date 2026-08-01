@@ -388,8 +388,30 @@ function XHSDevTools:BuildPerformanceState()
 	snapshot.phase_one_spawn_budget = GetPhaseOneSpawnBudgetState ~= nil
 		and GetPhaseOneSpawnBudgetState()
 		or {}
+	snapshot.wave_stager = XHSWaveStager ~= nil
+		and XHSWaveStager.GetState ~= nil
+		and XHSWaveStager:GetState()
+		or {}
 
 	snapshot.scan_ms = math.max(0, (PerformanceProfileNow() - startedAt) * 1000)
+
+	-- Session extrema are authoritative on the server so reconnecting or
+	-- rebuilding Panorama does not erase evidence of a slowdown. A deliberate
+	-- pause is excluded because simulation health can legitimately reach zero.
+	local gameState = GameRules:State_Get()
+	local paused = GameRules.IsGamePaused ~= nil and GameRules:IsGamePaused()
+	if gameState == DOTA_GAMERULES_STATE_GAME_IN_PROGRESS and not paused then
+		self.performance_sim_health_low_pct = math.min(
+			self.performance_sim_health_low_pct or snapshot.sim_health_pct,
+			snapshot.sim_health_pct
+		)
+		self.performance_creeps_high = math.max(
+			self.performance_creeps_high or 0,
+			snapshot.creeps
+		)
+	end
+	snapshot.sim_health_low_pct = self.performance_sim_health_low_pct
+	snapshot.creeps_high = self.performance_creeps_high
 
 	return snapshot
 end
@@ -1407,10 +1429,6 @@ function XHSDevTools:RefreshTemporaryDonatorStatus(playerID)
 				end
 			end
 		end
-
-		-- if hero.SetupHealthBarLabel ~= nil then
-		-- hero:SetupHealthBarLabel()
-		-- end
 	end
 end
 
@@ -1539,7 +1557,7 @@ function XHSDevTools:BuildBattlepassDevCatalog()
 
 	if ItemsGame == nil then return {} end
 	for _, trackData in ipairs({
-		{ id = "free", rewards = ItemsGame.battlepass or {} },
+		{ id = "free",    rewards = ItemsGame.battlepass or {} },
 		{ id = "premium", rewards = ItemsGame.battlepass2 or {} },
 	}) do
 		for _, reward in pairs(trackData.rewards) do

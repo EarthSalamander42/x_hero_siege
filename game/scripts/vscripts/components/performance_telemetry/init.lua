@@ -13,7 +13,7 @@ local SERVER_PACING_INTERVAL = 0.1
 local SERVER_PACING_GRACE = 0.04
 local CLIENT_FPS_INCIDENT = 40
 local INCIDENT_CONTEXT_SAMPLES = 4
-local LOCAL_REPORT_SCHEMA_VERSION = 4
+local LOCAL_REPORT_SCHEMA_VERSION = 5
 local LOCAL_REPORT_MAX_SAMPLES = math.ceil(3 * 60 * 60 / SAMPLE_INTERVAL)
 local LOCAL_REPORT_TOP_SOURCES = 3
 local LOCAL_REPORT_PREFIX = "[XHS_PERF_REPORT"
@@ -29,6 +29,14 @@ local ACTIVITY_INCIDENT_THRESHOLDS = {
 	creep_orders_blocked_wrong_owner_per_second = {
 		threshold = 0.1,
 		reason = "creep_order_wrong_owner_blocked",
+	},
+	wave_stage_create_failures_per_second = {
+		threshold = 0.1,
+		reason = "wave_stage_create_failure",
+	},
+	wave_stage_release_missing_per_second = {
+		threshold = 0.1,
+		reason = "wave_stage_release_missing",
 	},
 	ai_thinks_per_second = { threshold = 300, reason = "ai_think_pressure" },
 	wave_thinks_per_second = { threshold = 800, reason = "wave_think_pressure" },
@@ -402,6 +410,7 @@ function XHSPerformanceTelemetry:CaptureLocalReportSample(sample)
 	self.local_report_samples = self.local_report_samples or {}
 	local activity = sample.activity or {}
 	local director = sample.ai_director or {}
+	local stager = sample.wave_stager or {}
 	local client = self:BuildLocalClientSnapshot(sample.players)
 	local bots = self:BuildLocalBotSnapshot()
 	local hostTimescale = tonumber(activity.host_timescale)
@@ -448,8 +457,16 @@ function XHSPerformanceTelemetry:CaptureLocalReportSample(sample)
 			sample.ability_controllers,
 			sample.movement_owner_ai,
 			sample.movement_owner_wave,
+			stager.enabled == false and 0 or 1,
+			stager.active_jobs or 0,
+			stager.staged_units or 0,
+			stager.pending_units or 0,
+			stager.cleanup_units or 0,
+			stager.global_cap or 0,
+			Round(stager.create_cost_max_ms or 0, 3),
 			director.active_agents or 0,
 			director.queued_agents or 0,
+			director.staged_agents or 0,
 			director.cached_profiles or 0,
 			director.profiles_without_actives or 0,
 			director.budget or 0,
@@ -472,6 +489,15 @@ function XHSPerformanceTelemetry:CaptureLocalReportSample(sample)
 			ActivityValue(activity, "creep_orders_blocked_wrong_owner_per_second"),
 			ActivityValue(activity, "creep_orders_deduplicated_per_second"),
 			ActivityValue(activity, "creep_order_owner_handoffs_per_second"),
+			ActivityValue(activity, "wave_stage_units_created_per_second"),
+			ActivityValue(activity, "wave_stage_units_fallback_created_per_second"),
+			ActivityValue(activity, "wave_stage_units_released_per_second"),
+			ActivityValue(activity, "wave_stage_units_cancelled_per_second"),
+			ActivityValue(activity, "wave_stage_capacity_deferred_per_second"),
+			ActivityValue(activity, "wave_stage_create_failures_per_second"),
+			ActivityValue(activity, "wave_stage_release_missing_per_second"),
+			ActivityValue(activity, "wave_stage_create_cost_ms_per_second"),
+			ActivityValue(activity, "wave_stage_ai_wakes_per_second"),
 			ActivityValue(activity, "damage_events_per_second"),
 			ActivityValue(activity, "ability_casts_per_second"),
 			ActivityValue(activity, "projectiles_per_second"),
@@ -547,15 +573,21 @@ function XHSPerformanceTelemetry:PrintLocalReport(reason)
 		"creeps", "units", "heroes", "bosses", "summons", "breakables",
 		"other", "thinkers", "ai_ctrl", "wave_ctrl", "ability_ctrl",
 		"movement_owner_ai", "movement_owner_wave",
-		"director_active", "director_queued", "profiles", "profiles_passive",
+		"staging_enabled", "stage_jobs", "staged_units", "stage_pending",
+		"stage_cleanup", "stage_cap", "stage_create_max_ms",
+		"director_active", "director_queued", "director_staged",
+		"profiles", "profiles_passive",
 		"director_budget", "ai_s", "ai_processed_s", "ai_sleeping_s",
 		"wave_s", "ability_s", "spatial_s", "spatial_hits_s",
 		"spatial_cost_ms_s", "spatial_max_ms", "cache_hits_s",
 		"cache_misses_s", "orders_s", "repeat_orders_s",
 		"creep_orders_ai_s", "creep_orders_wave_s",
 		"order_owner_conflicts_s", "orders_blocked_wrong_owner_s",
-		"orders_deduplicated_s", "order_owner_handoffs_s", "damage_s",
-		"casts_s", "projectiles_s", "spawns_s", "deaths_s",
+		"orders_deduplicated_s", "order_owner_handoffs_s",
+		"stage_created_s", "stage_fallback_s", "stage_released_s",
+		"stage_cancelled_s", "stage_deferred_s", "stage_create_fail_s",
+		"stage_release_missing_s", "stage_create_cost_ms_s", "stage_ai_wakes_s",
+		"damage_s", "casts_s", "projectiles_s", "spawns_s", "deaths_s",
 		"target_changes_s", "bots_configured", "bots_live", "bots_active",
 		"bots_paused", "bot_orders_s", "bot_order_reject_s", "bot_casts_s",
 		"bot_cast_reject_s", "bot_target_changes_s", "bot_decision_avg_ms",
@@ -789,6 +821,10 @@ function XHSPerformanceTelemetry:BuildSample()
 		or {}
 	sample.ai_director = directorState
 	sample.ability_controllers = tonumber(directorState.active_ability_agents) or 0
+	sample.wave_stager = XHSWaveStager ~= nil
+		and XHSWaveStager.GetState ~= nil
+		and XHSWaveStager:GetState()
+		or {}
 	if XHSPerformanceCounters ~= nil
 		and XHSPerformanceCounters.GetAggregateSnapshot ~= nil then
 		sample.activity = CopyTable(XHSPerformanceCounters:GetAggregateSnapshot(

@@ -540,6 +540,9 @@ function XHSBotProvisioner:RemoveSelectionTrigger(heroName)
 			if trigger ~= nil then
 				UTIL_Remove(trigger)
 			end
+			if XHSRemoveHeroSelectionMarkerForHero ~= nil then
+				XHSRemoveHeroSelectionMarkerForHero(shortName)
+			end
 			return
 		end
 	end
@@ -589,18 +592,14 @@ function XHSBotProvisioner:CompleteHeroAssignment(
 	if XHSBots ~= nil and XHSBots.OnBotHeroReady ~= nil then
 		XHSBots:OnBotHeroReady(playerID, newHero)
 	end
-	local counts = self:GetHeroAssignmentCounts()
-	if counts.total > 0 and counts.assigned == counts.total
-		and XHSBotOnlyAutonomyAllowed ~= nil
-		and XHSBotOnlyAutonomyAllowed()
-		and XHSCleanupHeroSelectionShowcase ~= nil then
-		local cleanupOK, removed, cleanupReason = pcall(
-			XHSCleanupHeroSelectionShowcase,
-			"all_bot_heroes_assigned"
+	if XHSTryCleanupHeroSelectionShowcase ~= nil then
+		local cleanupOK, cleaned, cleanupReason = pcall(
+			XHSTryCleanupHeroSelectionShowcase,
+			"bot_hero_assignment_complete"
 		)
 		ProvisionLog("selection_showcase_cleanup", {
 			ok = cleanupOK,
-			removed = removed,
+			cleaned = cleaned,
 			reason = cleanupReason,
 		})
 	end
@@ -798,12 +797,43 @@ function XHSBotProvisioner:TryAssignHeroes(configuration)
 	if #assignable == 0 then
 		return false, self:FormatHeroAssignmentStatus(counts, "no assignable bot")
 	end
+	table.sort(assignable, function(leftPlayerID, rightPlayerID)
+		local left = XHSBotPlayerRegistry:GetBot(leftPlayerID)
+		local right = XHSBotPlayerRegistry:GetBot(rightPlayerID)
+		return (tonumber(left and left.slot) or 999)
+			< (tonumber(right and right.slot) or 999)
+	end)
 
 	local unavailable = self:GetUnavailableHumanHeroes()
-	local heroes = XHSBotHeroProfiles:PickHeroes(#assignable, configuration.composition, unavailable)
+	local heroesByPlayerID = {}
+	local randomPlayerIDs = {}
+	local configuredHeroes = type(configuration.hero_selections) == "table"
+		and configuration.hero_selections
+		or {}
+	for _, playerID in ipairs(assignable) do
+		local record = XHSBotPlayerRegistry:GetBot(playerID)
+		local slot = math.max(1, math.floor(tonumber(record and record.slot) or 1))
+		local requestedHero = configuredHeroes[slot] or configuredHeroes[tostring(slot)]
+		if requestedHero ~= nil
+			and XHSBotHeroProfiles:IsCertified(requestedHero)
+			and unavailable[requestedHero] ~= true then
+			heroesByPlayerID[playerID] = requestedHero
+			unavailable[requestedHero] = true
+		else
+			table.insert(randomPlayerIDs, playerID)
+		end
+	end
+	local randomHeroes = XHSBotHeroProfiles:PickHeroes(
+		#randomPlayerIDs,
+		configuration.composition,
+		unavailable
+	)
+	for index, playerID in ipairs(randomPlayerIDs) do
+		heroesByPlayerID[playerID] = randomHeroes[index]
+	end
 	local started = 0
-	for index, playerID in ipairs(assignable) do
-		local heroName = heroes[index]
+	for _, playerID in ipairs(assignable) do
+		local heroName = heroesByPlayerID[playerID]
 		if heroName ~= nil then
 			local assignmentStarted = self:AssignHero(playerID, heroName, humansSelected)
 			if assignmentStarted then started = started + 1 end

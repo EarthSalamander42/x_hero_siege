@@ -625,6 +625,37 @@
 		"VisionNighttimeRange"		"1600"		// Range of vision at night time.
 	}
 
+	// Uther's phase-three prison deliberately uses its own unit name so its
+	// destruction cannot trigger the phase-two ice-tower progression.
+	"npc_xhs_uther_ice_prison"
+	{
+		"BaseClass"                    "npc_dota_creature"
+		"Model"                        "models/particle/ice_shards.vmdl"
+		"SoundSet"                     "Tower.Water"
+		"ModelScale"                   "1.35"
+		"Level"                        "1"
+		"AttackCapabilities"           "DOTA_UNIT_CAP_NO_ATTACK"
+		"ArmorPhysical"                "0"
+		"MagicalResistance"            "0"
+		"BoundsHullName"               "DOTA_HULL_SIZE_REGULAR"
+		"RingRadius"                   "115"
+		"HealthBarOffset"              "300"
+		"MovementCapabilities"         "DOTA_UNIT_CAP_MOVE_NONE"
+		"MovementSpeed"                "0"
+		"StatusHealth"                 "1"
+		"StatusHealthRegen"            "0"
+		"StatusMana"                   "0"
+		"BountyXP"                     "0"
+		"BountyGoldMin"                "0"
+		"BountyGoldMax"                "0"
+		"TeamName"                     "DOTA_TEAM_BADGUYS"
+		"CombatClassAttack"            "DOTA_COMBAT_CLASS_ATTACK_BASIC"
+		"CombatClassDefend"            "DOTA_COMBAT_CLASS_DEFEND_BASIC"
+		"UnitRelationshipClass"        "DOTA_NPC_UNIT_RELATIONSHIP_TYPE_WARD"
+		"VisionDaytimeRange"           "0"
+		"VisionNighttimeRange"         "0"
+	}
+
 	//=================================================================================
 	// Tower: Death Tower
 	//=================================================================================

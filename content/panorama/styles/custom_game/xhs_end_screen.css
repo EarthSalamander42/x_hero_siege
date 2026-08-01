@@ -20,6 +20,74 @@
 	100% { box-shadow: fill #5ad0ff00 0px 0px 0px 0px; }
 }
 
+@keyframes 'xhs_reward_mythical_reveal'
+{
+	0% { opacity: 0; transform: scale3d( 0.94, 0.94, 1 ); brightness: 1.8; }
+	65% { opacity: 1; transform: scale3d( 1.015, 1.015, 1 ); brightness: 1.15; }
+	100% { opacity: 1; transform: scale3d( 1, 1, 1 ); brightness: 1; }
+}
+
+@keyframes 'xhs_reward_legendary_reveal'
+{
+	0% { opacity: 0; transform: scale3d( 0.82, 0.82, 1 ); brightness: 2.8; }
+	52% { opacity: 1; transform: scale3d( 1.045, 1.045, 1 ); brightness: 1.45; }
+	76% { transform: scale3d( 0.985, 0.985, 1 ); brightness: 1.12; }
+	100% { opacity: 1; transform: scale3d( 1, 1, 1 ); brightness: 1; }
+}
+
+@keyframes 'xhs_reward_apex_reveal'
+{
+	0% { opacity: 0; transform: scale3d( 1.22, 1.22, 1 ); brightness: 4; }
+	18% { opacity: 1; transform: scale3d( 0.9, 0.9, 1 ); brightness: 2.4; }
+	42% { transform: scale3d( 1.065, 1.065, 1 ); brightness: 1.5; }
+	68% { transform: scale3d( 0.98, 0.98, 1 ); brightness: 1.15; }
+	100% { opacity: 1; transform: scale3d( 1, 1, 1 ); brightness: 1; }
+}
+
+@keyframes 'xhs_reward_aura_breathe'
+{
+	0% { opacity: 0.28; transform: scale3d( 0.9, 0.9, 1 ); }
+	50% { opacity: 0.72; transform: scale3d( 1.08, 1.08, 1 ); }
+	100% { opacity: 0.28; transform: scale3d( 0.9, 0.9, 1 ); }
+}
+
+@keyframes 'xhs_reward_aura_apex'
+{
+	0% { opacity: 0.3; transform: scale3d( 0.72, 0.72, 1 ); brightness: 1; }
+	45% { opacity: 0.95; transform: scale3d( 1.16, 1.16, 1 ); brightness: 2; }
+	100% { opacity: 0.3; transform: scale3d( 0.72, 0.72, 1 ); brightness: 1; }
+}
+
+@keyframes 'xhs_reward_rays_spin'
+{
+	0% { opacity: 0.12; transform: rotateZ( 0deg ); }
+	35% { opacity: 0.58; }
+	100% { opacity: 0.12; transform: rotateZ( 360deg ); }
+}
+
+@keyframes 'xhs_reward_rays_spin_reverse'
+{
+	0% { opacity: 0.1; transform: rotateZ( 90deg ); }
+	50% { opacity: 0.42; }
+	100% { opacity: 0.1; transform: rotateZ( -270deg ); }
+}
+
+@keyframes 'xhs_reward_apex_flash'
+{
+	0% { opacity: 0; }
+	8% { opacity: 0.92; }
+	22% { opacity: 0.3; }
+	48% { opacity: 0.7; }
+	100% { opacity: 0; }
+}
+
+@keyframes 'xhs_reward_image_float'
+{
+	0% { transform: translateY( -3px ) scale3d( 1, 1, 1 ); brightness: 1; }
+	50% { transform: translateY( 4px ) scale3d( 1.035, 1.035, 1 ); brightness: 1.28; }
+	100% { transform: translateY( -3px ) scale3d( 1, 1, 1 ); brightness: 1; }
+}
+
 @keyframes 'xhs_end_result_glow'
 {
 	0% { brightness: 1; }
@@ -192,6 +260,7 @@
 .XHSEndScreenFallbackIcon {
 	width: 56px;
 	height: 56px;
+	horizontal-align: center;
 	margin-bottom: 18px;
 	text-align: center center;
 	font-size: 34px;
@@ -1110,9 +1179,43 @@
 	text-overflow: shrink;
 }
 
+.XHSXPBreakdown {
+	width: 100%;
+	height: 15px;
+	margin-top: 1px;
+	flow-children: right;
+}
+
+.XHSXPBreakdown Label {
+	margin-right: 7px;
+	font-size: 10px;
+	text-overflow: shrink;
+}
+
+.XHSXPBreakdownBase {
+	color: #9eb0c9;
+}
+
+.XHSXPBreakdownVictory {
+	color: #ffd76a;
+	font-weight: semi-bold;
+}
+
+.XHSXPBreakdownSupporter {
+	color: #82e8aa;
+	font-weight: semi-bold;
+	text-shadow: 0px 0px 5px #4ad88b45;
+}
+
+.XHSXPBreakdown.IsIneligible .XHSXPBreakdownBase {
+	width: 100%;
+	color: #ff8b80;
+	font-weight: semi-bold;
+}
+
 .XHSEndScreenSupportCta {
 	width: 100%;
-	height: 88px;
+	height: 102px;
 	margin-top: 10px;
 	padding: 10px 12px;
 	flow-children: right;
@@ -1173,13 +1276,46 @@
 
 .XHSEndScreenSupportText {
 	width: 100%;
-	height: 42px;
+	height: 30px;
 	margin-top: 4px;
 	color: #d6e9f7;
 	font-size: 15px;
 	line-height: 18px;
 	text-overflow: shrink;
 }
+
+.XHSEndScreenSupportBoosts {
+	width: 100%;
+	height: 20px;
+	margin-top: 2px;
+	flow-children: right;
+}
+
+.XHSEndScreenSupportBoostLabel {
+	width: 82px;
+	color: #8da5b8;
+	font-size: 11px;
+	font-weight: semi-bold;
+	vertical-align: center;
+}
+
+.XHSEndScreenSupportBoost {
+	width: 52px;
+	height: 18px;
+	margin-right: 5px;
+	padding-top: 1px;
+	background-color: #07131ee8;
+	border: 1px solid #ffffff22;
+	font-size: 11px;
+	font-weight: bold;
+	text-align: center;
+	vertical-align: center;
+}
+
+.XHSEndScreenSupportBoost.Tier1 { color: #70e39a; border-color: #70e39a55; }
+.XHSEndScreenSupportBoost.Tier2 { color: #ffcf66; border-color: #ffcf6655; }
+.XHSEndScreenSupportBoost.Tier3 { color: #ff765f; border-color: #ff765f55; }
+.XHSEndScreenSupportBoost.Tier4 { color: #5ad0ff; border-color: #5ad0ff66; }
 
 .XHSEndScreenSupportButton {
 	width: 190px;
@@ -1330,21 +1466,192 @@
 }
 
 .XHSEndScreenRewardContainer {
+	width: 100%;
+	height: 100%;
 	align: center center;
-	flow-children: right-wrap;
+	background-color: #01050be8;
+	opacity: 0;
+	visibility: collapse;
+	z-index: 100;
+	transition-property: opacity;
+	transition-duration: 0.18s;
+}
+
+.XHSEndScreenRewardContainer.IsVisible {
+	opacity: 1;
+	visibility: visible;
+}
+
+.HasPendingRewards .XHSEndScreenMain {
+	brightness: 0.42;
+	saturation: 0.45;
 }
 
 .XHSEndScreenRewardPanel {
-	width: 360px;
-	min-height: 420px;
-	margin: 10px;
-	padding: 24px;
+	width: 470px;
+	min-height: 610px;
+	align: center center;
+	padding: 0px 34px 28px 34px;
 	flow-children: down;
-	background-color: gradient( linear, 0% 0%, 100% 100%, from( #071827f6 ), to( #050b14fa ) );
-	border: 1px solid xhs_border;
-	box-shadow: fill #000000aa 0px 0px 16px 0px;
-	animation-name: xhs_end_fade_in;
-	animation-duration: 0.25s;
+	overflow: noclip;
+	background-color: gradient( linear, 0% 0%, 100% 100%, from( #0b2236 ), color-stop( 0.52, #071522 ), to( #030912 ) );
+	border: 2px solid xhs_border;
+	box-shadow: fill #000000e8 0px 18px 48px 0px;
+	transition-property: opacity, transform;
+	transition-duration: 0.18s;
+}
+
+.XHSEndScreenRewardPanel.RevealTier1 {
+	animation-name: xhs_reward_mythical_reveal;
+	animation-duration: 0.55s;
+	animation-timing-function: ease-out;
+}
+
+.XHSEndScreenRewardPanel.RevealTier2 {
+	animation-name: xhs_reward_legendary_reveal;
+	animation-duration: 0.8s;
+	animation-timing-function: ease-out;
+}
+
+.XHSEndScreenRewardPanel.RevealTier3 {
+	animation-name: xhs_reward_apex_reveal;
+	animation-duration: 1.05s;
+	animation-timing-function: ease-out;
+}
+
+.XHSRewardRevealEffects {
+	width: 100%;
+	height: 100%;
+	align: center center;
+	overflow: noclip;
+	z-index: 1;
+}
+
+.XHSEndScreenRewardPanel {
+	z-index: 2;
+}
+
+.XHSRewardRevealBurst {
+	width: 580px;
+	height: 580px;
+	align: center center;
+	background-color: gradient( radial, 50% 50%, 0% 0%, 50% 50%, from( #8847ff70 ), color-stop( 0.42, #6635ca30 ), to( #38146b00 ) );
+	animation-name: xhs_reward_aura_breathe;
+	animation-duration: 2.8s;
+	animation-iteration-count: infinite;
+	animation-timing-function: ease-in-out;
+}
+
+.RevealTier2 .XHSRewardRevealBurst {
+	background-color: gradient( radial, 50% 50%, 0% 0%, 50% 50%, from( #ffcf5978 ), color-stop( 0.4, #c4802635 ), to( #75410b00 ) );
+	animation-duration: 2.2s;
+}
+
+.RevealTier3 .XHSRewardRevealBurst {
+	width: 760px;
+	height: 760px;
+	animation-name: xhs_reward_aura_apex;
+	animation-duration: 1.65s;
+}
+
+.level-immortal .XHSRewardRevealBurst {
+	background-color: gradient( radial, 50% 50%, 0% 0%, 50% 50%, from( #ffb72fbb ), color-stop( 0.38, #ef6d243f ), to( #a92e0800 ) );
+}
+
+.level-arcana .XHSRewardRevealBurst {
+	background-color: gradient( radial, 50% 50%, 0% 0%, 50% 50%, from( #b8f45cbb ), color-stop( 0.38, #4dd1a94a ), to( #167b7200 ) );
+}
+
+.level-ancient .XHSRewardRevealBurst {
+	background-color: gradient( radial, 50% 50%, 0% 0%, 50% 50%, from( #ff5959bb ), color-stop( 0.38, #cc29434a ), to( #6d102600 ) );
+}
+
+.XHSRewardRevealRays {
+	width: 760px;
+	height: 76px;
+	align: center center;
+	background-color: gradient( linear, 0% 0%, 100% 0%, from( #ffd35b00 ), color-stop( 0.48, #ffd35b12 ), color-stop( 0.5, #fff1a6b8 ), color-stop( 0.52, #ffd35b12 ), to( #ffd35b00 ) );
+	animation-name: xhs_reward_rays_spin;
+	animation-duration: 8s;
+	animation-iteration-count: infinite;
+	animation-timing-function: linear;
+}
+
+.XHSRewardRevealRays.Cross {
+	animation-name: xhs_reward_rays_spin_reverse;
+	animation-duration: 11s;
+}
+
+.RevealTier3 .XHSRewardRevealRays {
+	height: 110px;
+	brightness: 1.8;
+	animation-duration: 4.2s;
+}
+
+.XHSRewardRevealFlash {
+	width: 100%;
+	height: 100%;
+	align: center center;
+	background-color: #fff3c4;
+	opacity: 0;
+	animation-name: xhs_reward_apex_flash;
+	animation-duration: 1.1s;
+	animation-iteration-count: 1;
+}
+
+.level-arcana .XHSRewardRevealFlash { background-color: #c9ffe6; }
+.level-ancient .XHSRewardRevealFlash { background-color: #ffd0d0; }
+
+.XHSEndScreenRewardPanel.IsPremiumReward {
+	background-color: gradient( linear, 0% 0%, 100% 100%, from( #241b35 ), color-stop( 0.48, #101426 ), to( #050812 ) );
+}
+
+.XHSEndScreenRewardPanel.IsLeaving {
+	opacity: 0;
+	transform: translateY( 18px ) scale3d( 0.97, 0.97, 1 );
+}
+
+.XHSRewardAccent {
+	width: 100%;
+	height: 4px;
+	horizontal-align: center;
+	background-color: gradient( linear, 0% 0%, 100% 0%, from( #2398c800 ), color-stop( 0.5, #65d9ff ), to( #2398c800 ) );
+	box-shadow: fill #4dcfff55 0px 0px 14px 0px;
+}
+
+.IsPremiumReward .XHSRewardAccent {
+	background-color: gradient( linear, 0% 0%, 100% 0%, from( #b37d2200 ), color-stop( 0.5, #ffd66b ), to( #b37d2200 ) );
+	box-shadow: fill #ffca4a55 0px 0px 14px 0px;
+}
+
+.XHSRewardHeader {
+	width: 100%;
+	height: 44px;
+	margin-top: 14px;
+	flow-children: right;
+	vertical-align: center;
+}
+
+.XHSRewardUnlocked {
+	width: fill-parent-flow( 1 );
+	vertical-align: center;
+	color: #8edfff;
+	font-size: 16px;
+	font-weight: semi-bold;
+	letter-spacing: 2px;
+}
+
+.IsPremiumReward .XHSRewardUnlocked {
+	color: #ffd66b;
+}
+
+.XHSRewardQueueProgress {
+	vertical-align: center;
+	padding: 4px 10px;
+	color: #c8d5e3;
+	font-size: 15px;
+	background-color: #ffffff0b;
+	border: 1px solid #ffffff18;
 }
 
 .XHSEndScreenRewardPanel.level-common { border: 1px solid COMMON_COLOR; }
@@ -1357,6 +1664,7 @@
 .XHSEndScreenRewardPanel.level-ancient { border: 1px solid ANCIENT_COLOR; }
 
 .XHSRewardDescription,
+.XHSRewardType,
 .XHSRewardName,
 .XHSRewardRarity {
 	width: 100%;
@@ -1365,21 +1673,95 @@
 }
 
 .XHSRewardDescription {
-	font-size: 18px;
+	margin-top: 4px;
+	font-size: 17px;
 	text-transform: uppercase;
-	color: xhs_text_muted;
+	letter-spacing: 1px;
+	color: #9fb2c5;
+}
+
+.XHSRewardImageFrame {
+	width: 286px;
+	height: 210px;
+	margin-top: 24px;
+	horizontal-align: center;
+	overflow: noclip;
+	background-color: gradient( linear, 0% 0%, 0% 100%, from( #0c1d2b ), to( #03080d ) );
+	border: 1px solid #6bcdf044;
+	box-shadow: fill #000000b0 0px 10px 24px 0px;
+}
+
+.IsPremiumReward .XHSRewardImageFrame {
+	border: 1px solid #e2b95a66;
+}
+
+.XHSRewardImageGlow {
+	width: 190px;
+	height: 140px;
+	align: center center;
+	background-color: #6bcdf014;
+	box-shadow: fill #6bcdf045 0px 0px 40px 12px;
+}
+
+.XHSRewardImageGlow.mythical { box-shadow: fill #8847ff66 0px 0px 44px 14px; }
+.XHSRewardImageGlow.legendary { box-shadow: fill #d9ad3766 0px 0px 44px 14px; }
+.XHSRewardImageGlow.immortal { box-shadow: fill #e4ae3966 0px 0px 48px 16px; }
+.XHSRewardImageGlow.arcana { box-shadow: fill #ade55c66 0px 0px 48px 16px; }
+.XHSRewardImageGlow.ancient { box-shadow: fill #eb4b4b66 0px 0px 48px 16px; }
+
+.RevealTier1 .XHSRewardImageGlow {
+	animation-name: xhs_reward_aura_breathe;
+	animation-duration: 2.4s;
+	animation-iteration-count: infinite;
+}
+
+.RevealTier2 .XHSRewardImage,
+.RevealTier3 .XHSRewardImage {
+	animation-name: xhs_reward_image_float;
+	animation-duration: 2.2s;
+	animation-iteration-count: infinite;
+	animation-timing-function: ease-in-out;
+}
+
+.RevealTier3 .XHSRewardImage {
+	animation-duration: 1.55s;
+}
+
+.XHSRewardImage {
+	width: 250px;
+	height: 178px;
+	align: center center;
+	background-position: center;
+}
+
+.XHSRewardType {
+	margin-top: 20px;
+	color: #8da5ba;
+	font-size: 15px;
+	font-weight: semi-bold;
+	text-transform: uppercase;
+	letter-spacing: 2px;
 }
 
 .XHSRewardName {
-	margin-top: 8px;
-	font-size: 25px;
+	height: 62px;
+	margin-top: 5px;
+	font-size: 27px;
+	font-weight: semi-bold;
+	vertical-align: center;
 	text-overflow: shrink;
 }
 
 .XHSRewardRarity {
-	margin-top: 6px;
-	font-size: 18px;
+	horizontal-align: center;
+	width: fit-children;
+	margin-top: 3px;
+	padding: 3px 12px;
+	font-size: 16px;
+	letter-spacing: 1px;
 	text-transform: uppercase;
+	background-color: #ffffff08;
+	border: 1px solid #ffffff12;
 }
 
 .XHSRewardRarity.common { color: COMMON_COLOR; }
@@ -1391,33 +1773,49 @@
 .XHSRewardRarity.arcana { color: ARCANA_COLOR; }
 .XHSRewardRarity.ancient { color: ANCIENT_COLOR; }
 
-.XHSRewardImage {
-	width: 220px;
-	height: 146px;
-	margin-top: 22px;
-	horizontal-align: center;
-	background-size: cover;
-	background-position: center;
-	border: 1px solid xhs_border_soft;
-}
-
 .XHSRewardButton {
 	width: 100%;
-	height: 42px;
-	margin-top: 26px;
-	background-color: gradient( linear, 0% 0%, 100% 0%, from( #0a7ca8 ), to( #1fb8ec ) );
-	border: 1px solid #ffffff20;
+	height: 48px;
+	margin-top: 22px;
+	background-color: gradient( linear, 0% 0%, 100% 0%, from( #087ba7 ), color-stop( 0.5, #18b9ed ), to( #087ba7 ) );
+	border: 1px solid #8de2ff55;
+	box-shadow: fill #10aee744 0px 0px 12px 0px;
+	transition-property: brightness, transform;
+	transition-duration: 0.08s;
+}
+
+.IsPremiumReward .XHSRewardButton {
+	background-color: gradient( linear, 0% 0%, 100% 0%, from( #a36a13 ), color-stop( 0.5, #e7ad35 ), to( #a36a13 ) );
+	border: 1px solid #ffe18b66;
+	box-shadow: fill #d7982344 0px 0px 12px 0px;
 }
 
 .XHSRewardButton:hover {
-	brightness: 1.2;
+	brightness: 1.25;
+	transform: translateY( -1px );
+}
+
+.XHSRewardButton:active {
+	brightness: 0.9;
+	transform: translateY( 1px );
+	pre-transform-scale2d: 0.99;
 }
 
 .XHSRewardButton Label {
 	align: center center;
 	color: #f4fbff;
 	font-size: 18px;
+	font-weight: semi-bold;
+	letter-spacing: 1px;
 	text-transform: uppercase;
+}
+
+.XHSRewardRemaining {
+	width: 100%;
+	margin-top: 9px;
+	color: #71869a;
+	font-size: 14px;
+	text-align: center;
 }
 
 .AspectRatio16x10 .XHSEndScreenMain {

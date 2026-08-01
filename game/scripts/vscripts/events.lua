@@ -2279,10 +2279,31 @@ function GameMode:OnQuestCompleted(questZone, quest)
 			if OpenGromGate ~= nil then
 				OpenGromGate()
 			end
+		elseif quest.szQuestName == "kill_proudmoore" then
+			if XHSActivateUtherIcePrison ~= nil then
+				XHSActivateUtherIcePrison()
+			end
+		elseif quest.szQuestName == "free_uther" then
+			if XHSReleaseUtherFromIce ~= nil then
+				XHSReleaseUtherFromIce()
+			end
 		elseif quest.szQuestName == "teleport_top" then
 			StartMagtheridonArena()
 		elseif quest.szQuestName == "teleport_arthas" then
-			StartArthasArena()
+			FourBossesKillCount()
+			XHSOpenDoorsWithCinematic(
+				{ "door_proudmoore3" },
+				{ "obstruction_proudmoore2" },
+				"gate_02_open",
+				function()
+					Timers:CreateTimer(2.5, StartArthasArena)
+				end,
+				{
+					move_duration = 1.35,
+					hold_duration = 1.25,
+					return_duration = 1.0,
+				}
+			)
 		end
 	end
 

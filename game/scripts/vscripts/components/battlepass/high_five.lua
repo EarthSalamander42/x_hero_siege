@@ -670,7 +670,9 @@ function SupporterHighFive:Init()
 		self:CleanupPlayer(event.PlayerID or event.playerid, "disconnected")
 	end, nil)
 	ListenToGameEvent("game_rules_state_change", function()
-		if GameRules:State_Get() >= DOTA_GAMERULES_STATE_POST_GAME then self:Reset() end
+		-- State_Get can briefly be nil while the rules object changes state. We
+		-- only need the exact post-game transition, not an ordered comparison.
+		if GameRules:State_Get() == DOTA_GAMERULES_STATE_POST_GAME then self:Reset() end
 	end, nil)
 
 	self:Debug("initialized")

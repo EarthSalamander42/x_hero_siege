@@ -473,12 +473,9 @@ XHS_BOSSES_TABLE = {
 		four_bosses_kill_count = true,
 	},
 	npc_dota_hero_proudmoore = {
-		doors_to_open = { "door_proudmoore3" },
-		obstructions_to_disable = { "obstruction_proudmoore2" },
 		death_animation = { duration = 6.0, activity = ACT_DOTA_DIE, rate = 0.4 },
 		death_sound = "skeleton_king_wraith_death_long_09",
 		death_no_draw_delay = 12.0,
-		four_bosses_kill_count = true,
 	},
 	npc_dota_hero_arthas = {
 		death_animation = { duration = 6.0, activity = ACT_DOTA_DIE, rate = 0.1 },

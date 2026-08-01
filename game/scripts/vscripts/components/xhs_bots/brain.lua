@@ -91,6 +91,22 @@ local DEFENSIVE_STRUCTURE_NAMES = {
 	npc_tower_death = true,
 }
 
+local NON_COMBAT_INTERACTION_UNIT_NAMES = {
+	npc_xhs_paladin = true,
+	npc_xhs_paladin_2 = true,
+}
+
+local function IsNonCombatInteractionUnit(unit)
+	if not IsValidEntityHandle(unit) then return false end
+	local name = tostring(unit.GetUnitName ~= nil and unit:GetUnitName() or "")
+	if NON_COMBAT_INTERACTION_UNIT_NAMES[name] == true
+		or unit.xhs_freed_shal_lightbinder == true then
+		return true
+	end
+	return unit.HasModifier ~= nil
+		and unit:HasModifier("modifier_npc_dialog")
+end
+
 function XHSBotBrain:IsTeamVisible(hero, unit)
 	if not IsValidEntityHandle(hero) or not IsValidEntityHandle(unit) then return false end
 	if unit.IsInvisible ~= nil and unit:IsInvisible() then return false end
@@ -259,6 +275,7 @@ function XHSBotBrain:FindEnemies(hero, radius)
 	for _, unit in pairs(entry.units or {}) do
 		if IsValidEntityHandle(unit)
 			and unit:IsAlive()
+			and self:IsCombatTarget(unit)
 			and Distance2D(origin, unit:GetAbsOrigin()) <= radius
 			and (unit.IsInvisible == nil or not unit:IsInvisible()) then
 			table.insert(enemies, unit)
@@ -274,6 +291,7 @@ end
 
 function XHSBotBrain:IsCombatTarget(unit)
 	if not IsValidEntityHandle(unit) or not unit:IsAlive() or unit:IsInvulnerable() then return false end
+	if IsNonCombatInteractionUnit(unit) then return false end
 	local name = unit:GetUnitName()
 	if name == "npc_dota_crate"
 		or name == "npc_dota_chest"
@@ -347,6 +365,18 @@ function XHSBotBrain:IsTargetAllowedByAssignment(playerID, hero, target, assignm
 				900,
 				tonumber(difficulty.self_defense_radius) or 650
 			)
+	end
+	if assignment.non_combat == true then
+		local distance = Distance2D(hero:GetAbsOrigin(), target:GetAbsOrigin())
+		local attacksHero = false
+		if target.GetAttackTarget ~= nil then
+			local ok, attackTarget = pcall(function()
+				return target:GetAttackTarget()
+			end)
+			attacksHero = ok and attackTarget == hero
+		end
+		return attacksHero
+			and distance <= (tonumber(difficulty.self_defense_radius) or 650)
 	end
 
 	if target.xhs_farm_event == true then
@@ -1383,6 +1413,9 @@ function XHSBotBrain:ThinkControlledUnits(hero, record, assignment, encounter)
 	local unit = units[record.controlled_unit_cursor]
 	local target = encounter and encounter.forced_target
 		or EntityFromIndex(record.target_entindex)
+	if target ~= nil and not self:IsCombatTarget(target) then
+		target = nil
+	end
 	local order = {
 		UnitIndex = unit:entindex(),
 		Queue = false,
@@ -2369,6 +2402,8 @@ end
 function XHSBotBrain:BuildContext(playerID, hero, profile, difficulty, record, assignment, encounter)
 	local now = GameRules:GetGameTime()
 	local assignmentGoal = assignment and assignment.goal or "regroup"
+	local nonCombatObjective = assignment ~= nil
+		and assignment.non_combat == true
 	local returningToLane = self:UpdateLaneReturnState(hero, assignment, record)
 	if encounter ~= nil then
 		returningToLane = false
@@ -2392,9 +2427,17 @@ function XHSBotBrain:BuildContext(playerID, hero, profile, difficulty, record, a
 			table.insert(enemies, enemy)
 		end
 	end
-	local target = encounter and encounter.forced_target or nil
+	local target = not nonCombatObjective
+		and encounter
+		and encounter.forced_target
+		or nil
+	if target ~= nil and not self:IsCombatTarget(target) then
+		target = nil
+	end
 	local targetScore = target ~= nil and 120 or nil
-	if target == nil and (encounter == nil or encounter.no_combat ~= true) then
+	if target == nil
+		and not nonCombatObjective
+		and (encounter == nil or encounter.no_combat ~= true) then
 		target, targetScore = self:SelectTarget(
 			playerID,
 			hero,
@@ -2567,6 +2610,7 @@ function XHSBotBrain:BuildContext(playerID, hero, profile, difficulty, record, a
 		tonumber(CustomTimers and CustomTimers.creep_level) or 1
 	)
 	local lootAllowed = encounter == nil
+		and not nonCombatObjective
 		and not returningToLane
 		and assignmentGoal ~= "shop"
 		and assignmentGoal ~= "defend_base"
@@ -2598,6 +2642,7 @@ function XHSBotBrain:BuildContext(playerID, hero, profile, difficulty, record, a
 		and tonumber(CustomTimers.current_time
 			and CustomTimers.current_time["special_wave"]) or nil
 	local runeStrategicallyAllowed = encounter == nil
+		and not nonCombatObjective
 		and not baseLastStand
 		and (
 			assignmentGoal ~= "shop"
@@ -2718,6 +2763,9 @@ function XHSBotBrain:BuildContext(playerID, hero, profile, difficulty, record, a
 		anchor = anchor,
 		anchor_distance = Distance2D(hero:GetAbsOrigin(), anchor),
 		assignment_urgency = assignment and assignment.urgency or 0,
+		non_combat_objective = nonCombatObjective,
+		objective_reached_distance = assignment
+			and assignment.reached_distance or 180,
 		shopping = assignmentGoal == "shop"
 			and not (
 				runeObjective ~= nil
