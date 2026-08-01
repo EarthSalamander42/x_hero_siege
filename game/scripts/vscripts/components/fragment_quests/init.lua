@@ -5,8 +5,8 @@ end
 local NET_TABLE = "fragment_quests"
 local NET_STATE_KEY = "state"
 local VERSION = 1
-local BALANCE_VERSION = "fragment_quests_v1_2026_06_27"
-local DEFAULT_REWARD_PER_STAR = 5
+local BALANCE_VERSION = "fragment_quests_v2_2026_08_01"
+local DEFAULT_REWARD_PER_STAR = 10
 local FRONTLINE_PACT_THRESHOLDS = { 500000, 1000000, 2000000 }
 
 local QUEST_CATEGORIES = {

@@ -305,11 +305,15 @@ end
 modifier_xhs_creep_fury_swipes = modifier_xhs_creep_fury_swipes or class({})
 modifier_xhs_creep_fury_swipes.XHS_LINK_CLIENT = true
 function modifier_xhs_creep_fury_swipes:IsHidden() return true end
+
 function modifier_xhs_creep_fury_swipes:IsPurgable() return false end
+
 function modifier_xhs_creep_fury_swipes:GetAttributes() return MODIFIER_ATTRIBUTE_PERMANENT end
+
 function modifier_xhs_creep_fury_swipes:DeclareFunctions()
 	return { MODIFIER_EVENT_ON_ATTACK_LANDED }
 end
+
 function modifier_xhs_creep_fury_swipes:OnAttackLanded(params)
 	if not IsServer() or params.attacker ~= self:GetParent() or params.target == nil then return end
 
@@ -365,15 +369,21 @@ end
 modifier_xhs_creep_fury_swipes_debuff = modifier_xhs_creep_fury_swipes_debuff or class({})
 modifier_xhs_creep_fury_swipes_debuff.XHS_LINK_CLIENT = true
 function modifier_xhs_creep_fury_swipes_debuff:IsHidden() return false end
+
 function modifier_xhs_creep_fury_swipes_debuff:IsDebuff() return true end
+
 function modifier_xhs_creep_fury_swipes_debuff:IsPurgable() return false end
+
 function modifier_xhs_creep_fury_swipes_debuff:GetTexture() return "ursa_fury_swipes" end
 
 modifier_xhs_creep_passive = modifier_xhs_creep_passive or class({})
 modifier_xhs_creep_passive.XHS_LINK_CLIENT = true
 function modifier_xhs_creep_passive:IsHidden() return true end
+
 function modifier_xhs_creep_passive:IsPurgable() return false end
+
 function modifier_xhs_creep_passive:GetAttributes() return MODIFIER_ATTRIBUTE_PERMANENT end
+
 function modifier_xhs_creep_passive:DeclareFunctions()
 	return {
 		MODIFIER_PROPERTY_BASEDAMAGEOUTGOING_PERCENTAGE,
@@ -389,21 +399,27 @@ function modifier_xhs_creep_passive:DeclareFunctions()
 		MODIFIER_EVENT_ON_TAKEDAMAGE,
 	}
 end
+
 function modifier_xhs_creep_passive:GetModifierBaseDamageOutgoing_Percentage()
 	return -Special(self:GetAbility(), "damage_compensation_pct")
 end
+
 function modifier_xhs_creep_passive:GetModifierIncomingDamage_Percentage()
 	return Special(self:GetAbility(), "defense_compensation_pct") - Special(self:GetAbility(), "damage_reduction_pct")
 end
+
 function modifier_xhs_creep_passive:GetModifierPhysicalArmorBonus()
 	return Special(self:GetAbility(), "bonus_armor")
 end
+
 function modifier_xhs_creep_passive:GetModifierHealthRegenPercentage()
 	return Special(self:GetAbility(), "regen_pct")
 end
+
 function modifier_xhs_creep_passive:GetModifierMagicalResistanceBonus()
 	return Special(self:GetAbility(), "magic_resist")
 end
+
 function modifier_xhs_creep_passive:GetModifierAttackSpeedBonus_Constant()
 	local ability = self:GetAbility()
 	local value = Special(ability, "attack_speed")
@@ -413,31 +429,40 @@ function modifier_xhs_creep_passive:GetModifierAttackSpeedBonus_Constant()
 	end
 	return value
 end
+
 function modifier_xhs_creep_passive:GetModifierEvasion_Constant()
 	return Special(self:GetAbility(), "evasion")
 end
+
 function modifier_xhs_creep_passive:GetModifierPhysical_ConstantBlock()
 	return Special(self:GetAbility(), "physical_block")
 end
+
 function modifier_xhs_creep_passive:GetModifierPreAttack_CriticalStrike(params)
 	local chance = Special(self:GetAbility(), "crit_chance")
 	if chance > 0 and RollPseudoRandomPercentage(chance, 1971, self:GetParent()) then
 		return Special(self:GetAbility(), "crit_damage")
 	end
 end
+
 function modifier_xhs_creep_passive:IsAura()
 	return Special(self:GetAbility(), "aura_mode") > 0
 end
+
 function modifier_xhs_creep_passive:GetModifierAura()
 	return EffectModifierName(self:GetAbility(), "aura", "modifier_xhs_creep_passive_aura")
 end
+
 function modifier_xhs_creep_passive:GetAuraRadius() return Special(self:GetAbility(), "aura_radius") end
+
 function modifier_xhs_creep_passive:GetAuraSearchTeam()
 	return Special(self:GetAbility(), "aura_mode") == 2 and DOTA_UNIT_TARGET_TEAM_ENEMY or DOTA_UNIT_TARGET_TEAM_FRIENDLY
 end
+
 function modifier_xhs_creep_passive:GetAuraSearchType()
 	return Special(self:GetAbility(), "aura_targets_heroes_only") > 0 and DOTA_UNIT_TARGET_HERO or DOTA_UNIT_TARGET_HERO + DOTA_UNIT_TARGET_BASIC
 end
+
 function modifier_xhs_creep_passive:GetAuraSearchFlags() return DOTA_UNIT_TARGET_FLAG_NONE end
 
 function modifier_xhs_creep_passive:OnAttackLanded(params)
@@ -481,7 +506,7 @@ function modifier_xhs_creep_passive:OnAttackLanded(params)
 		-- Creating it as a free-standing impact made one emitter survive every
 		-- proc, producing the accumulating golden star orbits. Skull Basher is a
 		-- lightweight one-shot impact and is already part of XHS precache.
-		PlayProcFeedback(parent, target, "particles/items_fx/skull_basher.vpcf", "DOTA_Item.SkullBasher")
+		PlayProcFeedback(parent, target, "particles/items_fx/abyssal_blade_crimson_impact_sparks.vpcf", "DOTA_Item.SkullBasher")
 	end
 
 	local mana_burn = Special(ability, "mana_burn_pct")
@@ -565,26 +590,42 @@ end
 modifier_xhs_creep_passive_slow = modifier_xhs_creep_passive_slow or class({})
 modifier_xhs_creep_passive_slow.XHS_LINK_CLIENT = true
 function modifier_xhs_creep_passive_slow:IsDebuff() return true end
+
 function modifier_xhs_creep_passive_slow:IsPurgable() return true end
+
 function modifier_xhs_creep_passive_slow:GetTexture() return AbilityTexture(self) end
-function modifier_xhs_creep_passive_slow:OnCreated(kv) self.slow = tonumber(kv.slow) or 0 self.attack_slow = tonumber(kv.attack_slow) or 0 end
+
+function modifier_xhs_creep_passive_slow:OnCreated(kv)
+	self.slow = tonumber(kv.slow) or 0
+	self.attack_slow = tonumber(kv.attack_slow) or 0
+end
+
 function modifier_xhs_creep_passive_slow:OnRefresh(kv) self:OnCreated(kv) end
+
 function modifier_xhs_creep_passive_slow:DeclareFunctions() return { MODIFIER_PROPERTY_MOVESPEED_BONUS_PERCENTAGE, MODIFIER_PROPERTY_ATTACKSPEED_BONUS_CONSTANT } end
+
 function modifier_xhs_creep_passive_slow:GetModifierMoveSpeedBonus_Percentage() return -self.slow end
+
 function modifier_xhs_creep_passive_slow:GetModifierAttackSpeedBonus_Constant() return -self.attack_slow end
 
 modifier_xhs_creep_silencing_glaive_debuff = modifier_xhs_creep_silencing_glaive_debuff or class({})
 modifier_xhs_creep_silencing_glaive_debuff.XHS_LINK_CLIENT = true
 function modifier_xhs_creep_silencing_glaive_debuff:IsHidden() return true end
+
 function modifier_xhs_creep_silencing_glaive_debuff:IsDebuff() return true end
+
 function modifier_xhs_creep_silencing_glaive_debuff:IsPurgable() return true end
+
 function modifier_xhs_creep_silencing_glaive_debuff:GetTexture() return AbilityTexture(self) end
+
 function modifier_xhs_creep_silencing_glaive_debuff:GetEffectName()
 	return "particles/generic_gameplay/generic_silenced.vpcf"
 end
+
 function modifier_xhs_creep_silencing_glaive_debuff:GetEffectAttachType()
 	return PATTACH_OVERHEAD_FOLLOW
 end
+
 function modifier_xhs_creep_silencing_glaive_debuff:CheckState()
 	return {
 		[MODIFIER_STATE_SILENCED] = true,
@@ -594,10 +635,18 @@ end
 modifier_xhs_creep_passive_dot = modifier_xhs_creep_passive_dot or class({})
 modifier_xhs_creep_passive_dot.XHS_LINK_CLIENT = true
 function modifier_xhs_creep_passive_dot:IsDebuff() return true end
+
 function modifier_xhs_creep_passive_dot:IsPurgable() return true end
+
 function modifier_xhs_creep_passive_dot:GetTexture() return AbilityTexture(self) end
-function modifier_xhs_creep_passive_dot:OnCreated(kv) self.damage = tonumber(kv.damage) or 0 if IsServer() then self:StartIntervalThink(1) end end
+
+function modifier_xhs_creep_passive_dot:OnCreated(kv)
+	self.damage = tonumber(kv.damage) or 0
+	if IsServer() then self:StartIntervalThink(1) end
+end
+
 function modifier_xhs_creep_passive_dot:OnRefresh(kv) self.damage = tonumber(kv.damage) or self.damage end
+
 function modifier_xhs_creep_passive_dot:OnIntervalThink()
 	ApplyDamage({ victim = self:GetParent(), attacker = self:GetCaster(), ability = self:GetAbility(), damage = self.damage, damage_type = DAMAGE_TYPE_MAGICAL })
 end
@@ -605,11 +654,17 @@ end
 modifier_xhs_creep_passive_armor_break = modifier_xhs_creep_passive_armor_break or class({})
 modifier_xhs_creep_passive_armor_break.XHS_LINK_CLIENT = true
 function modifier_xhs_creep_passive_armor_break:IsDebuff() return true end
+
 function modifier_xhs_creep_passive_armor_break:IsPurgable() return true end
+
 function modifier_xhs_creep_passive_armor_break:GetTexture() return AbilityTexture(self) end
+
 function modifier_xhs_creep_passive_armor_break:OnCreated(kv) self.armor = tonumber(kv.armor) or 0 end
+
 function modifier_xhs_creep_passive_armor_break:OnRefresh(kv) self:OnCreated(kv) end
+
 function modifier_xhs_creep_passive_armor_break:DeclareFunctions() return { MODIFIER_PROPERTY_PHYSICAL_ARMOR_BONUS } end
+
 function modifier_xhs_creep_passive_armor_break:GetModifierPhysicalArmorBonus() return -self.armor end
 
 local CRUSHING_ARMOR_SYNC_SCALE = 100
@@ -617,15 +672,21 @@ local CRUSHING_ARMOR_SYNC_SCALE = 100
 modifier_xhs_creep_crushing_armor_sync = modifier_xhs_creep_crushing_armor_sync or class({})
 modifier_xhs_creep_crushing_armor_sync.XHS_LINK_CLIENT = true
 function modifier_xhs_creep_crushing_armor_sync:IsHidden() return true end
+
 function modifier_xhs_creep_crushing_armor_sync:IsDebuff() return true end
+
 function modifier_xhs_creep_crushing_armor_sync:IsPurgable() return false end
+
 function modifier_xhs_creep_crushing_armor_sync:IsPurgeException() return false end
+
 function modifier_xhs_creep_crushing_armor_sync:GetAppliedArmorReduction()
 	return math.max(0, self:GetStackCount()) / CRUSHING_ARMOR_SYNC_SCALE
 end
+
 function modifier_xhs_creep_crushing_armor_sync:DeclareFunctions()
 	return { MODIFIER_PROPERTY_PHYSICAL_ARMOR_BONUS }
 end
+
 function modifier_xhs_creep_crushing_armor_sync:GetModifierPhysicalArmorBonus()
 	return -self:GetAppliedArmorReduction()
 end
@@ -633,9 +694,13 @@ end
 modifier_xhs_creep_crushing_armor_debuff = modifier_xhs_creep_crushing_armor_debuff or class({})
 modifier_xhs_creep_crushing_armor_debuff.XHS_LINK_CLIENT = true
 function modifier_xhs_creep_crushing_armor_debuff:IsHidden() return false end
+
 function modifier_xhs_creep_crushing_armor_debuff:IsDebuff() return true end
+
 function modifier_xhs_creep_crushing_armor_debuff:IsPurgable() return true end
+
 function modifier_xhs_creep_crushing_armor_debuff:GetTexture() return AbilityTexture(self) end
+
 function modifier_xhs_creep_crushing_armor_debuff:OnCreated(kv)
 	self.armor_reduction = math.max(0, tonumber(kv.armor) or 0)
 	self.armor_per_stack = math.max(0.01, tonumber(kv.armor_per_stack) or Special(self:GetAbility(), "armor_reduction"))
@@ -645,16 +710,19 @@ function modifier_xhs_creep_crushing_armor_debuff:OnCreated(kv)
 		self:StartIntervalThink(0.2)
 	end
 end
+
 function modifier_xhs_creep_crushing_armor_debuff:AddCustomTransmitterData()
 	return {
 		armor_reduction = self.armor_reduction or 0,
 		armor_per_stack = self.armor_per_stack or 0.01,
 	}
 end
+
 function modifier_xhs_creep_crushing_armor_debuff:HandleCustomTransmitterData(data)
 	self.armor_reduction = tonumber(data.armor_reduction) or 0
 	self.armor_per_stack = tonumber(data.armor_per_stack) or 0.01
 end
+
 function modifier_xhs_creep_crushing_armor_debuff:GetAppliedArmorReduction()
 	-- The visible modifier owns the exact transmitted float. A freshly
 	-- replicated hidden sync modifier can temporarily exist with 0 stacks; it
@@ -680,6 +748,7 @@ function modifier_xhs_creep_crushing_armor_debuff:GetAppliedArmorReduction()
 	end
 	return math.max(0, self:GetStackCount()) * armor_per_stack
 end
+
 function modifier_xhs_creep_crushing_armor_debuff:SetAppliedArmorReduction(reduction, armor_per_stack)
 	if not IsServer() then return end
 
@@ -707,6 +776,7 @@ function modifier_xhs_creep_crushing_armor_debuff:SetAppliedArmorReduction(reduc
 	self:SendBuffRefreshToClients()
 	self:GetParent():CalculateStatBonus(true)
 end
+
 function modifier_xhs_creep_crushing_armor_debuff:OnIntervalThink()
 	local parent = self:GetParent()
 	local current_reduction = self:GetAppliedArmorReduction()
@@ -719,6 +789,7 @@ function modifier_xhs_creep_crushing_armor_debuff:OnIntervalThink()
 		self:SetAppliedArmorReduction(clamped_reduction, self.armor_per_stack)
 	end
 end
+
 function modifier_xhs_creep_crushing_armor_debuff:OnDestroy()
 	if not IsServer() then return end
 
@@ -726,11 +797,13 @@ function modifier_xhs_creep_crushing_armor_debuff:OnDestroy()
 		sync_modifier:Destroy()
 	end
 end
+
 function modifier_xhs_creep_crushing_armor_debuff:DeclareFunctions()
 	return {
 		MODIFIER_PROPERTY_TOOLTIP,
 	}
 end
+
 function modifier_xhs_creep_crushing_armor_debuff:OnTooltip()
 	return self:GetAppliedArmorReduction()
 end
@@ -738,14 +811,19 @@ end
 modifier_xhs_creep_passive_aura = modifier_xhs_creep_passive_aura or class({})
 modifier_xhs_creep_passive_aura.XHS_LINK_CLIENT = true
 function modifier_xhs_creep_passive_aura:IsHidden() return false end
+
 function modifier_xhs_creep_passive_aura:IsPurgable() return false end
+
 function modifier_xhs_creep_passive_aura:IsDebuff() return Special(self:GetAbility(), "aura_mode") == 2 end
+
 function modifier_xhs_creep_passive_aura:GetTexture() return AbilityTexture(self) end
+
 function modifier_xhs_creep_passive_aura:OnCreated()
 	if IsServer() and Special(self:GetAbility(), "aura_dot_damage_pct") > 0 then
 		self:StartIntervalThink(1)
 	end
 end
+
 function modifier_xhs_creep_passive_aura:OnIntervalThink()
 	local caster = self:GetCaster()
 	if caster == nil or caster:IsNull() then return end
@@ -757,13 +835,19 @@ function modifier_xhs_creep_passive_aura:OnIntervalThink()
 		damage_type = DAMAGE_TYPE_MAGICAL,
 	})
 end
+
 function modifier_xhs_creep_passive_aura:DeclareFunctions()
 	return { MODIFIER_PROPERTY_ATTACKSPEED_BONUS_CONSTANT, MODIFIER_PROPERTY_BASEDAMAGEOUTGOING_PERCENTAGE, MODIFIER_PROPERTY_HEALTH_REGEN_PERCENTAGE, MODIFIER_PROPERTY_PHYSICAL_ARMOR_BONUS, MODIFIER_PROPERTY_TOOLTIP }
 end
+
 function modifier_xhs_creep_passive_aura:GetModifierAttackSpeedBonus_Constant() return Special(self:GetAbility(), "aura_attack_speed") end
+
 function modifier_xhs_creep_passive_aura:GetModifierBaseDamageOutgoing_Percentage() return Special(self:GetAbility(), "aura_damage_pct") end
+
 function modifier_xhs_creep_passive_aura:GetModifierHealthRegenPercentage() return Special(self:GetAbility(), "aura_regen_pct") end
+
 function modifier_xhs_creep_passive_aura:GetModifierPhysicalArmorBonus() return -Special(self:GetAbility(), "aura_armor_reduction") end
+
 function modifier_xhs_creep_passive_aura:OnTooltip()
 	return Special(self:GetAbility(), "aura_damage_pct")
 end

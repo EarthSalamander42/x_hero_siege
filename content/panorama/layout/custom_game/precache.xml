@@ -76,19 +76,21 @@
 			<Image src="file://panorama/images/custom_game/battlepass/emblem_divinity.png" hittest="false" />
 			<Image src="file://panorama/images/custom_game/battlepass/emblem_aghanim.png" hittest="false" />
 			<Image src="file://panorama/images/custom_game/battlepass/emblem_nemestice.png" hittest="false" />
+			<Image src="file://panorama/images/custom_game/battlepass/emblem_ti8_crystalline.png" hittest="false" />
 			<Image src="file://panorama/images/custom_game/battlepass/emblem_diretide_red.png" hittest="false" />
 
-			<Image src="file://panorama/images/custom_game/battlepass/kill_effect_culling_blade.png" hittest="false" />
-			<Image src="file://panorama/images/custom_game/battlepass/kill_effect_faceless_void.png" hittest="false" />
-			<Image src="file://panorama/images/custom_game/battlepass/kill_effect_purple_smoke_free.png" hittest="false" />
-			<Image src="file://panorama/images/custom_game/battlepass/kill_effect_purple_smoke.png" hittest="false" />
-			<Image src="file://panorama/images/custom_game/battlepass/kill_effect_radiant_tower.png" hittest="false" />
-			<Image src="file://panorama/images/custom_game/battlepass/kill_effect_razor.png" hittest="false" />
-			<Image src="file://panorama/images/custom_game/battlepass/kill_effect_spectre_free.png" hittest="false" />
-			<Image src="file://panorama/images/custom_game/battlepass/kill_effect_spectre.png" hittest="false" />
-
-			<Image src="file://panorama/images/custom_game/battlepass/kill_effect_rubick_free.png" hittest="false" />
-			<Image src="file://panorama/images/custom_game/battlepass/kill_effect_rubick.png" hittest="false" />
+			<Image src="file://panorama/images/custom_game/battlepass/kill_effect_earthshaker_arcana.png" hittest="false" />
+			<Image src="file://panorama/images/custom_game/battlepass/kill_effect_faceless_void_arcana.png" hittest="false" />
+			<Image src="file://panorama/images/custom_game/battlepass/kill_effect_lion_arcana.png" hittest="false" />
+			<Image src="file://panorama/images/custom_game/battlepass/kill_effect_razor_arcana.png" hittest="false" />
+			<Image src="file://panorama/images/custom_game/battlepass/kill_effect_queen_of_pain_arcana.png" hittest="false" />
+			<Image src="file://panorama/images/custom_game/battlepass/kill_effect_spectre_arcana.png" hittest="false" />
+			<Image src="file://panorama/images/custom_game/battlepass/kill_effect_zeus_arcana.png" hittest="false" />
+			<Image src="file://panorama/images/custom_game/battlepass/kill_effect_gyrocopter_ti10.png" hittest="false" />
+			<Image src="file://panorama/images/custom_game/battlepass/kill_effect_skywrath_arcana.png" hittest="false" />
+			<Image src="file://panorama/images/custom_game/battlepass/kill_effect_vengeful_arcana.png" hittest="false" />
+			<Image src="file://panorama/images/custom_game/battlepass/kill_effect_drow_arcana.png" hittest="false" />
+			<Image src="file://panorama/images/custom_game/battlepass/kill_effect_drow_arcana_style2.png" hittest="false" />
 
 			<Image src="file://panorama/images/spellicons/custom/arthas_frostmourne.png" hittest="false" />
 			<Image src="file://panorama/images/spellicons/custom/arthas_holy_light.png" hittest="false" />

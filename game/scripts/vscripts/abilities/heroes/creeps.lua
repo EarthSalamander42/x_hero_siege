@@ -45,19 +45,17 @@ end
 function modifier_campfire:OnCreated(kv)
 	if IsServer() then
 		self.aura_radius = self:GetAbility():GetSpecialValueFor("aura_radius")
+		local parent = self:GetParent()
+		parent:SetDayTimeVisionRange(self.aura_radius)
+		parent:SetNightTimeVisionRange(self.aura_radius)
 
 		--		self:GetParent():AddNewModifier( self:GetParent(), nil, "modifier_disable_aggro", { duration = -1 } )
-		self:GetParent():AddNewModifier(self:GetParent(), nil, "modifier_provides_fow_position", { duration = -1 })
+		-- parent:AddNewModifier(parent, nil, "modifier_provides_fow_position", { duration = -1 })
 
-		EmitSoundOn("Campfire.Warmth.Loop", self:GetParent())
+		EmitSoundOn("Campfire.Warmth.Loop", parent)
 
-		AddFOWViewer(
-			self:GetParent():GetTeamNumber(),
-			self:GetParent():GetAbsOrigin(),
-			self.aura_radius,
-			99999,
-			false
-		)
+		-- Let the spawned campfire settle before attaching its persistent flame.
+		self:StartIntervalThink(0.25)
 	end
 end
 
@@ -67,12 +65,30 @@ function modifier_campfire:CheckState()
 		state[MODIFIER_STATE_ROOTED] = true
 		state[MODIFIER_STATE_NO_HEALTH_BAR] = true
 		state[MODIFIER_STATE_NOT_ON_MINIMAP] = true
-		state[MODIFIER_STATE_BLIND] = true
 		state[MODIFIER_STATE_INVULNERABLE] = true
-		state[MODIFIER_STATE_OUT_OF_GAME] = true
+		state[MODIFIER_STATE_UNSELECTABLE] = true
+		state[MODIFIER_STATE_NO_UNIT_COLLISION] = true
 	end
 
 	return state
+end
+
+function modifier_campfire:OnIntervalThink()
+	if not IsServer() or self.nFXIndex ~= nil then return end
+
+	local parent = self:GetParent()
+	self.nFXIndex = ParticleManager:CreateParticle(
+		"particles/act_2/campfire_flame.vpcf",
+		PATTACH_ABSORIGIN,
+		parent
+	)
+	ParticleManager:SetParticleControl(
+		self.nFXIndex,
+		2,
+		parent:GetAbsOrigin() + Vector(0, 0, 50)
+	)
+	self:AddParticle(self.nFXIndex, false, false, -1, false, false)
+	self:StartIntervalThink(-1)
 end
 
 function modifier_campfire:OnDestroy()
@@ -86,10 +102,6 @@ modifier_campfire_effect.XHS_LINK_CLIENT = true
 
 function modifier_campfire_effect:GetEffectName()
 	return "particles/custom/supporter_pass/regen_aura_anchor.vpcf"
-end
-
-function modifier_campfire_effect:OnCreated(kv)
-
 end
 
 function modifier_campfire_effect:DeclareFunctions()

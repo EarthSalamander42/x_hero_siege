@@ -141,9 +141,15 @@ function api:GetUrl(endpoint)
 		url = url .. endUrlFrostrose
 	end
 
-	print("URL: " .. url .. endpoint)
+	local full_url = url .. endpoint
+	local uses_combined_log = endpoint == "game-register"
+		or endpoint == "game-complete"
+		or endpoint == "performance"
+	if not uses_combined_log then
+		print("URL: " .. full_url)
+	end
 
-	return url .. endpoint
+	return full_url
 end
 
 function api:IsDonator(player_id)
@@ -1148,6 +1154,33 @@ function api:UpdateSupporterPassSettings(player_id, settings, callback)
 	end, "POST", payload)
 end
 
+function api:RequestSupporterPassAsset(player_id, asset, callback)
+	callback = callback or function() end
+	local steamid = self:GetPersistentPlayerSteamID(player_id)
+	if steamid == nil then
+		return callback(false, { code = "non_persistent_player", message = "Persistent human player required." })
+	end
+
+	asset = type(asset) == "table" and asset or {}
+	self:Request("supporter-pass/asset-request", function(data)
+		callback(true, data or {})
+	end, function(error)
+		callback(false, error or { message = "Feature request failed." })
+	end, "POST", {
+		steamid = steamid,
+		game_id = self:GetApiGameId(),
+		match_id = self:GetMatchID(),
+		request_id = tostring(asset.request_id or ""),
+		request_type = tostring(asset.request_type or ""),
+		category = tostring(asset.category or ""),
+		asset_id = tostring(asset.asset_id or ""),
+		item_def = asset.item_def,
+		unit_name = asset.unit_name,
+		model = asset.model,
+		display_name = asset.display_name,
+	})
+end
+
 function api:BuySupporterPassShopItem(player_id, item_id, callback)
 	if callback == nil then
 		callback = function() end
@@ -1273,6 +1306,35 @@ function api:EquipSupporterPassItem(player_id, item_id, hero, slot_id, callback)
 	}
 
 	api:Request("supporter-pass/equip", function(data)
+		api:MergeSupporterPassResponse(steamid, data)
+
+		if data.armory then
+			api:PublishSupporterPassArmory(player_id, data.armory)
+		end
+
+		callback(true, data)
+	end, function(error)
+		callback(false, error)
+	end, "POST", payload)
+end
+
+function api:UnequipSupporterPassItem(player_id, hero, slot_id, callback)
+	if callback == nil then
+		callback = function() end
+	end
+
+	local steamid = self:GetPersistentPlayerSteamID(player_id)
+	if steamid == nil then
+		return callback(false, { code = "non_persistent_player", message = "Persistent human player required." })
+	end
+
+	local payload = {
+		steamid = steamid,
+		hero = hero,
+		slot_id = slot_id,
+	}
+
+	api:Request("supporter-pass/unequip", function(data)
 		api:MergeSupporterPassResponse(steamid, data)
 
 		if data.armory then
@@ -1727,7 +1789,8 @@ function api:Request(endpoint, okCallback, failCallback, method, payload)
 	end
 	method = string.upper(method)
 
-	local request = CreateHTTPRequestScriptVM(method, self:GetUrl(endpoint))
+	local request_url = self:GetUrl(endpoint)
+	local request = CreateHTTPRequestScriptVM(method, request_url)
 
 	if request == nil then
 		print("Failed to create http request. skipping")
@@ -1772,11 +1835,12 @@ function api:Request(endpoint, okCallback, failCallback, method, payload)
 		local response_body = tostring(result.Body or "")
 		if endpoint == "game-register" or endpoint == "game-complete" or endpoint == "performance" then
 			local elapsed_ms = math.floor(math.max(Time() - request_started_at, 0) * 1000)
-			print("[XHS HTTP] endpoint=" .. tostring(endpoint)
-				.. " status=" .. tostring(code or 0)
-				.. " elapsed_ms=" .. tostring(elapsed_ms)
-				.. " request_bytes=" .. tostring(encoded_payload_size)
-				.. " response_bytes=" .. tostring(string.len(response_body)))
+			print("[XHS HTTP] destination=" .. tostring(request_url)
+				.. " | method=" .. tostring(method)
+				.. " | status=" .. tostring(code or 0)
+				.. " | elapsed=" .. tostring(elapsed_ms) .. "ms"
+				.. " | request=" .. tostring(encoded_payload_size) .. "B"
+				.. " | response=" .. tostring(string.len(response_body)) .. "B")
 		end
 
 		local fail = function(message)

@@ -58,12 +58,18 @@ end
 
 local function SendChannelNotification(item, eventName, data)
 	local caster = GetChannelCaster(item)
-	if not IsValidEntityHandle(caster) then return end
+	if not IsValidEntityHandle(caster) then
+		return
+	end
 
 	local playerID = caster:GetPlayerOwnerID()
-	if playerID == nil or playerID < 0 then return end
+	if playerID == nil or playerID < 0 then
+		return
+	end
 	local player = PlayerResource:GetPlayer(playerID)
-	if player == nil then return end
+	if player == nil then
+		return
+	end
 
 	data = data or {}
 	data.id = GetChannelNotificationId(caster)
@@ -293,7 +299,9 @@ end
 
 function item_tombstone:OnAbilityPhaseStart()
 	if not IsServer() then return true end
-	if self.xhs_finish_handled == true or self.xhs_rearm_scheduled == true then return false end
+	if self.xhs_finish_handled == true or self.xhs_rearm_scheduled == true then
+		return false
+	end
 
 	local caster = self:GetCaster()
 	local hero = GetReviveHero(self)
@@ -379,7 +387,9 @@ function item_tombstone:OnSpellStart()
 
 	local caster = self:GetCaster()
 	local hero = GetReviveHero(self)
-	if not IsValidEntityHandle(caster) or not IsValidEntityHandle(hero) then return end
+	if not IsValidEntityHandle(caster) or not IsValidEntityHandle(hero) then
+		return
+	end
 
 	local position = self.xhs_tombstone_position or caster:GetAbsOrigin()
 	local isRestart = self.xhs_restart_cast == true
@@ -457,7 +467,10 @@ local function CleanupSuccessfulRevive(hero, winningItem)
 end
 
 function item_tombstone:OnChannelFinish(interrupted)
-	if not IsServer() or self.xhs_finish_handled == true then return end
+	if not IsServer() then return end
+	if self.xhs_finish_handled == true then
+		return
+	end
 
 	if self.xhs_restart_pending == true then
 		self.xhs_restart_pending = false

@@ -394,7 +394,7 @@ var XHSSupporterHover = (function () {
 
 		CreateMeter(hover, "XP_" + id, "Season XP");
 		CreateMeter(hover, "AccountXP_" + id, "Global XP");
-		CreateMeter(hover, "Weekly_" + id, "Daily Cap");
+		CreateMeter(hover, "Weekly_" + id, "Daily Fragment Cap");
 
 		var footer = $.CreatePanel("Label", hover, "XHSSupporterHoverFooter_" + id);
 		footer.AddClass("XHSSupporterHoverFooter");

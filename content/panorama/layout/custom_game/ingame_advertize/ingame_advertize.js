@@ -23,13 +23,23 @@ function IsAdsLocalSpectator() {
 	return Number(Players.GetTeam(playerID)) === 1;
 }
 
+function SetAdsShown(visible) {
+	if (!FIX_CG_ROOT) {
+		return;
+	}
+
+	FIX_CG_ROOT.SetHasClass("show", visible === true);
+	FIX_CG_ROOT.hittest = visible === true;
+	FIX_CG_ROOT.hittestchildren = visible === true;
+}
+
 function EnforceAdsTeamVisibility() {
 	const spectator = IsAdsLocalSpectator();
 	FIX_CG_ROOT.SetHasClass("XHSSpectatorHidden", spectator);
 
 	if (spectator) {
 		adsForceOpened = false;
-		FIX_CG_ROOT.SetHasClass("show", false);
+		SetAdsShown(false);
 	}
 
 	return spectator;
@@ -218,11 +228,11 @@ function SetAdsPanelVisible(forceShow) {
 	}
 
 	if (forceShow !== true && (adsDoNotShowAgain || GetResolvedAdsHiddenPreference() || adsDismissedThisSession)) {
-		FIX_CG_ROOT.SetHasClass("show", false);
+		SetAdsShown(false);
 		return;
 	}
 
-	FIX_CG_ROOT.SetHasClass("show", true);
+	SetAdsShown(true);
 }
 
 function OpenFixGame() {
@@ -247,7 +257,7 @@ function IsXHSIngameAdvertizeOpen() {
 
 function HideXHSIngameAdvertizeToggle() {
 	adsForceOpened = false;
-	FIX_CG_ROOT.SetHasClass("show", false);
+	SetAdsShown(false);
 }
 
 function ToggleXHSIngameAdvertize() {
@@ -263,7 +273,7 @@ function CloseFixGame() {
 	adsDismissedThisSession = true;
 	adsForceOpened = false;
 	UpdateAdsHiddenPreferenceFromCheckbox(true);
-	FIX_CG_ROOT.SetHasClass("show", false);
+	SetAdsShown(false);
 	StoreAdsHidden(adsDoNotShowAgain, false);
 }
 

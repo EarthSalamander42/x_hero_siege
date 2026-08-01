@@ -114,7 +114,7 @@
 		"AbilityTextureName"		"sniper_headshot"
 		"precache"
 		{
-			"particle"		"particles/items_fx/skull_basher.vpcf"
+			"particle"		"particles/items_fx/abyssal_blade_crimson_impact_sparks.vpcf"
 		}
 		"AbilityValues"
 		{

@@ -27,7 +27,8 @@ ListenToGameEvent('game_rules_state_change', function(keys)
 		require('components/battlepass/regen_aura')
 		require('components/battlepass/recovery_effects')
 		require('components/battlepass/immolation')
-		require('components/battlepass/high_five')
+		-- Supporter High Fives are deferred to 4.1. Keep their implementation in
+		-- the repository, but do not load it or expose its ability in 4.0.
 		require('components/battlepass/donator')
 		require('components/battlepass/experience')
 		require('libraries/wearables') -- this lib before items_game
@@ -133,21 +134,13 @@ ListenToGameEvent('npc_spawned', function(event)
 
 		-- The commented out lines here are what I used to test in tools mode
 		if api:IsDonator(npc:GetPlayerID()) or string.find(GetMapName(), "demo") then
-			if api:GetDonatorStatus(npc:GetPlayerID()) == 10 then
-				npc:SetOriginalModel("models/items/courier/kanyu_shark/kanyu_shark.vmdl")
-				npc:CenterCameraOnEntity(npc, -1)
-			else
-				if unit_name ~= "npc_dota_hero_wisp" then
-					npc:AddNewModifier(npc, nil, "modifier_patreon_donator", {})
-				end
+			if unit_name ~= "npc_dota_hero_wisp" then
+				npc:AddNewModifier(npc, nil, "modifier_patreon_donator", {})
 			end
 		end
 
 		Timers:CreateTimer(0.1, function()
 			if npc and not npc:IsNull() then
-				if SupporterHighFive and SupporterHighFive.EnsureAbility then
-					SupporterHighFive:EnsureAbility(npc)
-				end
 				Battlepass:ApplySupporterLoadout(npc:GetPlayerID(), npc)
 				if Battlepass.ReapplySupporterDevTest then
 					Battlepass:ReapplySupporterDevTest(npc:GetPlayerID(), npc)

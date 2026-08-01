@@ -49,6 +49,8 @@ var XHSTopHud = (function () {
 	var topHudLayerApplied = false;
 	var isSpecialEventPanelVisible = false;
 	var isGamePaused = false;
+	var isSupporterPassOccluding = false;
+	var areOverheadsModalOccluded = null;
 	var isHeroSelectionTransitionActive = false;
 	var nightfallVignetteToken = 0;
 	var activeCurrentEventTimerName = null;
@@ -815,24 +817,44 @@ var XHSTopHud = (function () {
 		overheadUiBlockerRefreshAt = 0;
 	}
 
-	function SetOverheadPauseOcclusion(paused) {
-		paused = !!paused;
-		if (isGamePaused === paused) {
+	function GetSupporterPassOcclusionState() {
+		return SafeValue(function () {
+			var config = GameUI.CustomUIConfig ? GameUI.CustomUIConfig() : null;
+			if (!config) {
+				return false;
+			}
+			if (typeof config.XHSSupporterPassOccludesOverheads === "boolean") {
+				return config.XHSSupporterPassOccludesOverheads;
+			}
+			return config.XHSSupporterPassVisible === true;
+		}, isSupporterPassOccluding);
+	}
+
+	function ApplyOverheadModalOcclusion(paused, supporterPassVisible) {
+		isGamePaused = !!paused;
+		isSupporterPassOccluding = !!supporterPassVisible;
+		var occluded = isGamePaused || isSupporterPassOccluding;
+		if (areOverheadsModalOccluded === occluded) {
 			return;
 		}
 
-		isGamePaused = paused;
+		areOverheadsModalOccluded = occluded;
 		var overheadRoot = Panel("XHSOverheadRoot");
 		if (overheadRoot) {
-			overheadRoot.SetHasClass("XHSPauseOccluded", paused);
+			overheadRoot.SetHasClass("XHSPauseOccluded", false);
+			overheadRoot.SetHasClass("XHSModalOccluded", occluded);
 		}
+	}
+
+	function SetOverheadPauseOcclusion(paused) {
+		ApplyOverheadModalOcclusion(paused, GetSupporterPassOcclusionState());
 	}
 
 	function SyncOverheadPauseOcclusion() {
 		var paused = SafeValue(function () {
 			return Game.IsGamePaused();
 		}, isGamePaused);
-		SetOverheadPauseOcclusion(paused);
+		ApplyOverheadModalOcclusion(paused, GetSupporterPassOcclusionState());
 	}
 
 	function SetSharedSpecialEventVisible(isVisible) {
@@ -1373,6 +1395,7 @@ var XHSTopHud = (function () {
 		label.AddClass("XHSOverheadLabel");
 		label.SetAttributeInt("player_id", playerID);
 		label.SetAttributeInt("ent_index", -1);
+		label.SetAttributeInt("position_ent_index", -1);
 		label.hittest = false;
 
 		// Bot intent is a separate world-space caption.  It must never become
@@ -1404,6 +1427,32 @@ var XHSTopHud = (function () {
 		var frameArt = $.CreatePanel("Panel", label, "XHSOverheadFrameArt_" + playerID);
 		frameArt.AddClass("XHSOverheadFrameArt");
 		frameArt.hittest = false;
+
+		var tombstoneCard = $.CreatePanel("Panel", label, "XHSOverheadTombstoneCard_" + playerID);
+		tombstoneCard.AddClass("XHSOverheadTombstoneCard");
+		tombstoneCard.hittest = false;
+		var tombstoneMark = $.CreatePanel("Panel", tombstoneCard, "XHSOverheadTombstoneMark_" + playerID);
+		tombstoneMark.AddClass("XHSOverheadTombstoneMark");
+		tombstoneMark.hittest = false;
+		var tombstoneRuneVertical = $.CreatePanel("Panel", tombstoneMark, "");
+		tombstoneRuneVertical.AddClass("XHSOverheadTombstoneRuneVertical");
+		tombstoneRuneVertical.hittest = false;
+		var tombstoneRuneHorizontal = $.CreatePanel("Panel", tombstoneMark, "");
+		tombstoneRuneHorizontal.AddClass("XHSOverheadTombstoneRuneHorizontal");
+		tombstoneRuneHorizontal.hittest = false;
+		var tombstoneRuneCore = $.CreatePanel("Panel", tombstoneMark, "");
+		tombstoneRuneCore.AddClass("XHSOverheadTombstoneRuneCore");
+		tombstoneRuneCore.hittest = false;
+		var tombstoneCopy = $.CreatePanel("Panel", tombstoneCard, "XHSOverheadTombstoneCopy_" + playerID);
+		tombstoneCopy.AddClass("XHSOverheadTombstoneCopy");
+		tombstoneCopy.hittest = false;
+		var tombstoneTitle = $.CreatePanel("Label", tombstoneCopy, "XHSOverheadTombstoneTitle_" + playerID);
+		tombstoneTitle.AddClass("XHSOverheadTombstoneTitle");
+		tombstoneTitle.hittest = false;
+		var tombstoneAction = $.CreatePanel("Label", tombstoneCopy, "XHSOverheadTombstoneAction_" + playerID);
+		tombstoneAction.AddClass("XHSOverheadTombstoneAction");
+		tombstoneAction.text = "RIGHT-CLICK TO REVIVE";
+		tombstoneAction.hittest = false;
 
 		var value = $.CreatePanel("Label", label, "XHSOverheadValue_" + playerID);
 		value.AddClass("XHSOverheadValue");
@@ -2162,6 +2211,7 @@ var XHSTopHud = (function () {
 		SetChildText(label, "XHSOverheadGameplayStatus_" + overheadKey, FormatOverheadGameplayStatus(data));
 		SetChildText(label, "XHSOverheadAltStatus_" + overheadKey, FormatOverheadAltStatus(data));
 		SetChildText(label, "XHSOverheadHealthLevel_" + overheadKey, Math.max(1, ToNumber(data.heroLevel, 1)).toString());
+		SetChildText(label, "XHSOverheadTombstoneTitle_" + overheadKey, displayName || "FALLEN HERO");
 		ApplyOverheadStatusEffect(label, overheadKey, GetOverheadStatusEffect(entIndex));
 		if (overheadKey === playerID) {
 			ApplyBotActivityToOverhead(playerID);
@@ -2185,7 +2235,12 @@ var XHSTopHud = (function () {
 		var currentHealth = Math.max(0, Math.floor(ToNumber(health, 0)));
 		var currentMaxHealth = Math.max(1, Math.floor(ToNumber(maxHealth, 1)));
 		var reincarnationState = GetReincarnationState(entIndex);
-		var shouldHideDeadOverhead = clampedHealth <= 0 && !reincarnationState.active && GetAnkhCharges(entIndex) <= 0;
+		var tombstoneState = GetTombstoneReviveState(entIndex);
+		var tombstoneEntIndex = Math.floor(ToNumber(tombstoneState.tombstoneEntIndex, -1));
+		var hasTombstone = clampedHealth <= 0 && IsValidEntityIndex(tombstoneEntIndex) && SafeValue(function () {
+			return typeof Entities.IsValidEntity !== "function" || Entities.IsValidEntity(tombstoneEntIndex);
+		}, true);
+		var shouldHideDeadOverhead = clampedHealth <= 0 && !reincarnationState.active && GetAnkhCharges(entIndex) <= 0 && !hasTombstone;
 
 		if (value) {
 			value.text = FormatNumber(currentHealth) + " / " + FormatNumber(currentMaxHealth);
@@ -2204,10 +2259,16 @@ var XHSTopHud = (function () {
 		label.SetHasClass("IsDead", clampedHealth <= 0);
 		label.SetHasClass("IsReincarnating", reincarnationState.active);
 		label.SetHasClass("XHSOverheadLowHealth", clampedHealth > 0 && clampedHealth <= 30);
+		label.SetHasClass("XHSOverheadTombstone", hasTombstone);
 		label.SetHasClass("XHSNoMana", !hasMana);
 		label.SetAttributeInt("death_hidden", shouldHideDeadOverhead ? 1 : 0);
+		label.SetAttributeInt("position_ent_index", hasTombstone ? tombstoneEntIndex : -1);
 		ApplyOverheadStatusEffect(label, overheadKey, GetOverheadStatusEffect(entIndex));
 
+		if (hasTombstone) {
+			SetChildText(label, "XHSOverheadGameplayStatus_" + overheadKey, "TOMBSTONE");
+			SetChildText(label, "XHSOverheadAltStatus_" + overheadKey, "CLICK TO REVIVE");
+		}
 		if (reincarnationState.active) {
 			SetChildText(label, "XHSOverheadGameplayStatus_" + overheadKey, FormatReincarnationStatus(reincarnationState));
 		}
@@ -2224,18 +2285,22 @@ var XHSTopHud = (function () {
 
 		var root = Panel("XHSOverheadRoot");
 		var entIndex = label.GetAttributeInt("ent_index", -1);
+		var positionEntIndex = label.GetAttributeInt("position_ent_index", -1);
+		if (!IsValidEntityIndex(positionEntIndex)) {
+			positionEntIndex = entIndex;
+		}
 		var playerID = label.GetAttributeInt("player_id", -1);
 		if (isHeroSelectionTransitionActive && playerID === GetLocalPlayerID()) {
 			SetOverheadLabelVisible(label, false);
 			return;
 		}
-		if (!root || !IsValidEntityIndex(entIndex) || label.GetAttributeInt("death_hidden", 0) > 0) {
+		if (!root || !IsValidEntityIndex(positionEntIndex) || label.GetAttributeInt("death_hidden", 0) > 0) {
 			SetOverheadLabelVisible(label, false);
 			return;
 		}
 
 		var origin = SafeValue(function () {
-			return Entities.GetAbsOrigin(entIndex);
+			return Entities.GetAbsOrigin(positionEntIndex);
 		}, null);
 		var screen = ProjectWorldToScreen(origin);
 		var rootWidth = Number(root.actuallayoutwidth || root.desiredlayoutwidth || 0);
@@ -2819,6 +2884,7 @@ var XHSTopHud = (function () {
 			endTime: endTime,
 			remaining: remaining,
 			channels: Math.max(0, ToNumber(data.channels, 0)),
+			tombstoneEntIndex: Math.floor(ToNumber(data.tombstone_entindex, -1)),
 		};
 	}
 
@@ -3532,7 +3598,8 @@ XHSTopHud.Initialize();
 	function UpdateReviveStackVisibility() {
 		var root = $("#XHSReviveFrameStack");
 		if (root) {
-			root.SetHasClass("XHSHasReviveFrames", root.GetChildCount() > 0);
+			var childCount = root.GetChildCount();
+			root.SetHasClass("XHSHasReviveFrames", childCount > 0);
 		}
 	}
 
@@ -3606,7 +3673,7 @@ XHSTopHud.Initialize();
 		var frame = state.panel;
 		frame.SetHasClass("XHSReviveCompleted", result === "completed");
 		frame.SetHasClass("XHSReviveCancelled", result !== "completed");
-		frame._xhsTimer.text = result === "completed" ? "ALIVE" : "BROKEN";
+		frame._xhsTimer.text = result === "completed" ? "ALIVE" : "CANCELLED";
 		frame._xhsChannelers.text = result === "completed" ? "SOUL RESTORED" : "RITUAL INTERRUPTED";
 		frame._xhsProgress.style.width = result === "completed" ? "100%" : "0%";
 		$.Schedule(result === "completed" ? 0.9 : 0.55, function () {
@@ -3687,12 +3754,14 @@ XHSTopHud.Initialize();
 
 	function SyncReviveFramesFromNetTables() {
 		var playerIds = typeof Game.GetAllPlayerIDs === "function" ? Game.GetAllPlayerIDs() : [];
+		var scannedHeroIndexes = {};
 		for (var i = 0; i < playerIds.length; i++) {
 			var heroEntIndex = Players.GetPlayerHeroEntityIndex(playerIds[i]);
 			if (!heroEntIndex || heroEntIndex < 0) {
 				continue;
 			}
 			var key = String(heroEntIndex);
+			scannedHeroIndexes[key] = true;
 			var data = CustomNetTables.GetTableValue("player_table", key + "_revive_channel") || {};
 			if (Number(data.active) > 0 && !frames[key]) {
 				OnReviveUpdate({
@@ -3708,10 +3777,44 @@ XHSTopHud.Initialize();
 				RemoveFrame(key, "cancelled");
 			}
 		}
+
+		// Enemy/NPC heroes do not appear in Game.GetAllPlayerIDs(). The server
+		// publishes their entity indexes explicitly so their revive state can use
+		// the same reliable nettable fallback as player-owned heroes.
+		var reviveIndex = CustomNetTables.GetTableValue("player_table", "xhs_tombstone_revive_index") || {};
+		var indexedHeroes = reviveIndex.heroes || {};
+		for (var indexKey in indexedHeroes) {
+			if (!indexedHeroes.hasOwnProperty(indexKey)) {
+				continue;
+			}
+			var indexEntry = indexedHeroes[indexKey] || {};
+			var indexedEntIndex = Number(indexEntry.hero_entindex) || Number(indexKey) || -1;
+			var indexedKey = String(indexedEntIndex);
+			if (indexedEntIndex < 0 || scannedHeroIndexes[indexedKey]) {
+				continue;
+			}
+			scannedHeroIndexes[indexedKey] = true;
+			var indexedData = CustomNetTables.GetTableValue("player_table", indexedKey + "_revive_channel") || {};
+			if (Number(indexedData.active) > 0 && !frames[indexedKey]) {
+				OnReviveUpdate({
+					hero_entindex: indexedEntIndex,
+					player_id: Number(indexEntry.player_id),
+					hero_name: String(indexEntry.hero_name || Entities.GetUnitName(indexedEntIndex) || ""),
+					active: 1,
+					duration: indexedData.duration,
+					end_time: indexedData.end_time,
+					channels: indexedData.channels,
+				});
+			} else if (Number(indexedData.active) <= 0 && frames[indexedKey]) {
+				RemoveFrame(indexedKey, "cancelled");
+			}
+		}
 		$.Schedule(0.5, SyncReviveFramesFromNetTables);
 	}
 
-	GameEvents.Subscribe("xhs_tombstone_revive_update", OnReviveUpdate);
+	GameEvents.Subscribe("xhs_tombstone_revive_update", function (data) {
+		OnReviveUpdate(data);
+	});
 	GameEvents.Subscribe("xhs_tombstone_channel_local", function (data) {
 		SetVanillaChannelHidden(Number((data || {}).active) > 0);
 	});

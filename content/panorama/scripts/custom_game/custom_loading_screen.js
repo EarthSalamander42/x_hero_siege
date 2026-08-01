@@ -208,6 +208,7 @@ var XHS_DIFFICULTY_VOTE_STATS = {
 var vote_fallbacks = {
 	loading_screen_bot_setup_title: "AI ALLIES",
 	loading_screen_bot_setup_count: "Allies",
+	loading_screen_bot_setup_performance_warning: "Performance warning: {total} total players (humans + AI). Above 4 players, bot resource usage may make the game less smooth.",
 	loading_screen_bot_setup_difficulty: "Difficulty",
 	loading_screen_bot_setup_composition: "Composition",
 	loading_screen_bot_setup_easy: "Easy",
@@ -635,6 +636,10 @@ function XHSBotSetupEnsureHeroDropdown(player_row, bot_data) {
 		}
 	}
 	player_row.hero_dropdown.SetSelected(selected_id);
+	player_row.hero_dropdown.SetHasClass("HasHeroIcon", !!selected_hero);
+	player_row.hero_dropdown.style.backgroundImage = selected_hero
+		? "url(\"file://{images}/heroes/icons/" + selected_hero + ".png\")"
+		: "none";
 	player_row.hero_dropdown.enabled = XHSBotSetupCanEdit();
 	player_row.hero_dropdown.SetHasClass("Disabled", !XHSBotSetupCanEdit());
 }
@@ -1008,6 +1013,12 @@ function XHSBotSetupBuildCard() {
 	xhs_bot_setup_ui.count_plus = XHSBotSetupMakeButton(count_controls, "XHSBotSetupCountPlus", "+", "CountStep", function () {
 		XHSBotSetupChangeCount(1);
 	});
+	xhs_bot_setup_ui.performance_warning = XHSBotSetupMakeLabel(
+		card,
+		"xhs-bot-setup-performance-warning",
+		""
+	);
+	xhs_bot_setup_ui.performance_warning.style.visibility = "collapse";
 
 	var difficulty_row = $.CreatePanel("Panel", card, "");
 	difficulty_row.AddClass("xhs-bot-setup-field-row");
@@ -1173,6 +1184,19 @@ function XHSBotSetupRender(reason) {
 	xhs_bot_setup_ui.spectator_row.style.visibility = tools_mode ? "visible" : "collapse";
 
 	xhs_bot_setup_ui.count_value.text = count + " / " + maximum;
+	var human_count = Math.max(1, Math.floor(ToNumber(
+		xhs_bot_setup_config && xhs_bot_setup_config.human_count,
+		xhs_bot_setup_config && xhs_bot_setup_config.vote_total
+	)));
+	var total_players = human_count + count;
+	var show_performance_warning = count > 0 && total_players > 4;
+	xhs_bot_setup_ui.performance_warning.text = LocalizeTemplate(
+		"loading_screen_bot_setup_performance_warning",
+		{ total: total_players.toString() }
+	);
+	xhs_bot_setup_ui.performance_warning.style.visibility = show_performance_warning
+		? "visible"
+		: "collapse";
 	XHSBotSetupSetButtonEnabled(xhs_bot_setup_ui.count_minus, can_edit && count > 0);
 	XHSBotSetupSetButtonEnabled(xhs_bot_setup_ui.count_plus, can_edit && count < maximum);
 

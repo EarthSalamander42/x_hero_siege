@@ -179,8 +179,8 @@
 		
 		// Vision
 		//----------------------------------------------------------------
-		"VisionDaytimeRange"		"1"
-		"VisionNighttimeRange"		"1"
+		"VisionDaytimeRange"		"700"
+		"VisionNighttimeRange"		"700"
 
 		"DisableDamageDisplay"      "1"
 	}

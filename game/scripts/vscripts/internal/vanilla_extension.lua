@@ -174,6 +174,7 @@ end
 local XHS_SUPPORTER_LIFESTEAL_CONFIG = {
 	attack = {
 		player_field = "attack_lifesteal_pfx",
+		default_particle = "particles/generic_gameplay/generic_lifesteal.vpcf",
 		cooldown = 0.30,
 	},
 	spell = {
@@ -184,7 +185,6 @@ local XHS_SUPPORTER_LIFESTEAL_CONFIG = {
 local XHS_SUPPORTER_LIFESTEAL_PARTICLE_PROFILES = {
 	["particles/econ/items/drow/drow_arcana/drow_arcana_lifesteal.vpcf"] = "hero_cp1",
 	["particles/econ/items/lone_druid/lone_druid_immortal_2021/lone_druid_immortal_2021_lifesteal.vpcf"] = "hero_cp1",
-	["particles/item/lifesteal_mask/lifesteal_particle.vpcf"] = "victim_to_hero",
 }
 
 local XHS_SUPPORTER_LIFESTEAL_BLOCKED_PREFIXES = {
@@ -235,15 +235,16 @@ local function XHSIsBlockedLifestealParticle(path)
 end
 
 local function XHSResolveSupporterLifestealParticle(hero, playerID, config)
+	local fallback = config.default_particle
 	if Battlepass ~= nil and Battlepass.AreSupporterRewardsEnabled ~= nil then
 		local success, enabled = pcall(Battlepass.AreSupporterRewardsEnabled, Battlepass, playerID)
-		if success and not enabled then return nil end
+		if success and not enabled then return fallback end
 	end
 
-	if Battlepass == nil or Battlepass.GetPlayerParticle == nil then return nil end
-	local particle = Battlepass:GetPlayerParticle(hero, config.player_field)
-	if not XHSIsValidLifestealParticlePath(particle) then return nil end
-	if XHSIsBlockedLifestealParticle(particle) then return nil end
+	if Battlepass == nil or Battlepass.GetPlayerParticle == nil then return fallback end
+	local particle = Battlepass:GetPlayerParticle(hero, config.player_field, fallback)
+	if not XHSIsValidLifestealParticlePath(particle) then return fallback end
+	if XHSIsBlockedLifestealParticle(particle) then return fallback end
 	return particle
 end
 
@@ -270,7 +271,7 @@ local function XHSCreateSupporterLifestealParticle(hero, victim, particleName)
 
 	local profile = XHS_SUPPORTER_LIFESTEAL_PARTICLE_PROFILES[string.lower(particleName)] or "hero"
 	local parent = hero
-	if profile == "victim_to_hero" then
+	if profile == "victim_to_hero" or profile == "victim_to_hero_world" then
 		if not XHSIsValidLifestealEntity(victim) then return false end
 		parent = victim
 	end
@@ -282,7 +283,12 @@ local function XHSCreateSupporterLifestealParticle(hero, victim, particleName)
 	)
 	if particle == nil or particle < 0 then return false end
 
-	if profile == "victim_to_hero" then
+	if profile == "victim_to_hero_world" then
+		-- Drow Arcana emits around CP0 and attracts toward CP1. Absolute
+		-- origins avoid attach_hitloc errors on XHS units without that point.
+		ParticleManager:SetParticleControl(particle, 0, victim:GetAbsOrigin())
+		ParticleManager:SetParticleControl(particle, 1, hero:GetAbsOrigin())
+	elseif profile == "victim_to_hero" then
 		XHSSetLifestealParticleControlEntity(particle, 0, victim)
 		XHSSetLifestealParticleControlEntity(particle, 1, hero)
 	elseif profile == "hero_cp1" then

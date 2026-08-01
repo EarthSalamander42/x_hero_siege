@@ -476,10 +476,10 @@ function CustomTimers:Think()
 		end
 
 		if GameMode.SpecialArena_occuring == true then CustomTimers:Countdown("special_arena") end
-		if GameMode.HeroImage_occuring == true then CustomTimers:Countdown("hero_image") end
-		if GameMode.SpiritBeast_occuring == true then CustomTimers:Countdown("spirit_beast") end
-		if GameMode.FrostInfernal_occuring == true then CustomTimers:Countdown("frost_infernal") end
-		if GameMode.AllHeroImages_occuring == true then CustomTimers:Countdown("all_hero_images") end
+		if GameMode.HeroImage_occuring == true and GameMode.HeroImageTimerStarted == true then CustomTimers:Countdown("hero_image") end
+		if GameMode.SpiritBeast_occuring == true and GameMode.SpiritBeastTimerStarted == true then CustomTimers:Countdown("spirit_beast") end
+		if GameMode.FrostInfernal_occuring == true and GameMode.FrostInfernalTimerStarted == true then CustomTimers:Countdown("frost_infernal") end
+		if GameMode.AllHeroImages_occuring == true and GameMode.AllHeroImagesTimerStarted == true then CustomTimers:Countdown("all_hero_images") end
 	end
 end
 

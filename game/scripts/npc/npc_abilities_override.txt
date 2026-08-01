@@ -19,7 +19,7 @@
 		"ItemCost"						"50"
 		"ItemInitialCharges"			"1000"
 		"ItemDisplayCharges"			"0"
-		"ItemPurchaseable"				"0"
+		"ItemPurchasable"				"0"
 		
 		// Special	
 		//-------------------------------------------------------------------------------------------------------------

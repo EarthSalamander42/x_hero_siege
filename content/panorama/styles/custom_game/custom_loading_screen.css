@@ -5938,6 +5938,20 @@
 	flow-children: right;
 }
 
+.xhs-bot-setup-performance-warning {
+	width: 100%;
+	min-height: 34px;
+	margin: 0px 0px 6px 0px;
+	padding: 5px 7px 5px 7px;
+	color: #ffd782;
+	font-size: 10px;
+	line-height: 12px;
+	white-space: normal;
+	background-color: #3b260dcc;
+	border: 1px solid #e5a83f88;
+	text-shadow: 0px 1px 2px 2 #000000;
+}
+
 .xhs-bot-setup-field-label,
 .xhs-bot-setup-composition-label {
 	width: 92px;
@@ -6118,6 +6132,13 @@ DropDownMenu.DropDownMenuVisible {
 	cursor: pointer;
 	transition-property: brightness, border;
 	transition-duration: 0.12s;
+	background-size: 16px 16px;
+	background-repeat: no-repeat;
+	background-position: 5px 50%;
+}
+
+.xhs-bot-hero-dropdown.HasHeroIcon {
+	padding-left: 25px;
 }
 
 .xhs-bot-hero-dropdown:hover {

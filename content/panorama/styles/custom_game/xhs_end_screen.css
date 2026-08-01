@@ -1543,7 +1543,7 @@
 }
 
 .RevealTier2 .XHSRewardRevealBurst {
-	background-color: gradient( radial, 50% 50%, 0% 0%, 50% 50%, from( #ffcf5978 ), color-stop( 0.4, #c4802635 ), to( #75410b00 ) );
+	background-color: gradient( radial, 50% 50%, 0% 0%, 50% 50%, from( #d32ce688 ), color-stop( 0.4, #8847ff40 ), to( #42135f00 ) );
 	animation-duration: 2.2s;
 }
 
@@ -1580,6 +1580,10 @@
 .XHSRewardRevealRays.Cross {
 	animation-name: xhs_reward_rays_spin_reverse;
 	animation-duration: 11s;
+}
+
+.level-legendary .XHSRewardRevealRays {
+	background-color: gradient( linear, 0% 0%, 100% 0%, from( #d32ce600 ), color-stop( 0.48, #d32ce618 ), color-stop( 0.5, #f0a6ffcc ), color-stop( 0.52, #d32ce618 ), to( #d32ce600 ) );
 }
 
 .RevealTier3 .XHSRewardRevealRays {
@@ -1704,7 +1708,7 @@
 }
 
 .XHSRewardImageGlow.mythical { box-shadow: fill #8847ff66 0px 0px 44px 14px; }
-.XHSRewardImageGlow.legendary { box-shadow: fill #d9ad3766 0px 0px 44px 14px; }
+.XHSRewardImageGlow.legendary { box-shadow: fill #d32ce675 0px 0px 44px 14px; }
 .XHSRewardImageGlow.immortal { box-shadow: fill #e4ae3966 0px 0px 48px 16px; }
 .XHSRewardImageGlow.arcana { box-shadow: fill #ade55c66 0px 0px 48px 16px; }
 .XHSRewardImageGlow.ancient { box-shadow: fill #eb4b4b66 0px 0px 48px 16px; }
@@ -1805,6 +1809,34 @@
 	align: center center;
 	color: #f4fbff;
 	font-size: 18px;
+	font-weight: semi-bold;
+	letter-spacing: 1px;
+	text-transform: uppercase;
+}
+
+.XHSRewardCloseAllButton {
+	width: 100%;
+	height: 38px;
+	margin-top: 8px;
+	background-color: #142434e8;
+	border: 1px solid #7f95a633;
+	transition-property: brightness, background-color;
+	transition-duration: 0.08s;
+}
+
+.XHSRewardCloseAllButton:hover {
+	brightness: 1.25;
+	background-color: #1b3044ee;
+}
+
+.XHSRewardCloseAllButton:active {
+	brightness: 0.82;
+}
+
+.XHSRewardCloseAllButton Label {
+	align: center center;
+	color: #9fb2c5;
+	font-size: 15px;
 	font-weight: semi-bold;
 	letter-spacing: 1px;
 	text-transform: uppercase;

@@ -5,21 +5,38 @@ local MIN_CHANNEL_TIME = 0.1
 local INTERACTION_RANGE = 190
 local INTERACTION_TIMEOUT = 12.0
 local REVIVE_PARTICLE = "particles/items_fx/aegis_respawn.vpcf"
-local CHANNEL_PARTICLE = "particles/items_fx/aegis_respawn_timer.vpcf"
 local SPAWN_PARTICLE = "particles/units/heroes/hero_undying/undying_tombstone.vpcf"
 local AMBIENT_PARTICLE = "particles/econ/items/undying/fall20_undying_head/fall20_undying_tombstone_ambient.vpcf"
 local COMPLETE_SOUND = "Hero_Omniknight.GuardianAngel.Cast"
+local TOMBSTONE_UNIT_NAME = "npc_xhs_hero_tombstone"
+local tombstoneHeroByEntindex = {}
 
 local SupporterRecoveryEffects = require("components/battlepass/recovery_effects"):Init()
+local reviveIndex = {}
 
 local function IsValid(entity)
 	return entity ~= nil and IsValidEntity(entity) and not entity:IsNull()
 end
 
+local function HasTombstoneArtifacts(hero)
+	return IsValid(hero) and (
+		hero.xhs_tombstone_state ~= nil
+		or hero.xhs_tombstone_unit ~= nil
+		or hero.xhs_tombstone_drop ~= nil
+		or hero.xhs_tombstone_item ~= nil
+	)
+end
+
 local function GetHeroFromTombstone(tombstone)
 	if not IsValid(tombstone) then return nil end
+	local tombstoneEntindex = tombstone:entindex()
 	local entindex = tonumber(tombstone.xhs_revive_hero_entindex)
+		or tonumber(tombstoneHeroByEntindex[tombstoneEntindex])
 	local hero = entindex ~= nil and entindex > 0 and EntIndexToHScript(entindex) or nil
+	if (not IsValid(hero) or not hero:IsRealHero()) and tombstone.GetOwnerEntity ~= nil then
+		local owner = tombstone:GetOwnerEntity()
+		if IsValid(owner) and owner:IsRealHero() then hero = owner end
+	end
 	return IsValid(hero) and hero:IsRealHero() and hero or nil
 end
 
@@ -36,7 +53,9 @@ local function GetState(hero, create)
 end
 
 local function SetNetState(hero, active, duration, endTime, channelCount, tombstone)
-	if not IsValid(hero) then return end
+	if not IsValid(hero) then
+		return
+	end
 	CustomNetTables:SetTableValue("player_table", tostring(hero:entindex()) .. "_revive_channel", {
 		active = active == true and 1 or 0,
 		duration = tonumber(duration) or 0,
@@ -44,20 +63,35 @@ local function SetNetState(hero, active, duration, endTime, channelCount, tombst
 		channels = tonumber(channelCount) or 0,
 		tombstone_entindex = IsValid(tombstone) and tombstone:entindex() or -1,
 	})
+	local heroKey = tostring(hero:entindex())
+	reviveIndex[heroKey] = {
+		hero_entindex = hero:entindex(),
+		player_id = hero:GetPlayerOwnerID(),
+		hero_name = hero:GetUnitName(),
+	}
+	CustomNetTables:SetTableValue("player_table", "xhs_tombstone_revive_index", {
+		heroes = reviveIndex,
+	})
 end
 
 local function SendLocalChannelState(caster, active)
-	if not IsValid(caster) then return end
+	if not IsValid(caster) then
+		return
+	end
 	local playerId = caster:GetPlayerOwnerID()
 	local player = playerId ~= nil and playerId >= 0 and PlayerResource:GetPlayer(playerId) or nil
-	if player == nil then return end
+	if player == nil then
+		return
+	end
 	CustomGameEventManager:Send_ServerToPlayer(player, "xhs_tombstone_channel_local", {
 		active = active == true and 1 or 0,
 	})
 end
 
 local function BroadcastReviveState(hero, active, duration, endTime, channelCount, result)
-	if not IsValid(hero) then return end
+	if not IsValid(hero) then
+		return
+	end
 	CustomGameEventManager:Send_ServerToAllClients("xhs_tombstone_revive_update", {
 		hero_entindex = hero:entindex(),
 		player_id = hero:GetPlayerOwnerID(),
@@ -68,13 +102,6 @@ local function BroadcastReviveState(hero, active, duration, endTime, channelCoun
 		channels = tonumber(channelCount) or 0,
 		result = result or "",
 	})
-end
-
-local function DestroyChannelParticle(ability, interrupted)
-	if ability == nil or ability.xhs_channel_particle == nil then return end
-	ParticleManager:DestroyParticle(ability.xhs_channel_particle, interrupted == true)
-	ParticleManager:ReleaseParticleIndex(ability.xhs_channel_particle)
-	ability.xhs_channel_particle = nil
 end
 
 local function ScheduleAbilityRemoval(caster, ability)
@@ -89,13 +116,19 @@ local function ScheduleAbilityRemoval(caster, ability)
 end
 
 local function PruneChannels(hero, state)
-	if state == nil then return 0, nil end
+	if state == nil then
+		return 0, nil
+	end
 	local count = 0
 	local earliestEnd = nil
 	for casterIndex, channel in pairs(state.channels or {}) do
 		local caster = channel.caster
 		local ability = channel.ability
-		if IsValid(caster) and caster:IsAlive() and ability ~= nil and ability:IsChanneling() then
+		local casterValid = IsValid(caster)
+		local casterAlive = casterValid and caster:IsAlive()
+		local abilityValid = ability ~= nil and IsValidEntity(ability) and not ability:IsNull()
+		local isChanneling = abilityValid and ability:IsChanneling()
+		if casterValid and casterAlive and abilityValid and isChanneling then
 			count = count + 1
 			local channelEnd = tonumber(channel.end_time) or 0
 			earliestEnd = earliestEnd == nil and channelEnd or math.min(earliestEnd, channelEnd)
@@ -132,11 +165,42 @@ local function PublishState(hero, state)
 	return count
 end
 
+-- OnSpellStart may run just before the engine flips IsChanneling() to true.
+-- Publish the freshly registered channel without pruning it during that frame,
+-- then let the normal validator take over once the engine state is settled.
+local function PublishStartingState(hero, state)
+	if not IsValid(hero) or hero:IsAlive() or state == nil then return 0 end
+	local count = 0
+	local earliestEnd = nil
+	for casterIndex, channel in pairs(state.channels or {}) do
+		local caster = channel.caster
+		local ability = channel.ability
+		if IsValid(caster) and caster:IsAlive()
+			and ability ~= nil and IsValidEntity(ability) and not ability:IsNull() then
+			count = count + 1
+			local channelEnd = tonumber(channel.end_time) or 0
+			earliestEnd = earliestEnd == nil and channelEnd or math.min(earliestEnd, channelEnd)
+		else
+			state.channels[casterIndex] = nil
+		end
+	end
+	state.end_time = earliestEnd
+	local remaining = earliestEnd ~= nil and math.max(0, earliestEnd - GameRules:GetGameTime()) or 0
+	if count <= 0 or remaining <= 0 then return 0 end
+	SetNetState(hero, true, remaining, earliestEnd, count, hero.xhs_tombstone_unit)
+	BroadcastReviveState(hero, true, remaining, earliestEnd, count)
+	for _, channel in pairs(state.channels) do
+		SendLocalChannelState(channel.caster, true)
+	end
+	return count
+end
+
 local function RemoveTombstone(hero)
 	if not IsValid(hero) then return end
 	local tombstone = hero.xhs_tombstone_unit
 	hero.xhs_tombstone_unit = nil
 	if IsValid(tombstone) then
+		tombstoneHeroByEntindex[tombstone:entindex()] = nil
 		if tombstone.xhs_tombstone_ambient_particle ~= nil then
 			ParticleManager:DestroyParticle(tombstone.xhs_tombstone_ambient_particle, false)
 			ParticleManager:ReleaseParticleIndex(tombstone.xhs_tombstone_ambient_particle)
@@ -144,11 +208,16 @@ local function RemoveTombstone(hero)
 		end
 		UTIL_Remove(tombstone)
 	end
+	-- Clear the world anchor after the unit has gone. Publishing before removal
+	-- leaves Panorama pointing at a stale entity index until the next death.
+	SetNetState(hero, false, 0, 0, 0, nil)
 end
 
 local function CancelAllChannels(hero, completed)
 	local state = GetState(hero, false)
-	if state == nil then return end
+	if state == nil then
+		return
+	end
 	state.completed = completed == true
 	for _, channel in pairs(state.channels or {}) do
 		local caster = channel.caster
@@ -156,7 +225,6 @@ local function CancelAllChannels(hero, completed)
 		SendLocalChannelState(caster, false)
 		if ability ~= nil then
 			ability.xhs_finish_handled = true
-			DestroyChannelParticle(ability, not completed)
 		end
 		if IsValid(caster) and caster:IsChanneling() then
 			caster:InterruptChannel()
@@ -170,12 +238,18 @@ local function CancelAllChannels(hero, completed)
 end
 
 local function CompleteRevive(hero, caster, ability)
-	if not IsValid(hero) or hero:IsAlive() then return false end
+	if not IsValid(hero) or hero:IsAlive() then
+		return false
+	end
 	local tombstone = hero.xhs_tombstone_unit
 	local revivePosition = IsValid(tombstone) and tombstone:GetAbsOrigin() or hero:GetAbsOrigin()
 
+	hero.xhs_tombstone_internal_respawn = true
 	hero:RespawnHero(false, false)
-	if not hero:IsAlive() then return false end
+	if not hero:IsAlive() then
+		hero.xhs_tombstone_internal_respawn = nil
+		return false
+	end
 
 	FindClearSpaceForUnit(hero, revivePosition, true)
 	hero:SetHealth(hero:GetMaxHealth())
@@ -196,13 +270,15 @@ local function CompleteRevive(hero, caster, ability)
 	CancelAllChannels(hero, true)
 	RemoveTombstone(hero)
 	hero.xhs_tombstone_state = nil
+	hero.xhs_tombstone_internal_respawn = nil
 	return true
 end
 
 xhs_tombstone_revive_channel = xhs_tombstone_revive_channel or class({})
 
 function xhs_tombstone_revive_channel:GetChannelTime()
-	return self.xhs_channel_duration or BASE_CHANNEL_TIME
+	local duration = self.xhs_channel_duration or BASE_CHANNEL_TIME
+	return duration
 end
 
 function xhs_tombstone_revive_channel:OnAbilityPhaseStart()
@@ -210,12 +286,15 @@ function xhs_tombstone_revive_channel:OnAbilityPhaseStart()
 	local caster = self:GetCaster()
 	local tombstone = self.xhs_tombstone
 	local hero = GetHeroFromTombstone(tombstone)
-	return IsValid(caster)
+	local distance = IsValid(caster) and IsValid(tombstone)
+		and (caster:GetAbsOrigin() - tombstone:GetAbsOrigin()):Length2D() or -1
+	local accepted = IsValid(caster)
 		and caster:IsAlive()
 		and IsValid(hero)
 		and not hero:IsAlive()
 		and caster:GetTeamNumber() == tombstone:GetTeamNumber()
-		and (caster:GetAbsOrigin() - tombstone:GetAbsOrigin()):Length2D() <= INTERACTION_RANGE + 50
+		and distance <= INTERACTION_RANGE + 50
+	return accepted
 end
 
 function xhs_tombstone_revive_channel:OnSpellStart()
@@ -223,7 +302,9 @@ function xhs_tombstone_revive_channel:OnSpellStart()
 	local caster = self:GetCaster()
 	local tombstone = self.xhs_tombstone
 	local hero = GetHeroFromTombstone(tombstone)
-	if not IsValid(hero) then return end
+	if not IsValid(hero) then
+		return
+	end
 
 	local now = GameRules:GetGameTime()
 	local state = GetState(hero, true)
@@ -234,20 +315,21 @@ function xhs_tombstone_revive_channel:OnSpellStart()
 		end_time = self.xhs_channel_end_time,
 	}
 
-	self.xhs_channel_particle = ParticleManager:CreateParticle(CHANNEL_PARTICLE, PATTACH_WORLDORIGIN, nil)
-	ParticleManager:SetParticleControl(self.xhs_channel_particle, 0, tombstone:GetAbsOrigin())
-	ParticleManager:SetParticleControl(self.xhs_channel_particle, 1, Vector(self:GetChannelTime(), 0, 0))
-	ParticleManager:SetParticleControl(self.xhs_channel_particle, 3, tombstone:GetAbsOrigin())
-	PublishState(hero, state)
+	PublishStartingState(hero, state)
+	GameRules:GetGameModeEntity():SetContextThink(DoUniqueString("xhs_tombstone_publish_after_channel_start"), function()
+		PublishState(hero, state)
+		return nil
+	end, 0.03)
 end
 
 function xhs_tombstone_revive_channel:OnChannelFinish(interrupted)
-	if not IsServer() or self.xhs_finish_handled == true then return end
+	if not IsServer() then return end
+	if self.xhs_finish_handled == true then
+		return
+	end
 	self.xhs_finish_handled = true
 	local caster = self:GetCaster()
 	local hero = GetHeroFromTombstone(self.xhs_tombstone)
-	DestroyChannelParticle(self, interrupted)
-
 	if not IsValid(hero) then
 		SendLocalChannelState(caster, false)
 		ScheduleAbilityRemoval(caster, self)
@@ -264,29 +346,50 @@ function xhs_tombstone_revive_channel:OnChannelFinish(interrupted)
 	end
 
 	SendLocalChannelState(caster, false)
-	if not CompleteRevive(hero, caster, self) then
+	local completed = CompleteRevive(hero, caster, self)
+	if not completed then
 		PublishState(hero, state)
 	end
 	ScheduleAbilityRemoval(caster, self)
 end
 
 function XHSUnitTombstone:IsTombstone(unit)
-	return IsValid(unit) and unit.xhs_is_hero_tombstone == true
+	if not IsValid(unit) then return false end
+	if unit.xhs_is_hero_tombstone == true then return true end
+	return unit.GetUnitName ~= nil and unit:GetUnitName() == TOMBSTONE_UNIT_NAME
+end
+
+function XHSUnitTombstone:RegisterHero(hero)
+	if not IsValid(hero) or not hero:IsRealHero() then return false end
+	if not hero:HasModifier("modifier_xhs_tombstone_interaction") then
+		hero:AddNewModifier(hero, nil, "modifier_xhs_tombstone_interaction", {})
+	end
+	return true
 end
 
 function XHSUnitTombstone:BeginInteraction(caster, tombstone)
-	if not IsValid(caster) or not caster:IsRealHero() or not caster:IsAlive() then return false end
-	if not self:IsTombstone(tombstone) or caster:GetTeamNumber() ~= tombstone:GetTeamNumber() then return false end
+	if not IsValid(caster) or not caster:IsRealHero() or not caster:IsAlive() then
+		return false
+	end
+	if not self:IsTombstone(tombstone) or caster:GetTeamNumber() ~= tombstone:GetTeamNumber() then
+		return false
+	end
 	local hero = GetHeroFromTombstone(tombstone)
-	if not IsValid(hero) or hero:IsAlive() or caster == hero then return false end
+	if not IsValid(hero) or hero:IsAlive() or caster == hero then
+		return false
+	end
 
 	caster.xhs_pending_tombstone_entindex = tombstone:entindex()
 	local deadline = GameRules:GetGameTime() + INTERACTION_TIMEOUT
 	caster:MoveToPosition(tombstone:GetAbsOrigin())
 
 	GameRules:GetGameModeEntity():SetContextThink(DoUniqueString("xhs_tombstone_interact"), function()
-		if not IsValid(caster) or not caster:IsAlive() then return nil end
-		if caster.xhs_pending_tombstone_entindex ~= tombstone:entindex() then return nil end
+		if not IsValid(caster) or not caster:IsAlive() then
+			return nil
+		end
+		if caster.xhs_pending_tombstone_entindex ~= tombstone:entindex() then
+			return nil
+		end
 		if not self:IsTombstone(tombstone) or hero:IsAlive() then
 			caster.xhs_pending_tombstone_entindex = nil
 			return nil
@@ -314,27 +417,35 @@ function XHSUnitTombstone:BeginInteraction(caster, tombstone)
 
 		local ability = caster:FindAbilityByName("xhs_tombstone_revive_channel")
 		if ability == nil then ability = caster:AddAbility("xhs_tombstone_revive_channel") end
-		if ability == nil then return nil end
+		if ability == nil then
+			return nil
+		end
 		ability:SetLevel(1)
 		ability:SetActivated(true)
+		ability:EndCooldown()
 		ability.xhs_tombstone = tombstone
 		ability.xhs_channel_duration = duration
 		ability.xhs_finish_handled = false
-
-		ExecuteOrderFromTable({
-			UnitIndex = caster:entindex(),
-			OrderType = DOTA_UNIT_ORDER_CAST_NO_TARGET,
-			AbilityIndex = ability:entindex(),
-			PlayerID = caster:GetPlayerOwnerID(),
-			Queue = false,
-		})
+		-- Let the engine register the freshly added technical ability, then let
+		-- the server own its cast. This avoids a player order being rejected
+		-- before the Lua ability phase even begins.
+		GameRules:GetGameModeEntity():SetContextThink(DoUniqueString("xhs_tombstone_cast_start"), function()
+			if not IsValid(caster) or not caster:IsAlive() or not self:IsTombstone(tombstone) then return nil end
+			caster:CastAbilityNoTarget(ability, -1)
+			GameRules:GetGameModeEntity():SetContextThink(DoUniqueString("xhs_tombstone_debug_cast_check"), function()
+				return nil
+			end, 0.1)
+			return nil
+		end, 0)
 		return nil
 	end, 0)
 	return true
 end
 
 function XHSUnitTombstone:RemoveForHero(hero, cleanupChannels)
-	if not IsValid(hero) then return end
+	if not IsValid(hero) then
+		return
+	end
 	if cleanupChannels == true then CancelAllChannels(hero, false) end
 	local legacyDrop = hero.xhs_tombstone_drop
 	local legacyItem = hero.xhs_tombstone_item
@@ -346,15 +457,22 @@ function XHSUnitTombstone:RemoveForHero(hero, cleanupChannels)
 end
 
 function XHSUnitTombstone:EnsureForHero(hero, position)
-	if not IsValid(hero) or hero:IsAlive() then return nil end
-	if self:IsTombstone(hero.xhs_tombstone_unit) then return hero.xhs_tombstone_unit end
+	if not IsValid(hero) or hero:IsAlive() then
+		return nil
+	end
+	if self:IsTombstone(hero.xhs_tombstone_unit) then
+		return hero.xhs_tombstone_unit
+	end
 
 	RemoveTombstone(hero)
 	local spawnPosition = position or hero:GetAbsOrigin()
-	local tombstone = CreateUnitByName("npc_xhs_hero_tombstone", spawnPosition, false, hero, hero, hero:GetTeamNumber())
-	if not IsValid(tombstone) then return nil end
+	local tombstone = CreateUnitByName(TOMBSTONE_UNIT_NAME, spawnPosition, false, hero, hero, hero:GetTeamNumber())
+	if not IsValid(tombstone) then
+		return nil
+	end
 	tombstone.xhs_is_hero_tombstone = true
 	tombstone.xhs_revive_hero_entindex = hero:entindex()
+	tombstoneHeroByEntindex[tombstone:entindex()] = hero:entindex()
 	tombstone:SetAngles(0, RandomFloat(0, 360), 0)
 	tombstone:AddNewModifier(tombstone, nil, "modifier_invulnerable", {})
 	tombstone:AddNewModifier(tombstone, nil, "modifier_phased", {})
@@ -371,7 +489,9 @@ function XHSUnitTombstone:EnsureForHero(hero, position)
 end
 
 function XHSUnitTombstone:SpawnForHero(hero, position)
-	if not IsValid(hero) or hero:IsAlive() then return nil end
+	if not IsValid(hero) or hero:IsAlive() then
+		return nil
+	end
 	self:RemoveForHero(hero, true)
 	hero.xhs_tombstone_state = {
 		channels = {},
@@ -381,11 +501,25 @@ function XHSUnitTombstone:SpawnForHero(hero, position)
 	return self:EnsureForHero(hero, position)
 end
 
+function XHSUnitTombstone:CleanupRevivedHero(hero)
+	if not IsValid(hero) or not hero:IsRealHero() or not hero:IsAlive() then return false end
+	if not HasTombstoneArtifacts(hero) then return false end
+	local state = GetState(hero, false)
+	if state ~= nil then
+		-- An external resurrection is still a successful revive from the HUD's
+		-- perspective. Stop every helper channel without rearming a tombstone.
+		CancelAllChannels(hero, true)
+	else
+		SetNetState(hero, false, 0, 0, 0, hero.xhs_tombstone_unit)
+		BroadcastReviveState(hero, false, 0, 0, 0, "completed")
+	end
+
+	self:RemoveForHero(hero, false)
+	hero.xhs_tombstone_state = nil
+	return true
+end
 function XHSUnitTombstone:Install()
 	_G.XHSUnitTombstone = self
-	_G.XHSBeginTombstoneInteraction = function(caster, tombstone)
-		return self:BeginInteraction(caster, tombstone)
-	end
 	_G.XHSClearTombstoneReviveState = function(hero)
 		if IsValid(hero) then SetNetState(hero, false, 0, 0, 0, hero.xhs_tombstone_unit) end
 	end
@@ -400,8 +534,8 @@ function XHSUnitTombstone:Install()
 		local tombstone = self:SpawnForHero(hero, position)
 		return tombstone, nil
 	end
-	_G.XHSIsTombstonePickupByActiveChanneler = function()
-		return false
+	for _, hero in ipairs(HeroList:GetAllHeroes() or {}) do
+		self:RegisterHero(hero)
 	end
 end
 

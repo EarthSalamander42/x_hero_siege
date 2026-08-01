@@ -9,7 +9,7 @@
 		<include src="file://{resources}/layout/custom_game/ingame_advertize/ingame_advertize.js"/>
 	</scripts>
 
-	<Panel class="Ads_Root" hittest="true">
+	<Panel class="Ads_Root" hittest="false" hittestchildren="false">
 		<Panel class="Ads_Backdrop" hittest="false"/>
 
 		<Panel class="Ads_HeaderRow">

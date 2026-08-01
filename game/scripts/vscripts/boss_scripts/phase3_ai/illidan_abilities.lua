@@ -35,6 +35,7 @@ local SHADOW_DASH_START_PARTICLE = "particles/items_fx/blink_dagger_start.vpcf"
 local SHADOW_DASH_END_PARTICLE = "particles/items_fx/blink_dagger_end.vpcf"
 local IMMOLATION_PULSE_PARTICLE = "particles/units/heroes/hero_phoenix/phoenix_supernova_reborn.vpcf"
 local IMMOLATION_PRECAST_PARTICLE = "particles/econ/events/darkmoon_2017/darkmoon_generic_aoe.vpcf"
+local SHADOW_DASH_ARENA_RADIUS = 2000
 local GLAIVE_STORM_PARTICLE = "particles/econ/items/luna/luna_lucent_ti5/luna_eclipse_impact_moonfall.vpcf"
 local GLAIVE_STORM_CAST_PARTICLE = "particles/units/heroes/hero_luna/luna_eclipse_cast.vpcf"
 
@@ -139,6 +140,35 @@ local function NormalizeDirection(direction)
 	direction.z = 0
 	if direction:Length2D() <= 0 then return Vector(1, 0, 0) end
 	return direction:Normalized()
+end
+
+local function GetShadowDashPath(ability, caster)
+	local context = GetContext(ability)
+	local startPosition = caster:GetAbsOrigin()
+	local targetPosition = context.position or startPosition
+	local direction = NormalizeDirection(targetPosition - startPosition)
+	local maxDistance = ability:GetSpecialValueFor("max_distance")
+	local travelDistance = math.min(maxDistance, math.max(180, (targetPosition - startPosition):Length2D()))
+	local endPosition = startPosition + direction * travelDistance
+	local arenaCenter = context.arena_center
+
+	if arenaCenter ~= nil then
+		local fromCenter = endPosition - arenaCenter
+		fromCenter.z = 0
+		if fromCenter:Length2D() > SHADOW_DASH_ARENA_RADIUS then
+			endPosition = arenaCenter + fromCenter:Normalized() * SHADOW_DASH_ARENA_RADIUS
+			endPosition.z = startPosition.z
+			direction = NormalizeDirection(endPosition - startPosition)
+			travelDistance = (endPosition - startPosition):Length2D()
+		end
+	end
+
+	return {
+		start_position = startPosition,
+		end_position = endPosition,
+		direction = direction,
+		distance = travelDistance,
+	}
 end
 
 local function DamageEnemies(caster, ability, position, radius, damage, damageType)
@@ -400,18 +430,15 @@ end
 function xhs_illidan_shadow_dash:OnAbilityPhaseStart()
 	if not IsServer() then return true end
 
-	local context = GetContext(self)
 	local caster = self:GetCaster()
-	local targetPosition = context.position or caster:GetAbsOrigin()
-	local direction = NormalizeDirection(targetPosition - caster:GetAbsOrigin())
-	local length = (targetPosition - caster:GetAbsOrigin()):Length2D()
+	local path = GetShadowDashPath(self, caster)
 	local width = self:GetSpecialValueFor("width")
 	local spacing = math.max(1, width * 1.4)
-	local count = math.max(1, math.floor(length / spacing))
+	local count = math.max(1, math.floor(path.distance / spacing))
 
 	StartBossCastBar(self, "Shadow Dash")
-	XHSBossTelegraphs:Target(targetPosition, self:GetSpecialValueFor("target_radius"), self:GetCastPoint(), ILLIDAN_COLORS)
-	XHSBossTelegraphs:Line(caster:GetAbsOrigin(), direction, spacing, width, count, self:GetCastPoint(), ILLIDAN_COLORS, 80)
+	XHSBossTelegraphs:Target(path.end_position, self:GetSpecialValueFor("target_radius"), self:GetCastPoint(), ILLIDAN_COLORS)
+	XHSBossTelegraphs:Line(path.start_position, path.direction, spacing, width, count, self:GetCastPoint(), ILLIDAN_COLORS, 80)
 	StartAnimation(caster, { duration = self:GetCastPoint() + 0.2, activity = ACT_DOTA_CAST_ABILITY_2, rate = 1.0 })
 	caster:EmitSound("Hero_Terrorblade.Sunder.Cast")
 	return true
@@ -424,23 +451,17 @@ end
 function xhs_illidan_shadow_dash:OnSpellStart()
 	if not IsServer() then return end
 
-	local context = GetContext(self)
 	local caster = self:GetCaster()
-	local startPosition = caster:GetAbsOrigin()
-	local targetPosition = context.position or startPosition
-	local direction = NormalizeDirection(targetPosition - startPosition)
-	local maxDistance = self:GetSpecialValueFor("max_distance")
-	local travelDistance = math.min(maxDistance, math.max(180, (targetPosition - startPosition):Length2D()))
-	local endPosition = startPosition + direction * travelDistance
+	local path = GetShadowDashPath(self, caster)
 	local width = self:GetSpecialValueFor("width")
 	local damage = ScaleDamage(self:GetSpecialValueFor("damage"))
 
-	CreateBlinkImpact(startPosition, SHADOW_DASH_START_PARTICLE, 1.0)
-	DamageLine(caster, self, startPosition, direction, travelDistance, width, damage, self:GetAbilityDamageType())
-	CreateDragonSlaveParticle(caster, self, startPosition, direction, travelDistance, width, 0.55)
-	FindClearSpaceForUnit(caster, endPosition, true)
-	CreateBlinkImpact(endPosition, SHADOW_DASH_END_PARTICLE, 1.0)
-	EmitLocationSound(caster, endPosition, "DOTA_Item.BlinkDagger.Activate")
+	CreateBlinkImpact(path.start_position, SHADOW_DASH_START_PARTICLE, 1.0)
+	DamageLine(caster, self, path.start_position, path.direction, path.distance, width, damage, self:GetAbilityDamageType())
+	CreateDragonSlaveParticle(caster, self, path.start_position, path.direction, path.distance, width, 0.55)
+	FindClearSpaceForUnit(caster, path.end_position, true)
+	CreateBlinkImpact(path.end_position, SHADOW_DASH_END_PARTICLE, 1.0)
+	EmitLocationSound(caster, path.end_position, "DOTA_Item.BlinkDagger.Activate")
 	caster:EmitSound("Hero_Antimage.Blink_out")
 	ClearContext(self)
 end

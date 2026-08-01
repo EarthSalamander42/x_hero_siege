@@ -400,7 +400,7 @@ function ApplyXHSReportBugButtonStyle(button) {
 
 function ApplyXHSSupporterPassButtonStyle(button) {
 	ApplyXHSTopBarUtilityButtonStyle(button, {
-		icon: "file://{images}/items/shield_of_invincibility.png",
+		icon: "file://{images}/custom_game/battlepass/supporter_pass_shield_blue.png",
 		iconId: "XHSSupporterPassTopBarIcon"
 	});
 

@@ -2219,6 +2219,7 @@ function XHSBots:BuildConfigurationNetTable()
 		vote_yes = tonumber(self.setup_vote_yes) or 0,
 		vote_total = tonumber(self.setup_vote_total) or 0,
 		tools_mode = IsInToolsMode() and 1 or 0,
+		human_count = self:GetSetupHumanIdentityCount(),
 		bot_count = tonumber(configuration.count) or 0,
 		max_bots = tonumber(configuration.maximum_bots) or 0,
 		max_play_bots = tonumber(configuration.maximum_play_bots) or 0,

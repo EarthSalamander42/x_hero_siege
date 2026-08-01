@@ -17,6 +17,14 @@ local MURADIN_TELEPORT_IN_DELAY = CINEMATIC_EVENT_PRE_TELEPORT_DELAY + CINEMATIC
 local MURADIN_TELEPORT_IN_CHANNEL_DURATION = 2.8
 local MURADIN_TELEPORT_ARRIVAL_EFFECT_DURATION = 0.8
 local MURADIN_TELEPORT_OUT_DURATION = 3.0
+local MURADIN_CAMERA_OWNER = "muradin_entry"
+local MURADIN_CAMERA_HOLD_DURATION = math.max(
+	0,
+	MURADIN_TELEPORT_IN_CHANNEL_DURATION
+		+ MURADIN_ENTRY_POST_TELEPORT_HOLD
+		- SPECIAL_EVENT_CAMERA_MOVE_DURATION
+		- SPECIAL_EVENT_CAMERA_RETURN_DURATION
+)
 local FARM_LEADERBOARD_NET_TABLE = "xhs_farm_leaderboard"
 local FARM_LEADERBOARD_NET_KEY = "state"
 local FARM_LEADERBOARD_UPDATE_INTERVAL = 0.5
@@ -258,6 +266,69 @@ local function FocusAllPlayersOnSpecialArena(point, intro_duration, return_camer
 		native_camera = true,
 		return_camera = return_camera ~= false,
 	})
+end
+
+local function FocusPlayerOnMuradinEntry(playerID, hero, Muradin)
+	if CameraMotion == nil or hero == nil or hero:IsNull() then return end
+
+	-- Keep every player on their own hero while the party enters the arena.
+	-- Following the entity also keeps the camera with it when the delayed
+	-- teleport moves it to its assigned Muradin event position.
+	CameraMotion:Follow(playerID, hero, {
+		from = hero,
+		duration = 0,
+		easing = "smootherstep",
+		persistent = true,
+		owner = MURADIN_CAMERA_OWNER,
+		priority = 100,
+		policy = "replace",
+		origin_mode = "server",
+	})
+
+	Timers:CreateTimer(MURADIN_TELEPORT_IN_DELAY, function()
+		if CameraMotion == nil then return nil end
+		if Muradin == nil
+			or Muradin:IsNull()
+			or hero == nil
+			or hero:IsNull()
+		then
+			CameraMotion:Release(playerID, {
+				owner = MURADIN_CAMERA_OWNER,
+				mode = "free",
+				reason = "Muradin entry target became invalid",
+			})
+			return nil
+		end
+
+		local cameraPlayerID = playerID
+		CameraMotion:Sequence(cameraPlayerID, {
+			{
+				type = "move",
+				to = Muradin,
+				duration = SPECIAL_EVENT_CAMERA_MOVE_DURATION,
+				easing = "smootherstep",
+			},
+			{
+				type = "hold",
+				duration = MURADIN_CAMERA_HOLD_DURATION,
+			},
+			{
+				type = "return",
+				to = function()
+					return PlayerResource:GetSelectedHeroEntity(cameraPlayerID)
+				end,
+				duration = SPECIAL_EVENT_CAMERA_RETURN_DURATION,
+				easing = "smootherstep",
+			},
+		}, {
+			owner = MURADIN_CAMERA_OWNER,
+			priority = 100,
+			policy = "replace",
+			release = "free",
+		})
+
+		return nil
+	end)
 end
 
 local function ReturnSpecialArenaAllyCameras(arenaPlayerID)
@@ -547,15 +618,6 @@ function SpecialEvents:MuradinEvent(time)
 	Muradin:AddNewModifier(Muradin, nil, "modifier_cinematic_pause", { duration = stun_duration, ramp_duration = SPECIAL_EVENT_CINEMATIC_PAUSE_RAMP })
 	Muradin:SetAngles(0, 270, 0)
 	PlayMuradinTeleportIn(Muradin, muradin_spawn_position)
-	-- Muradin uses a bespoke multi-player teleport instead of
-	-- StartSpecialArenaCinematicIntro, so its arena focus must be started here.
-	-- Release at the arena after the heroes have teleported; returning to their
-	-- pre-event positions would pull the view out just as Muradin appears.
-	FocusAllPlayersOnSpecialArena(
-		muradin_spawn_position,
-		MURADIN_TELEPORT_IN_DELAY,
-		false
-	)
 	Notifications:TopToAll({
 		duration = stun_duration,
 		segments = {
@@ -578,8 +640,11 @@ function SpecialEvents:MuradinEvent(time)
 				if ForceRespawnHeroForSpecialArena(hero) then
 					DisableItems(hero, event_end_delay)
 				end
-				if hero:IsAlive() and point ~= nil then
-					StartCinematicDelayedTeleport(hero, point:GetAbsOrigin(), CINEMATIC_EVENT_PRE_TELEPORT_DELAY)
+				if hero:IsAlive() then
+					FocusPlayerOnMuradinEntry(nPlayerID, hero, Muradin)
+					if point ~= nil then
+						StartCinematicDelayedTeleport(hero, point:GetAbsOrigin(), CINEMATIC_EVENT_PRE_TELEPORT_DELAY)
+					end
 				end
 			end
 		end

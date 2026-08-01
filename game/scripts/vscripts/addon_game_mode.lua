@@ -22,6 +22,7 @@ function Precache(context)
 	LinkLuaModifier("modifier_xhs_space_marine_attack_sound", "modifiers/modifier_xhs_space_marine_attack_sound.lua", LUA_MODIFIER_MOTION_NONE)
 	LinkLuaModifier("modifier_xhs_growth_overhead", "modifiers/modifier_xhs_growth_overhead.lua", LUA_MODIFIER_MOTION_NONE)
 	LinkLuaModifier("modifier_xhs_end_screen_stat_tracker", "modifiers/modifier_xhs_end_screen_stat_tracker.lua", LUA_MODIFIER_MOTION_NONE)
+	LinkLuaModifier("modifier_xhs_tombstone_interaction", "modifiers/modifier_xhs_tombstone_interaction.lua", LUA_MODIFIER_MOTION_NONE)
 
 	XHSPrecache:Run(context)
 
@@ -38,12 +39,12 @@ function Precache(context)
 	--	PrecacheResource("particle_folder", "particles/items2_fx", context)
 	--	PrecacheResource("particle", "particles/units/heroes/hero_earth_spirit/espirit_geomagentic_target_sphere.vpcf", context)
 	--	PrecacheResource("particle", "particles/units/heroes/hero_ember_spirit/ember_spirit_flameguard.vpcf", context) -- Immolation
-	PrecacheResource("particle", "particles/items2_fx/teleport_start.vpcf", context)                          -- Immolation
-	PrecacheResource("particle", "particles/items2_fx/teleport_end.vpcf", context)                            -- Immolation
+	PrecacheResource("particle", "particles/items2_fx/teleport_start.vpcf", context)                                          -- Immolation
+	PrecacheResource("particle", "particles/items2_fx/teleport_end.vpcf", context)                                            -- Immolation
 	PrecacheResource("particle", "particles/units/heroes/hero_templar_assassin/templar_assassin_trap_rings_inner.vpcf", context) -- Final Wave dark portals
-	PrecacheResource("particle", "particles/units/heroes/hero_wisp/wisp_relocate_marker.vpcf", context)       -- Return position marker
-	PrecacheResource("particle", "particles/econ/events/fall_major_2016/teleport_start_fm06_lvl3.vpcf", context) -- Immolation
-	PrecacheResource("particle", "particles/econ/events/fall_major_2016/teleport_end_fm06_lvl3.vpcf", context) -- Immolation
+	PrecacheResource("particle", "particles/units/heroes/hero_wisp/wisp_relocate_marker.vpcf", context)                       -- Return position marker
+	PrecacheResource("particle", "particles/econ/events/fall_major_2016/teleport_start_fm06_lvl3.vpcf", context)              -- Immolation
+	PrecacheResource("particle", "particles/econ/events/fall_major_2016/teleport_end_fm06_lvl3.vpcf", context)                -- Immolation
 	PrecacheResource("particle_folder", "particles/custom", context)
 	PrecacheResource("particle_folder", "particles/custom/items/orb", context)
 
@@ -60,7 +61,7 @@ function Precache(context)
 	PrecacheResource("particle", "particles/camp_fire_buff.vpcf", context)
 	PrecacheResource("particle", "particles/units/heroes/hero_pudge/pudge_rot.vpcf", context)
 	PrecacheResource("particle", "particles/units/heroes/hero_pudge/pudge_rot_recipient.vpcf", context)
-	PrecacheResource("particle", "particles/items_fx/skull_basher.vpcf", context)                              -- Phase 1 Human ranged creep Headshot
+	PrecacheResource("particle", "particles/items_fx/abyssal_blade_crimson_impact_sparks.vpcf", context)                     -- Phase 1 Human ranged creep Headshot
 	PrecacheResource("particle", "particles/darkmoon_last_hit_effect.vpcf", context)
 	PrecacheResource("particle", "particles/custom/xhs_growth_overhead.vpcf", context)                                       -- Farm event/Phase 2 overhead
 	PrecacheResource("particle", "particles/econ/items/shadow_fiend/sf_fire_arcana/sf_fire_arcana_shadowraze.vpcf", context) -- Boss death
@@ -72,7 +73,7 @@ function Precache(context)
 	PrecacheResource("particle", "particles/units/heroes/hero_jakiro/jakiro_base_attack.vpcf", context)                      -- Jakiro Level 2 creeps
 	PrecacheResource("particle", "particles/units/heroes/hero_ancient_apparition/ancient_apparition_base_attack.vpcf", context) -- Necro Level 2 creeps
 	PrecacheResource("particle", "particles/units/heroes/hero_lion/lion_base_attack.vpcf", context)                          -- Special Wave 2
-	PrecacheResource("particle", "particles/econ/items/razor/razor_ti6/razor_base_attack_ti6.vpcf", context)               -- Rifleman level 20 Laser projectile
+	PrecacheResource("particle", "particles/econ/items/razor/razor_ti6/razor_base_attack_ti6.vpcf", context)                 -- Rifleman level 20 Laser projectile
 
 	PrecacheResource("model_folder", "models/heroes/skeleton_king", context)                                                 --Lich King Boss
 	PrecacheResource("model_folder", "models/items/warlock/archivist_golem", context)                                        -- Spirit Beast event
@@ -123,7 +124,7 @@ function Precache(context)
 	-- --	XHSPrecache:PrecacheUnit("npc_dota_hero_lion", nil, -1) 			-- Warden &  Pit Lord
 	XHSPrecache:PrecacheUnit("npc_dota_hero_life_stealer", nil, -1) -- Creep wave 1 (undead)
 	XHSPrecache:PrecacheUnit("npc_dota_hero_lycan", nil, -1)     -- Creep level 4 human melee
-	XHSPrecache:PrecacheUnit("npc_dota_hero_magnataur", nil, -1) 	-- Magnataur & Tauren Chieftain
+	XHSPrecache:PrecacheUnit("npc_dota_hero_magnataur", nil, -1) -- Magnataur & Tauren Chieftain
 	XHSPrecache:PrecacheUnit("npc_dota_hero_morphling", nil, -1) -- Archmage & Archimage
 	XHSPrecache:PrecacheUnit("npc_dota_hero_naga_siren", nil, -1) -- Special Wave 2
 	-- XHSPrecache:PrecacheUnit("npc_dota_hero_necrolyte", nil, -1)     -- Special Wave 1 & Tauren Chieftain & Dark Summoner & LK & Paladin &
@@ -166,7 +167,7 @@ function Precache(context)
 	PrecacheResource("soundfile", "soundevents/game_sounds_heroes/game_sounds_skeletonking.vsndevts", context)
 	PrecacheResource("soundfile", "soundevents/game_sounds_heroes/game_sounds_skywrath_mage.vsndevts", context)
 	PrecacheResource("soundfile", "soundevents/game_sounds_heroes/game_sounds_spectre.vsndevts", context)
-	PrecacheResource("soundfile", "soundevents/game_sounds_heroes/game_sounds_tinker.vsndevts", context)     -- Archmage Elemental Wave
+	PrecacheResource("soundfile", "soundevents/game_sounds_heroes/game_sounds_tinker.vsndevts", context) -- Archmage Elemental Wave
 
 	PrecacheResource("soundfile", "soundevents/game_sounds_custom.vsndevts", context)
 	PrecacheResource("soundfile", "soundevents/game_sounds_dungeon.vsndevts", context)

@@ -967,11 +967,11 @@
 	"27" // Earthshaker Arcana target death
 	{
 		"item_id"					"16315"
-		"item_name"					"battlepass_kill_effect_culling_blade"
+		"item_name"					"battlepass_kill_effect_earthshaker_arcana"
 		"item_type"					"kill_effect"
 		"item_unlock_level"			"11"
 		"item_rarity"				"uncommon"
-		"image_inventory"			"custom_game/battlepass/kill_effect_culling_blade"
+		"image_inventory"			"custom_game/battlepass/kill_effect_earthshaker_arcana"
 		"used_by_heroes"			"kill_effect"
 
 		"visuals"
@@ -988,11 +988,11 @@
 	"28" // Faceless Void Arcana kill effect
 	{
 		"item_id"					"16315"
-		"item_name"					"battlepass_kill_effect_faceless_void"
+		"item_name"					"battlepass_kill_effect_faceless_void_arcana"
 		"item_type"					"kill_effect"
 		"item_unlock_level"			"11"
 		"item_rarity"				"uncommon"
-		"image_inventory"			"custom_game/battlepass/kill_effect_faceless_void"
+		"image_inventory"			"custom_game/battlepass/kill_effect_faceless_void_arcana"
 		"used_by_heroes"			"kill_effect"
 		"premium"					"1"
 
@@ -1017,11 +1017,11 @@
 	"29" // Lion Arcana Finger of Death
 	{
 		"item_id"					"16315"
-		"item_name"					"battlepass_kill_effect_radiant_tower"
+		"item_name"					"battlepass_kill_effect_lion_arcana"
 		"item_type"					"kill_effect"
 		"item_unlock_level"			"13"
 		"item_rarity"				"uncommon"
-		"image_inventory"			"custom_game/battlepass/kill_effect_radiant_tower"
+		"image_inventory"			"custom_game/battlepass/kill_effect_lion_arcana"
 		"used_by_heroes"			"kill_effect"
 
 		"visuals"
@@ -1038,11 +1038,11 @@
 	"30" // Razor Arcana kill effect
 	{
 		"item_id"					"16315"
-		"item_name"					"battlepass_kill_effect_razor"
+		"item_name"					"battlepass_kill_effect_razor_arcana"
 		"item_type"					"kill_effect"
 		"item_unlock_level"			"13"
 		"item_rarity"				"uncommon"
-		"image_inventory"			"custom_game/battlepass/kill_effect_razor"
+		"image_inventory"			"custom_game/battlepass/kill_effect_razor_arcana"
 		"used_by_heroes"			"kill_effect"
 		"premium"					"1"
 
@@ -1067,11 +1067,11 @@
 	"31" // Queen of Pain Arcana target death
 	{
 		"item_id"					"16315"
-		"item_name"					"battlepass_kill_effect_spectre_free"
+		"item_name"					"battlepass_kill_effect_queen_of_pain_arcana"
 		"item_type"					"kill_effect"
 		"item_unlock_level"			"15"
 		"item_rarity"				"uncommon"
-		"image_inventory"			"custom_game/battlepass/kill_effect_spectre_free"
+		"image_inventory"			"custom_game/battlepass/kill_effect_queen_of_pain_arcana"
 		"used_by_heroes"			"kill_effect"
 
 		"visuals"
@@ -1088,11 +1088,11 @@
 	"32" // Spectre Arcana kill effect
 	{
 		"item_id"					"16315"
-		"item_name"					"battlepass_kill_effect_spectre"
+		"item_name"					"battlepass_kill_effect_spectre_arcana"
 		"item_type"					"kill_effect"
 		"item_unlock_level"			"15"
 		"item_rarity"				"uncommon"
-		"image_inventory"			"custom_game/battlepass/kill_effect_spectre"
+		"image_inventory"			"custom_game/battlepass/kill_effect_spectre_arcana"
 		"used_by_heroes"			"kill_effect"
 		"premium"					"1"
 
@@ -1110,11 +1110,11 @@
 	"33" // Zeus Arcana kill
 	{
 		"item_id"					"16315"
-		"item_name"					"battlepass_kill_effect_gyro_free"
+		"item_name"					"battlepass_kill_effect_zeus_arcana"
 		"item_type"					"kill_effect"
 		"item_unlock_level"			"17"
 		"item_rarity"				"uncommon"
-		"image_inventory"			"custom_game/battlepass/kill_effect_purple_smoke_free"
+		"image_inventory"			"custom_game/battlepass/kill_effect_zeus_arcana"
 		"used_by_heroes"			"kill_effect"
 
 		"visuals"
@@ -1123,7 +1123,7 @@
 			{
 				"type"				"particle"
 				"asset"				"particles/kill_effect/default_target.vpcf"
-				"modifier"			"particles/econ/items/zeus/arcana_chariot/zeus_arcana_kill_real.vpcf"
+				"modifier"			"particles/econ/items/zeus/arcana_chariot/zeus_arcana_kill_remnant.vpcf"
 			}
 		}
 	}
@@ -1131,11 +1131,11 @@
 	"34" // Gyro TI 10
 	{
 		"item_id"					"16315"
-		"item_name"					"battlepass_kill_effect_gyro"
+		"item_name"					"battlepass_kill_effect_gyrocopter_ti10"
 		"item_type"					"kill_effect"
 		"item_unlock_level"			"17"
 		"item_rarity"				"uncommon"
-		"image_inventory"			"custom_game/battlepass/kill_effect_purple_smoke"
+		"image_inventory"			"custom_game/battlepass/kill_effect_gyrocopter_ti10"
 		"used_by_heroes"			"kill_effect"
 		"premium"					"1"
 
@@ -1153,11 +1153,11 @@
 	"35" // Skywrath Arcana kill
 	{
 		"item_id"					"16315"
-		"item_name"					"battlepass_kill_effect_rubick_free"
+		"item_name"					"battlepass_kill_effect_skywrath_arcana"
 		"item_type"					"kill_effect"
 		"item_unlock_level"			"19"
 		"item_rarity"				"uncommon"
-		"image_inventory"			"custom_game/battlepass/kill_effect_rubick_free"
+		"image_inventory"			"custom_game/battlepass/kill_effect_skywrath_arcana"
 		"used_by_heroes"			"kill_effect"
 
 		"visuals"
@@ -1174,11 +1174,11 @@
 	"36" // Vengeful Spirit Arcana kill
 	{
 		"item_id"					"16315"
-		"item_name"					"battlepass_kill_effect_rubick"
+		"item_name"					"battlepass_kill_effect_vengeful_arcana"
 		"item_type"					"kill_effect"
 		"item_unlock_level"			"19"
 		"item_rarity"				"uncommon"
-		"image_inventory"			"custom_game/battlepass/kill_effect_rubick"
+		"image_inventory"			"custom_game/battlepass/kill_effect_vengeful_arcana"
 		"used_by_heroes"			"kill_effect"
 		"premium"					"1"
 

@@ -198,11 +198,11 @@
 							<Label text="/" />
 						</Panel>
 
-						<Button class="sub_nav_tab" id="StatueTabButton" onactivate="SwitchDonatorWrapper('Statue');">
+						<Button class="sub_nav_tab" id="StatueTabButton" style="visibility: collapse;" hittest="false">
 							<Label class="text" text="#donator_statue" />
 						</Button>
 
-						<Panel hittest="false" class="tab_separator">
+						<Panel hittest="false" class="tab_separator" style="visibility: collapse;">
 							<Label text="/" />
 						</Panel>
 
@@ -322,7 +322,7 @@
 					<!-- JS Inserts records here -->
 				</Panel>
 
-				<Panel id="StatueTableWrapper" hittest="false">
+				<Panel id="StatueTableWrapper" style="visibility: collapse;" hittest="false">
 					<!-- JS Inserts records here -->
 				</Panel>
 

@@ -51,11 +51,9 @@
 			return false;
 		}
 
-		// GameInfoPanel is Valve's wrapper around this custom layout. The minimap
-		// and lower HUD live in a separate branch, so sibling ordering inside the
-		// original GameInfo host cannot put the drawer above them. Reparent only
-		// this wrapper to Hud and place it immediately after HUDElements. Custom
-		// roots that follow HUDElements keep their existing relative priority.
+		// Preserve Valve's complete Game Info branch so its open/close controller
+		// keeps working. Raise that branch above HUDElements instead of extracting
+		// GameInfoPanel from its native hierarchy.
 		shell.style.zIndex = "1000";
 
 		var hud = FindHudAncestor(shell);
@@ -65,32 +63,14 @@
 
 		var hudElements = hud.FindChildTraverse("HUDElements");
 		var hudElementsRoot = GetHudDirectChild(hudElements, hud);
-		if (!hudElementsRoot || hudElementsRoot === shell) {
+		var gameInfoRoot = GetHudDirectChild(shell, hud);
+		if (!hudElementsRoot || !gameInfoRoot || gameInfoRoot === hudElementsRoot) {
 			return false;
 		}
 
-		if (shell.GetParent() !== hud) {
-			shell.SetParent(hud);
-		}
-
-		if (shell.GetParent() !== hud) {
-			return false;
-		}
-
-		hud.MoveChildAfter(shell, hudElementsRoot);
+		gameInfoRoot.style.zIndex = "1000";
+		hud.MoveChildAfter(gameInfoRoot, hudElementsRoot);
 		return true;
-	}
-
-	function MaintainGameInfoLayer(shell) {
-		if (!shell || !shell.IsValid || !shell.IsValid()) {
-			$.Schedule(0.25, StyleGameInfoShell);
-			return;
-		}
-
-		RaiseGameInfoShell(shell);
-		$.Schedule(1.0, function() {
-			MaintainGameInfoLayer(shell);
-		});
 	}
 
 	function StyleGameInfoShell() {
@@ -101,16 +81,16 @@
 			return;
 		}
 
-		var button = shell.FindChildTraverse("GameInfoButton");
-		var icon = shell.FindChildTraverse("GameInfoIcon");
-		var openClose = shell.FindChildTraverse("GameInfoOpenClose");
+		var container = shell.GetParent ? shell.GetParent() : null;
+		var button = container && container.FindChildTraverse ? container.FindChildTraverse("GameInfoButton") : null;
+		var icon = button && button.FindChildTraverse ? button.FindChildTraverse("GameInfoIcon") : null;
+		var openClose = button && button.FindChildTraverse ? button.FindChildTraverse("GameInfoOpenClose") : null;
 
 		AddClass(shell, "XHSGameInfoPanel");
 		AddClass(button, "XHSGameInfoButton");
 		AddClass(icon, "XHSGameInfoIcon");
 		AddClass(openClose, "XHSGameInfoOpenClose");
 		RaiseGameInfoShell(shell);
-		MaintainGameInfoLayer(shell);
 
 		// Fallback styles for Valve's wrapper, which lives outside this custom layout.
 		shell.style.width = "600px";
@@ -118,6 +98,7 @@
 		shell.style.boxShadow = "fill #000000aa 0px 0px 12px 0px";
 
 		if (button) {
+			button.style.zIndex = "1001";
 			button.style.width = "38px";
 			button.style.height = "70px";
 			button.style.backgroundColor = "#071827f4";
@@ -130,6 +111,7 @@
 		}
 
 		if (openClose) {
+			openClose.style.zIndex = "1002";
 			openClose.style.washColor = "#dff6ff";
 			openClose.style.opacity = "0.9";
 		}

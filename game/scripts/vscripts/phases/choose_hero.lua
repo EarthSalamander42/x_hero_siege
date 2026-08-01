@@ -356,7 +356,8 @@ local function StartHeroSelectionDisplayTeleport(display)
 			activity = ACT_DOTA_TELEPORT,
 			rate = 1.0,
 		})
-	elseif display.StartGestureWithPlaybackRate ~= nil then
+	end
+	if display.StartGestureWithPlaybackRate ~= nil then
 		display:StartGestureWithPlaybackRate(ACT_DOTA_TELEPORT, 1.0)
 	elseif display.StartGesture ~= nil then
 		display:StartGesture(ACT_DOTA_TELEPORT)
@@ -390,30 +391,39 @@ local function GetHeroSelectionBaseTransform(playerID)
 	}
 end
 
-local function StartHeroSelectionSourceTeleport(transform, playerID)
+local function StartHeroSelectionSourceTeleport(transform, playerID, particleOwner)
 	local particles = {}
 	local display = transform.display
-	local sourceParticle = XHSGetBattlepassParticle ~= nil
-		and XHSGetBattlepassParticle(playerID, "teleport_start_pfx", HERO_SELECTION_SOURCE_PARTICLE)
-		or HERO_SELECTION_SOURCE_PARTICLE
+	-- Force the current vanilla particle while validating its modern control
+	-- point contract. Cosmetic replacements can be restored after this test.
+	local sourceParticle = HERO_SELECTION_SOURCE_PARTICLE
 	if IsValidSelectionUnit(display) then
 		display:AddNewModifier(display, nil, "modifier_xhs_cinematic_hide_health_bars", {
 			duration = HERO_SELECTION_TELEPORT_DURATION,
 		})
 		StartHeroSelectionDisplayTeleport(display)
+		local sourcePosition = display:GetAbsOrigin()
+		local networkOwner = IsValidSelectionUnit(particleOwner)
+			and particleOwner or display
 		local particle = ParticleManager:CreateParticle(
 			sourceParticle,
 			PATTACH_ABSORIGIN,
-			display
+			networkOwner
 		)
 		ParticleManager:SetParticleControlEnt(
 			particle,
 			0,
-			display,
+			networkOwner,
 			PATTACH_ABSORIGIN,
-			"attach_origin",
-			display:GetAbsOrigin(),
+			nil,
+			sourcePosition,
 			true
+		)
+		ParticleManager:SetParticleControl(particle, 2, Vector(1, 1, 1))
+		ParticleManager:SetParticleControl(
+			particle,
+			7,
+			Vector(HERO_SELECTION_TELEPORT_DURATION, 0, 0)
 		)
 		table.insert(particles, particle)
 		display:EmitSound("Portal.Loop_Appear")
@@ -470,13 +480,6 @@ local function AwakenSelectedHero(newHero, baseTransform, destinationParticle, p
 	DestroyHeroSelectionParticle(destinationParticle, false)
 	if newHero == nil or newHero:IsNull() then
 		SetHeroSelectionHealthFrameHidden(player, false)
-		if CameraMotion ~= nil then
-			CameraMotion:Release(playerID, {
-				owner = "hero_selection",
-				mode = "free",
-				reason = "selected hero creation failed",
-			})
-		end
 		return
 	end
 
@@ -512,13 +515,6 @@ local function AwakenSelectedHero(newHero, baseTransform, destinationParticle, p
 
 	Timers:CreateTimer(HERO_SELECTION_ARRIVAL_DURATION, function()
 		DestroyHeroSelectionParticle(arrivalParticle, false)
-		if CameraMotion ~= nil then
-			CameraMotion:Release(playerID, {
-				owner = "hero_selection",
-				mode = "free",
-				reason = "hero selection arrival finished",
-			})
-		end
 		return nil
 	end)
 end
@@ -550,7 +546,7 @@ function XHSBeginHeroSelectionTransition(id, pickedHeroName, oldHero, startingGo
 	oldHero:AddNewModifier(oldHero, nil, "modifier_xhs_cinematic_hide_health_bars", {
 		duration = HERO_SELECTION_TELEPORT_DURATION + 2.0,
 	})
-	oldHero:AddNoDraw()
+	local selectionCameraOrigin = oldHero:GetAbsOrigin()
 
 	local player = PlayerResource:GetPlayer(id)
 	SetHeroSelectionHealthFrameHidden(player, true)
@@ -558,7 +554,7 @@ function XHSBeginHeroSelectionTransition(id, pickedHeroName, oldHero, startingGo
 		-- First frame of the transition belongs to the selected showcase unit.
 		-- The existing delayed move to the base remains the second camera beat.
 		CameraMotion:Move(id, transform.position, {
-			from = oldHero,
+			from = selectionCameraOrigin,
 			duration = HERO_SELECTION_FOCUS_CAMERA_SPEED,
 			easing = "smootherstep",
 			owner = "hero_selection",
@@ -567,7 +563,23 @@ function XHSBeginHeroSelectionTransition(id, pickedHeroName, oldHero, startingGo
 			persistent = true,
 		})
 	end
-	local sourceParticles = StartHeroSelectionSourceTeleport(transform, id)
+	local sourceParticles = {}
+	local sourcePosition = IsValidSelectionUnit(transform.display)
+		and transform.display:GetAbsOrigin() or transform.position
+	if sourcePosition ~= nil then
+		oldHero:SetAbsOrigin(sourcePosition)
+		oldHero:Stop()
+	end
+	-- Particle ownership is resolved client-side from the networked Wisp
+	-- transform. Give that transform two server frames to replicate before the
+	-- vanilla hierarchy is created, otherwise it starts at the Wisp's old spot.
+	Timers:CreateTimer(0.06, function()
+		local createdParticles = StartHeroSelectionSourceTeleport(transform, id, oldHero)
+		for _, particle in pairs(createdParticles) do
+			table.insert(sourceParticles, particle)
+		end
+		return nil
+	end)
 	local destinationParticle = nil
 	local transitionCompleted = false
 	local travelHandle = nil
@@ -592,13 +604,6 @@ function XHSBeginHeroSelectionTransition(id, pickedHeroName, oldHero, startingGo
 			if newHero == nil or newHero:IsNull() then
 				DestroyHeroSelectionParticle(destinationParticle, true)
 				SetHeroSelectionHealthFrameHidden(player, false)
-				if CameraMotion ~= nil then
-					CameraMotion:Release(id, {
-						owner = "hero_selection",
-						mode = "free",
-						reason = "hero replacement failed",
-					})
-				end
 				if IsValidSelectionUnit(oldHero) then
 					oldHero.xhs_hero_selection_transition = nil
 					oldHero:RemoveNoDraw()
@@ -714,8 +719,30 @@ function SpawnHeroLoadout(hero_count)
 	end
 end
 
+local function RemoveUnavailableHeroSelectionMarkers()
+	local removed = 0
+	for group, heroes in pairs({
+		standard = HEROLIST,
+		vip = HEROLIST_VIP,
+	}) do
+		for index in ipairs(heroes) do
+			local triggerName = group == "vip"
+				and ("trigger_hero_vip_" .. tostring(index))
+				or ("trigger_hero_" .. tostring(index))
+			if Entities:FindByName(nil, triggerName) == nil then
+				removed = removed + RemoveHeroSelectionMarker(group, index)
+			end
+		end
+	end
+	if removed > 0 then
+		print("[XHS][SelectionCleanup] unavailable_hero_markers=" .. tostring(removed))
+	end
+	return removed
+end
+
 function SpawnHeroesBis()
 	IndexHeroSelectionMarkers()
+	RemoveUnavailableHeroSelectionMarkers()
 	local hero_count = 1
 	local hero_vip_count = 1
 

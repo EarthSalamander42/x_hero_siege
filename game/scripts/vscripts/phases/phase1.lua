@@ -167,17 +167,23 @@ end
 
 function SpiritBeastBack(event)
 	local hero = event.activator
+	local timerStarted = GameMode.SpiritBeastTimerStarted == true
 
 	SpecialEventBack(event)
+	if timers.SpiritBeastIntro then
+		Timers:RemoveTimer(timers.SpiritBeastIntro)
+		timers.SpiritBeastIntro = nil
+	end
 	if timers.SpiritBeast then
 		Timers:RemoveTimer(timers.SpiritBeast)
 		timers.SpiritBeast = nil
 	end
 	GameMode.SpiritBeast_occuring = false
+	GameMode.SpiritBeastTimerStarted = false
 	CustomGameEventManager:Send_ServerToAllClients("xhs_event_usage_update", {
 		spirit_beast_busy = false,
 	})
-	if FragmentQuests ~= nil then
+	if FragmentQuests ~= nil and timerStarted then
 		FragmentQuests:OnOptionalEventEnd("spirit_beast", false)
 	end
 
@@ -191,11 +197,17 @@ end
 
 function SpiritBeastDead(event)
 	local hero = GetPlayerHeroFromUnit(event.attacker) or event.attacker
+	local timerStarted = GameMode.SpiritBeastTimerStarted == true
 
 	SetHeroOptionalEventTomeLock(hero, "spirit_beast", false)
 	DoEntFire("trigger_spirit_beast_duration", "Kill", nil, 0, nil, nil)
 	GameMode.SpiritBeast_killed = true
 	GameMode.SpiritBeast_occuring = false
+	GameMode.SpiritBeastTimerStarted = false
+	if timers.SpiritBeastIntro then
+		Timers:RemoveTimer(timers.SpiritBeastIntro)
+		timers.SpiritBeastIntro = nil
+	end
 	if timers.SpiritBeast then
 		Timers:RemoveTimer(timers.SpiritBeast)
 		timers.SpiritBeast = nil
@@ -208,7 +220,7 @@ function SpiritBeastDead(event)
 	if GameMode.spirit_beast ~= nil and IsValidEntity(GameMode.spirit_beast) and not GameMode.spirit_beast:IsNull() then
 		GameMode:HideOptionalEventBossBar("spirit_beast", GameMode.spirit_beast)
 	end
-	if FragmentQuests ~= nil then
+	if FragmentQuests ~= nil and timerStarted then
 		FragmentQuests:OnOptionalEventEnd("spirit_beast", true)
 	end
 
@@ -221,17 +233,23 @@ end
 
 function FrostInfernalBack(event)
 	local hero = event.activator
+	local timerStarted = GameMode.FrostInfernalTimerStarted == true
 
 	SpecialEventBack(event)
+	if timers.FrostInfernalIntro then
+		Timers:RemoveTimer(timers.FrostInfernalIntro)
+		timers.FrostInfernalIntro = nil
+	end
 	if timers.FrostInfernal then
 		Timers:RemoveTimer(timers.FrostInfernal)
 		timers.FrostInfernal = nil
 	end
 	GameMode.FrostInfernal_occuring = false
+	GameMode.FrostInfernalTimerStarted = false
 	CustomGameEventManager:Send_ServerToAllClients("xhs_event_usage_update", {
 		frost_infernal_busy = false,
 	})
-	if FragmentQuests ~= nil then
+	if FragmentQuests ~= nil and timerStarted then
 		FragmentQuests:OnOptionalEventEnd("frost_infernal", false)
 	end
 
@@ -246,11 +264,17 @@ end
 
 function FrostInfernalDead(event)
 	local hero = GetPlayerHeroFromUnit(event.attacker) or event.attacker
+	local timerStarted = GameMode.FrostInfernalTimerStarted == true
 
 	SetHeroOptionalEventTomeLock(hero, "frost_infernal", false)
 	DoEntFire("trigger_frost_infernal_duration", "Kill", nil, 0, nil, nil)
 	GameMode.FrostInfernal_killed = true
 	GameMode.FrostInfernal_occuring = false
+	GameMode.FrostInfernalTimerStarted = false
+	if timers.FrostInfernalIntro then
+		Timers:RemoveTimer(timers.FrostInfernalIntro)
+		timers.FrostInfernalIntro = nil
+	end
 	if timers.FrostInfernal then
 		Timers:RemoveTimer(timers.FrostInfernal)
 		timers.FrostInfernal = nil
@@ -263,7 +287,7 @@ function FrostInfernalDead(event)
 	if GameMode.frost_infernal ~= nil and IsValidEntity(GameMode.frost_infernal) and not GameMode.frost_infernal:IsNull() then
 		GameMode:HideOptionalEventBossBar("frost_infernal", GameMode.frost_infernal)
 	end
-	if FragmentQuests ~= nil then
+	if FragmentQuests ~= nil and timerStarted then
 		FragmentQuests:OnOptionalEventEnd("frost_infernal", true)
 	end
 
@@ -273,15 +297,21 @@ end
 
 function AllHeroImageBack(event)
 	local point = Entities:FindByName(nil, "all_hero_image_player"):GetAbsOrigin()
+	local timerStarted = GameMode.AllHeroImagesTimerStarted == true
+	if timers.AllHeroImageIntro then Timers:RemoveTimer(timers.AllHeroImageIntro) end
 	if timers.AllHeroImage then Timers:RemoveTimer(timers.AllHeroImage) end
 	if timers.AllHeroImage2 then Timers:RemoveTimer(timers.AllHeroImage2) end
+	timers.AllHeroImageIntro = nil
+	timers.AllHeroImage = nil
+	timers.AllHeroImage2 = nil
 
 	CustomGameEventManager:Send_ServerToAllClients("hide_timer_all_hero_image", {})
 	GameMode.AllHeroImages_occuring = false
+	GameMode.AllHeroImagesTimerStarted = false
 	CustomGameEventManager:Send_ServerToAllClients("xhs_event_usage_update", {
 		all_hero_images_busy = false,
 	})
-	if FragmentQuests ~= nil then
+	if FragmentQuests ~= nil and timerStarted then
 		FragmentQuests:OnOptionalEventEnd("all_hero_images", false)
 	end
 	SpecialEventBack(event)

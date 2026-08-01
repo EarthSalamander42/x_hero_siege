@@ -22,6 +22,11 @@ local function CompanionModifierLog(parent, message, ...)
 	-- Intentionally silent: companion state changes are expected gameplay.
 end
 
+local function GetLiveCompanionModifier(companion)
+	if companion == nil or companion:IsNull() then return nil end
+	return companion:FindModifierByName("modifier_companion")
+end
+
 function modifier_companion:IsHidden() return true end
 
 function modifier_companion:GetAbsoluteNoDamagePhysical() return 1 end
@@ -278,10 +283,9 @@ function modifier_companion:HideForCombat()
 	self:PlayCompanionParticle("particles/items_fx/blink_dagger_start.vpcf")
 
 	Timers:CreateTimer(COMPANION_VANISH_DELAY, function()
-		if self == nil then return end
-		local parent = self:GetParent()
-		if parent ~= nil and not parent:IsNull() and self.hidden_by_combat == true then
-			parent:AddNoDraw()
+		local liveModifier = GetLiveCompanionModifier(companion)
+		if liveModifier ~= nil and liveModifier.hidden_by_combat == true then
+			companion:AddNoDraw()
 		end
 	end)
 end
@@ -302,9 +306,10 @@ function modifier_companion:ReturnFromCombat(hero)
 	self.next_follow_order_time = 0
 
 	Timers:CreateTimer(0.45, function()
-		if self == nil then return end
-		if self.companion_state == COMPANION_STATE_RETURNING then
-			self.companion_state = COMPANION_STATE_FOLLOWING
+		local liveModifier = GetLiveCompanionModifier(companion)
+		if liveModifier ~= nil
+			and liveModifier.companion_state == COMPANION_STATE_RETURNING then
+			liveModifier.companion_state = COMPANION_STATE_FOLLOWING
 		end
 	end)
 end

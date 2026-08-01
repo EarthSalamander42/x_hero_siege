@@ -9,6 +9,10 @@
 
 	<Panel class="XHSDevToolsRoot" hittest="false" hittestchildren="true">
 		<Panel id="XHSDevToolsRoot" class="XHSDevToolsHost" hittest="false" hittestchildren="true">
+			<Button id="XHSDevToolsCompactToggle" class="XHSDevToolsCompactToggle" onactivate="XHSDevToolsToggleCompactHUD();">
+				<Label id="XHSDevToolsCompactToggleLabel" text="&#x203A;" />
+			</Button>
+
 			<Panel id="XHSDevToolsButtons" hittest="false" hittestchildren="true">
 				<Panel id="XHSDevToolsTimescale" class="XHSDevToolsTimescale" />
 

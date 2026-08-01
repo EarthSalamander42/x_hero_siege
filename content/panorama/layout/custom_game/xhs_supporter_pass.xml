@@ -8,6 +8,7 @@
 		<include src="file://{resources}/scripts/custom_game/util.js" />
 		<include src="file://{resources}/scripts/custom_game/xhs_name_display.js" />
 		<include src="file://{resources}/scripts/custom_game/generated/xhs_supporter_couriers.js" />
+		<include src="file://{resources}/scripts/custom_game/generated/xhs_supporter_effigy_catalog.js" />
 		<include src="file://{resources}/scripts/custom_game/xhs_supporter_pass.js" />
 	</scripts>
 
@@ -57,6 +58,10 @@
 
 				<Button id="XHSPassDevUnlockUIButton" class="XHSPassDevUnlockUIButton">
 					<Label id="XHSPassDevUnlockUILabel" text="DEV: UNLOCK UI" />
+				</Button>
+
+				<Button id="XHSPassDevFreeUIButton" class="XHSPassDevUnlockUIButton XHSPassDevFreeUIButton">
+					<Label id="XHSPassDevFreeUILabel" text="DEV: FREE UI" />
 				</Button>
 
 				<Button id="XHSPassCloseButton" class="XHSPassIconButton">
@@ -153,12 +158,9 @@
 					</Panel>
 
 					<Panel id="XHSPassArmoryPage" class="XHSPassPage">
-						<Panel class="XHSPassSectionHeader HasFilters">
+						<Panel class="XHSPassSectionHeader HasFilters XHSPassArmoryHeader">
 							<Label class="XHSPassSectionTitle" text="#xhs_sp_armory" />
 							<Panel id="XHSPassArmoryFilters" class="XHSPassSectionFilterTabs" />
-							<Button id="XHSPassCourierRequestOpenButton" class="XHSPassRequestCompanionButton">
-								<Label text="#xhs_sp_request_companion" />
-							</Button>
 							<Label class="XHSPassSectionNote" text="#xhs_sp_armory_note" />
 						</Panel>
 						<Panel id="XHSPassArmoryPager" class="XHSPassPaginationBar" />
@@ -168,13 +170,18 @@
 							<Panel class="XHSPassCourierRequestWindow">
 								<Panel class="XHSPassCourierRequestWindowHeader">
 									<Panel class="XHSPassCourierRequestHeaderCopy">
-										<Label class="XHSPassCourierRequestWindowEyebrow" text="#xhs_sp_companion_requests" />
-										<Label class="XHSPassCourierRequestTitle" text="#xhs_sp_courier_request_title" />
-										<Label class="XHSPassCourierRequestBody" text="#xhs_sp_courier_request_body" />
+										<Label class="XHSPassCourierRequestWindowEyebrow" text="FEATURE REQUESTS" />
+										<Label id="XHSPassAssetRequestTitle" class="XHSPassCourierRequestTitle" text="#xhs_sp_courier_request_title" />
+										<Label id="XHSPassAssetRequestBody" class="XHSPassCourierRequestBody" text="#xhs_sp_courier_request_body" />
 									</Panel>
 									<Button id="XHSPassCourierRequestCloseButton" class="XHSPassCourierRequestCloseButton">
 										<Label text="×" />
 									</Button>
+								</Panel>
+								<Panel id="XHSPassAssetRequestTypeTabs" class="XHSPassAssetRequestTabs IsPrimary" />
+								<Panel class="XHSPassAssetRequestBrowseBar">
+									<Panel id="XHSPassAssetRequestCategoryTabs" class="XHSPassAssetRequestTabs IsCategory" />
+									<TextEntry id="XHSPassAssetRequestSearch" class="XHSPassAssetRequestSearch" placeholder="#xhs_sp_request_search" />
 								</Panel>
 								<Panel id="XHSPassCourierRequestPager" class="XHSPassPaginationBar" />
 								<Panel id="XHSPassCourierRequestGrid" class="XHSPassShopGrid XHSPassCourierRequestGrid" />
@@ -199,6 +206,14 @@
 						</Panel>
 					</Panel>
 				</Panel>
+			</Panel>
+
+			<Panel id="XHSPassPremiumCTA" class="XHSPassPremiumCTA" hittest="true">
+				<Label class="XHSPassPremiumCTAEyebrow" text="#xhs_sp_premium_cta_eyebrow" />
+				<Label class="XHSPassPremiumCTACopy" text="#xhs_sp_premium_cta_copy" />
+				<Button id="XHSPassPremiumCTAButton" class="XHSPassPremiumCTAButton">
+					<Label text="#xhs_sp_premium_cta_button" />
+				</Button>
 			</Panel>
 
 			<Panel id="XHSPassActionToast" class="XHSPassActionToast" hittest="false">

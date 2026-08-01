@@ -81,7 +81,6 @@ local BATTLEPASS_DEV_FAMILY_ORDER = {
 	"spell_lifesteal",
 	"regen_aura",
 	"immolation",
-	"high_five",
 }
 
 local BATTLEPASS_DEV_FAMILY_LABELS = {
@@ -99,7 +98,6 @@ local BATTLEPASS_DEV_FAMILY_LABELS = {
 	spell_lifesteal = "Spell Lifesteal",
 	regen_aura = "Regen Aura",
 	immolation = "Immolation",
-	high_five = "High Five",
 }
 
 local BATTLEPASS_DEV_FAMILY_SET = {}

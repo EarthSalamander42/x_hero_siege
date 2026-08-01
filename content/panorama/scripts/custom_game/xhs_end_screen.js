@@ -207,8 +207,10 @@ var XHSEndScreen = (function () {
 
 	function ResolveRewardImageURL(imagePath) {
 		var path = (imagePath || "").toString().replace(/\\/g, "/");
+		if (path.indexOf("s2r://") === 0) {
+			return path;
+		}
 		path = path.replace(/^file:\/\/\{images\}\//, "");
-		path = path.replace(/^s2r:\/\/panorama\/images\//, "");
 		path = path.replace(/_png\.vtex$/, "");
 		path = path.replace(/\.png$/, "");
 		if (!path) {
@@ -1745,6 +1747,25 @@ var XHSEndScreen = (function () {
 
 		var label = $.CreatePanel("Label", button, "");
 		label.text = rewardQueue.length > 0 ? Localize("#xhs_sp_accept") + "  ›" : Localize("#xhs_sp_accept");
+
+		var closeAllButton = $.CreatePanel("Button", panel, "");
+		closeAllButton.AddClass("XHSRewardCloseAllButton");
+		closeAllButton.SetPanelEvent("onactivate", function () {
+			if (!activeReward) {
+				return;
+			}
+			rewardQueue = [];
+			rewardBatchAccepted = rewardBatchTotal;
+			activeReward = null;
+			Game.EmitSound("ui_generic_button_click");
+			ClearPanel(container);
+			SetRewardOverlayVisible(false);
+			rewardBatchTotal = 0;
+			rewardBatchAccepted = 0;
+		});
+
+		var closeAllLabel = $.CreatePanel("Label", closeAllButton, "");
+		closeAllLabel.text = "CLOSE ALL";
 
 		var remaining = $.CreatePanel("Label", panel, "");
 		remaining.AddClass("XHSRewardRemaining");

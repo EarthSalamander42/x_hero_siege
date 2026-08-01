@@ -3,6 +3,22 @@
 	var closeButton = $("#XHSUIRecoveryClose");
 	var hoveredTarget = null;
 	var HOVER_INTERVAL = 0.05;
+	var TOOLTIP_LAYER_INTERVAL = 0.25;
+	var TOOLTIP_LAYER_Z_INDEX = "2147483647";
+	var TOOLTIP_PANEL_IDS = [
+		"Tooltips",
+		"TooltipManager",
+		"DOTATooltipManager",
+		"AbilityTooltips",
+		"ItemTooltips",
+		"DOTAAbilityTooltip",
+		"DOTAItemTooltip",
+		"DOTAEconItemTooltip",
+		"NeutralItemTooltip",
+		"HUDTeamItemTooltip",
+		"AbilityTooltip",
+		"ItemTooltip"
+	];
 
 	var targets = [
 		{ id: "CastleHP", visibleStyle: true, handler: "CastleHP" },
@@ -42,6 +58,36 @@
 	function findPanel(id) {
 		var root = getHudRoot();
 		return root && root.FindChildTraverse ? root.FindChildTraverse(id) : null;
+	}
+
+	function isTooltipPanel(panel) {
+		if (!panel) {
+			return false;
+		}
+		var id = String(panel.id || "").toLowerCase();
+		var panelType = String(panel.paneltype || "").toLowerCase();
+		return id.indexOf("tooltip") !== -1 || panelType.indexOf("tooltip") !== -1;
+	}
+
+	function promoteTooltipPanel(panel, root) {
+		var current = panel;
+		while (current && current !== root && isTooltipPanel(current)) {
+			current.style.zIndex = TOOLTIP_LAYER_Z_INDEX;
+			current = current.GetParent ? current.GetParent() : null;
+		}
+	}
+
+	function keepNativeTooltipsOnTop() {
+		var root = getHudRoot();
+		if (root && root.FindChildTraverse) {
+			for (var i = 0; i < TOOLTIP_PANEL_IDS.length; i++) {
+				var panel = root.FindChildTraverse(TOOLTIP_PANEL_IDS[i]);
+				if (isValid(panel)) {
+					promoteTooltipPanel(panel, root);
+				}
+			}
+		}
+		$.Schedule(TOOLTIP_LAYER_INTERVAL, keepNativeTooltipsOnTop);
 	}
 
 	function isValid(panel) {
@@ -225,5 +271,6 @@
 		});
 	}
 
+	keepNativeTooltipsOnTop();
 	updateHover();
 })();

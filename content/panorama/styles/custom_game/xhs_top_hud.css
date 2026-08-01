@@ -164,7 +164,8 @@
 	z-index: 20;
 }
 
-#XHSOverheadRoot.XHSPauseOccluded {
+#XHSOverheadRoot.XHSPauseOccluded,
+#XHSOverheadRoot.XHSModalOccluded {
 	visibility: collapse;
 	opacity: 0;
 }
@@ -238,6 +239,103 @@
 .XHSOverheadLabel.IsDead {
 	opacity: 0.42;
 	saturation: 0.45;
+}
+
+.XHSOverheadLabel.XHSOverheadTombstone,
+.XHSOverheadLabel.XHSOverheadTombstone.IsDead {
+	opacity: 1.0;
+	saturation: 1.0;
+	brightness: 1.08;
+}
+
+.XHSOverheadLabel.XHSOverheadTombstone .XHSOverheadContent {
+	background-color: gradient( linear, 0% 0%, 100% 100%, from( #1d0b0af0 ), color-stop( 0.58, #0b090dea ), to( #050207e6 ) );
+	box-shadow: fill #000000c8 0px 3px 10px 0px, fill #ff5a4328 0px 0px 12px 0px, inset #ffffff12 0px 1px 0px 0px;
+}
+
+.XHSOverheadLabel.XHSOverheadTombstone .XHSOverheadNameBg {
+	background-color: gradient( linear, 0% 0%, 100% 0%, from( #00000000 ), color-stop( .14, #35100ed8 ), color-stop( .50, #72251ff2 ), color-stop( .86, #35100ed8 ), to( #00000000 ) );
+	box-shadow: fill #0000007c 0px 1px 6px 0px, fill #ff5a4338 0px 0px 10px 0px;
+}
+
+.XHSOverheadLabel.XHSOverheadTombstone .XHSOverheadGameplayStatus,
+.XHSOverheadLabel.XHSOverheadTombstone .XHSOverheadAltStatus {
+	color: #ff9b84;
+	text-shadow: 0px 1px 2px #000000, 0px 0px 6px #ff5a437a;
+}
+
+.XHSOverheadLabel.XHSOverheadTombstone .XHSOverheadHealthFill,
+.XHSOverheadLabel.XHSOverheadTombstone .XHSOverheadHealthLag {
+	width: 0%;
+}
+
+.XHSOverheadLabel.XHSOverheadTombstone .XHSOverheadValue {
+	visibility: collapse;
+	opacity: 0;
+}
+
+.XHSOverheadLabel.XHSOverheadTombstone .XHSOverheadFrameArt,
+.XHSOverheadLabel.XHSOverheadTombstone .XHSOverheadBars,
+.XHSOverheadLabel.XHSOverheadTombstone .XHSOverheadTierOverline,
+.XHSOverheadLabel.XHSOverheadTombstone .XHSOverheadTagWrap,
+.XHSOverheadLabel.XHSOverheadTombstone .XHSOverheadLeftContent,
+.XHSOverheadLabel.XHSOverheadTombstone .XHSOverheadRightContent {
+	visibility: collapse;
+	opacity: 0;
+}
+
+.XHSOverheadLabel.XHSOverheadTombstone .XHSOverheadContent {
+	width: 210px;
+	height: 43px;
+	margin-top: 0px;
+	border: 1px solid #ff5a4378;
+}
+
+.XHSOverheadLabel.XHSOverheadTombstone .XHSOverheadCenterContent {
+	width: 210px;
+	height: 43px;
+}
+
+.XHSOverheadLabel.XHSOverheadTombstone .XHSOverheadTopRow {
+	width: 176px;
+	height: 16px;
+	margin-left: 17px;
+	margin-top: 5px;
+}
+
+.XHSOverheadLabel.XHSOverheadTombstone .XHSOverheadNameBg,
+.XHSOverheadLabel.XHSOverheadTombstone .XHSOverheadName {
+	width: 176px;
+	height: 16px;
+}
+
+.XHSOverheadLabel.XHSOverheadTombstone .XHSOverheadStatusRow {
+	width: 176px;
+	height: 17px;
+	margin-left: 17px;
+	margin-top: 2px;
+	visibility: visible;
+	opacity: 1;
+	background-color: gradient( linear, 0% 0%, 100% 0%, from( #00000000 ), color-stop( .16, #29100fde ), color-stop( .50, #491713ee ), color-stop( .84, #29100fde ), to( #00000000 ) );
+	border-top: 1px solid #ff806a56;
+	border-bottom: 1px solid #ff5a4332;
+}
+
+.XHSOverheadLabel.XHSOverheadTombstone .XHSOverheadStatusNode {
+	width: 6px;
+	height: 6px;
+	margin-left: 8px;
+	background-color: #ff806a;
+	box-shadow: fill #ff5a43b8 0px 0px 8px 0px;
+}
+
+.XHSOverheadLabel.XHSOverheadTombstone .XHSOverheadGameplayStatus,
+.XHSOverheadLabel.XHSOverheadTombstone .XHSOverheadAltStatus {
+	width: 150px;
+	height: 17px;
+	margin-right: 6px;
+	font-size: 11px;
+	text-align: center;
 }
 
 .XHSOverheadLabel.IsReincarnating {
@@ -3356,11 +3454,13 @@
 
 .XHSReviveChannelers
 {
+	width: 165px;
 	color: #b9afcf;
 	font-size: 12px;
 	font-weight: bold;
 	letter-spacing: 1px;
 	text-align: right;
+	text-overflow: shrink;
 }
 
 .XHSReviveTitle
@@ -3401,13 +3501,14 @@
 
 .XHSReviveTimer
 {
-	width: 74px;
+	width: 96px;
 	vertical-align: center;
-	margin-right: 13px;
+	margin-right: 11px;
 	color: #fff0a5;
-	font-size: 24px;
+	font-size: 21px;
 	font-weight: bold;
 	text-align: right;
+	text-overflow: shrink;
 	text-shadow: 0px 0px 8px #d69c2f70, 0px 2px 4px #000000;
 }
 
@@ -3440,4 +3541,109 @@
 	0% { opacity: .55; transform: scaleX(.88) scaleY(.88); }
 	50% { opacity: 1; transform: scaleX(1.08) scaleY(1.08); }
 	100% { opacity: .55; transform: scaleX(.88) scaleY(.88); }
+}
+
+/* A dead hero gets a dedicated interaction card, never a recycled health-frame asset. */
+.XHSOverheadTombstoneCard {
+	width: 204px;
+	height: 48px;
+	horizontal-align: center;
+	margin-top: 7px;
+	flow-children: right;
+	visibility: collapse;
+	opacity: 0;
+	background-color: gradient( linear, 0% 0%, 100% 100%, from( #24100ff5 ), color-stop( .56, #10090bed ), to( #080508ed ) );
+	border: 1px solid #d65b4f9a;
+	border-radius: 3px;
+	box-shadow: fill #000000c4 0px 4px 11px 0px, fill #ff5a4334 0px 0px 13px 0px, inset #ffffff12 0px 1px 0px 0px;
+	z-index: 20;
+}
+
+.XHSOverheadLabel.XHSOverheadTombstone .XHSOverheadTombstoneCard {
+	visibility: visible;
+	opacity: 1;
+}
+
+.XHSOverheadLabel.XHSOverheadTombstone .XHSOverheadFrameArt,
+.XHSOverheadLabel.XHSOverheadTombstone .XHSOverheadContent,
+.XHSOverheadLabel.XHSOverheadTombstone .XHSOverheadValue,
+.XHSOverheadLabel.XHSOverheadTombstone .XHSOverheadBotActivity,
+.XHSOverheadLabel.XHSOverheadTombstone .XHSOverheadBotNextPurchase,
+.XHSOverheadLabel.XHSOverheadTombstone .XHSOverheadTagWrap,
+.XHSOverheadLabel.XHSOverheadTombstone .XHSOverheadAnchor,
+.XHSOverheadLabel.XHSOverheadTombstone .XHSOverheadAnchorDot {
+	visibility: collapse;
+	opacity: 0;
+}
+
+.XHSOverheadLabel.IsDead .XHSOverheadBotActivity,
+.XHSOverheadLabel.IsDead .XHSOverheadBotNextPurchase {
+	visibility: collapse;
+	opacity: 0;
+}
+
+.XHSOverheadTombstoneMark {
+	width: 42px;
+	height: 46px;
+	background-color: gradient( radial, 50% 50%, 0% 0%, 58% 58%, from( #b83f35b8 ), color-stop( .58, #4a1717b8 ), to( #13090a00 ) );
+	border-right: 1px solid #ff806a4f;
+}
+
+.XHSOverheadTombstoneRuneVertical {
+	width: 5px;
+	height: 27px;
+	horizontal-align: center;
+	vertical-align: center;
+	background-color: gradient( linear, 0% 0%, 0% 100%, from( #fff1eb ), color-stop( .5, #ff806a ), to( #7f2823 ) );
+	box-shadow: #ff5a4380 0px 0px 7px 0px;
+	transform: rotateZ(45deg);
+}
+
+.XHSOverheadTombstoneRuneHorizontal {
+	width: 20px;
+	height: 5px;
+	horizontal-align: center;
+	vertical-align: center;
+	background-color: gradient( linear, 0% 0%, 100% 0%, from( #7f2823 ), color-stop( .5, #fff1eb ), to( #7f2823 ) );
+	box-shadow: #ff5a4380 0px 0px 7px 0px;
+	transform: rotateZ(45deg);
+}
+
+.XHSOverheadTombstoneRuneCore {
+	width: 7px;
+	height: 7px;
+	horizontal-align: center;
+	vertical-align: center;
+	background-color: #fff4ef;
+	border: 1px solid #ff9b84;
+	box-shadow: #ff5a43b0 0px 0px 8px 0px;
+	transform: rotateZ(45deg);
+}
+
+.XHSOverheadTombstoneCopy {
+	width: 160px;
+	height: 46px;
+	flow-children: down;
+	padding: 6px 10px 4px 10px;
+}
+
+.XHSOverheadTombstoneTitle {
+	width: 140px;
+	height: 18px;
+	color: #fff1ed;
+	font-size: 12px;
+	font-weight: bold;
+	text-overflow: shrink;
+	text-transform: uppercase;
+	text-shadow: 0px 1px 2px #000000;
+}
+
+.XHSOverheadTombstoneAction {
+	width: 140px;
+	height: 15px;
+	color: #ff9b84;
+	font-size: 9px;
+	font-weight: bold;
+	letter-spacing: 1px;
+	text-shadow: 0px 1px 2px #000000, 0px 0px 6px #ff5a4366;
 }

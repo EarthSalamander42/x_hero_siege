@@ -1,7 +1,7 @@
 .XHSUIRecoveryRoot {
 	width: 100%;
 	height: 100%;
-	z-index: 999999;
+	z-index: 950;
 }
 
 .XHSUIRecoveryClose {
@@ -15,7 +15,7 @@
 	box-shadow: fill #000000cc 0px 1px 7px 1px;
 	transition-property: opacity, brightness, transform;
 	transition-duration: 0.08s;
-	z-index: 999999;
+	z-index: 950;
 }
 
 .XHSUIRecoveryClose.Visible {

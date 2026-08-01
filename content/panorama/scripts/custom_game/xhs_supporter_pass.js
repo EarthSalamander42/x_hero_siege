@@ -11,10 +11,15 @@ var XHSSupporterPass = (function () {
 	var paginationState = {
 		shop: { page: 0, page_size: 10 },
 		armory: { page: 0, page_size: 10 },
-		courier: { page: 0, page_size: 10 },
+		asset_request: { page: 0, page_size: 10 },
 	};
-	var courierRequestSerial = 0;
-	var courierRequestState = {};
+	var assetRequestSerial = 0;
+	var assetRequestResultState = {};
+	var assetRequestView = {
+		request_type: "companion",
+		category: "courier",
+		search: "",
+	};
 	var settingsOriginal = {};
 	var settingsDraft = {};
 	var settingsInitialized = false;
@@ -30,6 +35,14 @@ var XHSSupporterPass = (function () {
 	var windowAnimationSerial = 0;
 	var DEV_ASSET_FILTER = "Dev Assets";
 	var devUnlockAllUI = false;
+	var devUnlockFreeUI = false;
+	var devLocallyClaimedRewards = {};
+	var devLocalEquippedBySlot = {};
+	var DEV_LOCAL_LOADOUT_SLOTS = [
+		"teleport", "levelup", "kill_effect", "companion", "emblem",
+		"potion", "rebirth", "attack_lifesteal", "spell_lifesteal", "regen_aura",
+		"immolation", "title",
+	];
 	var devSelectedAsset = "";
 	var devAssetAssignments = {};
 	var devTestRequestSerial = 0;
@@ -132,7 +145,7 @@ var XHSSupporterPass = (function () {
 	}
 
 	function ScheduleSupporterLayerRetry() {
-		if (supporterLayerApplied || supporterLayerRetryScheduled) {
+		if (supporterLayerRetryScheduled) {
 			return;
 		}
 
@@ -144,10 +157,6 @@ var XHSSupporterPass = (function () {
 	}
 
 	function EnsureSupporterPassAboveVanillaHud() {
-		if (supporterLayerApplied) {
-			return true;
-		}
-
 		var host = $.GetContextPanel();
 		if (!host || typeof FindDotaHudElement !== "function") {
 			ScheduleSupporterLayerRetry();
@@ -157,6 +166,9 @@ var XHSSupporterPass = (function () {
 		var hudElements = FindDotaHudElement("HUDElements");
 		var hud = GetHudAncestor(hudElements) || GetHudAncestor(host);
 		var hudElementsChild = GetHudDirectChild(hudElements, hud);
+		var pauseRoot = hud && hud.FindChildTraverse ? hud.FindChildTraverse("XHSPauseRoot") : null;
+		var pauseChild = GetHudDirectChild(pauseRoot, hud);
+		var layerAnchor = pauseChild && pauseChild !== host ? pauseChild : hudElementsChild;
 		if (!hud || !hudElementsChild || typeof host.SetParent !== "function" || typeof hud.MoveChildAfter !== "function") {
 			ScheduleSupporterLayerRetry();
 			return false;
@@ -172,7 +184,8 @@ var XHSSupporterPass = (function () {
 				return false;
 			}
 
-			hud.MoveChildAfter(host, hudElementsChild);
+			host.style.zIndex = "10000";
+			hud.MoveChildAfter(host, layerAnchor);
 			supporterLayerApplied = true;
 			return true;
 		} catch (error) {
@@ -398,7 +411,7 @@ var XHSSupporterPass = (function () {
 			return Text("xhs_sp_composition_immolation", "Owner + Targets");
 		}
 		if (type === "High Five") {
-			return Text("xhs_sp_composition_high_five", "Overhead + Travel + Impact");
+			return "";
 		}
 		return "";
 	}
@@ -459,12 +472,23 @@ var XHSSupporterPass = (function () {
 		return items.slice(start, start + state.page_size);
 	}
 
-	function RenderPaginationControls(parentID, key, totalItems, rerender) {
+	function CreatePageSizeOption(dropdown, key, pageSize) {
+		var option = $.CreatePanel("Label", dropdown, "XHSPassPageSize_" + key + "_" + pageSize);
+		option.AddClass("XHSPassPageSizeOption");
+		option.xhs_page_size = pageSize.toString();
+		option.SetAttributeString("xhs_page_size", option.xhs_page_size);
+		option.text = option.xhs_page_size;
+		dropdown.AddOption(option);
+		return option;
+	}
+
+	function RenderPaginationControls(parentID, key, totalItems, rerender, options) {
 		var parent = Panel(parentID);
 		ClearPanel(parent);
 		if (!parent) {
 			return;
 		}
+		options = options || {};
 
 		var state = paginationState[key];
 		var totalPages = Math.max(1, Math.ceil(totalItems / state.page_size));
@@ -481,6 +505,55 @@ var XHSSupporterPass = (function () {
 
 		var controls = $.CreatePanel("Panel", parent, "");
 		controls.AddClass("XHSPassPaginationControls");
+
+		if (options.show_asset_request === true) {
+			var requestCompanion = $.CreatePanel("Button", controls, "");
+			requestCompanion.AddClass("XHSPassRequestCompanionButton");
+			requestCompanion.AddClass("XHSPassPaginationRequestCompanion");
+			requestCompanion.SetPanelEvent("onactivate", function () {
+				if (!options.on_asset_request) {
+					Game.EmitSound("General.Cancel");
+					return;
+				}
+				options.on_asset_request();
+			});
+			var requestCompanionLabel = $.CreatePanel("Label", requestCompanion, "");
+			requestCompanionLabel.text = options.asset_request_label
+				|| Text("xhs_sp_request_companion", "Request companion");
+		}
+
+		if (options.equipped_label) {
+			var equippedLabel = $.CreatePanel("Label", controls, "");
+			equippedLabel.AddClass("XHSPassPaginationEquipped");
+			equippedLabel.text = options.equipped_label;
+			equippedLabel.hittest = true;
+			if (options.equipped_tooltip) {
+				equippedLabel.SetPanelEvent("onmouseover", function () {
+					$.DispatchEvent("DOTAShowTextTooltip", equippedLabel, options.equipped_tooltip);
+				});
+				equippedLabel.SetPanelEvent("onmouseout", function () {
+					$.DispatchEvent("DOTAHideTextTooltip", equippedLabel);
+				});
+			}
+		}
+
+		if (options.show_unequip === true) {
+			var unequip = $.CreatePanel("Button", controls, "");
+			unequip.AddClass("XHSPassPaginationButton");
+			unequip.AddClass("XHSPassUnequipButton");
+			unequip.SetHasClass("IsDisabled", options.can_unequip !== true || options.unequip_pending === true);
+			unequip.SetPanelEvent("onactivate", function () {
+				if (options.can_unequip !== true || options.unequip_pending === true || !options.on_unequip) {
+					Game.EmitSound("General.Cancel");
+					return;
+				}
+				options.on_unequip();
+			});
+			var unequipLabel = $.CreatePanel("Label", unequip, "");
+			unequipLabel.text = options.unequip_pending === true
+				? Text("xhs_sp_pending", "Pending...")
+				: (options.unequip_label || Text("xhs_sp_unequip", "Unequip"));
+		}
 
 		var previous = $.CreatePanel("Button", controls, "");
 		previous.AddClass("XHSPassPaginationButton");
@@ -521,38 +594,32 @@ var XHSSupporterPass = (function () {
 		perPageLabel.AddClass("XHSPassPaginationPerPageLabel");
 		perPageLabel.text = Text("xhs_sp_per_page", "Per page");
 
-		var selector = $.CreatePanel("Panel", controls, "XHSPassPageSize_" + key);
-		selector.AddClass("XHSPassPaginationSelect");
-		var selectorButton = $.CreatePanel("Button", selector, "");
-		selectorButton.AddClass("XHSPassPaginationSelectButton");
-		var selectedLabel = $.CreatePanel("Label", selectorButton, "");
-		selectedLabel.AddClass("XHSPassPaginationSelectedValue");
-		selectedLabel.text = state.page_size.toString();
-		var selectorArrow = $.CreatePanel("Label", selectorButton, "");
-		selectorArrow.AddClass("XHSPassPaginationSelectArrow");
-		selectorArrow.text = "▼";
-
-		var selectorMenu = $.CreatePanel("Panel", selector, "");
-		selectorMenu.AddClass("XHSPassPaginationSelectMenu");
-		var sizes = [10, 25];
-		for (var i = 0; i < sizes.length; i++) {
-			(function (size) {
-				var option = $.CreatePanel("Button", selectorMenu, "XHSPassPageSize_" + key + "_" + size);
-				option.AddClass("XHSPassPaginationSelectOption");
-				option.SetHasClass("IsSelected", size === state.page_size);
-				var optionLabel = $.CreatePanel("Label", option, "");
-				optionLabel.text = size.toString();
-				option.SetPanelEvent("onactivate", function () {
-					state.page_size = size;
-					state.page = 0;
-					selector.SetHasClass("IsOpen", false);
-					rerender();
-				});
-			})(sizes[i]);
+		var pageSizeDropdown = $.CreatePanel("DropDown", controls, "XHSPassPageSize_" + key);
+		pageSizeDropdown.AddClass("XHSPassPageSizeDropDown");
+		var pageSizes = [10, 25];
+		var selectedOptionID = "";
+		for (var pageSizeIndex = 0; pageSizeIndex < pageSizes.length; pageSizeIndex++) {
+			var pageSize = pageSizes[pageSizeIndex];
+			var optionID = "XHSPassPageSize_" + key + "_" + pageSize;
+			CreatePageSizeOption(pageSizeDropdown, key, pageSize);
+			if (pageSize === state.page_size) {
+				selectedOptionID = optionID;
+			}
 		}
-
-		selectorButton.SetPanelEvent("onactivate", function () {
-			selector.SetHasClass("IsOpen", !selector.BHasClass("IsOpen"));
+		pageSizeDropdown.SetSelected(selectedOptionID || ("XHSPassPageSize_" + key + "_10"));
+		pageSizeDropdown.SetPanelEvent("oninputsubmit", function () {
+			var selected = pageSizeDropdown.GetSelected();
+			var selectedSize = selected
+				? ToNumber(selected.GetAttributeString("xhs_page_size", String(selected.xhs_page_size || state.page_size)), state.page_size)
+				: state.page_size;
+			if (pageSizes.indexOf(selectedSize) < 0 || selectedSize === state.page_size) {
+				return;
+			}
+			state.page_size = selectedSize;
+			state.page = 0;
+			// Let the native DropDown finish and close before rebuilding its pager.
+			// Deleting it synchronously from its own submit event can crash Panorama.
+			$.Schedule(0.05, rerender);
 		});
 	}
 
@@ -860,6 +927,34 @@ var XHSSupporterPass = (function () {
 		return devUnlockAllUI === true && IsLocalSupporterDeveloper(player);
 	}
 
+	function IsDevUnlockFreeUIActive(player) {
+		return devUnlockFreeUI === true && IsLocalSupporterDeveloper(player);
+	}
+
+	function GetDisplayPlayerData(player) {
+		if (!player || !IsDevUnlockFreeUIActive(player)) {
+			return player;
+		}
+
+		var displayPlayer = {};
+		for (var key in player) {
+			if (player.hasOwnProperty(key)) {
+				displayPlayer[key] = player[key];
+			}
+		}
+		displayPlayer.tier_id = 0;
+		displayPlayer.supporter_tier = 0;
+		displayPlayer.donator_level = 0;
+		displayPlayer.tier_name = Text("xhs_sp_free_player", "Free Player");
+		displayPlayer.tier_color = "#f3fbff";
+		displayPlayer.xp_boost = 0;
+		displayPlayer.xp_bonus = 0;
+		displayPlayer.vote_power = 1;
+		displayPlayer.season_level = SUPPORTER_PASS_LEVEL_COUNT;
+		displayPlayer._dev_free_ui = true;
+		return displayPlayer;
+	}
+
 	function FormatXHSAccountXPSummary(player) {
 		var level = Math.max(0, ToNumber(player.xhs_account_level, 0));
 		var total = Math.max(0, ToNumber(player.xhs_xp_total, 0));
@@ -965,6 +1060,9 @@ var XHSSupporterPass = (function () {
 
 		for (var i = 0; i < publishedRewards.length; i++) {
 			var reward = CopyObject(publishedRewards[i]);
+			if (IsDeferredSupporterItem(reward)) {
+				continue;
+			}
 			var level = Math.floor(ToNumber(reward.level_required || reward.level, 0));
 			if (level < 1 || level > SUPPORTER_PASS_LEVEL_COUNT) {
 				continue;
@@ -1237,6 +1335,20 @@ var XHSSupporterPass = (function () {
 		return Text(keys[normalized] || "xhs_sp_type_cosmetic", normalized);
 	}
 
+	function DisplayRewardRarity(item) {
+		var rarity = ((item && (item.rarity || item.item_rarity)) || "common").toString().toLowerCase();
+		var labels = {
+			common: "Common",
+			uncommon: "Uncommon",
+			rare: "Rare",
+			mythical: "Mythical",
+			legendary: "Legendary",
+			immortal: "Immortal",
+			arcana: "Arcana",
+		};
+		return Text("xhs_sp_" + rarity, labels[rarity] || rarity);
+	}
+
 	function ReadLoadoutValue(loadout, slotNames) {
 		if (!loadout) {
 			return "";
@@ -1382,6 +1494,9 @@ var XHSSupporterPass = (function () {
 		if (slot === "fragment") {
 			return false;
 		}
+		if (IsDevUnlockAllUIActive(player) && devLocalEquippedBySlot.hasOwnProperty(slot)) {
+			return ArmoryValueMatchesItem(devLocalEquippedBySlot[slot], item);
+		}
 		if (slotAliases[slot]) {
 			equippedValue = ReadLoadoutValue(loadout, slotAliases[slot]);
 		}
@@ -1406,6 +1521,30 @@ var XHSSupporterPass = (function () {
 		return ArmoryValueMatchesItem(equippedValue, item) || item.equipped === true;
 	}
 
+	function GetEquippedArmoryItems(items) {
+		var equipped = [];
+		for (var i = 0; i < items.length; i++) {
+			if (items[i].equipped === true) {
+				equipped.push(items[i]);
+			}
+		}
+		return equipped;
+	}
+
+	function GetArmoryEquippedSummary(items) {
+		var names = [];
+		for (var i = 0; i < items.length; i++) {
+			var name = LocalizeMaybeKey(items[i].name || items[i].item_name || items[i].id || "");
+			if (name && names.indexOf(name) < 0) {
+				names.push(name);
+			}
+		}
+		if (names.length === 0) {
+			return Text("xhs_sp_equipped_default", "Equipped: Default");
+		}
+		return Text("xhs_sp_equipped_item", "Equipped: {item}", { item: names.join(" · ") });
+	}
+
 	function BuildArmoryItemFromReward(reward, player, track) {
 		var requiredLevel = ToNumber(reward.level_required || reward.level, 1);
 		var isPremium = track === "premium" || reward.track === "premium" || reward.premium === 1 || reward.premium === "1";
@@ -1421,6 +1560,7 @@ var XHSSupporterPass = (function () {
 			id: actualItemID,
 			display_id: "battlepass_" + (actualItemID || reward.name),
 			item_id: actualItemID,
+			catalog_item_id: reward.catalog_item_id || actualItemID,
 			entitlement_id: reward.entitlement_id,
 			name: reward.name || reward.item_name || reward.id,
 			item_name: reward.item_name || reward.name,
@@ -1453,11 +1593,8 @@ var XHSSupporterPass = (function () {
 
 		item.locked = devPreviewUnlocked ? false : (premiumLocked || levelLocked);
 		item.lock_reason = premiumLocked ? Text("xhs_sp_supporter_track", "Supporter Track") : Text("xhs_sp_level_value", "Level {level}", { level: requiredLevel });
-		item.equipped = !item.locked && IsArmoryItemEquipped(player, item);
 		item.dev_preview_only = devPreviewUnlocked && !actuallyOwned;
-		if (item.dev_preview_only) {
-			item.equipped = false;
-		}
+		item.equipped = !item.locked && IsArmoryItemEquipped(player, item);
 		return item;
 	}
 
@@ -1469,8 +1606,8 @@ var XHSSupporterPass = (function () {
 
 	function BuildLegacyBattlepassArmory(player) {
 		var items = [];
-		var freeRewards = GetRewards("free");
-		var premiumRewards = GetRewards("premium");
+		var freeRewards = GetRewards("free") || [];
+		var premiumRewards = GetRewards("premium") || [];
 		var devPreviewUnlocked = IsDevUnlockAllUIActive(player);
 
 		for (var i = 0; i < freeRewards.length; i++) {
@@ -1557,6 +1694,9 @@ var XHSSupporterPass = (function () {
 		var normalizedItems = [];
 		for (var i = 0; i < items.length; i++) {
 			var item = EnrichOwnedArmoryItem(CopyObject(items[i]));
+			if (IsDeferredSupporterItem(item)) {
+				continue;
+			}
 			item.type = NormalizeArmoryItemType(item);
 			item.entitlement_id = item.entitlement_id || item.id;
 			item.item_id = item.item_id || item.catalog_item_id || item.catalog_item_key ||
@@ -1584,7 +1724,9 @@ var XHSSupporterPass = (function () {
 	function GetShopItems() {
 		var data = GetTable("supporter_pass_shop", "featured", null);
 		var items = AsArray(data && data.items ? data.items : data);
-		return items;
+		return items.filter(function (item) {
+			return !IsDeferredSupporterItem(item);
+		});
 	}
 
 	function GetArmoryItems(player) {
@@ -1697,6 +1839,24 @@ var XHSSupporterPass = (function () {
 		}
 
 		return value === true || value === 1 || value === "1" || value === "true";
+	}
+
+	// Effigies and High Fives are retained in the catalog for their 4.1
+	// implementations, but no 4.0 Supporter Pass surface advertises or equips them.
+	function IsDeferredSupporterItem(item) {
+		if (!item) {
+			return false;
+		}
+
+		var fields = [item.type, item.item_type, item.slot_id, item.category];
+		for (var i = 0; i < fields.length; i++) {
+			var value = (fields[i] || "").toString().toLowerCase().replace(/[^a-z0-9]/g, "");
+			if (value === "effigy" || value === "effigies" || value === "statue" || value === "statues" ||
+				value === "highfive" || value === "highfives") {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	function CopySettings(settings) {
@@ -1882,6 +2042,9 @@ var XHSSupporterPass = (function () {
 		var config = GameUI.CustomUIConfig ? GameUI.CustomUIConfig() : null;
 		if (config) {
 			config.XHSSupporterPassVisible = visible === true;
+			if (visible) {
+				config.XHSSupporterPassOccludesOverheads = true;
+			}
 			if (typeof config.UpdateXHSSupporterPassButtonState === "function") {
 				config.UpdateXHSSupporterPassButtonState(visible);
 			}
@@ -1910,6 +2073,9 @@ var XHSSupporterPass = (function () {
 			$.Schedule(0.32, function () {
 				if (animationSerial === windowAnimationSerial && window && (!window.IsValid || window.IsValid())) {
 					window.RemoveClass("IsClosing");
+					if (config) {
+						config.XHSSupporterPassOccludesOverheads = false;
+					}
 				}
 			});
 		}
@@ -1943,8 +2109,26 @@ var XHSSupporterPass = (function () {
 			SetCourierRequestViewerVisible(false);
 		}
 
+		UpdatePremiumCTA(GetDisplayPlayerData(GetLocalPlayerData()));
+
 		UpdateBackToTopButton();
 		ScheduleBackToTopPoll();
+	}
+
+	function IsPageActive(pageName) {
+		var pagePanel = Panel(PAGE_IDS[pageName]);
+		return !!(pagePanel && pagePanel.BHasClass("IsVisible"));
+	}
+
+	function UpdatePremiumCTA(player) {
+		var cta = Panel("XHSPassPremiumCTA");
+		if (!cta) {
+			return;
+		}
+
+		var visible = !!player && player.tier_id < 1 && !IsDevUnlockAllUIActive(player) && IsPageActive("rewards");
+		cta.SetHasClass("IsVisible", visible);
+		cta.hittest = visible;
 	}
 
 	function GetCurrentScrollPanel() {
@@ -2080,6 +2264,16 @@ var XHSSupporterPass = (function () {
 			"XHSPassDevUnlockUILabel",
 			devUnlockAllUI ? "DEV: LOCK UI" : "DEV: UNLOCK UI"
 		);
+		var devFreeButton = Panel("XHSPassDevFreeUIButton");
+		if (devFreeButton) {
+			devFreeButton.SetHasClass("IsVisible", canUseDevUnlock);
+			devFreeButton.SetHasClass("IsActive", canUseDevUnlock && devUnlockFreeUI);
+			devFreeButton.hittest = canUseDevUnlock;
+		}
+		SetText(
+			"XHSPassDevFreeUILabel",
+			devUnlockFreeUI ? "DEV: EXIT FREE" : "DEV: FREE UI"
+		);
 
 		var avatar = Panel("XHSPassAvatar");
 		if (avatar && player.steamID) {
@@ -2123,13 +2317,14 @@ var XHSSupporterPass = (function () {
 		if (votePowerValue) {
 			votePowerValue.style.color = player.tier_id > 0 ? player.tier_color : "#f3fbff";
 		}
+		UpdatePremiumCTA(player);
 	}
 
-	function RenderTiers() {
+	function RenderTiers(player) {
 		var parent = Panel("XHSPassTierRows");
 		ClearPanel(parent);
 
-		var player = GetLocalPlayerData();
+		player = player || GetLocalPlayerData();
 		var supporterURL = player.supporter_url || SUPPORTER_URL;
 		var tiers = GetTiers();
 		for (var i = 0; i < tiers.length; i++) {
@@ -2225,19 +2420,28 @@ var XHSSupporterPass = (function () {
 		var card = $.CreatePanel("Panel", parent, "");
 		card.AddClass("XHSPassRewardCard");
 		ApplyItemVisualClasses(card, reward, track);
-		var devPreviewUnlocked = IsDevUnlockAllUIActive(player);
+		var devAllPreview = IsDevUnlockAllUIActive(player);
+		var devFreePreview = IsDevUnlockFreeUIActive(player) && track === "free";
+		var devPreviewUnlocked = devAllPreview || devFreePreview;
 		var legacyReward = IsTruthy(reward.legacy, false);
 		var rewardClaimable = reward.claimable === undefined ? !legacyReward : IsTruthy(reward.claimable, false);
-		var legacyUnlocked = legacyReward && (devPreviewUnlocked || IsLegacyRewardUnlocked(reward, player, track));
-		var rewardClaimed = devPreviewUnlocked || (legacyReward ? legacyUnlocked : IsRewardClaimed(reward, player));
+		var rewardID = GetRewardID(reward);
+		var devLocallyClaimed = devAllPreview && rewardID !== "" && devLocallyClaimedRewards[rewardID] === true;
+		var legacyUnlocked = legacyReward && (devFreePreview || devLocallyClaimed || (!devAllPreview && IsLegacyRewardUnlocked(reward, player, track)));
+		var rewardClaimed = devAllPreview
+			? devLocallyClaimed
+			: (devFreePreview || (legacyReward ? legacyUnlocked : IsRewardClaimed(reward, player)));
 		var requiredLevel = ToNumber(reward.level_required || reward.level, 1);
 		var backendReady = devPreviewUnlocked || IsTruthy(player.raw && player.raw.backend_season_ready, true);
 		var premiumLocked = (track === "premium" || reward.track === "premium" ||
 			reward.premium === 1 || reward.premium === "1") && player.tier_id < 1 && !devPreviewUnlocked;
 		var levelLocked = player.season_level < requiredLevel && !devPreviewUnlocked;
+		var rewardLocked = devAllPreview ? false : (!rewardClaimed &&
+			(legacyReward ? !legacyUnlocked : (levelLocked || premiumLocked || !backendReady)));
 		card.SetHasClass("IsLegacyReward", legacyReward);
-		card.SetHasClass("IsDevUIPreview", devPreviewUnlocked);
-		card.SetHasClass("IsLocked", !rewardClaimed && (legacyReward ? !legacyUnlocked : (levelLocked || premiumLocked || !backendReady)));
+		card.SetHasClass("IsDevUIPreview", devAllPreview);
+		card.SetHasClass("IsLocked", rewardLocked);
+		card.SetHasClass("IsUnlocked", !rewardLocked && !rewardClaimed);
 		card.SetHasClass("IsPremiumLocked", premiumLocked);
 		card.SetHasClass("IsClaimed", rewardClaimed);
 
@@ -2253,25 +2457,33 @@ var XHSSupporterPass = (function () {
 		name.AddClass("XHSPassRewardName");
 		name.text = LocalizeMaybeKey(reward.name || reward.item_name || Text("xhs_sp_reward", "Reward"));
 
+		var rarity = $.CreatePanel("Label", details, "");
+		rarity.AddClass("XHSPassRewardRarity");
+		rarity.text = DisplayRewardRarity(reward);
+
 		var type = $.CreatePanel("Label", details, "");
 		type.AddClass("XHSPassRewardType");
-		type.text = devPreviewUnlocked
-			? "DEV UI PREVIEW"
-			: rewardClaimed
-			? Text(legacyReward ? "xhs_sp_unlocked" : "xhs_sp_claimed", legacyReward ? "Unlocked" : "Claimed")
-			: (legacyReward ? Text("xhs_sp_legacy_reward", "Legacy Reward") : DisplayRewardType(reward.type || reward.item_type || "Cosmetic"));
+		type.text = DisplayRewardType(reward.type || reward.item_type || "Cosmetic");
 
-		var rewardID = GetRewardID(reward);
 		if (rewardID) {
 			var button = $.CreatePanel("Button", card, "");
 			button.AddClass("XHSPassShopButton");
 			var pending = IsActionPending("claim", rewardID);
-			var canClaim = !legacyReward && rewardClaimable && !rewardClaimed &&
-				player.season_level >= requiredLevel && !premiumLocked && backendReady && !pending;
+			var canClaim = devAllPreview
+				? !devLocallyClaimed
+				: (!legacyReward && rewardClaimable && !rewardClaimed &&
+					player.season_level >= requiredLevel && !premiumLocked && backendReady && !pending);
 			button.SetHasClass("IsLocked", !canClaim);
 			button.SetPanelEvent("onactivate", function () {
 				if (!canClaim) {
 					Game.EmitSound("General.Cancel");
+					return;
+				}
+				if (devAllPreview) {
+					devLocallyClaimedRewards[rewardID] = true;
+					ShowActionMessage(Text("xhs_sp_dev_reward_claimed_local", "Reward claimed locally · backend unchanged."), true);
+					Game.EmitSound("General.ButtonClick");
+					RenderRewards(GetDisplayPlayerData(GetLocalPlayerData()));
 					return;
 				}
 				GameEvents.SendCustomGameEventToServer("supporter_pass_claim_reward", {
@@ -2283,8 +2495,8 @@ var XHSSupporterPass = (function () {
 			});
 
 			var label = $.CreatePanel("Label", button, "");
-			label.text = devPreviewUnlocked
-				? "PREVIEW ONLY"
+			label.text = devAllPreview
+				? Text(devLocallyClaimed ? "xhs_sp_dev_claimed_local" : "xhs_sp_dev_claim_local", devLocallyClaimed ? "Claimed locally" : "Claim locally")
 				: legacyReward
 				? Text(legacyUnlocked ? "xhs_sp_unlocked" : "xhs_sp_locked", legacyUnlocked ? "Unlocked" : "Locked")
 				: Text(pending ? "xhs_sp_pending" : (rewardClaimed ? "xhs_sp_claimed" : (canClaim ? "xhs_sp_claim" : "xhs_sp_locked")), pending ? "Pending..." : (rewardClaimed ? "Claimed" : (canClaim ? "Claim" : "Locked")));
@@ -2318,12 +2530,6 @@ var XHSSupporterPass = (function () {
 		for (var i = 0; i < rewards.length; i++) {
 			CreateRewardCard(row, rewards[i], player, track);
 		}
-
-		$.Schedule(0.0, function () {
-			if (row && row.IsValid() && typeof row.ScrollToLeftEdge === "function") {
-				row.ScrollToLeftEdge();
-			}
-		});
 	}
 
 	function RenderRewards(player) {
@@ -2334,16 +2540,31 @@ var XHSSupporterPass = (function () {
 			return;
 		}
 
-		RenderRewardTrack(parent, Text("xhs_sp_free_track", "Free Track"), GetRewards("free"), player, "free");
-		RenderRewardTrack(parent, Text("xhs_sp_supporter_track", "Supporter Track"), GetRewards("premium"), player, "premium");
+		var freeRewards = GetRewards("free") || [];
+		var premiumRewards = GetRewards("premium") || [];
+		var rewardCount = Math.max(freeRewards.length, premiumRewards.length, 1);
+		var canvas = $.CreatePanel("Panel", parent, "XHSPassRewardTracksCanvas");
+		canvas.AddClass("XHSPassRewardTracksCanvas");
+		canvas.style.width = Math.max(rewardCount * 222 + 24, 1348) + "px";
+
+		RenderRewardTrack(canvas, Text("xhs_sp_free_track", "Free Track"), freeRewards, player, "free");
+		RenderRewardTrack(canvas, Text("xhs_sp_supporter_track", "Supporter Track"), premiumRewards, player, "premium");
+
+		$.Schedule(0.0, function () {
+			if (parent && parent.IsValid() && typeof parent.ScrollToLeftEdge === "function") {
+				parent.ScrollToLeftEdge();
+			}
+		});
 	}
 
 	function CreateShopCard(parent, item, player, mode) {
 		var card = $.CreatePanel("Panel", parent, "");
 		var devPreviewOnly = mode === "armory" && item.dev_preview_only === true;
+		var devLocalEquipMode = mode === "armory" && IsDevUnlockAllUIActive(player);
 		card.AddClass("XHSPassShopCard");
 		card.SetHasClass("IsArmoryCard", mode === "armory");
 		card.SetHasClass("IsDevUIPreview", devPreviewOnly);
+		card.SetHasClass("IsDevLocalEquip", devLocalEquipMode);
 		card.SetHasClass("IsEquipped", item.equipped === true);
 		card.SetHasClass("IsLocked", item.locked === true);
 		ApplyItemVisualClasses(card, item, item.track === "premium" ? "premium" : "");
@@ -2356,13 +2577,13 @@ var XHSSupporterPass = (function () {
 
 		var meta = $.CreatePanel("Label", card, "");
 		meta.AddClass("XHSPassShopMeta");
-		meta.text = LocalizeMaybeKey(item.rarity || Text("xhs_sp_common", "Common")) + " " + DisplayRewardType(item.type || item.item_type || "Cosmetic");
+		meta.text = DisplayRewardRarity(item) + " " + DisplayRewardType(item.type || item.item_type || "Cosmetic");
 
 		var price = $.CreatePanel("Label", card, "");
 		price.AddClass("XHSPassShopPrice");
 		if (mode === "armory") {
-			price.text = devPreviewOnly
-				? "DEV UI PREVIEW"
+			price.text = devLocalEquipMode
+				? (item.equipped ? "DEV EQUIPPED LOCALLY" : "DEV LOCAL LOADOUT")
 				: (item.locked ? (item.lock_reason || Text("xhs_sp_locked", "Locked")) : Text(item.equipped ? "xhs_sp_equipped" : "xhs_sp_unlocked", item.equipped ? "Equipped" : "Unlocked"));
 		} else {
 			price.text = FormatNumber(item.price || item.fragment_price || 0) + " " + Text("xhs_sp_fragments_lower", "fragments");
@@ -2370,27 +2591,35 @@ var XHSSupporterPass = (function () {
 
 		var button = $.CreatePanel("Button", card, "");
 		button.AddClass("XHSPassShopButton");
-		var requestID = mode === "armory"
+		var backendRequestID = mode === "armory"
 			? (item.entitlement_id || item.item_id || item.id)
 			: (item.id || item.item_id);
-		var actionKind = mode === "armory" ? "equip" : "purchase";
+		var devRequestID = item.catalog_item_id || item.item_id || item.id;
+		var requestID = devLocalEquipMode ? devRequestID : backendRequestID;
+		var actionKind = mode === "armory" ? (devLocalEquipMode ? "dev_equip" : "equip") : "purchase";
 		var pending = IsActionPending(actionKind, requestID);
 		var canAfford = mode === "armory"
-			? item.locked !== true && item.equipped !== true && !pending && !devPreviewOnly
+			? item.locked !== true && item.equipped !== true && !pending
 			: player.fragments >= ToNumber(item.price || item.fragment_price, 0) && !pending;
 		button.SetHasClass("IsLocked", !canAfford);
 		button.SetPanelEvent("onactivate", function () {
-			if (devPreviewOnly) {
-				ShowActionMessage("UI preview only \u00b7 no server unlock or equip was sent.", true);
-				Game.EmitSound("General.ButtonClick");
-				return;
-			}
 			if (!canAfford) {
 				Game.EmitSound("General.Cancel");
 				return;
 			}
 
 			if (mode === "armory") {
+				if (devLocalEquipMode) {
+					SetActionPending("dev_equip", requestID, true);
+					GameEvents.SendCustomGameEventToServer("supporter_pass_dev_equip_local", {
+						item_id: requestID,
+						slot_id: GetCanonicalArmorySlot(item),
+						action: "equip",
+					});
+					Game.EmitSound("General.ButtonClick");
+					RenderArmory(player);
+					return;
+				}
 				SetActionPending("equip", requestID, true);
 				GameEvents.SendCustomGameEventToServer("supporter_pass_equip_item", {
 					item_id: requestID,
@@ -2412,8 +2641,8 @@ var XHSSupporterPass = (function () {
 		var label = $.CreatePanel("Label", button, "");
 		if (pending) {
 			label.text = Text("xhs_sp_pending", "Pending...");
-		} else if (devPreviewOnly) {
-			label.text = "PREVIEW ONLY";
+		} else if (devLocalEquipMode) {
+			label.text = item.equipped ? "EQUIPPED LOCALLY" : "EQUIP LOCALLY";
 		} else if (mode === "armory") {
 			label.text = Text(item.locked ? "xhs_sp_locked" : (item.equipped ? "xhs_sp_equipped" : "xhs_sp_equip"), item.locked ? "Locked" : (item.equipped ? "Equipped" : "Equip"));
 		} else {
@@ -2512,40 +2741,29 @@ var XHSSupporterPass = (function () {
 			"Kill FX",
 			"Companion",
 			"Emblem",
-			"Effigy",
 			"Potion FX",
 			"Rebirth FX",
 			"Attack Lifesteal",
 			"Spell Lifesteal",
 			"Regen Aura",
 			"Immolation",
-			"High Five",
 			"Title",
 			"Bundle",
 			"Pudge Hook",
 			"Pudge Arcana",
 			"Streak Counter",
 		];
-		var showDevAssets = IsLocalSupporterDeveloper(player);
-		var devAssetsAdded = false;
 		for (var j = 0; j < categoryOrder.length; j++) {
 			var orderedKey = GetCategoryKey(categoryOrder[j]);
 			if (available[orderedKey]) {
 				filters.push(categoryOrder[j]);
 				delete available[orderedKey];
 			}
-			if (categoryOrder[j] === "Effigy" && showDevAssets) {
-				filters.push(DEV_ASSET_FILTER);
-				devAssetsAdded = true;
-			}
 		}
 		for (var remainingKey in available) {
 			if (available.hasOwnProperty(remainingKey)) {
 				filters.push(available[remainingKey]);
 			}
-		}
-		if (showDevAssets && !devAssetsAdded) {
-			filters.push(DEV_ASSET_FILTER);
 		}
 		return filters;
 	}
@@ -2591,15 +2809,14 @@ var XHSSupporterPass = (function () {
 				button.AddClass("XHSPassFilterTab");
 				button.SetHasClass("IsActive", activeFilter === filterName);
 				button.SetPanelEvent("onactivate", function () {
+					SetCourierRequestViewerVisible(false);
 					onSelect(filterName);
 				});
 
 				var label = $.CreatePanel("Label", button, "");
 				label.text = filterName === "All"
 					? Text("xhs_sp_filter_all", "All")
-					: (filterName === DEV_ASSET_FILTER
-						? "DEV ASSETS"
-						: DisplayRewardType(filterName));
+					: DisplayRewardType(filterName);
 			})(filters[i]);
 		}
 
@@ -3221,7 +3438,100 @@ var XHSSupporterPass = (function () {
 		return courier.name || Text("xhs_sp_courier_fallback_name", "Courier");
 	}
 
-	function CreateCourierRequestCard(parent, courier, rerender) {
+	function HumanizeAssetID(assetID) {
+		return (assetID || "").toString()
+			.replace(/^npc_dota_hero_/, "")
+			.replace(/^npc_dota_(creature|boss)_/, "")
+			.replace(/^npc_xhs_/, "")
+			.replace(/^npc_/, "")
+			.replace(/_/g, " ")
+			.replace(/\b\w/g, function (letter) { return letter.toUpperCase(); });
+	}
+
+	function GetAssetRequestName(asset) {
+		if (asset.item_def) {
+			return GetCourierDisplayName(asset);
+		}
+		var token = "#" + (asset.unit || asset.asset_id || "");
+		var localized = $.Localize(token);
+		return asset.name || (localized && localized !== token ? localized : HumanizeAssetID(asset.asset_id));
+	}
+
+	function GetAssetRequestKey(asset) {
+		return assetRequestView.request_type + ":" + assetRequestView.category + ":" + asset.asset_id;
+	}
+
+	function GetAssetRequestCatalog() {
+		var list = [];
+		if (assetRequestView.category === "courier") {
+			var couriers = GetCourierCatalog();
+			for (var c = 0; c < couriers.length; c++) {
+				couriers[c].asset_id = couriers[c].item_def.toString();
+				couriers[c].category = "courier";
+				list.push(couriers[c]);
+			}
+		} else if (typeof XHSSupporterEffigyCatalog !== "undefined" && XHSSupporterEffigyCatalog) {
+			var catalogKey = assetRequestView.category === "hero" ? "heroes" : assetRequestView.category + "s";
+			list = XHSSupporterEffigyCatalog[catalogKey] || [];
+		}
+		var needle = (assetRequestView.search || "").toString().toLowerCase().replace(/^\s+|\s+$/g, "");
+		if (!needle) return list;
+		return list.filter(function (asset) {
+			return (GetAssetRequestName(asset) + " " + (asset.asset_id || "") + " " + (asset.model || ""))
+				.toLowerCase().indexOf(needle) !== -1;
+		});
+	}
+
+	function RenderAssetRequestTabs(parentID, entries, selected, onSelect) {
+		var parent = Panel(parentID);
+		ClearPanel(parent);
+		if (!parent) return;
+		for (var i = 0; i < entries.length; i++) {
+			(function (entry) {
+				var button = $.CreatePanel("Button", parent, "");
+				button.AddClass("XHSPassAssetRequestTab");
+				button.SetHasClass("IsActive", entry.id === selected);
+				button.SetPanelEvent("onactivate", function () { onSelect(entry.id); });
+				var label = $.CreatePanel("Label", button, "");
+				label.text = entry.label;
+			})(entries[i]);
+		}
+	}
+
+	function RenderAssetRequestNavigation() {
+		RenderAssetRequestTabs("XHSPassAssetRequestTypeTabs", [
+			{ id: "companion", label: Text("xhs_sp_companions", "Companions") },
+			{ id: "effigy", label: Text("xhs_sp_effigies", "Statues / Effigies") },
+		], assetRequestView.request_type, function (requestType) {
+			assetRequestView.request_type = requestType;
+			assetRequestView.category = requestType === "companion" ? "courier" : "hero";
+			ResetPagination("asset_request");
+			RenderCourierRequestOverlay();
+		});
+		var categories = assetRequestView.request_type === "companion"
+			? [{ id: "courier", label: Text("xhs_sp_request_category_couriers", "Couriers") }]
+			: [
+				{ id: "hero", label: Text("xhs_sp_request_category_heroes", "Heroes") },
+				{ id: "courier", label: Text("xhs_sp_request_category_couriers", "Couriers") },
+				{ id: "creep", label: Text("xhs_sp_request_category_creeps", "Creeps") },
+				{ id: "boss", label: Text("xhs_sp_request_category_bosses", "Bosses") },
+			];
+		RenderAssetRequestTabs("XHSPassAssetRequestCategoryTabs", categories, assetRequestView.category, function (category) {
+			assetRequestView.category = category;
+			ResetPagination("asset_request");
+			RenderCourierRequestOverlay();
+		});
+		var title = Panel("XHSPassAssetRequestTitle");
+		var body = Panel("XHSPassAssetRequestBody");
+		if (title) title.text = assetRequestView.request_type === "companion"
+			? Text("xhs_sp_courier_request_title", "Request a companion")
+			: Text("xhs_sp_effigy_request_title", "Request a statue / effigy");
+		if (body) body.text = assetRequestView.request_type === "companion"
+			? Text("xhs_sp_courier_request_body", "Choose a courier you would like to see as a companion.")
+			: Text("xhs_sp_effigy_request_body", "Browse heroes, couriers, creeps and bosses, then submit the model you would like as an effigy.");
+	}
+
+	function CreateCourierRequestCard(parent, asset, rerender) {
 		var card = $.CreatePanel("Panel", parent, "");
 		card.AddClass("XHSPassShopCard");
 		card.AddClass("XHSPassCourierRequestCard");
@@ -3232,39 +3542,47 @@ var XHSSupporterPass = (function () {
 		preview.AddClass("XHSPassShopPreview");
 		preview.AddClass("HasAnimatedModel");
 
-		var scene = $.CreatePanel("DOTAScenePanel", preview, "", {
+		var sceneSettings = {
 			"class": "XHSPassCompanionScene XHSPassCourierScene",
 			environment: "default",
 			hittest: "false",
 			particleonly: "false",
-			unit: courier.unit,
-			itemdef: courier.item_def,
+			unit: asset.unit,
 			activity: "ACT_DOTA_IDLE",
-		});
+		};
+		if (asset.item_def) sceneSettings.itemdef = asset.item_def;
+		var scene = $.CreatePanel("DOTAScenePanel", preview, "", sceneSettings);
 		scene.hittest = false;
 
 		var name = $.CreatePanel("Label", card, "");
 		name.AddClass("XHSPassShopName");
-		name.text = GetCourierDisplayName(courier);
+		name.text = GetAssetRequestName(asset);
 
 		var meta = $.CreatePanel("Label", card, "");
 		meta.AddClass("XHSPassShopMeta");
 		meta.text = Text("xhs_sp_courier_request_meta", "{rarity} courier · Item {item}", {
-			rarity: LocalizeMaybeKey(courier.rarity || Text("xhs_sp_common", "Common")),
-			item: courier.item_def,
+			rarity: DisplayRewardRarity(asset),
+			item: asset.item_def || HumanizeAssetID(asset.category),
 		});
+
+		if (!asset.item_def) {
+			meta.text = Text("xhs_sp_effigy_request_meta", "{category} effigy", {
+				category: HumanizeAssetID(asset.category),
+			});
+		}
 
 		var model = $.CreatePanel("Label", card, "");
 		model.AddClass("XHSPassCourierModel");
-		model.text = (courier.model || "").replace(/^.*\//, "");
+		model.text = asset.model ? asset.model.replace(/^.*\//, "") : asset.asset_id;
 		model.SetPanelEvent("onmouseover", function () {
-			$.DispatchEvent("DOTAShowTextTooltip", model, courier.model || "");
+			$.DispatchEvent("DOTAShowTextTooltip", model, asset.model || asset.asset_id || "");
 		});
 		model.SetPanelEvent("onmouseout", function () {
 			$.DispatchEvent("DOTAHideTextTooltip", model);
 		});
 
-		var state = courierRequestState[courier.item_def] || "idle";
+		var requestKey = GetAssetRequestKey(asset);
+		var state = assetRequestResultState[requestKey] || "idle";
 		var button = $.CreatePanel("Button", card, "");
 		button.AddClass("XHSPassShopButton");
 		button.AddClass("XHSPassCourierRequestButton");
@@ -3275,11 +3593,17 @@ var XHSSupporterPass = (function () {
 				Game.EmitSound(state === "pending" ? "General.Cancel" : "General.ButtonClick");
 				return;
 			}
-			courierRequestSerial++;
-			var requestID = "courier_" + courierRequestSerial + "_" + Date.now();
-			courierRequestState[courier.item_def] = "pending";
-			GameEvents.SendCustomGameEventToServer("supporter_pass_request_companion", {
-				item_def: courier.item_def,
+			assetRequestSerial++;
+			var requestID = "asset_" + assetRequestSerial + "_" + Date.now();
+			assetRequestResultState[requestKey] = "pending";
+			GameEvents.SendCustomGameEventToServer("supporter_pass_request_asset", {
+				request_type: assetRequestView.request_type,
+				category: assetRequestView.category,
+				asset_id: asset.asset_id,
+				item_def: asset.item_def || "",
+				unit_name: asset.unit || "",
+				model: asset.model || "",
+				display_name: GetAssetRequestName(asset),
 				request_id: requestID,
 			});
 			Game.EmitSound("General.ButtonClick");
@@ -3290,31 +3614,32 @@ var XHSSupporterPass = (function () {
 		buttonLabel.text = Text(
 			state === "pending"
 				? "xhs_sp_request_pending"
-				: (state === "success" ? "xhs_sp_requested" : "xhs_sp_request_companion"),
-			state === "pending" ? "Sending..." : (state === "success" ? "Requested" : "Request companion")
+				: (state === "success" ? "xhs_sp_requested" : "xhs_sp_request_asset"),
+			state === "pending" ? "Sending..." : (state === "success" ? "Requested" : "Submit request")
 		);
 	}
 
 	function RenderCourierRequestViewer(parent, pagerID, rerender) {
-		var catalog = GetCourierCatalog();
-		RenderPaginationControls(pagerID, "courier", catalog.length, rerender);
+		var catalog = GetAssetRequestCatalog();
+		RenderPaginationControls(pagerID, "asset_request", catalog.length, rerender);
 
 		if (catalog.length === 0) {
 			CreateEmpty(
 				parent,
-				Text("xhs_sp_courier_catalog_unavailable", "Courier catalog unavailable"),
-				Text("xhs_sp_courier_catalog_unavailable_body", "Generate the catalogue before compiling Panorama.")
+				Text("xhs_sp_asset_catalog_empty", "No matching assets"),
+				Text("xhs_sp_asset_catalog_empty_body", "Try another category or search.")
 			);
 			return;
 		}
 
-		var pageItems = GetPageSlice(catalog, "courier");
+		var pageItems = GetPageSlice(catalog, "asset_request");
 		for (var i = 0; i < pageItems.length; i++) {
 			CreateCourierRequestCard(parent, pageItems[i], rerender);
 		}
 	}
 
 	function RenderCourierRequestOverlay() {
+		RenderAssetRequestNavigation();
 		var grid = Panel("XHSPassCourierRequestGrid");
 		ClearPanel(grid);
 		ClearPanel(Panel("XHSPassCourierRequestPager"));
@@ -3325,7 +3650,7 @@ var XHSSupporterPass = (function () {
 		RenderCourierRequestViewer(grid, "XHSPassCourierRequestPager", RenderCourierRequestOverlay);
 	}
 
-	function SetCourierRequestViewerVisible(visible) {
+	function SetCourierRequestViewerVisible(visible, requestType) {
 		var overlay = Panel("XHSPassCourierRequestOverlay");
 		if (!overlay) {
 			return;
@@ -3334,7 +3659,12 @@ var XHSSupporterPass = (function () {
 		overlay.SetHasClass("IsVisible", visible === true);
 		overlay.hittest = visible === true;
 		if (visible) {
-			ResetPagination("courier");
+			assetRequestView.request_type = requestType === "effigy" ? "effigy" : "companion";
+			assetRequestView.category = assetRequestView.request_type === "effigy" ? "hero" : "courier";
+			assetRequestView.search = "";
+			var search = Panel("XHSPassAssetRequestSearch");
+			if (search) search.text = "";
+			ResetPagination("asset_request");
 			RenderCourierRequestOverlay();
 			Game.EmitSound("General.ButtonClick");
 		}
@@ -3352,12 +3682,7 @@ var XHSSupporterPass = (function () {
 			RenderArmory(player);
 		}, player);
 
-		var devAssetMode = currentArmoryFilter === DEV_ASSET_FILTER && IsLocalSupporterDeveloper(player);
-		parent.SetHasClass("IsDevAssetMode", devAssetMode);
-		if (devAssetMode) {
-			RenderDevAssetMapper(parent, player);
-			return;
-		}
+		parent.SetHasClass("IsDevAssetMode", false);
 
 		if (items.length === 0) {
 			CreateEmpty(parent, Text("xhs_sp_no_cosmetics", "No unlocked cosmetics"), Text("xhs_sp_no_cosmetics_body", "Unlock cosmetics through the Supporter Pass or Fragment Shop, then equip them here."));
@@ -3365,8 +3690,52 @@ var XHSSupporterPass = (function () {
 		}
 
 		var filteredItems = FilterItemsByCategory(items, currentArmoryFilter);
+		var equippedItems = GetEquippedArmoryItems(filteredItems);
+		var unequipAll = currentArmoryFilter === "All";
+		var unequipSlot = unequipAll
+			? "all"
+			: (equippedItems.length > 0 ? GetCanonicalArmorySlot(equippedItems[0]) : "");
+		var devLocalEquipMode = IsDevUnlockAllUIActive(player);
+		var unequipActionKind = devLocalEquipMode ? "dev_unequip" : "unequip";
+		var unequipRequestID = unequipAll ? "all" : unequipSlot;
+		var unequipPending = IsActionPending(unequipActionKind, unequipRequestID);
+		var equippedSummary = GetArmoryEquippedSummary(equippedItems);
 		RenderPaginationControls("XHSPassArmoryPager", "armory", filteredItems.length, function () {
 			RenderArmory(GetLocalPlayerData());
+		}, {
+			show_asset_request: GetCategoryKey(currentArmoryFilter) === "companion" || GetCategoryKey(currentArmoryFilter) === "effigy",
+			asset_request_label: GetCategoryKey(currentArmoryFilter) === "effigy"
+				? Text("xhs_sp_request_effigy", "Request statue / effigy")
+				: Text("xhs_sp_request_companion", "Request companion"),
+			on_asset_request: function () {
+				SetCourierRequestViewerVisible(true, GetCategoryKey(currentArmoryFilter) === "effigy" ? "effigy" : "companion");
+			},
+			show_unequip: true,
+			can_unequip: equippedItems.length > 0,
+			unequip_pending: unequipPending,
+			unequip_label: Text(unequipAll ? "xhs_sp_unequip_all" : "xhs_sp_unequip", unequipAll ? "Unequip all" : "Unequip"),
+			equipped_label: equippedSummary,
+			equipped_tooltip: equippedSummary,
+			on_unequip: function () {
+				if (!unequipRequestID || equippedItems.length === 0) {
+					Game.EmitSound("General.Cancel");
+					return;
+				}
+				SetActionPending(unequipActionKind, unequipRequestID, true);
+				if (devLocalEquipMode) {
+					GameEvents.SendCustomGameEventToServer("supporter_pass_dev_equip_local", {
+						action: unequipAll ? "unequip_all" : "unequip",
+						slot_id: unequipSlot,
+					});
+				} else {
+					GameEvents.SendCustomGameEventToServer("supporter_pass_unequip_item", {
+						hero: "global",
+						slot_id: unequipSlot,
+					});
+				}
+				Game.EmitSound("General.ButtonClick");
+				RenderArmory(GetLocalPlayerData());
+			},
 		});
 		if (filteredItems.length === 0) {
 			CreateEmpty(parent, Text("xhs_sp_no_armory_items", "No armory items"), Text("xhs_sp_no_armory_items_body", "No unlocked cosmetics match this category."));
@@ -3513,10 +3882,10 @@ var XHSSupporterPass = (function () {
 	}
 
 	function RenderAll() {
-		var player = GetLocalPlayerData();
+		var player = GetDisplayPlayerData(GetLocalPlayerData());
 		UpdateShopAvailability();
 		RenderHeader(player);
-		RenderTiers();
+		RenderTiers(player);
 		RenderRewards(player);
 		if (HasShopData()) {
 			RenderShop(player);
@@ -3552,11 +3921,19 @@ var XHSSupporterPass = (function () {
 				}
 
 				devUnlockAllUI = !devUnlockAllUI;
+				if (devUnlockAllUI) {
+					devUnlockFreeUI = false;
+				}
+				devLocallyClaimedRewards = {};
+				devLocalEquippedBySlot = {};
+				GameEvents.SendCustomGameEventToServer("supporter_pass_dev_equip_local", {
+					action: "clear",
+				});
 				ResetPagination("armory");
 				RenderAll();
 				ShowActionMessage(
 					devUnlockAllUI
-						? "DEV UI preview enabled \u00b7 all 50 levels and both tracks are visible."
+						? "DEV UI enabled \u00b7 claim rewards locally without touching the backend."
 						: "DEV UI preview disabled \u00b7 account ownership restored.",
 					true
 				);
@@ -3564,10 +3941,32 @@ var XHSSupporterPass = (function () {
 			});
 		}
 
-		var openCourierRequests = Panel("XHSPassCourierRequestOpenButton");
-		if (openCourierRequests) {
-			openCourierRequests.SetPanelEvent("onactivate", function () {
-				SetCourierRequestViewerVisible(true);
+		var devFreeUI = Panel("XHSPassDevFreeUIButton");
+		if (devFreeUI) {
+			devFreeUI.SetPanelEvent("onactivate", function () {
+				var player = GetLocalPlayerData();
+				if (!IsLocalSupporterDeveloper(player)) {
+					Game.EmitSound("General.Cancel");
+					return;
+				}
+
+				devUnlockFreeUI = !devUnlockFreeUI;
+				if (devUnlockFreeUI) {
+					devUnlockAllUI = false;
+				}
+				devLocalEquippedBySlot = {};
+				GameEvents.SendCustomGameEventToServer("supporter_pass_dev_equip_local", {
+					action: "clear",
+				});
+				ResetPagination("armory");
+				RenderAll();
+				ShowActionMessage(
+					devUnlockFreeUI
+						? "Free-player preview enabled · Free Track unlocked, Premium Track locked."
+						: "Free-player preview disabled · account ownership restored.",
+					true
+				);
+				Game.EmitSound("General.ButtonClick");
 			});
 		}
 
@@ -3587,9 +3986,26 @@ var XHSSupporterPass = (function () {
 			});
 		}
 
+		var assetRequestSearch = Panel("XHSPassAssetRequestSearch");
+		if (assetRequestSearch) {
+			assetRequestSearch.SetPanelEvent("ontextentrychange", function () {
+				assetRequestView.search = (assetRequestSearch.text || "").toString();
+				ResetPagination("asset_request");
+				RenderCourierRequestOverlay();
+			});
+		}
+
 		var support = Panel("XHSPassSupportButton");
 		if (support) {
 			support.SetPanelEvent("onactivate", function () {
+				OpenExternalURL(GetLocalPlayerData().supporter_url || SUPPORTER_URL);
+			});
+		}
+
+		var premiumCTA = Panel("XHSPassPremiumCTAButton");
+		if (premiumCTA) {
+			premiumCTA.SetPanelEvent("onactivate", function () {
+				Game.EmitSound("General.ButtonClick");
 				OpenExternalURL(GetLocalPlayerData().supporter_url || SUPPORTER_URL);
 			});
 		}
@@ -3691,6 +4107,51 @@ var XHSSupporterPass = (function () {
 				ShowActionMessage(LocalizeMaybeKey((payload && payload.message) || "#xhs_sp_equip_failed"), false);
 				RenderAll();
 			});
+			GameEvents.Subscribe("supporter_pass_unequip_success", function (payload) {
+				SetActionPending("unequip", payload && payload.slot_id, false);
+				ShowActionMessage(Text("xhs_sp_cosmetic_unequipped", "Cosmetic unequipped."), true);
+				RenderAll();
+			});
+			GameEvents.Subscribe("supporter_pass_unequip_failed", function (payload) {
+				SetActionPending("unequip", payload && payload.slot_id, false);
+				ShowActionMessage(LocalizeMaybeKey((payload && payload.message) || "#xhs_sp_unequip_failed"), false);
+				RenderAll();
+			});
+			GameEvents.Subscribe("supporter_pass_dev_equip_local_result", function (payload) {
+				payload = payload || {};
+				var action = (payload.action || "equip").toString();
+				var itemID = (payload.item_id || "").toString();
+				var slot = CanonicalSupporterSlot(payload.slot_id || "");
+				var success = payload.success === true || payload.success === 1;
+				if (itemID) {
+					SetActionPending("dev_equip", itemID, false);
+				}
+				if (action === "unequip") {
+					SetActionPending("dev_unequip", slot, false);
+				} else if (action === "unequip_all") {
+					SetActionPending("dev_unequip", "all", false);
+				}
+				if (!success) {
+					ShowActionMessage(LocalizeMaybeKey(payload.message || "#xhs_sp_dev_test_error_item"), false);
+					RenderAll();
+					return;
+				}
+				if (action === "equip" && slot && itemID) {
+					devLocalEquippedBySlot[slot] = itemID;
+					ShowActionMessage("DEV cosmetic equipped locally \u00b7 backend unchanged.", true);
+				} else if (action === "unequip" && slot) {
+					devLocalEquippedBySlot[slot] = "";
+					ShowActionMessage("DEV cosmetic unequipped locally \u00b7 backend unchanged.", true);
+				} else if (action === "unequip_all") {
+					for (var devSlotIndex = 0; devSlotIndex < DEV_LOCAL_LOADOUT_SLOTS.length; devSlotIndex++) {
+						devLocalEquippedBySlot[DEV_LOCAL_LOADOUT_SLOTS[devSlotIndex]] = "";
+					}
+					ShowActionMessage("DEV supporter loadout unequipped locally \u00b7 backend unchanged.", true);
+				} else if (action === "clear") {
+					devLocalEquippedBySlot = {};
+				}
+				RenderAll();
+			});
 			GameEvents.Subscribe("supporter_pass_settings_failed", function (payload) {
 				settingsSaving = false;
 				settingsDraft = CopySettings(settingsOriginal);
@@ -3724,14 +4185,17 @@ var XHSSupporterPass = (function () {
 				}
 				RenderArmory(GetLocalPlayerData());
 			});
-			GameEvents.Subscribe("supporter_pass_companion_request_result", function (payload) {
+			var handleAssetRequestResult = function (payload) {
 				payload = payload || {};
-				var itemDef = (payload.item_def || "").toString();
-				if (!itemDef) {
+				var requestKey = (payload.request_key || "").toString();
+				if (!requestKey && payload.item_def) {
+					requestKey = "companion:courier:" + payload.item_def.toString();
+				}
+				if (!requestKey) {
 					return;
 				}
 				var accepted = payload.accepted === true || payload.accepted === 1;
-				courierRequestState[itemDef] = accepted ? "success" : "error";
+				assetRequestResultState[requestKey] = accepted ? "success" : "error";
 				ShowActionMessage(
 					LocalizeMaybeKey(payload.message || (accepted ? "#xhs_sp_request_recorded" : "#xhs_sp_request_failed")),
 					accepted
@@ -3740,11 +4204,31 @@ var XHSSupporterPass = (function () {
 				if (requestOverlay && requestOverlay.BHasClass("IsVisible")) {
 					RenderCourierRequestOverlay();
 				}
-			});
+			};
+			GameEvents.Subscribe("supporter_pass_asset_request_result", handleAssetRequestResult);
+			GameEvents.Subscribe("supporter_pass_companion_request_result", handleAssetRequestResult);
 		}
 	}
 
 	function Init() {
+		if (GameEvents && GameEvents.Subscribe) {
+			GameEvents.Subscribe("xhs_game_pause_state", function () {
+				var window = Panel("XHSSupporterPassWindow");
+				if (!window || (!window.BHasClass("IsVisible") && !window.BHasClass("IsOpening"))) {
+					return;
+				}
+
+				$.Schedule(0.0, EnsureSupporterPassAboveVanillaHud);
+				$.Schedule(0.75, function () {
+					var currentWindow = Panel("XHSSupporterPassWindow");
+					if (currentWindow
+						&& (currentWindow.BHasClass("IsVisible") || currentWindow.BHasClass("IsOpening"))) {
+						EnsureSupporterPassAboveVanillaHud();
+					}
+				});
+			});
+		}
+
 		EnsureSupporterPassAboveVanillaHud();
 		BindButtons();
 		SwitchPage("overview");
@@ -3757,6 +4241,8 @@ var XHSSupporterPass = (function () {
 
 		var config = GameUI.CustomUIConfig ? GameUI.CustomUIConfig() : null;
 		if (config) {
+			config.XHSSupporterPassVisible = false;
+			config.XHSSupporterPassOccludesOverheads = false;
 			config.OpenXHSSupporterPass = function () {
 				ToggleWindow(true);
 			};

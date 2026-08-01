@@ -15,6 +15,7 @@
 	margin-right: 18px;
 	flow-children: down;
 	overflow: noclip;
+	visibility: collapse;
 	opacity: 0;
 	transform: translateX( 28px );
 	pre-transform-scale2d: 0.98;
@@ -25,6 +26,7 @@
 
 .XHSFarmLeaderboard.IsVisible
 {
+	visibility: visible;
 	opacity: 1;
 	transform: translateX( 0px );
 	pre-transform-scale2d: 1;
@@ -34,6 +36,7 @@
 .XHSFarmLeaderboard.IsVisible.IsFullyHidden,
 .XHSFarmLeaderboard.IsArchived.IsReopened.IsFullyHidden
 {
+	visibility: collapse;
 	opacity: 0;
 	transform: translateX( 360px );
 }
@@ -46,6 +49,7 @@
 
 .XHSFarmLeaderboard.IsArchived.IsReopened
 {
+	visibility: visible;
 	opacity: 1;
 	transform: translateX( 0px );
 }

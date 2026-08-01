@@ -455,6 +455,9 @@ XHSPrecache:RegisterGroup("hero_abilities", {
 		"particles/units/heroes/hero_zuus/zuus_arc_lightning.vpcf",
 		"particles/units/heroes/hero_zuus/zuus_arc_lightning_head.vpcf",
 		"particles/units/heroes/hero_razor_reduced_flash/razor_rain_storm_reduced_flash.vpcf",
+		"particles/hero/ghost_revenant/ambient_effects.vpcf",
+		"particles/econ/events/ti8/radiance_owner_ti8.vpcf",
+		"particles/status_fx/status_effect_ghost_revenant.vpcf",
 		"particles/econ/items/mirana/mirana_starstorm_bow/mirana_starstorm_starfall_attack.vpcf",
 		"particles/units/heroes/hero_death_prophet/death_prophet_carrion_swarm.vpcf",
 		"particles/units/heroes/hero_dreadlord/chaos_2_fly.vpcf",
@@ -660,7 +663,7 @@ XHSPrecache:RegisterGroup("waves", {
 	particles = {
 		"particles/units/heroes/hero_pudge/pudge_rot.vpcf",
 		"particles/units/heroes/hero_pudge/pudge_rot_recipient.vpcf",
-		"particles/items_fx/skull_basher.vpcf",
+		"particles/items_fx/abyssal_blade_crimson_impact_sparks.vpcf",
 		"particles/generic_gameplay/generic_silenced.vpcf",
 		"particles/darkmoon_last_hit_effect.vpcf",
 		"particles/units/heroes/hero_jakiro/jakiro_base_attack.vpcf",

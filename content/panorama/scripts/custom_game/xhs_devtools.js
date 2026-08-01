@@ -14,6 +14,7 @@ var XHSDevToolsFPSFrames = 0;
 var XHSDevToolsFPSWindowStartedAt = Date.now();
 var XHSDevToolsFPSLastSentAt = 0;
 var XHSDevToolsLocalFPS = -1;
+var XHSDevToolsCompactHidden = false;
 var XHSDevToolsSpectatorState = {
 	currentPlayerID: -1,
 	// Spectator mode is follow-first by default. The server confirms the
@@ -269,6 +270,46 @@ function XHSDevToolsRequestStateLoop() {
 	if (!XHSDevToolsHasServerState) {
 		$.Schedule(1.0, XHSDevToolsRequestStateLoop);
 	}
+}
+
+function XHSDevToolsApplyCompactHUDState() {
+	var root = $("#XHSDevToolsRoot");
+	var controls = $("#XHSDevToolsButtons");
+	var performance = $("#XHSDevToolsPerformance");
+	var label = $("#XHSDevToolsCompactToggleLabel");
+	if (!root) {
+		return;
+	}
+
+	root.SetHasClass("CompactHidden", XHSDevToolsCompactHidden);
+	if (controls) {
+		controls.hittestchildren = !XHSDevToolsCompactHidden;
+	}
+	if (performance) {
+		performance.hittestchildren = !XHSDevToolsCompactHidden;
+	}
+	if (label) {
+		label.text = XHSDevToolsCompactHidden ? "\u2039" : "\u203a";
+	}
+}
+
+function XHSDevToolsToggleCompactHUD() {
+	XHSDevToolsCompactHidden = !XHSDevToolsCompactHidden;
+
+	if (XHSDevToolsCompactHidden) {
+		var panel = XHSDevToolsPanel();
+		if (panel) {
+			panel.RemoveClass("Visible");
+		}
+
+		var performance = $("#XHSDevToolsPerformance");
+		if (performance) {
+			performance.RemoveClass("Expanded");
+		}
+		XHSDevToolsApplyPerformanceColumns();
+	}
+
+	XHSDevToolsApplyCompactHUDState();
 }
 
 function XHSDevToolsTogglePanel() {
@@ -2797,6 +2838,7 @@ function XHSDevToolsRender() {
 	if (root) {
 		root.style.visibility = toolsMode ? "visible" : "collapse";
 	}
+	XHSDevToolsApplyCompactHUDState();
 	if (!toolsMode) {
 		return;
 	}

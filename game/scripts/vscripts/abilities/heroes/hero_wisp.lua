@@ -217,9 +217,9 @@ function modifier_wisp_passive:OnIntervalThink()
 	ApplyWispSupporterAmbientControls(self.supporterAmbientPfx, parent)
 
 	if donator_level > 0 or self.supporterAmbientRefreshAttempts >= 10 then
-		if IsInToolsMode() then
-			print("[XHS Wisp] supporter ambient finalized, donator status:", donator_level, self.supporterAmbientParticleName)
-		end
+		-- if IsInToolsMode() then
+		-- 	print("[XHS Wisp] supporter ambient finalized, donator status:", donator_level, self.supporterAmbientParticleName)
+		-- end
 
 		self:StartIntervalThink(-1)
 	end

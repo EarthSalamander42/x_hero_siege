@@ -26237,9 +26237,10 @@
 	{
 		"BaseClass"					"ability_lua"
 		"ScriptFile"				"abilities/xhs_tombstone_revive.lua"
-		"AbilityBehavior"			"DOTA_ABILITY_BEHAVIOR_NO_TARGET | DOTA_ABILITY_BEHAVIOR_CHANNELLED | DOTA_ABILITY_BEHAVIOR_HIDDEN | DOTA_ABILITY_BEHAVIOR_NOT_LEARNABLE | DOTA_ABILITY_BEHAVIOR_DONT_RESUME_ATTACK"
+		"AbilityBehavior"			"DOTA_ABILITY_BEHAVIOR_NO_TARGET | DOTA_ABILITY_BEHAVIOR_CHANNELLED | DOTA_ABILITY_BEHAVIOR_NOT_LEARNABLE | DOTA_ABILITY_BEHAVIOR_DONT_RESUME_ATTACK"
 		"AbilityTextureName"		"tombstone"
 		"MaxLevel"					"1"
+		"IsOnCastBar"				"0"
 		"AbilityCastPoint"			"0"
 		"AbilityChannelTime"		"5.0"
 		"AbilityCooldown"			"0"

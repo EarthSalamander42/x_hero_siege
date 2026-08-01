@@ -841,7 +841,6 @@ function SupporterPass2026:Init()
 		SupporterRegenAura,
 		SupporterRecoveryEffects,
 		SupporterPassImmolation,
-		SupporterHighFive,
 	}) do
 		if runtime ~= nil and runtime.Init ~= nil then
 			runtime:Init()

@@ -248,6 +248,10 @@ ListenToGameEvent('npc_spawned', function(keys)
 	local hero_level = npc:GetLevel()
 
 	if npc and IsValidEntity(npc) then
+		if npc:IsRealHero() and _G.XHSUnitTombstone ~= nil then
+			_G.XHSUnitTombstone:RegisterHero(npc)
+		end
+
 		--ALL NPC
 		for i = 1, #innate_abilities do
 			local current_ability = npc:FindAbilityByName(innate_abilities[i])
@@ -1502,14 +1506,13 @@ ListenToGameEvent('entity_killed', function(keys)
 		-- zone kill quests, Fragment Quests or event-unlock thresholds.
 		return
 	end
-	local killerAbility = nil
+	-- local killerAbility = nil
 	local killer = nil
 	if keys.entindex_attacker ~= nil then killer = EntIndexToHScript(keys.entindex_attacker) end
 	if not killer then killer = GameRules:GetGameModeEntity() end
-	if keys.entindex_inflictor ~= nil then killerAbility = EntIndexToHScript(keys.entindex_inflictor) end
+	-- if keys.entindex_inflictor ~= nil then killerAbility = EntIndexToHScript(keys.entindex_inflictor) end
 	local difficulty = GameRules:GetCustomGameDifficulty()
 	local Zone = killedUnit.zone
-
 	if FragmentQuests ~= nil then
 		FragmentQuests:OnEntityKilled(killedUnit, killer)
 	end
@@ -1575,8 +1578,7 @@ ListenToGameEvent('entity_killed', function(keys)
 
 		--Drop Tombstone to be revived if dead after Castle Defense
 		if CustomTimers.game_phase == 3 then
-			if killedUnit.ankh_respawn == true then
-			else
+			if killedUnit.ankh_respawn ~= true then
 				SpawnXHSTombstoneForHero(killedUnit, killedUnit:GetAbsOrigin())
 			end
 		end
@@ -1852,7 +1854,6 @@ function GameMode:OnPlayerRevived(event)
 	local hRevivedHero = EntIndexToHScript(revivedIndex)
 	if hRevivedHero == nil or hRevivedHero:IsNull() or not hRevivedHero:IsRealHero() then return end
 
-	print("GameMode:OnPlayerRevived")
 	hRevivedHero:AddNewModifier(hRevivedHero, nil, "modifier_invulnerable", { duration = 2.5 })
 	hRevivedHero:AddNewModifier(hRevivedHero, nil, "modifier_omninight_guardian_angel", { duration = 2.5 })
 	EmitSoundOn("Dungeon.HeroRevived", hRevivedHero)
@@ -2112,7 +2113,7 @@ function GameMode:OnQuestFocusRequested(_, event)
 				duration = 0.55,
 				easing = "smootherstep",
 			},
-			{ type = "hold", duration = 1.70 },
+			{ type = "hold",    duration = 1.70 },
 			{
 				type = "return",
 				to = function()
