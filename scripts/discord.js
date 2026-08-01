@@ -4,6 +4,7 @@ const webhookUrl = process.env.DISCORD_WEBHOOK;
 const eventName = process.env.GITHUB_EVENT_NAME;
 const eventPath = process.env.GITHUB_EVENT_PATH;
 const githubToken = process.env.GITHUB_TOKEN;
+const discordMessageId = process.env.DISCORD_MESSAGE_ID;
 
 if (!webhookUrl) {
 	console.error("Missing DISCORD_WEBHOOK secret.");
@@ -104,6 +105,62 @@ async function getCommitStats(commit) {
 		console.warn(`Could not load stats for ${shortSha(commit.id)}: ${error.message}`);
 		return null;
 	}
+}
+
+async function addStatsToExistingDescription(description) {
+	const withoutStats = String(description || "").replace(
+		/\n```diff\n\+\d+ additions\n-\d+ deletions\n```/g,
+		""
+	);
+	const commitUrlPattern = /https:\/\/github\.com\/[^/\s)]+\/[^/\s)]+\/commit\/([0-9a-f]{7,40})/i;
+	const lines = withoutStats.split("\n");
+	const updatedLines = [];
+
+	for (const line of lines) {
+		updatedLines.push(line);
+		const match = line.match(commitUrlPattern);
+		if (!match) continue;
+
+		const stats = await getCommitStats({ id: match[1] });
+		if (stats) {
+			updatedLines.push(`\`\`\`diff\n+${stats.additions} additions\n-${stats.deletions} deletions\n\`\`\``);
+		}
+	}
+
+	return truncate(updatedLines.join("\n"), 4096);
+}
+
+async function updateDiscordMessage() {
+	if (!/^\d+$/.test(discordMessageId || "")) {
+		throw new Error("DISCORD_MESSAGE_ID must be a numeric Discord message ID.");
+	}
+
+	const messageUrl = `${webhookUrl}/messages/${discordMessageId}`;
+	const currentResponse = await fetch(messageUrl);
+	if (!currentResponse.ok) {
+		throw new Error(`Could not load Discord message ${discordMessageId}: ${currentResponse.status} ${await currentResponse.text()}`);
+	}
+
+	const message = await currentResponse.json();
+	if (!Array.isArray(message.embeds) || message.embeds.length === 0) {
+		throw new Error(`Discord message ${discordMessageId} has no embed to update.`);
+	}
+
+	const embeds = await Promise.all(message.embeds.map(async embed => ({
+		...embed,
+		description: await addStatsToExistingDescription(embed.description)
+	})));
+	const updateResponse = await fetch(messageUrl, {
+		method: "PATCH",
+		headers: { "Content-Type": "application/json" },
+		body: JSON.stringify({ embeds })
+	});
+
+	if (!updateResponse.ok) {
+		throw new Error(`Discord message update failed: ${updateResponse.status} ${await updateResponse.text()}`);
+	}
+
+	console.log(`Updated Discord message ${discordMessageId} in place.`);
 }
 
 async function pushEmbed() {
@@ -377,7 +434,7 @@ async function sendToDiscord() {
 	}
 }
 
-sendToDiscord().catch(error => {
+(discordMessageId ? updateDiscordMessage() : sendToDiscord()).catch(error => {
 	console.error(error);
 	process.exit(1);
 });
