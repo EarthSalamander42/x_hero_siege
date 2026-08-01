@@ -3,6 +3,7 @@ const fs = require("fs");
 const webhookUrl = process.env.DISCORD_WEBHOOK;
 const eventName = process.env.GITHUB_EVENT_NAME;
 const eventPath = process.env.GITHUB_EVENT_PATH;
+const githubToken = process.env.GITHUB_TOKEN;
 
 if (!webhookUrl) {
 	console.error("Missing DISCORD_WEBHOOK secret.");
@@ -72,20 +73,61 @@ function baseEmbed({ title, description, url, color = COLORS.discord, fields = [
 	};
 }
 
-function pushEmbed() {
+async function getCommitStats(commit) {
+	if (!commit?.id || !repo.full_name) return null;
+
+	const headers = {
+		Accept: "application/vnd.github+json",
+		"X-GitHub-Api-Version": "2022-11-28"
+	};
+
+	if (githubToken) headers.Authorization = `Bearer ${githubToken}`;
+
+	try {
+		const response = await fetch(`https://api.github.com/repos/${repo.full_name}/commits/${commit.id}`, {
+			headers
+		});
+
+		if (!response.ok) {
+			console.warn(`Could not load stats for ${shortSha(commit.id)}: GitHub API returned ${response.status}.`);
+			return null;
+		}
+
+		const details = await response.json();
+		if (!details.stats) return null;
+
+		return {
+			additions: Number(details.stats.additions) || 0,
+			deletions: Number(details.stats.deletions) || 0
+		};
+	} catch (error) {
+		console.warn(`Could not load stats for ${shortSha(commit.id)}: ${error.message}`);
+		return null;
+	}
+}
+
+async function pushEmbed() {
 	const branch = (event.ref || "").replace("refs/heads/", "");
 	const commits = event.commits || [];
+	const displayedCommits = commits.slice(0, 10);
+	const commitStats = await Promise.all(displayedCommits.map(getCommitStats));
 
-	const commitLines = commits
-		.slice(0, 10)
-		.map(commit => `• [${shortSha(commit.id)}](${commit.url}) ${truncate(commit.message.split("\n")[0], 130)}`)
+	const commitLines = displayedCommits
+		.map((commit, index) => {
+			const summary = `• [${shortSha(commit.id)}](${commit.url}) ${truncate(commit.message.split("\n")[0], 130)}`;
+			const stats = commitStats[index];
+
+			if (!stats) return summary;
+
+			return `${summary}\n\`\`\`diff\n+${stats.additions} additions\n-${stats.deletions} deletions\n\`\`\``;
+		})
 		.join("\n");
 
 	const extra = commits.length > 10 ? `\n…and ${commits.length - 10} more commit(s).` : "";
 
 	return baseEmbed({
 		title: "🚀 New Push",
-		description: commitLines || "No commits listed.",
+		description: `${commitLines || "No commits listed."}${extra}`,
 		url: event.compare || repoUrl,
 		color: COLORS.success,
 		fields: [
@@ -254,10 +296,10 @@ function simpleEmbed(icon, title, description, url = repoUrl, color = COLORS.gra
 	});
 }
 
-function buildEmbed() {
+async function buildEmbed() {
 	switch (eventName) {
 		case "push":
-			return pushEmbed();
+			return await pushEmbed();
 
 		case "pull_request":
 			return pullRequestEmbed();
@@ -313,7 +355,7 @@ function buildEmbed() {
 }
 
 async function sendToDiscord() {
-	const embed = buildEmbed();
+	const embed = await buildEmbed();
 
 	const response = await fetch(webhookUrl, {
 		method: "POST",
