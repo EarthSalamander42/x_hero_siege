@@ -19,7 +19,22 @@
 			<Image src="file://panorama/images/custom_game/overhead/xhs_overhead_frame_tier4_small.png" hittest="false" />
 			<Image src="file://panorama/images/custom_game/overhead/xhs_overhead_frame_tier5_small.png" hittest="false" />
 
-			<Image src="file://panorama/images/custom_game/loading_screen/bg.png" hittest="false" />
+			<Image src="file://panorama/images/custom_game/overhead/xhs_overhead_frame_tier0.png" hittest="false" />
+			<Image src="file://panorama/images/custom_game/overhead/xhs_overhead_frame_tier1.png" hittest="false" />
+			<Image src="file://panorama/images/custom_game/overhead/xhs_overhead_frame_tier2.png" hittest="false" />
+			<Image src="file://panorama/images/custom_game/overhead/xhs_overhead_frame_tier3.png" hittest="false" />
+			<Image src="file://panorama/images/custom_game/overhead/xhs_overhead_frame_tier4.png" hittest="false" />
+			<Image src="file://panorama/images/custom_game/overhead/xhs_overhead_frame_tier5.png" hittest="false" />
+			<Image src="file://panorama/images/custom_game/overhead/xhs_overhead_frame_tier0_cyber.png" hittest="false" />
+			<Image src="file://panorama/images/custom_game/overhead/xhs_overhead_frame_tier1_cyber.png" hittest="false" />
+			<Image src="file://panorama/images/custom_game/overhead/xhs_overhead_frame_tier2_cyber.png" hittest="false" />
+			<Image src="file://panorama/images/custom_game/overhead/xhs_overhead_frame_tier3_cyber.png" hittest="false" />
+			<Image src="file://panorama/images/custom_game/overhead/xhs_overhead_frame_tier4_cyber.png" hittest="false" />
+			<Image src="file://panorama/images/custom_game/overhead/xhs_overhead_frame_tier5_cyber.png" hittest="false" />
+
+			<Image src="file://panorama/images/custom_game/loading_screen/bg.jpg" hittest="false" />
+			<Image src="file://panorama/images/custom_game/loading_screen/description-container.webp" hittest="false" />
+			<Image src="file://panorama/images/custom_game/loading_screen/discord.webp" hittest="false" />
 			<Image src="file://panorama/images/custom_game/loading_screen/patreon.png" hittest="false" />
 			<Image src="file://panorama/images/custom_game/loading_screen/xhs.jpg" hittest="false" />
 			<Image src="file://panorama/images/custom_game/mods/modlist1.png" hittest="false" />
@@ -32,6 +47,25 @@
 			<Image src="file://panorama/images/custom_game/mods/modlist9.png" hittest="false" />
 
 			<Image src="file://panorama/images/custom_game/gg/gg_background.png" hittest="false" />
+			<Image src="file://panorama/images/custom_game/logo/logo-xhs-transparent.png" hittest="false" />
+			<Image src="file://panorama/images/custom_game/events/event_hero_image.png" hittest="false" />
+			<Image src="file://panorama/images/custom_game/events/event_all_hero_images.png" hittest="false" />
+			<Image src="file://panorama/images/custom_game/events/event_spirit_beast.png" hittest="false" />
+			<Image src="file://panorama/images/custom_game/events/event_frost_infernal.png" hittest="false" />
+			<Image src="file://panorama/images/custom_game/ui/xhs_ankh_topbar.png" hittest="false" />
+			<Image src="file://panorama/images/custom_game/ui/xhs_disconnect_icon.png" hittest="false" />
+			<Image src="file://panorama/images/custom_game/ui/xhs_top_bar_frame.png" hittest="false" />
+
+			<Image src="file://panorama/images/custom_game/battlepass/supporter-pass-cover.png" hittest="false" />
+			<Image src="file://panorama/images/custom_game/battlepass/battlepass.png" hittest="false" />
+			<Image src="file://panorama/images/custom_game/battlepass/battlepass_new.png" hittest="false" />
+			<Image src="file://panorama/images/custom_game/battlepass/assets/close.png" hittest="false" />
+			<Image src="file://panorama/images/custom_game/battlepass/assets/btn_battlepass.png" hittest="false" />
+			<Image src="file://panorama/images/custom_game/battlepass/assets/btn_battlepass_icon.png" hittest="false" />
+			<Image src="file://panorama/images/custom_game/battlepass/assets/btn_donator.png" hittest="false" />
+			<Image src="file://panorama/images/custom_game/battlepass/assets/btn_donator_icon.png" hittest="false" />
+			<Image src="file://panorama/images/custom_game/battlepass/assets/btn_leaderboard.png" hittest="false" />
+			<Image src="file://panorama/images/custom_game/battlepass/assets/btn_leaderboard_icon.png" hittest="false" />
 
 			<Image src="file://panorama/images/custom_game/battlepass/teleport1.png" hittest="false" />
 			<Image src="file://panorama/images/custom_game/battlepass/teleport2.png" hittest="false" />
@@ -41,7 +75,6 @@
 			<Image src="file://panorama/images/custom_game/battlepass/teleport6.png" hittest="false" />
 			<Image src="file://panorama/images/custom_game/battlepass/teleport7.png" hittest="false" />
 			<Image src="file://panorama/images/custom_game/battlepass/teleport8.png" hittest="false" />
-			<Image src="file://panorama/images/custom_game/battlepass/teleport.png" hittest="false" />
 			<Image src="file://panorama/images/custom_game/battlepass/teleport9.png" hittest="false" />
 			<Image src="file://panorama/images/custom_game/battlepass/teleport10.png" hittest="false" />
 			<Image src="file://panorama/images/custom_game/battlepass/teleport11.png" hittest="false" />
@@ -159,7 +192,50 @@
 			<Image src="file://panorama/images/spellicons/custom/xhs_spirit_storm_static_orbs.png" hittest="false" />
 			<Image src="file://panorama/images/spellicons/custom/xhs_trueshot_aura.png" hittest="false" />
 
-			<Image src="file://panorama/images/items/doom_artifact.png" hittest="false" />
+			<Image src="file://panorama/images/spellicons/modifiers/astral_core.png" hittest="false" />
+			<Image src="file://panorama/images/spellicons/modifiers/mystic_gem.png" hittest="false" />
+			<Image src="file://panorama/images/spellicons/modifiers/orb_of_arcane.png" hittest="false" />
+			<Image src="file://panorama/images/spellicons/modifiers/tempest_aegis.png" hittest="false" />
+			<Image src="file://panorama/images/spellicons/modifiers/zephyr_gem.png" hittest="false" />
+
+			<Image src="file://panorama/images/items/custom/amulet_of_the_wild.png" hittest="false" />
+			<Image src="file://panorama/images/items/custom/ankh_of_reincarnation.png" hittest="false" />
+			<Image src="file://panorama/images/items/custom/astral_core.png" hittest="false" />
+			<Image src="file://panorama/images/items/custom/boots_of_speed.png" hittest="false" />
+			<Image src="file://panorama/images/items/custom/bracer_of_the_void.png" hittest="false" />
+			<Image src="file://panorama/images/items/custom/celestial_claws.png" hittest="false" />
+			<Image src="file://panorama/images/items/custom/cloak_of_flames.png" hittest="false" />
+			<Image src="file://panorama/images/items/custom/healing_wards.png" hittest="false" />
+			<Image src="file://panorama/images/items/custom/healing_wards2.png" hittest="false" />
+			<Image src="file://panorama/images/items/custom/health_potion.png" hittest="false" />
+			<Image src="file://panorama/images/items/custom/lifesteal_mask.png" hittest="false" />
+			<Image src="file://panorama/images/items/custom/mana_potion.png" hittest="false" />
+			<Image src="file://panorama/images/items/custom/mystic_gem.png" hittest="false" />
+			<Image src="file://panorama/images/items/custom/orb_of_arcane.png" hittest="false" />
+			<Image src="file://panorama/images/items/custom/orb_of_darkness.png" hittest="false" />
+			<Image src="file://panorama/images/items/custom/orb_of_darkness2.png" hittest="false" />
+			<Image src="file://panorama/images/items/custom/orb_of_earth.png" hittest="false" />
+			<Image src="file://panorama/images/items/custom/orb_of_earth2.png" hittest="false" />
+			<Image src="file://panorama/images/items/custom/orb_of_earth3.png" hittest="false" />
+			<Image src="file://panorama/images/items/custom/orb_of_fire.png" hittest="false" />
+			<Image src="file://panorama/images/items/custom/orb_of_fire2.png" hittest="false" />
+			<Image src="file://panorama/images/items/custom/orb_of_lightning.png" hittest="false" />
+			<Image src="file://panorama/images/items/custom/orb_of_lightning2.png" hittest="false" />
+			<Image src="file://panorama/images/items/custom/orb_of_venom.png" hittest="false" />
+			<Image src="file://panorama/images/items/custom/plagueheart.png" hittest="false" />
+			<Image src="file://panorama/images/items/custom/potion_full.png" hittest="false" />
+			<Image src="file://panorama/images/items/custom/potion_of_antimagic.png" hittest="false" />
+			<Image src="file://panorama/images/items/custom/potion_of_invulnerability.png" hittest="false" />
+			<Image src="file://panorama/images/items/custom/scepter_of_mastery.png" hittest="false" />
+			<Image src="file://panorama/images/items/custom/searing_blade.png" hittest="false" />
+			<Image src="file://panorama/images/items/custom/talisman_of_evasion_datadriven.png" hittest="false" />
+			<Image src="file://panorama/images/items/custom/tempest_aegis.png" hittest="false" />
+			<Image src="file://panorama/images/items/custom/tome_big.png" hittest="false" />
+			<Image src="file://panorama/images/items/custom/tome_of_power.png" hittest="false" />
+			<Image src="file://panorama/images/items/custom/tome_small.png" hittest="false" />
+			<Image src="file://panorama/images/items/custom/viridian_gem.png" hittest="false" />
+			<Image src="file://panorama/images/items/custom/zephyr_gem.png" hittest="false" />
+
 			<Image src="file://panorama/images/items/key_of_the_three_moons.png" hittest="false" />
 			<Image src="file://panorama/images/items/lightning_sword.png" hittest="false" />
 			<Image src="file://panorama/images/items/ring_of_superiority.png" hittest="false" />
