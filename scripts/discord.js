@@ -130,6 +130,30 @@ async function addStatsToExistingDescription(description) {
 	return truncate(updatedLines.join("\n"), 4096);
 }
 
+function editableEmbed(embed, description) {
+	const editable = {
+		title: embed.title,
+		description,
+		url: embed.url,
+		timestamp: embed.timestamp,
+		color: embed.color,
+		fields: embed.fields?.map(({ name, value, inline }) => ({ name, value, inline }))
+	};
+
+	if (embed.footer) editable.footer = { text: embed.footer.text, icon_url: embed.footer.icon_url };
+	if (embed.image?.url) editable.image = { url: embed.image.url };
+	if (embed.thumbnail?.url) editable.thumbnail = { url: embed.thumbnail.url };
+	if (embed.author) {
+		editable.author = {
+			name: embed.author.name,
+			url: embed.author.url,
+			icon_url: embed.author.icon_url
+		};
+	}
+
+	return editable;
+}
+
 async function updateDiscordMessage() {
 	if (!/^\d+$/.test(discordMessageId || "")) {
 		throw new Error("DISCORD_MESSAGE_ID must be a numeric Discord message ID.");
@@ -146,10 +170,9 @@ async function updateDiscordMessage() {
 		throw new Error(`Discord message ${discordMessageId} has no embed to update.`);
 	}
 
-	const embeds = await Promise.all(message.embeds.map(async embed => ({
-		...embed,
-		description: await addStatsToExistingDescription(embed.description)
-	})));
+	const embeds = await Promise.all(message.embeds.map(async embed =>
+		editableEmbed(embed, await addStatsToExistingDescription(embed.description))
+	));
 	const updateResponse = await fetch(messageUrl, {
 		method: "PATCH",
 		headers: { "Content-Type": "application/json" },
