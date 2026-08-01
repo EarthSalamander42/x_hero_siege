@@ -1,6 +1,12 @@
 name: Discord Notifications
 
 on:
+  workflow_dispatch:
+    inputs:
+      message_id:
+        description: Discord message ID to update in place
+        required: true
+        type: string
   push:
   pull_request:
     types: [opened, closed, reopened, edited, ready_for_review, converted_to_draft, synchronize]
@@ -30,6 +36,7 @@ on:
 
 jobs:
   notify:
+    if: github.event_name != 'workflow_dispatch'
     runs-on: ubuntu-latest
 
     steps:
