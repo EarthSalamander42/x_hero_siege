@@ -154,20 +154,16 @@ function editableEmbed(embed, description) {
 	return editable;
 }
 
-async function updateDiscordMessage() {
-	if (!/^\d+$/.test(discordMessageId || "")) {
-		throw new Error("DISCORD_MESSAGE_ID must be a numeric Discord message ID.");
-	}
-
-	const messageUrl = `${webhookUrl}/messages/${discordMessageId}`;
+async function updateDiscordMessage(messageId) {
+	const messageUrl = `${webhookUrl}/messages/${messageId}`;
 	const currentResponse = await fetch(messageUrl);
 	if (!currentResponse.ok) {
-		throw new Error(`Could not load Discord message ${discordMessageId}: ${currentResponse.status} ${await currentResponse.text()}`);
+		throw new Error(`Could not load Discord message ${messageId}: ${currentResponse.status} ${await currentResponse.text()}`);
 	}
 
 	const message = await currentResponse.json();
 	if (!Array.isArray(message.embeds) || message.embeds.length === 0) {
-		throw new Error(`Discord message ${discordMessageId} has no embed to update.`);
+		throw new Error(`Discord message ${messageId} has no embed to update.`);
 	}
 
 	const embeds = await Promise.all(message.embeds.map(async embed =>
@@ -183,7 +179,22 @@ async function updateDiscordMessage() {
 		throw new Error(`Discord message update failed: ${updateResponse.status} ${await updateResponse.text()}`);
 	}
 
-	console.log(`Updated Discord message ${discordMessageId} in place.`);
+	console.log(`Updated Discord message ${messageId} in place.`);
+}
+
+async function updateDiscordMessages() {
+	const messageIds = String(discordMessageId || "")
+		.split(",")
+		.map(messageId => messageId.trim())
+		.filter(Boolean);
+
+	if (messageIds.length === 0 || messageIds.some(messageId => !/^\d+$/.test(messageId))) {
+		throw new Error("DISCORD_MESSAGE_ID must contain numeric Discord message IDs separated by commas.");
+	}
+
+	for (const messageId of [...new Set(messageIds)]) {
+		await updateDiscordMessage(messageId);
+	}
 }
 
 async function pushEmbed() {
@@ -457,7 +468,7 @@ async function sendToDiscord() {
 	}
 }
 
-(discordMessageId ? updateDiscordMessage() : sendToDiscord()).catch(error => {
+(discordMessageId ? updateDiscordMessages() : sendToDiscord()).catch(error => {
 	console.error(error);
 	process.exit(1);
 });

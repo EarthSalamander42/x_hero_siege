@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       message_id:
-        description: Discord message ID to update in place
+        description: Discord message ID(s) to update, separated by commas
         required: true
         type: string
   push:
