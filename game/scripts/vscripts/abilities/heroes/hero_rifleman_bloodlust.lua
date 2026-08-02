@@ -22,15 +22,42 @@ function rifleman_bloodlust:OnSpellStart()
 
 	local particle = ParticleManager:CreateParticle(
 		"particles/units/heroes/hero_ogre_magi/ogre_magi_bloodlust_cast.vpcf",
-		PATTACH_ABSORIGIN_FOLLOW,
+		PATTACH_CUSTOMORIGIN,
 		caster
 	)
 	ParticleManager:SetParticleControlEnt(
 		particle,
+		0,
+		caster,
+		PATTACH_POINT_FOLLOW,
+		"attach_attack1",
+		caster:GetAbsOrigin(),
+		true
+	)
+	ParticleManager:SetParticleControlEnt(
+		particle,
 		1,
+		caster,
+		PATTACH_ABSORIGIN_FOLLOW,
+		nil,
+		caster:GetAbsOrigin(),
+		true
+	)
+	ParticleManager:SetParticleControlEnt(
+		particle,
+		2,
+		target,
+		PATTACH_POINT_FOLLOW,
+		"attach_hitloc",
+		target:GetAbsOrigin(),
+		true
+	)
+	ParticleManager:SetParticleControlEnt(
+		particle,
+		3,
 		target,
 		PATTACH_ABSORIGIN_FOLLOW,
-		"attach_hitloc",
+		nil,
 		target:GetAbsOrigin(),
 		true
 	)

@@ -29,6 +29,16 @@ end
 
 function OnCreated(keys)
 	local boss = GetBossFromDataDrivenKeys(keys)
+	-- Spirit boss_health modifiers can be created synchronously inside
+	-- CreateUnitByName, before BeginSplit has assigned boss_count/key fields.
+	-- Configure from the unit name first so Earth/Fire never emit a transient
+	-- slot-1 show event that can replace Storm's bar.
+	if boss ~= nil
+		and XHSSpiritMaster_ConfigureSpiritBossBar ~= nil
+		and string.find(boss:GetUnitName(), "npc_dota_boss_spirit_master_") then
+		XHSSpiritMaster_ConfigureSpiritBossBar(boss)
+	end
+
 	if boss ~= nil and ((IsPrivateBossBarBoss and IsPrivateBossBarBoss(boss)) or IsDeferredPhase3BossBar(boss)) then
 		return
 	end

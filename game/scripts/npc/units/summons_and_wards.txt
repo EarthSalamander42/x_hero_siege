@@ -859,7 +859,7 @@
 	{
 		// General
 		"BaseClass"					"npc_dota_creature"
-		"Model"						"models/heroes/juggernaut/jugg_healing_ward.vmdl"
+		"Model"						"models/items/juggernaut/ward/ancient_exile_ward/ancient_exile_ward.vmdl"
 		"SoundSet"					""
 		"Level"						"1"
 		"ModelScale"				"1"
@@ -903,7 +903,7 @@
 	{
 		// General
 		"BaseClass"					"npc_dota_creature"
-		"Model"						"models/heroes/juggernaut/jugg_healing_ward.vmdl"
+		"Model"						"models/items/juggernaut/ward/ancient_exile_ward/ancient_exile_ward.vmdl"
 		"SoundSet"					""
 		"Level"						"1"
 		"ModelScale"				"1"

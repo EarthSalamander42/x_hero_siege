@@ -72,6 +72,13 @@ function wisp_pick_random_hero:OnSpellStart()
 	if not IsServer() then return end
 	self.caster = self:GetCaster()
 
+	-- This pedestal owns an independent map particle rather than a particle
+	-- attached to the Wisp. Consume it before the selection transition moves
+	-- the Wisp to the randomly chosen hero slot.
+	if XHSRemoveRandomHeroSelectionMarker ~= nil then
+		XHSRemoveRandomHeroSelectionMarker(self.caster:GetAbsOrigin())
+	end
+
 	local random = RandomInt(1, #HEROLIST)
 	local IsAvailableHero = Entities:FindByName(nil, "trigger_hero_" .. random)
 	local difficulty = GameRules:GetCustomGameDifficulty()

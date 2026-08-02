@@ -8,6 +8,8 @@ var XHSSupporterPass = (function () {
 	var SUPPORTER_PASS_LEVEL_COUNT = 50;
 	var currentShopFilter = "All";
 	var currentArmoryFilter = "All";
+	var armorySearchByCategory = {};
+	var armorySearchRenderSerial = 0;
 	var paginationState = {
 		shop: { page: 0, page_size: 10 },
 		armory: { page: 0, page_size: 10 },
@@ -493,7 +495,7 @@ var XHSSupporterPass = (function () {
 		var state = paginationState[key];
 		var totalPages = Math.max(1, Math.ceil(totalItems / state.page_size));
 		state.page = Clamp(state.page, 0, totalPages - 1);
-		parent.SetHasClass("IsEmpty", totalItems === 0);
+		parent.SetHasClass("IsEmpty", totalItems === 0 && options.keep_visible_when_empty !== true);
 
 		var count = $.CreatePanel("Label", parent, "");
 		count.AddClass("XHSPassPaginationCount");
@@ -535,6 +537,18 @@ var XHSSupporterPass = (function () {
 					$.DispatchEvent("DOTAHideTextTooltip", equippedLabel);
 				});
 			}
+		}
+
+		if (options.show_search === true) {
+			var search = $.CreatePanel("TextEntry", controls, options.search_id || "");
+			search.AddClass(options.search_class || "XHSPassArmorySearch");
+			search.placeholder = options.search_placeholder || Text("xhs_sp_armory_search", "Search cosmetics...");
+			search.text = (options.search_value || "").toString();
+			search.SetPanelEvent("ontextentrychange", function () {
+				if (options.on_search) {
+					options.on_search((search.text || "").toString());
+				}
+			});
 		}
 
 		if (options.show_unequip === true) {
@@ -2650,23 +2664,18 @@ var XHSSupporterPass = (function () {
 		}
 	}
 
-	function HasShopData() {
-		return GetShopItems().length > 0;
-	}
-
 	function UpdateShopAvailability() {
-		var available = HasShopData();
 		var tab = Panel("XHSPassTabShop");
 		var page = Panel("XHSPassShopPage");
 		if (tab) {
-			tab.SetHasClass("IsHiddenByData", !available);
-			tab.hittest = available;
+			// The permanent shop is a first-class 4.0 page. Keep its navigation
+			// available while the catalog is empty so the explicit empty state can
+			// explain that content has not been published yet.
+			tab.SetHasClass("IsHiddenByData", false);
+			tab.hittest = true;
 		}
 		if (page) {
-			page.SetHasClass("IsHiddenByData", !available);
-			if (!available && page.BHasClass("IsVisible")) {
-				SwitchPage("overview");
-			}
+			page.SetHasClass("IsHiddenByData", false);
 		}
 	}
 
@@ -2781,6 +2790,40 @@ var XHSSupporterPass = (function () {
 			}
 		}
 		return filtered;
+	}
+
+	function FilterArmoryItemsBySearch(items, searchValue) {
+		var query = (searchValue || "").toString().toLowerCase().replace(/^\s+|\s+$/g, "");
+		if (!query) {
+			return items;
+		}
+
+		var terms = query.split(/\s+/);
+		return items.filter(function (item) {
+			var fields = [
+				LocalizeMaybeKey(item.name || item.item_name || item.id || ""),
+				DisplayRewardType(item.type || item.item_type || "Cosmetic"),
+				DisplayRewardRarity(item),
+				item.item_id,
+				item.catalog_item_id,
+				item.entitlement_id,
+				item.id,
+				item.slot_id,
+				item.unit,
+				item.unit_name,
+				item.file,
+				item.particle,
+			];
+			var haystack = fields.filter(function (value) {
+				return value !== undefined && value !== null;
+			}).join(" ").toLowerCase();
+			for (var termIndex = 0; termIndex < terms.length; termIndex++) {
+				if (haystack.indexOf(terms[termIndex]) === -1) {
+					return false;
+				}
+			}
+			return true;
+		});
 	}
 
 	function RenderCategoryTabs(parentID, items, activeFilter, onSelect, player) {
@@ -3638,8 +3681,7 @@ var XHSSupporterPass = (function () {
 		}
 	}
 
-	function RenderCourierRequestOverlay() {
-		RenderAssetRequestNavigation();
+	function RenderCourierRequestResults() {
 		var grid = Panel("XHSPassCourierRequestGrid");
 		ClearPanel(grid);
 		ClearPanel(Panel("XHSPassCourierRequestPager"));
@@ -3647,7 +3689,12 @@ var XHSSupporterPass = (function () {
 			return;
 		}
 
-		RenderCourierRequestViewer(grid, "XHSPassCourierRequestPager", RenderCourierRequestOverlay);
+		RenderCourierRequestViewer(grid, "XHSPassCourierRequestPager", RenderCourierRequestResults);
+	}
+
+	function RenderCourierRequestOverlay() {
+		RenderAssetRequestNavigation();
+		RenderCourierRequestResults();
 	}
 
 	function SetCourierRequestViewerVisible(visible, requestType) {
@@ -3663,7 +3710,11 @@ var XHSSupporterPass = (function () {
 			assetRequestView.category = assetRequestView.request_type === "effigy" ? "hero" : "courier";
 			assetRequestView.search = "";
 			var search = Panel("XHSPassAssetRequestSearch");
-			if (search) search.text = "";
+			if (search) {
+				search.text = "";
+				search.placeholder = Text("xhs_sp_request_search", "Search by name or unit...");
+				search.SetHasClass("HasInput", false);
+			}
 			ResetPagination("asset_request");
 			RenderCourierRequestOverlay();
 			Game.EmitSound("General.ButtonClick");
@@ -3677,6 +3728,7 @@ var XHSSupporterPass = (function () {
 
 		var items = GetArmoryItems(player);
 		currentArmoryFilter = RenderCategoryTabs("XHSPassArmoryFilters", items, currentArmoryFilter, function (filterName) {
+			armorySearchRenderSerial++;
 			currentArmoryFilter = filterName;
 			ResetPagination("armory");
 			RenderArmory(player);
@@ -3689,8 +3741,11 @@ var XHSSupporterPass = (function () {
 			return;
 		}
 
-		var filteredItems = FilterItemsByCategory(items, currentArmoryFilter);
-		var equippedItems = GetEquippedArmoryItems(filteredItems);
+		var categoryItems = FilterItemsByCategory(items, currentArmoryFilter);
+		var armorySearchKey = GetCategoryKey(currentArmoryFilter);
+		var armorySearchValue = armorySearchByCategory[armorySearchKey] || "";
+		var filteredItems = FilterArmoryItemsBySearch(categoryItems, armorySearchValue);
+		var equippedItems = GetEquippedArmoryItems(categoryItems);
 		var unequipAll = currentArmoryFilter === "All";
 		var unequipSlot = unequipAll
 			? "all"
@@ -3711,6 +3766,29 @@ var XHSSupporterPass = (function () {
 				SetCourierRequestViewerVisible(true, GetCategoryKey(currentArmoryFilter) === "effigy" ? "effigy" : "companion");
 			},
 			show_unequip: true,
+			show_search: true,
+			keep_visible_when_empty: true,
+			search_id: "XHSPassArmorySearch",
+			search_value: armorySearchValue,
+			search_placeholder: Text("xhs_sp_armory_search", "Search cosmetics..."),
+			on_search: function (searchValue) {
+				armorySearchByCategory[armorySearchKey] = searchValue;
+				var renderSerial = ++armorySearchRenderSerial;
+				$.Schedule(0.12, function () {
+					if (renderSerial !== armorySearchRenderSerial ||
+						GetCategoryKey(currentArmoryFilter) !== armorySearchKey) {
+						return;
+					}
+					ResetPagination("armory");
+					RenderArmory(GetLocalPlayerData());
+					$.Schedule(0.0, function () {
+						var refreshedSearch = Panel("XHSPassArmorySearch");
+						if (refreshedSearch && refreshedSearch.IsValid()) {
+							refreshedSearch.SetFocus();
+						}
+					});
+				});
+			},
 			can_unequip: equippedItems.length > 0,
 			unequip_pending: unequipPending,
 			unequip_label: Text(unequipAll ? "xhs_sp_unequip_all" : "xhs_sp_unequip", unequipAll ? "Unequip all" : "Unequip"),
@@ -3887,9 +3965,7 @@ var XHSSupporterPass = (function () {
 		RenderHeader(player);
 		RenderTiers(player);
 		RenderRewards(player);
-		if (HasShopData()) {
-			RenderShop(player);
-		}
+		RenderShop(player);
 		RenderArmory(player);
 		RenderSettings(player);
 	}
@@ -3990,8 +4066,12 @@ var XHSSupporterPass = (function () {
 		if (assetRequestSearch) {
 			assetRequestSearch.SetPanelEvent("ontextentrychange", function () {
 				assetRequestView.search = (assetRequestSearch.text || "").toString();
+				assetRequestSearch.SetHasClass("HasInput", assetRequestView.search.length > 0);
+				assetRequestSearch.placeholder = assetRequestView.search
+					? ""
+					: Text("xhs_sp_request_search", "Search by name or unit...");
 				ResetPagination("asset_request");
-				RenderCourierRequestOverlay();
+				RenderCourierRequestResults();
 			});
 		}
 

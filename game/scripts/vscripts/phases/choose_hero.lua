@@ -211,6 +211,44 @@ function XHSRemoveHeroSelectionMarkerForHero(heroName)
 	return 0
 end
 
+-- The Random pedestal is not one of the standard/VIP hero slots, so its
+-- map-authored info_particle_system is intentionally absent from
+-- HERO_SELECTION_MARKERS. Remove the nearest unclaimed selection marker while
+-- the Wisp is still standing on the pedestal, before the transition moves it.
+function XHSRemoveRandomHeroSelectionMarker(position)
+	if position == nil or Entities.FindAllByClassname == nil then return 0 end
+
+	IndexHeroSelectionMarkers()
+	local claimed = {}
+	for _, group in pairs(HERO_SELECTION_MARKERS) do
+		for _, marker in pairs(group) do
+			if IsValidSelectionUnit(marker) then
+				claimed[marker:entindex()] = true
+			end
+		end
+	end
+
+	local nearest = nil
+	local nearestDistance = HERO_SELECTION_MARKER_SEARCH_RADIUS + 0.01
+	for _, particle in pairs(Entities:FindAllByClassname("info_particle_system") or {}) do
+		if IsValidSelectionUnit(particle)
+			and particle.xhs_hero_selection_marker_removed ~= true
+			and claimed[particle:entindex()] ~= true then
+			local distance = (particle:GetAbsOrigin() - position):Length2D()
+			if distance < nearestDistance then
+				nearest = particle
+				nearestDistance = distance
+			end
+		end
+	end
+
+	if not IsValidSelectionUnit(nearest) then return 0 end
+	nearest.xhs_hero_selection_marker_removed = true
+	if nearest.Stop ~= nil then pcall(function() nearest:Stop() end) end
+	UTIL_Remove(nearest)
+	return 1
+end
+
 -- XHS performs its physical pick screen during PRE_GAME, so the engine state
 -- cannot tell us when selection is over. The phase is complete only once every
 -- connected Radiant participant (humans and bots, never spectators) owns a
@@ -436,6 +474,11 @@ local function StartHeroSelectionSourceTeleport(transform, playerID, particleOwn
 			nil
 		)
 		ParticleManager:SetParticleControl(particle, 0, transform.position)
+		ParticleManager:SetParticleControl(
+			particle,
+			7,
+			Vector(HERO_SELECTION_TELEPORT_DURATION, 0, 0)
+		)
 		table.insert(particles, particle)
 	end
 
@@ -508,6 +551,11 @@ local function AwakenSelectedHero(newHero, baseTransform, destinationParticle, p
 		arrivalParticlePath,
 		PATTACH_ABSORIGIN_FOLLOW,
 		newHero
+	)
+	ParticleManager:SetParticleControl(
+		arrivalParticle,
+		7,
+		Vector(HERO_SELECTION_ARRIVAL_DURATION, 0, 0)
 	)
 	EmitSoundOnLocationWithCaster(basePosition, "Portal.Hero_Appear", newHero)
 	newHero:RemoveNoDraw()

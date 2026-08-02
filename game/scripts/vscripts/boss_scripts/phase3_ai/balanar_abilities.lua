@@ -32,11 +32,12 @@ local BALANAR_COLORS = {
 	primary = Vector(155, 55, 255),
 	secondary = Vector(45, 255, 105),
 	style = 6,
+	family = "balanar",
 }
 
 local NIGHTFALL_PARTICLE = "particles/units/heroes/hero_pugna/pugna_netherblast.vpcf"
 local DREAD_HOWL_PARTICLE = "particles/units/heroes/hero_lycan/lycan_howl_cast.vpcf"
-local DARKMOON_AOE_PARTICLE = "particles/econ/events/darkmoon_2017/darkmoon_generic_aoe.vpcf"
+local DARKMOON_AOE_PARTICLE = "particles/custom/boss_warnings/balanar/radius.vpcf"
 local SLEEPING_TERROR_PARTICLE = "particles/units/heroes/hero_bane/bane_nightmare.vpcf"
 local CARRION_SWARM_PARTICLE = "particles/units/heroes/hero_death_prophet/death_prophet_carrion_swarm.vpcf"
 
@@ -131,8 +132,10 @@ end
 local function CreateDarkmoonPrecast(position, radius, duration)
 	local particle = ParticleManager:CreateParticle(DARKMOON_AOE_PARTICLE, PATTACH_WORLDORIGIN, nil)
 	ParticleManager:SetParticleControl(particle, 0, position)
-	ParticleManager:SetParticleControl(particle, 1, Vector(radius or 250, 0, 0))
+	ParticleManager:SetParticleControl(particle, 1, Vector(radius or 250, duration or 1.0, 0))
 	ParticleManager:SetParticleControl(particle, 2, Vector(duration or 1.0, 0, 0))
+	ParticleManager:SetParticleControl(particle, 15, BALANAR_COLORS.primary)
+	ParticleManager:SetParticleControl(particle, 16, Vector(1, 0, 0))
 	Timers:CreateTimer(math.max(0.1, duration or 1.0) + 0.03, function()
 		ParticleManager:DestroyParticle(particle, false)
 		ParticleManager:ReleaseParticleIndex(particle)
@@ -199,6 +202,7 @@ function xhs_balanar_nightfall:OnSpellStart()
 		end
 	end
 	CreateRadialImpact(caster:GetAbsOrigin(), radius, NIGHTFALL_PARTICLE)
+	XHSBossTelegraphs:Release(caster:GetAbsOrigin(), radius, BALANAR_COLORS)
 	CreateNightfallScreenEffects(duration)
 	caster:EmitSound("Hero_Nightstalker.Darkness")
 	ClearContext(self)
@@ -267,6 +271,7 @@ function xhs_balanar_sleeping_terror:OnSpellStart()
 		end
 	end
 	CreateRadialImpact(position, radius, SLEEPING_TERROR_PARTICLE)
+	XHSBossTelegraphs:Release(position, radius, BALANAR_COLORS)
 	EmitLocationSound(caster, position, "Hero_Bane.Nightmare")
 	ClearContext(self)
 end

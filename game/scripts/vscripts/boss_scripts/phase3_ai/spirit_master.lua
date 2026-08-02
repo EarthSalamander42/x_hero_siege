@@ -197,9 +197,9 @@ end
 
 local function ApplyBossBarIdentity(boss, def)
 	boss.boss_count = def.boss_count or 1
-	-- A fresh trio is created at every threshold. Keep delayed events from an
-	-- older trio from taking ownership of the same three Panorama slots.
-	boss.xhs_boss_bar_id = def.bar_id .. "_" .. tostring(boss:entindex())
+	-- The entity index is the authoritative identity. Each threshold creates a
+	-- fresh trio, so delayed events from an older spirit cannot own the new bar.
+	boss.xhs_boss_bar_id = tostring(boss:entindex())
 	boss.xhs_boss_bar_name = def.name
 	boss.xhs_boss_bar_icon = def.icon
 	boss.xhs_boss_bar_colors = {

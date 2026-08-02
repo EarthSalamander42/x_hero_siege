@@ -1022,6 +1022,11 @@ var XHSTopHud = (function () {
 		var laneSuffix = lane > 0 ? " " + lane : "";
 		var targetName = FormatBotTargetName(data.decision_target || data.target);
 		var abilityName = FormatBotAbilityName(data.decision_ability || data.last_ability);
+		// Sogat's legacy unit name is npc_ramero_2. Prefer the semantic encounter
+		// identity so the activity label does not display "FIGHTING RAMERO".
+		if (macroState === "SOGAT_ARENA" || encounter === "sogat") {
+			targetName = "SOGAT";
+		}
 
 		if (state === "SELECTING_HERO" || macroState === "SELECTING_HERO") {
 			return BotActivity("SELECTING HERO", "Idle");
@@ -1155,6 +1160,9 @@ var XHSTopHud = (function () {
 			case "hold":
 				if (goal === "shop" || macroState === "SHOPPING") {
 					return ResolveBotShopActivity(data, false);
+				}
+				if (goal === "campaign_wait_player") {
+					return BotActivity("WAITING FOR PLAYER", "Idle");
 				}
 				if (goal === "defend_base" || macroState === "DEFENDING_BASE") {
 					return BotActivity("GUARDING ANCIENT", "Defense");
@@ -2688,7 +2696,20 @@ var XHSTopHud = (function () {
 			playerName = localHeroName || FormatUnitNameFallback(heroName) || ("Player " + (playerID + 1));
 		}
 
+		var sharedHoverData = typeof XHSSupporterHover !== "undefined" && XHSSupporterHover.GetPlayerData
+			? XHSSupporterHover.GetPlayerData(playerID, {
+				tableData: data,
+				entIndex: entIndex,
+				playerInfo: playerInfo,
+				playerName: playerName,
+				heroName: heroName,
+				localHeroName: localHeroName,
+			})
+			: {};
+
 		return {
+			playerID: playerID,
+			entIndex: entIndex,
 			playerName: playerName,
 			heroName: heroName,
 			localHeroName: localHeroName,
@@ -2714,6 +2735,7 @@ var XHSTopHud = (function () {
 			ankhCharges: GetAnkhCharges(entIndex),
 			reincarnationState: GetReincarnationState(entIndex),
 			disconnected: IsPlayerDisconnected(playerInfo),
+			equippedItems: sharedHoverData.equippedItems || [],
 		};
 	}
 

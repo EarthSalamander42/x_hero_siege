@@ -15,7 +15,7 @@ LinkLuaModifier("modifier_xhs_magtheridon_demonic_howl", "boss_scripts/phase3_ai
 
 local BRUTAL_SLAM_PARTICLE = "particles/units/heroes/hero_centaur/centaur_warstomp.vpcf"
 local FEL_STOMP_PARTICLE = "particles/units/heroes/hero_brewmaster/brewmaster_thunder_clap.vpcf"
-local DARKMOON_AOE_PRECAST_PARTICLE = "particles/econ/events/darkmoon_2017/darkmoon_generic_aoe.vpcf"
+local DARKMOON_AOE_PRECAST_PARTICLE = "particles/custom/boss_warnings/magtheridon/radius.vpcf"
 local FIRESTORM_PARTICLE = "particles/units/heroes/heroes_underlord/abyssal_underlord_firestorm_wave.vpcf"
 local FIRESTORM_PRECAST_PARTICLE = "particles/units/heroes/heroes_underlord/underlord_firestorm_pre.vpcf"
 local FEL_FISSURE_PARTICLE = "particles/units/heroes/hero_elder_titan/elder_titan_earth_splitter.vpcf"
@@ -44,6 +44,7 @@ local RUPTURE_IMPACT_SOUND = "Hero_ElderTitan.EarthSplitter.Destroy"
 local FEL_COLORS = {
 	primary = Vector(255, 110, 35),
 	secondary = Vector(120, 255, 80),
+	family = "magtheridon",
 }
 
 local function IsValidAlive(unit)
@@ -244,10 +245,12 @@ end
 local function CreateDarkmoonAOEPrecast(ability, position, radius, duration)
 	local particle = ParticleManager:CreateParticle(DARKMOON_AOE_PRECAST_PARTICLE, PATTACH_WORLDORIGIN, nil)
 	ParticleManager:SetParticleControl(particle, 0, position)
-	ParticleManager:SetParticleControl(particle, 1, Vector(radius, 0, 0))
+	ParticleManager:SetParticleControl(particle, 1, Vector(radius, duration or 1.0, 0))
 	ParticleManager:SetParticleControl(particle, 2, Vector(duration or 1.0, 0, 1))
 	ParticleManager:SetParticleControl(particle, 3, FEL_COLORS.primary)
 	ParticleManager:SetParticleControl(particle, 4, position)
+	ParticleManager:SetParticleControl(particle, 15, FEL_COLORS.primary)
+	ParticleManager:SetParticleControl(particle, 16, Vector(1, 0, 0))
 	TrackPrecastParticle(ability, particle)
 
 	Timers:CreateTimer(math.max(duration or 1.0, 0.03), function()
@@ -366,6 +369,7 @@ function xhs_magtheridon_brutal_slam:OnSpellStart()
 	local damage = caster:GetAverageTrueAttackDamage(damageTarget) * self:GetSpecialValueFor("attack_damage_pct") * 0.01
 
 	CreateRadialParticle(position, radius, BRUTAL_SLAM_PARTICLE)
+	XHSBossTelegraphs:Release(position, radius, FEL_COLORS)
 	EmitLocationSound(caster, position, BRUTAL_SLAM_IMPACT_SOUND)
 	DamageEnemies(caster, self, position, radius, damage, self:GetAbilityDamageType())
 	ClearContext(self)
@@ -410,6 +414,7 @@ function xhs_magtheridon_fel_stomp:OnSpellStart()
 
 	caster:EmitSound(FEL_STOMP_IMPACT_SOUND)
 	CreateRadialParticle(caster:GetAbsOrigin(), radius, FEL_STOMP_PARTICLE)
+	XHSBossTelegraphs:Release(caster:GetAbsOrigin(), radius, FEL_COLORS)
 	DamageEnemies(caster, self, caster:GetAbsOrigin(), radius, damage, self:GetAbilityDamageType())
 
 	local units = FindUnitsInRadius(caster:GetTeamNumber(), caster:GetAbsOrigin(), nil, radius, DOTA_UNIT_TARGET_TEAM_ENEMY, DOTA_UNIT_TARGET_HERO + DOTA_UNIT_TARGET_BASIC, DOTA_UNIT_TARGET_FLAG_MAGIC_IMMUNE_ENEMIES, FIND_ANY_ORDER, false)
@@ -666,6 +671,7 @@ function xhs_magtheridon_demonic_howl:OnSpellStart()
 	local caster = self:GetCaster()
 	local radius = self:GetSpecialValueFor("radius")
 	local duration = self:GetSpecialValueFor("duration")
+	XHSBossTelegraphs:Release(caster:GetAbsOrigin(), radius, FEL_COLORS)
 	local howl = ParticleManager:CreateParticle(DEMONIC_HOWL_PARTICLE, PATTACH_OVERHEAD_FOLLOW, caster)
 	ParticleManager:ReleaseParticleIndex(howl)
 	caster:EmitSound(DEMONIC_HOWL_CAST_SOUND)

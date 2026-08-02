@@ -1,5 +1,5 @@
 .XHSSupporterHoverCard {
-	width: 336px;
+	width: 388px;
 	padding: 10px;
 	flow-children: down;
 	ignore-parent-flow: true;
@@ -259,6 +259,91 @@
 	background-color: gradient( linear, 0% 0%, 100% 0%, from( #0b6e97 ), color-stop( 0.55, #25b7ff ), to( #8fdcff ) );
 }
 
+.XHSSupporterHoverEquipped {
+	width: 100%;
+	flow-children: down;
+	margin-top: 2px;
+	margin-bottom: 6px;
+	padding-top: 7px;
+	border-top: 1px solid #77c8ff22;
+}
+
+.XHSSupporterHoverEquippedTitle,
+.XHSSupporterHoverEquippedSlot {
+	font-size: 10px;
+	letter-spacing: 1px;
+	text-transform: uppercase;
+	color: #86dfff;
+	font-family: Reaver;
+	text-shadow: 0px 1px 3px #000000;
+}
+
+.XHSSupporterHoverEquippedTitle {
+	width: 100%;
+	height: 18px;
+	margin-bottom: 4px;
+}
+
+.XHSSupporterHoverEquippedGrid {
+	width: 100%;
+	flow-children: right-wrap;
+}
+
+.XHSSupporterHoverEquippedItem {
+	width: 174px;
+	height: 54px;
+	margin-right: 6px;
+	margin-bottom: 6px;
+	padding: 4px 6px;
+	flow-children: right;
+	background-color: #07111dc8;
+	border: 1px solid #77c8ff24;
+}
+
+.XHSSupporterHoverEquippedImage {
+	width: 42px;
+	height: 42px;
+	margin-right: 7px;
+	vertical-align: center;
+	background-color: #02060bcc;
+	border: 1px solid #77c8ff28;
+	opacity: 0.35;
+}
+
+.XHSSupporterHoverEquippedImage.HasImage {
+	opacity: 1;
+}
+
+.XHSSupporterHoverEquippedCopy {
+	width: fill-parent-flow( 1.0 );
+	height: 100%;
+	flow-children: down;
+	vertical-align: center;
+}
+
+.XHSSupporterHoverEquippedSlot {
+	width: 100%;
+	height: 14px;
+	font-size: 9px;
+	text-overflow: shrink;
+}
+
+.XHSSupporterHoverEquippedName {
+	width: 100%;
+	height: 25px;
+	font-size: 12px;
+	color: #f4fbff;
+	text-overflow: shrink;
+	font-family: Reaver;
+	text-shadow: 0px 1px 3px #000000;
+}
+
+.XHSSupporterHoverCard.XHSSupporterTier1 .XHSSupporterHoverEquippedItem { background-color: #071a12d8; border-color: #70e39a38; }
+.XHSSupporterHoverCard.XHSSupporterTier2 .XHSSupporterHoverEquippedItem { background-color: #1d1709d8; border-color: #ffcf663d; }
+.XHSSupporterHoverCard.XHSSupporterTier3 .XHSSupporterHoverEquippedItem { background-color: #1d0c09d8; border-color: #ff5a433a; }
+.XHSSupporterHoverCard.XHSSupporterTier4 .XHSSupporterHoverEquippedItem { background-color: #061a26d8; border-color: #5ad0ff44; }
+.XHSSupporterHoverCard.XHSSupporterTier5 .XHSSupporterHoverEquippedItem { background-color: #130b20e0; border-color: #c99cff56; }
+
 .XHSSupporterHoverCard.XHSSupporterTier1 .XHSSupporterHoverMeterFill { background-color: gradient( linear, 0% 0%, 100% 0%, from( #2d8a4d ), to( #70e39a ) ); }
 .XHSSupporterHoverCard.XHSSupporterTier2 .XHSSupporterHoverMeterFill { background-color: gradient( linear, 0% 0%, 100% 0%, from( #9c7924 ), to( #ffcf66 ) ); }
 .XHSSupporterHoverCard.XHSSupporterTier3 .XHSSupporterHoverMeterFill { background-color: gradient( linear, 0% 0%, 100% 0%, from( #8d2f21 ), to( #ff5a43 ) ); }
@@ -291,5 +376,9 @@
 }
 
 .AspectRatio4x3 .XHSSupporterHoverStat {
+	width: 135px;
+}
+
+.AspectRatio4x3 .XHSSupporterHoverEquippedItem {
 	width: 135px;
 }

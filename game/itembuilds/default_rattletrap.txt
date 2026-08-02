@@ -34,7 +34,6 @@
 		{
 			"item"		"item_bracer_of_the_void"
 			"item"		"item_searing_blade"
-			"item"		"item_staff_of_mastery"
 			"item"		"item_tome_big"
 		}
 

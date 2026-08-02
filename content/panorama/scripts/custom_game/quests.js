@@ -41,6 +41,20 @@ var XHS_QUEST_COMPLETED_SOUND = "Dungeon.Stinger01";
 var XHSQuestStartedSoundPlaying = false;
 var XHSQuestCompletedSoundPlaying = false;
 
+function IsXHSDemoMap() {
+	try {
+		if (typeof Game === "undefined" || typeof Game.GetMapInfo !== "function") {
+			return false;
+		}
+
+		var mapInfo = Game.GetMapInfo() || {};
+		var mapName = String(mapInfo.map_display_name || mapInfo.map_name || "");
+		return mapName === "x_hero_siege_demo";
+	} catch (error) {
+		return false;
+	}
+}
+
 var XHSMainQuestPhases = {
 	xhs_phase_1: 1,
 	xhs_phase_2: 2,
@@ -80,6 +94,12 @@ function RefreshXHSQuestLogCollapsedState() {
 }
 
 function SaveXHSQuestLogCollapsedState() {
+	// The demo always starts collapsed for an unobstructed asset-preview area.
+	// Do not let a temporary demo toggle overwrite the player's normal-map choice.
+	if (IsXHSDemoMap()) {
+		return;
+	}
+
 	if (typeof GameUI !== "undefined" && GameUI.CustomUIConfig) {
 		GameUI.CustomUIConfig().xhsQuestLogCollapsed = XHSQuestLogCollapsed;
 	}
@@ -410,6 +430,7 @@ var XHSQuestUiOrder = [
 	"kill_illidan",
 	"kill_balanar",
 	"kill_proudmoore",
+	"free_uther",
 	"xhs_phase_4",
 	"teleport_arthas",
 	"kill_arthas",
@@ -437,6 +458,7 @@ var XHSQuestUiMeta = {
 	kill_illidan: { phase: 3, subquest: true, infoTarget: "npc_dota_hero_illidan" },
 	kill_balanar: { phase: 3, subquest: true, infoTarget: "npc_dota_hero_balanar" },
 	kill_proudmoore: { phase: 3, subquest: true, infoTarget: "npc_dota_hero_proudmoore" },
+	free_uther: { phase: 3, subquest: true, infoTarget: "npc_xhs_uther_ice_prison" },
 	teleport_arthas: { phase: 4, subquest: true, infoTarget: "npc_xhs_paladin_2" },
 	kill_arthas: { phase: 4, subquest: true },
 	kill_banehallow: { phase: 4, subquest: true },
@@ -719,7 +741,7 @@ function IsXHSQuestCompleted(questID) {
 
 function RefreshPhaseQuestHeaders(phase) {
 	phase = phase || GetEffectiveQuestPhase();
-	var phase3Completed = IsXHSQuestCompleted("kill_proudmoore");
+	var phase3Completed = IsXHSQuestCompleted("free_uther");
 	var phase4Completed = IsXHSQuestCompleted("kill_spirit_master");
 	SetStaticQuest("xhs_phase_1", "Phase 1: Defend the Castle", phase > 1 ? "Completed" : "Active");
 	SetStaticQuest("xhs_phase_2", "Phase 2: Break the enemy siege", phase === 2 ? "Active" : (phase > 2 ? "Completed" : "Inactive"));
@@ -959,9 +981,11 @@ function InitStaticQuestLog() {
 	}
 
 	XHSQuestState.initialized = true;
+	XHSQuestLogCollapsed = IsXHSDemoMap();
 	if (typeof GameUI !== "undefined" && GameUI.CustomUIConfig) {
 		XHSQuestLogPinnedBackground = GameUI.CustomUIConfig().xhsQuestLogPinnedBackground === true;
-		XHSQuestLogCollapsed = GameUI.CustomUIConfig().xhsQuestLogCollapsed === true;
+		XHSQuestLogCollapsed = XHSQuestLogCollapsed
+			|| GameUI.CustomUIConfig().xhsQuestLogCollapsed === true;
 	}
 	LoadXHSCollapsedMainQuestPhases();
 	BindXHSQuestLogBackgroundToggle();

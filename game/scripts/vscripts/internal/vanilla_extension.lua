@@ -179,6 +179,9 @@ local XHS_SUPPORTER_LIFESTEAL_CONFIG = {
 	},
 	spell = {
 		player_field = "spell_lifesteal_pfx",
+		default_particle = "particles/items3_fx/octarine_core_lifesteal.vpcf",
+		slot = "spell_lifesteal",
+		item_field = "pfx",
 	},
 }
 
@@ -241,6 +244,25 @@ local function XHSResolveSupporterLifestealParticle(hero, playerID, config)
 		if success and not enabled then return fallback end
 	end
 
+	-- Resolve the currently equipped reward at playback time. This keeps every
+	-- spell-lifesteal source in sync with live and DEV-local loadout changes,
+	-- even when the cached player-particle table predates the equip action.
+	if Battlepass ~= nil and Battlepass.GetEquippedSupporterItem ~= nil
+		and config.slot ~= nil and config.item_field ~= nil then
+		local success, item = pcall(
+			Battlepass.GetEquippedSupporterItem,
+			Battlepass,
+			playerID,
+			config.slot
+		)
+		local equippedParticle = success and type(item) == "table"
+			and item[config.item_field] or nil
+		if XHSIsValidLifestealParticlePath(equippedParticle)
+			and not XHSIsBlockedLifestealParticle(equippedParticle) then
+			return equippedParticle
+		end
+	end
+
 	if Battlepass == nil or Battlepass.GetPlayerParticle == nil then return fallback end
 	local particle = Battlepass:GetPlayerParticle(hero, config.player_field, fallback)
 	if not XHSIsValidLifestealParticlePath(particle) then return fallback end
@@ -300,6 +322,15 @@ local function XHSCreateSupporterLifestealParticle(hero, victim, particleName)
 
 	ParticleManager:ReleaseParticleIndex(particle)
 	return true
+end
+
+-- Trusted Tools-mode previews supply a server-owned candidate path directly.
+-- Reuse the exact runtime profiles while bypassing the player's equipped item
+-- and rewards visibility, so the Content Studio can never validate a fallback
+-- or a different cosmetic by mistake.
+function XHSPlaySupporterLifestealPreviewFX(hero, victim, particleName)
+	if IsServer ~= nil and not IsServer() then return false end
+	return XHSCreateSupporterLifestealParticle(hero, victim, particleName)
 end
 
 local function XHSGetSupporterLifestealState(hero)

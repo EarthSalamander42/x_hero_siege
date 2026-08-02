@@ -4,6 +4,11 @@ if not SpecialEvents then
 	SpecialEvents.Ramero_trigger = 0
 end
 
+SpecialEvents.muradin_winners_by_player = SpecialEvents.muradin_winners_by_player or {}
+SpecialEvents.ramero_baristol_winners_by_player = SpecialEvents.ramero_baristol_winners_by_player or {}
+SpecialEvents.sogat_winners_by_player = SpecialEvents.sogat_winners_by_player or {}
+SpecialEvents.farm_event_total_kills_by_player = SpecialEvents.farm_event_total_kills_by_player or {}
+
 require("boss_scripts/special_arena_ai")
 
 local SPECIAL_EVENT_CINEMATIC_PAUSE_RAMP = 2.75
@@ -30,6 +35,8 @@ local FARM_LEADERBOARD_NET_KEY = "state"
 local FARM_LEADERBOARD_UPDATE_INTERVAL = 0.5
 local RAMERO_KILL_RACE_START = 250
 local RAMERO_KILL_RACE_UPDATE_INTERVAL = 0.25
+local KILL_EVENT_OBJECTIVES_NET_TABLE = "xhs_kill_event_objectives"
+local KILL_EVENT_OBJECTIVES_NET_KEY = "state"
 local FARM_EVENT_RETURN_TELEPORT_DURATION = 3.0
 local FARM_EVENT_RETURN_GRACE_DURATION = 3.0
 local FARM_EVENT_RETURN_TOTAL_DELAY = FARM_EVENT_RETURN_TELEPORT_DURATION + FARM_EVENT_RETURN_GRACE_DURATION
@@ -73,6 +80,16 @@ local FARM_EVENT_REWARDS = {
 	npc_dota_creature_tuskarr = { gold_min = 250, gold_max = 300, xp = 45 },
 	npc_dota_creature_satyrr = { gold_min = 250, gold_max = 300, xp = 45 },
 }
+
+function SpecialEvents:PublishKillEventObjectiveState()
+	local progression = tonumber(self.Ramero_trigger) or 0
+	CustomNetTables:SetTableValue(KILL_EVENT_OBJECTIVES_NET_TABLE, KILL_EVENT_OBJECTIVES_NET_KEY, {
+		ramero_baristol_consumed = progression >= 1 and 1 or 0,
+		sogat_consumed = progression >= 2 and 1 or 0,
+	})
+end
+
+SpecialEvents:PublishKillEventObjectiveState()
 
 LinkLuaModifier(
 	"modifier_xhs_farm_staged",
@@ -412,6 +429,11 @@ local function PlayMuradinTeleportIn(unit, spawn_position)
 				)
 				ParticleManager:SetParticleControl(arrival_particle, 0, position)
 				ParticleManager:SetParticleControl(arrival_particle, 1, position)
+				ParticleManager:SetParticleControl(
+					arrival_particle,
+					7,
+					Vector(MURADIN_TELEPORT_ARRIVAL_EFFECT_DURATION, 0, 0)
+				)
 				EmitSoundOnLocationWithCaster(position, "Portal.Hero_Appear", unit)
 
 				Timers:CreateTimer(MURADIN_TELEPORT_ARRIVAL_EFFECT_DURATION, function()
@@ -435,6 +457,7 @@ local function StartMuradinTeleportOut(unit)
 	})
 
 	local particle = ParticleManager:CreateParticle(MURADIN_TELEPORT_START_PARTICLE, PATTACH_ABSORIGIN_FOLLOW, unit)
+	ParticleManager:SetParticleControl(particle, 7, Vector(MURADIN_TELEPORT_OUT_DURATION, 0, 0))
 	unit:EmitSound("Portal.Loop_Appear")
 
 	Timers:CreateTimer(MURADIN_TELEPORT_OUT_DURATION, function()
@@ -733,6 +756,10 @@ function SpecialEvents:EndMuradinEvent()
 		-- Timers:CreateTimer(function()
 		if hero and not hero:IsNull() and hero:IsRealHero() and not hero:IsIllusion() and hero:IsRealHero() and not hero.paid then
 			hero.paid = true
+			local winnerPlayerID = hero:GetPlayerOwnerID()
+			if winnerPlayerID ~= nil and winnerPlayerID >= 0 then
+				self.muradin_winners_by_player[winnerPlayerID] = true
+			end
 			if hero.old_pos then
 				TeleportHero(hero, hero.old_pos, 3.0, 1.0)
 			else
@@ -1291,6 +1318,8 @@ function SpecialEvents:OnFarmEventCreepKilled(killedUnit)
 	if progress == nil then return end
 
 	progress.kills = math.max(0, tonumber(progress.kills) or 0) + 1
+	self.farm_event_total_kills_by_player[playerID] =
+		math.max(0, tonumber(self.farm_event_total_kills_by_player[playerID]) or 0) + 1
 	progress.remaining = math.max(0, (tonumber(progress.remaining) or 0) - 1)
 	progress.pending_wave_gold = (progress.pending_wave_gold or 0)
 		+ math.max(0, tonumber(killedUnit.xhs_farm_reward_gold) or 0)
@@ -1508,20 +1537,25 @@ function SpecialEvents:EndFarmEvent()
 	end
 
 	-- Start Phase 2
-	local combatParticipants = GetXHSCombatParticipantCount ~= nil
-		and GetXHSCombatParticipantCount()
-		or PlayerResource:GetPlayerCount()
-	for NumPlayers = 1, MAGNATAURS_TO_KILL * combatParticipants * CREEP_LANES_TYPE do
-		local rax_spawner = Entities:FindByName(nil, "npc_dota_spawner_" .. NumPlayers)
+	local magnataurBatchesPerLane = math.max(1, tonumber(MAGNATAURS_TO_KILL) or 1)
+	for lane = 1, 8 do
+		local laneState = CREEP_LANES ~= nil and CREEP_LANES[lane] or nil
+		if laneState ~= nil and laneState[1] == 1 then
+			local rax_spawner = Entities:FindByName(nil, "npc_dota_spawner_" .. lane)
 
-		if rax_spawner then
-			local magnataur, magnataurs = SpawnMagnataur(rax_spawner:GetAbsOrigin())
-			for _, unit in ipairs(magnataurs or {}) do
-				self:SuspendNonFarmUnit(unit)
+			if rax_spawner then
+				local laneAttacker = nil
+				for _ = 1, magnataurBatchesPerLane do
+					local magnataur, magnataurs = SpawnMagnataur(rax_spawner:GetAbsOrigin())
+					laneAttacker = laneAttacker or magnataur
+					for _, unit in ipairs(magnataurs or {}) do
+						self:SuspendNonFarmUnit(unit)
+					end
+				end
+				CollapsePhaseOneLane(lane, laneAttacker)
+				print("npc_dota_spawner_" .. lane .. " removed.")
+				rax_spawner.disabled = true
 			end
-			CollapsePhaseOneLane(NumPlayers, magnataur)
-			print("npc_dota_spawner_" .. NumPlayers .. " removed.")
-			rax_spawner.disabled = true
 		end
 	end
 
@@ -1566,6 +1600,7 @@ function SpecialEvents:StartRameroAndBaristolEvent(hero)
 	NotifySpecialArenaStarted(hero, "Ramero and Baristol")
 
 	SpecialEvents.Ramero_trigger = 1
+	SpecialEvents:PublishKillEventObjectiveState()
 	SpecialEvents.active_arena_player_id = hero ~= nil
 		and not hero:IsNull()
 		and hero:GetPlayerID()
@@ -1633,6 +1668,9 @@ function SpecialEvents:EndRameroAndBaristolEvent(bWin)
 
 	local arenaPlayerID = SpecialEvents.active_arena_player_id
 	bWin = bWin == true or (SpecialEvents.RameroDead == true and SpecialEvents.BaristolDead == true)
+	if bWin and arenaPlayerID ~= nil and arenaPlayerID >= 0 then
+		SpecialEvents.ramero_baristol_winners_by_player[arenaPlayerID] = true
+	end
 	_G.RAMERO_ARTIFACT_PICKED = true
 	SpecialEvents.active_arena_player_id = nil
 	if FragmentQuests ~= nil then
@@ -1704,6 +1742,7 @@ function SpecialEvents:StartSogatEvent(hero)
 	NotifySpecialArenaStarted(hero, "Sogat")
 
 	SpecialEvents.Ramero_trigger = 2
+	SpecialEvents:PublishKillEventObjectiveState()
 	SpecialEvents.active_arena_player_id = hero ~= nil
 		and not hero:IsNull()
 		and hero:GetPlayerID()
@@ -1753,6 +1792,9 @@ function SpecialEvents:EndSogatEvent(bWin)
 	-- if _G.SOGAT_ARTIFACT_PICKED == true then return end -- if timer is not removed, uncomment this
 
 	local arenaPlayerID = SpecialEvents.active_arena_player_id
+	if bWin == true and arenaPlayerID ~= nil and arenaPlayerID >= 0 then
+		SpecialEvents.sogat_winners_by_player[arenaPlayerID] = true
+	end
 	_G.SOGAT_ARTIFACT_PICKED = true
 	SpecialEvents.active_arena_player_id = nil
 	if FragmentQuests ~= nil then

@@ -4,7 +4,9 @@ local function ConfigureSpiritBossBar(boss, bossCount, bossBarId, bossName, boss
 	end
 
 	boss.boss_count = bossCount
-	boss.xhs_boss_bar_id = bossBarId
+	-- Keep the legacy split path compatible with the phase-3 encounter: the
+	-- spawned entity itself is always the authoritative boss-bar identity.
+	boss.xhs_boss_bar_id = tostring(boss:entindex())
 	boss.xhs_boss_bar_name = bossName
 	boss.xhs_boss_bar_icon = bossIcon
 	boss.xhs_boss_bar_colors = {

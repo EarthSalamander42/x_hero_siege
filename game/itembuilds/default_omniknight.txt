@@ -41,7 +41,6 @@
 
 		"#DOTA_Item_Build_Other_Items"
 		{
-			"item"		"item_staff_of_mastery"
 			"item"		"item_potion_of_invulnerability"
 			"item"		"item_potion_of_antimagic"
 			"item"		"item_amulet_of_the_wild"

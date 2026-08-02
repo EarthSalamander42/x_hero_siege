@@ -420,7 +420,7 @@
 "sp26_attack_lifesteal_radiant"			"Radiant Attack Lifesteal"
 "sp26_attack_lifesteal_soulfrost"		"Soulfrost Attack Lifesteal"
 "sp26_attack_lifesteal_primal"			"Primal Attack Lifesteal"
-"sp26_spell_lifesteal_octarine"			"Octarine Spell Lifesteal"
+"sp26_spell_lifesteal_octarine"			"Cyan Grace Spell Lifesteal"
 "sp26_spell_lifesteal_skywrath"			"Skywrath Arcana Spell Lifesteal"
 "sp26_spell_lifesteal_skywrath_style2"	"Skywrath Arcana Spell Lifesteal · Style II"
 

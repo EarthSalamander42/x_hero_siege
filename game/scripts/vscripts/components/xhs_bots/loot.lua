@@ -95,33 +95,34 @@ function XHSBotLoot:FindDrop(playerID, hero, now)
 end
 
 function XHSBotLoot:FindCrate(playerID, hero, now)
-	local units = FindUnitsInRadius(
-		hero:GetTeamNumber(),
+	-- Breakables are npc_dota_creature entities whose team is rewritten by a
+	-- modifier. Combat target queries can omit them despite a visible crate
+	-- being attackable, so inspect the bounded entity class directly.
+	local units = Entities:FindAllByClassnameWithin(
+		"npc_dota_creature",
 		hero:GetAbsOrigin(),
-		nil,
-		self.CRATE_RADIUS,
-		DOTA_UNIT_TARGET_TEAM_ENEMY,
-		DOTA_UNIT_TARGET_BASIC,
-		DOTA_UNIT_TARGET_FLAG_MAGIC_IMMUNE_ENEMIES,
-		FIND_CLOSEST,
-		false
-	)
+		self.CRATE_RADIUS
+	) or {}
+	local nearest = nil
 	for _, unit in pairs(units) do
 		if Valid(unit) and unit:IsAlive()
 			and unit:GetUnitName() == "npc_dota_crate"
 			and unit:HasModifier("modifier_breakable_container")
 			and self:CanClaim(unit, playerID, now) then
-			self:Claim(unit, playerID, now)
-			return {
+			local candidate = {
 				kind = "crate",
 				entity = unit,
 				position = unit:GetAbsOrigin(),
 				distance = Distance(hero, unit),
 				item_name = "",
 			}
+			if nearest == nil or candidate.distance < nearest.distance then
+				nearest = candidate
+			end
 		end
 	end
-	return nil
+	if nearest ~= nil then self:Claim(nearest.entity, playerID, now) end
+	return nearest
 end
 
 function XHSBotLoot:FindOpportunity(playerID, hero, record, allowed)

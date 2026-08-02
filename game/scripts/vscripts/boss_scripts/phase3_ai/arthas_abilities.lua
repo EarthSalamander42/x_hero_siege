@@ -26,24 +26,28 @@ local ARTHAS_COLORS = {
 	primary = Vector(105, 215, 255),
 	secondary = Vector(235, 250, 255),
 	style = 7,
+	family = "arthas",
 }
 
 local DARK_COLORS = {
 	primary = Vector(25, 70, 140),
 	secondary = Vector(170, 225, 255),
 	style = 6,
+	family = "arthas",
 }
 
 local JUDGMENT_SOAK_COLORS = {
 	primary = Vector(65, 255, 145),
 	secondary = Vector(225, 255, 245),
 	style = 5,
+	family = "arthas",
 }
 
 local JUDGMENT_DANGER_COLORS = {
 	primary = Vector(255, 55, 35),
 	secondary = Vector(255, 215, 65),
 	style = 7,
+	family = "arthas",
 }
 
 local JUDGMENT_BEACON_PARTICLE = "particles/units/heroes/hero_omniknight/omniknight_purification.vpcf"
@@ -435,6 +439,7 @@ function xhs_arthas_frozen_chains:OnSpellStart()
 		enemy:AddNewModifier(caster, self, "modifier_xhs_arthas_chains", { duration = self:GetSpecialValueFor("root_duration") })
 	end)
 	CreateImpact(position, CHAINS_PARTICLE, radius, 1.0)
+	XHSBossTelegraphs:Release(position, radius, ARTHAS_COLORS)
 	EmitSoundOnLocationWithCaster(position, "Hero_Lich.FrostBlast", caster)
 	ClearContext(self)
 end
@@ -502,6 +507,7 @@ function xhs_arthas_frostmourne_execute:OnSpellStart()
 	local radius = self:GetSpecialValueFor("radius")
 	DamageEnemies(caster, self, position, radius, ScaleDamage(self:GetSpecialValueFor("damage")), self:GetAbilityDamageType())
 	CreateImpact(position, EXECUTE_PARTICLE, radius, 1.0)
+	XHSBossTelegraphs:Release(position, radius, DARK_COLORS)
 	EmitSoundOnLocationWithCaster(position, "Hero_SkeletonKing.Hellfire_BlastImpact", caster)
 	ClearContext(self)
 end

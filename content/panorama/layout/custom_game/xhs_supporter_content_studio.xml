@@ -1,0 +1,27 @@
+<root>
+	<styles><include src="file://{resources}/styles/custom_game/xhs_supporter_content_studio.css" /></styles>
+	<scripts><include src="file://{resources}/scripts/custom_game/xhs_supporter_content_studio.js" /></scripts>
+	<Panel class="SupporterContentStudioRoot" hittest="false">
+		<Button id="ContentStudioOpen" class="StudioOpen Hidden" hittest="true" onactivate="GameUI.CustomUIConfig().XHSContentStudio.Toggle()"><Label id="ContentStudioOpenLabel" text="CONTENT STUDIO" /></Button>
+		<Panel id="ContentStudioWindow" class="StudioWindow Hidden" hittest="true">
+			<Panel class="StudioHeader">
+				<Panel class="StudioHeaderCopy"><Label class="Eyebrow" text="SUPPORTER PASS 4.0 - DEVELOPER CATALOG" /><Label class="Title" text="Content Studio" /><Label class="Subtitle" text="Preview official Dota effects, then send the strongest candidates to the persistent review queue." /></Panel>
+				<Button class="CloseButton" onactivate="GameUI.CustomUIConfig().XHSContentStudio.Toggle()"><Label text="X" /></Button>
+			</Panel>
+			<Panel class="SceneNotice"><Label id="ContentStudioSceneNoticeText" text="Checking preview support…" /></Panel>
+			<Panel id="ContentStudioCategories" class="FacetRow Categories" />
+			<Panel class="SecondaryFacets">
+				<Panel id="ContentStudioEditions" class="FacetRow" />
+				<Panel id="ContentStudioRarities" class="FacetRow" />
+				<Panel id="ContentStudioStates" class="FacetRow" />
+			</Panel>
+			<Panel class="StudioToolbar">
+				<TextEntry id="ContentStudioSearch" placeholder="Search name or VPCF path" ontextentrychange="GameUI.CustomUIConfig().XHSContentStudio.Render()" />
+				<Button onactivate="GameUI.CustomUIConfig().XHSContentStudio.Stop()"><Label text="STOP PREVIEW" /></Button>
+				<Button onactivate="GameUI.CustomUIConfig().XHSContentStudio.Sync()"><Label text="REFRESH" /></Button>
+			</Panel>
+			<Label id="ContentStudioStatus" class="Status" text="Opening Content Studio..." />
+			<Panel id="ContentStudioCandidates" class="CandidateGrid" />
+		</Panel>
+	</Panel>
+</root>

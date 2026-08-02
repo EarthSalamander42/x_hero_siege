@@ -317,6 +317,12 @@ local function CreateCameraDummy(position, playerID)
 		and PlayerResource:IsValidPlayerID(playerID) then
 		playerTeam = PlayerResource:GetTeam(playerID)
 	end
+	-- Observer-team units are not reliably networked as camera targets. Keep
+	-- the invisible motion anchor on a playable team while the observer camera
+	-- remains fully server-controlled through SetCameraTarget.
+	if playerTeam == 1 or playerTeam == DOTA_TEAM_NOTEAM then
+		playerTeam = DOTA_TEAM_GOODGUYS
+	end
 
 	local ok, dummy = pcall(
 		CreateUnitByName,

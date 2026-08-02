@@ -22,6 +22,11 @@ local function SetXHSLaneDoorState(lane, open)
 		nil
 	)
 
+	if not open and XHSRemoveClosedPhaseOneLaneStructures ~= nil then
+		XHSRemoveClosedPhaseOneLaneStructures(lane)
+		return
+	end
+
 	for _, tower in pairs(Entities:FindAllByName("dota_badguys_tower" .. lane)) do
 		if open then
 			tower:RemoveModifierByName("modifier_invulnerable")
@@ -248,6 +253,11 @@ ListenToGameEvent('npc_spawned', function(keys)
 	local hero_level = npc:GetLevel()
 
 	if npc and IsValidEntity(npc) then
+		if npc:IsRealHero() and npc:IsAlive() and npc.xhs_dead_inventory_lock_active == true
+			and StopXHSDeadInventoryLock ~= nil then
+			StopXHSDeadInventoryLock(npc)
+		end
+
 		if npc:IsRealHero() and _G.XHSUnitTombstone ~= nil then
 			_G.XHSUnitTombstone:RegisterHero(npc)
 		end
@@ -612,16 +622,25 @@ end
 ListenToGameEvent('dota_item_purchased', function(keys)
 	local playerID = tonumber(keys.PlayerID)
 	if playerID == nil or playerID < 0 then return end
-	if IsPlayerXHSReincarnating == nil or not IsPlayerXHSReincarnating(playerID) then return end
+	if IsPlayerXHSInventoryLocked == nil or not IsPlayerXHSInventoryLocked(playerID) then return end
 
 	local itemName = keys.itemname or ""
 	local itemCost = tonumber(keys.itemcost) or 0
 	local itemEntIndex = tonumber(keys.item_entindex or keys.ItemEntityIndex or keys.item_ent_index) or -1
 	local purchaseGameTime = GameRules:GetGameTime()
 
-	SendErrorMessage(playerID, "#error_reincarnation_inventory_locked")
+	local lockedHero = PlayerResource:GetSelectedHeroEntity(playerID)
+	if lockedHero == nil or lockedHero:IsNull() then
+		local player = PlayerResource:GetPlayer(playerID)
+		lockedHero = player and player:GetAssignedHero() or nil
+	end
+	if lockedHero ~= nil and not lockedHero:IsNull() and SendXHSInventoryLockedError ~= nil then
+		SendXHSInventoryLockedError(lockedHero)
+	else
+		SendErrorMessage(playerID, "#error_dead_inventory_locked")
+	end
 
-	GameRules:GetGameModeEntity():SetContextThink(DoUniqueString("xhs_reincarnation_purchase_rollback"), function()
+	GameRules:GetGameModeEntity():SetContextThink(DoUniqueString("xhs_locked_inventory_purchase_rollback"), function()
 		local hero = PlayerResource:GetSelectedHeroEntity(playerID)
 		if hero == nil or hero:IsNull() then
 			local player = PlayerResource:GetPlayer(playerID)
@@ -1498,6 +1517,11 @@ XHSUnitTombstone:Install()
 ListenToGameEvent('entity_killed', function(keys)
 	local killedUnit = EntIndexToHScript(keys.entindex_killed)
 	if killedUnit == nil then return end
+	if killedUnit.xhs_silent_phase_one_lane_cleanup == true then
+		-- Closed-lane structures are removed only to release entity/render cost.
+		-- They grant no kill credit, quest progress, Revenants or Magnataurs.
+		return
+	end
 	local killedUnitName = killedUnit.GetUnitName ~= nil and killedUnit:GetUnitName() or ""
 	if killedUnit:FindModifierByName("modifier_breakable_container")
 		or killedUnitName == "npc_dota_crate"
@@ -1539,6 +1563,10 @@ ListenToGameEvent('entity_killed', function(keys)
 	end
 
 	if killedUnit:IsRealHero() and (killedUnit:GetTeamNumber() == DOTA_TEAM_GOODGUYS) then
+		if StartXHSDeadInventoryLock ~= nil then
+			StartXHSDeadInventoryLock(killedUnit)
+		end
+
 		if FragmentQuests ~= nil then
 			FragmentQuests:OnHeroDeath(killedUnit)
 		end
@@ -1853,6 +1881,9 @@ function GameMode:OnPlayerRevived(event)
 
 	local hRevivedHero = EntIndexToHScript(revivedIndex)
 	if hRevivedHero == nil or hRevivedHero:IsNull() or not hRevivedHero:IsRealHero() then return end
+	if StopXHSDeadInventoryLock ~= nil then
+		StopXHSDeadInventoryLock(hRevivedHero)
+	end
 
 	hRevivedHero:AddNewModifier(hRevivedHero, nil, "modifier_invulnerable", { duration = 2.5 })
 	hRevivedHero:AddNewModifier(hRevivedHero, nil, "modifier_omninight_guardian_angel", { duration = 2.5 })
@@ -2012,6 +2043,7 @@ local XHS_QUEST_FOCUS_TARGETS = {
 	kill_illidan = "npc_dota_hero_illidan",
 	kill_balanar = "npc_dota_hero_balanar",
 	kill_proudmoore = "npc_dota_hero_proudmoore",
+	free_uther = "npc_xhs_uther_ice_prison",
 }
 
 local XHS_BOSS_QUEST_VISION_TARGETS = {
@@ -2292,19 +2324,10 @@ function GameMode:OnQuestCompleted(questZone, quest)
 			StartMagtheridonArena()
 		elseif quest.szQuestName == "teleport_arthas" then
 			FourBossesKillCount()
-			XHSOpenDoorsWithCinematic(
-				{ "door_proudmoore3" },
-				{ "obstruction_proudmoore2" },
-				"gate_02_open",
-				function()
-					Timers:CreateTimer(2.5, StartArthasArena)
-				end,
-				{
-					move_duration = 1.35,
-					hold_duration = 1.25,
-					return_duration = 1.0,
-				}
-			)
+			-- Uther's prison now opens the last Proudmoore gate. His dialog only
+			-- authorizes the next encounter, so it cannot leave him trapped behind it.
+			if XHSOpenProudmooreFinalDoor ~= nil then XHSOpenProudmooreFinalDoor() end
+			Timers:CreateTimer(2.5, StartArthasArena)
 		end
 	end
 

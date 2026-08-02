@@ -24,6 +24,7 @@ local GROM_COLORS = {
 	primary = Vector(255, 62, 34),
 	secondary = Vector(255, 185, 64),
 	style = 4,
+	family = "grom",
 }
 
 local GROM_TEXTURES = {
@@ -252,6 +253,7 @@ function xhs_grom_blade_storm:OnSpellStart()
 	local damagePerSecond = ScaleDamage(self:GetSpecialValueFor("damage_per_second"))
 	local elapsed = 0
 	local nextImpactFx = 0
+	XHSBossTelegraphs:Release(caster:GetAbsOrigin(), radius, GROM_COLORS)
 
 	caster:AddNewModifier(caster, self, "modifier_xhs_grom_blade_storm", { duration = duration })
 	local particle = ParticleManager:CreateParticle(BLADE_STORM_PARTICLE, PATTACH_ABSORIGIN_FOLLOW, caster)
@@ -521,6 +523,7 @@ function xhs_grom_warsong_leap:OnSpellStart()
 
 		FindClearSpaceForUnit(caster, position, true)
 		CreateWorldParticle(position, WINDWALK_END_PARTICLE, 0.8)
+		XHSBossTelegraphs:Release(position, radius, GROM_COLORS)
 		caster:EmitSound("Hero_EarthSpirit.BoulderSmash.Target")
 		local particle = ParticleManager:CreateParticle(WARSONG_LEAP_PARTICLE, PATTACH_WORLDORIGIN, nil)
 		ParticleManager:SetParticleControl(particle, 0, position)

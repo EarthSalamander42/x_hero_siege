@@ -553,7 +553,28 @@ function XHSBotUtility:Build(context)
 		)
 	end
 
-	if context.target ~= nil then
+	local engagementHolding = context.target ~= nil
+		and context.engagement_allow_attack == false
+	if engagementHolding then
+		local holdPosition = context.reposition_position
+			or context.retreat_position
+			or context.anchor
+		if holdPosition ~= nil then
+			AddAction(
+				actions,
+				"reposition",
+				94,
+				{ position = holdPosition },
+				context.engagement_mode == "SHOP_POWER_SPIKE"
+					and "do not feed: buy the planned power spike"
+					or context.engagement_mode == "WAIT_FOR_ONE_HELPER"
+						and "hold the pack edge for one responder"
+					or "avoid an unfavourable pack and preserve resources"
+			)
+		end
+	end
+
+	if context.target ~= nil and not engagementHolding then
 		if context.too_close == true then
 			AddAction(
 				actions,
@@ -589,7 +610,8 @@ function XHSBotUtility:Build(context)
 		)
 	end
 
-	if context.anchor_distance ~= nil and context.anchor_distance > 260 then
+	if not engagementHolding
+		and context.anchor_distance ~= nil and context.anchor_distance > 260 then
 		local movementScore = Clamp(
 			42 + context.anchor_distance / 100
 				+ (context.assignment_urgency or 0) * 12

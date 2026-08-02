@@ -226,7 +226,6 @@
 			<Image src="file://panorama/images/items/custom/potion_full.png" hittest="false" />
 			<Image src="file://panorama/images/items/custom/potion_of_antimagic.png" hittest="false" />
 			<Image src="file://panorama/images/items/custom/potion_of_invulnerability.png" hittest="false" />
-			<Image src="file://panorama/images/items/custom/scepter_of_mastery.png" hittest="false" />
 			<Image src="file://panorama/images/items/custom/searing_blade.png" hittest="false" />
 			<Image src="file://panorama/images/items/custom/talisman_of_evasion_datadriven.png" hittest="false" />
 			<Image src="file://panorama/images/items/custom/tempest_aegis.png" hittest="false" />

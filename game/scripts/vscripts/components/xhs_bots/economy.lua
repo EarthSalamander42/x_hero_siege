@@ -591,7 +591,7 @@ function XHSBotEconomy:UseTacticalItems(hero, record, encounter)
 	if IsValidEntityHandle(target)
 		and target:GetTeamNumber() ~= hero:GetTeamNumber()
 		and (record.boss_threat_nearby == true or threat >= 0.82) then
-		if self:CastNamedActiveItem(hero, "item_staff_of_mastery", {
+		if self:CastNamedActiveItem(hero, "item_astral_core", {
 				mode = "enemy_unit",
 				target = target,
 				reason = "disable dangerous physical target",
@@ -807,6 +807,11 @@ function XHSBotEconomy:GrantPurchasedItem(
 	if item.SetPurchaseTime ~= nil then
 		pcall(function() item:SetPurchaseTime(GameRules:GetGameTime()) end)
 	end
+	local pendingRemoteAnkh = deliverToStash
+		and purchaseName == self.ANKH_ITEM_NAME
+	if pendingRemoteAnkh then
+		item.xhs_pending_stash_delivery = true
+	end
 	local cost = math.max(0, tonumber(entry.cost) or 0)
 	if not self:WithdrawGold(playerID, cost) then
 		self:RemoveGrantedItem(hero, item)
@@ -842,10 +847,26 @@ function XHSBotEconomy:GrantPurchasedItem(
 		if not mergedBeforeStash then
 			local stashed, stashReason = self:MovePurchasedItemToStash(hero, item)
 			if not stashed then
+				if IsValidEntityHandle(item) then
+					item.xhs_pending_stash_delivery = nil
+				end
 				self:RemoveGrantedItem(hero, item)
 				self:RefundGold(playerID, cost)
 				return false, stashReason, shopKind, shopDistance
 			end
+		end
+		if pendingRemoteAnkh then
+			local verifiedSlot = IsValidEntityHandle(item)
+				and self:GetItemSlot(hero, item) or nil
+			if verifiedSlot == nil or verifiedSlot < self.STASH_FIRST_SLOT then
+				self:RemoveGrantedItem(hero, item)
+				self:RefundGold(playerID, cost)
+				return false,
+					"remote Ankh was not verified in stash",
+					shopKind,
+					shopDistance
+			end
+			item.xhs_pending_stash_delivery = nil
 		end
 	end
 
@@ -971,6 +992,12 @@ function XHSBotEconomy:CollectStashItems(hero, record)
 		return 0
 	end
 
+	local recoveryGoal = type(record.shopping_goal) == "table"
+		and record.shopping_goal.recovery_purchase == true
+		and record.shopping_goal or nil
+	local recoveryItem = recoveryGoal ~= nil
+		and tostring(recoveryGoal.item or "") or ""
+	local collectedRecoveryItem = false
 	local moved = 0
 	local safety = 0
 	while safety < self.STASH_CAPACITY do
@@ -993,8 +1020,16 @@ function XHSBotEconomy:CollectStashItems(hero, record)
 		local itemAfter = hero:GetItemInSlot(stashSlot)
 		if not ok or itemAfter == item then break end
 		moved = moved + 1
+		if recoveryItem ~= "" and name == recoveryItem then
+			collectedRecoveryItem = true
+		end
 		record.stash_items_collected = (record.stash_items_collected or 0) + 1
 		record.last_item_action = "collect_stash:" .. name
+	end
+	if collectedRecoveryItem then
+		record.last_gear_purchase_at = GameRules:GetGameTime()
+		record.last_gear_purchase_deaths = tonumber(record.deaths) or 0
+		record.last_recovery_purchase_collected = recoveryItem
 	end
 	return moved
 end
@@ -1059,8 +1094,6 @@ function XHSBotEconomy:GetItemEquipPriority(item, snapshot, plan)
 	end
 	if catalog.kind == "core" then
 		return 650 + math.max(0, tonumber(catalog.tier) or 0) * 70
-	elseif name == "item_staff_of_mastery" then
-		return 900
 	elseif name == "item_amulet_of_the_wild" then
 		return highThreat and 890 or 500
 	elseif catalog.active_slot == true or catalog.kind == "tactical" then
@@ -1117,6 +1150,11 @@ function XHSBotEconomy:ReconcileLightningSwordUpgrade(
 		self.LIFESTEAL_MASK_ITEM_NAME
 	)
 	if maskSlot == nil or not IsValidEntityHandle(mask) then return false end
+	if not self:IsAtAnyShop(hero) then
+		record.last_item_rejection =
+			"redundant lifesteal mask sale deferred until shop range"
+		return false
+	end
 	self:RemoveGrantedItem(hero, mask)
 	if self:FindItemSlotByName(
 			hero,
@@ -1287,6 +1325,11 @@ function XHSBotEconomy:FindReplacementCandidate(hero, entry, snapshot, plan)
 end
 
 function XHSBotEconomy:PrepareInventoryReplacement(hero, entry, snapshot, plan, record, now)
+	-- Replacement grants a 50% resale credit. Keep the same spatial invariant
+	-- as a real player sale even if a caller changes purchase routing later.
+	if not self:IsAtAnyShop(hero) then
+		return nil, "replacement sale requires shop range"
+	end
 	local candidate = self:FindReplacementCandidate(hero, entry, snapshot, plan)
 	if candidate == nil then return nil, "no lower-value replacement candidate" end
 	if candidate.catalog.no_backpack == true then
@@ -1857,6 +1900,26 @@ function XHSBotEconomy:RecordPlan(record, snapshot, plan)
 			reason = candidate.reason,
 		})
 	end
+	record.planned_purchase_queue = {}
+	local purchases = self:BuildPlannedPurchases(snapshot, plan)
+	for index = 1, math.min(6, #(purchases or {})) do
+		local entry = purchases[index]
+		if type(entry) == "table" and tostring(entry.name or "") ~= "" then
+			table.insert(record.planned_purchase_queue, entry.name)
+		end
+	end
+	local suggestion = plan.next_entry
+		or plan.tactical_entry
+		or plan.candidates ~= nil and plan.candidates[1] ~= nil
+			and plan.candidates[1].entry or nil
+	record.planned_suggestion_item = suggestion and suggestion.name or ""
+	record.planned_suggestion_only = plan.next_entry == nil
+		and suggestion ~= nil
+	record.planned_suggestion_reason = plan.next_entry ~= nil
+		and tostring(plan.next_reason or "")
+		or suggestion ~= nil
+			and "best current candidate; below committed purchase threshold"
+		or ""
 end
 
 function XHSBotEconomy:ShouldRestockPotion(kind, snapshot, plan)
@@ -2046,9 +2109,9 @@ function XHSBotEconomy:GetShopAnchors(shop)
 	end
 	if shop == "base" then return anchors end
 
-	-- Discover the same map-owned lane shop classes used by the lane director.
-	-- Exclude both castle_shop itself and any companion trigger colocated with
-	-- it, since the custom secret shop may expose more than one entity.
+	-- Discover the same map-owned normal-shop classes used by the lane director.
+	-- Exclude castle_shop itself, but retain a distinct normal shop beside it:
+	-- the top outpost intentionally provides both normal and secret inventories.
 	local seen = {}
 	for _, className in ipairs(GENERAL_SHOP_CLASSNAMES) do
 		for _, entity in pairs(Entities:FindAllByClassname(className) or {}) do
@@ -2059,7 +2122,12 @@ function XHSBotEconomy:GetShopAnchors(shop)
 				local distanceFromSecret = secretPosition ~= nil
 					and (entity:GetAbsOrigin() - secretPosition):Length2D()
 					or math.huge
-				if distanceFromSecret > self.SECRET_SHOP_EXCLUSION_RADIUS then
+				-- A distinct map-owned normal shop is valid even inside the
+				-- secret-shop exclusion ring (the top outpost intentionally
+				-- co-locates both services). GetCurrentShopKind still requires
+				-- the engine HOME range and proximity to this exact anchor.
+				if distanceFromSecret > self.SECRET_SHOP_EXCLUSION_RADIUS
+					or entity ~= castleShop then
 					seen[entityIndex] = true
 					Add(entity, "lane", self.LANE_SHOP_RADIUS)
 				end
@@ -2076,12 +2144,23 @@ function XHSBotEconomy:GetCurrentShopKind(hero, shop)
 	shop = tostring(shop or "home")
 	local origin = hero:GetAbsOrigin()
 	local castleShop = Entities:FindByName(nil, "castle_shop")
+	local normalShopNearby = false
+	if shop ~= "secret" then
+		for _, anchor in ipairs(self:GetShopAnchors("home")) do
+			if anchor.kind == "lane"
+				and (origin - anchor.position):Length2D() <= anchor.radius then
+				normalShopNearby = true
+				break
+			end
+		end
+	end
 	if shop ~= "secret" and IsValidEntityHandle(castleShop)
 		and (origin - castleShop:GetAbsOrigin()):Length2D()
-		<= self.SECRET_SHOP_EXCLUSION_RADIUS then
+		<= self.SECRET_SHOP_EXCLUSION_RADIUS
+		and not normalShopNearby then
 		return nil,
 			(origin - castleShop:GetAbsOrigin()):Length2D(),
-			"inside secret-shop exclusion"
+			"inside secret-shop exclusion without normal shop"
 	end
 	if shop ~= "secret" then
 		if DOTA_SHOP_HOME == nil then
@@ -2112,6 +2191,11 @@ end
 function XHSBotEconomy:IsAtRequiredShop(hero, shop)
 	local shopKind = self:GetCurrentShopKind(hero, shop)
 	return shopKind ~= nil
+end
+
+function XHSBotEconomy:IsAtAnyShop(hero)
+	return self:IsAtRequiredShop(hero, "home")
+		or self:IsAtRequiredShop(hero, "secret")
 end
 
 function XHSBotEconomy:GetShopAnchor(shop, hero)
@@ -2193,7 +2277,10 @@ function XHSBotEconomy:SetShoppingGoal(
 end
 
 function XHSBotEconomy:GetEmergencyHealthShopAnchor(hero, forceHome)
-	return CopyPosition(self:GetShopAnchor("base", hero))
+	return CopyPosition(self:GetShopAnchor(
+		forceHome == true and "base" or "home",
+		hero
+	))
 end
 
 function XHSBotEconomy:ScheduleEmergencyHealthResupply(
@@ -2208,7 +2295,7 @@ function XHSBotEconomy:ScheduleEmergencyHealthResupply(
 		return false
 	end
 	local now = GameRules:GetGameTime()
-	local forceHome = true
+	local forceHome = forceHomeOverride == true
 	local anchor = self:GetEmergencyHealthShopAnchor(hero, forceHome)
 	if anchor == nil then return false end
 	local entry = XHSBotItemCatalog:CopyEntry("item_health_potion")
@@ -2290,10 +2377,12 @@ function XHSBotEconomy:RefreshEmergencyHealthResupply(hero, record, difficulty)
 		)
 	end
 	if emergencyActive then
-		local baseAnchor = self:GetShopAnchor("base", hero)
-		if baseAnchor ~= nil then
-			record.shopping_goal.anchor = CopyPosition(baseAnchor)
-			record.shopping_goal.force_home = true
+		local forceHome = type(record.shopping_goal) == "table"
+			and record.shopping_goal.force_home == true
+		local anchor = self:GetEmergencyHealthShopAnchor(hero, forceHome)
+		if anchor ~= nil then
+			record.shopping_goal.anchor = CopyPosition(anchor)
+			record.shopping_goal.force_home = forceHome
 		end
 		record.emergency_health_resupply_active = true
 		return true
@@ -2305,7 +2394,7 @@ function XHSBotEconomy:RefreshEmergencyHealthResupply(hero, record, difficulty)
 			difficulty,
 			"health potion reserve at " .. tostring(carriedCharges)
 			.. "/" .. tostring(trigger),
-			true
+			false
 		)
 	end
 	return false
@@ -2316,7 +2405,8 @@ function XHSBotEconomy:SetStashCollectionGoal(
 	hero,
 	now,
 	forcePickup,
-	purchasedItem
+	purchasedItem,
+	forceRecovery
 )
 	if type(record.shopping_goal) == "table"
 		and record.shopping_goal.emergency_health_resupply == true then
@@ -2373,7 +2463,13 @@ function XHSBotEconomy:SetStashCollectionGoal(
 	local pendingRemoteItem = purchasedItem ~= "" and purchasedItem
 		or pendingRemotePurchase and existing ~= nil
 			and tostring(existing.item or "") or ""
+	local recoveryPurchase = forceRecovery == true
+		or existing ~= nil and existing.recovery_purchase == true
+	local lifeInsurance = pendingRemoteItem == self.ANKH_ITEM_NAME
+		or existing ~= nil and existing.life_insurance == true
 	local forceHome = pendingRemotePurchase
+		or recoveryPurchase
+		or lifeInsurance
 		or hasAnkh
 		or stashCount >= self.STASH_COLLECTION_THRESHOLD
 	record.shopping_goal = {
@@ -2388,6 +2484,9 @@ function XHSBotEconomy:SetStashCollectionGoal(
 		force_home = forceHome,
 		inventory_logistics = true,
 		remote_purchase = pendingRemotePurchase,
+		force_gear = recoveryPurchase,
+		recovery_purchase = recoveryPurchase,
+		life_insurance = lifeInsurance,
 		reason = pendingRemotePurchase and pendingRemoteItem ~= ""
 			and "collect remote purchase: " .. pendingRemoteItem
 			or hasAnkh and "equip reincarnation charge"
@@ -2649,6 +2748,9 @@ function XHSBotEconomy:TryPurchaseBuildEntry(
 			or type(record.shopping_goal) == "table"
 			and record.shopping_goal.emergency_health_resupply == true
 		)
+	local healthForceHome = continuingHealthRestock
+		and type(record.shopping_goal) == "table"
+		and record.shopping_goal.force_home == true
 	-- Route before the final charge is consumed. Waiting for zero is too late:
 	-- the next death deletes the registered bot hero before economy can think.
 	local replacingLastAnkh = entry.name == self.ANKH_ITEM_NAME
@@ -2683,8 +2785,13 @@ function XHSBotEconomy:TryPurchaseBuildEntry(
 			- (tonumber(record.last_gear_purchase_deaths) or 0)
 	)
 	local purchaseAge = now - (tonumber(record.last_gear_purchase_at) or 0)
+	local engagementForceGear = nonConsumableGear
+		and record.engagement_purchase_requested == true
+		and now - (tonumber(record.engagement_purchase_requested_at) or -math.huge) <= 8
 	local forceGear = nonConsumableGear
 		and (
+			engagementForceGear
+			or
 			self:GetGold(playerID) >= math.max(
 				cost + preserveGold,
 				math.max(25000, cost * 2.5)
@@ -2692,12 +2799,16 @@ function XHSBotEconomy:TryPurchaseBuildEntry(
 			or deathsSinceGear >= 1 and purchaseAge >= 18
 		)
 	local atRequiredShop = self:IsAtRequiredShop(hero, requiredShop)
+	-- Like a real player, a bot may buy any normal-shop item remotely. Every
+	-- such purchase, including consumables, is delivered to stash and grants no
+	-- immediate combat benefit: the bot must still collect it at home. Secret
+	-- shop inventory remains strictly purchase-on-site.
 	local remoteStashDelivery = not atRequiredShop
 		and requiredShop ~= "secret"
 	if not atRequiredShop and not remoteStashDelivery then
 		local shop = requiredShop
 		local anchor = continuingHealthRestock
-			and self:GetShopAnchor("base", hero)
+			and self:GetEmergencyHealthShopAnchor(hero, healthForceHome)
 			or self:GetShopAnchor(shop, hero)
 		if anchor ~= nil then
 			self:SetShoppingGoal(
@@ -2710,6 +2821,9 @@ function XHSBotEconomy:TryPurchaseBuildEntry(
 					and "health potion reserve reached"
 				or replacingLastAnkh
 					and "replace consumed reincarnation charge"
+				or engagementForceGear and tostring(
+					record.engagement_purchase_reason or "engagement power spike"
+				)
 				or forceGear and "forced gear spending window"
 				or "scheduled build restock",
 				forceGear
@@ -2718,7 +2832,7 @@ function XHSBotEconomy:TryPurchaseBuildEntry(
 				record.shopping_goal.life_insurance = true
 			end
 			if continuingHealthRestock then
-				record.shopping_goal.force_home = true
+				record.shopping_goal.force_home = healthForceHome
 				record.shopping_goal.anchor = CopyPosition(anchor)
 			end
 			record.last_item_rejection = "travelling to " .. shop .. " shop for " .. entry.name
@@ -2748,7 +2862,7 @@ function XHSBotEconomy:TryPurchaseBuildEntry(
 	end
 	if entry.consumable ~= nil and not remoteStashDelivery then
 		local anchor = continuingHealthRestock
-			and self:GetShopAnchor("base", hero)
+			and self:GetEmergencyHealthShopAnchor(hero, healthForceHome)
 			or self:GetShopAnchor(requiredShop, hero)
 		if anchor ~= nil then
 			self:SetShoppingGoal(
@@ -2762,7 +2876,7 @@ function XHSBotEconomy:TryPurchaseBuildEntry(
 				or "finish consumable restock"
 			)
 			if continuingHealthRestock then
-				record.shopping_goal.force_home = true
+				record.shopping_goal.force_home = healthForceHome
 				record.shopping_goal.anchor = CopyPosition(anchor)
 			end
 		end
@@ -2868,7 +2982,11 @@ function XHSBotEconomy:TryPurchaseBuildEntry(
 	record.last_item_rejection = nil
 	if nonConsumableGear then
 		record.last_gear_purchase_at = now
-		record.last_gear_purchase_deaths = tonumber(record.deaths) or 0
+		-- A stash delivery has spent gold but has not improved the hero yet.
+		-- Advance the recovery checkpoint only after CollectStashItems equips it.
+		if not remoteStashDelivery then
+			record.last_gear_purchase_deaths = tonumber(record.deaths) or 0
+		end
 	end
 	if retired ~= nil then
 		self:CommitInventoryReplacement(playerID, retired, entry, record)
@@ -2881,7 +2999,7 @@ function XHSBotEconomy:TryPurchaseBuildEntry(
 	if entry.consumable ~= nil and stillNeeded == true then
 		local keepEmergency = continuingHealthRestock
 		local anchor = keepEmergency
-			and self:GetShopAnchor("base", hero)
+			and self:GetEmergencyHealthShopAnchor(hero, healthForceHome)
 			or self:GetShopAnchor(requiredShop, hero)
 		if anchor ~= nil then
 			self:SetShoppingGoal(
@@ -2895,7 +3013,7 @@ function XHSBotEconomy:TryPurchaseBuildEntry(
 				or "continue consumable stock to target"
 			)
 			if keepEmergency then
-				record.shopping_goal.force_home = true
+				record.shopping_goal.force_home = healthForceHome
 				record.shopping_goal.anchor = CopyPosition(anchor)
 			end
 		end
@@ -2907,7 +3025,8 @@ function XHSBotEconomy:TryPurchaseBuildEntry(
 			hero,
 			now,
 			remoteStashDelivery,
-			remoteStashDelivery and entry.name or nil
+			remoteStashDelivery and entry.name or nil,
+			remoteStashDelivery and forceGear
 		)
 	end
 	if XHSBotDecisionAudit ~= nil then
@@ -2921,6 +3040,10 @@ function XHSBotEconomy:TryPurchaseBuildEntry(
 			purchaseShopDistance,
 			purchaseResult
 		)
+	end
+	if nonConsumableGear then
+		record.engagement_purchase_requested = false
+		record.engagement_purchase_completed_at = now
 	end
 	return "purchased"
 end

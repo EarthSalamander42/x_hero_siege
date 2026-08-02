@@ -37,8 +37,8 @@ local MAGTHERIDON_ABILITIES = {
 	"boss_health",
 }
 
-local WARNING_PARTICLE = "particles/econ/events/darkmoon_2017/darkmoon_generic_aoe.vpcf"
-local FEL_WARNING_PARTICLE = "particles/events/darkmoon_generic_aoe_green.vpcf"
+local WARNING_PARTICLE = "particles/custom/boss_warnings/magtheridon/radius.vpcf"
+local FEL_WARNING_PARTICLE = "particles/custom/boss_warnings/magtheridon/radius.vpcf"
 local SPAWN_WARNING_PARTICLE = "particles/units/heroes/hero_templar_assassin/templar_assassin_trap_rings_inner.vpcf"
 local SPAWN_PARTICLE = "particles/units/heroes/hero_shadowshaman/shadow_shaman_dust_hit.vpcf"
 
@@ -122,11 +122,14 @@ end
 
 local function CreateWarning(position, radius, delay, fel)
 	local particle = ParticleManager:CreateParticle(fel == true and FEL_WARNING_PARTICLE or WARNING_PARTICLE, PATTACH_WORLDORIGIN, nil)
+	local color = fel == true and Vector(120, 255, 80) or Vector(255, 110, 35)
 	ParticleManager:SetParticleControl(particle, 0, position)
-	ParticleManager:SetParticleControl(particle, 1, Vector(radius, 0, 0))
+	ParticleManager:SetParticleControl(particle, 1, Vector(radius, delay or 1.0, 0))
 	ParticleManager:SetParticleControl(particle, 2, Vector(delay or 1.0, 0, 1))
-	ParticleManager:SetParticleControl(particle, 3, Vector(120, 255, 80))
+	ParticleManager:SetParticleControl(particle, 3, color)
 	ParticleManager:SetParticleControl(particle, 4, position)
+	ParticleManager:SetParticleControl(particle, 15, color)
+	ParticleManager:SetParticleControl(particle, 16, Vector(1, 0, 0))
 	ParticleManager:ReleaseParticleIndex(particle)
 end
 

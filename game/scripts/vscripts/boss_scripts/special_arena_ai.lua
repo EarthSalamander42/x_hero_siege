@@ -105,6 +105,7 @@ local function StartCastFeedback(boss, ability, spell)
 			primary = Vector(255, 185, 65),
 			secondary = Vector(255, 70, 45),
 			style = 4,
+			family = "special",
 		})
 	end
 end

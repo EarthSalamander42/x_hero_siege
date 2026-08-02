@@ -21,6 +21,7 @@ local ILLIDAN_COLORS = {
 	primary = Vector(102, 255, 64),
 	secondary = Vector(142, 66, 255),
 	style = 5,
+	family = "illidan",
 }
 
 local METAMORPHOSIS_PARTICLE = "particles/units/heroes/hero_terrorblade/terrorblade_metamorphosis_transform.vpcf"
@@ -34,7 +35,7 @@ local FEL_BEAM_IMPACT_PARTICLE = "particles/units/heroes/hero_lina/lina_spell_dr
 local SHADOW_DASH_START_PARTICLE = "particles/items_fx/blink_dagger_start.vpcf"
 local SHADOW_DASH_END_PARTICLE = "particles/items_fx/blink_dagger_end.vpcf"
 local IMMOLATION_PULSE_PARTICLE = "particles/units/heroes/hero_phoenix/phoenix_supernova_reborn.vpcf"
-local IMMOLATION_PRECAST_PARTICLE = "particles/econ/events/darkmoon_2017/darkmoon_generic_aoe.vpcf"
+local IMMOLATION_PRECAST_PARTICLE = "particles/custom/boss_warnings/illidan/radius.vpcf"
 local SHADOW_DASH_ARENA_RADIUS = 2000
 local GLAIVE_STORM_PARTICLE = "particles/econ/items/luna/luna_lucent_ti5/luna_eclipse_impact_moonfall.vpcf"
 local GLAIVE_STORM_CAST_PARTICLE = "particles/units/heroes/hero_luna/luna_eclipse_cast.vpcf"
@@ -98,10 +99,12 @@ local function CreateImmolationPrecast(ability, position, radius, duration)
 
 	local particle = ParticleManager:CreateParticle(IMMOLATION_PRECAST_PARTICLE, PATTACH_WORLDORIGIN, nil)
 	ParticleManager:SetParticleControl(particle, 0, position)
-	ParticleManager:SetParticleControl(particle, 1, Vector(radius, 0, 0))
+	ParticleManager:SetParticleControl(particle, 1, Vector(radius, duration or 1.0, 0))
 	ParticleManager:SetParticleControl(particle, 2, Vector(duration or 1.0, 0, 1))
 	ParticleManager:SetParticleControl(particle, 3, ILLIDAN_COLORS.primary)
 	ParticleManager:SetParticleControl(particle, 4, position)
+	ParticleManager:SetParticleControl(particle, 15, ILLIDAN_COLORS.primary)
+	ParticleManager:SetParticleControl(particle, 16, Vector(1, 0, 0))
 	ability.xhs_illidan_immolation_precast_particle = particle
 
 	Timers:CreateTimer(math.max(duration or 1.0, 0.03), function()
@@ -375,6 +378,7 @@ function xhs_illidan_metamorphosis:OnSpellStart()
 	DamageEnemies(caster, self, caster:GetAbsOrigin(), radius, damage, self:GetAbilityDamageType())
 	CreateRadialImpact(caster:GetAbsOrigin(), radius, METAMORPHOSIS_PARTICLE)
 	CreateRadialImpact(caster:GetAbsOrigin(), radius, IMMOLATION_PULSE_PARTICLE)
+	XHSBossTelegraphs:Release(caster:GetAbsOrigin(), radius, ILLIDAN_COLORS)
 	EmitLocationSound(caster, caster:GetAbsOrigin(), "Hero_Terrorblade.Metamorphosis")
 	HideBossCastBar(self)
 	ClearContext(self)
@@ -496,6 +500,7 @@ function xhs_illidan_immolation_burst:OnSpellStart()
 	local pulseInterval = math.max(0.1, self:GetSpecialValueFor("pulse_interval"))
 	local damage = ScaleDamage(self:GetSpecialValueFor("damage_per_pulse"))
 	local pulse = 0
+	XHSBossTelegraphs:Release(caster:GetAbsOrigin(), radius, ILLIDAN_COLORS)
 
 	Timers:CreateTimer(0, function()
 		if not IsValidAlive(caster) then return nil end

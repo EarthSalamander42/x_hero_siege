@@ -611,11 +611,18 @@ function XHSBotSetupEnsureHeroDropdown(player_row, bot_data) {
 		}
 		dropdown.SetPanelEvent("oninputsubmit", (function (target_slot, target_dropdown) {
 			return function () {
-				var selected = target_dropdown.GetSelected();
-				var hero_name = selected
-					? selected.GetAttributeString("xhs_hero_name", String(selected.xhs_hero_name || ""))
-					: "";
-				XHSBotSetupSelectHero(target_slot, hero_name);
+				// oninputsubmit can run before GetSelected reflects the clicked
+				// option. Defer one frame so Random cannot overwrite the choice.
+				$.Schedule(0.03, function () {
+					if (!target_dropdown) {
+						return;
+					}
+					var selected = target_dropdown.GetSelected();
+					var hero_name = selected
+						? selected.GetAttributeString("xhs_hero_name", String(selected.xhs_hero_name || ""))
+						: "";
+					XHSBotSetupSelectHero(target_slot, hero_name);
+				});
 			};
 		})(slot, dropdown));
 		player_row.hero_dropdown = dropdown;

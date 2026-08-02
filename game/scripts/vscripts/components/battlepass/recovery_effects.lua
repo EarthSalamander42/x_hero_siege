@@ -92,8 +92,9 @@ local function GetPlayerParticle(hero, key, fallback)
 	return fallback
 end
 
-local function PlayParticle(hero, particlePath, lifetime)
+local function PlayParticle(hero, particlePath, lifetime, options)
 	if not IsValidEntity(hero) or not IsParticlePath(particlePath) then return nil end
+	options = type(options) == "table" and options or {}
 
 	local origin = hero:GetAbsOrigin()
 	local worldControlPoints = POTION_WORLD_CP_PROFILES[string.lower(particlePath)]
@@ -111,7 +112,10 @@ local function PlayParticle(hero, particlePath, lifetime)
 	else
 		ParticleManager:SetParticleControl(particle, 0, origin)
 	end
-	if lifetime ~= nil and lifetime > 0 and Timers ~= nil then
+	if options.externally_managed == true then
+		-- Content Studio owns this index so STOP/new-preview can destroy it.
+		-- Ordinary gameplay keeps the historical release/self-termination path.
+	elseif lifetime ~= nil and lifetime > 0 and Timers ~= nil then
 		Timers:CreateTimer(lifetime, function()
 			ParticleManager:DestroyParticle(particle, false)
 			ParticleManager:ReleaseParticleIndex(particle)
@@ -149,10 +153,12 @@ function SupporterRecoveryEffects:PlayPotion(hero, potionKind, fallback)
 	return PlayParticle(hero, particlePath, POTION_PARTICLE_LIFETIME)
 end
 
-function SupporterRecoveryEffects:PlayRebirth(hero, fallback)
+function SupporterRecoveryEffects:PlayRebirth(hero, fallback, options)
 	return PlayParticle(
 		hero,
-		GetPlayerParticle(hero, "rebirth_pfx", fallback)
+		GetPlayerParticle(hero, "rebirth_pfx", fallback),
+		nil,
+		options
 	)
 end
 

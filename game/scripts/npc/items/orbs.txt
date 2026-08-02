@@ -1133,11 +1133,9 @@
 		"AllowedInBackpack"				"0"
 		"ScriptFile"					"items/item_orb_of_arcane.lua"
 		"AbilityTextureName"			"custom/orb_of_arcane"
-		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET"
-		"AbilityCooldown"				"1.0"
-		"AbilitySharedCooldown"         "orb_of_arcane"
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_PASSIVE"
 		"ItemShareability"				"ITEM_FULLY_SHAREABLE"
-		"ItemShopTags"                    "spell_amp;cooldown_reduction"
+		"ItemShopTags"                    "spell_amp;lifesteal"
 		"ItemQuality"					"artifact"
 		"ItemAliases"					"orb of arcane"
 		"ItemPermanent"					"0"
@@ -1161,9 +1159,7 @@
 		"AbilityValues"
 		{
 			"spell_amp"							"35"
-			"cooldown_reduction_pct"                "5"
-			"exposure_magic_resist_reduction"  "8"
-			"exposure_duration"                    "4.0"
+			"spell_lifesteal_pct"             "8"
 		}
 	}
 
@@ -1177,11 +1173,9 @@
 		"AllowedInBackpack"				"0"
 		"ScriptFile"					"items/item_orb_of_arcane.lua"
 		"AbilityTextureName"			"custom/mystic_gem"
-		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET"
-		"AbilityCooldown"				"1.0"
-		"AbilitySharedCooldown"         "orb_of_arcane"
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_PASSIVE"
 		"ItemShareability"				"ITEM_FULLY_SHAREABLE"
-		"ItemShopTags"                    "spell_amp;cooldown_reduction"
+		"ItemShopTags"                    "spell_amp;lifesteal"
 		"ItemQuality"					"artifact"
 		"ItemAliases"					"mystic gem"
 		"ItemPermanent"					"0"
@@ -1205,9 +1199,7 @@
 		"AbilityValues"
 		{
 			"spell_amp"                         "50"
-			"cooldown_reduction_pct"                "12"
-			"exposure_magic_resist_reduction"  "16"
-			"exposure_duration"                    "5.0"
+			"spell_lifesteal_pct"             "16"
 		}
 	}
 
@@ -1240,11 +1232,16 @@
 		"AllowedInBackpack"				"0"
 		"ScriptFile"					"items/item_orb_of_arcane.lua"
 		"AbilityTextureName"			"custom/astral_core"
-		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET"
-		"AbilityCooldown"				"1.0"
-		"AbilitySharedCooldown"         "orb_of_arcane"
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_UNIT_TARGET"
+		"AbilityUnitTargetTeam"			"DOTA_UNIT_TARGET_TEAM_ENEMY"
+		"AbilityUnitTargetType"			"DOTA_UNIT_TARGET_HERO | DOTA_UNIT_TARGET_BASIC"
+		"AbilityCastPoint"               "0"
+		"AbilityCastRange"				"700"
+		"AbilityCooldown"                "30"
+		"AbilityManaCost"                "0"
+		"AbilitySharedCooldown"          "ethereal"
 		"ItemShareability"				"ITEM_FULLY_SHAREABLE"
-		"ItemShopTags"                    "spell_amp;cooldown_reduction"
+		"ItemShopTags"                    "spell_amp;lifesteal"
 		"ItemQuality"					"epic"
 		"ItemAliases"					"astral core"
 		"ItemPermanent"					"0"
@@ -1269,9 +1266,11 @@
 		"AbilityValues"
 		{
 			"spell_amp"                         "70"
-			"cooldown_reduction_pct"                "20"
-			"exposure_magic_resist_reduction"  "25"
-			"exposure_duration"                    "6.0"
+			"spell_lifesteal_pct"             "25"
+			"ethereal_duration"               "5.0"
+			"extra_spell_damage_percent"      "-100"
+			"projectile_speed"                "800"
+			"ethereal_movement_slow_pct"      "-60"
 		}
 	}
 

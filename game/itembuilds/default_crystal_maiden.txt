@@ -26,7 +26,6 @@
 		{
 			"item"		"item_mystic_gem"
 			"item"		"item_orb_of_darkness2"
-			"item"		"item_staff_of_mastery"
 			"item"		"item_boots_of_speed"
 		}
 

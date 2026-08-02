@@ -40,7 +40,6 @@ local ALLOWED_ITEMS = {
 	item_potion_of_antimagic = true,
 	item_potion_of_invulnerability = true,
 	item_searing_blade = true,
-	item_staff_of_mastery = true,
 	item_tempest_aegis = true,
 	item_tome_big = true,
 	item_tome_of_power = true,

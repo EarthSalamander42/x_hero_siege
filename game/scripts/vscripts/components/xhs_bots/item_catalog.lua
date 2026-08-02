@@ -129,32 +129,6 @@ local ITEMS = {
 		intrinsic_modifier = "modifier_item_boots",
 		stats = { bonus_movement_speed = 60 },
 	},
-	item_staff_of_mastery = {
-		cost = 30000,
-		shop = "secret",
-		kind = "utility",
-		purchasable = true,
-		stackable = false,
-		active_slot = true,
-		requires_active_slot = true,
-		backpack_usable = false,
-		cooldown = 30,
-		cast_range = 700,
-		target_team = "enemy",
-		tags = { armor = 0.8, magical = 0.6, control = 0.45, mana = 0.25 },
-		behavior = "unit_target",
-		stacking = "multiple_passive",
-		intrinsic_modifier = "modifier_item_ghost_datadriven",
-		active_modifier = "modifier_item_ghost_datadriven_active",
-		stats = {
-			bonus_armor = 50,
-			duration = 5,
-			target_spell_damage_pct = -100,
-			bonus_movement_pct = -60,
-			target_magic_amp_pct = 50,
-			mana_regen = 10,
-		},
-	},
 	item_healing_wards = {
 		cost = 3000,
 		shop = "home",
@@ -561,18 +535,14 @@ local FAMILIES = {
 	arcane = {
 		tags = {
 			magical = 1.0,
-			cooldown = 1.0,
 			caster = 1.0,
+			sustain = 0.8,
 			control = 0.25,
-			shared_debuff = 0.35,
 		},
-		behavior = "toggle_no_target",
+		behavior = "passive",
 		passive_stacks = true,
 		active_stacks = false,
-		requires_active_slot = true,
-		default_active = true,
-		toggle_policy = "always_on",
-		active_modifier = "modifier_orb_of_arcane_active",
+		requires_active_slot = false,
 		levels = {
 			{
 				name = "item_orb_of_arcane",
@@ -580,9 +550,7 @@ local FAMILIES = {
 				shop = "home",
 				stats = {
 					spell_amp_pct = 35,
-					cooldown_reduction_pct = 5,
-					exposure_magic_resist_reduction = 8,
-					exposure_duration = 4,
+					spell_lifesteal_pct = 8,
 				},
 			},
 			{
@@ -592,9 +560,7 @@ local FAMILIES = {
 				shop = "home",
 				stats = {
 					spell_amp_pct = 50,
-					cooldown_reduction_pct = 12,
-					exposure_magic_resist_reduction = 16,
-					exposure_duration = 5,
+					spell_lifesteal_pct = 16,
 				},
 			},
 			{
@@ -603,11 +569,19 @@ local FAMILIES = {
 				cost = 30000,
 				shop = "secret",
 				no_backpack = true,
+				active_slot = true,
+				requires_active_slot = true,
+				behavior = "unit_target",
+				cooldown = 30,
+				cast_range = 700,
+				target_team = "enemy",
+				active_modifier = "modifier_astral_core_ethereal",
 				stats = {
 					spell_amp_pct = 70,
-					cooldown_reduction_pct = 20,
-					exposure_magic_resist_reduction = 25,
-					exposure_duration = 6,
+					spell_lifesteal_pct = 25,
+					ethereal_duration = 5,
+					target_spell_damage_pct = -100,
+					bonus_movement_pct = -60,
 				},
 			},
 		},
@@ -748,10 +722,12 @@ for familyName, family in pairs(FAMILIES) do
 		item.behavior = level.behavior or family.behavior
 		item.passive_stacks = family.passive_stacks
 		item.active_stacks = family.active_stacks
-		item.requires_active_slot = family.requires_active_slot
-		item.default_active = family.default_active
-		item.toggle_policy = family.toggle_policy
-		item.active_modifier = family.active_modifier
+		item.requires_active_slot = level.requires_active_slot ~= nil
+			and level.requires_active_slot or family.requires_active_slot
+		item.default_active = level.default_active ~= nil
+			and level.default_active or family.default_active
+		item.toggle_policy = level.toggle_policy or family.toggle_policy
+		item.active_modifier = level.active_modifier or family.active_modifier
 		item.maximum = 1
 		item.combines = tier > 1
 		item.predecessor = tier > 1 and family.levels[tier - 1].name or nil

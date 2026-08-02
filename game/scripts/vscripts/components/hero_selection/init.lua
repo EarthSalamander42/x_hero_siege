@@ -5,6 +5,14 @@ local herolist = {}
 local hotdisabledlist = {}
 local totalheroes = 0
 
+-- The game mode force-spawns Wisp as the temporary hero-selection unit. It
+-- must remain available to that flow, but it is never a playable demo hero.
+-- Keep this exclusion local to the demo picker instead of changing the shared
+-- hero data that provisions the selection unit.
+local nonPickableHeroes = {
+	["npc_dota_hero_wisp"] = true,
+}
+
 -- list all available heroes and get their primary attrs, and send it to client
 ListenToGameEvent('game_rules_state_change', function()
 	if GameRules:State_Get() == DOTA_GAMERULES_STATE_HERO_SELECTION then
@@ -12,8 +20,10 @@ ListenToGameEvent('game_rules_state_change', function()
 
 		for key, value in pairs(LoadKeyValues(herolistFile)) do
 			local isDisabled = tonumber(value) == 0
+			local isNonPickable = nonPickableHeroes[key] == true
+			local isPickable = not isDisabled and not isNonPickable
 
-			if isDisabled then
+			if not isPickable then
 				hotdisabledlist[key] = 1
 			elseif KeyValues.HeroKV[key] == nil then -- Cookies: If the hero is not in custom file, load vanilla KV's
 				--				print(key .. " is not in custom file!")
@@ -27,10 +37,9 @@ ListenToGameEvent('game_rules_state_change', function()
 			--				hotdisabledlist[key] = 1
 			--			end
 
-			if not isDisabled and KeyValues.HeroKV[key] then
+			if isPickable and KeyValues.HeroKV[key] then
 				herolist[key] = KeyValues.HeroKV[key].AttributePrimary
 				totalheroes = totalheroes + 1
-				assert(key ~= "npc_dota_hero_wisp", "npc_dota_hero_wisp cannot be a pickable hero")
 			end
 		end
 

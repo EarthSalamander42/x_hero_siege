@@ -17,6 +17,7 @@ local LICH_KING_ABILITIES = {
 }
 
 local THRESHOLDS = { 75, 50, 25 }
+local LICH_KING_AMBIENT_PARTICLE = "particles/creatures/aghanim/aghanim_pulse_ambient.vpcf"
 
 local function IsValidAlive(unit)
 	return unit ~= nil and IsValidEntity(unit) and not unit:IsNull() and unit:IsAlive()
@@ -83,6 +84,9 @@ function modifier_xhs_lich_king_phase3_ai:IsPurgable() return false end
 function modifier_xhs_lich_king_phase3_ai:OnCreated()
 	if not IsServer() then return end
 	self.boss = self:GetParent()
+	self.ambient_pfx = ParticleManager:CreateParticle(LICH_KING_AMBIENT_PARTICLE, PATTACH_ABSORIGIN_FOLLOW, self.boss)
+	ParticleManager:SetParticleControlEnt(self.ambient_pfx, 1, self.boss, PATTACH_ABSORIGIN_FOLLOW, "attach_hitloc", self.boss:GetAbsOrigin(), true)
+	self:AddParticle(self.ambient_pfx, false, false, -1, false, false)
 	self.arena_center = GetLichKingArenaCenter(self.boss:GetAbsOrigin())
 	self.next_action = GameRules:GetGameTime() + 3.0
 	self.thresholds_done = {}

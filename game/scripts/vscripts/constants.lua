@@ -102,6 +102,16 @@ function GetXHSGromVanguardKillLimit(difficulty)
 	return limits[difficulty] or limits[1]
 end
 
+function GetXHSActivePhaseOneLaneCount()
+	local activeLanes = 0
+	for lane = 1, 8 do
+		if CREEP_LANES ~= nil and CREEP_LANES[lane] ~= nil and CREEP_LANES[lane][1] == 1 then
+			activeLanes = activeLanes + 1
+		end
+	end
+	return activeLanes
+end
+
 function GetXHSDestroyerMagnataurKillLimit(difficulty)
 	if difficulty == nil and GameRules ~= nil then
 		difficulty = GameRules:GetCustomGameDifficulty()
@@ -109,14 +119,8 @@ function GetXHSDestroyerMagnataurKillLimit(difficulty)
 
 	difficulty = tonumber(difficulty) or 1
 
-	local players = 1
-	if GetXHSCombatParticipantCount ~= nil then
-		players = GetXHSCombatParticipantCount()
-	elseif PlayerResource ~= nil and PlayerResource.GetPlayerCount ~= nil then
-		players = PlayerResource:GetPlayerCount()
-	end
-
-	return math.max(1, (MAGNATAURS_TO_KILL or 1) * players * (CREEP_LANES_TYPE or 1) * difficulty)
+	local activeLanes = GetXHSActivePhaseOneLaneCount()
+	return math.max(1, (MAGNATAURS_TO_KILL or 1) * activeLanes * difficulty)
 end
 
 if IsInToolsMode() then

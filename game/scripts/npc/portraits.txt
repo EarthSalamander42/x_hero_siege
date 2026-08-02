@@ -2760,7 +2760,7 @@
 		"PortraitHideDropShadow"		"0"
 		"PortraitDesaturateParticles"		"0"
 	}
-	"models/heroes/juggernaut/jugg_healing_ward.vmdl"
+	"models/items/juggernaut/ward/ancient_exile_ward/ancient_exile_ward.vmdl"
 	{
 		"PortraitLightPosition"		"58.77 58.27 194.33"
 		"PortraitLightAngles"		"60.27 238.63 0.00"

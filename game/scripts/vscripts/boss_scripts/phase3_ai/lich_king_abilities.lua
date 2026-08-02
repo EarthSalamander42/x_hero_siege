@@ -28,16 +28,20 @@ local LICH_COLORS = {
 	primary = Vector(120, 220, 255),
 	secondary = Vector(235, 250, 255),
 	style = 7,
+	family = "lich_king",
 }
 
 local DARK_COLORS = {
 	primary = Vector(40, 90, 150),
 	secondary = Vector(160, 225, 255),
 	style = 6,
+	family = "lich_king",
 }
 
 local FROST_NOVA_PARTICLE = "particles/units/heroes/hero_lich/lich_frost_nova.vpcf"
 local REMORSELESS_WINTER_CAST_PARTICLE = "particles/units/heroes/hero_crystalmaiden/maiden_freezing_field_caster.vpcf"
+local REMORSELESS_RELEASE_PARTICLE = "particles/custom/boss_warnings/lich_king/release.vpcf"
+local REMORSELESS_IMPACT_PARTICLE = "particles/custom/boss_warnings/lich_king/impact.vpcf"
 local FROSTMOURNE_PARTICLE = "particles/units/heroes/hero_abaddon/abaddon_death_coil_explosion.vpcf"
 local GLACIAL_SPIKE_PARTICLE = "particles/econ/items/crystal_maiden/crystal_maiden_cowl_of_ice/maiden_crystal_nova_cowlofice.vpcf"
 local DEFILE_PARTICLE = "particles/units/heroes/hero_abaddon/abaddon_aphotic_shield_explosion.vpcf"
@@ -380,7 +384,8 @@ function xhs_lich_king_remorseless_winter:OnSpellStart()
 	DamageEnemies(caster, self, caster:GetAbsOrigin(), radius, ScaleDamage(self:GetSpecialValueFor("damage")), self:GetAbilityDamageType(), 2)
 	SlowEnemies(caster, self, caster:GetAbsOrigin(), radius, self:GetSpecialValueFor("slow_duration"))
 	caster:AddNewModifier(caster, self, "modifier_xhs_lich_king_remorseless", { duration = self:GetSpecialValueFor("buff_duration") })
-	CreateImpact(caster:GetAbsOrigin(), FROST_NOVA_PARTICLE, radius, 0.9)
+	CreateImpact(caster:GetAbsOrigin(), REMORSELESS_RELEASE_PARTICLE, radius, 0.5)
+	CreateImpact(caster:GetAbsOrigin(), REMORSELESS_IMPACT_PARTICLE, radius, 1.25)
 	EmitLocationSound(caster, caster:GetAbsOrigin(), "Hero_Lich.FrostBlast")
 	ClearContext(self)
 end

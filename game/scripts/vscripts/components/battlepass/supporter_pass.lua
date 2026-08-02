@@ -27,6 +27,29 @@ local function CopySupporterTable(source)
 	return copy
 end
 
+local function BuildPublishedSupporterLoadout(items)
+	local published = {}
+	for _, item in ipairs(type(items) == "table" and items or {}) do
+		if type(item) == "table" then
+			table.insert(published, {
+				id = item.id or item.item_id or item.catalog_item_id,
+				item_id = item.item_id or item.catalog_item_id or item.id,
+				catalog_item_id = item.catalog_item_id or item.item_id or item.id,
+				name = item.name or item.item_name,
+				item_name = item.item_name or item.name,
+				type = item.type or item.item_type or item.slot_id,
+				item_type = item.item_type or item.type or item.slot_id,
+				slot_id = item.slot_id or item.item_type or item.type,
+				rarity = item.rarity or item.item_rarity,
+				item_rarity = item.item_rarity or item.rarity,
+				image = item.image or item.image_inventory,
+				image_inventory = item.image_inventory or item.image,
+			})
+		end
+	end
+	return published
+end
+
 local function GetBackendSeasonRecord(supporterPass)
 	local playerSeason = type(supporterPass) == "table"
 		and supporterPass.season
@@ -463,6 +486,24 @@ function SupporterPass:BuildPlayerTable(playerID)
 		passRewards = player.bp_rewards
 	end
 	local loadout = supporterPass.loadout or current.loadout
+	local isBot = Battlepass ~= nil
+		and Battlepass.IsSupporterBotPlayerID ~= nil
+		and Battlepass:IsSupporterBotPlayerID(playerID)
+	local equippedItems = {}
+	if Battlepass ~= nil and Battlepass.GetEquippedSupporterItems ~= nil then
+		local success, items = pcall(
+			Battlepass.GetEquippedSupporterItems,
+			Battlepass,
+			playerID
+		)
+		if success and type(items) == "table" then
+			equippedItems = BuildPublishedSupporterLoadout(items)
+		end
+	end
+	if isBot then
+		loadout = equippedItems
+		passRewards = true
+	end
 	local supporterTitle = FirstSupporterValue(
 		supporterPass.supporter_title,
 		current.supporter_title
@@ -485,6 +526,7 @@ function SupporterPass:BuildPlayerTable(playerID)
 
 	return {
 		steamid = steamID,
+		is_bot = isBot,
 		XP = seasonXP,
 		MaxXP = seasonXPMax,
 		Lvl = seasonLevel,
@@ -538,6 +580,7 @@ function SupporterPass:BuildPlayerTable(playerID)
 		entitlements = supporterPass.entitlements or current.entitlements,
 		armory = supporterPass.armory or current.armory,
 		loadout = loadout,
+		equipped_items = equippedItems,
 		claimed_rewards = seasonStateAllowed
 			and (supporterPass.claimed_rewards or current.claimed_rewards)
 			or {},

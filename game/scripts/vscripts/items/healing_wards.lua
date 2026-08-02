@@ -14,7 +14,7 @@ modifier_healing_ward2.XHS_LINK_CLIENT = true
 modifier_healing_ward_datadriven.XHS_LINK_CLIENT = true
 modifier_healing_ward2_datadriven.XHS_LINK_CLIENT = true
 
-local WARD_AMBIENT_PARTICLE = "particles/units/heroes/hero_juggernaut/juggernaut_healing_ward.vpcf"
+local WARD_AMBIENT_PARTICLE = "particles/econ/items/juggernaut/ancient_exile/ancient_exile_healing_ward.vpcf"
 local WARD_ERUPTION_PARTICLE = "particles/units/heroes/hero_juggernaut/juggernaut_healing_ward_eruption.vpcf"
 -- The Supporter Pass regen controller owns the recipient visual. Keep the
 -- gameplay modifier intact while routing its old persistent PFX to an empty

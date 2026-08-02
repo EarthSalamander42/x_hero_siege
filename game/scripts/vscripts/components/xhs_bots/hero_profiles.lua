@@ -429,7 +429,7 @@ local PROFILE_BY_HERO = {
 		redundant_items = {
 			-- Chieftain wants enemies hittable; an ethereal target works
 			-- against his physical frontline/control job.
-			item_staff_of_mastery = true,
+			item_astral_core = true,
 		},
 		skill_build = {
 			"holdout_lightning_stroke",

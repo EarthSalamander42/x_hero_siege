@@ -44,6 +44,7 @@ if IsInToolsMode() then
 end
 require('components/battlepass/init')
 require('components/timers/init')
+require('components/tp_scroll/init')
 require('components/overhead_status/init')
 require('components/runes/init')
 require('components/fragment_quests/init')
@@ -729,7 +730,17 @@ function GameMode:FilterExecuteOrder(filterTable)
 		return false
 	end
 
-	local function IsAnkhReincarnationInventoryOrder(orderType)
+	-- Uther visually sits in front of the ice-prison unit. While imprisoned he
+	-- is a friendly deny target, but attacks on his model must hit the prison.
+	if order_type == DOTA_UNIT_ORDER_ATTACK_TARGET and XHSGetUtherIcePrisonAttackTarget ~= nil then
+		local redirectedTarget = XHSGetUtherIcePrisonAttackTarget(targetIndex)
+		if redirectedTarget ~= nil then
+			filterTable["entindex_target"] = redirectedTarget
+			targetIndex = redirectedTarget
+		end
+	end
+
+	local function IsInventoryOrder(orderType)
 		return orderType == DOTA_UNIT_ORDER_PURCHASE_ITEM
 			or (DOTA_UNIT_ORDER_MOVE_ITEM ~= nil and orderType == DOTA_UNIT_ORDER_MOVE_ITEM)
 			or (DOTA_UNIT_ORDER_SELL_ITEM ~= nil and orderType == DOTA_UNIT_ORDER_SELL_ITEM)
@@ -788,15 +799,22 @@ function GameMode:FilterExecuteOrder(filterTable)
 		if tpResult ~= nil then return tpResult end
 	end
 
-	if IsAnkhReincarnationInventoryOrder(order_type) then
-		if issuer ~= nil and issuer >= 0 and IsPlayerXHSReincarnating ~= nil and IsPlayerXHSReincarnating(issuer) then
-			SendErrorMessage(issuer, "#error_reincarnation_inventory_locked")
-			return false
+	if IsInventoryOrder(order_type) then
+		local orderHero = GetOrderHero()
+		local inventoryLocked = issuer ~= nil and issuer >= 0
+			and IsPlayerXHSInventoryLocked ~= nil and IsPlayerXHSInventoryLocked(issuer)
+		if not inventoryLocked and orderHero ~= nil and not orderHero:IsNull() then
+			inventoryLocked = orderHero.xhs_dead_inventory_lock_active == true
+				or (orderHero.IsXHSReincarnating ~= nil and orderHero:IsXHSReincarnating())
+				or not orderHero:IsAlive()
 		end
 
-		local orderHero = GetOrderHero()
-		if orderHero ~= nil and not orderHero:IsNull() and orderHero.IsXHSReincarnating and orderHero:IsXHSReincarnating() then
-			SendErrorMessage(orderHero:GetPlayerID(), "#error_reincarnation_inventory_locked")
+		if inventoryLocked then
+			if orderHero ~= nil and not orderHero:IsNull() and SendXHSInventoryLockedError ~= nil then
+				SendXHSInventoryLockedError(orderHero)
+			elseif issuer ~= nil and issuer >= 0 then
+				SendErrorMessage(issuer, "#error_dead_inventory_locked")
+			end
 			return false
 		end
 	end
@@ -844,8 +862,13 @@ function GameMode:FilterExecuteOrder(filterTable)
 	end
 --]]
 	if order_type == DOTA_UNIT_ORDER_PURCHASE_ITEM then
-		if issuer ~= nil and issuer >= 0 and IsPlayerXHSReincarnating ~= nil and IsPlayerXHSReincarnating(issuer) then
-			SendErrorMessage(issuer, "#error_reincarnation_inventory_locked")
+		if issuer ~= nil and issuer >= 0 and IsPlayerXHSInventoryLocked ~= nil and IsPlayerXHSInventoryLocked(issuer) then
+			local lockedHero = GetOrderHero()
+			if lockedHero ~= nil and not lockedHero:IsNull() and SendXHSInventoryLockedError ~= nil then
+				SendXHSInventoryLockedError(lockedHero)
+			else
+				SendErrorMessage(issuer, "#error_dead_inventory_locked")
+			end
 			return false
 		end
 

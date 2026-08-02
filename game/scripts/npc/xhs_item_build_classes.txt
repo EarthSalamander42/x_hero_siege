@@ -44,7 +44,6 @@
 				"3"		"item_potion_of_invulnerability"
 				"4"		"item_potion_of_antimagic"
 				"5"		"item_amulet_of_the_wild"
-				"6"		"item_staff_of_mastery"
 			}
 		}
 
@@ -76,7 +75,6 @@
 			{
 				"1"		"item_bracer_of_the_void"
 				"2"		"item_searing_blade"
-				"3"		"item_staff_of_mastery"
 				"4"		"item_tome_big"
 			}
 			"other"
@@ -128,7 +126,6 @@
 				"4"		"item_potion_of_invulnerability"
 				"5"		"item_potion_of_antimagic"
 				"6"		"item_amulet_of_the_wild"
-				"7"		"item_staff_of_mastery"
 			}
 		}
 
@@ -170,7 +167,6 @@
 				"4"		"item_potion_of_invulnerability"
 				"5"		"item_potion_of_antimagic"
 				"6"		"item_amulet_of_the_wild"
-				"7"		"item_staff_of_mastery"
 			}
 		}
 
@@ -195,7 +191,6 @@
 			{
 				"1"		"item_mystic_gem"
 				"2"		"item_orb_of_darkness2"
-				"3"		"item_staff_of_mastery"
 				"4"		"item_boots_of_speed"
 			}
 			"late"
@@ -250,7 +245,6 @@
 			}
 			"other"
 			{
-				"1"		"item_staff_of_mastery"
 				"2"		"item_potion_of_invulnerability"
 				"3"		"item_potion_of_antimagic"
 				"4"		"item_amulet_of_the_wild"
@@ -286,7 +280,6 @@
 			{
 				"1"		"item_bracer_of_the_void"
 				"2"		"item_astral_core"
-				"3"		"item_staff_of_mastery"
 				"4"		"item_tome_big"
 			}
 			"other"

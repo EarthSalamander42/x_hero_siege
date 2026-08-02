@@ -1088,6 +1088,7 @@ function XHSBotTeamDirector:BuildStrategicSnapshot(phase)
 		objectives = {},
 		by_key = {},
 		by_player_id = {},
+		help_by_player_id = {},
 		built_at = GameRules:GetGameTime(),
 	}
 	snapshot.base_threat = self:CalculateBaseThreat(snapshot.built_at)
@@ -1168,6 +1169,46 @@ function XHSBotTeamDirector:BuildStrategicSnapshot(phase)
 		for index, playerID in ipairs(participants) do
 			local side = index <= leftCount and "left" or "right"
 			snapshot.by_player_id[playerID] = snapshot.by_key["side:" .. side]
+		end
+	end
+	if phase == 1 then
+		local now = snapshot.built_at
+		for _, requesterID in ipairs(XHSBotPlayerRegistry:GetXHSBotPlayerIDs()) do
+			local requester = XHSBotPlayerRegistry:GetBot(requesterID)
+			local objective = snapshot.by_player_id[requesterID]
+			if requester ~= nil and objective ~= nil
+				and requester.engagement_help_requested == true
+				and now - (tonumber(requester.engagement_help_requested_at) or -math.huge) <= 3 then
+				local requesterHero = XHSBotPlayerRegistry:GetBotHero(requesterID)
+				local bestID = nil
+				local bestDistance = math.huge
+				for _, candidateID in ipairs(XHSBotPlayerRegistry:GetXHSBotPlayerIDs()) do
+					local candidate = XHSBotPlayerRegistry:GetBot(candidateID)
+					local candidateHero = XHSBotPlayerRegistry:GetBotHero(candidateID)
+					local candidateObjective = snapshot.by_player_id[candidateID]
+					if candidateID ~= requesterID
+						and snapshot.help_by_player_id[candidateID] == nil
+						and candidate ~= nil
+						and candidate.engagement_help_requested ~= true
+						and IsValidEntityHandle(candidateHero) and candidateHero:IsAlive()
+						and candidateHero:GetHealth() / math.max(1, candidateHero:GetMaxHealth()) >= 0.58
+						and candidateObjective ~= nil
+						and (tonumber(candidateObjective.threat_count) or 0) <= 0 then
+						local distance = IsValidEntityHandle(requesterHero)
+							and Distance2D(candidateHero:GetAbsOrigin(), requesterHero:GetAbsOrigin())
+							or Distance2D(candidateHero:GetAbsOrigin(), objective.anchor)
+						if distance < bestDistance then
+							bestID, bestDistance = candidateID, distance
+						end
+					end
+				end
+				if bestID ~= nil then
+					snapshot.help_by_player_id[bestID] = objective
+					snapshot.help_requester_by_player_id =
+						snapshot.help_requester_by_player_id or {}
+					snapshot.help_requester_by_player_id[bestID] = requesterID
+				end
+			end
 		end
 	end
 	table.sort(snapshot.objectives, function(left, right)
@@ -1252,6 +1293,9 @@ function XHSBotTeamDirector:IsRecoveryGearShopping(record)
 		or record.shopping_goal.force_gear ~= true then
 		return false
 	end
+	-- Gold spent on a remote purchase is not progression until the bot has
+	-- physically collected the item from its stash at base.
+	if record.shopping_goal.recovery_purchase == true then return true end
 	return math.max(
 		0,
 		(tonumber(record.deaths) or 0)
@@ -1629,7 +1673,8 @@ function XHSBotTeamDirector:BuildAssignment(playerID, slot, phase, now, snapshot
 			-- PlayerID: roster position 1 owns lane 1, position 2 owns lane 2,
 			-- and so on. A bot never steals a human's participant lane because
 			-- urgency/load balancing only applies to phase two.
-			objective = strategicSnapshot.by_player_id[playerID]
+			objective = strategicSnapshot.help_by_player_id[playerID]
+				or strategicSnapshot.by_player_id[playerID]
 		else
 			objective = strategicSnapshot.by_player_id[playerID]
 		end
@@ -1644,6 +1689,13 @@ function XHSBotTeamDirector:BuildAssignment(playerID, slot, phase, now, snapshot
 			assignment.urgency = objective.urgency
 			assignment.threat_count = objective.threat_count
 			assignment.human_count = objective.human_count
+			if phase == 1
+				and strategicSnapshot.help_by_player_id[playerID] ~= nil then
+				assignment.helping_player_id = strategicSnapshot.help_requester_by_player_id
+					and strategicSnapshot.help_requester_by_player_id[playerID] or nil
+				assignment.label = "ASSISTING L" .. tostring(objective.lane)
+				assignment.urgency = math.max(0.78, assignment.urgency or 0)
+			end
 
 			local nearestHuman = objective.humans and objective.humans[1] or nil
 			if nearestHuman ~= nil
@@ -1662,9 +1714,9 @@ function XHSBotTeamDirector:BuildAssignment(playerID, slot, phase, now, snapshot
 				assignment.follow_human_player_id = nearestHuman.player_id
 			end
 
-			if phase == 1 then
+			if phase == 1 and assignment.helping_player_id == nil then
 				assignment.label = "DEFENDING L" .. tostring(assignment.lane)
-			else
+			elseif phase ~= 1 then
 				assignment.label = "PHASE 2 " .. string.upper(tostring(assignment.side))
 			end
 		else
@@ -2045,6 +2097,11 @@ function XHSBotTeamDirector:ShouldReplaceAssignment(existing, phase, now, snapsh
 	end
 
 	if now >= (existing.locked_until or 0) then return true end
+	if phase == 1 and snapshot ~= nil then
+		local expected = snapshot.help_by_player_id[record and record.player_id or -1]
+			or snapshot.by_player_id[record and record.player_id or -1]
+		if expected ~= nil and existing.strategy_key ~= expected.key then return true end
+	end
 	if existing.target_entindex ~= nil then
 		local ok, target = pcall(EntIndexToHScript, existing.target_entindex)
 		if not ok or not IsValidEntityHandle(target) or not target:IsAlive() then

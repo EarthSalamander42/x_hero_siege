@@ -74,6 +74,15 @@ function modifier_ankh:IsHidden() return true end
 function modifier_ankh:OnCreated(keys)
 	if not IsServer() then return end
 
+	-- Remote bot purchases must first live in stash slots 9-14. AddItem briefly
+	-- creates this intrinsic before economy.lua can swap the item there; suppress
+	-- conversion until the verified base pickup moves it into an active slot.
+	local pendingAbility = self:GetAbility()
+	if pendingAbility ~= nil and not pendingAbility:IsNull()
+		and pendingAbility.xhs_pending_stash_delivery == true then
+		return
+	end
+
 	if self:GetParent():IsRealHero() and self:GetParent():IsOwnedByAnyPlayer() and IsPlayerXHSReincarnating ~= nil and IsPlayerXHSReincarnating(self:GetParent():GetPlayerID()) then
 		SendErrorMessage(self:GetParent():GetPlayerID(), "#error_reincarnation_inventory_locked")
 		if WasItemInXHSReincarnationInventorySnapshot ~= nil and WasItemInXHSReincarnationInventorySnapshot(self:GetParent(), self:GetAbility()) then

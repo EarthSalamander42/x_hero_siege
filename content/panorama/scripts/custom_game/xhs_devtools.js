@@ -17,13 +17,11 @@ var XHSDevToolsLocalFPS = -1;
 var XHSDevToolsCompactHidden = false;
 var XHSDevToolsSpectatorState = {
 	currentPlayerID: -1,
-	// Spectator mode is follow-first by default. The server confirms the
-	// current target and retries after provisioning/cinematics as necessary.
+	// Spectator mode is follow-first by default. Camera tracking is deliberately
+	// client-only so team spectators never depend on a server camera target.
 	following: true,
 	lastFollowEntIndex: -1,
 	lastInspectedEntIndex: -1,
-	pendingFollowEntIndex: -1,
-	lastFollowRequestAt: 0,
 	radiantFogApplied: false,
 	radiantFogConfirmations: 0,
 	cameraModeConfirmations: 0,
@@ -1183,7 +1181,9 @@ function XHSDevToolsUpdateVanillaSpectatorUI() {
 	// apply them before collapsing the native spectator parent.
 	XHSDevToolsApplyDefaultRadiantFog(hidden);
 	if (hidden) {
-		XHSDevToolsApplySpectatorCameraMode(XHSDevToolsSpectatorState.following);
+		// Panorama owns follow mode. Keep Valve's camera in free mode so its
+		// chase controller cannot fight SetCameraTargetPosition every frame.
+		XHSDevToolsApplySpectatorCameraMode(false);
 	}
 	XHSDevToolsSetVanillaSpectatorPanelHidden("GameInfoButton", hidden);
 	XHSDevToolsSetVanillaSpectatorPanelHidden("spectator_options", hidden);
@@ -1323,43 +1323,47 @@ function XHSDevToolsSpectatorFormatGold(value) {
 	return String(gold).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 }
 
-function XHSDevToolsSpectatorSendCamera(playerID) {
-	var targetPlayerID = Number(playerID);
-	var bots = XHSDevToolsSpectatorBots();
-	var pendingEntIndex = -1;
-	for (var i = 0; i < bots.length; i++) {
-		if (bots[i].playerID === targetPlayerID) {
-			pendingEntIndex = XHSDevToolsSpectatorHeroEntIndex(bots[i]);
-			break;
-		}
+function XHSDevToolsSpectatorUpdateClientCamera(transitionSeconds) {
+	if (!XHSDevToolsSpectatorState.following ||
+		!XHSDevToolsIsLocalSpectator() ||
+		typeof GameUI.SetCameraTargetPosition !== "function") {
+		return false;
 	}
-	XHSDevToolsSpectatorState.pendingFollowEntIndex = pendingEntIndex;
-	XHSDevToolsSpectatorState.lastFollowRequestAt = Date.now();
-	GameEvents.SendCustomGameEventToServer("xhs_bot_spectator_camera", {
-		target_player_id: targetPlayerID,
-		local_player_id: Game.GetLocalPlayerID()
-	});
+
+	var bot = XHSDevToolsSpectatorCurrentBot().bot;
+	var entIndex = XHSDevToolsSpectatorHeroEntIndex(bot);
+	if (entIndex < 0 ||
+		(Entities.IsValidEntity && !Entities.IsValidEntity(entIndex))) {
+		return false;
+	}
+
+	var origin = Entities.GetAbsOrigin(entIndex);
+	if (!origin || origin.length < 3 ||
+		!isFinite(Number(origin[0])) ||
+		!isFinite(Number(origin[1])) ||
+		!isFinite(Number(origin[2]))) {
+		return false;
+	}
+
+	try {
+		GameUI.SetCameraTargetPosition(origin, Math.max(0, Number(transitionSeconds) || 0));
+		XHSDevToolsSpectatorState.lastFollowEntIndex = entIndex;
+		return true;
+	} catch (error) {
+		return false;
+	}
 }
 
-function XHSDevToolsOnSpectatorCameraState(event) {
-	event = event || {};
-	var following = Number(event.following || 0) === 1;
-	var targetPlayerID = Number(event.target_player_id);
-	var heroEntIndex = Number(event.hero_entindex);
-
-	XHSDevToolsSpectatorState.following = following;
-	if (following && !isNaN(targetPlayerID) && targetPlayerID >= 0) {
-		XHSDevToolsSpectatorState.currentPlayerID = targetPlayerID;
+function XHSDevToolsSpectatorCameraTick() {
+	// 20 Hz is smooth enough for hero movement while remaining negligible next
+	// to Panorama's normal HUD work. The loop performs no work in free camera.
+	if (XHSDevToolsSpectatorState.following && XHSDevToolsIsLocalSpectator()) {
+		var current = XHSDevToolsSpectatorCurrentBot();
+		var entIndex = XHSDevToolsSpectatorHeroEntIndex(current.bot);
+		var changedTarget = entIndex !== XHSDevToolsSpectatorState.lastFollowEntIndex;
+		XHSDevToolsSpectatorUpdateClientCamera(changedTarget ? 0.18 : 0.065);
 	}
-	var active = following && Number(event.active || 0) === 1;
-	XHSDevToolsSpectatorState.lastFollowEntIndex =
-		active && !isNaN(heroEntIndex) ? heroEntIndex : -1;
-	XHSDevToolsSpectatorState.pendingFollowEntIndex =
-		active ? -1 : XHSDevToolsSpectatorHeroEntIndex(
-			XHSDevToolsSpectatorCurrentBot().bot
-		);
-	XHSDevToolsSpectatorState.lastFollowRequestAt = Date.now();
-	XHSDevToolsRenderSpectator();
+	$.Schedule(0.05, XHSDevToolsSpectatorCameraTick);
 }
 
 function XHSDevToolsSpectatorInspect() {
@@ -1375,12 +1379,13 @@ function XHSDevToolsSpectatorInspect() {
 	}
 
 	if (XHSDevToolsSpectatorState.following) {
-		XHSDevToolsApplySpectatorCameraMode(true);
+		XHSDevToolsApplySpectatorCameraMode(false);
 	}
 	GameUI.SelectUnit(entIndex, false);
 	XHSDevToolsSpectatorState.lastInspectedEntIndex = entIndex;
 	if (XHSDevToolsSpectatorState.following) {
-		XHSDevToolsSpectatorSendCamera(bot.playerID);
+		XHSDevToolsSpectatorState.lastFollowEntIndex = -1;
+		XHSDevToolsSpectatorUpdateClientCamera(0.18);
 	}
 }
 
@@ -1412,11 +1417,9 @@ function XHSDevToolsSpectatorToggleFollow() {
 	XHSDevToolsSpectatorState.following = !XHSDevToolsSpectatorState.following;
 	XHSDevToolsSpectatorState.lastFollowEntIndex = -1;
 	XHSDevToolsSpectatorState.cameraModeConfirmations = 0;
-	XHSDevToolsApplySpectatorCameraMode(XHSDevToolsSpectatorState.following);
+	XHSDevToolsApplySpectatorCameraMode(false);
 	if (XHSDevToolsSpectatorState.following) {
-		XHSDevToolsSpectatorSendCamera(current.bot.playerID);
-	} else {
-		XHSDevToolsSpectatorSendCamera(-1);
+		XHSDevToolsSpectatorUpdateClientCamera(0.18);
 	}
 	XHSDevToolsRenderSpectator();
 }
@@ -1430,13 +1433,9 @@ function XHSDevToolsRenderSpectator() {
 	var visible = XHSDevToolsIsLocalSpectator();
 	panel.SetHasClass("Visible", visible);
 	if (!visible) {
-		if (XHSDevToolsSpectatorState.wasVisible && XHSDevToolsSpectatorState.following) {
-			XHSDevToolsSpectatorSendCamera(-1);
-		}
 		XHSDevToolsSpectatorState.following = true;
 		XHSDevToolsSpectatorState.lastFollowEntIndex = -1;
 		XHSDevToolsSpectatorState.lastInspectedEntIndex = -1;
-		XHSDevToolsSpectatorState.pendingFollowEntIndex = -1;
 		XHSDevToolsSpectatorState.wasVisible = false;
 		return;
 	}
@@ -1511,14 +1510,6 @@ function XHSDevToolsRenderSpectator() {
 			entIndex !== XHSDevToolsSpectatorState.lastInspectedEntIndex) {
 			GameUI.SelectUnit(entIndex, false);
 			XHSDevToolsSpectatorState.lastInspectedEntIndex = entIndex;
-		}
-		var requestExpired =
-			Date.now() - XHSDevToolsSpectatorState.lastFollowRequestAt >= 500;
-		if (entIndex >= 0 &&
-			entIndex !== XHSDevToolsSpectatorState.lastFollowEntIndex &&
-			(entIndex !== XHSDevToolsSpectatorState.pendingFollowEntIndex ||
-				requestExpired)) {
-			XHSDevToolsSpectatorSendCamera(bot.playerID);
 		}
 	}
 }
@@ -3019,10 +3010,6 @@ function XHSDevToolsOnGameOptions(tableName, key, data) {
 	XHSDevToolsClientFPSTick();
 
 	if (XHSDevToolsIsToolsMode()) {
-		GameEvents.Subscribe(
-			"xhs_bot_spectator_camera_state",
-			XHSDevToolsOnSpectatorCameraState
-		);
 		CustomNetTables.SubscribeNetTableListener("xhs_bots", XHSDevToolsOnBots);
 		var state = CustomNetTables.GetTableValue("xhs_devtools", "state");
 		if (state) {
@@ -3031,6 +3018,7 @@ function XHSDevToolsOnGameOptions(tableName, key, data) {
 		}
 		XHSDevToolsReadBotNetTables();
 		XHSDevToolsRender();
+		XHSDevToolsSpectatorCameraTick();
 		XHSDevToolsSpectatorTick();
 		XHSDevToolsRequestStateLoop();
 	}

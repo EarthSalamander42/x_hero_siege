@@ -18,7 +18,7 @@ local PHASE_2_STAGE_JOB = {
 }
 local PHASE_2_WAVE_INTERVAL = {
 	left = XHS_CREEPS_INTERVAL,
-	right = 30,
+	right = XHS_CREEPS_INTERVAL,
 }
 local PHASE_2_SIDES = {
 	left = {
@@ -259,43 +259,39 @@ function StartPhase2()
 	end
 
 	OpenPhase2Doors(multiplayer and "both" or "left", true, function()
-		Phase2CreepsLeft()
-		if multiplayer then
-			Phase2CreepsRight()
+		Phase2Creeps(multiplayer and "both" or "left")
+	end)
+end
+
+function Phase2Creeps(side)
+	local sides = GetPhase2Sides(side)
+	if sides == nil then return end
+	Timers:CreateTimer(0, function()
+		if CustomTimers.proc_final_wave == true or CustomTimers.game_phase >= 3 then
+			return nil
 		end
+
+		local hasActiveSide = false
+		for _, sideName in ipairs(sides) do
+			if IsPhase2SideActive(sideName) then
+				hasActiveSide = true
+				if CustomTimers.timers_paused == 0
+					and not (XHSDevTools ~= nil and XHSDevTools:IsSandboxActive()) then
+					SpawnPhase2CreepWave(sideName, false)
+				end
+			end
+		end
+
+		return hasActiveSide and XHS_CREEPS_INTERVAL or nil
 	end)
 end
 
 function Phase2CreepsLeft()
-	local EntIceTower = Entities:FindByName(nil, "npc_tower_cold_1")
-	Timers:CreateTimer(function()
-		if EntIceTower == nil or EntIceTower:IsNull() or not EntIceTower:IsAlive() or CustomTimers.proc_final_wave == true or CustomTimers.game_phase >= 3 then
-			return nil
-		elseif XHSDevTools ~= nil and XHSDevTools:IsSandboxActive() then
-			return XHS_CREEPS_INTERVAL
-		elseif CustomTimers.timers_paused == 0 then
-			SpawnPhase2CreepWave("left", false)
-			return XHS_CREEPS_INTERVAL
-		else -- if CustomTimers.timers_paused == 1 or 2
-			return XHS_CREEPS_INTERVAL
-		end
-	end)
+	Phase2Creeps("left")
 end
 
 function Phase2CreepsRight()
-	local EntIceTower = Entities:FindByName(nil, "npc_tower_cold_2")
-	Timers:CreateTimer(0, function()
-		if EntIceTower == nil or EntIceTower:IsNull() or not EntIceTower:IsAlive() or CustomTimers.proc_final_wave == true or CustomTimers.game_phase >= 3 then
-			return nil
-		elseif XHSDevTools ~= nil and XHSDevTools:IsSandboxActive() then
-			return 30
-		elseif CustomTimers.timers_paused == 0 then
-			SpawnPhase2CreepWave("right", false)
-			return 30
-		elseif CustomTimers.timers_paused ~= 0 then
-			return 30
-		end
-	end)
+	Phase2Creeps("right")
 end
 
 local SHAL_LIGHTBINDER_UNIT_NAME = "npc_xhs_paladin"
@@ -888,6 +884,7 @@ local function PlayFinalWaveArrivalEffects(unit)
 	local particle = ParticleManager:CreateParticle(FINAL_WAVE_PORTAL_START_PARTICLE, PATTACH_ABSORIGIN_FOLLOW, unit)
 	ParticleManager:SetParticleControl(particle, 0, origin)
 	ParticleManager:SetParticleControl(particle, 1, origin)
+	ParticleManager:SetParticleControl(particle, 7, Vector(0.8, 0, 0))
 
 	Timers:CreateTimer(0.8, function()
 		DestroyFinalWaveParticle(particle)

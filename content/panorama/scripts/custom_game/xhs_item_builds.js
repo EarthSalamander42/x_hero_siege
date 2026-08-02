@@ -43,7 +43,6 @@
 		"item_potion_of_antimagic",
 		"item_potion_of_invulnerability",
 		"item_searing_blade",
-		"item_staff_of_mastery",
 		"item_tempest_aegis",
 		"item_tome_big",
 		"item_tome_of_power",

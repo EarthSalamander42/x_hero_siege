@@ -45,7 +45,6 @@
 			"item"		"item_potion_of_invulnerability"
 			"item"		"item_potion_of_antimagic"
 			"item"		"item_amulet_of_the_wild"
-			"item"		"item_staff_of_mastery"
 		}
 	}
 }

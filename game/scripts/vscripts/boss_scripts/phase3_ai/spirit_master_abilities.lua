@@ -57,11 +57,11 @@ local SPIRIT_TEXTURES = {
 }
 
 local COLORS = {
-	master = { primary = Vector(255, 255, 255), secondary = Vector(70, 210, 255), style = 4 },
-	storm = { primary = Vector(70, 220, 255), secondary = Vector(210, 245, 255), style = 4 },
-	earth = { primary = Vector(110, 220, 110), secondary = Vector(210, 255, 160), style = 5 },
-	fire = { primary = Vector(255, 115, 35), secondary = Vector(255, 220, 90), style = 0 },
-	trinity = { primary = Vector(255, 255, 255), secondary = Vector(255, 185, 70), style = 2 },
+	master = { primary = Vector(255, 255, 255), secondary = Vector(70, 210, 255), style = 4, family = "spirit_master" },
+	storm = { primary = Vector(70, 220, 255), secondary = Vector(210, 245, 255), style = 4, family = "spirit_storm" },
+	earth = { primary = Vector(110, 220, 110), secondary = Vector(210, 255, 160), style = 5, family = "spirit_earth" },
+	fire = { primary = Vector(255, 115, 35), secondary = Vector(255, 220, 90), style = 0, family = "spirit_fire" },
+	trinity = { primary = Vector(255, 255, 255), secondary = Vector(255, 185, 70), style = 2, family = "spirit_master" },
 }
 
 local UNIT_STYLES = {
@@ -391,6 +391,7 @@ end
 function xhs_spirit_master_trinity_cycle:OnSpellStart()
 	if not IsServer() then return end
 	if XHSSpiritMasterEncounter ~= nil then
+		XHSBossTelegraphs:Release(self:GetCaster():GetAbsOrigin(), self:GetSpecialValueFor("radius"), COLORS.trinity)
 		CreateImpact(self:GetCaster():GetAbsOrigin(), TRINITY_SPLIT_PARTICLE, self:GetSpecialValueFor("radius"))
 		self:GetCaster():EmitSound("Hero_Brewmaster.PrimalSplit.Cast")
 		XHSSpiritMasterEncounter:BeginSplit(self:GetCaster(), GetContext(self).threshold)
@@ -511,6 +512,7 @@ end
 function xhs_spirit_master_convergence:OnSpellStart()
 	if not IsServer() then return end
 	local caster = self:GetCaster()
+	XHSBossTelegraphs:Release(caster:GetAbsOrigin(), self:GetSpecialValueFor("radius"), COLORS.trinity)
 	DamageEnemies(caster, self, caster:GetAbsOrigin(), self:GetSpecialValueFor("radius"), 0, self:GetAbilityDamageType())
 	CreateImpact(caster:GetAbsOrigin(), TRINITY_SPLIT_PARTICLE, self:GetSpecialValueFor("radius"))
 	caster:EmitSound("Hero_Brewmaster.CinderBrew.Cast")
@@ -707,6 +709,7 @@ function xhs_spirit_earth_stone_guard:OnAbilityPhaseInterrupted() if IsServer() 
 function xhs_spirit_earth_stone_guard:OnSpellStart()
 	if not IsServer() then return end
 	local caster = self:GetCaster()
+	XHSBossTelegraphs:Release(caster:GetAbsOrigin(), self:GetSpecialValueFor("radius"), COLORS.earth)
 	DamageEnemies(caster, self, caster:GetAbsOrigin(), self:GetSpecialValueFor("radius"), ScaleDamage(self:GetSpecialValueFor("damage")), self:GetAbilityDamageType())
 	SlowEnemies(caster, self, caster:GetAbsOrigin(), self:GetSpecialValueFor("radius"), self:GetSpecialValueFor("slow_duration"))
 	caster:AddNewModifier(caster, self, "modifier_xhs_spirit_earth_guard", { duration = self:GetSpecialValueFor("guard_duration") })

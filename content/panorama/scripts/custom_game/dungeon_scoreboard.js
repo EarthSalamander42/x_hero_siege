@@ -3,9 +3,16 @@ CustomNetTables.SubscribeNetTableListener( "zone_scores", ZoneScoresReceived )
 CustomNetTables.SubscribeNetTableListener( "player_zone_locations", UpdatePlayerZones )
 CustomNetTables.SubscribeNetTableListener( "fragment_quests", FragmentQuestsReceived )
 CustomNetTables.SubscribeNetTableListener( "supporter_pass_player", ScoreboardSupporterPassReceived )
+CustomNetTables.SubscribeNetTableListener( "xhs_kill_event_objectives", KillEventObjectivesReceived )
 GameEvents.Subscribe( "zone_complete", OnZoneCompleted );
 
-var KILL_EVENT_THRESHOLDS = [100, 200, 400, 500, 750];
+var KILL_EVENTS = [
+	{ target: 50, label: "+7,500 GOLD", type: "gold" },
+	{ target: 100, label: "+25,000 GOLD", type: "gold" },
+	{ target: 200, label: "+50,000 GOLD", type: "gold" },
+	{ target: 300, label: "RAMERO & BARISTOL EVENT", type: "event", consumedKey: "ramero_baristol_consumed" },
+	{ target: 500, label: "SOGAT EVENT", type: "event", consumedKey: "sogat_consumed" }
+];
 var KILL_EVENT_VISIBLE_RATIO = 0.8;
 var scoreboard_supporter_hover = null;
 var scoreboard_supporter_hover_player_id = -1;
@@ -554,10 +561,14 @@ function UpdatePlayerImages() {
 }
 
 function GetNextKillEvent(kills) {
-	for (var i = 0; i < KILL_EVENT_THRESHOLDS.length; i++) {
-		var target = KILL_EVENT_THRESHOLDS[i];
-		if (kills < target) {
-			return target;
+	var objectiveState = GetScoreboardNetTableValue("xhs_kill_event_objectives", "state") || {};
+	for (var i = 0; i < KILL_EVENTS.length; i++) {
+		var event = KILL_EVENTS[i];
+		if (event.consumedKey && Number(objectiveState[event.consumedKey]) === 1) {
+			continue;
+		}
+		if (kills < event.target) {
+			return event;
 		}
 	}
 
@@ -595,6 +606,12 @@ function EnsureKillEventHint(displaySlot) {
 
 	var hint = scoreContainer.FindChildTraverse("KillEventHint" + displaySlot);
 	if (hint) {
+		if (!hint.FindChildTraverse("KillEventRewardLabel" + displaySlot)) {
+			var existingRewardLabel = $.CreatePanel("Label", hint, "KillEventRewardLabel" + displaySlot);
+			existingRewardLabel.AddClass("KillEventRewardLabel");
+			existingRewardLabel.text = "";
+			existingRewardLabel.hittest = false;
+		}
 		return hint;
 	}
 
@@ -610,6 +627,11 @@ function EnsureKillEventHint(displaySlot) {
 	label.AddClass("KillEventHintLabel");
 	label.text = "";
 	label.hittest = false;
+
+	var rewardLabel = $.CreatePanel("Label", hint, "KillEventRewardLabel" + displaySlot);
+	rewardLabel.AddClass("KillEventRewardLabel");
+	rewardLabel.text = "";
+	rewardLabel.hittest = false;
 
 	return hint;
 }
@@ -638,15 +660,22 @@ function UpdateKillEventHint(displaySlot, playerId, kills) {
 
 	ApplyKillEventHintSupporterTier(hint, playerId);
 
-	var nextTarget = GetNextKillEvent(kills);
-	var remaining = nextTarget === null ? 0 : nextTarget - kills;
-	var visible = nextTarget !== null && remaining > 0 && kills >= Math.ceil(nextTarget * KILL_EVENT_VISIBLE_RATIO);
+	var nextEvent = GetNextKillEvent(kills);
+	var remaining = nextEvent === null ? 0 : nextEvent.target - kills;
+	var visible = nextEvent !== null && remaining > 0 &&
+		kills >= Math.ceil(nextEvent.target * KILL_EVENT_VISIBLE_RATIO);
 
 	hint.SetHasClass("KillEventHintVisible", visible);
+	hint.SetHasClass("KillEventRewardGold", nextEvent !== null && nextEvent.type === "gold");
+	hint.SetHasClass("KillEventRewardEvent", nextEvent !== null && nextEvent.type === "event");
 
 	var label = hint.FindChildTraverse("KillEventHintLabel" + displaySlot);
 	if (label) {
 		label.text = remaining === 1 ? "1 kill remaining" : remaining + " kills remaining";
+	}
+	var rewardLabel = hint.FindChildTraverse("KillEventRewardLabel" + displaySlot);
+	if (rewardLabel) {
+		rewardLabel.text = nextEvent === null ? "" : "•  " + nextEvent.label;
 	}
 }
 
@@ -1114,6 +1143,11 @@ function ZoneScoresReceived()
 		}
 		UpdateZoneScores(zoneNameList[g_nCurZone]["value"]["ZoneName"]);
 	}
+}
+
+function KillEventObjectivesReceived()
+{
+	ZoneScoresReceived();
 }
 
 var g_szZoneNameClass = null;

@@ -119,8 +119,6 @@
 "DOTA_Tooltip_modifier_invoker_tornado_datadriven_cyclone_Description"		"Disabled or displaced by Invoker Tornado Cyclone."
 "DOTA_Tooltip_modifier_invoker_tornado_datadriven_unit_ability"		"Invoker Tornado"
 "DOTA_Tooltip_modifier_invoker_tornado_datadriven_unit_ability_Description"		"Disabled or displaced by Invoker Tornado."
-"DOTA_Tooltip_modifier_item_ghost_datadriven_active"		"Ghost Form"
-"DOTA_Tooltip_modifier_item_ghost_datadriven_active_Description"		"Ghost Form is active."
 "DOTA_Tooltip_modifier_jingu_mastery_activated"		"Jingu Mastery"
 "DOTA_Tooltip_modifier_jingu_mastery_activated_Description"		"Jingu Mastery is active."
 "DOTA_Tooltip_modifier_jingu_mastery_hitcount"		"Jingu Mastery Hit Counter"

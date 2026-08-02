@@ -181,6 +181,8 @@
 								<Panel id="XHSPassAssetRequestTypeTabs" class="XHSPassAssetRequestTabs IsPrimary" />
 								<Panel class="XHSPassAssetRequestBrowseBar">
 									<Panel id="XHSPassAssetRequestCategoryTabs" class="XHSPassAssetRequestTabs IsCategory" />
+								</Panel>
+								<Panel class="XHSPassAssetRequestSearchRow">
 									<TextEntry id="XHSPassAssetRequestSearch" class="XHSPassAssetRequestSearch" placeholder="#xhs_sp_request_search" />
 								</Panel>
 								<Panel id="XHSPassCourierRequestPager" class="XHSPassPaginationBar" />

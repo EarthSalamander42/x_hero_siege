@@ -10,8 +10,9 @@
 	{
 		// General
 		"BaseClass"					"npc_dota_creature"	// Class of entity of link to.
-		"Model"						"models/heroes/necrolyte/necrolyte.vmdl"	// Model.
-		"ModelScale"				"1.1"
+		"Model"						"models/creeps/neutral_creeps/n_creep_froglet/n_creep_froglet_mage.vmdl"
+		"ModelScale"				"1.20"
+		"SoundSet"					"Creep_Bad_Range"
 		"Level"						"1"
 		"ConsideredHero"			"1"
 		"MinimapIcon"				"minimap_roshancamp"
@@ -43,7 +44,7 @@
 		"AttackAnimationPoint"		"0.56"						// Normalized time in animation cycle to attack.
 		"AttackAcquisitionRange"	"1000"						// Range within a target can be acquired.
 		"AttackRange"				"600"						// Range within a target can be attacked.
-		"ProjectileModel"			"particles/units/heroes/hero_necrolyte/necrolyte_base_attack.vpcf"							// Particle system model for projectile.
+		"ProjectileModel"			"particles/base_attacks/ranged_badguy.vpcf"
 		"ProjectileSpeed"			"1000"							// Speed of projectile.
 
 		// Bounty
@@ -64,9 +65,6 @@
 		"MovementSpeed"				"345"		// Speed
 		"MovementTurnRate"			"0.5"		// Turning rate.
 		
-		"GameSoundsFile"			"soundevents/game_sounds_heroes/game_sounds_necrolyte.vsndevts"
-		"VoiceFile"					"soundevents/voscripts/game_sounds_vo_necrolyte.vsndevts"
-
 		// Status
 		//----------------------------------------------------------------
 		"StatusHealth"				"2475"			// Base health.
@@ -86,19 +84,6 @@
 		"VisionDaytimeRange"		"1400"		// Range of vision during day light.
 		"VisionNighttimeRange"		"1400"		// Range of vision at night time.
 
-		// Creature Data
-		//----------------------------------------------------------------------------------------------------------------------
-		"Creature"
-		{
-			"AttachWearables" //( Shaded Eulogy Set )
-			{
-				"Wearable1" { "ItemDef" "7427" } //Back( Sullen Hollow )
-				"Wearable2" { "ItemDef" "6377" } //Head/Beard( Heretic Set )
-				"Wearable3" { "ItemDef" "6378" } //Head
-				"Wearable4" { "ItemDef" "6379" } //Weapon
-				"Wearable5" { "ItemDef" "6380" } //Shoulder/Mantle
-			}
-		}
 	}
 
 	//=================================================================================
@@ -108,13 +93,13 @@
 	{
 		// General
 		"BaseClass"					"npc_dota_creature"	// Class of entity of link to.
-		"Model"						"models/heroes/siren/siren.vmdl"	// Model.
-		"ModelScale"				"1.1"
+		"Model"						"models/creeps/neutral_creeps/n_creep_ancient_frog/n_creep_ancient_frog_mage.vmdl"
+		"ModelScale"				"1.00"
 		"Level"						"1"
 		"ConsideredHero"			"1"
 		"MinimapIcon"				"minimap_roshancamp"
 		"MinimapIconSize"			"500"
-		"SoundSet"					"Hero_Lion"
+		"SoundSet"					"Creep_Bad_Range"
 		"UseAI"						"1"
 
 		// Abilities
@@ -142,7 +127,7 @@
 		"AttackAnimationPoint"		"0.5"						// Normalized time in animation cycle to attack.
 		"AttackAcquisitionRange"	"1000"						// Range within a target can be acquired.
 		"AttackRange"				"400"						// Range within a target can be attacked.
-		"ProjectileModel"			"particles/units/heroes/hero_lion/lion_base_attack.vpcf"
+		"ProjectileModel"			"particles/base_attacks/ranged_badguy.vpcf"
 		"ProjectileSpeed"			"800"							// Speed of projectile.
 
 		// Bounty
@@ -163,9 +148,6 @@
 		"MovementSpeed"				"365"		// Speed
 		"MovementTurnRate"			"0.5"		// Turning rate.
 		
-		"GameSoundsFile"			"soundevents/game_sounds_heroes/game_sounds_lion.vsndevts"
-		"VoiceFile"					"soundevents/voscripts/game_sounds_vo_lion.vsndevts"
-
 		// Status
 		//----------------------------------------------------------------
 		"StatusHealth"				"4975"			// Base health.
@@ -185,34 +167,6 @@
 		"VisionDaytimeRange"		"1400"		// Range of vision during day light.
 		"VisionNighttimeRange"		"1400"		// Range of vision at night time.
 
-		// Creature Data
-		//----------------------------------------------------------------------------------------------------------------------
-		"Creature"
-		{
-			"AttachWearables"
-			{
-				"Wearable1"
-				{
-					"ItemDef"			"191" //Head
-				}
-				"Wearable2"
-				{
-					"ItemDef"			"192" //Weapon
-				}
-				"Wearable3"
-				{
-					"ItemDef"			"193" //Tail
-				}
-				"Wearable4"
-				{
-					"ItemDef"			"194" //Armor
-				}
-				"Wearable5"
-				{
-					"ItemDef"			"312" //OffWeapon
-				}
-			}
-		}
 	}
 
 	//=================================================================================
@@ -223,13 +177,13 @@
 		// General
 		//
 		"BaseClass"					"npc_dota_creature"	// Class of entity of link to.
-		"Model"						"models/heroes/vengeful/vengeful.vmdl"	// Model.
-		"ModelScale"				"1.15"
+		"Model"						"models/creeps/neutral_creeps/n_creep_tadpole/n_creep_tadpole_ranged_v2.vmdl"
+		"ModelScale"				"1.10"
 		"Level"						"1"
 		"ConsideredHero"			"1"
 		"MinimapIcon"				"minimap_roshancamp"
 		"MinimapIconSize"			"300"
-		"SoundSet"					"Hero_VengefulSpirit"								// Name of sound set.
+		"SoundSet"					"Creep_Bad_Range"
 		"UseAI"						"1"
 
 		// Abilities
@@ -254,7 +208,7 @@
 		"AttackAnimationPoint"		"0.33"		// Normalized time in animation cycle to attack.
 		"AttackAcquisitionRange"	"2000"		// Range within a target can be acquired.
 		"AttackRange"				"450"		// Range within a target can be attacked.
-		"ProjectileModel"			"particles/units/heroes/hero_vengeful/vengeful_base_attack.vpcf"			// Particle system model for projectile.
+		"ProjectileModel"			"particles/base_attacks/ranged_badguy.vpcf"
 		"ProjectileSpeed"			"1500"			// Speed of projectile.
 
 		// Bounty
@@ -266,7 +220,7 @@
 		// Bounds
 		//----------------------------------------------------------------
 		"RingRadius"				"100"
-		"HealthBarOffset"			"300"
+		"HealthBarOffset"			"190"
 		"BoundsHullName"			"DOTA_HULL_SIZE_HERO"	
 
 		// Movement
@@ -276,9 +230,6 @@
 		"MovementTurnRate"			"0.5"		// Turning rate.
 
 		
-		"GameSoundsFile"			"soundevents/game_sounds_heroes/game_sounds_vengefulspirit.vsndevts"
-		"VoiceFile"					"soundevents/voscripts/game_sounds_vo_vengefulspirit.vsndevts"
-
 		// Status
 		//----------------------------------------------------------------
 		"StatusHealth"				"6950"		// Base health.
@@ -298,34 +249,6 @@
 		"VisionDaytimeRange"		"2000"		// Range of vision during day light.
 		"VisionNighttimeRange"		"2000"		// Range of vision at night time.
 
-		// Creature Data
-		//----------------------------------------------------------------------------------------------------------------------
-		"Creature"
-		{
-			"AttachWearables"
-			{
-				"Wearable1"
-				{
-					"ItemDef"			"6256" //Head - Fallen Princess Set
-				}
-				"Wearable2"
-				{
-					"ItemDef"			"6257" //Shoulder
-				}
-				"Wearable3"
-				{
-					"ItemDef"			"5344" //Weapon
-				}
-				"Wearable4"
-				{
-					"ItemDef"			"6259" //Legs
-				}
-				"Wearable5"
-				{
-					"ItemDef"			"517" //Ambient Effects
-				}
-			}
-		}
 	}
 
 	//=================================================================================
@@ -335,13 +258,13 @@
 	{
 		// General
 		"BaseClass"					"npc_dota_creature"	// Class of entity of link to.
-		"Model"						"models/heroes/dragon_knight/dragon_knight.vmdl"	// Model.
-		"ModelScale"				"0.95"
+		"Model"						"models/creeps/neutral_creeps/n_creep_kobold/kobold_a/n_creep_kobold_a.vmdl"
+		"ModelScale"				"1.40"
 		"Level"						"1"
 		"ConsideredHero"			"1"
 		"MinimapIcon"				"minimap_roshancamp"
 		"MinimapIconSize"			"500"
-		"SoundSet"					"Hero_DragonKnight"
+		"SoundSet"					"Creep_Bad_Melee"
 		"UseAI"						"1"
 
 		// Abilities
@@ -410,34 +333,6 @@
 		"VisionNighttimeRange"		"1400"		// Range of vision at night time.
 
 
-		// Creature Data
-		//----------------------------------------------------------------------------------------------------------------------
-		"Creature"
-		{
-			"AttachWearables"
-			{
-				"Wearable1"
-				{
-					"ItemDef"			"5084" //Offhand Weapon - Crest of the Wyrm Lords
-				}
-				"Wearable2"
-				{
-					"ItemDef"			"4731" //Weapon - Ember Edge
-				}
-				"Wearable3"
-				{
-					"ItemDef"			"6093" //Arms - Fire Tribunal Arms
-				}
-				"Wearable4"
-				{
-					"ItemDef"			"6099" //Helmet - Fire Tribunal Helm
-				}
-				"Wearable5"
-				{
-					"ItemDef"			"6104" //Shoulders - Fire Tribunal Shoulders
-				}
-			}
-		}
 	}
 
 	//=================================================================================
@@ -447,13 +342,13 @@
 	{
 		// General
 		"BaseClass"					"npc_dota_creature"	// Class of entity of link to.
-		"Model"						"models/heroes/slardar/slardar.vmdl"	// Model.
+		"Model"						"models/creeps/neutral_creeps/n_creep_worg_large/n_creep_worg_large.vmdl"
 		"ModelScale"				"1.15"
 		"Level"						"1"
 		"ConsideredHero"			"1"
 		"MinimapIcon"				"minimap_roshancamp"
 		"MinimapIconSize"			"500"
-		"SoundSet"					"Hero_Slardar"
+		"SoundSet"					"Creep_Bad_Melee"
 		"UseAI"						"1"
 
 		// Abilities
@@ -498,9 +393,6 @@
 		"MovementSpeed"				"385"		// Speed
 		"MovementTurnRate"			"0.5"		// Turning rate.
 
-		"GameSoundsFile"			"soundevents/game_sounds_heroes/game_sounds_slardar.vsndevts"
-		"VoiceFile"					"soundevents/voscripts/game_sounds_vo_slardar.vsndevts"
-
 		// Status
 		//----------------------------------------------------------------
 		"StatusHealth"				"12760"			// Base health.
@@ -521,18 +413,6 @@
 		"VisionNighttimeRange"		"1400"		// Range of vision at night time.
 
 
-		// Creature Data
-		//----------------------------------------------------------------------------------------------------------------------
-		"Creature"
-		{
-			"AttachWearables"
-			{
-				"Wearable1"		{ "ItemDef"	"8789" } //Weapon - Andestial Sentinel Set
-				"Wearable2"		{ "ItemDef"	"8790" } //Bracers/Arms
-				"Wearable3"		{ "ItemDef"	"8791" } //Head
-				"Wearable4"		{ "ItemDef"	"8792" } //Back
-			}
-		}
 	}
 
 	//=================================================================================
@@ -542,13 +422,13 @@
 	{
 		// General
 		"BaseClass"					"npc_dota_creature"	// Class of entity of link to.
-		"Model"						"models/heroes/chaos_knight/chaos_knight.vmdl"	// Model.
-		"ModelScale"				"1.35"
+		"Model"						"models/creeps/neutral_creeps/n_creep_jungle_stalker/n_creep_jungle_stalker.vmdl"
+		"ModelScale"				"1.10"
 		"Level"						"1"
 		"ConsideredHero"			"1"
 		"MinimapIcon"				"minimap_roshancamp"
 		"MinimapIconSize"			"500"
-		"SoundSet"					"Hero_ChaosKnight"
+		"SoundSet"					"Creep_Bad_Melee"
 		"UseAI"						"1"
 
 		// Abilities
@@ -593,9 +473,6 @@
 		"MovementSpeed"				"385"		// Speed
 		"MovementTurnRate"			"0.5"		// Turning rate.
 
-		"GameSoundsFile"			"soundevents/game_sounds_heroes/game_sounds_chaos_knight.vsndevts"
-		"VoiceFile"					"soundevents/voscripts/game_sounds_vo_chaos_knight.vsndevts"
-
 		// Status
 		//----------------------------------------------------------------
 		"StatusHealth"				"22500"			// Base health.
@@ -616,19 +493,6 @@
 		"VisionNighttimeRange"		"1400"		// Range of vision at night time.
 
 
-		// Creature Data
-		//----------------------------------------------------------------------------------------------------------------------
-		"Creature"
-		{
-			"AttachWearables"
-			{
-				"Wearable1" { "ItemDef" "5518" } //Weapon - Burning Turmoil Set
-				"Wearable2" { "ItemDef" "5521" } //Offhand Weapon
-				"Wearable3" { "ItemDef" "5519" } //Head
-				"Wearable4" { "ItemDef" "5522" } //Shoulder
-				"Wearable5" { "ItemDef" "5520" } //Mount - Enmity
-			}
-		}
 	}
 
 	//=================================================================================
@@ -638,13 +502,13 @@
 	{
 		// General
 		"BaseClass"					"npc_dota_creature"	// Class of entity of link to.
-		"Model"						"models/heroes/luna/luna.vmdl"	// Model.
-		"ModelScale"				"1.45"
+		"Model"						"models/creeps/neutral_creeps/n_creep_gnoll/n_creep_gnoll.vmdl"
+		"ModelScale"				"1.20"
 		"Level"						"1"
 		"ConsideredHero"			"1"
 		"MinimapIcon"				"minimap_roshancamp"
 		"MinimapIconSize"			"500"
-		"SoundSet"					"Hero_Luna"
+		"SoundSet"					"Creep_Bad_Range"
 		"UseAI"						"1"
 
 		// Abilities
@@ -668,7 +532,7 @@
 		"AttackAnimationPoint"		"0.3"						// Normalized time in animation cycle to attack.
 		"AttackAcquisitionRange"	"1000"						// Range within a target can be acquired.
 		"AttackRange"				"600"						// Range within a target can be attacked.
-		"ProjectileModel"			"particles/units/heroes/hero_luna/luna_base_attack.vpcf"							// Particle system model for projectile.
+		"ProjectileModel"			"particles/base_attacks/ranged_badguy.vpcf"
 		"ProjectileSpeed"			"925"							// Speed of projectile.
 
 		// Bounty
@@ -688,9 +552,6 @@
 		"MovementCapabilities"		"DOTA_UNIT_CAP_MOVE_GROUND"			// Type of locomotion - ground, air
 		"MovementSpeed"				"385"		// Speed
 		"MovementTurnRate"			"0.5"		// Turning rate.
-
-		"GameSoundsFile"			"soundevents/game_sounds_heroes/game_sounds_luna.vsndevts"
-		"VoiceFile"					"soundevents/voscripts/game_sounds_vo_luna.vsndevts"
 
 		// Status
 		//----------------------------------------------------------------
@@ -712,19 +573,6 @@
 		"VisionNighttimeRange"		"1400"		// Range of vision at night time.
 
 
-		// Creature Data
-		//----------------------------------------------------------------------------------------------------------------------
-		"Creature"
-		{
-			"AttachWearables"
-			{
-				"Wearable1" { "ItemDef" "8852" } //Crest
-				"Wearable2" { "ItemDef" "8853" } //Glaive
-				"Wearable3" { "ItemDef" "8854" } //Shield
-				"Wearable4" { "ItemDef" "8855" } //Spaulders
-				"Wearable5" { "ItemDef" "8856" } //Guardian
-			}
-		}
 	}
 
 	//=================================================================================
@@ -734,13 +582,13 @@
 	{
 		// General
 		"BaseClass"					"npc_dota_creature"	// Class of entity of link to.
-		"Model"						"models/heroes/rattletrap/rattletrap.vmdl"	// Model.
-		"ModelScale"				"1.55"
+		"Model"						"models/creeps/neutral_creeps/n_creep_gargoyle/n_creep_gargoyle.vmdl"
+		"ModelScale"				"1.15"
 		"Level"						"1"
 		"ConsideredHero"			"1"
 		"MinimapIcon"				"minimap_roshancamp"
 		"MinimapIconSize"			"500"
-		"SoundSet"					"Hero_Sniper"
+		"SoundSet"					"Creep_Bad_Range"
 		"UseAI"						"1"
 
 		// Abilities
@@ -764,7 +612,7 @@
 		"AttackAnimationPoint"		"0.33"						// Normalized time in animation cycle to attack.
 		"AttackAcquisitionRange"	"1000"						// Range within a target can be acquired.
 		"AttackRange"				"650"						// Range within a target can be attacked.
-		"ProjectileModel"			"particles/econ/items/sniper/sniper_charlie/sniper_assassinate_charlie.vpcf"							// Particle system model for projectile.
+		"ProjectileModel"			"particles/base_attacks/ranged_badguy.vpcf"
 		"ProjectileSpeed"			"1700"							// Speed of projectile.
 
 		// Bounty
@@ -784,9 +632,6 @@
 		"MovementCapabilities"		"DOTA_UNIT_CAP_MOVE_GROUND"			// Type of locomotion - ground, air
 		"MovementSpeed"				"385"		// Speed
 		"MovementTurnRate"			"0.5"		// Turning rate.
-
-		"GameSoundsFile"			"soundevents/game_sounds_heroes/game_sounds_rattletrap.vsndevts"
-		"VoiceFile"					"soundevents/voscripts/game_sounds_vo_rattletrap.vsndevts"
 
 		// Status
 		//----------------------------------------------------------------
@@ -808,18 +653,6 @@
 		"VisionNighttimeRange"		"1400"		// Range of vision at night time.
 
 
-		// Creature Data
-		//----------------------------------------------------------------------------------------------------------------------
-		"Creature"
-		{
-			"AttachWearables"
-			{
-				"Wearable1" { "ItemDef" "6481" } //Weapon
-				"Wearable2" { "ItemDef" "6482" } //Helm
-				"Wearable3" { "ItemDef" "6484" } //Rocket Cannon
-				"Wearable4" { "ItemDef" "6485" } //Armor
-			}
-		}
 	}
 
 	//=================================================================================

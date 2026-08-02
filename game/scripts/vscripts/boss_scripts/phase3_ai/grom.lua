@@ -26,6 +26,7 @@ local GROM_COLORS = {
 	primary = Vector(255, 62, 34),
 	secondary = Vector(255, 185, 64),
 	style = 4,
+	family = "grom",
 }
 
 local function IsValidAlive(unit)

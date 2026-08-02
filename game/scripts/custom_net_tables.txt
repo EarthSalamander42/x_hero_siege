@@ -22,6 +22,7 @@
 		"supporter_pass_shop",
 		"supporter_pass_leaderboards",
 		"fragment_quests",
+		"xhs_kill_event_objectives",
 		"custom_polls",
 		"xhs_quest_state",
 		"xhs_phase_one_spawn_budget",

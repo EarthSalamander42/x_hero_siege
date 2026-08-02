@@ -6,7 +6,7 @@ holdout_rain_of_chaos = balanar_rain_of_chaos
 holdout_rain_of_chaos_20 = balanar_rain_of_chaos
 
 local METEOR_FLY_PARTICLE = "particles/units/heroes/hero_invoker/invoker_chaos_meteor_fly.vpcf"
-local METEOR_WARNING_PARTICLE = "particles/econ/events/darkmoon_2017/darkmoon_generic_aoe.vpcf"
+local METEOR_WARNING_PARTICLE = "particles/custom/boss_warnings/balanar/radius.vpcf"
 local METEOR_IMPACT_PARTICLE = "particles/units/heroes/hero_invoker/invoker_chaos_meteor_land_soil.vpcf"
 local METEOR_CRUMBLE_PARTICLE = "particles/units/heroes/hero_invoker/invoker_chaos_meteor_crumble.vpcf"
 local WARNING_LIFETIME = 1.2
@@ -144,10 +144,7 @@ function modifier_balanar_rain_of_chaos:OnIntervalThink()
 
 		local warning = ParticleManager:CreateParticle(METEOR_WARNING_PARTICLE, PATTACH_CUSTOMORIGIN, self.caster)
 		ParticleManager:SetParticleControl(warning, 0, point)
-		ParticleManager:SetParticleControl(warning, 1, Vector(self.ability.radius_explosion, 0, 0))
-		ParticleManager:SetParticleControl(warning, 2, Vector(WARNING_LIFETIME, 0, 1))
-		ParticleManager:SetParticleControl(warning, 3, Vector(200, 0, 0))
-		ParticleManager:SetParticleControl(warning, 4, point)
+		ParticleManager:SetParticleControl(warning, 1, Vector(self.ability.radius_explosion, WARNING_LIFETIME, 0))
 		Timers:CreateTimer(WARNING_LIFETIME + 0.1, function()
 			ParticleManager:DestroyParticle(warning, false)
 			ParticleManager:ReleaseParticleIndex(warning)

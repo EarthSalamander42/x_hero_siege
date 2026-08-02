@@ -678,8 +678,7 @@ function XHSBotItemPlanner:GetStatPower(snapshot, profile, entry)
 	power = power + Delta("bonus_armor") / 4 * (0.30 + survival * 0.70)
 	power = power + Delta("bonus_health_regen") / 25 * survival
 	power = power + Delta("spell_amp_pct") / 5 * (0.30 + caster * 0.70)
-	power = power + Delta("cooldown_reduction_pct") / 3 * caster
-	power = power + Delta("exposure_magic_resist_reduction") / 3 * caster
+	power = power + Delta("spell_lifesteal_pct") / 4 * caster
 	power = power + Delta("bonus_evasion_pct") / 5 * (0.35 + mobility * 0.65)
 	power = power + (
 		Delta("bonus_movement_speed")
@@ -1212,15 +1211,6 @@ function XHSBotItemPlanner:GetTacticalPurchase(snapshot, profile, phase, coreRes
 				+ (tonumber(snapshot.magical_threat) or 0) * 15,
 				"measured magical pressure", not extremeThreat)
 		end
-	end
-
-	local casterValue = (tonumber(affinities.magical) or 0)
-		+ (tonumber(affinities.control) or 0)
-	if (phase == "upgrades" or phase == "luxury")
-		and casterValue >= 1.15
-		and (snapshot.boss_nearby == true or threat >= 0.75) then
-		Add("item_staff_of_mastery", 82 + casterValue * 18,
-			"caster control against dangerous target", true)
 	end
 
 	table.sort(candidates, function(left, right)

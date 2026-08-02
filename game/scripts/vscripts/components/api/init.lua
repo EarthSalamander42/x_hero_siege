@@ -1864,9 +1864,19 @@ function api:Request(endpoint, okCallback, failCallback, method, payload)
 			print("Request to " .. endpoint .. " succeeded with no content")
 			return okCallback({})
 		else
-			local obj, pos, err = json.decode(result.Body)
+			-- Express' default 403/404 responses can be empty or HTML when a
+			-- deployment is missing a route. Do not report those transport errors
+			-- as malformed JSON: that hides the actionable HTTP status from Tools.
+			if response_body == "" then
+				return fail("HTTP " .. tostring(code) .. " returned an empty response")
+			end
+
+			local obj, pos, err = json.decode(response_body)
 
 			if err then
+				if code >= 400 then
+					return fail("HTTP " .. tostring(code) .. " returned a non-JSON response")
+				end
 				return fail("Json error: " .. tostring(err))
 			end
 

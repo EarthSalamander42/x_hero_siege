@@ -10,6 +10,27 @@ var XHSSupporterHover = (function () {
 		{ id: 4, name: "Stoneguard Donator", color: "#5AD0FF", fragments: 1800, xpBoost: 40, votePower: 5 },
 		{ id: 5, name: "Earthwarden Donator", color: "#C99CFF", fragments: 1800, xpBoost: 40, votePower: 5 },
 	];
+	var SUPPORTER_SLOT_ORDER = [
+		"teleport", "levelup", "kill_effect", "emblem", "potion", "rebirth",
+		"attack_lifesteal", "spell_lifesteal", "regen_aura", "immolation",
+		"high_five", "companion", "effigy", "title"
+	];
+	var SUPPORTER_SLOT_LABELS = {
+		teleport: ["xhs_sp_type_teleport", "Teleport FX"],
+		levelup: ["xhs_sp_type_tome", "Ascension FX"],
+		kill_effect: ["xhs_sp_type_kill", "Kill FX"],
+		emblem: ["xhs_sp_type_emblem", "Emblem"],
+		potion: ["xhs_sp_type_potion", "Potion FX"],
+		rebirth: ["xhs_sp_type_rebirth", "Rebirth FX"],
+		attack_lifesteal: ["xhs_sp_type_attack_lifesteal", "Attack Lifesteal"],
+		spell_lifesteal: ["xhs_sp_type_spell_lifesteal", "Spell Lifesteal"],
+		regen_aura: ["xhs_sp_type_regen_aura", "Regen Aura"],
+		immolation: ["xhs_sp_type_immolation", "Immolation"],
+		high_five: ["xhs_sp_type_high_five", "High Five"],
+		companion: ["xhs_sp_type_companion", "Companion"],
+		effigy: ["xhs_sp_type_effigy", "Effigy"],
+		title: ["xhs_sp_type_title", "Title"]
+	};
 
 	function ToNumber(value, fallback) {
 		var numberValue = Number(value);
@@ -36,6 +57,148 @@ var XHSSupporterHover = (function () {
 	function FormatVotePower(value) {
 		var votes = Math.max(1, Math.floor(ToNumber(value, 1)));
 		return votes + " setup " + (votes > 1 ? "votes" : "vote");
+	}
+
+	function LocalizeMaybeKey(value) {
+		value = value === undefined || value === null ? "" : value.toString();
+		if (!value) {
+			return "";
+		}
+		var token = value.charAt(0) === "#" ? value : "#" + value;
+		var localized = $.Localize(token);
+		return localized && localized !== token ? localized : value;
+	}
+
+	function ResolveSupporterImageURL(imagePath) {
+		var raw = imagePath ? imagePath.toString().replace(/\\/g, "/") : "";
+		if (!raw || raw.indexOf("particles/") === 0) {
+			return "";
+		}
+		if (raw.indexOf("s2r://panorama/images/") === 0 || raw.indexOf("file://{images}/") === 0) {
+			return raw;
+		}
+		var normalized = raw
+			.replace(/^file:\/\/\{images\}\//, "")
+			.replace(/^s2r:\/\/panorama\/images\//, "")
+			.replace(/_png\.vtex$/, "")
+			.replace(/\.png$/, "");
+		if (normalized.indexOf("custom_game/") === 0) {
+			return "file://{images}/" + normalized + ".png";
+		}
+		var dotaRoots = ["badges/", "battlepass/", "compendium/", "econ/", "events/", "game_modes/", "heroes/", "items/", "spellicons/", "status_icons/"];
+		for (var index = 0; index < dotaRoots.length; index++) {
+			if (normalized.indexOf(dotaRoots[index]) === 0) {
+				return "s2r://panorama/images/" + normalized + "_png.vtex";
+			}
+		}
+		return "file://{images}/custom_game/" + normalized + ".png";
+	}
+
+	function SetSupporterItemImage(panel, imagePath) {
+		var imageURL = ResolveSupporterImageURL(imagePath);
+		panel.SetHasClass("HasImage", !!imageURL);
+		if (imageURL) {
+			panel.style.backgroundImage = 'url("' + imageURL + '")';
+			panel.style.backgroundSize = "contain";
+			panel.style.backgroundPosition = "50% 50%";
+			panel.style.backgroundRepeat = "no-repeat";
+		}
+	}
+
+	function NormalizeSupporterSlot(slot) {
+		var normalized = (slot || "default").toString().toLowerCase();
+		var aliases = {
+			teleport_fx: "teleport",
+			tome: "levelup",
+			tome_fx: "levelup",
+			kill_fx: "kill_effect",
+			courier: "companion",
+			statue: "effigy",
+			bottle: "potion",
+			ankh: "rebirth",
+			lifesteal: "attack_lifesteal",
+			fountain: "regen_aura",
+			radiance: "immolation",
+			highfive: "high_five"
+		};
+		return aliases[normalized] || normalized;
+	}
+
+	function GetEquippedItemIdentity(item) {
+		return (item && (item.item_id || item.catalog_item_id || item.id || item.name || item.item_name) || "").toString();
+	}
+
+	function NormalizeEquippedItems(value) {
+		var items = [];
+		if (!value || typeof value !== "object") {
+			return items;
+		}
+		if (value.slot_id || value.item_type || value.type) {
+			value = { 1: value };
+		}
+		for (var key in value) {
+			if (!value.hasOwnProperty(key)) {
+				continue;
+			}
+			var source = value[key];
+			var item = typeof source === "object" && source !== null ? source : {
+				item_id: source,
+				slot_id: key
+			};
+			var slot = NormalizeSupporterSlot(item.slot_id || item.item_type || item.type || key);
+			if (!slot || slot === "default" || !GetEquippedItemIdentity(item)) {
+				continue;
+			}
+			items.push({
+				slot: slot,
+				name: item.name || item.item_name || item.title_text || GetEquippedItemIdentity(item),
+				image: item.image || item.image_inventory || item.icon || item.icon_path || ""
+			});
+		}
+		items.sort(function (a, b) {
+			var aIndex = SUPPORTER_SLOT_ORDER.indexOf(a.slot);
+			var bIndex = SUPPORTER_SLOT_ORDER.indexOf(b.slot);
+			if (aIndex < 0) aIndex = SUPPORTER_SLOT_ORDER.length;
+			if (bIndex < 0) bIndex = SUPPORTER_SLOT_ORDER.length;
+			return aIndex === bIndex ? a.slot.localeCompare(b.slot) : aIndex - bIndex;
+		});
+		return items;
+	}
+
+	function GetSupporterSlotLabel(slot) {
+		var entry = SUPPORTER_SLOT_LABELS[slot];
+		if (!entry) {
+			return slot.replace(/_/g, " ").toUpperCase();
+		}
+		var localized = $.Localize("#" + entry[0]);
+		return localized && localized !== "#" + entry[0] ? localized : entry[1];
+	}
+
+	function RenderEquippedItems(hover, id, equippedItems) {
+		var section = hover.FindChildTraverse("XHSSupporterHoverEquipped_" + id);
+		var grid = hover.FindChildTraverse("XHSSupporterHoverEquippedGrid_" + id);
+		if (!section || !grid) {
+			return;
+		}
+		grid.RemoveAndDeleteChildren();
+		equippedItems = equippedItems || [];
+		section.style.visibility = equippedItems.length > 0 ? "visible" : "collapse";
+		for (var index = 0; index < equippedItems.length; index++) {
+			var item = equippedItems[index];
+			var cell = $.CreatePanel("Panel", grid, "");
+			cell.AddClass("XHSSupporterHoverEquippedItem");
+			var image = $.CreatePanel("Panel", cell, "");
+			image.AddClass("XHSSupporterHoverEquippedImage");
+			SetSupporterItemImage(image, item.image);
+			var copy = $.CreatePanel("Panel", cell, "");
+			copy.AddClass("XHSSupporterHoverEquippedCopy");
+			var slot = $.CreatePanel("Label", copy, "");
+			slot.AddClass("XHSSupporterHoverEquippedSlot");
+			slot.text = GetSupporterSlotLabel(item.slot);
+			var name = $.CreatePanel("Label", copy, "");
+			name.AddClass("XHSSupporterHoverEquippedName");
+			name.text = LocalizeMaybeKey(item.name);
+		}
 	}
 
 	function FormatWinrate(value) {
@@ -293,6 +456,7 @@ var XHSSupporterHover = (function () {
 			votePower: tierData.votePower,
 			heroLevel: ToNumber(model.level || options.heroLevel || (entIndex >= 0 && typeof Entities !== "undefined" ? Entities.GetLevel(entIndex) : 0), 0),
 			ankhCharges: ToNumber(options.ankhCharges || model.ankhCharges, 0),
+			equippedItems: NormalizeEquippedItems(tableData.equipped_items || tableData.loadout),
 		};
 	}
 
@@ -396,6 +560,14 @@ var XHSSupporterHover = (function () {
 		CreateMeter(hover, "AccountXP_" + id, "Global XP");
 		CreateMeter(hover, "Weekly_" + id, "Daily Fragment Cap");
 
+		var equipped = $.CreatePanel("Panel", hover, "XHSSupporterHoverEquipped_" + id);
+		equipped.AddClass("XHSSupporterHoverEquipped");
+		var equippedTitle = $.CreatePanel("Label", equipped, "XHSSupporterHoverEquippedTitle_" + id);
+		equippedTitle.AddClass("XHSSupporterHoverEquippedTitle");
+		equippedTitle.text = "EQUIPPED EFFECTS";
+		var equippedGrid = $.CreatePanel("Panel", equipped, "XHSSupporterHoverEquippedGrid_" + id);
+		equippedGrid.AddClass("XHSSupporterHoverEquippedGrid");
+
 		var footer = $.CreatePanel("Label", hover, "XHSSupporterHoverFooter_" + id);
 		footer.AddClass("XHSSupporterHoverFooter");
 		return hover;
@@ -441,6 +613,7 @@ var XHSSupporterHover = (function () {
 		SetFillPercent(hover, "XHSSupporterHoverMeterFill_XP_" + id, data.seasonXP, data.seasonXPMax);
 		SetFillPercent(hover, "XHSSupporterHoverMeterFill_AccountXP_" + id, data.accountXPCurrent, data.accountXPMax > 0 ? data.accountXPMax : 1);
 		SetFillPercent(hover, "XHSSupporterHoverMeterFill_Weekly_" + id, data.weeklyFragments, data.weeklyCap);
+		RenderEquippedItems(hover, id, data.equippedItems);
 
 		if (ToNumber(data.tier, 0) > 0) {
 			SetChildText(hover, "XHSSupporterHoverFooter_" + id, "+" + FormatNumber(data.fragmentsPerMonth) + " monthly fragments / +" + FormatNumber(data.xpBoost) + "% season XP / " + FormatVotePower(data.votePower));

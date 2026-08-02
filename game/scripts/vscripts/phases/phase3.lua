@@ -151,6 +151,7 @@ local function PlayPhase3BossSpawnCinematic(boss, cinematicId, title, subtitle, 
 end
 
 local UTHER_ICE_PRISON_UNIT = "npc_xhs_uther_ice_prison"
+local UTHER_ICE_PRISON_PARTICLE = "particles/units/heroes/hero_crystalmaiden/maiden_frostbite_buff.vpcf"
 local UTHER_ICE_BREAK_PARTICLE = "particles/units/heroes/hero_crystalmaiden/maiden_freezing_field_explosion.vpcf"
 local UTHER_RELEASE_PARTICLE = "particles/units/heroes/hero_omniknight/omniknight_purification.vpcf"
 local UTHER_RELEASE_CINEMATIC_ID = "xhs_uther_freed"
@@ -267,20 +268,37 @@ function XHSSetupUtherIcePrison(proudmoore)
 	prison.xhs_uther_ice_prison = true
 	prison.zone = "xhs_holdout"
 	prison:AddNewModifier(prison, nil, "modifier_invulnerable", {})
-	prison:SetRenderAlpha(215)
+	prison:SetModelScale(1.8)
+	prison:SetRenderColor(155, 220, 255)
+	prison:SetRenderAlpha(235)
 	RegisterXHSDevSpawn(prison)
 
 	uther:RemoveModifierByName("modifier_npc_dialog_notify")
 	uther:AddNewModifier(uther, nil, "modifier_invulnerable", {})
 	uther:AddNewModifier(uther, nil, "modifier_phased", {})
+	-- Unlike invulnerability/phasing, this modifier supplies the actual
+	-- MODIFIER_STATE_FROZEN state and keeps Uther's pose locked in the prison.
+	uther:AddNewModifier(uther, nil, "modifier_pause_creeps", {})
+	-- Frozen Uther reveals only his position; modifier_pause_creeps suppresses
+	-- the normal day/night vision supplied by the friendly unit itself.
+	uther:AddNewModifier(uther, nil, "modifier_provides_fow_position", {})
 	FindClearSpaceForUnit(uther, prisonOrigin, true)
 	uther:SetAbsOrigin(prisonOrigin)
 	local animation = uther:FindModifierByName("modifier_stack_count_animation_controller")
 	if animation ~= nil then animation:SetStackCount(ACT_DOTA_DISABLED) end
 
+	-- The ice-shard unit model is kept as the attackable quest target. Frostbite
+	-- adds a reliable, persistent shell around Uther on every graphics preset.
+	local iceParticle = ParticleManager:CreateParticle(
+		UTHER_ICE_PRISON_PARTICLE,
+		PATTACH_ABSORIGIN_FOLLOW,
+		uther
+	)
+
 	GameMode.UtherRescue = {
 		uther = uther,
 		prison = prison,
+		ice_particle = iceParticle,
 		destination = destination,
 		activated = false,
 		released = false,
@@ -293,6 +311,10 @@ function XHSActivateUtherIcePrison()
 	if rescue == nil or rescue.activated == true or not IsUsableEntity(rescue.prison) then return end
 
 	rescue.activated = true
+	-- Uther stays friendly, but is temporarily deny-targetable at any health.
+	-- The order filter redirects the actual attack to the prison, while Uther's
+	-- frozen state and invulnerability remain until the prison is destroyed.
+	rescue.uther:AddNewModifier(rescue.uther, nil, "modifier_xhs_uther_prison_target", {})
 	rescue.prison:RemoveModifierByName("modifier_invulnerable")
 	rescue.prison:SetHealth(rescue.prison:GetMaxHealth())
 	Notifications:TopToAll({
@@ -302,6 +324,27 @@ function XHSActivateUtherIcePrison()
 	})
 end
 
+function XHSGetUtherIcePrisonAttackTarget(targetIndex)
+	local rescue = GameMode.UtherRescue
+	if rescue == nil or rescue.activated ~= true or rescue.released == true then return nil end
+	if not IsUsableEntity(rescue.uther) or not IsUsableEntity(rescue.prison) or not rescue.prison:IsAlive() then return nil end
+	if tonumber(targetIndex) ~= rescue.uther:entindex() then return nil end
+	return rescue.prison:entindex()
+end
+
+function XHSOpenProudmooreFinalDoor()
+	local rescue = GameMode.UtherRescue
+	if rescue ~= nil and rescue.final_door_opened == true then return end
+	if rescue ~= nil then rescue.final_door_opened = true end
+
+	-- This progression change is server-authoritative and does not wait for a
+	-- camera acknowledgement, which could otherwise leave the obstruction up.
+	DoEntFire("door_proudmoore3", "SetAnimation", "gate_02_open", 0, nil, nil)
+	for _, obstruction in ipairs(Entities:FindAllByName("obstruction_proudmoore2")) do
+		obstruction:SetEnabled(false, true)
+	end
+end
+
 function XHSReleaseUtherFromIce()
 	local rescue = GameMode.UtherRescue
 	if rescue == nil or rescue.released == true or not IsUsableEntity(rescue.uther) then return end
@@ -309,6 +352,12 @@ function XHSReleaseUtherFromIce()
 	rescue.released = true
 	local uther = rescue.uther
 	local origin = uther:GetAbsOrigin()
+	XHSOpenProudmooreFinalDoor()
+	if rescue.ice_particle ~= nil then
+		ParticleManager:DestroyParticle(rescue.ice_particle, false)
+		ParticleManager:ReleaseParticleIndex(rescue.ice_particle)
+		rescue.ice_particle = nil
+	end
 	CreateWorldParticle(UTHER_ICE_BREAK_PARTICLE, origin)
 	CreateWorldParticle(UTHER_RELEASE_PARTICLE, origin)
 	EmitSoundOnLocationWithCaster(origin, "Hero_Crystal.CrystalNova", uther)
@@ -317,6 +366,9 @@ function XHSReleaseUtherFromIce()
 	uther:RemoveModifierByName("modifier_stack_count_animation_controller")
 	uther:RemoveModifierByName("modifier_npc_dialog")
 	uther:RemoveModifierByName("modifier_npc_dialog_notify")
+	uther:RemoveModifierByName("modifier_xhs_uther_prison_target")
+	uther:RemoveModifierByName("modifier_pause_creeps")
+	uther:RemoveModifierByName("modifier_provides_fow_position")
 	uther:RemoveModifierByName("modifier_invulnerable")
 	uther:RemoveModifierByName("modifier_phased")
 	StartAnimation(uther, { duration = UTHER_RELEASE_CINEMATIC_DURATION, activity = ACT_DOTA_SPAWN, rate = 0.7 })

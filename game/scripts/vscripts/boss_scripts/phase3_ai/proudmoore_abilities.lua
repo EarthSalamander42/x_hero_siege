@@ -33,12 +33,13 @@ local PROUDMOORE_COLORS = {
 	primary = Vector(70, 190, 255),
 	secondary = Vector(255, 215, 95),
 	style = 7,
+	family = "proudmoore",
 }
 
 local TORRENT_SPLASH_PARTICLE = "particles/hero/kunkka/torrent_splash.vpcf"
 local GHOSTSHIP_SPLASH_PARTICLE = "particles/econ/items/kunkka/kunkka_immortal/kunkka_immortal_ghost_ship_splash.vpcf"
 local ANCHOR_SMASH_PARTICLE = "particles/units/heroes/hero_tidehunter/tidehunter_anchor_hero.vpcf"
-local DARKMOON_AOE_PARTICLE = "particles/econ/events/darkmoon_2017/darkmoon_generic_aoe.vpcf"
+local DARKMOON_AOE_PARTICLE = "particles/custom/boss_warnings/proudmoore/radius.vpcf"
 local POWERSHOT_PARTICLE = "particles/units/heroes/hero_windrunner/windrunner_spell_powershot.vpcf"
 
 local function IsValidAlive(unit)
@@ -59,10 +60,12 @@ local function CreateAnchorSmashWarning(ability, position, radius, duration)
 
 	local particle = ParticleManager:CreateParticle(DARKMOON_AOE_PARTICLE, PATTACH_WORLDORIGIN, nil)
 	ParticleManager:SetParticleControl(particle, 0, position)
-	ParticleManager:SetParticleControl(particle, 1, Vector(radius, 0, 0))
+	ParticleManager:SetParticleControl(particle, 1, Vector(radius, duration or 1.0, 0))
 	ParticleManager:SetParticleControl(particle, 2, Vector(duration or 1.0, 0, 1))
 	ParticleManager:SetParticleControl(particle, 3, PROUDMOORE_COLORS.primary)
 	ParticleManager:SetParticleControl(particle, 4, position)
+	ParticleManager:SetParticleControl(particle, 15, PROUDMOORE_COLORS.primary)
+	ParticleManager:SetParticleControl(particle, 16, Vector(1, 0, 0))
 	ability.xhs_anchor_smash_warning = particle
 
 	Timers:CreateTimer(math.max(duration or 1.0, 0.03), function()
@@ -253,6 +256,7 @@ function xhs_proudmoore_admirals_command:OnSpellStart()
 
 	local caster = self:GetCaster()
 	local context = GetContext(self)
+	XHSBossTelegraphs:Release(caster:GetAbsOrigin(), self:GetSpecialValueFor("radius"), PROUDMOORE_COLORS)
 	caster:AddNewModifier(caster, self, "modifier_xhs_proudmoore_command", { duration = self:GetSpecialValueFor("duration") })
 	DamageEnemies(caster, self, caster:GetAbsOrigin(), self:GetSpecialValueFor("radius"), ScaleDamage(self:GetSpecialValueFor("damage")), self:GetAbilityDamageType(), function(enemy)
 		enemy:AddNewModifier(caster, self, "modifier_xhs_proudmoore_command_shock", { duration = 3.5 })
@@ -379,6 +383,7 @@ function xhs_proudmoore_anchor_smash:OnSpellStart()
 	ClearAnchorSmashWarning(self, false)
 	local caster = self:GetCaster()
 	local radius = self:GetSpecialValueFor("radius")
+	XHSBossTelegraphs:Release(caster:GetAbsOrigin(), radius, PROUDMOORE_COLORS)
 	DamageEnemies(caster, self, caster:GetAbsOrigin(), radius, ScaleDamage(self:GetSpecialValueFor("damage")), self:GetAbilityDamageType(), function(enemy)
 		enemy:AddNewModifier(caster, self, "modifier_xhs_proudmoore_anchor_slow", { duration = self:GetSpecialValueFor("slow_duration") })
 	end)

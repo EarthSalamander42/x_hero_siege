@@ -556,8 +556,12 @@ function BuyMaxSmallTomesForPlayer(playerID, options)
 	local hero = PlayerResource:GetSelectedHeroEntity(playerID) or player:GetAssignedHero()
 	if hero == nil or hero:IsNull() then return 0 end
 
-	if IsPlayerXHSReincarnating(playerID) then
-		SendPurchaseError("#error_reincarnation_inventory_locked")
+	if IsPlayerXHSInventoryLocked ~= nil and IsPlayerXHSInventoryLocked(playerID) then
+		if IsPlayerXHSReincarnating(playerID) then
+			SendPurchaseError("#error_reincarnation_inventory_locked")
+		else
+			SendPurchaseError("#error_dead_inventory_locked")
+		end
 		return 0
 	end
 
@@ -709,6 +713,34 @@ function GetItemByID(id)
 	end
 end
 
+function XHSRemoveClosedPhaseOneLaneStructures(lane_number)
+	lane_number = tonumber(lane_number)
+	if lane_number == nil or lane_number < 1 or lane_number > 8 then return 0 end
+
+	if CREEP_LANES ~= nil and CREEP_LANES[lane_number] ~= nil then
+		-- This lane no longer owns a barracks and must never participate in
+		-- phase-one wave release or the phase-two Magnataur transition.
+		CREEP_LANES[lane_number][3] = 0
+	end
+
+	local removed = 0
+	local function RemoveNamedStructures(entityName)
+		for _, structure in pairs(Entities:FindAllByName(entityName)) do
+			if structure ~= nil and IsValidEntity(structure) and not structure:IsNull() then
+				-- UTIL_Remove is intentionally silent. Keep the marker as a guard in
+				-- case an engine build still emits entity_killed while removing it.
+				structure.xhs_silent_phase_one_lane_cleanup = true
+				UTIL_Remove(structure)
+				removed = removed + 1
+			end
+		end
+	end
+
+	RemoveNamedStructures("dota_badguys_tower" .. lane_number)
+	RemoveNamedStructures("dota_badguys_barracks_" .. lane_number)
+	return removed
+end
+
 function OpenLane(lane_number)
 	if IsInToolsMode() then
 		OpenCreepLane(lane_number)
@@ -815,25 +847,19 @@ function CloseCreepLane(lane_number)
 	if not CREEP_LANES[lane_number] then return end
 	if not CREEP_LANES[lane_number][1] then return end
 
-	if CREEP_LANES[lane_number][1] == 0 then return end
+	if CREEP_LANES[lane_number][1] == 0 then
+		XHSRemoveClosedPhaseOneLaneStructures(lane_number)
+		return
+	end
 	local DoorObs = Entities:FindAllByName("obstruction_lane" .. lane_number)
-	local towers = Entities:FindAllByName("dota_badguys_tower" .. lane_number)
-	local raxes = Entities:FindAllByName("dota_badguys_barracks_" .. lane_number)
 
 	for _, obs in pairs(DoorObs) do
 		obs:SetEnabled(true, false)
 	end
 
-	for _, tower in pairs(towers) do
-		tower:AddNewModifier(tower, nil, "modifier_invulnerable", nil)
-	end
-
-	for _, rax in pairs(raxes) do
-		rax:AddNewModifier(rax, nil, "modifier_invulnerable", nil)
-	end
-
 	Notifications:TopToAll({ text = "Host closed lane " .. lane_number .. "!", style = { color = "red" }, duration = 5.0 })
 	CREEP_LANES[lane_number][1] = 0
+	XHSRemoveClosedPhaseOneLaneStructures(lane_number)
 	DoEntFire("door_lane" .. lane_number, "SetAnimation", "gate_02_close", 0, nil, nil)
 end
 
@@ -1256,6 +1282,10 @@ function TeleportHero(hero, point, delay, iCameraSpeed, onTeleported)
 
 		TeleportEffect = ParticleManager:CreateParticle(teleportStartParticle, PATTACH_ABSORIGIN, hero)
 		ParticleManager:SetParticleControlEnt(TeleportEffect, 0, hero, PATTACH_ABSORIGIN, "attach_origin", pos, true)
+		-- Vanilla teleport_start and its cosmetic replacements read CP7.x as
+		-- the remaining channel duration. Without it, their countdown starts
+		-- at zero and the start effect can be completely invisible.
+		ParticleManager:SetParticleControl(TeleportEffect, 7, Vector(delay, 0, 0))
 		hero:Attribute_SetIntValue("effectsID", TeleportEffect)
 
 		TeleportEffectEnd = ParticleManager:CreateParticle(teleportEndParticle, PATTACH_WORLDORIGIN, nil)
@@ -1568,6 +1598,116 @@ function IsPlayerXHSReincarnating(playerID)
 	end
 
 	return hero ~= nil and not hero:IsNull() and hero.IsXHSReincarnating and hero:IsXHSReincarnating() == true
+end
+
+local XHS_DEAD_INVENTORY_SLOT_ORDER = {
+	-- Lock the stash first: a recipe stored there is what lets the engine
+	-- assemble items as soon as a dead hero gains fountain shop access.
+	9, 10, 11, 12, 13, 14,
+	0, 1, 2, 3, 4, 5, 6, 7, 8,
+}
+
+local function LockXHSDeadInventoryItems(hero)
+	if hero == nil or hero:IsNull() then return end
+
+	hero.xhs_dead_inventory_original_combine_locks = hero.xhs_dead_inventory_original_combine_locks or {}
+	local originalLocks = hero.xhs_dead_inventory_original_combine_locks
+
+	for _, slot in ipairs(XHS_DEAD_INVENTORY_SLOT_ORDER) do
+		local item = hero:GetItemInSlot(slot)
+		if item ~= nil and not item:IsNull() and item.SetCombineLocked ~= nil then
+			local itemEntIndex = item:entindex()
+			if originalLocks[itemEntIndex] == nil then
+				originalLocks[itemEntIndex] = item.IsCombineLocked ~= nil and item:IsCombineLocked() or false
+			end
+			item:SetCombineLocked(true)
+		end
+	end
+end
+
+function StopXHSDeadInventoryLock(hero)
+	if hero == nil or hero:IsNull() then return end
+
+	if hero.xhs_dead_inventory_lock_think_name ~= nil then
+		GameRules:GetGameModeEntity():SetContextThink(hero.xhs_dead_inventory_lock_think_name, nil, 0)
+		hero.xhs_dead_inventory_lock_think_name = nil
+	end
+
+	local originalLocks = hero.xhs_dead_inventory_original_combine_locks or {}
+	for _, slot in ipairs(XHS_DEAD_INVENTORY_SLOT_ORDER) do
+		local item = hero:GetItemInSlot(slot)
+		if item ~= nil and not item:IsNull() and item.SetCombineLocked ~= nil then
+			local originalLock = originalLocks[item:entindex()]
+			if originalLock ~= nil then
+				item:SetCombineLocked(originalLock == true)
+			end
+		end
+	end
+
+	hero.xhs_dead_inventory_original_combine_locks = nil
+	hero.xhs_dead_inventory_lock_active = nil
+	hero.xhs_dead_inventory_lock_message_time = nil
+end
+
+function StartXHSDeadInventoryLock(hero)
+	if hero == nil or hero:IsNull() or not hero:IsRealHero() or not hero:IsOwnedByAnyPlayer() then return end
+	if hero.xhs_dead_inventory_lock_active == true then return end
+
+	hero.xhs_dead_inventory_lock_active = true
+	LockXHSDeadInventoryItems(hero)
+
+	local thinkName = "xhs_dead_inventory_lock_" .. tostring(hero:entindex())
+	hero.xhs_dead_inventory_lock_think_name = thinkName
+	GameRules:GetGameModeEntity():SetContextThink(thinkName, function()
+		if hero == nil or hero:IsNull() then return nil end
+		if hero:IsAlive() then
+			StopXHSDeadInventoryLock(hero)
+			return nil
+		end
+
+		-- Also catches inventory changes made directly by another server script.
+		LockXHSDeadInventoryItems(hero)
+		return 0.03
+	end, 0)
+end
+
+local function GetXHSPlayerHero(playerID)
+	if playerID == nil or playerID < 0 or not PlayerResource:IsValidPlayerID(playerID) then return nil end
+
+	local hero = PlayerResource:HasSelectedHero(playerID) and PlayerResource:GetSelectedHeroEntity(playerID) or nil
+	if hero == nil or hero:IsNull() then
+		local player = PlayerResource:GetPlayer(playerID)
+		hero = player ~= nil and player:GetAssignedHero() or nil
+	end
+
+	return hero
+end
+
+function IsPlayerXHSInventoryLocked(playerID)
+	playerID = tonumber(playerID)
+	if playerID == nil or playerID < 0 then return false end
+	if IsPlayerXHSReincarnating(playerID) then return true end
+
+	local hero = GetXHSPlayerHero(playerID)
+	return hero ~= nil and not hero:IsNull()
+		and (hero.xhs_dead_inventory_lock_active == true or not hero:IsAlive())
+end
+
+function SendXHSInventoryLockedError(hero)
+	if hero == nil or hero:IsNull() or not hero.GetPlayerID then return end
+
+	local playerID = hero:GetPlayerID()
+	if playerID == nil or playerID < 0 then return end
+	if hero.IsXHSReincarnating ~= nil and hero:IsXHSReincarnating() then
+		SendXHSReincarnationInventoryLockedError(hero)
+		return
+	end
+
+	local now = GameRules:GetGameTime()
+	if hero.xhs_dead_inventory_lock_message_time == nil or hero.xhs_dead_inventory_lock_message_time <= now then
+		SendErrorMessage(playerID, "#error_dead_inventory_locked")
+		hero.xhs_dead_inventory_lock_message_time = now + 0.75
+	end
 end
 
 function GetBossBarColor(sBossName)

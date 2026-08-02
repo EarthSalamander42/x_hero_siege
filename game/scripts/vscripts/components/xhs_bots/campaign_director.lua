@@ -8,11 +8,49 @@ XHSBotCampaignDirector.stage = "inactive"
 XHSBotCampaignDirector.shal_confirmed = false
 XHSBotCampaignDirector.shal_entindex =
 	XHSBotCampaignDirector.shal_entindex or nil
+XHSBotCampaignDirector.uther_confirmed = false
 
 local SHAL_NAME = "npc_xhs_paladin"
+local UTHER_NAME = "npc_xhs_paladin_2"
+local UTHER_PRISON_NAME = "npc_xhs_uther_ice_prison"
+local ARTHAS_NAME = "npc_dota_hero_arthas"
 local MAGTHERIDON_NAME = "npc_dota_hero_magtheridon"
-local GROM_NAME = "npc_dota_hero_grom_hellscream"
 local SHAL_REACHED_DISTANCE = 340
+
+local PHASE_THREE_BOSSES = {
+	{
+		stage = "grom",
+		quest = "kill_grom",
+		goal = "campaign_grom",
+		unit_name = "npc_dota_hero_grom_hellscream",
+		spawn_names = { "spawn_grom_hellscream" },
+		label = "GROM HELLSCREAM",
+	},
+	{
+		stage = "illidan",
+		quest = "kill_illidan",
+		goal = "campaign_illidan",
+		unit_name = "npc_dota_hero_illidan",
+		spawn_names = { "spawn_illidan" },
+		label = "ILLIDAN",
+	},
+	{
+		stage = "balanar",
+		quest = "kill_balanar",
+		goal = "campaign_balanar",
+		unit_name = "npc_dota_hero_balanar",
+		spawn_names = { "spawn_balanar" },
+		label = "BALANAR",
+	},
+	{
+		stage = "proudmoore",
+		quest = "kill_proudmoore",
+		goal = "campaign_proudmoore",
+		unit_name = "npc_dota_hero_proudmoore",
+		spawn_names = { "spawn_admiral_proudmore" },
+		label = "PROUDMOORE",
+	},
+}
 
 local function IsValidEntityHandle(entity)
 	return entity ~= nil and IsValidEntity(entity) and not entity:IsNull()
@@ -192,23 +230,65 @@ function XHSBotCampaignDirector:ConfirmShalDialog(shal)
 	return completed
 end
 
+function XHSBotCampaignDirector:ConfirmUtherDialog(uther)
+	if self.uther_confirmed or not IsValidEntityHandle(uther)
+		or not IsQuestActive("teleport_arthas") then
+		return false
+	end
+	local completed = false
+	for _, zone in pairs(GameMode.Zones or {}) do
+		if zone ~= nil and zone.OnDialogAllConfirmed ~= nil then
+			local ok = pcall(function()
+				zone:OnDialogAllConfirmed(uther, 4)
+			end)
+			completed = completed or ok
+		end
+	end
+	print(
+		"[XHSBots][Campaign] action=confirm_uther_dialog result="
+			.. tostring(completed)
+	)
+	self.uther_confirmed = completed
+	return completed
+end
+
 function XHSBotCampaignDirector:Update(force)
 	local now = GameRules:GetGameTime()
 	if not force and now < (self.next_update or 0) then return end
 	self.next_update = now + 0.5
 
-	if not self:IsAutonomyAllowed() then
-		self:SetObjective("human_controlled", nil)
-		return
-	end
 	local phase = CustomTimers ~= nil
 		and tonumber(CustomTimers.game_phase) or 1
+	local autonomous = self:IsAutonomyAllowed()
+	if not autonomous
+		and phase >= 3
+		and IsQuestActive("teleport_top")
+		and not IsQuestComplete("teleport_top") then
+		-- In mixed games the player owns campaign interactions. Keep bots visibly
+		-- waiting around Shal instead of letting generic phase-three assignments
+		-- pull them back and forth across the interaction area.
+		local shal = self:FindShal()
+		local position = IsValidEntityHandle(shal)
+			and CopyPosition(shal:GetAbsOrigin()) or nil
+		self:SetObjective("shal_waiting_for_player", position ~= nil and {
+			goal = "campaign_wait_player",
+			anchor = position,
+			non_combat = true,
+			attack_move = false,
+			label = "WAITING FOR PLAYER",
+			urgency = 0.72,
+			-- Holding anywhere in this generous ring avoids oscillation while
+			-- leaving the NPC approachable for the human player.
+			reached_distance = 460,
+		} or nil)
+		return
+	end
 	if phase < 3 then
 		self:SetObjective("waiting_phase_3", nil)
 		return
 	end
 
-	if IsQuestActive("teleport_top")
+	if autonomous and IsQuestActive("teleport_top")
 		and not IsQuestComplete("teleport_top") then
 		local shal = self:FindShal()
 		local position = IsValidEntityHandle(shal)
@@ -260,25 +340,16 @@ function XHSBotCampaignDirector:Update(force)
 		return
 	end
 
-	local grom = FindUnitByName(GROM_NAME, DOTA_TEAM_CUSTOM_2, true)
 	local vanguard = GameMode ~= nil
 		and type(GameMode.GromVanguard) == "table"
 		and GameMode.GromVanguard or nil
-	if IsValidCombatUnit(grom)
-		and (vanguard == nil or vanguard.gate_opened == true) then
-		self:SetObjective("grom", {
-			goal = "campaign_grom",
-			anchor = CopyPosition(grom:GetAbsOrigin()),
-			target_entindex = grom:entindex(),
-			label = "FIGHTING GROM HELLSCREAM",
-			urgency = 1,
-			reached_distance = 500,
-		})
-		return
-	end
-
-	if IsQuestActive("clear_grom_vanguard")
-		or vanguard ~= nil and vanguard.started == true then
+	local vanguardQuestActive = IsQuestActive("clear_grom_vanguard")
+		and not IsQuestComplete("clear_grom_vanguard")
+	local vanguardFallbackActive = vanguard ~= nil
+		and vanguard.started == true
+		and vanguard.gate_opened ~= true
+		and not IsQuestComplete("clear_grom_vanguard")
+	if vanguardQuestActive or vanguardFallbackActive then
 		local started = vanguard ~= nil and vanguard.started == true
 		local position = nil
 		if started then
@@ -303,11 +374,129 @@ function XHSBotCampaignDirector:Update(force)
 		return
 	end
 
+	-- The four bosses already exist behind their successive gates. Drive only
+	-- the boss whose quest is active; otherwise an alive but still locked boss
+	-- (or the stale GromVanguard.started flag) can pull bots backwards.
+	for _, bossDefinition in ipairs(PHASE_THREE_BOSSES) do
+		if IsQuestActive(bossDefinition.quest)
+			and not IsQuestComplete(bossDefinition.quest) then
+			local boss = FindUnitByName(
+				bossDefinition.unit_name,
+				DOTA_TEAM_CUSTOM_2,
+				true
+			)
+			local bossIsAlive = IsValidCombatUnit(boss)
+				and boss.deathStart ~= true
+			local position = bossIsAlive
+				and CopyPosition(boss:GetAbsOrigin())
+				or FindNamedEntityPosition(bossDefinition.spawn_names)
+			self:SetObjective(bossDefinition.stage, position ~= nil and {
+				goal = bossDefinition.goal,
+				anchor = position,
+				target_entindex = bossIsAlive and boss:entindex() or nil,
+				label = (bossIsAlive and "FIGHTING " or "GOING TO ")
+					.. bossDefinition.label,
+				urgency = 1,
+				reached_distance = 500,
+			} or nil)
+			return
+		end
+	end
+
+	if IsQuestActive("free_uther")
+		and not IsQuestComplete("free_uther") then
+		local prison = FindUnitByName(
+			UTHER_PRISON_NAME,
+			DOTA_TEAM_CUSTOM_2,
+			true
+		)
+		local rescue = GameMode ~= nil and GameMode.UtherRescue or nil
+		if not IsValidCombatUnit(prison) and type(rescue) == "table"
+			and IsValidCombatUnit(rescue.prison) then
+			prison = rescue.prison
+		end
+		local position = IsValidCombatUnit(prison)
+			and CopyPosition(prison:GetAbsOrigin())
+			or FindNamedEntityPosition({ "spawn_admiral_proudmore" })
+		self:SetObjective("free_uther", position ~= nil and {
+			goal = "campaign_free_uther",
+			anchor = position,
+			target_entindex = IsValidCombatUnit(prison)
+				and prison:entindex() or nil,
+			label = IsValidCombatUnit(prison)
+				and "FREEING UTHER" or "GOING TO UTHER",
+			urgency = 1,
+			reached_distance = 400,
+		} or nil)
+		return
+	end
+
+	if IsQuestActive("teleport_arthas")
+		and not IsQuestComplete("teleport_arthas") then
+		local uther = FindUnitByName(UTHER_NAME, DOTA_TEAM_GOODGUYS, false)
+		local position = IsValidEntityHandle(uther)
+			and CopyPosition(uther:GetAbsOrigin())
+			or FindNamedEntityPosition({ "xhs_spawner_paladin_2_vip" })
+		self:SetObjective(
+			autonomous and "uther" or "uther_waiting_for_player",
+			position ~= nil and {
+			goal = autonomous and "campaign_uther" or "campaign_wait_player",
+			anchor = position,
+			target_entindex = IsValidEntityHandle(uther)
+				and uther:entindex() or nil,
+			non_combat = true,
+			attack_move = false,
+			label = autonomous and "TALKING TO UTHER LIGHTBRINGER"
+				or "WAITING FOR PLAYER",
+			urgency = autonomous and 0.95 or 0.72,
+			reached_distance = autonomous and SHAL_REACHED_DISTANCE or 460,
+		} or nil)
+		if autonomous and position ~= nil and self:AnyBotReached(
+			position,
+			SHAL_REACHED_DISTANCE
+		) then
+			self:ConfirmUtherDialog(uther)
+		end
+		return
+	end
+
+	if IsQuestActive("kill_arthas")
+		and not IsQuestComplete("kill_arthas") then
+		local arthas = FindUnitByName(ARTHAS_NAME, DOTA_TEAM_CUSTOM_2, true)
+		local arthasIsAlive = IsValidCombatUnit(arthas)
+			and arthas.deathStart ~= true
+		local position = arthasIsAlive
+			and CopyPosition(arthas:GetAbsOrigin())
+			or FindNamedEntityPosition({
+				"npc_dota_spawner_magtheridon_arena",
+				"point_teleport_boss_1",
+			})
+		self:SetObjective("arthas", position ~= nil and {
+			goal = "campaign_arthas",
+			anchor = position,
+			target_entindex = arthasIsAlive and arthas:entindex() or nil,
+			label = arthasIsAlive and "FIGHTING ARTHAS"
+				or "GOING TO ARTHAS",
+			urgency = 1,
+			reached_distance = 500,
+		} or nil)
+		return
+	end
+
 	self:SetObjective("phase_3_idle", nil)
 end
 
 function XHSBotCampaignDirector:GetObjective(playerID, hero)
-	if not self:IsAutonomyAllowed() or type(self.objective) ~= "table" then
+	if type(self.objective) ~= "table" then
+		return nil
+	end
+	local playerWaitObjective = self.stage == "shal_waiting_for_player"
+		or self.stage == "uther_waiting_for_player"
+	-- Mixed games still need explicit combat routing after the player starts a
+	-- quest. Only autonomous non-combat interactions remain bot-only.
+	if not self:IsAutonomyAllowed()
+		and self.objective.non_combat == true
+		and not playerWaitObjective then
 		return nil
 	end
 	local objective = {}
@@ -324,6 +513,7 @@ function XHSBotCampaignDirector:Reset()
 	self.stage = "inactive"
 	self.shal_confirmed = false
 	self.shal_entindex = nil
+	self.uther_confirmed = false
 end
 
 return XHSBotCampaignDirector

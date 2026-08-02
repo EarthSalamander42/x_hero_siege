@@ -506,6 +506,248 @@ function XHSBotBrain:SelectTarget(playerID, hero, profile, record, assignment, d
 	return best, bestScore
 end
 
+function XHSBotBrain:IsSpecialThreat(unit)
+	if not self:IsCombatTarget(unit) then return false end
+	local active = CustomTimers and CustomTimers.active_special_wave_units or nil
+	if type(active) ~= "table" then return false end
+	local index = unit:entindex()
+	if active[index] == true
+		or active[index] == unit
+		or active[tostring(index)] == true
+		or active[tostring(index)] == unit then return true end
+	for _, value in pairs(active) do
+		if value == unit or tonumber(value) == index then return true end
+	end
+	return false
+end
+
+function XHSBotBrain:BuildThreatPacks(hero, enemies)
+	local candidates = {}
+	for _, enemy in pairs(enemies or {}) do
+		if self:IsCombatTarget(enemy) and self:IsTeamVisible(hero, enemy) then
+			table.insert(candidates, enemy)
+			if #candidates >= 32 then break end
+		end
+	end
+
+	local packs = {}
+	local claimed = {}
+	for seedIndex, seed in ipairs(candidates) do
+		if not claimed[seedIndex] then
+			local pack = { members = {}, indices = {} }
+			local queue = { seedIndex }
+			claimed[seedIndex] = true
+			local cursor = 1
+			while cursor <= #queue do
+				local candidateIndex = queue[cursor]
+				cursor = cursor + 1
+				local candidate = candidates[candidateIndex]
+				table.insert(pack.members, candidate)
+				table.insert(pack.indices, candidate:entindex())
+				for otherIndex, other in ipairs(candidates) do
+					if not claimed[otherIndex]
+						and Distance2D(candidate:GetAbsOrigin(), other:GetAbsOrigin()) <= 575 then
+						claimed[otherIndex] = true
+						table.insert(queue, otherIndex)
+					end
+				end
+			end
+			table.sort(pack.indices)
+			pack.signature = table.concat(pack.indices, ",")
+			table.insert(packs, pack)
+		end
+	end
+	return packs
+end
+
+function XHSBotBrain:EvaluateThreatPacks(
+	playerID,
+	hero,
+	profile,
+	record,
+	assignment,
+	difficulty,
+	enemies
+)
+	local allowedEnemies = {}
+	for _, enemy in pairs(enemies or {}) do
+		if self:IsTargetAllowedByAssignment(
+			playerID,
+			hero,
+			enemy,
+			assignment,
+			difficulty
+		) then
+			table.insert(allowedEnemies, enemy)
+		end
+	end
+	local packs = self:BuildThreatPacks(hero, allowedEnemies)
+	local heroOrigin = hero:GetAbsOrigin()
+	local preferredRange = tonumber(profile and profile.preferred_range) or 0
+	local attackRange = 0
+	if hero.Script_GetAttackRange ~= nil then
+		local ok, value = pcall(function() return hero:Script_GetAttackRange() end)
+		if ok then attackRange = tonumber(value) or 0 end
+	end
+	local ranged = preferredRange >= 450 or attackRange >= 450
+	local allies = self:GetAllies(hero, 1800)
+	local now = GameRules:GetGameTime()
+	local best = nil
+	local bestScore = -math.huge
+	local previous = nil
+
+	for _, pack in ipairs(packs) do
+		local sum = Vector(0, 0, 0)
+		local forecastEnemies = {}
+		local structureEmergency = false
+		local bossCount = 0
+		local specialCount = 0
+		for _, enemy in ipairs(pack.members) do
+			sum = sum + enemy:GetAbsOrigin()
+			local focused = false
+			local attackTarget = nil
+			if enemy.GetAttackTarget ~= nil then
+				local ok, value = pcall(function() return enemy:GetAttackTarget() end)
+				if ok then attackTarget = value end
+				focused = attackTarget == hero
+			end
+			if IsValidEntityHandle(attackTarget)
+				and attackTarget.IsBuilding ~= nil
+				and attackTarget:IsBuilding() then
+				structureEmergency = true
+			end
+			local enemyRange = 150
+			if enemy.Script_GetAttackRange ~= nil then
+				local ok, value = pcall(function() return enemy:Script_GetAttackRange() end)
+				if ok then enemyRange = math.max(0, tonumber(value) or enemyRange) end
+			end
+			-- Forecast the fight at contact, not the harmless travel frame. Using
+			-- current distance here made every distant lethal wave look farmable.
+			local reach = focused and 1
+				or enemyRange >= 450 and 0.88
+				or ranged and 0.58
+				or 0.78
+			local boss = XHSBotConfig:IsBossTarget(enemy)
+			local special = self:IsSpecialThreat(enemy)
+			if boss then bossCount = bossCount + 1 end
+			if special then specialCount = specialCount + 1 end
+			table.insert(forecastEnemies, {
+				effective_health = math.max(1, enemy:GetHealth()),
+				projected_dps = self:GetAttackDamageAgainst(enemy, hero)
+					* self:GetUnitAttacksPerSecond(enemy),
+				reach_factor = reach,
+				focused = focused,
+				disable_risk = boss and 0.34 or special and 0.16 or 0.03,
+				boss = boss,
+				special = special,
+			})
+		end
+		pack.position = sum * (1 / math.max(1, #pack.members))
+		pack.distance = Distance2D(heroOrigin, pack.position)
+		local representative = pack.members[1]
+		local allyDPS = 0
+		for _, ally in ipairs(allies or {}) do
+			if IsValidEntityHandle(ally) and ally ~= hero and ally:IsAlive()
+				and Distance2D(ally:GetAbsOrigin(), pack.position) <= 950 then
+				allyDPS = allyDPS + self:GetHeroAttackDPSAgainst(ally, representative)
+			end
+		end
+		local areaFactor = 1 + math.min(1.35, (#pack.members - 1)
+			* (ranged and 0.08 or 0.18))
+		local objectiveLoss = assignment ~= nil
+			and tonumber(assignment.objective_loss_seconds) or nil
+		local affordablePowerSpike = tostring(record.planned_item or "") ~= ""
+			and XHSBotEconomy ~= nil
+			and XHSBotEconomy:GetGold(playerID) >= math.max(
+				5000,
+				(tonumber(record.economy_reserve_gold) or 0) + 2500
+			)
+		local lifestealPercent, lifestealUptime =
+			self:GetForecastAttackLifesteal(hero, profile)
+		if lifestealPercent > 2 then lifestealPercent = lifestealPercent / 100 end
+		local heroDPS = self:GetHeroAttackDPSAgainst(hero, representative)
+		local availableBurst = 0
+		for abilityName, rule in pairs(profile and profile.abilities or {}) do
+			local offensive = rule.mode == "enemy_unit"
+				or rule.mode == "point_aoe"
+				or rule.mode == "directional_point"
+				or rule.mode == "no_target_enemy"
+				or rule.mode == "no_target_mixed"
+			if offensive then
+				local ability = hero:FindAbilityByName(abilityName)
+				if IsValidEntityHandle(ability) and ability:GetLevel() > 0
+					and ability:IsFullyCastable() then
+					local cooldown = 0
+					if ability.GetCooldown ~= nil then
+						local ok, value = pcall(function()
+							return ability:GetCooldown(math.max(0, ability:GetLevel() - 1))
+						end)
+						if ok then cooldown = tonumber(value) or 0 end
+					end
+					if cooldown < 45 then
+						local damage = self:GetAbilityDamageAgainst(
+							hero,
+							ability,
+							representative,
+							rule
+						)
+						local areaTargets = rule.mode == "enemy_unit" and 1
+							or math.min(#pack.members, 3)
+						availableBurst = availableBurst + damage * areaTargets
+					end
+				end
+			end
+		end
+		pack.forecast = XHSBotWorldModel:EstimateEngagement({
+			maximum_health = hero:GetMaxHealth(),
+			current_health = hero:GetHealth(),
+			hero_dps = heroDPS,
+			available_burst = availableBurst,
+			ally_dps = allyDPS,
+			enemies = forecastEnemies,
+			area_factor = areaFactor,
+			combat_uptime = ranged and 0.72 or 0.86,
+			sustain_per_second = self:GetUnitHealthRegen(hero)
+				+ heroDPS * lifestealPercent * lifestealUptime,
+			cover_reduction = structureEmergency and 0.18 or 0,
+			ranged = ranged,
+			pullable = pack.distance >= 260,
+			affordable_power_spike = affordablePowerSpike,
+			structure_emergency = structureEmergency,
+			objective_loss_time = objectiveLoss,
+			travel_time = pack.distance / math.max(100, self:GetUnitMovementSpeed(hero)),
+			unavoidable = structureEmergency and assignment ~= nil
+				and assignment.goal == "defend_base",
+		})
+		pack.structure_emergency = structureEmergency
+		pack.score = ({
+			FARMABLE = 62,
+			CONTESTABLE = 42,
+			NEEDS_GEAR = 8,
+			NEEDS_HELP = 18,
+			SUICIDAL = -38,
+		})[pack.forecast.classification] or 0
+		pack.score = pack.score + pack.forecast.feasibility * 32
+			+ (structureEmergency and 125 or 0)
+			+ math.min(45, bossCount * 30 + specialCount * 18)
+			- pack.distance / 85
+		if pack.signature == record.engagement_pack_signature then previous = pack end
+		if pack.score > bestScore then best, bestScore = pack, pack.score end
+	end
+
+	-- Short hysteresis prevents adjacent packs from making the bot oscillate.
+	if previous ~= nil and now < (tonumber(record.engagement_locked_until) or 0)
+		and previous.score >= bestScore - 16 then
+		best = previous
+		bestScore = previous.score
+	end
+	if best ~= nil and best.signature ~= record.engagement_pack_signature then
+		record.engagement_pack_signature = best.signature
+		record.engagement_locked_until = now + 1.35
+	end
+	return best, packs
+end
+
 function XHSBotBrain:GetAllies(hero, radius)
 	radius = math.max(0, tonumber(radius) or 0)
 	return self:FilterFriendlyQueryUnits(
@@ -2070,6 +2312,31 @@ function XHSBotBrain:BuildAbilityAction(hero, ability, rule, target, enemies, di
 		action.score = action.score + (tonumber(difficulty.simple_combo_bonus) or 0)
 		action.reason = action.reason .. " (simple control follow-up)"
 	end
+	local cooldown = 0
+	if ability.GetCooldown ~= nil then
+		local ok, value = pcall(function()
+			return ability:GetCooldown(math.max(0, ability:GetLevel() - 1))
+		end)
+		if ok then cooldown = math.max(0, tonumber(value) or 0) end
+	end
+	action.cooldown_budget = cooldown
+	action.long_cooldown = rule.reserve_ultimate == true or cooldown >= 45
+	local offensive = mode == "enemy_unit"
+		or mode == "point_aoe"
+		or mode == "directional_point"
+		or mode == "no_target_enemy"
+		or mode == "no_target_mixed"
+		or mode == "summon"
+	if action.long_cooldown and offensive
+		and record.engagement_classification == "FARMABLE"
+		and not XHSBotConfig:IsBossTarget(target)
+		and (tonumber(record.engagement_time_to_clear) or 999) <= 8
+		and (tonumber(record.combat_threat) or 0) < 0.62 then
+		record.ultimate_reservation_reason = "farmable pack; reserve " .. name
+		record.ultimate_reservations = (record.ultimate_reservations or 0) + 1
+		self:RecordAbilityRejection(record, name, record.ultimate_reservation_reason)
+		return nil
+	end
 	if action.score <= 0 then return nil end
 	return action
 end
@@ -2221,6 +2488,7 @@ end
 
 function XHSBotBrain:BuildAbilityActions(hero, profile, target, enemies, difficulty, record)
 	local actions = {}
+	record.ultimate_reservation_reason = ""
 	local attackModeAction = self:BuildRifleAttackModeAction(
 		hero,
 		profile.attack_mode,
@@ -2431,10 +2699,54 @@ function XHSBotBrain:BuildContext(playerID, hero, profile, difficulty, record, a
 		and encounter
 		and encounter.forced_target
 		or nil
+	local forcedTarget = target
+	record.forced_target_entindex = IsValidEntityHandle(forcedTarget)
+		and forcedTarget:entindex() or nil
+	record.forced_target_block_reason = nil
 	if target ~= nil and not self:IsCombatTarget(target) then
+		record.forced_target_block_reason = "invalid forced target"
 		target = nil
+	elseif target ~= nil
+		and not self:IsTeamVisible(hero, target) then
+		-- A campaign boss may exist several rooms ahead. Do not let its large
+		-- forced-target score starve the lower-scored movement action: advance to
+		-- the encounter anchor until the team genuinely sees the boss.
+		record.forced_target_block_reason = "forced target not team-visible"
+		target = nil
+	elseif target ~= nil then
+		local forcedDistance = Distance2D(
+			hero:GetAbsOrigin(),
+			target:GetAbsOrigin()
+		)
+		local forcedChaseLimit = math.max(
+			250,
+			tonumber(encounter and encounter.max_chase_distance)
+				or tonumber(difficulty.max_chase_distance)
+				or 1800
+		)
+		if forcedDistance > forcedChaseLimit then
+			record.forced_target_block_reason =
+				"forced target beyond chase limit"
+			target = nil
+		end
 	end
+	record.forced_target_reachable = target ~= nil
 	local targetScore = target ~= nil and 120 or nil
+	local engagementPack = nil
+	local threatPacks = {}
+	if target == nil
+		and encounter == nil
+		and not nonCombatObjective then
+		engagementPack, threatPacks = self:EvaluateThreatPacks(
+			playerID,
+			hero,
+			profile,
+			record,
+			assignment,
+			difficulty,
+			enemies
+		)
+	end
 	if target == nil
 		and not nonCombatObjective
 		and (encounter == nil or encounter.no_combat ~= true) then
@@ -2445,8 +2757,46 @@ function XHSBotBrain:BuildContext(playerID, hero, profile, difficulty, record, a
 			record,
 			assignment,
 			difficulty,
-			enemies
+			engagementPack ~= nil and engagementPack.members or enemies
 		)
+	end
+	local engagement = engagementPack and engagementPack.forecast or nil
+	if engagement ~= nil then
+		record.engagement_classification = engagement.classification
+		record.engagement_mode = engagement.mode
+		record.engagement_pack_count = #threatPacks
+		record.engagement_enemy_count = engagement.enemy_count
+		record.engagement_time_to_clear =
+			math.floor(engagement.time_to_clear * 10) / 10
+		record.engagement_time_to_die =
+			math.floor(engagement.time_to_die * 10) / 10
+		record.engagement_survival_ratio =
+			math.floor(engagement.survival_ratio * 100) / 100
+		record.engagement_feasibility =
+			math.floor(engagement.feasibility * 100) / 100
+		record.engagement_score = math.floor((engagementPack.score or 0) * 10) / 10
+		record.engagement_position = CopyPosition(engagementPack.position)
+		local wantsGear = engagement.classification == "NEEDS_GEAR"
+			or engagement.classification == "SUICIDAL"
+				and engagement.urgent_objective ~= true
+		if wantsGear and tostring(record.planned_item or "") ~= "" then
+			record.engagement_purchase_requested = true
+			record.engagement_purchase_requested_at = now
+			record.engagement_purchase_reason = engagement.classification
+				.. " pack: TTD " .. string.format("%.1f", engagement.time_to_die)
+				.. "s vs TTK " .. string.format("%.1f", engagement.time_to_clear) .. "s"
+		elseif engagement.classification == "FARMABLE" then
+			record.engagement_purchase_requested = false
+		end
+		record.engagement_help_requested = engagement.classification == "NEEDS_HELP"
+		record.engagement_help_requested_at = record.engagement_help_requested
+			and now or record.engagement_help_requested_at
+	else
+		record.engagement_classification = encounter ~= nil and "ENCOUNTER" or "NONE"
+		record.engagement_mode = encounter ~= nil and "FULL_COMMIT" or "NONE"
+		record.engagement_pack_count = #threatPacks
+		record.engagement_enemy_count = 0
+		record.engagement_help_requested = false
 	end
 	if target ~= nil and record.target_entindex ~= target:entindex() then
 		record.target_changes = (record.target_changes or 0) + 1
@@ -2757,8 +3107,30 @@ function XHSBotBrain:BuildContext(playerID, hero, profile, difficulty, record, a
 			profile,
 			anchor,
 			mobileSafeZone,
-			strategicThreatPosition
+			engagementPack ~= nil and engagementPack.position
+				or strategicThreatPosition
 		),
+		engagement_classification = engagement and engagement.classification or "NONE",
+		engagement_mode = engagement and engagement.mode or "FULL_COMMIT",
+		engagement_position = engagementPack and engagementPack.position or nil,
+		engagement_enemy_count = engagement and engagement.enemy_count or 0,
+		engagement_time_to_clear = engagement and engagement.time_to_clear or 0,
+		engagement_time_to_die = engagement and engagement.time_to_die or 0,
+		engagement_survival_ratio = engagement and engagement.survival_ratio or 0,
+		engagement_feasibility = engagement and engagement.feasibility or 1,
+		engagement_urgent = engagement and engagement.urgent_objective == true or false,
+		engagement_allow_attack = engagement == nil
+			or engagement.classification == "FARMABLE"
+			or engagement.classification == "CONTESTABLE"
+			or engagement.urgent_objective == true
+			or (engagement.mode == "PULL_SMALL_GROUP"
+				or engagement.mode == "KITE_EDGE")
+				and targetDistance ~= nil
+				and targetDistance <= math.max(
+					tonumber(profile.preferred_range) or 0,
+					450
+				) + 100
+				and threat.focused_by <= 1,
 		ability_actions = abilityActions,
 		anchor = anchor,
 		anchor_distance = Distance2D(hero:GetAbsOrigin(), anchor),
