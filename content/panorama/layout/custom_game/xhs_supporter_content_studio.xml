@@ -6,7 +6,7 @@
 		<Panel id="ContentStudioWindow" class="StudioWindow Hidden" hittest="true">
 			<Panel class="StudioHeader">
 				<Panel class="StudioHeaderCopy"><Label class="Eyebrow" text="SUPPORTER PASS 4.0 - DEVELOPER CATALOG" /><Label class="Title" text="Content Studio" /><Label class="Subtitle" text="Preview official Dota effects, then send the strongest candidates to the persistent review queue." /></Panel>
-				<Button class="CloseButton" onactivate="GameUI.CustomUIConfig().XHSContentStudio.Toggle()"><Label text="X" /></Button>
+				<Button class="CloseButton" onactivate="GameUI.CustomUIConfig().XHSContentStudio.Close()"><Label text="X" /></Button>
 			</Panel>
 			<Panel class="SceneNotice"><Label id="ContentStudioSceneNoticeText" text="Checking preview support…" /></Panel>
 			<Panel id="ContentStudioCategories" class="FacetRow Categories" />
@@ -17,8 +17,8 @@
 			</Panel>
 			<Panel class="StudioToolbar">
 				<TextEntry id="ContentStudioSearch" placeholder="Search name or VPCF path" ontextentrychange="GameUI.CustomUIConfig().XHSContentStudio.Render()" />
-				<Button onactivate="GameUI.CustomUIConfig().XHSContentStudio.Stop()"><Label text="STOP PREVIEW" /></Button>
-				<Button onactivate="GameUI.CustomUIConfig().XHSContentStudio.Sync()"><Label text="REFRESH" /></Button>
+				<Button id="ContentStudioStop" onactivate="GameUI.CustomUIConfig().XHSContentStudio.Stop()"><Label id="ContentStudioStopLabel" text="STOP PREVIEW" /></Button>
+				<Button id="ContentStudioRefresh" onactivate="GameUI.CustomUIConfig().XHSContentStudio.Sync()"><Label text="REFRESH" /></Button>
 			</Panel>
 			<Label id="ContentStudioStatus" class="Status" text="Opening Content Studio..." />
 			<Panel id="ContentStudioCandidates" class="CandidateGrid" />

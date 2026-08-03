@@ -1465,6 +1465,736 @@
 	visibility: visible;
 }
 
+@keyframes 'xhs_xp_modal_reveal'
+{
+	0% { opacity: 0; transform: translateY( 18px ) scale3d( 0.965, 0.965, 1 ); }
+	70% { opacity: 1; transform: translateY( -2px ) scale3d( 1.006, 1.006, 1 ); }
+	100% { opacity: 1; transform: translateY( 0px ) scale3d( 1, 1, 1 ); }
+}
+
+@keyframes 'xhs_xp_accent_breathe'
+{
+	0% { opacity: 0.55; brightness: 1; }
+	50% { opacity: 1; brightness: 1.7; }
+	100% { opacity: 0.55; brightness: 1; }
+}
+
+@keyframes 'xhs_xp_progress_shimmer'
+{
+	0% { transform: translateX( -210px ); opacity: 0; }
+	18% { opacity: 0.7; }
+	72% { opacity: 0.7; }
+	100% { transform: translateX( 470px ); opacity: 0; }
+}
+
+@keyframes 'xhs_xp_step_reveal'
+{
+	0% { opacity: 0; transform: translateX( -12px ); }
+	100% { opacity: 1; transform: translateX( 0px ); }
+}
+
+@keyframes 'xhs_xp_step_active'
+{
+	0% { box-shadow: inset #5ad0ff00 0px 0px 0px 0px; }
+	50% { box-shadow: inset #5ad0ff2b 0px 0px 18px 0px; }
+	100% { box-shadow: inset #5ad0ff00 0px 0px 0px 0px; }
+}
+
+@keyframes 'xhs_xp_gain_pop'
+{
+	0% { transform: scale3d( 0.78, 0.78, 1 ); brightness: 1; }
+	55% { transform: scale3d( 1.13, 1.13, 1 ); brightness: 2; }
+	100% { transform: scale3d( 1, 1, 1 ); brightness: 1; }
+}
+
+@keyframes 'xhs_xp_transfer_to_bar'
+{
+	0% { opacity: 0; transform: translateY( 215px ) scale3d( 0.82, 0.82, 1 ); brightness: 1; }
+	18% { opacity: 1; transform: translateY( 170px ) scale3d( 1.08, 1.08, 1 ); brightness: 2; }
+	78% { opacity: 1; transform: translateY( -150px ) scale3d( 0.94, 0.94, 1 ); brightness: 1.5; }
+	100% { opacity: 0; transform: translateY( -195px ) scale3d( 0.62, 0.62, 1 ); brightness: 2.4; }
+}
+
+@keyframes 'xhs_xp_next_reward_breathe'
+{
+	0% { box-shadow: fill #9d63ff22 0px 0px 8px 0px; brightness: 1; }
+	50% { box-shadow: fill #9d63ff66 0px 0px 18px 0px; brightness: 1.22; }
+	100% { box-shadow: fill #9d63ff22 0px 0px 8px 0px; brightness: 1; }
+}
+
+@keyframes 'xhs_xp_level_up_burst'
+{
+	0% { opacity: 0; transform: scale3d( 0.42, 0.42, 1 ); brightness: 4; }
+	22% { opacity: 1; transform: scale3d( 1.08, 1.08, 1 ); brightness: 2.2; }
+	65% { opacity: 1; transform: scale3d( 0.98, 0.98, 1 ); brightness: 1.25; }
+	100% { opacity: 0; transform: scale3d( 1.28, 1.28, 1 ); brightness: 1; }
+}
+
+@keyframes 'xhs_xp_level_up_ring'
+{
+	0% { opacity: 0.9; transform: rotateZ( 0deg ) scale3d( 0.55, 0.55, 1 ); }
+	100% { opacity: 0; transform: rotateZ( 180deg ) scale3d( 1.35, 1.35, 1 ); }
+}
+
+@keyframes 'xhs_xp_ready_pulse'
+{
+	0% { box-shadow: fill #d4a64244 0px 0px 9px 0px; }
+	50% { box-shadow: fill #f1c862aa 0px 0px 19px 0px; }
+	100% { box-shadow: fill #d4a64244 0px 0px 9px 0px; }
+}
+
+.XHSEndScreenXPContainer {
+	width: 100%;
+	height: 100%;
+	align: center center;
+	opacity: 0;
+	visibility: collapse;
+	z-index: 90;
+	transition-property: opacity;
+	transition-duration: 0.2s;
+}
+
+.XHSEndScreenXPContainer.IsVisible {
+	opacity: 1;
+	visibility: visible;
+}
+
+.XHSXPBackdrop {
+	width: 100%;
+	height: 100%;
+	background-color: #01040bed;
+}
+
+.HasPendingXP .XHSEndScreenMain {
+	brightness: 0.27;
+	saturation: 0.32;
+}
+
+.XHSXPModal {
+	width: 880px;
+	height: 820px;
+	align: center center;
+	flow-children: down;
+	padding: 30px 34px 24px 34px;
+	overflow: noclip;
+	background-color: gradient( linear, 0% 0%, 100% 100%, from( #0a1d31 ), color-stop( 0.48, #071422 ), to( #030914 ) );
+	border: 1px solid #3b7296;
+	box-shadow: fill #000000f2 0px 24px 70px 0px;
+	animation-name: xhs_xp_modal_reveal;
+	animation-duration: 0.42s;
+	animation-timing-function: ease-out;
+}
+
+.XHSXPTopAccent {
+	width: 520px;
+	height: 4px;
+	align: center top;
+	margin-top: -31px;
+	background-color: gradient( linear, 0% 0%, 100% 0%, from( #5ad0ff00 ), color-stop( 0.28, #5ad0ff ), color-stop( 0.72, #c486ff ), to( #c486ff00 ) );
+	box-shadow: fill #6fcfff66 0px 0px 12px 0px;
+	animation-name: xhs_xp_accent_breathe;
+	animation-duration: 2.4s;
+	animation-iteration-count: infinite;
+}
+
+.XHSXPHeader {
+	width: 100%;
+	height: 64px;
+	flow-children: right;
+}
+
+.XHSXPHeaderCopy {
+	width: fill-parent-flow( 1 );
+	flow-children: down;
+}
+
+.XHSXPEyebrow,
+.XHSXPTotalCaption,
+.XHSXPRewardCaption,
+.XHSXPStepsTitle {
+	color: #78cbed;
+	font-size: 13px;
+	font-weight: bold;
+	letter-spacing: 2px;
+	text-transform: uppercase;
+}
+
+.XHSXPPlayerName {
+	margin-top: 2px;
+	color: #f0f6ff;
+	font-size: 28px;
+	font-weight: bold;
+	text-shadow: 0px 2px 4px 2 #000000cc;
+}
+
+.XHSXPTotalBlock {
+	width: 210px;
+	flow-children: down;
+	horizontal-align: right;
+}
+
+.XHSXPTotalCaption {
+	width: 100%;
+	color: #8a9dad;
+	text-align: right;
+}
+
+.XHSXPTotalGain {
+	width: 100%;
+	margin-top: -2px;
+	color: #efc65a;
+	font-size: 31px;
+	font-weight: bold;
+	text-align: right;
+	text-shadow: 0px 0px 10px 2 #d39e3655;
+}
+
+.XHSEndScreenXPContainer.IsAnimating .XHSXPTotalGain,
+.XHSXPModal.IsAnimating .XHSXPTotalGain {
+	animation-name: xhs_xp_gain_pop;
+	animation-duration: 0.32s;
+}
+
+.XHSXPProgressSection {
+	width: 100%;
+	height: 148px;
+	margin-top: 8px;
+	padding: 12px 14px;
+	background-color: #030b15cc;
+	border: 1px solid #244a63;
+	box-shadow: inset #000000aa 0px 4px 18px 0px;
+}
+
+.XHSXPRewardEndpoints {
+	width: 100%;
+	height: 100%;
+	flow-children: right;
+}
+
+.XHSXPRewardEndpoint {
+	width: 220px;
+	height: 100%;
+	flow-children: right;
+	vertical-align: center;
+}
+
+.XHSXPRewardImageFrame {
+	width: 94px;
+	height: 94px;
+	vertical-align: center;
+	overflow: noclip;
+	background-color: #07131e;
+	border: 1px solid #4e7185;
+	box-shadow: fill #000000aa 0px 5px 13px 0px;
+}
+
+.XHSXPRewardEndpoint.Previous .XHSXPRewardImageFrame {
+	saturation: 1;
+	brightness: 0.86;
+	border-color: #3d4c57;
+}
+
+.XHSXPRewardEndpoint.Next .XHSXPRewardImageFrame {
+	border-color: #b18afb;
+	animation-name: xhs_xp_next_reward_breathe;
+	animation-duration: 2.1s;
+	animation-iteration-count: infinite;
+}
+
+.XHSXPRewardImage,
+.XHSXPRewardImageShade,
+.XHSXPRewardImageGlow {
+	width: 100%;
+	height: 100%;
+}
+
+.XHSXPRewardImage {
+	pre-transform-scale2d: 1.04;
+}
+
+.XHSXPRewardImageShade {
+	background-color: #07111c22;
+}
+
+.XHSXPRewardImageGlow {
+	background-color: gradient( radial, 50% 50%, 0% 0%, 50% 50%, from( #c38aff22 ), color-stop( 0.7, #7435c511 ), to( #00000000 ) );
+}
+
+.XHSXPRewardCopy {
+	width: fill-parent-flow( 1 );
+	flow-children: down;
+	vertical-align: center;
+	margin-left: 10px;
+}
+
+.XHSXPRewardEndpoint.Next .XHSXPRewardCopy {
+	margin-left: 0px;
+	margin-right: 10px;
+}
+
+.XHSXPRewardCaption {
+	color: #71899c;
+	font-size: 10px;
+	letter-spacing: 1.5px;
+}
+
+.XHSXPRewardEndpoint.Next .XHSXPRewardCaption,
+.XHSXPRewardEndpoint.Next .XHSXPRewardName {
+	width: 100%;
+	text-align: right;
+}
+
+.XHSXPRewardName {
+	width: 100%;
+	margin-top: 3px;
+	color: #d7e2ed;
+	font-size: 14px;
+	font-weight: semi-bold;
+	text-overflow: shrink;
+}
+
+.XHSXPRewardEndpoint.Previous .XHSXPRewardName {
+	color: #aab9c5;
+}
+
+.XHSXPLevelTrack {
+	width: fill-parent-flow( 1 );
+	height: 100%;
+	flow-children: down;
+	vertical-align: center;
+	margin: 0px 16px;
+}
+
+.XHSXPLevelLabels {
+	width: 100%;
+	height: 28px;
+}
+
+.XHSXPLevelLabel {
+	color: #dceaff;
+	font-size: 15px;
+	font-weight: bold;
+	letter-spacing: 1px;
+	text-shadow: 0px 1px 3px 2 #000000cc;
+}
+
+.XHSXPLevelLabel.Current { horizontal-align: left; }
+.XHSXPLevelLabel.Next { horizontal-align: right; color: #d7b7ff; }
+
+.XHSXPProgressBar {
+	width: 100%;
+	height: 24px;
+	overflow: clip;
+	background-color: #02070d;
+	border: 1px solid #3a5667;
+	box-shadow: inset #000000ee 0px 3px 9px 0px;
+}
+
+.XHSXPProgressBackGlow {
+	width: 100%;
+	height: 100%;
+	background-color: gradient( linear, 0% 0%, 100% 0%, from( #13385244 ), to( #4c296344 ) );
+}
+
+.XHSXPProgressFill {
+	width: 0%;
+	height: 100%;
+	overflow: clip;
+	background-color: gradient( linear, 0% 0%, 100% 0%, from( #1591c0 ), color-stop( 0.58, #38d0df ), to( #ab62f0 ) );
+	box-shadow: fill #65dbff66 0px 0px 9px 0px;
+	transition-property: width;
+	transition-duration: 0.12s;
+	transition-timing-function: ease-out;
+}
+
+.XHSXPProgressShine {
+	width: 105px;
+	height: 100%;
+	background-color: gradient( linear, 0% 0%, 100% 0%, from( #ffffff00 ), color-stop( 0.5, #ffffffaa ), to( #ffffff00 ) );
+	animation-name: xhs_xp_progress_shimmer;
+	animation-duration: 1.25s;
+	animation-iteration-count: infinite;
+}
+
+.XHSXPProgressTicks {
+	width: 100%;
+	height: 100%;
+	background-color: gradient( linear, 0% 0%, 100% 0%, from( #ffffff00 ), color-stop( 0.25, #ffffff19 ), color-stop( 0.251, #ffffff00 ), color-stop( 0.5, #ffffff19 ), color-stop( 0.501, #ffffff00 ), color-stop( 0.75, #ffffff19 ), color-stop( 0.751, #ffffff00 ), to( #ffffff00 ) );
+}
+
+.XHSXPProgressText {
+	width: 100%;
+	margin-top: 7px;
+	color: #9eb7ca;
+	font-size: 13px;
+	font-weight: semi-bold;
+	text-align: center;
+}
+
+.XHSXPStepsSection {
+	width: 100%;
+	height: fill-parent-flow( 1 );
+	min-height: 430px;
+	margin-top: 14px;
+	flow-children: down;
+}
+
+.XHSXPStepsHeader {
+	width: 100%;
+	height: 32px;
+	flow-children: right;
+	border-bottom: 1px solid #284355;
+}
+
+.XHSXPStepsTitle {
+	width: fill-parent-flow( 1 );
+	color: #9ecde2;
+}
+
+.XHSXPStepsHint {
+	color: #607889;
+	font-size: 12px;
+	text-align: right;
+}
+
+.XHSXPSteps {
+	width: 100%;
+	height: fill-parent-flow( 1 );
+	flow-children: down;
+	padding-top: 6px;
+	overflow: squish scroll;
+}
+
+.XHSXPSteps VerticalScrollBar {
+	width: 5px;
+	background-color: #02060a88;
+}
+
+.XHSXPSteps VerticalScrollBar .ScrollThumb {
+	background-color: #345b72;
+	border: 0px;
+}
+
+.XHSXPStep {
+	width: 100%;
+	min-height: 48px;
+	margin-bottom: 5px;
+	padding: 7px 12px 7px 14px;
+	flow-children: right;
+	opacity: 0.32;
+	background-color: #071521aa;
+	border-left: 3px solid #334c5b;
+	transition-property: opacity, brightness, background-color, border;
+	transition-duration: 0.18s;
+}
+
+.XHSXPStep.IsActive {
+	opacity: 1;
+	background-color: #0c2638dd;
+	border-left-color: #5ad0ff;
+	animation-name: xhs_xp_step_active;
+	animation-duration: 0.75s;
+	animation-iteration-count: infinite;
+}
+
+.XHSXPStep.IsResolved {
+	opacity: 0.82;
+	border-left-color: #55b886;
+	animation-name: xhs_xp_step_reveal;
+	animation-duration: 0.24s;
+}
+
+.XHSXPStep.IsZero {
+	opacity: 0.5;
+	saturation: 0.2;
+	border-left-color: #53616a;
+}
+
+.XHSXPStep.IsSupporter {
+	background-color: gradient( linear, 0% 0%, 100% 0%, from( #241b3dcc ), to( #0b1a27cc ) );
+	border-left-color: #b36bea;
+}
+
+.XHSXPStep.IsSupporter.IsZero {
+	opacity: 0.78;
+	saturation: 1;
+}
+
+.XHSXPStep.IsSupporter.IsZero.IsActive {
+	opacity: 1;
+	saturation: 1;
+	brightness: 1.12;
+}
+
+.XHSXPStep.IsSupporter.IsZero.IsResolved {
+	opacity: 0.9;
+	saturation: 1;
+}
+
+.XHSXPStepMarker {
+	width: 32px;
+	height: 32px;
+	vertical-align: center;
+	margin-right: 12px;
+	padding-top: 5px;
+	color: #7cc7e8;
+	font-size: 14px;
+	font-weight: bold;
+	text-align: center;
+	background-color: #0a2232;
+	border: 1px solid #47758e;
+}
+
+.XHSXPStepCopy {
+	width: fill-parent-flow( 1 );
+	flow-children: down;
+	vertical-align: center;
+}
+
+.XHSXPStepTitle {
+	color: #dbe9f4;
+	font-size: 16px;
+	font-weight: semi-bold;
+}
+
+.XHSXPStepDetails {
+	width: 100%;
+	margin-top: 1px;
+	flow-children: down;
+	color: #7890a2;
+	font-size: 12px;
+	text-overflow: shrink;
+}
+
+.XHSXPStepDetail {
+	width: 100%;
+	height: 16px;
+	flow-children: right;
+}
+
+.XHSXPStepDetailBullet {
+	width: 12px;
+	height: 16px;
+	margin-right: 4px;
+	color: #62c7e8;
+	font-size: 13px;
+	font-weight: bold;
+	text-align: center;
+}
+
+.XHSXPStepDetailLabel {
+	width: fill-parent-flow( 1 );
+	color: #879faf;
+	font-size: 12px;
+	text-overflow: shrink;
+}
+
+.XHSXPStepDetailValue {
+	min-width: 76px;
+	color: #a9c4d5;
+	font-size: 12px;
+	font-weight: semi-bold;
+	text-align: right;
+}
+
+.XHSXPStepGain {
+	min-width: 118px;
+	vertical-align: center;
+	color: #82e1b0;
+	font-size: 22px;
+	font-weight: bold;
+	text-align: right;
+	text-shadow: 0px 0px 8px 2 #3fd78f33;
+}
+
+.XHSXPStep.IsActive .XHSXPStepGain {
+	color: #f1cb68;
+	animation-name: xhs_xp_gain_pop;
+	animation-duration: 0.34s;
+}
+
+.XHSXPStep.IsZero .XHSXPStepGain {
+	color: #7b8993;
+	text-shadow: none;
+}
+
+.XHSXPStep.IsSupporter .XHSXPStepGain {
+	color: #d99aff;
+}
+
+.XHSXPSupporterCTA {
+	min-width: 125px;
+	height: 30px;
+	margin-top: 4px;
+	background-color: gradient( linear, 0% 0%, 100% 0%, from( #8d4dba ), to( #c78548 ) );
+	border: 1px solid #dda8ff66;
+}
+
+.XHSXPSupporterCTA:hover {
+	brightness: 1.35;
+}
+
+.XHSXPSupporterCTA Label {
+	align: center center;
+	color: white;
+	font-size: 12px;
+	font-weight: bold;
+	letter-spacing: 0.8px;
+}
+
+.XHSXPFooter {
+	width: 100%;
+	height: 56px;
+	flow-children: right;
+	padding-top: 10px;
+	border-top: 1px solid #203a4c;
+}
+
+.XHSXPFooterHint {
+	width: fill-parent-flow( 1 );
+	vertical-align: center;
+	color: #60788a;
+	font-size: 13px;
+}
+
+.XHSXPContinueButton {
+	width: 280px;
+	height: 43px;
+	flow-children: right;
+	background-color: #172631;
+	border: 1px solid #40515b;
+	brightness: 0.55;
+	transition-property: brightness, background-color, border, box-shadow;
+	transition-duration: 0.16s;
+}
+
+.XHSXPContinueButton Label {
+	align: center center;
+	color: #84929b;
+	font-size: 14px;
+	font-weight: bold;
+	letter-spacing: 1.1px;
+}
+
+.XHSEndScreenXPContainer.IsReady .XHSXPContinueButton,
+.XHSXPModal.IsReady .XHSXPContinueButton {
+	background-color: gradient( linear, 0% 0%, 100% 0%, from( #a66d12 ), to( #d8a632 ) );
+	border-color: #f3cf73;
+	brightness: 1;
+	animation-name: xhs_xp_ready_pulse;
+	animation-duration: 1.8s;
+	animation-iteration-count: infinite;
+}
+
+.XHSEndScreenXPContainer.IsReady .XHSXPContinueButton:hover,
+.XHSXPModal.IsReady .XHSXPContinueButton:hover {
+	brightness: 1.35;
+}
+
+.XHSEndScreenXPContainer.IsReady .XHSXPContinueButton Label,
+.XHSXPModal.IsReady .XHSXPContinueButton Label {
+	color: #fff7dd;
+	text-shadow: 0px 1px 3px 2 #6c3d00aa;
+}
+
+.XHSXPContinueArrow {
+	width: 9px;
+	height: 9px;
+	vertical-align: center;
+	margin-left: 14px;
+	margin-right: 17px;
+	border-top: 2px solid #fff2c4;
+	border-right: 2px solid #fff2c4;
+	transform: rotateZ( 45deg );
+	opacity: 0.45;
+}
+
+.XHSEndScreenXPContainer.IsReady .XHSXPContinueArrow,
+.XHSXPModal.IsReady .XHSXPContinueArrow {
+	opacity: 1;
+}
+
+.XHSXPTransferLayer {
+	width: 880px;
+	height: 820px;
+	align: center center;
+	overflow: noclip;
+	z-index: 94;
+}
+
+.XHSXPTransferFlyup,
+.XHSXPTransferGain {
+	align: center center;
+	opacity: 0;
+	color: #f1cf70;
+	font-size: 26px;
+	font-weight: bold;
+	text-shadow: 0px 0px 12px 3 #55cfff77;
+}
+
+.XHSXPTransferFlyup.IsFlying,
+.XHSXPTransferGain.IsFlying {
+	animation-name: xhs_xp_transfer_to_bar;
+	animation-duration: 0.72s;
+	animation-timing-function: ease-in;
+}
+
+.XHSXPLevelUpBurst {
+	width: 410px;
+	height: 210px;
+	align: center center;
+	margin-top: -126px;
+	opacity: 0;
+	overflow: noclip;
+	z-index: 95;
+}
+
+.XHSEndScreenXPContainer.IsLevelUp .XHSXPLevelUpBurst,
+.XHSXPModal.IsLevelUp .XHSXPLevelUpBurst,
+.XHSXPLevelUpBurst.IsLevelUp {
+	animation-name: xhs_xp_level_up_burst;
+	animation-duration: 1.05s;
+	animation-timing-function: ease-out;
+}
+
+.XHSXPLevelUpRing {
+	width: 170px;
+	height: 170px;
+	align: center center;
+	border: 3px solid #72ddff;
+	transform: rotateZ( 45deg );
+}
+
+.XHSXPLevelUpRing.Inner {
+	width: 118px;
+	height: 118px;
+	border-color: #d39cff;
+}
+
+.XHSEndScreenXPContainer.IsLevelUp .XHSXPLevelUpRing,
+.XHSXPModal.IsLevelUp .XHSXPLevelUpRing,
+.XHSXPLevelUpBurst.IsLevelUp .XHSXPLevelUpRing {
+	animation-name: xhs_xp_level_up_ring;
+	animation-duration: 0.95s;
+	animation-timing-function: ease-out;
+}
+
+.XHSXPLevelUpFlash {
+	width: 300px;
+	height: 150px;
+	align: center center;
+	background-color: gradient( radial, 50% 50%, 0% 0%, 50% 50%, from( #ecfaffbb ), color-stop( 0.22, #7bdfff55 ), color-stop( 0.55, #af70e522 ), to( #00000000 ) );
+}
+
+.XHSXPLevelUpText {
+	align: center center;
+	color: #fff2bc;
+	font-size: 31px;
+	font-weight: bold;
+	letter-spacing: 3px;
+	text-shadow: 0px 0px 15px 4 #5ad0ffcc;
+}
+
 .XHSEndScreenRewardContainer {
 	width: 100%;
 	height: 100%;
@@ -1855,6 +2585,24 @@
 	height: 780px;
 }
 
+.AspectRatio16x10 .XHSXPModal,
+.AspectRatio16x10 .XHSXPTransferLayer {
+	width: 840px;
+	height: 760px;
+}
+
+.AspectRatio16x10 .XHSXPModal {
+	padding: 24px 28px 18px 28px;
+}
+
+.AspectRatio16x10 .XHSXPStepsSection {
+	min-height: 370px;
+}
+
+.AspectRatio16x10 .XHSXPProgressSection {
+	height: 136px;
+}
+
 .AspectRatio16x10 .XHSEndScreenMetaItem {
 	width: 128px;
 }
@@ -1871,6 +2619,33 @@
 .AspectRatio4x3 .XHSEndScreenMain {
 	width: 1160px;
 	height: 760px;
+}
+
+.AspectRatio4x3 .XHSXPModal,
+.AspectRatio4x3 .XHSXPTransferLayer {
+	width: 800px;
+	height: 730px;
+}
+
+.AspectRatio4x3 .XHSXPModal {
+	padding: 22px 24px 16px 24px;
+}
+
+.AspectRatio4x3 .XHSXPRewardEndpoint {
+	width: 202px;
+}
+
+.AspectRatio4x3 .XHSXPRewardImageFrame {
+	width: 82px;
+	height: 82px;
+}
+
+.AspectRatio4x3 .XHSXPStepsSection {
+	min-height: 350px;
+}
+
+.AspectRatio4x3 .XHSXPProgressSection {
+	height: 126px;
 }
 
 .AspectRatio4x3 .XHSEndScreenLeft {

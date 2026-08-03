@@ -2871,6 +2871,773 @@ DropDownMenu.DropDownMenuVisible {
 	brightness: 0.46;
 }
 
+.XHSPassShopCard.IsDormant {
+	border-color: #f0a83c70;
+	box-shadow: fill #000000a8 0px 5px 13px 0px, inset #f0a83c18 0px 0px 16px 0px;
+}
+
+.XHSPassShopCard.IsDormant .XHSPassShopPrice,
+.XHSPassShopCard.IsDormant .XHSPassShopButton Label {
+	color: #f0c06a;
+}
+
+/* Permanent Supporter Pass 4.0 storefront. Rotation inventory remains a
+ * separate 4.1 concern; this surface only consumes the permanent catalog. */
+.ItemTypeBundle .XHSPassItemPreview {
+	background-color: gradient( radial, 48% 48%, 0% 0%, 72% 72%, from( #b58a3f78 ), color-stop( 0.44, #49331aee ), color-stop( 0.72, #17101df2 ), to( #030206fa ) );
+	box-shadow: inset #f2c77724 0px 0px 24px 0px;
+}
+
+.XHSPassShopDiscoveryBar {
+	width: 100%;
+	height: 48px;
+	padding: 6px 8px;
+	flow-children: right;
+	background-color: gradient( linear, 0% 0%, 100% 0%, from( #030811f2 ), color-stop( 0.48, #07131ff0 ), to( #030811f2 ) );
+	border: 1px solid #5ad0ff26;
+}
+
+.XHSPassShopSearch {
+	width: 250px;
+	height: 34px;
+	padding: 6px 12px 6px 36px;
+	vertical-align: center;
+	color: #e8f7ff;
+	font-size: 13px;
+	background-color: #020710f4;
+	background-image: url( "s2r://panorama/images/control_icons/24px/search.vsvg" );
+	background-size: 18px 18px;
+	background-position: 10px 50%;
+	background-repeat: no-repeat;
+	wash-color: #7db9d8;
+	border: 1px solid #5ad0ff42;
+}
+
+.XHSPassShopSearch:focus,
+.XHSPassShopSearch.HasInput {
+	wash-color: white;
+	border-color: #8ce5ff;
+	box-shadow: fill #5ad0ff18 0px 0px 8px 0px;
+}
+
+.XHSPassShopFacetGroup {
+	width: 360px;
+	height: 34px;
+	margin-left: 12px;
+	flow-children: right;
+	vertical-align: center;
+}
+
+.XHSPassShopFacetGroup.IsRarity {
+	width: fill-parent-flow( 1.0 );
+}
+
+.XHSPassShopFacetLabel {
+	width: 58px;
+	vertical-align: center;
+	color: #668397;
+	font-size: 10px;
+	font-weight: bold;
+	letter-spacing: 1px;
+}
+
+.XHSPassShopFacetTabs {
+	width: fill-parent-flow( 1.0 );
+	height: 34px;
+	flow-children: right;
+	overflow: scroll squish;
+}
+
+.XHSPassShopFacetButton {
+	width: fit-children;
+	height: 26px;
+	min-width: 42px;
+	margin-right: 4px;
+	padding: 0px 9px;
+	vertical-align: center;
+	background-color: #091522d8;
+	border: 1px solid #5d789033;
+	transition-property: brightness, border, background-color;
+	transition-duration: 0.1s;
+}
+
+.XHSPassShopFacetButton:hover,
+.XHSPassShopFacetButton.IsActive {
+	brightness: 1.2;
+	background-color: gradient( linear, 0% 0%, 100% 0%, from( #123146 ), to( #0b566f ) );
+	border-color: #69d7ff88;
+}
+
+.XHSPassShopFacetButton Label {
+	align: center center;
+	color: #8fa9ba;
+	font-size: 10px;
+	font-weight: bold;
+	text-transform: uppercase;
+	white-space: nowrap;
+}
+
+.XHSPassShopFacetButton:hover Label,
+.XHSPassShopFacetButton.IsActive Label {
+	color: #edfaff;
+}
+
+.XHSPassShopCatalogMeta {
+	width: 110px;
+	vertical-align: center;
+	color: #5d7d91;
+	font-size: 10px;
+	text-align: right;
+	text-overflow: shrink;
+	text-transform: uppercase;
+}
+
+.XHSPassShopHighlights {
+	width: 100%;
+	height: 236px;
+	margin-top: 10px;
+	flow-children: right;
+	visibility: collapse;
+}
+
+.XHSPassShopHighlights.IsVisible {
+	visibility: visible;
+}
+
+.XHSPassShopHero {
+	width: 50%;
+	height: 100%;
+	margin-right: 12px;
+	visibility: collapse;
+}
+
+.XHSPassShopHighlights.HasHero .XHSPassShopHero {
+	visibility: visible;
+}
+
+.XHSPassShopFeatured {
+	width: fill-parent-flow( 1.0 );
+	height: 100%;
+	flow-children: right-wrap;
+}
+
+.XHSPassShopHeroCard,
+.XHSPassShopFeaturedCard {
+	flow-children: right;
+	background-color: gradient( linear, 0% 0%, 100% 100%, from( #0c2334f4 ), color-stop( 0.56, #07121ef8 ), to( #02050bfa ) );
+	border: 1px solid #5ad0ff46;
+	box-shadow: fill #000000b8 0px 5px 14px 0px, inset #ffffff10 0px 1px 0px 0px;
+	overflow: clip;
+}
+
+.XHSPassShopHeroCard {
+	width: 100%;
+	height: 100%;
+}
+
+.XHSPassShopFeaturedCard {
+	width: 49%;
+	height: 112px;
+	margin-right: 1%;
+	margin-bottom: 12px;
+}
+
+.XHSPassShopHeroCard:hover,
+.XHSPassShopFeaturedCard:hover {
+	brightness: 1.13;
+	border-color: #8ce5ff9c;
+}
+
+.XHSPassShopHeroCard.IsOwned,
+.XHSPassShopFeaturedCard.IsOwned,
+.XHSPassPermanentShopCard.IsOwned {
+	border-color: #70e39a78;
+	box-shadow: fill #000000b8 0px 5px 14px 0px, inset #70e39a18 0px 0px 14px 0px;
+}
+
+.XHSPassShopHeroCard.IsLocked .XHSPassItemPreview,
+.XHSPassShopFeaturedCard.IsLocked .XHSPassItemPreview {
+	saturation: 0.34;
+	brightness: 0.58;
+}
+
+.XHSPassShopHighlightPreview {
+	width: 44%;
+	height: 100%;
+	border: 0px solid #00000000;
+	border-right: 1px solid #5ad0ff35;
+}
+
+.XHSPassShopFeaturedCard .XHSPassShopHighlightPreview {
+	width: 38%;
+}
+
+.XHSPassShopHighlightCopy {
+	width: fill-parent-flow( 1.0 );
+	height: 100%;
+	padding: 14px 16px;
+	flow-children: down;
+}
+
+.XHSPassShopFeaturedCard .XHSPassShopHighlightCopy {
+	padding: 7px 9px;
+}
+
+.XHSPassShopHighlightName {
+	width: 100%;
+	height: 38px;
+	margin-top: 6px;
+	color: #f5fbff;
+	font-size: 24px;
+	font-weight: bold;
+	text-overflow: shrink;
+	text-shadow: 0px 1px 4px 2.0 #000000;
+}
+
+.XHSPassShopFeaturedCard .XHSPassShopHighlightName {
+	height: 24px;
+	margin-top: 2px;
+	font-size: 15px;
+}
+
+.XHSPassShopHighlightMeta {
+	width: 100%;
+	color: #7db9d8;
+	font-size: 11px;
+	text-transform: uppercase;
+}
+
+.XHSPassShopHighlightDescription {
+	width: 100%;
+	height: 42px;
+	margin-top: 8px;
+	color: #b7cbd8;
+	font-size: 13px;
+	line-height: 17px;
+	text-overflow: shrink;
+}
+
+.XHSPassShopHighlightPrice {
+	width: 100%;
+	margin-top: 8px;
+	color: #f2c94c;
+	font-size: 19px;
+	font-weight: bold;
+	text-shadow: 0px 1px 4px 2.0 #000000;
+}
+
+.XHSPassShopFeaturedCard .XHSPassShopHighlightPrice {
+	margin-top: 2px;
+	font-size: 13px;
+}
+
+.XHSPassShopHighlightActions,
+.XHSPassShopCardActions,
+.XHSPassShopDetailActions {
+	width: 100%;
+	height: 32px;
+	margin-top: 8px;
+	flow-children: right;
+}
+
+.XHSPassShopFeaturedCard .XHSPassShopHighlightActions {
+	height: 25px;
+	margin-top: 3px;
+}
+
+.XHSPassShopCatalogHeader {
+	width: 100%;
+	height: 28px;
+	margin-top: 8px;
+	flow-children: right;
+	border-bottom: 1px solid #5ad0ff26;
+}
+
+.XHSPassShopCatalogTitle {
+	width: fill-parent-flow( 1.0 );
+	vertical-align: center;
+	color: #d9edf7;
+	font-size: 13px;
+	font-weight: bold;
+	letter-spacing: 1.5px;
+}
+
+.XHSPassShopCatalogCount {
+	width: 260px;
+	vertical-align: center;
+	color: #7895a8;
+	font-size: 11px;
+	text-align: right;
+	text-transform: uppercase;
+}
+
+.XHSPassPermanentShopCard {
+	height: 388px;
+	background-color: gradient( linear, 0% 0%, 100% 100%, from( #091725f2 ), color-stop( 0.62, #050c15f5 ), to( #02050bfa ) );
+	transition-property: brightness, border, box-shadow, pre-transform-scale2d;
+	transition-duration: 0.12s;
+	pre-transform-scale2d: 0.985;
+}
+
+.XHSPassPermanentShopCard:hover {
+	brightness: 1.13;
+	border-color: #8ce5ff8c;
+	box-shadow: fill #000000cc 0px 8px 18px 0px, fill #5ad0ff1e 0px 0px 14px 0px;
+	pre-transform-scale2d: 1.0;
+}
+
+.XHSPassPermanentShopCard .XHSPassShopName {
+	height: 38px;
+	margin-top: 6px;
+	font-size: 17px;
+}
+
+.XHSPassPermanentShopCard .XHSPassShopPrice {
+	margin-top: 5px;
+	font-size: 19px;
+}
+
+.XHSPassShopBadges {
+	width: 100%;
+	height: 25px;
+	margin-top: 7px;
+	flow-children: right;
+	overflow: squish;
+}
+
+.XHSPassShopHighlightCopy > .XHSPassShopBadges {
+	margin-top: 0px;
+}
+
+.XHSPassShopBadges.IsCompact {
+	height: 21px;
+}
+
+.XHSPassShopBadge {
+	height: 20px;
+	margin-right: 4px;
+	padding: 2px 6px;
+	color: #a9c0cf;
+	font-size: 9px;
+	font-weight: bold;
+	text-transform: uppercase;
+	background-color: #0d1b28e8;
+	border: 1px solid #607c9045;
+	white-space: nowrap;
+}
+
+.XHSPassShopBadge.IsEdition { color: #8edfff; border-color: #5ad0ff60; }
+.XHSPassShopBadge.IsGiftable { color: #a8efc0; border-color: #70e39a62; }
+.XHSPassShopBadge.IsTier { color: #e1c1ff; border-color: #c99cff65; }
+.XHSPassShopBadge.IsOwned { color: #a8efc0; border-color: #70e39a72; }
+.XHSPassShopBadge.IsDormant { color: #f2c779; border-color: #f0a83c70; }
+
+.XHSPassBundleBadge {
+	width: fit-children;
+	height: 20px;
+	margin-right: 5px;
+	padding: 1px 5px 1px 2px;
+	flow-children: right;
+	background-color: #080d13e8;
+	border: 1px solid #9db1bf55;
+}
+
+.XHSPassBundleBadge Label {
+	margin-left: 2px;
+	vertical-align: center;
+	color: #d6e1e7;
+	font-size: 9px;
+	font-weight: bold;
+	text-transform: uppercase;
+}
+
+.XHSPassBundleGlyph {
+	width: 18px;
+	height: 18px;
+	vertical-align: center;
+	background-image: url( "s2r://panorama/images/control_icons/24px/bundle.vsvg" );
+	background-size: 75%;
+	background-position: 50% 50%;
+	background-repeat: no-repeat;
+	wash-color: #dbe5ea;
+}
+
+.XHSPassBundleBadge.IsOnPreview {
+	ignore-parent-flow: true;
+	horizontal-align: right;
+	margin-top: 8px;
+	margin-right: 8px;
+	padding: 2px;
+	background-color: #020508e8;
+	border-color: #dbe5ea80;
+	z-index: 5;
+}
+
+.XHSPassBundleBadge.IsOnPreview .XHSPassBundleGlyph {
+	width: 22px;
+	height: 22px;
+}
+
+.XHSPassShopDetailsButton,
+.XHSPassShopPurchaseButton,
+.XHSPassCatalogPreviewButton {
+	width: fill-parent-flow( 1.0 );
+	height: 100%;
+	margin-right: 5px;
+	background-color: #101d29ee;
+	border: 1px solid #7393a955;
+	transition-property: brightness, border;
+	transition-duration: 0.1s;
+}
+
+.XHSPassShopPurchaseButton {
+	margin-right: 0px;
+	background-color: gradient( linear, 0% 0%, 100% 0%, from( #075675 ), color-stop( 0.5, #0a8ab8 ), to( #075675 ) );
+	border-color: #8ce5ff68;
+}
+
+.XHSPassCatalogPreviewButton {
+	background-color: gradient( linear, 0% 0%, 100% 0%, from( #594112 ), color-stop( 0.5, #8c681e ), to( #594112 ) );
+	border-color: #e7bc5968;
+}
+
+.XHSPassShopDetailsButton:hover,
+.XHSPassShopPurchaseButton:hover,
+.XHSPassCatalogPreviewButton:hover {
+	brightness: 1.25;
+	border-color: #c6f2ff;
+}
+
+.XHSPassShopDetailsButton Label,
+.XHSPassShopPurchaseButton Label,
+.XHSPassCatalogPreviewButton Label {
+	align: center center;
+	color: #edf8ff;
+	font-size: 11px;
+	font-weight: bold;
+	text-transform: uppercase;
+	text-overflow: shrink;
+}
+
+.XHSPassShopPurchaseButton.IsLocked,
+.XHSPassShopPurchaseButton.IsOwned,
+.XHSPassCatalogPreviewButton.IsLocked {
+	brightness: 0.58;
+	saturation: 0.35;
+	background-color: #202a36;
+	border-color: #65717b42;
+}
+
+.XHSPassShopPurchaseButton.IsOwned Label {
+	color: #8fcfa6;
+}
+
+.XHSPassCatalogPreviewButton.IsActive {
+	background-color: gradient( linear, 0% 0%, 100% 0%, from( #5a2316 ), color-stop( 0.5, #9b4125 ), to( #5a2316 ) );
+	border-color: #ff9a7068;
+}
+
+.XHSPassCatalogPreviewButton.IsPending {
+	brightness: 0.82;
+}
+
+.XHSPassCatalogPreviewButton.IsMapLocked Label {
+	color: #d4b777;
+}
+
+.XHSPassShopDetailOverlay {
+	width: 100%;
+	height: 100%;
+	ignore-parent-flow: true;
+	visibility: collapse;
+	opacity: 0;
+	background-color: #010307d8;
+	z-index: 500;
+	transition-property: opacity;
+	transition-duration: 0.12s;
+}
+
+.XHSPassShopDetailOverlay.IsVisible {
+	visibility: visible;
+	opacity: 1;
+}
+
+.XHSPassShopDetailBackdrop {
+	width: 100%;
+	height: 100%;
+	background-color: #010308b8;
+}
+
+.XHSPassShopDetailWindow {
+	width: 980px;
+	height: 610px;
+	align: center center;
+	flow-children: down;
+	background-color: gradient( linear, 0% 0%, 100% 100%, from( #0b1b27fc ), color-stop( 0.56, #071019fc ), to( #02050afc ) );
+	border: 1px solid #d6a94975;
+	box-shadow: fill #000000e0 0px 0px 30px 0px, fill #d6a9491e 0px 0px 20px 0px, inset #ffffff12 0px 1px 0px 0px;
+}
+
+.XHSPassShopDetailHeader {
+	width: 100%;
+	height: 76px;
+	padding: 13px 16px 10px 20px;
+	flow-children: right;
+	background-color: gradient( linear, 0% 0%, 100% 0%, from( #172130f2 ), to( #080d14f2 ) );
+	border-bottom: 1px solid #d6a94948;
+}
+
+.XHSPassShopDetailHeaderCopy {
+	width: fill-parent-flow( 1.0 );
+	flow-children: down;
+}
+
+.XHSPassShopDetailEyebrow {
+	color: #d6a949;
+	font-size: 10px;
+	font-weight: bold;
+	letter-spacing: 2px;
+}
+
+.XHSPassShopDetailTitle {
+	width: 100%;
+	height: 38px;
+	margin-top: 3px;
+	color: #f6f2e9;
+	font-size: 28px;
+	font-weight: bold;
+	text-overflow: shrink;
+	text-shadow: 0px 1px 4px 2.0 #000000;
+}
+
+.XHSPassShopDetailClose {
+	width: 42px;
+	height: 42px;
+	vertical-align: center;
+	background-color: #101820e8;
+	border: 1px solid #76889755;
+}
+
+.XHSPassShopDetailClose:hover { brightness: 1.3; border-color: #c8d6df; }
+.XHSPassShopDetailClose Label { align: center center; color: #dbe5eb; font-size: 19px; }
+
+.XHSPassShopDetailBody {
+	width: 100%;
+	height: fill-parent-flow( 1.0 );
+	padding: 18px;
+	flow-children: right;
+}
+
+.XHSPassShopDetailMedia {
+	width: 392px;
+	height: 100%;
+	margin-right: 20px;
+	background-color: #02060bf2;
+	border: 1px solid #5ad0ff34;
+}
+
+.XHSPassShopDetailPreview {
+	width: 100%;
+	height: 100%;
+	border: 0px solid #00000000;
+}
+
+.XHSPassShopDetailContent {
+	width: fill-parent-flow( 1.0 );
+	height: 100%;
+	flow-children: down;
+	overflow: squish scroll;
+}
+
+.XHSPassShopDetailMeta {
+	margin-top: 8px;
+	color: #8fdcff;
+	font-size: 12px;
+	font-weight: bold;
+	text-transform: uppercase;
+}
+
+.XHSPassShopDetailDescription {
+	width: 100%;
+	min-height: 46px;
+	margin-top: 10px;
+	color: #bdcbd5;
+	font-size: 14px;
+	line-height: 19px;
+}
+
+.XHSPassShopDetailBundleHeader {
+	width: 100%;
+	height: 28px;
+	margin-top: 12px;
+	flow-children: right;
+	border-bottom: 1px solid #7b8f9e35;
+}
+
+.XHSPassShopDetailBundleCount {
+	width: fill-parent-flow( 1.0 );
+	vertical-align: center;
+	color: #8196a4;
+	font-size: 10px;
+	text-align: right;
+	text-transform: uppercase;
+}
+
+.XHSPassShopDetailComponents {
+	width: 100%;
+	max-height: 230px;
+	margin-top: 7px;
+	flow-children: down;
+	overflow: squish scroll;
+}
+
+.XHSPassShopDetailComponent {
+	width: 100%;
+	height: 66px;
+	margin-bottom: 5px;
+	padding: 5px 7px;
+	flow-children: right;
+	background-color: #0a121be8;
+	border: 1px solid #61798c32;
+}
+
+.XHSPassShopDetailComponent.IsOwned { border-color: #70e39a55; background-color: #0b1e18e8; }
+.XHSPassShopDetailComponent.IsDormant { border-color: #f0a83c55; background-color: #211609e8; }
+
+.XHSPassShopDetailComponentImage {
+	width: 42px;
+	height: 42px;
+	margin-right: 8px;
+	background-color: #02050a;
+	border: 1px solid #71859645;
+}
+
+.XHSPassShopDetailComponentCopy {
+	width: fill-parent-flow( 1.0 );
+	flow-children: down;
+	vertical-align: center;
+}
+
+.XHSPassShopDetailComponentName {
+	width: 100%;
+	color: #e9f2f6;
+	font-size: 13px;
+	font-weight: bold;
+	text-overflow: shrink;
+}
+
+.XHSPassShopDetailComponentMeta {
+	color: #7894a7;
+	font-size: 9px;
+	text-transform: uppercase;
+}
+
+.XHSPassShopDetailComponentSide {
+	width: 148px;
+	height: 100%;
+	flow-children: down;
+	vertical-align: center;
+}
+
+.XHSPassShopDetailComponentState {
+	width: 100%;
+	height: 17px;
+	color: #9fb4c0;
+	font-size: 9px;
+	font-weight: bold;
+	text-align: right;
+	text-transform: uppercase;
+	text-overflow: shrink;
+}
+
+.XHSPassCatalogPreviewButton.IsCompact {
+	width: 100%;
+	height: 28px;
+	margin-top: 2px;
+	margin-right: 0px;
+}
+
+.XHSPassCatalogPreviewButton.IsCompact Label {
+	font-size: 9px;
+}
+
+.XHSPassShopDetailComponent.IsOwned .XHSPassShopDetailComponentState { color: #70e39a; }
+.XHSPassShopDetailComponent.IsDormant .XHSPassShopDetailComponentState { color: #f0c06a; }
+
+.XHSPassShopDetailComponentsEmpty,
+.XHSPassShopDetailWarning,
+.XHSPassShopDetailNotice {
+	width: 100%;
+	margin-top: 8px;
+	padding: 8px 10px;
+	color: #c1cbd2;
+	font-size: 11px;
+	background-color: #101820d8;
+	border: 1px solid #6d7e8b42;
+}
+
+.XHSPassShopDetailWarning {
+	color: #ffd58a;
+	background-color: #261805df;
+	border-color: #f0a83c68;
+}
+
+.XHSPassShopDetailWarning.IsOwned {
+	color: #a7edbe;
+	background-color: #092116df;
+	border-color: #70e39a68;
+}
+
+.XHSPassShopDetailNotice {
+	color: #d8c39c;
+	border-color: #c3924860;
+}
+
+.XHSPassShopDetailNotice.IsWebsiteOnly {
+	color: #9ddfff;
+	background-color: #071a27df;
+	border-color: #5ad0ff60;
+}
+
+.XHSPassShopDetailFooter {
+	width: 100%;
+	min-height: 66px;
+	margin-top: 10px;
+	flow-children: down;
+}
+
+.XHSPassShopDetailPrice {
+	width: 100%;
+	color: #f2c94c;
+	font-size: 23px;
+	font-weight: bold;
+}
+
+.XHSPassShopDetailActions {
+	height: 36px;
+	margin-top: 6px;
+}
+
+.AspectRatio4x3 .XHSPassShopFacetGroup {
+	width: 250px;
+}
+
+.AspectRatio4x3 .XHSPassShopFacetGroup.IsRarity {
+	width: fill-parent-flow( 1.0 );
+}
+
+.AspectRatio4x3 .XHSPassShopCatalogMeta {
+	visibility: collapse;
+}
+
+.AspectRatio4x3 .XHSPassShopDetailWindow {
+	width: 900px;
+}
+
+.AspectRatio4x3 .XHSPassShopDetailMedia {
+	width: 340px;
+}
+
 .XHSPassSettingRow,
 .XHSPassLeaderboardRow {
 	width: 100%;

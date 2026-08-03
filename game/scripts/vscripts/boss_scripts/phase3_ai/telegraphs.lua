@@ -264,3 +264,85 @@ function XHSBossTelegraphs:Line(startPosition, direction, spacing, nodeRadius, c
 		CreateWarning(position, nodeRadius or 180, duration, colors, "circle", true)
 	end
 end
+
+-- Tools-only visual QA. This deliberately bypasses the danger registry and
+-- never invokes an ability, damage callback, modifier, movement, or AI state.
+local VISUAL_QA_FAMILIES = {
+	{ key = "arthas", primary = Vector(105, 215, 255), secondary = Vector(225, 250, 255) },
+	{ key = "balanar", primary = Vector(155, 55, 255), secondary = Vector(125, 255, 80) },
+	{ key = "grom", primary = Vector(255, 62, 34), secondary = Vector(255, 185, 65) },
+	{ key = "illidan", primary = Vector(102, 255, 64), secondary = Vector(180, 70, 255) },
+	{ key = "lich_king", primary = Vector(105, 215, 255), secondary = Vector(225, 250, 255) },
+	{ key = "magtheridon", primary = Vector(255, 110, 35), secondary = Vector(120, 255, 80) },
+	{ key = "proudmoore", primary = Vector(70, 190, 255), secondary = Vector(255, 200, 75) },
+	{ key = "special", primary = Vector(255, 185, 65), secondary = Vector(255, 70, 45) },
+	{ key = "spirit_master", primary = Vector(255, 255, 255), secondary = Vector(70, 210, 255) },
+	{ key = "spirit_storm", primary = Vector(70, 220, 255), secondary = Vector(210, 245, 255) },
+	{ key = "spirit_earth", primary = Vector(110, 220, 110), secondary = Vector(210, 255, 160) },
+	{ key = "spirit_fire", primary = Vector(255, 115, 35), secondary = Vector(255, 220, 90) },
+}
+
+local function FindVisualQAFamily(key)
+	for _, definition in ipairs(VISUAL_QA_FAMILIES) do
+		if definition.key == key then return definition end
+	end
+	return nil
+end
+
+local function VisualQAColors(definition)
+	return {
+		family = definition.key,
+		primary = definition.primary,
+		secondary = definition.secondary,
+	}
+end
+
+function XHSBossTelegraphs:SpawnVisualGallery(origin, requestedFamily)
+	if not IsInToolsMode() or not ValidVector(origin) then return false end
+	local requested = requestedFamily and string.lower(tostring(requestedFamily)) or "all"
+	local single = requested ~= "all" and FindVisualQAFamily(requested) or nil
+	if requested ~= "all" and single == nil then return false end
+
+	if single ~= nil then
+		local colors = VisualQAColors(single)
+		CreateWarning(origin, 260, 5.0, colors, "circle", true)
+		CreateWarning(origin + Vector(600, 0, 0), 260, 5.0, colors, "target", true)
+		CreateLineWarning(origin + Vector(-650, -500, 0), origin + Vector(-650, 500, 0), 135, 5.0, colors)
+		Timers:CreateTimer(1.0, function()
+			XHSBossTelegraphs:Release(origin, 260, colors)
+			return nil
+		end)
+		print("[XHS PFX QA] family=" .. single.key .. " circle=(0,0) target=(600,0) line=(-650,-500..500)")
+		return true
+	end
+
+	local columns = 4
+	local spacing = 560
+	for index, definition in ipairs(VISUAL_QA_FAMILIES) do
+		local column = (index - 1) % columns
+		local row = math.floor((index - 1) / columns)
+		local position = origin + Vector((column - 1.5) * spacing, (1 - row) * spacing, 0)
+		CreateWarning(position, 210, 6.0, VisualQAColors(definition), "target", true)
+		print(string.format("[XHS PFX QA] row=%d col=%d family=%s", row + 1, column + 1, definition.key))
+	end
+	return true
+end
+
+if IsInToolsMode() and Convars ~= nil and Convars.RegisterCommand ~= nil and not XHSBossTelegraphs.visual_qa_registered then
+	XHSBossTelegraphs.visual_qa_registered = true
+	Convars:RegisterCommand("xhs_pfx_gallery", function(_, familyName)
+		local player = Convars.GetCommandClient ~= nil and Convars:GetCommandClient() or nil
+		local hero = player ~= nil and player.GetAssignedHero ~= nil and player:GetAssignedHero() or nil
+		if (hero == nil or hero:IsNull()) and PlayerResource ~= nil then
+			hero = PlayerResource:GetSelectedHeroEntity(0)
+		end
+		if hero == nil or hero:IsNull() then
+			print("[XHS PFX QA] no selected hero; start a Tools match first")
+			return
+		end
+		local origin = hero:GetAbsOrigin() + hero:GetForwardVector() * 1000
+		if not XHSBossTelegraphs:SpawnVisualGallery(origin, familyName) then
+			print("[XHS PFX QA] usage: xhs_pfx_gallery [all|arthas|balanar|grom|illidan|lich_king|magtheridon|proudmoore|special|spirit_master|spirit_storm|spirit_earth|spirit_fire]")
+		end
+	end, "Tools-only boss warning visual gallery", FCVAR_CHEAT)
+end

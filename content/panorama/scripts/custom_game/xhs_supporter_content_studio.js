@@ -18,6 +18,8 @@
 	var latestGlobalOperation = "";
 	var activePreviewID = "";
 	var layerRaiseGeneration = 0;
+	var stopping = false;
+	var pendingPreviewInstruction = "";
 
 	function hudAncestor(panel) {
 		var current = panel;
@@ -69,6 +71,15 @@
 			if (attempt < 8) $.Schedule(attempt < 3 ? 0.2 : 0.75, function () { raise(attempt + 1); });
 		}
 		raise(0);
+	}
+	function updateLayoutClass() {
+		if (!root) return;
+		var width = Number(root.actuallayoutwidth || 0);
+		var height = Number(root.actuallayoutheight || 0);
+		root.SetHasClass("Compact", width > 0 && width < 1250);
+		root.SetHasClass("Narrow", width > 0 && width < 850);
+		root.SetHasClass("LowHeight", height > 0 && height < 780);
+		root.SetHasClass("Tiny", (width > 0 && width < 680) || (height > 0 && height < 620));
 	}
 
 	function list(value) {
@@ -122,6 +133,19 @@
 		var panel = $("#ContentStudioStatus");
 		panel.text = message;
 		panel.SetHasClass("Error", !!error);
+		panel.SetHasClass("Pending", !error && (!!pendingPreviewInstruction || stopping));
+	}
+	function pendingCardText(item) {
+		if (text(item && item.category) === "attack_lifesteal") return "PENDING - WAITING FOR THE IN-GAME ATTACK";
+		if (text(item && item.category) === "kill_effect") return "PENDING - WAITING FOR THE IN-GAME KILL TRIGGER";
+		return "PENDING - WAITING FOR THE IN-GAME EFFECT";
+	}
+	function pendingStatusText() {
+		if (stopping) return "Stopping the active preview and cleaning its temporary gameplay assets...";
+		if (activePreviewID && isBusy(activePreviewID, "preview")) {
+			return pendingPreviewInstruction || "Preview pending: watch the in-game trigger before returning to the candidate card.";
+		}
+		return "";
 	}
 	function openButtonState(caption, state) {
 		var button = $("#ContentStudioOpen");
@@ -160,7 +184,24 @@
 	function isBusy(candidateID, actionName) {
 		return !!busy[candidateID] && (!actionName || busy[candidateID].action === actionName);
 	}
+	function setStopControls(isStopping) {
+		var stopButton = $("#ContentStudioStop");
+		var refreshButton = $("#ContentStudioRefresh");
+		var stopLabel = $("#ContentStudioStopLabel");
+		if (stopButton) stopButton.enabled = !isStopping;
+		if (refreshButton) refreshButton.enabled = !isStopping;
+		if (stopLabel) stopLabel.text = isStopping ? "STOPPING..." : "STOP PREVIEW";
+		if (root) root.SetHasClass("IsStopping", !!isStopping);
+	}
 	function setBusy(candidateID, actionName) {
+		// A new explicit preview supersedes a pending STOP. Its higher operation
+		// ID makes a late stop acknowledgement stale while keeping the Studio
+		// usable if that acknowledgement is delayed or lost.
+		if (stopping) {
+			stopping = false;
+			setStopControls(false);
+			if (root) root.RemoveClass("StopTimedOut");
+		}
 		var operationID = String(++operationSequence);
 		latestGlobalOperation = operationID;
 		latestOperation[candidateID] = operationID;
@@ -169,7 +210,10 @@
 			if (busy[candidateID] && busy[candidateID].operation_id === operationID) {
 				var timedOutAction = busy[candidateID].action;
 				delete busy[candidateID];
-				if (activePreviewID === candidateID) activePreviewID = "";
+				if (activePreviewID === candidateID) {
+					activePreviewID = "";
+					pendingPreviewInstruction = "";
+				}
 				if (timedOutAction === "preview") openButtonState("PREVIEW TIMEOUT - OPEN STUDIO", "error");
 				render(); status("No callback received. Retry the action after checking the game console.", true);
 			}
@@ -178,6 +222,7 @@
 	}
 	function card(item) {
 		var parent = $.CreatePanel("Panel", $("#ContentStudioCandidates"), "candidate_" + item.candidate_id); parent.AddClass("CandidateCard");
+		parent.AddClass("Rarity" + label(item.rarity || "common").replace(/[^A-Za-z0-9]/g, ""));
 		var art = $.CreatePanel("Panel", parent, ""); art.AddClass("CandidateArt");
 		var marker = $.CreatePanel("Label", art, ""); marker.AddClass("VPCFMarker"); marker.text = item.ti_edition ? text(item.ti_edition).toUpperCase() : "VPCF";
 		if (item.metadata && item.metadata.experimental) { var warning = $.CreatePanel("Label", art, ""); warning.AddClass("Experimental"); warning.text = "EXPERIMENTAL"; }
@@ -192,13 +237,19 @@
 		var itemVerified = isVerified(item);
 		var previewPending = isBusy(item.candidate_id, "preview");
 		parent.SetHasClass("AwaitingPreview", previewPending);
-		var state = $.CreatePanel("Label", body, ""); state.AddClass("CandidateState"); state.SetHasClass("Verified", itemVerified); state.SetHasClass("Pending", previewPending); state.text = item.sent ? "SENT - persisted on reload" : (previewPending ? "WAITING FOR THE VISIBLE EFFECT..." : (itemVerified ? "LIVE PREVIEW RUN - confirm it was visible" : "LIVE PREVIEW REQUIRED"));
+		if (previewPending) {
+			var pendingBadge = $.CreatePanel("Label", art, "");
+			pendingBadge.AddClass("PendingBadge");
+			pendingBadge.text = "PENDING";
+		}
+		var state = $.CreatePanel("Label", body, ""); state.AddClass("CandidateState"); state.SetHasClass("Verified", itemVerified); state.SetHasClass("Pending", previewPending); state.text = item.sent ? "SENT - persisted on reload" : (previewPending ? pendingCardText(item) : (itemVerified ? "LIVE PREVIEW RUN - confirm it was visible" : "LIVE PREVIEW REQUIRED"));
 		var actions = $.CreatePanel("Panel", body, ""); actions.AddClass("CandidateActions");
 		action(actions, previewPending ? "TESTING..." : "TEST LIVE PLAYBACK", "Preview", function () {
 			if (activePreviewID && activePreviewID !== item.candidate_id) delete busy[activePreviewID];
 			activePreviewID = item.candidate_id;
+			pendingPreviewInstruction = "Preview pending for " + item.display_name + ": watch the in-game trigger, then reopen the Studio to review the result.";
 			var operationID = setBusy(item.candidate_id, "preview");
-			status("Starting live playback for " + item.display_name + "...", false);
+			status(pendingPreviewInstruction, false);
 			openButtonState("PREVIEW RUNNING - OPEN STUDIO", "pending");
 			windowPanel.AddClass("Hidden");
 			send("supporter_content_studio_preview", { candidate_id: item.candidate_id, operation_id: operationID });
@@ -209,6 +260,7 @@
 		}, item.sent || !itemVerified || isBusy(item.candidate_id));
 	}
 	function render(preserveStatus) {
+		updateLayoutClass();
 		var parent = $("#ContentStudioCandidates"); if (!parent) return; parent.RemoveAndDeleteChildren();
 		var searchPanel = $("#ContentStudioSearch"); var query = text(searchPanel && searchPanel.text).toLowerCase();
 		var shown = candidates.filter(function (item) {
@@ -220,14 +272,17 @@
 				&& (!query || text(item.display_name).toLowerCase().indexOf(query) !== -1 || text(item.asset_path).toLowerCase().indexOf(query) !== -1);
 		});
 		shown.forEach(card);
-		var waitingForPreview = activePreviewID && isBusy(activePreviewID, "preview");
-		if (!preserveStatus && !waitingForPreview) status(shown.length + " / " + candidates.length + " candidates - " + candidates.filter(function (item) { return item.sent; }).length + " already sent", false);
+		var pendingInstruction = pendingStatusText();
+		if (pendingInstruction) status(pendingInstruction, false);
+		else if (!preserveStatus) status(shown.length + " / " + candidates.length + " candidates - " + candidates.filter(function (item) { return item.sent; }).length + " already sent", false);
 	}
 	function sync() {
 		var requestID = ++syncSequence;
 		pendingSyncID = requestID;
 		syncChunks = {};
-		status("Syncing persistent candidate state...", false);
+		var pendingInstruction = pendingStatusText();
+		if (pendingInstruction) status(pendingInstruction, false);
+		else status("Syncing persistent candidate state...", false);
 		send("supporter_content_studio_sync", { request_id: String(requestID) });
 		$.Schedule(4.0, function () {
 			if (pendingSyncID === requestID && root && root.IsValid()) {
@@ -242,17 +297,47 @@
 		});
 	}
 	function stop() {
+		if (stopping) return;
+		stopping = true;
 		activePreviewID = "";
+		pendingPreviewInstruction = "";
 		busy = {};
 		latestGlobalOperation = String(++operationSequence);
+		var stopOperation = latestGlobalOperation;
+		setStopControls(true);
+		if (root) root.RemoveClass("StopTimedOut");
+		status("Stopping the active preview and cleaning its temporary gameplay assets...", false);
 		send("supporter_content_studio_stop", { operation_id: latestGlobalOperation });
-		openButtonState("CONTENT STUDIO", "");
-		render();
+		openButtonState("STOPPING PREVIEW - OPEN STUDIO", "pending");
+		render(true);
+		$.Schedule(5.0, function () {
+			if (!stopping || latestGlobalOperation !== stopOperation) return;
+			finishStop("STOP TIMEOUT: the server did not acknowledge cleanup. Local Studio state was reset; retry STOP before testing another effect.", true);
+		});
+	}
+	function finishStop(message, timedOut) {
+		stopping = false;
+		busy = {};
+		activePreviewID = "";
+		pendingPreviewInstruction = "";
+		setStopControls(false);
+		if (root) root.SetHasClass("StopTimedOut", !!timedOut);
+		openButtonState(timedOut ? "STOP TIMEOUT - OPEN STUDIO" : "CONTENT STUDIO", timedOut ? "error" : "");
+		render(true);
+		status(message || "Preview stopped.", !!timedOut);
 	}
 	function toggle() {
 		startLayerRaiseCycle();
+		updateLayoutClass();
 		windowPanel.ToggleClass("Hidden");
 		if (!windowPanel.BHasClass("Hidden")) sync();
+	}
+	function closeStudio() {
+		if (!windowPanel.BHasClass("Hidden")) windowPanel.AddClass("Hidden");
+		var hasPendingPreview = Object.keys(busy).some(function (candidateID) { return busy[candidateID] && busy[candidateID].action === "preview"; });
+		// A verified preview can remain active after its callback. Keep the X a
+		// cleanup action, not just a visual close, so no temporary asset leaks.
+		if (activePreviewID || hasPendingPreview) stop();
 	}
 
 	function applySyncedState(event) {
@@ -313,14 +398,18 @@
 		if (truthy(event.stopped)) {
 			var stopOperation = text(event.operation_id);
 			if (stopOperation && stopOperation !== latestGlobalOperation) return;
-			busy = {}; activePreviewID = "";
-			openButtonState("CONTENT STUDIO", "");
+			return finishStop(event.message || "Preview stopped.", false);
 		}
 		if (event.candidate_id) {
 			var current = busy[event.candidate_id];
 			var responseOperation = text(event.operation_id);
 			if (responseOperation && (!current || current.operation_id !== responseOperation)) return;
-			if (!truthy(event.pending)) delete busy[event.candidate_id];
+			if (!truthy(event.pending)) {
+				delete busy[event.candidate_id];
+				pendingPreviewInstruction = "";
+			} else {
+				pendingPreviewInstruction = event.message || "Preview pending: watch the in-game trigger before returning to the candidate card.";
+			}
 			if (truthy(event.ok) && truthy(event.verified)) {
 				var item = candidateByID(event.candidate_id);
 				var responseSignature = normalizeSignature(event.asset_signature);
@@ -356,8 +445,9 @@
 		render(); status(event.message || (truthy(event.ok) ? "Candidate sent." : "Submission failed."), !truthy(event.ok));
 	});
 
-	var api = { Toggle: toggle, Sync: sync, Stop: stop, Render: render, RaiseLayer: ensureTopHudLayer };
+	var api = { Toggle: toggle, Close: closeStudio, Sync: sync, Stop: stop, Render: render, RaiseLayer: ensureTopHudLayer };
 	GameUI.CustomUIConfig().XHSContentStudio = api;
 	startLayerRaiseCycle();
+	updateLayoutClass();
 	$.Schedule(0.35, sync);
 })();

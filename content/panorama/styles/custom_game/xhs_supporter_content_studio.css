@@ -17,3 +17,111 @@
 .CandidateCard { width: 32%; min-width: 310px; height: 266px; margin: 0 1% 10px 0; flow-children: down; border: 1px solid #354143; background-color: #0d1315; box-shadow: #00000055 0 8px 18px; }.CandidateCard.AwaitingPreview { border-color: #a97c35; }.CandidateArt { width: 100%; height: 76px; background-color: gradient(radial,50% 50%,0% 0%,50% 50%,from(#344547),to(#101719)); }.VPCFMarker { horizontal-align: center; vertical-align: center; color: #bcd0cd33; font-size: 27px; letter-spacing: 7px; }.Experimental { horizontal-align: right; vertical-align: top; margin: 7px; padding: 3px 6px; background-color: #42231ddd; color: #e28e78; font-size: 9px; letter-spacing: 1px; }.BundleOnly { horizontal-align: left; vertical-align: top; margin: 7px; padding: 3px 6px; background-color: #243342dd; color: #95b8d5; font-size: 8px; letter-spacing: .7px; }
 .CandidateBody { width: 100%; height: fill-parent-flow(1); padding: 12px; flow-children: down; }.CandidateMeta { color: #bd9957; font-size: 11px; text-transform: uppercase; }.CandidateName { color: #f0e6d0; font-size: 19px; margin-top: 2px; }.CandidatePath { width: 100%; color: #71817f; font-size: 11px; text-overflow: ellipsis; white-space: nowrap; }.CandidateState { margin-top: 8px; color: #c29b58; font-size: 11px; }.CandidateState.Pending { color: #d7a950; }.CandidateState.Verified { color: #77bd96; }
 .CandidateActions { width: 100%; flow-children: right; margin-top: 9px; }.CandidateActions Button { width: fill-parent-flow(1); height: 34px; margin-right: 6px; border: 1px solid #405053; background-color: #182224; }.CandidateActions Button.Submit { border-color: #80622d; background-color: #463718; }.CandidateActions Button:disabled { wash-color: #58605f; saturation: .2; }.CandidateActions Label { horizontal-align: center; vertical-align: center; color: #d8e0de; font-size: 11px; letter-spacing: .6px; }
+.FacetRow Button:hover { background-color: #20292b; }.FacetRow Button:active { brightness: 1.25; transform: translateY(1px); }
+.CandidateCard:hover { border-color: #64777a; box-shadow: #00000088 0 11px 24px; }
+.CandidateCard.RarityRare .CandidateArt { background-color: gradient(radial,50% 50%,0% 0%,50% 50%,from(#28566b),to(#101719)); }
+.CandidateCard.RarityMythical .CandidateArt { background-color: gradient(radial,50% 50%,0% 0%,50% 50%,from(#523567),to(#101719)); }
+.CandidateCard.RarityLegendary .CandidateArt { background-color: gradient(radial,50% 50%,0% 0%,50% 50%,from(#6a5124),to(#101719)); }
+.CandidateCard.RarityImmortal .CandidateArt { background-color: gradient(radial,50% 50%,0% 0%,50% 50%,from(#6b3524),to(#101719)); }
+.CandidateCard.RarityArcana .CandidateArt { background-color: gradient(radial,50% 50%,0% 0%,50% 50%,from(#485d25),to(#101719)); }
+.CandidateActions Button:hover:enabled, .StudioToolbar Button:hover:enabled, .CloseButton:hover:enabled { brightness: 1.35; }
+.CandidateActions Button:active:enabled, .StudioToolbar Button:active:enabled, .CloseButton:active:enabled { brightness: .85; transform: translateY(1px); }
+.SupporterContentStudioRoot.Compact .StudioWindow { width: 96%; height: 95%; padding: 16px; }
+.SupporterContentStudioRoot.Compact .CandidateCard { width: 49%; min-width: 280px; }
+.SupporterContentStudioRoot.Compact .Subtitle { font-size: 13px; }
+.SupporterContentStudioRoot.Narrow .StudioWindow { width: 98%; height: 97%; padding: 12px; }
+.SupporterContentStudioRoot.Narrow .StudioHeader { height: 92px; }
+.SupporterContentStudioRoot.Narrow .Title { font-size: 27px; }
+.SupporterContentStudioRoot.Narrow .Subtitle { font-size: 11px; padding-right: 48px; }
+.SupporterContentStudioRoot.Narrow .CandidateCard { width: 100%; min-width: 0; }
+.SupporterContentStudioRoot.Narrow .StudioToolbar Button { width: 105px; }
+.SupporterContentStudioRoot.Narrow .CandidateActions Label { font-size: 9px; }
+
+/* Runtime state stays legible even when its candidate is outside the active facet. */
+.Status.Pending { color: #d8b05d; }
+.SupporterContentStudioRoot.IsStopping .StudioWindow { border-color: #a97c35; }
+.SupporterContentStudioRoot.StopTimedOut .StudioWindow { border-color: #a65449; }
+.PendingBadge {
+	horizontal-align: left;
+	vertical-align: bottom;
+	margin: 0 0 7px 7px;
+	padding: 3px 7px;
+	border: 1px solid #c2903d;
+	background-color: #3d2a12ee;
+	box-shadow: #000000aa 0 2px 6px;
+	color: #f0c66d;
+	font-size: 9px;
+	font-weight: bold;
+	letter-spacing: 1.4px;
+}
+.CandidateCard.AwaitingPreview { box-shadow: #b17b2744 0 0 16px; }
+.CandidateCard.AwaitingPreview .CandidateState { width: 100%; }
+
+/* VPCF paths are review data: allow two readable lines and retain the full tooltip. */
+.CandidatePath {
+	height: 29px;
+	margin-top: 2px;
+	color: #8fa19f;
+	font-family: monospace;
+	font-size: 10px;
+	line-height: 13px;
+	text-overflow: shrink;
+	white-space: normal;
+}
+.CandidatePath:hover { color: #c4d1cf; }
+
+/* Consistent mouse and keyboard affordances across facets and actions. */
+.FacetRow Button:focus,
+.CandidateActions Button:focus,
+.StudioToolbar Button:focus,
+.CloseButton:focus {
+	border-color: #d1a756;
+	box-shadow: #d1a75655 0 0 7px;
+}
+.StudioToolbar TextEntry:focus {
+	border-color: #b68d43;
+	box-shadow: #b68d4333 0 0 6px;
+}
+.FacetRow {
+	border-bottom: 1px solid #202b2d;
+	background-color: gradient(linear, 0% 0%, 100% 0%, from(#10171999), to(#10171900));
+}
+.FacetRow Button.Active { box-shadow: #c1954633 0 3px 8px; }
+.FacetRow Button:disabled,
+.CandidateActions Button:disabled,
+.StudioToolbar Button:disabled { opacity: .55; }
+
+/* 720p and compact-window density without collapsing the filter model. */
+.SupporterContentStudioRoot.LowHeight .StudioWindow { height: 97%; padding: 13px; }
+.SupporterContentStudioRoot.LowHeight .StudioHeader { height: 76px; }
+.SupporterContentStudioRoot.LowHeight .Title { font-size: 27px; }
+.SupporterContentStudioRoot.LowHeight .Subtitle { font-size: 11px; }
+.SupporterContentStudioRoot.LowHeight .SceneNotice { padding: 6px 9px; margin-bottom: 4px; }
+.SupporterContentStudioRoot.LowHeight .SceneNotice Label { font-size: 11px; }
+.SupporterContentStudioRoot.LowHeight .FacetRow { height: 29px; }
+.SupporterContentStudioRoot.LowHeight .Categories { height: 34px; }
+.SupporterContentStudioRoot.LowHeight .FacetRow Button { height: 25px; padding: 4px 8px; }
+.SupporterContentStudioRoot.LowHeight .Categories Button { height: 30px; padding: 6px 9px; }
+.SupporterContentStudioRoot.LowHeight .StudioToolbar { height: 40px; margin: 2px 0; }
+.SupporterContentStudioRoot.LowHeight .StudioToolbar TextEntry,
+.SupporterContentStudioRoot.LowHeight .StudioToolbar Button { height: 34px; }
+.SupporterContentStudioRoot.LowHeight .Status { height: 22px; font-size: 11px; }
+.SupporterContentStudioRoot.LowHeight .CandidateCard { height: 236px; }
+.SupporterContentStudioRoot.LowHeight .CandidateArt { height: 58px; }
+.SupporterContentStudioRoot.LowHeight .CandidateBody { padding: 9px; }
+.SupporterContentStudioRoot.LowHeight .CandidateName { font-size: 16px; }
+.SupporterContentStudioRoot.LowHeight .CandidateState { margin-top: 4px; font-size: 10px; }
+.SupporterContentStudioRoot.LowHeight .CandidateActions { margin-top: 5px; }
+.SupporterContentStudioRoot.LowHeight .CandidateActions Button { height: 30px; }
+
+.SupporterContentStudioRoot.Tiny .StudioWindow { width: 99%; height: 99%; padding: 8px; }
+.SupporterContentStudioRoot.Tiny .StudioHeader { height: 56px; }
+.SupporterContentStudioRoot.Tiny .Eyebrow { font-size: 10px; letter-spacing: 1.4px; }
+.SupporterContentStudioRoot.Tiny .Title { margin-top: 0; font-size: 23px; }
+.SupporterContentStudioRoot.Tiny .Subtitle { visibility: collapse; }
+.SupporterContentStudioRoot.Tiny .SceneNotice { max-height: 42px; }
+.SupporterContentStudioRoot.Tiny .StudioToolbar { height: 72px; flow-children: right-wrap; }
+.SupporterContentStudioRoot.Tiny .StudioToolbar TextEntry { width: 100%; height: 32px; }
+.SupporterContentStudioRoot.Tiny .StudioToolbar Button { width: fill-parent-flow(1); height: 31px; margin-left: 0; margin-right: 6px; }
+.SupporterContentStudioRoot.Tiny .CandidateCard { width: 100%; min-width: 0; height: 224px; }
+.SupporterContentStudioRoot.Tiny .CandidateActions Label { font-size: 8px; letter-spacing: .2px; }

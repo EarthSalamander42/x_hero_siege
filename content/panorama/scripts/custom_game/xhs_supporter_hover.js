@@ -1,7 +1,7 @@
 "use strict";
 
 var XHSSupporterHover = (function () {
-	var DAILY_FRAGMENT_CAP = 100;
+	var DAILY_FRAGMENT_CAP = 190;
 	var DEFAULT_SUPPORTER_TIER_CATALOG = [
 		{ id: 0, name: "Free Player", color: "#7db9d8", fragments: 0, xpBoost: 0, votePower: 1 },
 		{ id: 1, name: "Donator", color: "#45C46B", fragments: 150, xpBoost: 10, votePower: 2 },

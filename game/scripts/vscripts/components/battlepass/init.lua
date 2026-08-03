@@ -1,7 +1,10 @@
 -- Copyright (C) 2018  Frostrose Studio
 -- Battlepass System
 
--- Register developer candidate assets before the global Precache() pass.
+-- Register approved permanent assets and developer candidates before the
+-- global Precache() pass. The permanent manifest is empty until an item is
+-- explicitly approved and published in source control.
+require('components/battlepass/supporter_permanent_assets')
 require('components/battlepass/content_studio_assets')
 
 local function LoadContentStudioRuntime()
@@ -73,6 +76,7 @@ ListenToGameEvent('game_rules_state_change', function(keys)
 
 		require('components/battlepass/constants')
 		require('components/battlepass/util')
+		require('components/battlepass/supporter_telemetry')
 		require('components/battlepass/supporter_pass')
 		require('components/battlepass/supporter_pass_2026')
 		require('components/battlepass/regen_aura')

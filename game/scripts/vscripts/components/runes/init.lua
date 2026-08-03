@@ -815,14 +815,24 @@ function Runes:GrantFragmentRune(hero)
 		return
 	end
 
-	api:GrantSupporterFragments(playerID, self.FRAGMENT_AMOUNT, "fragment_rune", idempotencyKey, function(success)
+	api:GrantSupporterFragments(playerID, self.FRAGMENT_AMOUNT, "fragment_rune", idempotencyKey, function(success, data)
 		if player ~= nil then
+			local appliedAmount = success and tonumber(
+				data and (data.applied_amount or (data.ledger and data.ledger.amount)) or 0
+			) or 0
+			local notificationText = "Fragment Rune grant failed backend validation."
+			local notificationSeverity = "warning"
+			if success and appliedAmount > 0 then
+				notificationText = "Fragment Rune granted +" .. tostring(appliedAmount) .. " supporter fragments."
+				notificationSeverity = "success"
+			elseif success then
+				notificationText = "Daily supporter fragment cap reached."
+				notificationSeverity = "info"
+			end
 			Notifications:Bottom(player, {
-				text = success
-					and ("Fragment Rune granted +" .. tostring(self.FRAGMENT_AMOUNT) .. " supporter fragments.")
-					or "Fragment Rune grant failed backend validation.",
+				text = notificationText,
 				duration = 5.0,
-				severity = success and "success" or "warning",
+				severity = notificationSeverity,
 			})
 		end
 	end)

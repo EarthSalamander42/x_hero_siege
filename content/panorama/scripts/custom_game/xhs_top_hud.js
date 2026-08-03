@@ -34,7 +34,7 @@ var XHSTopHud = (function () {
 	// Flip this back to true to show the static overhead health bar design sandbox.
 	var OVERHEAD_MOCKUP_MODE = false;
 	var OVERHEAD_TIER_DEV_VIEW = false;
-	var DAILY_FRAGMENT_CAP = 100;
+	var DAILY_FRAGMENT_CAP = 190;
 	var WEEKLY_FRAGMENT_CAP = DAILY_FRAGMENT_CAP;
 
 	var allyCards = {};

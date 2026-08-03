@@ -83,6 +83,7 @@ local function RegisterGameAndLoadArmories()
 		for k, _ in pairs(data and data.players or {}) do
 			local payload = {
 				steamid = tostring(k),
+				game_id = api:GetApiGameId(),
 			}
 
 			api:Request("armory", function(armoryData)

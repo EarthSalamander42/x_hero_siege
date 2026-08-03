@@ -1008,6 +1008,7 @@ function api:RefreshSupporterPassClaims(player_id, callback)
 		callback(false, error)
 	end, "GET", {
 		steamid = steamid,
+		game_id = self:GetApiGameId(),
 	})
 end
 
@@ -1109,6 +1110,7 @@ function api:UpdateSupporterPassSettings(player_id, settings, callback)
 
 	local payload = {
 		steamid = steamid,
+		game_id = self:GetApiGameId(),
 	}
 
 	if settings.toggle_tag ~= nil then payload.toggle_tag = settings.toggle_tag == true or settings.toggle_tag == 1 end
@@ -1229,6 +1231,7 @@ function api:ClaimSupporterPassReward(player_id, reward_id, callback)
 
 	local payload = {
 		steamid = steamid,
+		game_id = self:GetApiGameId(),
 		reward_id = reward_id,
 	}
 
@@ -1288,7 +1291,17 @@ function api:ClaimSupporterPassReward(player_id, reward_id, callback)
 	end, "POST", payload)
 end
 
-function api:EquipSupporterPassItem(player_id, item_id, hero, slot_id, callback)
+local function NormalizeSupporterPassMutationRequestID(request_id)
+	request_id = tostring(request_id or "")
+	if request_id == ""
+		or string.len(request_id) > 160
+		or string.match(request_id, "^[%w_-]+$") == nil then
+		return nil
+	end
+	return request_id
+end
+
+function api:EquipSupporterPassItem(player_id, item_id, hero, slot_id, request_id, callback)
 	if callback == nil then
 		callback = function() end
 	end
@@ -1297,15 +1310,23 @@ function api:EquipSupporterPassItem(player_id, item_id, hero, slot_id, callback)
 	if steamid == nil then
 		return callback(false, { code = "non_persistent_player", message = "Persistent human player required." })
 	end
+	request_id = NormalizeSupporterPassMutationRequestID(request_id)
+	if request_id == nil then
+		return callback(false, { code = "supporter_request_id_invalid", message = "A valid server request ID is required." })
+	end
 
 	local payload = {
 		steamid = steamid,
+		game_id = self:GetApiGameId(),
 		item_id = item_id,
 		hero = hero,
 		slot_id = slot_id,
+		request_id = request_id,
 	}
 
 	api:Request("supporter-pass/equip", function(data)
+		data = type(data) == "table" and data or {}
+		data.request_id = data.request_id or request_id
 		api:MergeSupporterPassResponse(steamid, data)
 
 		if data.armory then
@@ -1314,11 +1335,13 @@ function api:EquipSupporterPassItem(player_id, item_id, hero, slot_id, callback)
 
 		callback(true, data)
 	end, function(error)
+		error = type(error) == "table" and error or {}
+		error.request_id = error.request_id or request_id
 		callback(false, error)
 	end, "POST", payload)
 end
 
-function api:UnequipSupporterPassItem(player_id, hero, slot_id, callback)
+function api:UnequipSupporterPassItem(player_id, hero, slot_id, scope, request_id, callback)
 	if callback == nil then
 		callback = function() end
 	end
@@ -1327,14 +1350,23 @@ function api:UnequipSupporterPassItem(player_id, hero, slot_id, callback)
 	if steamid == nil then
 		return callback(false, { code = "non_persistent_player", message = "Persistent human player required." })
 	end
+	request_id = NormalizeSupporterPassMutationRequestID(request_id)
+	if request_id == nil then
+		return callback(false, { code = "supporter_request_id_invalid", message = "A valid server request ID is required." })
+	end
 
 	local payload = {
 		steamid = steamid,
+		game_id = self:GetApiGameId(),
 		hero = hero,
 		slot_id = slot_id,
+		request_id = request_id,
 	}
+	if scope ~= nil and tostring(scope) ~= "" then payload.scope = tostring(scope) end
 
 	api:Request("supporter-pass/unequip", function(data)
+		data = type(data) == "table" and data or {}
+		data.request_id = data.request_id or request_id
 		api:MergeSupporterPassResponse(steamid, data)
 
 		if data.armory then
@@ -1343,6 +1375,8 @@ function api:UnequipSupporterPassItem(player_id, hero, slot_id, callback)
 
 		callback(true, data)
 	end, function(error)
+		error = type(error) == "table" and error or {}
+		error.request_id = error.request_id or request_id
 		callback(false, error)
 	end, "POST", payload)
 end
@@ -2213,6 +2247,47 @@ function api:CompleteGame()
 		return fallbackHero
 	end
 
+	local completed_hero_images = 0
+	for candidateID = 0, PlayerResource:GetPlayerCount() - 1 do
+		if PlayerResource:IsValidPlayerID(candidateID)
+			and not IsApiSpectatorPlayerID(candidateID)
+			and self:IsPersistentPlayerID(candidateID) then
+			local candidateHero = ResolveEndScreenHero(candidateID)
+			local completed = GameMode ~= nil
+				and GameMode.IsHeroImageCompleted ~= nil
+				and GameMode:IsHeroImageCompleted(candidateID, candidateHero)
+			if completed then
+				completed_hero_images = completed_hero_images + 1
+			end
+		end
+	end
+
+	local function GetFarmEventKills(playerID)
+		if SpecialEvents == nil then return 0 end
+
+		local totalKills = SpecialEvents.farm_event_total_kills_by_player ~= nil
+			and SpecialEvents.farm_event_total_kills_by_player[playerID]
+			or nil
+		if totalKills ~= nil then
+			return math.max(0, math.floor(tonumber(totalKills) or 0))
+		end
+
+		local progress = SpecialEvents.hero_farm_event ~= nil
+			and SpecialEvents.hero_farm_event[playerID]
+			or nil
+		if progress ~= nil then
+			return math.max(0, math.floor(tonumber(progress.kills) or 0))
+		end
+
+		for _, result in pairs(SpecialEvents.farm_event_final_players or {}) do
+			if tonumber(result.player_id) == tonumber(playerID) then
+				return math.max(0, math.floor(tonumber(result.kills) or 0))
+			end
+		end
+
+		return 0
+	end
+
 	for id = 0, PlayerResource:GetPlayerCount() - 1 do
 		if PlayerResource:IsValidPlayerID(id)
 			and not IsApiSpectatorPlayerID(id) then
@@ -2305,6 +2380,25 @@ function api:CompleteGame()
 
 			local is_persistent_player = self:IsPersistentPlayerID(id)
 			local is_xhs_bot = self:IsXHSBotParticipant(id)
+			local supporter_xp = {
+				version = 1,
+				muradin_event_won = (SpecialEvents ~= nil
+					and SpecialEvents.muradin_winners_by_player ~= nil
+					and SpecialEvents.muradin_winners_by_player[id] == true)
+					or (heroEntity ~= nil and heroEntity.paid == true),
+				hero_images_done = completed_hero_images,
+				all_hero_images_done = GameMode ~= nil and GameMode.AllHeroImagesDead == true,
+				frost_infernal_done = GameMode ~= nil
+					and (GameMode.FrostInfernal_killed == true or GameMode.FrostInfernal_killed == 1),
+				spirit_beast_done = GameMode ~= nil and GameMode.SpiritBeast_killed == true,
+				ramero_baristol_won = SpecialEvents ~= nil
+					and SpecialEvents.ramero_baristol_winners_by_player ~= nil
+					and SpecialEvents.ramero_baristol_winners_by_player[id] == true,
+				sogat_won = SpecialEvents ~= nil
+					and SpecialEvents.sogat_winners_by_player ~= nil
+					and SpecialEvents.sogat_winners_by_player[id] == true,
+				farm_event_kills = GetFarmEventKills(id),
+			}
 			local player = {
 				id = id,
 				kills = tonumber(PlayerResource:GetKills(id)),
@@ -2340,6 +2434,7 @@ function api:CompleteGame()
 				leaderboard = leaderboard,
 				participant_kind = is_xhs_bot and "xhs_bot" or (is_persistent_player and "human" or "non_persistent"),
 				is_xhs_bot = is_xhs_bot and 1 or 0,
+				supporter_xp = supporter_xp,
 			}
 
 			local steamid = tostring(PlayerResource:GetSteamID(id))
@@ -2484,6 +2579,7 @@ function api:CompleteGame()
 			abandon = player_data.abandon,
 			disconnected = player_data.disconnected,
 			connection_state = player_data.connection_state,
+			supporter_xp = player_data.supporter_xp,
 		}
 	end
 	print("[XHS game-complete] outbound " .. json.encode({
@@ -2505,6 +2601,7 @@ function api:CompleteGame()
 					victory_xp_bonus = player_data.victory_xp_bonus,
 					xp_boost = player_data.xp_boost,
 					xp_bonus = player_data.xp_bonus,
+					xp_breakdown = player_data.xp_breakdown,
 					xp_eligible = player_data.xp_eligible,
 					xp_ineligible_reason = player_data.xp_ineligible_reason,
 				}

@@ -163,6 +163,90 @@
 			</Panel>
 		</Panel>
 
+		<Panel id="XHSEndScreenXPContainer" class="XHSEndScreenXPContainer" hittest="true">
+			<Panel class="XHSXPBackdrop" hittest="true" />
+
+			<Panel id="XHSXPModal" class="XHSXPModal" hittest="true">
+				<Panel class="XHSXPTopAccent" hittest="false" />
+
+				<Panel class="XHSXPHeader">
+					<Panel class="XHSXPHeaderCopy">
+						<Label class="XHSXPEyebrow" text="SUPPORTER PASS PROGRESS" />
+						<Label id="XHSXPPlayerName" class="XHSXPPlayerName" text="Player" />
+					</Panel>
+					<Panel class="XHSXPTotalBlock">
+						<Label class="XHSXPTotalCaption" text="TOTAL EARNED" />
+						<Label id="XHSXPTotalGain" class="XHSXPTotalGain" text="+0 XP" />
+					</Panel>
+				</Panel>
+
+				<Panel class="XHSXPProgressSection">
+					<Panel class="XHSXPRewardEndpoints">
+						<Panel class="XHSXPRewardEndpoint Previous">
+							<Panel class="XHSXPRewardImageFrame">
+								<Panel id="XHSXPPreviousRewardImage" class="XHSXPRewardImage" />
+								<Panel class="XHSXPRewardImageShade" hittest="false" />
+							</Panel>
+							<Panel class="XHSXPRewardCopy">
+								<Label class="XHSXPRewardCaption" text="LAST REWARD" />
+								<Label id="XHSXPPreviousRewardName" class="XHSXPRewardName" text="Previous reward" />
+							</Panel>
+						</Panel>
+
+						<Panel class="XHSXPLevelTrack">
+							<Panel class="XHSXPLevelLabels">
+								<Label id="XHSXPCurrentLevel" class="XHSXPLevelLabel Current" text="LEVEL 1" />
+								<Label id="XHSXPNextLevel" class="XHSXPLevelLabel Next" text="LEVEL 2" />
+							</Panel>
+							<Panel class="XHSXPProgressBar">
+								<Panel class="XHSXPProgressBackGlow" hittest="false" />
+								<Panel id="XHSXPProgressFill" class="XHSXPProgressFill">
+									<Panel class="XHSXPProgressShine" hittest="false" />
+								</Panel>
+								<Panel class="XHSXPProgressTicks" hittest="false" />
+							</Panel>
+							<Label id="XHSXPProgressText" class="XHSXPProgressText" text="0 / 1000 XP" />
+						</Panel>
+
+						<Panel class="XHSXPRewardEndpoint Next">
+							<Panel class="XHSXPRewardCopy">
+								<Label class="XHSXPRewardCaption" text="NEXT REWARD" />
+								<Label id="XHSXPNextRewardName" class="XHSXPRewardName" text="Upcoming reward" />
+							</Panel>
+							<Panel class="XHSXPRewardImageFrame">
+								<Panel id="XHSXPNextRewardImage" class="XHSXPRewardImage" />
+								<Panel class="XHSXPRewardImageGlow" hittest="false" />
+							</Panel>
+						</Panel>
+					</Panel>
+				</Panel>
+
+				<Panel class="XHSXPStepsSection">
+					<Panel class="XHSXPStepsHeader">
+						<Label class="XHSXPStepsTitle" text="MATCH XP BREAKDOWN" />
+						<Label class="XHSXPStepsHint" text="Rewards are added to your progress one by one" />
+					</Panel>
+					<Panel id="XHSXPSteps" class="XHSXPSteps" />
+				</Panel>
+
+				<Panel class="XHSXPFooter">
+					<Label class="XHSXPFooterHint" text="Your unlocked rewards will follow" />
+					<Button id="XHSXPContinueButton" class="XHSXPContinueButton" enabled="false">
+						<Label id="XHSXPContinueButtonLabel" text="CONTINUE TO REWARDS" />
+						<Panel class="XHSXPContinueArrow" hittest="false" />
+					</Button>
+				</Panel>
+			</Panel>
+
+			<Panel id="XHSXPTransferLayer" class="XHSXPTransferLayer" hittest="false" />
+			<Panel id="XHSXPLevelUpBurst" class="XHSXPLevelUpBurst" hittest="false">
+				<Panel class="XHSXPLevelUpRing Outer" />
+				<Panel class="XHSXPLevelUpRing Inner" />
+				<Panel class="XHSXPLevelUpFlash" />
+				<Label id="XHSXPLevelUpText" class="XHSXPLevelUpText" text="+1 LEVEL" />
+			</Panel>
+		</Panel>
+
 		<Panel id="XHSEndScreenRewardContainer" class="XHSEndScreenRewardContainer" />
 	</Panel>
 </root>

@@ -1,6 +1,6 @@
 SupporterPass = SupporterPass or class({})
 
-SupporterPass.DAILY_FRAGMENT_CAP = 100
+SupporterPass.DAILY_FRAGMENT_CAP = 190
 SupporterPass.WEEKLY_FRAGMENT_CAP = SupporterPass.DAILY_FRAGMENT_CAP
 SupporterPass.SEASON_XP_PER_LEVEL = 1000
 
@@ -27,11 +27,280 @@ local function CopySupporterTable(source)
 	return copy
 end
 
+local function IsSupporterShopItem(value)
+	return type(value) == "table" and (
+		value.item_id ~= nil
+		or value.catalog_item_id ~= nil
+		or (
+			value.id ~= nil
+			and (
+				value.name ~= nil
+				or value.type ~= nil
+				or value.item_type ~= nil
+				or value.price ~= nil
+				or value.price_fragments ~= nil
+			)
+		)
+	)
+end
+
+local function AddSupporterShopItem(result, seen, value)
+	if not IsSupporterShopItem(value) then return end
+	local identity = value.item_id
+		or value.catalog_item_id
+		or value.id
+	local key = tostring(identity or "")
+	if key == "" then
+		key = tostring(value)
+	end
+	if seen[key] then return end
+	seen[key] = true
+	table.insert(result, value)
+end
+
+local function CollectSupporterShopSection(result, seen, section)
+	if type(section) ~= "table" then return end
+	if IsSupporterShopItem(section) then
+		AddSupporterShopItem(result, seen, section)
+		return
+	end
+
+	local list = section.items
+	if type(list) ~= "table" and #section > 0 then list = section end
+	for _, item in ipairs(type(list) == "table" and list or {}) do
+		AddSupporterShopItem(result, seen, item)
+	end
+
+	for _, field in ipairs({ "item", "primary", "secondary", "secondary_items" }) do
+		local nested = section[field]
+		if type(nested) == "table" then
+			if IsSupporterShopItem(nested) then
+				AddSupporterShopItem(result, seen, nested)
+			else
+				for _, item in ipairs(nested) do
+					AddSupporterShopItem(result, seen, item)
+				end
+			end
+		end
+	end
+end
+
+local function NormalizeSupporterShopSection(source, fallbackItems)
+	local section = CopySupporterTable(source)
+	if type(source) == "table" and #source > 0 and source.items == nil then
+		section = { items = source }
+	end
+	if type(section.items) ~= "table" then
+		section.items = type(fallbackItems) == "table" and fallbackItems or {}
+	end
+	return section
+end
+
+local function SupporterShopItemIdentity(value)
+	if type(value) ~= "table" then
+		local identity = tostring(value or "")
+		return identity ~= "" and identity or nil
+	end
+	local identity = value.item_id or value.catalog_item_id or value.id
+	if identity == nil or tostring(identity) == "" then return nil end
+	return tostring(identity)
+end
+
+local function AddSupporterShopReference(result, seen, value)
+	local identity = SupporterShopItemIdentity(value)
+	if identity == nil or seen[identity] then return end
+	seen[identity] = true
+	table.insert(result, identity)
+end
+
+local function IsNonEmptySupporterShopValue(value)
+	return value ~= nil and tostring(value) ~= ""
+end
+
+local function IsExplicitSupporterShopFalse(value)
+	if value == false or value == 0 then return true end
+	local normalized = string.lower(tostring(value or ""))
+	return normalized == "false" or normalized == "0"
+end
+
+local function NormalizePublishedSupporterShopComponent(source, parent, depth)
+	local component = CopySupporterTable(source)
+	if type(source) ~= "table" then return component end
+	depth = tonumber(depth) or 0
+
+	-- Bundle children are not necessarily published as standalone listings. Keep
+	-- their own explicit catalogue flags, plus an immutable proof of the
+	-- published parent listing that made them visible in this release.
+	component.parent_item_id = parent.item_id
+	component.parent_active = parent.active == true
+	component.parent_is_published = parent.is_published == true
+	component.parent_release_id = parent.release_id
+	component.parent_release_status = parent.release_status
+
+	if depth < 4 and type(source.components) == "table" then
+		component.components = {}
+		for _, child in ipairs(source.components) do
+			table.insert(
+				component.components,
+				NormalizePublishedSupporterShopComponent(child, parent, depth + 1)
+			)
+		end
+	end
+	return component
+end
+
+local function NormalizePublishedSupporterShopItems(sourceItems, releaseID)
+	local result = {}
+	local releasePublished = IsNonEmptySupporterShopValue(releaseID)
+	for _, source in ipairs(type(sourceItems) == "table" and sourceItems or {}) do
+		if type(source) == "table" then
+			local item = CopySupporterTable(source)
+			local itemID = SupporterShopItemIdentity(item)
+			if releasePublished and itemID ~= nil then
+				-- getShop only returns rows from the published release where the
+				-- listing and catalogue item are active and published. The backend
+				-- omits those redundant flags on root listings, so make the proof
+				-- explicit before publishing the game nettable.
+				item.active = not IsExplicitSupporterShopFalse(source.active)
+				item.is_published = not IsExplicitSupporterShopFalse(source.is_published)
+				item.publication_status = "published"
+				item.release_id = tostring(releaseID)
+			end
+
+			if type(source.components) == "table" then
+				item.components = {}
+				local parent = {
+					item_id = itemID,
+					active = item.active == true,
+					is_published = item.is_published == true,
+					release_id = releasePublished and tostring(releaseID) or nil,
+					release_status = releasePublished and "published" or "unavailable",
+				}
+				for _, component in ipairs(source.components) do
+					table.insert(
+						item.components,
+						NormalizePublishedSupporterShopComponent(component, parent, 0)
+					)
+				end
+			end
+			table.insert(result, item)
+		end
+	end
+	return result
+end
+
+local function BuildNamedSupporterShopSections(shop, rawSections, rootItems)
+	local isDefinitionList = type(rawSections) == "table" and #rawSections > 0
+	local named = isDefinitionList and { definitions = rawSections } or CopySupporterTable(rawSections)
+	local heroReferences = {}
+	local featuredReferences = {}
+	local catalogReferences = {}
+	local seenHero = {}
+	local seenFeatured = {}
+	local seenCatalog = {}
+	local featuredDefinition = nil
+
+	for _, definition in ipairs(isDefinitionList and rawSections or {}) do
+		local sectionID = string.lower(tostring(
+			definition.section_id or definition.id or definition.key or ""
+		))
+		if sectionID == "featured" or sectionID == "hero" then
+			featuredDefinition = definition
+		end
+	end
+
+	for _, item in ipairs(rootItems) do
+		AddSupporterShopReference(catalogReferences, seenCatalog, item)
+		local rank = tonumber(item.featured_rank)
+		local sectionID = string.lower(tostring(item.section_id or item.section or ""))
+		if rank == 1 and #heroReferences == 0 then
+			AddSupporterShopReference(heroReferences, seenHero, item)
+		elseif rank ~= nil and rank > 0 then
+			AddSupporterShopReference(featuredReferences, seenFeatured, item)
+		elseif sectionID == "hero" and #heroReferences == 0 then
+			AddSupporterShopReference(heroReferences, seenHero, item)
+		elseif sectionID == "featured" then
+			AddSupporterShopReference(featuredReferences, seenFeatured, item)
+		end
+	end
+
+	for _, itemID in ipairs(type(featuredDefinition) == "table"
+		and type(featuredDefinition.item_ids) == "table"
+		and featuredDefinition.item_ids
+		or {}) do
+		local identity = SupporterShopItemIdentity(itemID)
+		if identity ~= nil and seenHero[identity] then
+			-- The rank-1 item is already the large hero card.
+		elseif #heroReferences == 0 then
+			AddSupporterShopReference(heroReferences, seenHero, itemID)
+		else
+			AddSupporterShopReference(featuredReferences, seenFeatured, itemID)
+		end
+	end
+	if #heroReferences == 0 and #featuredReferences > 0 then
+		local firstFeatured = table.remove(featuredReferences, 1)
+		seenFeatured[firstFeatured] = nil
+		AddSupporterShopReference(heroReferences, seenHero, firstFeatured)
+	end
+	if #heroReferences == 0 and #catalogReferences > 0 then
+		AddSupporterShopReference(heroReferences, seenHero, catalogReferences[1])
+	end
+
+	named.hero = NormalizeSupporterShopSection(
+		named.hero or shop.hero,
+		heroReferences
+	)
+	named.featured = NormalizeSupporterShopSection(
+		named.featured or shop.featured,
+		featuredReferences
+	)
+	named.catalog = NormalizeSupporterShopSection(
+		named.catalog or shop.permanent or shop.catalog,
+		catalogReferences
+	)
+	return named
+end
+
+local function BuildPublishedSupporterShop(source)
+	local shop = type(source) == "table" and source or {}
+	local rawSections = type(shop.sections) == "table" and shop.sections or {}
+	local rootItems = NormalizePublishedSupporterShopItems(shop.items, shop.release_id)
+	local sections = BuildNamedSupporterShopSections(shop, rawSections, rootItems)
+
+	local permanent = NormalizeSupporterShopSection(
+		shop.permanent or rawSections.catalog or shop.catalog,
+		rootItems
+	)
+	local rotation = NormalizeSupporterShopSection(shop.rotation, {})
+	local items = {}
+	local seen = {}
+	CollectSupporterShopSection(items, seen, rootItems)
+	CollectSupporterShopSection(items, seen, sections.hero)
+	CollectSupporterShopSection(items, seen, sections.featured)
+	CollectSupporterShopSection(items, seen, sections.catalog)
+	CollectSupporterShopSection(items, seen, permanent)
+	CollectSupporterShopSection(items, seen, rotation)
+
+	local published = CopySupporterTable(shop)
+	published.schema_version = tonumber(shop.schema_version) or 2
+	published.version = shop.version or published.schema_version
+	published.release_id = shop.release_id
+	published.release_status = IsNonEmptySupporterShopValue(shop.release_id)
+		and "published"
+		or "unavailable"
+	published.sections = sections
+	published.section_definitions = #rawSections > 0 and rawSections or shop.section_definitions
+	published.permanent = permanent
+	published.rotation = rotation
+	published.items = items
+	return published
+end
+
 local function BuildPublishedSupporterLoadout(items)
 	local published = {}
 	for _, item in ipairs(type(items) == "table" and items or {}) do
 		if type(item) == "table" then
-			table.insert(published, {
+			local entry = {
 				id = item.id or item.item_id or item.catalog_item_id,
 				item_id = item.item_id or item.catalog_item_id or item.id,
 				catalog_item_id = item.catalog_item_id or item.item_id or item.id,
@@ -44,7 +313,33 @@ local function BuildPublishedSupporterLoadout(items)
 				item_rarity = item.item_rarity or item.rarity,
 				image = item.image or item.image_inventory,
 				image_inventory = item.image_inventory or item.image,
-			})
+				asset_path = item.asset_path,
+				effect_paths = item.effect_paths,
+				equip = item.equip,
+				equip_rules = item.equip_rules,
+				runtime = item.runtime,
+				runtime_assets = item.runtime_assets,
+				visuals = item.visuals,
+				unit = item.unit or item.unit_name or item.file,
+				particle = item.particle,
+			}
+			for _, field in ipairs({
+				"start_pfx",
+				"end_pfx",
+				"pfx",
+				"target_pfx",
+				"caster_pfx",
+				"health_pfx",
+				"mana_pfx",
+				"light_pfx",
+				"owner_pfx",
+				"overhead_pfx",
+				"travel_pfx",
+				"impact_pfx",
+			}) do
+				entry[field] = item[field]
+			end
+			table.insert(published, entry)
 		end
 	end
 	return published
@@ -392,14 +687,32 @@ function SupporterPass:PublishMeta()
 end
 
 function SupporterPass:PublishFeaturedShop()
-	if api and api.supporter_pass and api.supporter_pass.shop then
-		local shop = api.supporter_pass.shop
-		CustomNetTables:SetTableValue("supporter_pass_shop", "featured", shop.featured or shop)
-		return
-	end
+	local source = api
+		and api.supporter_pass
+		and api.supporter_pass.shop
+		or { items = {} }
+	local shop = BuildPublishedSupporterShop(source)
+	local legacyFeatured = CopySupporterTable(shop.sections.featured)
+	legacyFeatured.items = shop.items
+	legacyFeatured.release_id = shop.release_id
+	legacyFeatured.version = shop.version
+	legacyFeatured.schema_version = shop.schema_version
+	legacyFeatured.refresh_label = legacyFeatured.refresh_label
+		or shop.refresh_label
+	legacyFeatured.rotation_id = legacyFeatured.rotation_id
+		or shop.rotation_id
+	legacyFeatured.season_id = legacyFeatured.season_id
+		or shop.season_id
 
-	CustomNetTables:SetTableValue("supporter_pass_shop", "featured", {
-		items = {},
+	CustomNetTables:SetTableValue("supporter_pass_shop", "catalog", shop)
+	CustomNetTables:SetTableValue("supporter_pass_shop", "permanent", shop.permanent)
+	CustomNetTables:SetTableValue("supporter_pass_shop", "rotation", shop.rotation)
+	CustomNetTables:SetTableValue("supporter_pass_shop", "hero", shop.sections.hero)
+	CustomNetTables:SetTableValue("supporter_pass_shop", "featured", legacyFeatured)
+	CustomNetTables:SetTableValue("supporter_pass_shop", "meta", {
+		release_id = shop.release_id,
+		version = shop.version,
+		schema_version = shop.schema_version,
 	})
 end
 

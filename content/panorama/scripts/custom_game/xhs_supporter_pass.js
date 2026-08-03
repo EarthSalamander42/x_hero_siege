@@ -3,10 +3,21 @@
 var XHSSupporterPass = (function () {
 	var SUPPORTER_URL = "https://www.patreon.com/bePatron?u=2533325";
 	var DISCORD_URL = "https://discord.frostrose-studio.com/";
-	var DAILY_FRAGMENT_CAP = 100;
+	var SUPPORTER_SHOP_URL = "https://mods.frostrose-studio.com/supporter-pass?tab=shop";
+	// Explicit 4.0 product decision: purchases happen on the website. The game
+	// must never initiate an economic mutation or emit economic telemetry.
+	var IN_GAME_SHOP_PURCHASES_ENABLED = false;
+	var DAILY_FRAGMENT_CAP = 190;
 	var WEEKLY_FRAGMENT_CAP = DAILY_FRAGMENT_CAP;
 	var SUPPORTER_PASS_LEVEL_COUNT = 50;
 	var currentShopFilter = "All";
+	var currentShopEditionFilter = "All";
+	var currentShopRarityFilter = "All";
+	var currentShopSearch = "";
+	var shopSearchTelemetrySerial = 0;
+	var supporterUITelemetrySequence = 0;
+	var shopDetailItem = null;
+	var activePageName = "overview";
 	var currentArmoryFilter = "All";
 	var armorySearchByCategory = {};
 	var armorySearchRenderSerial = 0;
@@ -54,6 +65,31 @@ var XHSSupporterPass = (function () {
 		item_id: "",
 		slot_id: "",
 		message: "",
+	};
+	var catalogPreviewRequestSerial = 0;
+	var catalogPreviewState = {
+		status: "idle",
+		request_id: "",
+		item_id: "",
+		slot_id: "",
+		category: "",
+		message: "",
+		expires_in: 0,
+		started_at_ms: 0,
+	};
+	var CATALOG_PREVIEW_SLOTS = {
+		teleport: true,
+		levelup: true,
+		kill_effect: true,
+		emblem: true,
+		companion: true,
+		potion: true,
+		rebirth: true,
+		attack_lifesteal: true,
+		spell_lifesteal: true,
+		regen_aura: true,
+		immolation: true,
+		high_five: true,
 	};
 
 	var PAGE_IDS = {
@@ -215,6 +251,89 @@ var XHSSupporterPass = (function () {
 
 	function Clamp(value, minValue, maxValue) {
 		return Math.max(minValue, Math.min(maxValue, value));
+	}
+
+	function BoundedUIEventValue(value, maxLength) {
+		var bounded = value === undefined || value === null ? "" : value.toString();
+		bounded = bounded.replace(/[\r\n\t]/g, " ").replace(/^\s+|\s+$/g, "");
+		return bounded.substring(0, Math.max(0, maxLength || 64));
+	}
+
+	function GetShopTelemetryContext() {
+		var payload = GetRawShopPayload();
+		return {
+			release_id: BoundedUIEventValue(payload && (payload.release_id || payload.release), 64),
+		};
+	}
+
+	function EmitSupporterUIEvent(eventName, fields) {
+		if (!GameEvents || !GameEvents.SendCustomGameEventToServer) {
+			return;
+		}
+
+		var allowedEvents = {
+			pass_open: true,
+			tab: true,
+			search: true,
+			filter: true,
+			detail: true,
+			preview_start: true,
+			preview_verified: true,
+			preview_fail: true,
+			preview_stop: true,
+		};
+		if (allowedEvents[eventName] !== true) {
+			return;
+		}
+
+		fields = fields || {};
+		var context = GetShopTelemetryContext();
+		if (!fields.release_id && context.release_id) {
+			fields.release_id = context.release_id;
+		}
+		var metadata = {};
+		var stringLimits = {
+			tab: 24,
+			filter_key: 32,
+			filter_value: 64,
+			item_id: 96,
+			category: 48,
+			candidate_id: 96,
+			result: 32,
+			error_code: 64,
+			release_id: 64,
+		};
+		for (var stringKey in stringLimits) {
+			if (!stringLimits.hasOwnProperty(stringKey) || fields[stringKey] === undefined || fields[stringKey] === null) {
+				continue;
+			}
+			var textValue = BoundedUIEventValue(fields[stringKey], stringLimits[stringKey]);
+			var lowerValue = textValue.toLowerCase();
+			if (!textValue || lowerValue.indexOf("vpcf") !== -1 || lowerValue.indexOf("particles/") !== -1 ||
+				lowerValue.indexOf("http://") !== -1 || lowerValue.indexOf("https://") !== -1 ||
+				lowerValue.indexOf("server_key") !== -1 || lowerValue.indexOf("api_key") !== -1 ||
+				lowerValue.indexOf("password") !== -1 || lowerValue.indexOf("secret") !== -1 ||
+				lowerValue.indexOf("token") !== -1) {
+				continue;
+			}
+			metadata[stringKey] = textValue;
+		}
+		var integerLimits = {
+			query_length: 500,
+			duration_ms: 3600000,
+		};
+		for (var integerKey in integerLimits) {
+			if (!integerLimits.hasOwnProperty(integerKey) || fields[integerKey] === undefined || fields[integerKey] === null) {
+				continue;
+			}
+			metadata[integerKey] = Clamp(Math.floor(ToNumber(fields[integerKey], 0)), 0, integerLimits[integerKey]);
+		}
+		supporterUITelemetrySequence = Math.min(2147483647, supporterUITelemetrySequence + 1);
+		GameEvents.SendCustomGameEventToServer("supporter_pass_ui_event", {
+			event_name: eventName,
+			client_seq: supporterUITelemetrySequence,
+			metadata: metadata,
+		});
 	}
 
 	function IsEarthwardenSupporterData(data) {
@@ -1708,9 +1827,7 @@ var XHSSupporterPass = (function () {
 		var normalizedItems = [];
 		for (var i = 0; i < items.length; i++) {
 			var item = EnrichOwnedArmoryItem(CopyObject(items[i]));
-			if (IsDeferredSupporterItem(item)) {
-				continue;
-			}
+			var activatesIn41 = IsDeferredSupporterItem(item);
 			item.type = NormalizeArmoryItemType(item);
 			item.entitlement_id = item.entitlement_id || item.id;
 			item.item_id = item.item_id || item.catalog_item_id || item.catalog_item_key ||
@@ -1727,20 +1844,450 @@ var XHSSupporterPass = (function () {
 				}
 			}
 			var requiredTier = ToNumber(item.required_tier || item.tier_id, RequiredTierFromStatus(item.required_status));
-			item.locked = requiredTier > 0 && player.tier_id < requiredTier;
-			item.lock_reason = item.locked ? Text("xhs_sp_tier_value", "Tier {tier}", { tier: requiredTier }) : "";
-			item.equipped = item.equipped === true || IsArmoryItemEquipped(player, item);
+			if (activatesIn41) {
+				// TI bundles may already grant these permanent entitlements in 4.0.
+				// Keep them visible in the collection, but dormant until their runtime
+				// systems ship in 4.1. These flags also prevent developer UI mode from
+				// accidentally turning the Armory card into an equip action.
+				item.deferred_until = item.deferred_until || "4.1";
+				item.runtime_status = "dormant_4_1";
+				item.activates_in_4_1 = true;
+				item.dormant = true;
+				item.previewable = false;
+				item.preview_available = false;
+				item.locked = true;
+				item.lock_reason = Text("xhs_sp_activates_41", "Activates in 4.1");
+				item.equipped = false;
+			} else {
+				item.locked = requiredTier > 0 && player.tier_id < requiredTier;
+				item.lock_reason = item.locked ? Text("xhs_sp_tier_value", "Tier {tier}", { tier: requiredTier }) : "";
+				item.equipped = item.equipped === true || IsArmoryItemEquipped(player, item);
+			}
 			normalizedItems.push(item);
 		}
 		return normalizedItems;
 	}
 
+	function GetRawShopPayload() {
+		var catalog = GetTable("supporter_pass_shop", "catalog", null);
+		if (catalog) {
+			return catalog;
+		}
+
+		var permanent = GetTable("supporter_pass_shop", "permanent", null);
+		if (permanent) {
+			return permanent;
+		}
+
+		return GetTable("supporter_pass_shop", "featured", {}) || {};
+	}
+
+	function AsShopList(value) {
+		if (value === undefined || value === null || value === "") {
+			return [];
+		}
+		if (typeof value === "string" || typeof value === "number") {
+			return [value];
+		}
+		if (Object.prototype.toString.call(value) === "[object Array]") {
+			return value;
+		}
+		if (typeof value !== "object") {
+			return [];
+		}
+		if (value.items !== undefined && value.id === undefined && value.item_id === undefined) {
+			return AsShopList(value.items);
+		}
+		if (value.id !== undefined || value.item_id !== undefined || value.catalog_item_id !== undefined ||
+			value.catalog_item_key !== undefined || value.item_key !== undefined ||
+			value.reward_item_id !== undefined || value.entitlement_id !== undefined) {
+			return [value];
+		}
+
+		var keys = [];
+		for (var key in value) {
+			if (value.hasOwnProperty(key) && /^\d+$/.test(key)) {
+				keys.push(key);
+			}
+		}
+		keys.sort(function (a, b) { return Number(a) - Number(b); });
+		var list = [];
+		for (var i = 0; i < keys.length; i++) {
+			list.push(value[keys[i]]);
+		}
+		return list;
+	}
+
+	function ShopItemID(item) {
+		if (item === undefined || item === null) {
+			return "";
+		}
+		if (typeof item !== "object") {
+			return item.toString();
+		}
+		var id = item.id || item.item_id || item.catalog_item_id || item.catalog_item_key ||
+			item.item_key || item.reward_item_id || item.entitlement_id;
+		return id === undefined || id === null ? "" : id.toString();
+	}
+
+	function ShopOwnershipKeys(item) {
+		if (!item || typeof item !== "object") {
+			return item === undefined || item === null || item === "" ? [] : [item.toString().toLowerCase()];
+		}
+		var fields = [
+			item.item_id,
+			item.catalog_item_id,
+			item.catalog_item_key,
+			item.item_key,
+			item.reward_item_id,
+			item.entitlement_id,
+			item.id,
+		];
+		var keys = [];
+		var seen = {};
+		for (var i = 0; i < fields.length; i++) {
+			if (fields[i] === undefined || fields[i] === null || fields[i] === "") {
+				continue;
+			}
+			var key = fields[i].toString().toLowerCase();
+			if (!seen[key]) {
+				seen[key] = true;
+				keys.push(key);
+			}
+		}
+		return keys;
+	}
+
+	function CollectShopArmoryEntries(value, result, depth) {
+		if (!value || depth > 6) {
+			return;
+		}
+		if (Object.prototype.toString.call(value) === "[object Array]") {
+			for (var arrayIndex = 0; arrayIndex < value.length; arrayIndex++) {
+				CollectShopArmoryEntries(value[arrayIndex], result, depth + 1);
+			}
+			return;
+		}
+		if (typeof value !== "object") {
+			return;
+		}
+		if (ShopOwnershipKeys(value).length > 0) {
+			result.push(value);
+			return;
+		}
+		for (var key in value) {
+			if (value.hasOwnProperty(key) && value[key] && typeof value[key] === "object") {
+				CollectShopArmoryEntries(value[key], result, depth + 1);
+			}
+		}
+	}
+
+	function ShopArmoryEntryQuantity(entry) {
+		var fields = [entry && entry.owned_quantity, entry && entry.quantity, entry && entry.count, entry && entry.stack_count];
+		var quantity = 0;
+		for (var i = 0; i < fields.length; i++) {
+			if (fields[i] !== undefined && fields[i] !== null && fields[i] !== "") {
+				quantity = Math.max(quantity, Math.floor(ToNumber(fields[i], 0)));
+			}
+		}
+		if (quantity <= 0 && !IsTruthy(entry && entry.owned, true)) {
+			return 0;
+		}
+		return Math.max(1, quantity);
+	}
+
+	function BuildShopArmoryOwnershipIndex(player) {
+		var playerID = Players.GetLocalPlayer();
+		var sources = [
+			GetTable("supporter_pass_armory", "rewards_" + playerID, []),
+			player && player.raw && player.raw.armory,
+			player && player.raw && player.raw.supporter_pass && player.raw.supporter_pass.armory,
+		];
+		var entries = [];
+		for (var sourceIndex = 0; sourceIndex < sources.length; sourceIndex++) {
+			CollectShopArmoryEntries(sources[sourceIndex], entries, 0);
+		}
+		var index = {
+			__xhs_favorite: {},
+			__xhs_giftable: {},
+		};
+		for (var entryIndex = 0; entryIndex < entries.length; entryIndex++) {
+			var entry = entries[entryIndex];
+			var quantity = ShopArmoryEntryQuantity(entry);
+			var favorite = IsTruthy(entry.favorite, false) || IsTruthy(entry.is_favorite, false);
+			var giftable = IsTruthy(entry.giftable, false)
+				|| IsTruthy(entry.is_giftable, false)
+				|| Math.floor(ToNumber(entry.giftable_quantity, 0)) > 0;
+			var keys = ShopOwnershipKeys(entry);
+			for (var keyIndex = 0; keyIndex < keys.length; keyIndex++) {
+				index[keys[keyIndex]] = Math.max(ToNumber(index[keys[keyIndex]], 0), quantity);
+				if (favorite) index.__xhs_favorite[keys[keyIndex]] = true;
+				if (giftable) index.__xhs_giftable[keys[keyIndex]] = true;
+			}
+		}
+		return index;
+	}
+
+	function GetShopArmoryOwnedQuantity(item, ownershipIndex) {
+		var quantity = 0;
+		var keys = ShopOwnershipKeys(item);
+		for (var i = 0; i < keys.length; i++) {
+			quantity = Math.max(quantity, ToNumber(ownershipIndex && ownershipIndex[keys[i]], 0));
+		}
+		return Math.max(0, Math.floor(quantity));
+	}
+
+	function GetShopArmoryFlag(item, ownershipIndex, flagName) {
+		var flags = ownershipIndex && ownershipIndex["__xhs_" + flagName];
+		if (!flags) return false;
+		var keys = ShopOwnershipKeys(item);
+		for (var i = 0; i < keys.length; i++) {
+			if (flags[keys[i]] === true) return true;
+		}
+		return false;
+	}
+
+	function NormalizeShopComponent(component, ownershipIndex) {
+		if (component === undefined || component === null) {
+			return null;
+		}
+		if (typeof component !== "object") {
+			component = { id: component.toString(), item_id: component.toString(), name: component.toString() };
+		}
+
+		var normalized = CopyObject(component);
+		normalized.id = ShopItemID(component);
+		normalized.item_id = normalized.item_id || normalized.id;
+		normalized.name = normalized.name || normalized.item_name || normalized.id;
+		normalized.item_type = normalized.item_type || normalized.type || normalized.category || "Cosmetic";
+		normalized.owned_quantity = Math.max(
+			Math.floor(ToNumber(normalized.owned_quantity || (normalized.ownership && normalized.ownership.quantity), 0)),
+			GetShopArmoryOwnedQuantity(normalized, ownershipIndex)
+		);
+		normalized.owned = IsTruthy(normalized.owned, false) || IsTruthy(normalized.is_owned, false) || normalized.owned_quantity > 0;
+		normalized.runtime_status = (normalized.runtime_status || normalized.status || "ready").toString().toLowerCase();
+		return normalized;
+	}
+
+	function NormalizeShopItem(source, player, ownershipIndex) {
+		if (!source || typeof source !== "object") {
+			return null;
+		}
+
+		var item = CopyObject(source);
+		item.id = ShopItemID(source);
+		if (!item.id) {
+			return null;
+		}
+		item.item_id = item.item_id || item.id;
+		item.item_type = item.item_type || item.type || item.category || "Cosmetic";
+		item.type = item.type || item.item_type;
+		item.category = item.category || NormalizeArmoryItemType(item);
+		item.edition = (item.edition || item.edition_id || item.ti_edition || item.event_edition || "Global").toString();
+		item.rarity = (item.rarity || item.item_rarity || "common").toString().toLowerCase();
+		var serverLocked = IsTruthy(item.locked, false) || IsTruthy(item.is_locked, false);
+		var serverLockReason = item.lock_reason || item.locked_reason || "";
+		var minimumTierValue = item.min_tier !== undefined && item.min_tier !== null
+			? item.min_tier
+			: (item.min_tier_id !== undefined && item.min_tier_id !== null
+				? item.min_tier_id
+				: (item.required_tier !== undefined && item.required_tier !== null ? item.required_tier : item.tier_id));
+		item.min_tier = Math.max(0, Math.floor(ToNumber(minimumTierValue, 0)));
+		item.giftable = IsTruthy(item.giftable, false) || IsTruthy(item.is_giftable, false)
+			|| GetShopArmoryFlag(item, ownershipIndex, "giftable");
+		item.favorite = IsTruthy(item.favorite, false) || IsTruthy(item.is_favorite, false)
+			|| GetShopArmoryFlag(item, ownershipIndex, "favorite");
+		item.runtime_status = (item.runtime_status || item.status || "ready").toString().toLowerCase();
+		item.description = item.description || item.long_description || item.subtitle || "";
+
+		var componentSource = item.components || item.grants || (item.bundle && (item.bundle.components || item.bundle.grants));
+		if (!componentSource && item.payload && typeof item.payload === "object") {
+			componentSource = item.payload.components || item.payload.grants;
+		}
+		var rawComponents = AsShopList(componentSource);
+		item.components = [];
+		for (var componentIndex = 0; componentIndex < rawComponents.length; componentIndex++) {
+			var component = NormalizeShopComponent(rawComponents[componentIndex], ownershipIndex);
+			if (component) {
+				item.components.push(component);
+			}
+		}
+		var ownedComponentIDs = {};
+		var rawOwnedComponents = AsShopList(item.owned_component_ids || item.owned_components || (item.ownership && item.ownership.components));
+		for (var ownedComponentIndex = 0; ownedComponentIndex < rawOwnedComponents.length; ownedComponentIndex++) {
+			ownedComponentIDs[ShopItemID(rawOwnedComponents[ownedComponentIndex])] = true;
+		}
+		for (var normalizedComponentIndex = 0; normalizedComponentIndex < item.components.length; normalizedComponentIndex++) {
+			if (ownedComponentIDs[item.components[normalizedComponentIndex].id]) {
+				item.components[normalizedComponentIndex].owned = true;
+				item.components[normalizedComponentIndex].owned_quantity = Math.max(1, ToNumber(item.components[normalizedComponentIndex].owned_quantity, 0));
+			}
+		}
+		item.is_bundle = IsTruthy(item.is_bundle, false) || NormalizeRewardType(item.item_type) === "Bundle" || item.components.length > 1;
+		if (item.is_bundle) {
+			item.type = "Bundle";
+			item.item_type = "Bundle";
+			item.category = "Bundle";
+		}
+
+		var countedOwned = 0;
+		var dormantComponents = 0;
+		for (var ownedIndex = 0; ownedIndex < item.components.length; ownedIndex++) {
+			if (item.components[ownedIndex].owned) {
+				countedOwned++;
+			}
+			var componentStatus = item.components[ownedIndex].runtime_status;
+			if (componentStatus.indexOf("dormant") !== -1 || componentStatus.indexOf("4.1") !== -1 || componentStatus.indexOf("deferred") !== -1) {
+				dormantComponents++;
+			}
+		}
+		item.component_count = Math.max(item.components.length, Math.floor(ToNumber(item.component_count, 0)));
+		item.owned_count = Math.max(countedOwned, Math.floor(ToNumber(item.owned_count, 0)));
+		item.owned_quantity = Math.max(
+			Math.floor(ToNumber(item.owned_quantity || (item.ownership && item.ownership.quantity), 0)),
+			GetShopArmoryOwnedQuantity(item, ownershipIndex)
+		);
+		item.owned = IsTruthy(item.owned, false) || IsTruthy(item.is_owned, false) || IsTruthy(item.ownership && item.ownership.owned, false) ||
+			item.owned_quantity > 0 || (item.is_bundle && item.component_count > 0 && item.owned_count >= item.component_count);
+		item.has_owned_components = item.is_bundle && item.owned_count > 0 && !item.owned;
+		item.has_dormant_components = dormantComponents > 0;
+		var tierLocked = item.min_tier > Math.max(0, Math.floor(ToNumber(player && player.tier_id, 0)));
+		item.locked = serverLocked || tierLocked;
+		item.lock_reason = serverLocked && serverLockReason
+			? LocalizeMaybeKey(serverLockReason)
+			: (tierLocked ? Text("xhs_sp_shop_tier_required", "Tier {tier} required", { tier: item.min_tier }) : "");
+		return item;
+	}
+
+	function BuildShopItemIndex(items) {
+		var index = {};
+		for (var i = 0; i < items.length; i++) {
+			var id = ShopItemID(items[i]);
+			if (id) {
+				index[id] = items[i];
+			}
+		}
+		return index;
+	}
+
+	function ResolveShopSection(section, itemIndex, player, ownershipIndex) {
+		var references = AsShopList(section);
+		if (references.length === 0 && section && typeof section === "object") {
+			var sectionFields = ["item", "primary", "secondary", "secondary_items"];
+			for (var sectionFieldIndex = 0; sectionFieldIndex < sectionFields.length; sectionFieldIndex++) {
+				references = references.concat(AsShopList(section[sectionFields[sectionFieldIndex]]));
+			}
+		}
+		var resolved = [];
+		var seen = {};
+		for (var i = 0; i < references.length; i++) {
+			var reference = references[i];
+			var id = ShopItemID(reference);
+			var item = id && itemIndex[id] ? itemIndex[id] : null;
+			if (item && reference && typeof reference === "object") {
+				var merged = CopyObject(item);
+				for (var field in reference) {
+					if (reference.hasOwnProperty(field)) {
+						merged[field] = reference[field];
+					}
+				}
+				item = NormalizeShopItem(merged, player, ownershipIndex);
+			} else if (!item && reference && typeof reference === "object") {
+				item = NormalizeShopItem(reference, player, ownershipIndex);
+			}
+			if (!item || seen[item.id] || IsStandaloneDeferredShopItem(item)) {
+				continue;
+			}
+			seen[item.id] = true;
+			resolved.push(item);
+		}
+		return resolved;
+	}
+
+	function IsStandaloneDeferredShopItem(item) {
+		if (!item || item.is_bundle === true) {
+			return false;
+		}
+		return IsDeferredSupporterItem(item);
+	}
+
+	function GetShopViewModel(player) {
+		player = player || GetDisplayPlayerData(GetLocalPlayerData());
+		var ownershipIndex = BuildShopArmoryOwnershipIndex(player);
+		var payload = GetRawShopPayload();
+		var sections = payload && payload.sections && typeof payload.sections === "object" ? payload.sections : {};
+		var structured = !!(payload && (payload.sections || payload.permanent || payload.hero || payload.catalog_items || payload.release_id || payload.version));
+		var rawItems = AsShopList(payload && payload.items !== undefined ? payload.items : payload);
+		if (rawItems.length === 0 && payload && payload.permanent) {
+			rawItems = AsShopList(payload.permanent);
+		}
+		if (rawItems.length === 0 && sections.catalog) {
+			rawItems = AsShopList(sections.catalog);
+		}
+
+		var items = [];
+		var seen = {};
+		for (var i = 0; i < rawItems.length; i++) {
+			var normalized = NormalizeShopItem(rawItems[i], player, ownershipIndex);
+			if (!normalized || seen[normalized.id] || IsStandaloneDeferredShopItem(normalized)) {
+				continue;
+			}
+			var scope = (normalized.shop_scope || normalized.scope || "permanent").toString().toLowerCase();
+			if (structured && (scope === "rotation" || scope === "rotating")) {
+				continue;
+			}
+			seen[normalized.id] = true;
+			items.push(normalized);
+		}
+
+		var index = BuildShopItemIndex(items);
+		var hasCatalogSection = !!(sections.catalog || payload.catalog_items || payload.permanent_items || payload.permanent);
+		var hero = ResolveShopSection(sections.hero || payload.hero, index, player, ownershipIndex).slice(0, 1);
+		var featured = ResolveShopSection(sections.featured || payload.featured_items, index, player, ownershipIndex);
+		var catalog = ResolveShopSection(sections.catalog || payload.catalog_items || payload.permanent_items, index, player, ownershipIndex);
+		if (catalog.length === 0 && !hasCatalogSection) {
+			catalog = items.slice(0);
+		}
+		if (hero.length === 0 && structured) {
+			for (var heroIndex = 0; heroIndex < items.length; heroIndex++) {
+				if ((items[heroIndex].placement || items[heroIndex].section || "").toString().toLowerCase() === "hero") {
+					hero = [items[heroIndex]];
+					break;
+				}
+			}
+		}
+		if (featured.length === 0 && structured) {
+			featured = items.filter(function (item) {
+				var placement = (item.placement || item.section || "").toString().toLowerCase();
+				return placement === "featured" || ToNumber(item.featured_rank, 0) > 0;
+			});
+		}
+
+		var heroID = hero.length ? hero[0].id : "";
+		featured = featured.filter(function (item) { return item.id !== heroID; }).slice(0, 4);
+		var allResolved = [];
+		var resolvedSeen = {};
+		var resolvedGroups = [items, hero, featured, catalog];
+		for (var groupIndex = 0; groupIndex < resolvedGroups.length; groupIndex++) {
+			for (var resolvedIndex = 0; resolvedIndex < resolvedGroups[groupIndex].length; resolvedIndex++) {
+				var resolvedItem = resolvedGroups[groupIndex][resolvedIndex];
+				if (!resolvedItem || resolvedSeen[resolvedItem.id]) { continue; }
+				resolvedSeen[resolvedItem.id] = true;
+				allResolved.push(resolvedItem);
+			}
+		}
+		return {
+			payload: payload || {},
+			structured: structured,
+			items: allResolved,
+			hero: hero,
+			featured: featured,
+			catalog: catalog,
+		};
+	}
+
 	function GetShopItems() {
-		var data = GetTable("supporter_pass_shop", "featured", null);
-		var items = AsArray(data && data.items ? data.items : data);
-		return items.filter(function (item) {
-			return !IsDeferredSupporterItem(item);
-		});
+		return GetShopViewModel(GetDisplayPlayerData(GetLocalPlayerData())).catalog;
 	}
 
 	function GetArmoryItems(player) {
@@ -1856,7 +2403,8 @@ var XHSSupporterPass = (function () {
 	}
 
 	// Effigies and High Fives are retained in the catalog for their 4.1
-	// implementations, but no 4.0 Supporter Pass surface advertises or equips them.
+	// implementations. Owned copies remain visible as dormant Armory entries, but
+	// 4.0 never sells them standalone or lets players equip them.
 	function IsDeferredSupporterItem(item) {
 		if (!item) {
 			return false;
@@ -2046,9 +2594,10 @@ var XHSSupporterPass = (function () {
 			return;
 		}
 
+		var wasVisible = window.BHasClass("IsVisible") || window.BHasClass("IsOpening");
 		var visible = forceVisible;
 		if (visible === undefined) {
-			visible = !(window.BHasClass("IsVisible") || window.BHasClass("IsOpening"));
+			visible = !wasVisible;
 		}
 
 		windowAnimationSerial += 1;
@@ -2068,6 +2617,10 @@ var XHSSupporterPass = (function () {
 			window.AddClass("IsOpening");
 			window.hittest = true;
 			RenderAll();
+			if (!wasVisible) {
+				EmitSupporterUIEvent("pass_open", { tab: activePageName });
+				EmitSupporterUIEvent("tab", { tab: activePageName });
+			}
 			UpdateBackToTopButton();
 			ScheduleBackToTopPoll();
 			$.Schedule(0.01, function () {
@@ -2079,6 +2632,7 @@ var XHSSupporterPass = (function () {
 			});
 		} else {
 			SetCourierRequestViewerVisible(false);
+			SetShopDetailVisible(false);
 			window.RemoveClass("IsOpening");
 			window.RemoveClass("IsVisible");
 			window.AddClass("IsClosing");
@@ -2121,6 +2675,17 @@ var XHSSupporterPass = (function () {
 
 		if (pageName !== "armory") {
 			SetCourierRequestViewerVisible(false);
+		}
+		if (pageName !== "shop") {
+			SetShopDetailVisible(false);
+		}
+
+		activePageName = pageName;
+		if (pageName === "shop") {
+			RenderShop(GetLocalPlayerData());
+		}
+		if (IsSupporterPassVisible()) {
+			EmitSupporterUIEvent("tab", { tab: pageName });
 		}
 
 		UpdatePremiumCTA(GetDisplayPlayerData(GetLocalPlayerData()));
@@ -2572,15 +3137,20 @@ var XHSSupporterPass = (function () {
 	}
 
 	function CreateShopCard(parent, item, player, mode) {
+		if (mode === "shop") {
+			return CreatePermanentShopCard(parent, item, player, "catalog", 0);
+		}
 		var card = $.CreatePanel("Panel", parent, "");
-		var devPreviewOnly = mode === "armory" && item.dev_preview_only === true;
-		var devLocalEquipMode = mode === "armory" && IsDevUnlockAllUIActive(player);
+		var dormantUntil41 = mode === "armory" && item.activates_in_4_1 === true;
+		var devPreviewOnly = mode === "armory" && item.dev_preview_only === true && !dormantUntil41;
+		var devLocalEquipMode = mode === "armory" && IsDevUnlockAllUIActive(player) && !dormantUntil41;
 		card.AddClass("XHSPassShopCard");
 		card.SetHasClass("IsArmoryCard", mode === "armory");
 		card.SetHasClass("IsDevUIPreview", devPreviewOnly);
 		card.SetHasClass("IsDevLocalEquip", devLocalEquipMode);
 		card.SetHasClass("IsEquipped", item.equipped === true);
 		card.SetHasClass("IsLocked", item.locked === true);
+		card.SetHasClass("IsDormant", dormantUntil41);
 		ApplyItemVisualClasses(card, item, item.track === "premium" ? "premium" : "");
 
 		CreateItemPreview(card, item, "XHSPassShopPreview", "XHSPassShopImage");
@@ -2658,7 +3228,9 @@ var XHSSupporterPass = (function () {
 		} else if (devLocalEquipMode) {
 			label.text = item.equipped ? "EQUIPPED LOCALLY" : "EQUIP LOCALLY";
 		} else if (mode === "armory") {
-			label.text = Text(item.locked ? "xhs_sp_locked" : (item.equipped ? "xhs_sp_equipped" : "xhs_sp_equip"), item.locked ? "Locked" : (item.equipped ? "Equipped" : "Equip"));
+			label.text = dormantUntil41
+				? Text("xhs_sp_activates_41", "Activates in 4.1")
+				: Text(item.locked ? "xhs_sp_locked" : (item.equipped ? "xhs_sp_equipped" : "xhs_sp_equip"), item.locked ? "Locked" : (item.equipped ? "Equipped" : "Equip"));
 		} else {
 			label.text = Text(canAfford ? "xhs_sp_buy" : "xhs_sp_locked", canAfford ? "Buy" : "Locked");
 		}
@@ -2681,38 +3253,106 @@ var XHSSupporterPass = (function () {
 
 	function RenderShop(player) {
 		var parent = Panel("XHSPassShopGrid");
+		var heroParent = Panel("XHSPassShopHero");
+		var featuredParent = Panel("XHSPassShopFeatured");
+		var highlights = Panel("XHSPassShopHighlights");
 		ClearPanel(parent);
+		ClearPanel(heroParent);
+		ClearPanel(featuredParent);
 		ClearPanel(Panel("XHSPassShopPager"));
 
-		var data = GetTable("supporter_pass_shop", "featured", {}) || {};
-		var refresh = data.refresh_label || data.refresh_at || Text("xhs_sp_featured_rotation", "Featured rotation");
+		player = GetDisplayPlayerData(player || GetLocalPlayerData());
+		var view = GetShopViewModel(player);
+		var data = view.payload || {};
+		var refresh = data.title || data.label || data.refresh_label || Text("xhs_sp_permanent_catalog", "Permanent catalog");
 		SetText("XHSPassShopRefresh", LocalizeMaybeKey(refresh.toString()));
+		var releaseMeta = [];
+		if (data.release_id || data.release) {
+			releaseMeta.push(BoundedUIEventValue(data.release_id || data.release, 64));
+		}
+		if (ToNumber(data.version, 0) > 0) {
+			releaseMeta.push("v" + Math.floor(ToNumber(data.version, 0)));
+		}
+		SetText("XHSPassShopCatalogMeta", releaseMeta.join("  /  "));
 
-		var items = GetShopItems();
+		var items = view.catalog;
 		currentShopFilter = RenderCategoryTabs("XHSPassShopFilters", items, currentShopFilter, function (filterName) {
 			currentShopFilter = filterName;
 			ResetPagination("shop");
+			EmitSupporterUIEvent("filter", {
+				tab: "shop",
+				filter_key: "category",
+				filter_value: filterName,
+			});
 			RenderShop(player);
 		});
+		currentShopEditionFilter = RenderShopFacetTabs(
+			"XHSPassShopEditionFilters",
+			GetShopFacetValues(items, "edition"),
+			currentShopEditionFilter,
+			"edition",
+			function (value) {
+				currentShopEditionFilter = value;
+				ResetPagination("shop");
+				RenderShop(player);
+			}
+		);
+		currentShopRarityFilter = RenderShopFacetTabs(
+			"XHSPassShopRarityFilters",
+			GetShopFacetValues(items, "rarity"),
+			currentShopRarityFilter,
+			"rarity",
+			function (value) {
+				currentShopRarityFilter = value;
+				ResetPagination("shop");
+				RenderShop(player);
+			}
+		);
 
 		if (items.length === 0) {
-			CreateEmpty(parent, Text("xhs_sp_shop_unavailable", "Shop unavailable"), Text("xhs_sp_shop_unavailable_body", "The Fragment Shop catalog has not been sent by the backend yet."));
+			if (highlights) { highlights.SetHasClass("IsVisible", false); }
+			SetText("XHSPassShopCatalogCount", Text("xhs_sp_zero_items", "0 items"));
+			SetShopDetailVisible(false);
+			CreateEmpty(parent, Text("xhs_sp_shop_unavailable", "Permanent catalog unavailable"), Text("xhs_sp_shop_unavailable_body", "No permanent Supporter Pass items have been published yet."));
 			return;
 		}
 
-		var filteredItems = FilterItemsByCategory(items, currentShopFilter);
+		var showHighlights = view.structured && IsDefaultShopDiscovery() && (view.hero.length > 0 || view.featured.length > 0);
+		if (highlights) {
+			highlights.SetHasClass("IsVisible", showHighlights);
+			highlights.SetHasClass("HasHero", showHighlights && view.hero.length > 0);
+		}
+		if (showHighlights) {
+			if (view.hero.length > 0) {
+				CreateShopHighlight(heroParent, view.hero[0], player, true, 0);
+			}
+			for (var featuredIndex = 0; featuredIndex < view.featured.length; featuredIndex++) {
+				CreateShopHighlight(featuredParent, view.featured[featuredIndex], player, false, featuredIndex);
+			}
+		}
+
+		var filteredItems = FilterShopItems(items);
+		var ownedCount = 0;
+		for (var ownedIndex = 0; ownedIndex < filteredItems.length; ownedIndex++) {
+			if (filteredItems[ownedIndex].owned) { ownedCount++; }
+		}
+		SetText("XHSPassShopCatalogCount", Text("xhs_sp_catalog_item_count", "{count} items  /  {owned} owned", {
+			count: filteredItems.length,
+			owned: ownedCount,
+		}));
 		RenderPaginationControls("XHSPassShopPager", "shop", filteredItems.length, function () {
 			RenderShop(GetLocalPlayerData());
 		});
 		if (filteredItems.length === 0) {
-			CreateEmpty(parent, Text("xhs_sp_no_shop_items", "No shop items"), Text("xhs_sp_no_shop_items_body", "No Fragment Shop items match this category."));
+			CreateEmpty(parent, Text("xhs_sp_no_shop_items", "No matching items"), Text("xhs_sp_no_shop_items_body", "Try another category, edition, rarity, or search."));
 			return;
 		}
 
 		var pageItems = GetPageSlice(filteredItems, "shop");
 		for (var i = 0; i < pageItems.length; i++) {
-			CreateShopCard(parent, pageItems[i], player, "shop");
+			CreatePermanentShopCard(parent, pageItems[i], player, "catalog", paginationState.shop.page * paginationState.shop.page_size + i);
 		}
+		RefreshShopDetail(player);
 	}
 
 	function GetItemCategory(item) {
@@ -2734,15 +3374,22 @@ var XHSSupporterPass = (function () {
 
 	function GetItemCategories(items, player) {
 		var available = {};
+		var hasFavorites = false;
 		for (var i = 0; i < items.length; i++) {
 			var type = GetItemCategory(items[i]);
 			var key = GetCategoryKey(type);
 			if (!available[key]) {
 				available[key] = type;
 			}
+			if (items[i].favorite === true) {
+				hasFavorites = true;
+			}
 		}
 
 		var filters = ["All"];
+		if (hasFavorites) {
+			filters.push("Favorites");
+		}
 		var categoryOrder = [
 			"Cosmetic",
 			"Teleport FX",
@@ -2780,6 +3427,9 @@ var XHSSupporterPass = (function () {
 	function FilterItemsByCategory(items, category) {
 		if (category === "All") {
 			return items;
+		}
+		if (category === "Favorites") {
+			return items.filter(function (item) { return item.favorite === true; });
 		}
 
 		var filtered = [];
@@ -2826,6 +3476,781 @@ var XHSSupporterPass = (function () {
 		});
 	}
 
+	function ShopFacetKey(value) {
+		return (value || "").toString().toLowerCase().replace(/[^a-z0-9]/g, "");
+	}
+
+	function ShopEditionLabel(value) {
+		var edition = (value || "Global").toString();
+		var match = /^ti\s*0*([1-9]\d*)$/i.exec(edition);
+		if (match) {
+			return "TI" + match[1];
+		}
+		return edition.toUpperCase();
+	}
+
+	function GetShopFacetValues(items, facet) {
+		var seen = {};
+		var values = [];
+		for (var i = 0; i < items.length; i++) {
+			var value = facet === "edition" ? (items[i].edition || "Global") : (items[i].rarity || "common");
+			var key = ShopFacetKey(value);
+			if (!key || seen[key]) {
+				continue;
+			}
+			seen[key] = true;
+			values.push(value.toString());
+		}
+		if (facet === "rarity") {
+			var rarityOrder = { common: 1, uncommon: 2, rare: 3, mythical: 4, legendary: 5, immortal: 6, arcana: 7 };
+			values.sort(function (a, b) {
+				return (rarityOrder[ShopFacetKey(a)] || 99) - (rarityOrder[ShopFacetKey(b)] || 99);
+			});
+		} else {
+			values.sort(function (a, b) {
+				var aMatch = /^ti\s*0*([1-9]\d*)$/i.exec(a);
+				var bMatch = /^ti\s*0*([1-9]\d*)$/i.exec(b);
+				if (aMatch && bMatch) {
+					return Number(aMatch[1]) - Number(bMatch[1]);
+				}
+				if (aMatch) { return -1; }
+				if (bMatch) { return 1; }
+				return a.toLowerCase() < b.toLowerCase() ? -1 : 1;
+			});
+		}
+		return values;
+	}
+
+	function RenderShopFacetTabs(parentID, values, activeValue, facet, onSelect) {
+		var parent = Panel(parentID);
+		ClearPanel(parent);
+		if (!parent) {
+			return activeValue;
+		}
+
+		var options = ["All"].concat(values);
+		var activeKey = ShopFacetKey(activeValue || "All");
+		var activeExists = activeKey === "all";
+		for (var i = 1; i < options.length; i++) {
+			if (ShopFacetKey(options[i]) === activeKey) {
+				activeValue = options[i];
+				activeExists = true;
+				break;
+			}
+		}
+		if (!activeExists) {
+			activeValue = "All";
+		}
+
+		for (var optionIndex = 0; optionIndex < options.length; optionIndex++) {
+			(function (option) {
+				var button = $.CreatePanel("Button", parent, "");
+				button.AddClass("XHSPassShopFacetButton");
+				button.SetHasClass("IsActive", ShopFacetKey(option) === ShopFacetKey(activeValue));
+				button.SetPanelEvent("onactivate", function () {
+					onSelect(option);
+					EmitSupporterUIEvent("filter", {
+						tab: "shop",
+						filter_key: facet,
+						filter_value: option,
+					});
+				});
+				var label = $.CreatePanel("Label", button, "");
+				label.text = option === "All"
+					? Text("xhs_sp_filter_all", "All")
+					: (facet === "edition" ? ShopEditionLabel(option) : DisplayRewardRarity({ rarity: option }));
+			})(options[optionIndex]);
+		}
+		return activeValue;
+	}
+
+	function FilterShopItems(items) {
+		var categoryFiltered = FilterItemsByCategory(items, currentShopFilter);
+		var query = (currentShopSearch || "").toString().toLowerCase().replace(/^\s+|\s+$/g, "");
+		var terms = query ? query.split(/\s+/) : [];
+		return categoryFiltered.filter(function (item) {
+			if (currentShopEditionFilter !== "All" && ShopFacetKey(item.edition) !== ShopFacetKey(currentShopEditionFilter)) {
+				return false;
+			}
+			if (currentShopRarityFilter !== "All" && ShopFacetKey(item.rarity) !== ShopFacetKey(currentShopRarityFilter)) {
+				return false;
+			}
+			if (terms.length === 0) {
+				return true;
+			}
+			var componentNames = [];
+			for (var i = 0; i < item.components.length; i++) {
+				componentNames.push(item.components[i].name || item.components[i].id || "");
+			}
+			var haystack = [
+				item.name,
+				item.item_name,
+				item.id,
+				item.description,
+				item.category,
+				item.edition,
+				item.rarity,
+				componentNames.join(" "),
+			].join(" ").toLowerCase();
+			for (var termIndex = 0; termIndex < terms.length; termIndex++) {
+				if (haystack.indexOf(terms[termIndex]) === -1) {
+					return false;
+				}
+			}
+			return true;
+		});
+	}
+
+	function IsDefaultShopDiscovery() {
+		return currentShopFilter === "All" && currentShopEditionFilter === "All" &&
+			currentShopRarityFilter === "All" && !currentShopSearch;
+	}
+
+	function IsSupporterPassVisible() {
+		var window = Panel("XHSSupporterPassWindow");
+		return !!(window && (window.BHasClass("IsVisible") || window.BHasClass("IsOpening")));
+	}
+
+	function CreateBundleGlyph(parent, withLabel) {
+		var badge = $.CreatePanel("Panel", parent, "");
+		badge.AddClass("XHSPassBundleBadge");
+		var glyph = $.CreatePanel("Panel", badge, "");
+		glyph.AddClass("XHSPassBundleGlyph");
+		if (withLabel) {
+			var label = $.CreatePanel("Label", badge, "");
+			label.text = Text("xhs_sp_bundle", "Bundle");
+		}
+		return badge;
+	}
+
+	function CreateShopBadges(parent, item, compact) {
+		var row = $.CreatePanel("Panel", parent, "");
+		row.AddClass("XHSPassShopBadges");
+		row.SetHasClass("IsCompact", compact === true);
+		if (item.is_bundle) {
+			CreateBundleGlyph(row, !compact);
+		}
+
+		function badge(text, className) {
+			var label = $.CreatePanel("Label", row, "");
+			label.AddClass("XHSPassShopBadge");
+			if (className) { label.AddClass(className); }
+			label.text = text;
+		}
+		if (item.edition && ShopFacetKey(item.edition) !== "global") {
+			badge(ShopEditionLabel(item.edition), "IsEdition");
+		}
+		if (item.giftable) {
+			badge(Text("xhs_sp_giftable", "Giftable"), "IsGiftable");
+		}
+		if (item.favorite) {
+			badge(Text("xhs_sp_favorite", "Favorite"), "IsFavorite");
+		}
+		if (item.min_tier > 0) {
+			badge(Text("xhs_sp_tier_value", "Tier {tier}", { tier: item.min_tier }), "IsTier");
+		}
+		if (item.owned) {
+			badge(Text("xhs_sp_owned", "Owned"), "IsOwned");
+		}
+		if (item.has_dormant_components) {
+			badge("4.1 ITEM INCLUDED", "IsDormant");
+		}
+		return row;
+	}
+
+	function IsShopRuntimeUnavailable(item) {
+		if (!item || item.is_bundle) {
+			return false;
+		}
+		var status = (item.runtime_status || "ready").toString().toLowerCase();
+		return status === "draft" || status === "unavailable" || status === "disabled" ||
+			status.indexOf("deferred") !== -1 || status.indexOf("dormant") !== -1 || status.indexOf("4.1") !== -1;
+	}
+
+	function GetShopPurchaseState(item, player) {
+		var requestID = ShopItemID(item);
+		var pending = IsActionPending("purchase", requestID);
+		var price = Math.max(0, ToNumber(item.price || item.fragment_price, 0));
+		if (pending) {
+			return { allowed: false, pending: true, label: Text("xhs_sp_pending", "Pending...") };
+		}
+		if (item.locked) {
+			return { allowed: false, label: item.lock_reason || Text("xhs_sp_locked", "Locked") };
+		}
+		if (IsShopRuntimeUnavailable(item)) {
+			return { allowed: false, label: Text("xhs_sp_unavailable", "Unavailable") };
+		}
+		if (!IN_GAME_SHOP_PURCHASES_ENABLED) {
+			return {
+				allowed: true,
+				intent_only: true,
+				reason: "website_only",
+				label: Text("xhs_sp_available_on_website", "Available on website"),
+			};
+		}
+		if (item.owned) {
+			return { allowed: false, label: Text("xhs_sp_owned", "Owned") };
+		}
+		if (ToNumber(player && player.fragments, 0) < price) {
+			return { allowed: false, label: Text("xhs_sp_need_fragments", "Need fragments") };
+		}
+		return { allowed: true, label: Text("xhs_sp_buy", "Buy") };
+	}
+
+	function BeginShopPurchase(item, player, placement) {
+		var state = GetShopPurchaseState(item, player);
+		var requestID = ShopItemID(item);
+		if (state.intent_only && requestID) {
+			OpenExternalURL(SUPPORTER_SHOP_URL);
+			ShowActionMessage(Text("xhs_sp_website_purchase_notice", "This item is purchased on the Supporter Pass website."), true);
+			Game.EmitSound("General.ButtonClick");
+			return;
+		}
+		if (!state.allowed || !requestID) {
+			Game.EmitSound("General.Cancel");
+			return;
+		}
+		// Kept as an explicit no-op guard even if the UI state is accidentally
+		// changed later: 4.0 has no authorized in-game purchase transport.
+		Game.EmitSound("General.Cancel");
+	}
+
+	function CreateShopPurchaseButton(parent, item, player, placement) {
+		var state = GetShopPurchaseState(item, player);
+		var button = $.CreatePanel("Button", parent, "");
+		button.AddClass("XHSPassShopPurchaseButton");
+		button.SetHasClass("IsLocked", !state.allowed);
+		button.SetHasClass("IsOwned", item.owned === true && state.intent_only !== true);
+		button.SetHasClass("IsPending", state.pending === true);
+		button.SetPanelEvent("onactivate", function () { BeginShopPurchase(item, player, placement); });
+		var label = $.CreatePanel("Label", button, "");
+		label.text = state.label;
+		return button;
+	}
+
+	function CreateShopDetailsButton(parent, item, player, placement) {
+		var button = $.CreatePanel("Button", parent, "");
+		button.AddClass("XHSPassShopDetailsButton");
+		button.SetPanelEvent("onactivate", function () {
+			OpenShopDetail(item, player, placement);
+		});
+		var label = $.CreatePanel("Label", button, "");
+		label.text = Text("xhs_sp_details", "Details");
+		return button;
+	}
+
+	function CreatePermanentShopCard(parent, item, player, placement, position) {
+		var card = $.CreatePanel("Panel", parent, "");
+		card.AddClass("XHSPassShopCard");
+		card.AddClass("XHSPassPermanentShopCard");
+		card.SetHasClass("IsOwned", item.owned === true);
+		card.SetHasClass("IsBundle", item.is_bundle === true);
+		card.SetHasClass("IsLocked", item.locked === true);
+		ApplyItemVisualClasses(card, item, "");
+
+		var preview = CreateItemPreview(card, item, "XHSPassShopPreview", "XHSPassShopImage");
+		if (item.is_bundle) {
+			var previewGlyph = CreateBundleGlyph(preview, false);
+			previewGlyph.AddClass("IsOnPreview");
+		}
+		CreateShopBadges(card, item, true);
+
+		var name = $.CreatePanel("Label", card, "");
+		name.AddClass("XHSPassShopName");
+		name.text = LocalizeMaybeKey(item.name || item.item_name || item.id);
+
+		var meta = $.CreatePanel("Label", card, "");
+		meta.AddClass("XHSPassShopMeta");
+		meta.text = DisplayRewardRarity(item) + "  " + DisplayRewardType(item.item_type);
+
+		var price = $.CreatePanel("Label", card, "");
+		price.AddClass("XHSPassShopPrice");
+		price.text = item.owned
+			? Text("xhs_sp_in_collection", "In collection")
+			: FormatNumber(item.price || item.fragment_price || 0) + " " + Text("xhs_sp_fragments_lower", "fragments");
+
+		var actions = $.CreatePanel("Panel", card, "");
+		actions.AddClass("XHSPassShopCardActions");
+		CreateShopDetailsButton(actions, item, player, placement || "catalog");
+		CreateShopPurchaseButton(actions, item, player, placement || "catalog");
+		return card;
+	}
+
+	function CreateShopHighlight(parent, item, player, hero, position) {
+		var card = $.CreatePanel("Panel", parent, "");
+		card.AddClass(hero ? "XHSPassShopHeroCard" : "XHSPassShopFeaturedCard");
+		card.SetHasClass("IsOwned", item.owned === true);
+		card.SetHasClass("IsBundle", item.is_bundle === true);
+		card.SetHasClass("IsLocked", item.locked === true);
+		ApplyItemVisualClasses(card, item, "");
+
+		var preview = CreateItemPreview(card, item, "XHSPassShopHighlightPreview", "XHSPassShopImage");
+		if (item.is_bundle) {
+			var glyph = CreateBundleGlyph(preview, false);
+			glyph.AddClass("IsOnPreview");
+		}
+		var copy = $.CreatePanel("Panel", card, "");
+		copy.AddClass("XHSPassShopHighlightCopy");
+		CreateShopBadges(copy, item, !hero);
+		var name = $.CreatePanel("Label", copy, "");
+		name.AddClass("XHSPassShopHighlightName");
+		name.text = LocalizeMaybeKey(item.name || item.item_name || item.id);
+		var meta = $.CreatePanel("Label", copy, "");
+		meta.AddClass("XHSPassShopHighlightMeta");
+		meta.text = DisplayRewardRarity(item) + "  /  " + DisplayRewardType(item.item_type);
+		if (hero && item.description) {
+			var description = $.CreatePanel("Label", copy, "");
+			description.AddClass("XHSPassShopHighlightDescription");
+			description.text = LocalizeMaybeKey(item.description);
+		}
+		var price = $.CreatePanel("Label", copy, "");
+		price.AddClass("XHSPassShopHighlightPrice");
+		price.text = item.owned
+			? Text("xhs_sp_in_collection", "In collection")
+			: FormatNumber(item.price || item.fragment_price || 0) + " " + Text("xhs_sp_fragments_lower", "fragments");
+		var actions = $.CreatePanel("Panel", copy, "");
+		actions.AddClass("XHSPassShopHighlightActions");
+		CreateShopDetailsButton(actions, item, player, hero ? "hero" : "featured");
+		CreateShopPurchaseButton(actions, item, player, hero ? "hero" : "featured");
+		return card;
+	}
+
+	function FindCurrentShopItem(itemID, player) {
+		var view = GetShopViewModel(GetDisplayPlayerData(player || GetLocalPlayerData()));
+		for (var i = 0; i < view.items.length; i++) {
+			if (view.items[i].id === itemID) {
+				return view.items[i];
+			}
+		}
+		return null;
+	}
+
+	function SetShopDetailVisible(visible) {
+		var overlay = Panel("XHSPassShopDetailOverlay");
+		if (!overlay) {
+			return;
+		}
+		overlay.SetHasClass("IsVisible", visible === true);
+		overlay.hittest = visible === true;
+		if (!visible) {
+			shopDetailItem = null;
+		}
+	}
+
+	function GetCatalogPreviewSlot(item) {
+		var fields = [item && item.slot_id, item && item.item_type, item && item.type, item && item.category];
+		for (var i = 0; i < fields.length; i++) {
+			var value = (fields[i] || "").toString().toLowerCase().replace(/[\s-]+/g, "_");
+			var slot = CanonicalSupporterSlot(value);
+			if (CATALOG_PREVIEW_SLOTS[slot] === true) {
+				return slot;
+			}
+		}
+		var armorySlot = GetCanonicalArmorySlot(item || {});
+		return CATALOG_PREVIEW_SLOTS[armorySlot] === true ? armorySlot : "";
+	}
+
+	function GetCatalogPreviewPlayerIDs() {
+		var playerIDs = Safe(function () {
+			return typeof Game.GetAllPlayerIDs === "function" ? Game.GetAllPlayerIDs() : [];
+		}, []);
+		playerIDs = AsArray(playerIDs);
+		if (playerIDs.length > 0) {
+			return playerIDs;
+		}
+
+		var teams = AsArray(Safe(function () {
+			return typeof Game.GetAllTeamIDs === "function" ? Game.GetAllTeamIDs() : [];
+		}, []));
+		var seen = {};
+		for (var teamIndex = 0; teamIndex < teams.length; teamIndex++) {
+			var teamPlayers = AsArray(Safe(function () {
+				return typeof Game.GetPlayerIDsOnTeam === "function" ? Game.GetPlayerIDsOnTeam(teams[teamIndex]) : [];
+			}, []));
+			for (var playerIndex = 0; playerIndex < teamPlayers.length; playerIndex++) {
+				seen[teamPlayers[playerIndex].toString()] = teamPlayers[playerIndex];
+			}
+		}
+		playerIDs = [];
+		for (var key in seen) {
+			if (seen.hasOwnProperty(key)) {
+				playerIDs.push(seen[key]);
+			}
+		}
+		return playerIDs;
+	}
+
+	function GetCatalogPreviewAccess() {
+		var mapInfo = Safe(function () {
+			return typeof Game.GetMapInfo === "function" ? Game.GetMapInfo() : {};
+		}, {});
+		var mapName = (mapInfo.map_display_name || mapInfo.map_name || "").toString().toLowerCase();
+		if (mapName === "x_hero_siege_demo") {
+			return { allowed: true, demo: true, human_count: 1 };
+		}
+
+		var playerIDs = GetCatalogPreviewPlayerIDs();
+		var humanCount = 0;
+		var localPlayerID = Safe(function () { return Players.GetLocalPlayer(); }, -1);
+		for (var i = 0; i < playerIDs.length; i++) {
+			var playerID = ToNumber(playerIDs[i], -1);
+			if (playerID < 0) {
+				continue;
+			}
+			var info = Safe(function () { return Game.GetPlayerInfo(playerID); }, {});
+			var fakeClient = IsTruthy(info.player_is_fake_client, false) || IsTruthy(info.player_fake_client, false) || IsTruthy(info.player_is_bot, false);
+			var steamID = (info.player_steamid || "").toString();
+			if (!fakeClient && (playerID === localPlayerID || (steamID && steamID !== "0"))) {
+				humanCount++;
+			}
+		}
+
+		return {
+			allowed: playerIDs.length > 0 && humanCount === 1,
+			demo: false,
+			human_count: humanCount,
+		};
+	}
+
+	function SetCatalogPreviewTooltip(panel, tooltip) {
+		if (!panel || !tooltip) {
+			return;
+		}
+		panel.SetPanelEvent("onmouseover", function () {
+			$.DispatchEvent("DOTAShowTextTooltip", panel, tooltip);
+		});
+		panel.SetPanelEvent("onmouseout", function () {
+			$.DispatchEvent("DOTAHideTextTooltip", panel);
+		});
+	}
+
+	function GetCatalogPreviewActionState(item) {
+		var itemID = ShopItemID(item);
+		var sameItem = itemID && catalogPreviewState.item_id === itemID;
+		if (sameItem && catalogPreviewState.status === "active") {
+			return {
+				allowed: true,
+				action: "stop",
+				label: Text("xhs_sp_preview_stop", "Stop preview"),
+				tooltip: Text("xhs_sp_preview_stop_tooltip", "Stop the temporary catalog preview."),
+			};
+		}
+		if (sameItem && catalogPreviewState.status === "pending") {
+			return {
+				allowed: true,
+				action: "stop",
+				label: Text("xhs_sp_preview_cancel", "Cancel preview"),
+				tooltip: Text("xhs_sp_preview_cancel_tooltip", "Cancel the pending catalog preview."),
+			};
+		}
+		if (sameItem && catalogPreviewState.status === "stopping") {
+			return { allowed: false, label: Text("xhs_sp_preview_stopping", "Stopping..."), tooltip: "" };
+		}
+
+		var slot = GetCatalogPreviewSlot(item);
+		if (!itemID || item.is_bundle === true || !slot) {
+			return {
+				allowed: false,
+				error_code: "unsupported_item",
+				label: Text("xhs_sp_preview_not_available", "No live preview"),
+				tooltip: Text("xhs_sp_preview_not_available_tooltip", "This item has no live effect preview."),
+			};
+		}
+		var runtimeStatus = (item.runtime_status || "ready").toString().toLowerCase();
+		if (runtimeStatus !== "ready" && runtimeStatus !== "available") {
+			return {
+				allowed: false,
+				error_code: "runtime_unavailable",
+				label: Text("xhs_sp_preview_not_available", "Preview unavailable"),
+				tooltip: Text("xhs_sp_preview_runtime_unavailable", "This effect is not active in the current catalog release."),
+			};
+		}
+
+		var access = GetCatalogPreviewAccess();
+		if (!access.allowed) {
+			return {
+				allowed: false,
+				map_locked: true,
+				error_code: "map_locked",
+				label: Text("xhs_sp_preview_demo_only", "Available on demo map"),
+				tooltip: Text("xhs_sp_preview_demo_tooltip", "Preview is available on the demo map, or on a normal map with exactly one human player."),
+			};
+		}
+
+		return {
+			allowed: true,
+			action: "preview",
+			label: Text("xhs_sp_preview_test", "Test effect"),
+			tooltip: Text("xhs_sp_preview_test_tooltip", "Temporarily test this effect. Ownership and tier locks do not apply to previews."),
+		};
+	}
+
+	function CatalogPreviewNowMS() {
+		return Math.max(0, Math.floor(Safe(function () { return Game.GetGameTime(); }, 0) * 1000));
+	}
+
+	function CatalogPreviewDurationMS(state) {
+		var startedAt = Math.max(0, ToNumber(state && state.started_at_ms, 0));
+		return startedAt > 0 ? Math.max(0, CatalogPreviewNowMS() - startedAt) : 0;
+	}
+
+	function EmitCatalogPreviewTelemetry(eventName, state, extra) {
+		state = state || {};
+		extra = extra || {};
+		EmitSupporterUIEvent(eventName, {
+			tab: "shop",
+			item_id: state.item_id,
+			category: state.category,
+			candidate_id: extra.candidate_id,
+			result: extra.result,
+			error_code: extra.error_code,
+			duration_ms: extra.duration_ms !== undefined ? extra.duration_ms : CatalogPreviewDurationMS(state),
+		});
+	}
+
+	function StartCatalogPreview(item) {
+		var state = GetCatalogPreviewActionState(item);
+		if (state.action === "stop") {
+			StopCatalogPreview();
+			return;
+		}
+		if (!state.allowed || state.action !== "preview") {
+			EmitCatalogPreviewTelemetry("preview_fail", {
+				item_id: ShopItemID(item),
+				category: item && item.category,
+				started_at_ms: 0,
+			}, {
+				result: "blocked",
+				error_code: state.error_code || "unavailable",
+				duration_ms: 0,
+			});
+			Game.EmitSound("General.Cancel");
+			ShowActionMessage(state.tooltip || Text("xhs_sp_preview_not_available", "Preview unavailable."), false);
+			return;
+		}
+
+		catalogPreviewRequestSerial += 1;
+		var requestID = "sp-preview-" + catalogPreviewRequestSerial + "-" + Math.floor(Safe(function () { return Game.GetGameTime(); }, 0) * 1000);
+		catalogPreviewState = {
+			status: "pending",
+			request_id: requestID,
+			item_id: ShopItemID(item),
+			slot_id: GetCatalogPreviewSlot(item),
+			category: item.category || "",
+			message: Text("xhs_sp_preview_pending", "Checking live preview..."),
+			expires_in: 0,
+			started_at_ms: CatalogPreviewNowMS(),
+		};
+		EmitCatalogPreviewTelemetry("preview_start", catalogPreviewState, { result: "requested", duration_ms: 0 });
+		GameEvents.SendCustomGameEventToServer("supporter_pass_catalog_preview", {
+			action: "preview",
+			request_id: requestID,
+			item_id: catalogPreviewState.item_id,
+		});
+		RefreshShopDetail(GetLocalPlayerData());
+		Game.EmitSound("General.ButtonClick");
+
+		$.Schedule(8.0, function () {
+			if (catalogPreviewState.request_id === requestID && catalogPreviewState.status === "pending") {
+				catalogPreviewState.status = "error";
+				catalogPreviewState.message = Text("xhs_sp_preview_timeout", "The preview request timed out.");
+				EmitCatalogPreviewTelemetry("preview_fail", catalogPreviewState, { result: "timeout", error_code: "timeout" });
+				ShowActionMessage(catalogPreviewState.message, false);
+				RefreshShopDetail(GetLocalPlayerData());
+			}
+		});
+	}
+
+	function StopCatalogPreview() {
+		if (catalogPreviewState.status !== "active" && catalogPreviewState.status !== "pending") {
+			Game.EmitSound("General.Cancel");
+			return;
+		}
+		catalogPreviewRequestSerial += 1;
+		var previousState = catalogPreviewState;
+		var requestID = "sp-preview-stop-" + catalogPreviewRequestSerial + "-" + Math.floor(Safe(function () { return Game.GetGameTime(); }, 0) * 1000);
+		EmitCatalogPreviewTelemetry("preview_stop", previousState, {
+			result: previousState.status === "pending" ? "cancel_requested" : "stop_requested",
+		});
+		catalogPreviewState.status = "stopping";
+		catalogPreviewState.request_id = requestID;
+		catalogPreviewState.message = Text("xhs_sp_preview_stopping", "Stopping preview...");
+		GameEvents.SendCustomGameEventToServer("supporter_pass_catalog_preview_stop", {
+			action: "stop",
+			request_id: requestID,
+		});
+		RefreshShopDetail(GetLocalPlayerData());
+		Game.EmitSound("General.ButtonClick");
+	}
+
+	function CreateCatalogPreviewButton(parent, item, compact) {
+		var state = GetCatalogPreviewActionState(item);
+		var button = $.CreatePanel("Button", parent, "");
+		button.AddClass("XHSPassCatalogPreviewButton");
+		button.SetHasClass("IsCompact", compact === true);
+		button.SetHasClass("IsLocked", !state.allowed);
+		button.SetHasClass("IsMapLocked", state.map_locked === true);
+		button.SetHasClass("IsActive", state.action === "stop" && catalogPreviewState.status === "active");
+		button.SetHasClass("IsPending", state.action === "stop" && catalogPreviewState.status === "pending");
+		button.SetPanelEvent("onactivate", function () {
+			StartCatalogPreview(item);
+		});
+		SetCatalogPreviewTooltip(button, state.tooltip);
+		var label = $.CreatePanel("Label", button, "");
+		label.text = state.label;
+		return button;
+	}
+
+	function CreateShopDetailComponent(parent, component) {
+		var row = $.CreatePanel("Panel", parent, "");
+		row.AddClass("XHSPassShopDetailComponent");
+		row.SetHasClass("IsOwned", component.owned === true);
+		var status = (component.runtime_status || "ready").toString().toLowerCase();
+		var dormant = status.indexOf("dormant") !== -1 || status.indexOf("deferred") !== -1 || status.indexOf("4.1") !== -1;
+		row.SetHasClass("IsDormant", dormant);
+
+		var image = $.CreatePanel("Panel", row, "");
+		image.AddClass("XHSPassShopDetailComponentImage");
+		SetCustomGameImage(image, component.image || component.image_inventory || component.icon || component.icon_path);
+		var copy = $.CreatePanel("Panel", row, "");
+		copy.AddClass("XHSPassShopDetailComponentCopy");
+		var name = $.CreatePanel("Label", copy, "");
+		name.AddClass("XHSPassShopDetailComponentName");
+		name.text = LocalizeMaybeKey(component.name || component.item_name || component.id);
+		var meta = $.CreatePanel("Label", copy, "");
+		meta.AddClass("XHSPassShopDetailComponentMeta");
+		meta.text = DisplayRewardType(component.item_type || component.type || component.category || "Cosmetic");
+		var side = $.CreatePanel("Panel", row, "");
+		side.AddClass("XHSPassShopDetailComponentSide");
+		var state = $.CreatePanel("Label", side, "");
+		state.AddClass("XHSPassShopDetailComponentState");
+		state.text = component.owned
+			? Text("xhs_sp_owned", "Owned")
+			: (dormant ? Text("xhs_sp_activates_41", "Activates in 4.1") : Text("xhs_sp_included", "Included"));
+		CreateCatalogPreviewButton(side, component, true);
+		return row;
+	}
+
+	function RenderShopDetail(item, player, placement) {
+		var body = Panel("XHSPassShopDetailBody");
+		ClearPanel(body);
+		if (!body || !item) {
+			return;
+		}
+		SetText("XHSPassShopDetailTitle", LocalizeMaybeKey(item.name || item.item_name || item.id));
+
+		var media = $.CreatePanel("Panel", body, "");
+		media.AddClass("XHSPassShopDetailMedia");
+		ApplyItemVisualClasses(media, item, "");
+		var preview = CreateItemPreview(media, item, "XHSPassShopDetailPreview", "XHSPassShopImage");
+		if (item.is_bundle) {
+			var glyph = CreateBundleGlyph(preview, false);
+			glyph.AddClass("IsOnPreview");
+		}
+
+		var content = $.CreatePanel("Panel", body, "");
+		content.AddClass("XHSPassShopDetailContent");
+		CreateShopBadges(content, item, false);
+		var meta = $.CreatePanel("Label", content, "");
+		meta.AddClass("XHSPassShopDetailMeta");
+		meta.text = DisplayRewardRarity(item) + "  /  " + DisplayRewardType(item.item_type);
+		var description = $.CreatePanel("Label", content, "");
+		description.AddClass("XHSPassShopDetailDescription");
+		description.text = LocalizeMaybeKey(item.description || Text("xhs_sp_permanent_item_description", "A permanent cosmetic for your Supporter Pass collection."));
+
+		if (item.is_bundle) {
+			var bundleHeader = $.CreatePanel("Panel", content, "");
+			bundleHeader.AddClass("XHSPassShopDetailBundleHeader");
+			CreateBundleGlyph(bundleHeader, true);
+			var count = $.CreatePanel("Label", bundleHeader, "");
+			count.AddClass("XHSPassShopDetailBundleCount");
+			count.text = Text("xhs_sp_bundle_item_count", "{count} items", { count: item.component_count || item.components.length });
+			var components = $.CreatePanel("Panel", content, "");
+			components.AddClass("XHSPassShopDetailComponents");
+			for (var componentIndex = 0; componentIndex < item.components.length; componentIndex++) {
+				CreateShopDetailComponent(components, item.components[componentIndex]);
+			}
+			if (item.components.length === 0) {
+				var unavailable = $.CreatePanel("Label", components, "");
+				unavailable.AddClass("XHSPassShopDetailComponentsEmpty");
+				unavailable.text = Text("xhs_sp_bundle_contents_unavailable", "Bundle contents are not available in this legacy catalog payload.");
+			}
+		}
+
+		if (item.has_owned_components) {
+			var duplicateWarning = $.CreatePanel("Label", content, "");
+			duplicateWarning.AddClass("XHSPassShopDetailWarning");
+			duplicateWarning.text = Text("xhs_sp_bundle_owned_warning", "You already own {owned}/{total} items. The bundle keeps its full price; only missing items are granted.", {
+				owned: item.owned_count,
+				total: item.component_count || item.components.length,
+			});
+		} else if (item.owned) {
+			var ownedWarning = $.CreatePanel("Label", content, "");
+			ownedWarning.AddClass("XHSPassShopDetailWarning");
+			ownedWarning.AddClass("IsOwned");
+			ownedWarning.text = Text("xhs_sp_item_already_owned_warning", "This permanent item is already in your collection.");
+		}
+		if (item.has_dormant_components) {
+			var dormantNotice = $.CreatePanel("Label", content, "");
+			dormantNotice.AddClass("XHSPassShopDetailNotice");
+			dormantNotice.text = Text("xhs_sp_bundle_dormant_notice", "This bundle includes an item stored in your collection until its system activates in 4.1.");
+		}
+		if (!IN_GAME_SHOP_PURCHASES_ENABLED) {
+			var websiteNotice = $.CreatePanel("Label", content, "");
+			websiteNotice.AddClass("XHSPassShopDetailNotice");
+			websiteNotice.AddClass("IsWebsiteOnly");
+			websiteNotice.text = Text("xhs_sp_website_purchase_notice", "This item is purchased on the Supporter Pass website. No transaction is sent from the game.");
+		}
+
+		var footer = $.CreatePanel("Panel", content, "");
+		footer.AddClass("XHSPassShopDetailFooter");
+		var price = $.CreatePanel("Label", footer, "");
+		price.AddClass("XHSPassShopDetailPrice");
+		price.text = item.owned
+			? Text("xhs_sp_in_collection", "In collection")
+			: FormatNumber(item.price || item.fragment_price || 0) + " " + Text("xhs_sp_fragments_lower", "fragments");
+		var actions = $.CreatePanel("Panel", footer, "");
+		actions.AddClass("XHSPassShopDetailActions");
+		if (!item.is_bundle) {
+			CreateCatalogPreviewButton(actions, item, false);
+		}
+		var close = $.CreatePanel("Button", actions, "");
+		close.AddClass("XHSPassShopDetailsButton");
+		close.SetPanelEvent("onactivate", function () { SetShopDetailVisible(false); });
+		var closeLabel = $.CreatePanel("Label", close, "");
+		closeLabel.text = Text("xhs_sp_close", "Close");
+		CreateShopPurchaseButton(actions, item, player, placement || "detail");
+	}
+
+	function OpenShopDetail(item, player, placement) {
+		if (!item) {
+			return;
+		}
+		shopDetailItem = { id: item.id, placement: placement || "catalog" };
+		SetShopDetailVisible(true);
+		RenderShopDetail(item, player, placement);
+		EmitSupporterUIEvent("detail", {
+			tab: "shop",
+			item_id: item.id,
+			category: item.category,
+			result: placement || "catalog",
+		});
+		Game.EmitSound("General.ButtonClick");
+	}
+
+	function RefreshShopDetail(player) {
+		if (!shopDetailItem) {
+			return;
+		}
+		var displayPlayer = GetDisplayPlayerData(player || GetLocalPlayerData());
+		var item = FindCurrentShopItem(shopDetailItem.id, displayPlayer);
+		if (!item) {
+			SetShopDetailVisible(false);
+			return;
+		}
+		RenderShopDetail(item, displayPlayer, shopDetailItem.placement);
+	}
+
 	function RenderCategoryTabs(parentID, items, activeFilter, onSelect, player) {
 		var parent = Panel(parentID);
 		ClearPanel(parent);
@@ -2859,7 +4284,7 @@ var XHSSupporterPass = (function () {
 				var label = $.CreatePanel("Label", button, "");
 				label.text = filterName === "All"
 					? Text("xhs_sp_filter_all", "All")
-					: DisplayRewardType(filterName);
+					: (filterName === "Favorites" ? Text("xhs_sp_filter_favorites", "Favorites") : DisplayRewardType(filterName));
 			})(filters[i]);
 		}
 
@@ -3987,6 +5412,45 @@ var XHSSupporterPass = (function () {
 			});
 		}
 
+		var shopSearch = Panel("XHSPassShopSearch");
+		if (shopSearch) {
+			shopSearch.SetPanelEvent("ontextentrychange", function () {
+				currentShopSearch = BoundedUIEventValue(shopSearch.text || "", 64);
+				shopSearch.SetHasClass("HasInput", currentShopSearch.length > 0);
+				ResetPagination("shop");
+				RenderShop(GetLocalPlayerData());
+				shopSearchTelemetrySerial++;
+				var serial = shopSearchTelemetrySerial;
+				$.Schedule(0.4, function () {
+					if (serial !== shopSearchTelemetrySerial) {
+						return;
+					}
+					EmitSupporterUIEvent("search", {
+						tab: "shop",
+						query_length: currentShopSearch.length,
+						filter_key: "category",
+						filter_value: currentShopFilter,
+					});
+				});
+			});
+		}
+
+		var closeShopDetail = Panel("XHSPassShopDetailClose");
+		if (closeShopDetail) {
+			closeShopDetail.SetPanelEvent("onactivate", function () {
+				SetShopDetailVisible(false);
+				Game.EmitSound("General.Cancel");
+			});
+		}
+
+		var shopDetailBackdrop = Panel("XHSPassShopDetailBackdrop");
+		if (shopDetailBackdrop) {
+			shopDetailBackdrop.SetPanelEvent("onactivate", function () {
+				SetShopDetailVisible(false);
+				Game.EmitSound("General.Cancel");
+			});
+		}
+
 		var devUnlockUI = Panel("XHSPassDevUnlockUIButton");
 		if (devUnlockUI) {
 			devUnlockUI.SetPanelEvent("onactivate", function () {
@@ -4243,6 +5707,48 @@ var XHSSupporterPass = (function () {
 				settingsOriginal = CopySettings(settingsDraft);
 				UpdateSettingsSaveBar();
 				ShowActionMessage(Text("xhs_sp_settings_saved", "Settings saved."), true);
+			});
+			GameEvents.Subscribe("supporter_pass_catalog_preview_result", function (payload) {
+				payload = payload || {};
+				var requestID = (payload.request_id || "").toString();
+				if (requestID && catalogPreviewState.request_id && requestID !== catalogPreviewState.request_id) {
+					return;
+				}
+				var previousPreviewState = catalogPreviewState;
+				var allowedStatuses = { pending: true, active: true, success: true, idle: true, error: true };
+				var status = (payload.status || "error").toString().toLowerCase();
+				if (allowedStatuses[status] !== true) {
+					status = "error";
+				}
+				catalogPreviewState = {
+					status: status,
+					request_id: requestID,
+					item_id: (payload.item_id || previousPreviewState.item_id || "").toString(),
+					slot_id: (payload.slot_id || previousPreviewState.slot_id || "").toString(),
+					category: (previousPreviewState.category || "").toString(),
+					message: payload.message || Text("xhs_sp_preview_" + status, status),
+					expires_in: Math.max(0, ToNumber(payload.expires_in, 0)),
+					started_at_ms: Math.max(0, ToNumber(previousPreviewState.started_at_ms, 0)),
+				};
+				if (status === "error") {
+					EmitCatalogPreviewTelemetry("preview_fail", catalogPreviewState, {
+						result: "server_error",
+						error_code: payload.error_code || payload.code || "server_error",
+					});
+					ShowActionMessage(LocalizeMaybeKey(catalogPreviewState.message), false);
+				} else if (status === "active") {
+					if (previousPreviewState.status !== "active") {
+						EmitCatalogPreviewTelemetry("preview_verified", catalogPreviewState, { result: "active" });
+					}
+					ShowActionMessage(Text("xhs_sp_preview_active", "Preview active. The effect will stop automatically."), true);
+					ToggleWindow(false);
+				} else if (status === "success" || status === "idle") {
+					EmitCatalogPreviewTelemetry("preview_stop", catalogPreviewState, {
+						result: previousPreviewState.status === "stopping" ? "stopped" : "expired",
+					});
+					ShowActionMessage(LocalizeMaybeKey(catalogPreviewState.message), true);
+				}
+				RefreshShopDetail(GetLocalPlayerData());
 			});
 			GameEvents.Subscribe("supporter_pass_dev_test_result", function (payload) {
 				payload = payload || {};

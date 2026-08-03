@@ -151,10 +151,43 @@
 						<Panel class="XHSPassSectionHeader HasFilters">
 							<Label class="XHSPassSectionTitle" text="#xhs_sp_fragment_shop" />
 							<Panel id="XHSPassShopFilters" class="XHSPassSectionFilterTabs" />
-							<Label id="XHSPassShopRefresh" class="XHSPassSectionNote" text="#xhs_sp_featured_rotation" />
+							<Label id="XHSPassShopRefresh" class="XHSPassSectionNote" text="PERMANENT CATALOG" />
+						</Panel>
+						<Panel class="XHSPassShopDiscoveryBar">
+							<TextEntry id="XHSPassShopSearch" class="XHSPassShopSearch" placeholder="Search permanent items..." />
+							<Panel class="XHSPassShopFacetGroup">
+								<Label class="XHSPassShopFacetLabel" text="EDITION" />
+								<Panel id="XHSPassShopEditionFilters" class="XHSPassShopFacetTabs" />
+							</Panel>
+							<Panel class="XHSPassShopFacetGroup IsRarity">
+								<Label class="XHSPassShopFacetLabel" text="RARITY" />
+								<Panel id="XHSPassShopRarityFilters" class="XHSPassShopFacetTabs" />
+							</Panel>
+							<Label id="XHSPassShopCatalogMeta" class="XHSPassShopCatalogMeta" text="" />
+						</Panel>
+						<Panel id="XHSPassShopHighlights" class="XHSPassShopHighlights">
+							<Panel id="XHSPassShopHero" class="XHSPassShopHero" />
+							<Panel id="XHSPassShopFeatured" class="XHSPassShopFeatured" />
+						</Panel>
+						<Panel id="XHSPassShopCatalogHeader" class="XHSPassShopCatalogHeader">
+							<Label class="XHSPassShopCatalogTitle" text="PERMANENT COLLECTION" />
+							<Label id="XHSPassShopCatalogCount" class="XHSPassShopCatalogCount" text="" />
 						</Panel>
 						<Panel id="XHSPassShopPager" class="XHSPassPaginationBar" />
 						<Panel id="XHSPassShopGrid" class="XHSPassShopGrid" />
+						<Panel id="XHSPassShopDetailOverlay" class="XHSPassShopDetailOverlay" hittest="false">
+							<Button id="XHSPassShopDetailBackdrop" class="XHSPassShopDetailBackdrop" />
+							<Panel class="XHSPassShopDetailWindow">
+								<Panel class="XHSPassShopDetailHeader">
+									<Panel class="XHSPassShopDetailHeaderCopy">
+										<Label class="XHSPassShopDetailEyebrow" text="PERMANENT SUPPORTER ITEM" />
+										<Label id="XHSPassShopDetailTitle" class="XHSPassShopDetailTitle" text="" />
+									</Panel>
+									<Button id="XHSPassShopDetailClose" class="XHSPassShopDetailClose"><Label text="X" /></Button>
+								</Panel>
+								<Panel id="XHSPassShopDetailBody" class="XHSPassShopDetailBody" />
+							</Panel>
+						</Panel>
 					</Panel>
 
 					<Panel id="XHSPassArmoryPage" class="XHSPassPage">

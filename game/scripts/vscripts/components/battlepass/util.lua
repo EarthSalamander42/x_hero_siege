@@ -36,6 +36,8 @@ CustomGameEventManager:RegisterListener("supporter_pass_unequip_item", Dynamic_W
 CustomGameEventManager:RegisterListener("supporter_pass_update_settings", Dynamic_Wrap(Battlepass, "SupporterPassUpdateSettings"))
 CustomGameEventManager:RegisterListener("supporter_pass_dev_test_reward", Dynamic_Wrap(Battlepass, "SupporterPassDevTestReward"))
 CustomGameEventManager:RegisterListener("supporter_pass_dev_stop_test", Dynamic_Wrap(Battlepass, "SupporterPassDevStopTest"))
+CustomGameEventManager:RegisterListener("supporter_pass_catalog_preview", Dynamic_Wrap(Battlepass, "SupporterPassCatalogPreview"))
+CustomGameEventManager:RegisterListener("supporter_pass_catalog_preview_stop", Dynamic_Wrap(Battlepass, "SupporterPassCatalogPreviewStop"))
 CustomGameEventManager:RegisterListener("supporter_pass_dev_equip_local", Dynamic_Wrap(Battlepass, "SupporterPassDevEquipLocal"))
 CustomGameEventManager:RegisterListener("supporter_pass_request_companion", Dynamic_Wrap(Battlepass, "SupporterPassRequestCompanion"))
 CustomGameEventManager:RegisterListener("supporter_pass_request_asset", Dynamic_Wrap(Battlepass, "SupporterPassRequestAsset"))
@@ -249,6 +251,346 @@ function Battlepass:NormalizeSupporterSlot(slot)
 	return NormalizeSupporterSlot(slot)
 end
 
+local SUPPORTER_RUNTIME_PARTICLE_FIELDS = {
+	start_pfx = true,
+	end_pfx = true,
+	pfx = true,
+	target_pfx = true,
+	caster_pfx = true,
+	health_pfx = true,
+	mana_pfx = true,
+	light_pfx = true,
+	owner_pfx = true,
+	overhead_pfx = true,
+	travel_pfx = true,
+	impact_pfx = true,
+}
+
+local SUPPORTER_EFFECT_PATH_FIELDS = {
+	start = "start_pfx",
+	start_pfx = "start_pfx",
+	["end"] = "end_pfx",
+	end_pfx = "end_pfx",
+	pfx = "pfx",
+	particle = "pfx",
+	target = "target_pfx",
+	target_pfx = "target_pfx",
+	caster = "caster_pfx",
+	caster_pfx = "caster_pfx",
+	health = "health_pfx",
+	health_pfx = "health_pfx",
+	mana = "mana_pfx",
+	mana_pfx = "mana_pfx",
+	light = "light_pfx",
+	light_pfx = "light_pfx",
+	owner = "owner_pfx",
+	owner_pfx = "owner_pfx",
+	overhead = "overhead_pfx",
+	overhead_pfx = "overhead_pfx",
+	travel = "travel_pfx",
+	travel_pfx = "travel_pfx",
+	impact = "impact_pfx",
+	impact_pfx = "impact_pfx",
+}
+
+local SUPPORTER_PARTICLE_FIELD_BY_ANCHOR = {
+	["particles/items2_fx/teleport_start.vpcf"] = "start_pfx",
+	["particles/items2_fx/teleport_end.vpcf"] = "end_pfx",
+	["particles/generic_hero_status/hero_levelup.vpcf"] = "pfx",
+	["particles/kill_effect/default_target.vpcf"] = "target_pfx",
+	["particles/kill_effect/default_caster.vpcf"] = "caster_pfx",
+	["particles/hero_emblem/default.vpcf"] = "pfx",
+	["particles/custom/supporter_pass/health_potion_anchor.vpcf"] = "health_pfx",
+	["particles/custom/supporter_pass/mana_potion_anchor.vpcf"] = "mana_pfx",
+	["particles/custom/supporter_pass/light_potion_anchor.vpcf"] = "light_pfx",
+	["particles/custom/supporter_pass/rebirth_anchor.vpcf"] = "pfx",
+	["particles/custom/supporter_pass/attack_lifesteal_anchor.vpcf"] = "pfx",
+	["particles/custom/supporter_pass/spell_lifesteal_anchor.vpcf"] = "pfx",
+	["particles/custom/supporter_pass/regen_aura_anchor.vpcf"] = "pfx",
+	["particles/custom/supporter_pass/immolation_owner_anchor.vpcf"] = "owner_pfx",
+	["particles/custom/supporter_pass/immolation_target_anchor.vpcf"] = "target_pfx",
+}
+
+local SUPPORTER_DEFAULT_ASSET_FIELD = {
+	teleport = "start_pfx",
+	levelup = "pfx",
+	kill_effect = "target_pfx",
+	emblem = "pfx",
+	rebirth = "pfx",
+	attack_lifesteal = "pfx",
+	spell_lifesteal = "pfx",
+	regen_aura = "pfx",
+	immolation = "owner_pfx",
+	high_five = "overhead_pfx",
+}
+
+local SUPPORTER_PERMANENT_RUNTIME_FIELDS = {
+	asset_path = true,
+	effect_paths = true,
+	equip = true,
+	equip_rules = true,
+	runtime = true,
+	runtime_assets = true,
+	visuals = true,
+	unit = true,
+	unit_name = true,
+	file = true,
+	particle = true,
+	title_text = true,
+}
+for field, _ in pairs(SUPPORTER_RUNTIME_PARTICLE_FIELDS) do
+	SUPPORTER_PERMANENT_RUNTIME_FIELDS[field] = true
+end
+
+local function IsSupporterRuntimeParticlePath(value)
+	return type(value) == "string"
+		and string.match(string.lower(value), "^particles/.+%.vpcf$") ~= nil
+end
+
+local function SetSupporterRuntimeParticle(item, field, value)
+	if SUPPORTER_RUNTIME_PARTICLE_FIELDS[field] ~= true
+		or not IsSupporterRuntimeParticlePath(value)
+		or IsSupporterRuntimeParticlePath(item[field]) then
+		return
+	end
+	item[field] = value
+end
+
+local function HydrateSupporterRuntimeMetadata(item, ignoreMetadata)
+	if type(item) ~= "table" then return item end
+	if ignoreMetadata ~= true then
+		if item.metadata == nil and type(item.metadata_json) == "table" then
+			item.metadata = item.metadata_json
+		end
+		if item.visuals == nil and type(item.visuals_json) == "table" then
+			item.visuals = item.visuals_json
+		end
+		if item.equip_rules == nil and type(item.equip_rules_json) == "table" then
+			item.equip_rules = item.equip_rules_json
+		end
+	end
+	local metadata = ignoreMetadata ~= true and type(item.metadata) == "table"
+		and item.metadata
+		or {}
+	local payload = ignoreMetadata ~= true and type(item.payload) == "table"
+		and item.payload
+		or {}
+	for _, field in ipairs({
+		"asset_path",
+		"effect_paths",
+		"equip",
+		"equip_rules",
+		"runtime",
+		"runtime_assets",
+		"visuals",
+	}) do
+		if item[field] == nil then
+			local value = metadata[field]
+			if value == nil then value = payload[field] end
+			item[field] = value
+		end
+	end
+
+	local runtime = type(item.runtime) == "table" and item.runtime or {}
+	for field, _ in pairs(SUPPORTER_RUNTIME_PARTICLE_FIELDS) do
+		SetSupporterRuntimeParticle(item, field, runtime[field])
+	end
+	for _, field in ipairs({ "unit", "unit_name", "file", "particle", "title_text" }) do
+		if (item[field] == nil or item[field] == "") and runtime[field] ~= nil then
+			item[field] = runtime[field]
+		end
+	end
+
+	local effectPaths = type(item.effect_paths) == "table" and item.effect_paths or {}
+	for channel, path in pairs(effectPaths) do
+		local field = SUPPORTER_EFFECT_PATH_FIELDS[string.lower(tostring(channel))]
+		if field ~= nil then SetSupporterRuntimeParticle(item, field, path) end
+	end
+	if type(runtime.effect_paths) == "table" then
+		for channel, path in pairs(runtime.effect_paths) do
+			local field = SUPPORTER_EFFECT_PATH_FIELDS[string.lower(tostring(channel))]
+			if field ~= nil then SetSupporterRuntimeParticle(item, field, path) end
+		end
+	end
+
+	for key, value in pairs(type(item.runtime_assets) == "table" and item.runtime_assets or {}) do
+		local hook = key
+		local path = value
+		if type(value) == "table" then
+			hook = value.hook or value.channel or value.field or key
+			path = value.path or value.modifier or value.asset_path
+		end
+		local field = SUPPORTER_EFFECT_PATH_FIELDS[string.lower(tostring(hook))]
+			or SUPPORTER_PARTICLE_FIELD_BY_ANCHOR[string.lower(tostring(hook))]
+		if field ~= nil then SetSupporterRuntimeParticle(item, field, path) end
+	end
+
+	for _, visual in pairs(type(item.visuals) == "table" and item.visuals or {}) do
+		if type(visual) == "table" and tostring(visual.type or "particle") == "particle" then
+			local field = SUPPORTER_EFFECT_PATH_FIELDS[string.lower(tostring(visual.channel or ""))]
+				or SUPPORTER_PARTICLE_FIELD_BY_ANCHOR[string.lower(tostring(visual.asset or ""))]
+			if field ~= nil then
+				SetSupporterRuntimeParticle(item, field, visual.modifier or visual.path)
+			end
+		end
+	end
+
+	local assetPath = item.asset_path
+	local slot = NormalizeSupporterSlot(item.slot_id or item.item_type or item.type)
+	local defaultField = SUPPORTER_DEFAULT_ASSET_FIELD[slot]
+	if slot == "potion" then
+		local channel = tostring(
+			metadata.potion_channel
+			or payload.potion_channel
+			or runtime.potion_channel
+			or item.potion_channel
+			or ""
+		)
+		defaultField = SUPPORTER_EFFECT_PATH_FIELDS[string.lower(channel)]
+	end
+	if defaultField ~= nil then
+		SetSupporterRuntimeParticle(item, defaultField, assetPath)
+	end
+
+	if slot == "emblem" and item.particle == nil and IsSupporterRuntimeParticlePath(item.pfx) then
+		item.particle = item.pfx
+	end
+	return item
+end
+
+local function MergeSupporterRuntimeSource(item, source)
+	if type(item) ~= "table" or type(source) ~= "table" then return item end
+	for key, _ in pairs(SUPPORTER_PERMANENT_RUNTIME_FIELDS) do
+		if (item[key] == nil or item[key] == "") and source[key] ~= nil then
+			item[key] = source[key]
+		end
+	end
+	if item.metadata == nil and type(source.metadata) == "table" then
+		item.metadata = source.metadata
+	end
+	if item.metadata == nil and type(source.metadata_json) == "table" then
+		item.metadata = source.metadata_json
+	end
+	if item.payload == nil and type(source.payload) == "table" then
+		item.payload = source.payload
+	end
+	if item.visuals == nil and type(source.visuals_json) == "table" then
+		item.visuals = source.visuals_json
+	end
+	if item.equip_rules == nil and type(source.equip_rules_json) == "table" then
+		item.equip_rules = source.equip_rules_json
+	end
+	return item
+end
+
+local function ApplySupporterPermanentManifest(item)
+	if type(item) ~= "table"
+		or SupporterPermanentAssets == nil
+		or SupporterPermanentAssets.FindItem == nil then
+		return item, false
+	end
+	local definition = SupporterPermanentAssets:FindItem(item)
+	if type(definition) ~= "table" then return item, false end
+	for key, _ in pairs(SUPPORTER_PERMANENT_RUNTIME_FIELDS) do
+		item[key] = nil
+	end
+	for key, value in pairs(definition) do
+		if SUPPORTER_PERMANENT_RUNTIME_FIELDS[key] == true then
+			-- Runtime-sensitive fields are sourced from the reviewed game manifest.
+			item[key] = value
+		elseif item[key] == nil or item[key] == "" then
+			item[key] = value
+		end
+	end
+	item.permanent_manifest_version = SupporterPermanentAssets.SCHEMA_VERSION
+	return item, true
+end
+
+local function IsSupporterContentStudioRuntime(item)
+	if not IsInToolsMode()
+		or GetMapName == nil
+		or string.lower(GetMapName() or "") ~= "x_hero_siege_demo" then
+		return false
+	end
+	if type(item) ~= "table" then return false end
+	if item.content_studio == true then return true end
+	for _, field in ipairs({ "item_id", "catalog_item_id", "id" }) do
+		if string.sub(tostring(item[field] or ""), 1, 15) == "content_studio:" then
+			return true
+		end
+	end
+	return false
+end
+
+local function StripUntrustedSupporterRuntime(item)
+	if type(item) ~= "table" then return item end
+	for field, _ in pairs(SUPPORTER_PERMANENT_RUNTIME_FIELDS) do
+		item[field] = nil
+	end
+	item.runtime_manifest_blocked = true
+	return item
+end
+
+local function ApplyTrustedItemsGameRuntime(battlepass, item)
+	if type(item) ~= "table"
+		or ItemsGame == nil
+		or ItemsGame.GetItemKV == nil
+		or battlepass.GetSupporterCatalogItemID == nil then
+		return item, false
+	end
+	local catalogID = battlepass:GetSupporterCatalogItemID(item)
+	local definition = catalogID ~= nil and ItemsGame:GetItemKV(catalogID) or nil
+	if type(definition) ~= "table" then return item, false end
+
+	item = StripUntrustedSupporterRuntime(item)
+	item.runtime_manifest_blocked = nil
+	for field, _ in pairs(SUPPORTER_RUNTIME_PARTICLE_FIELDS) do
+		item[field] = definition[field]
+	end
+	for _, field in ipairs({
+		"asset_path",
+		"effect_paths",
+		"equip",
+		"equip_rules",
+		"runtime",
+		"runtime_assets",
+		"visuals",
+		"unit",
+		"unit_name",
+		"file",
+		"particle",
+		"title_text",
+	}) do
+		if definition[field] ~= nil then item[field] = definition[field] end
+	end
+	if item.runtime_assets == nil and ItemsGame.GetItemRuntimeAssets ~= nil then
+		item.runtime_assets = ItemsGame:GetItemRuntimeAssets(catalogID)
+	end
+	item.trusted_items_game_id = tostring(catalogID)
+	return item, true
+end
+
+function Battlepass:HydrateSupporterRuntimeMetadata(item)
+	item = HydrateSupporterRuntimeMetadata(item, false)
+	local manifestApplied = false
+	item, manifestApplied = ApplySupporterPermanentManifest(item)
+	if manifestApplied then
+		item = HydrateSupporterRuntimeMetadata(item, true)
+		item.runtime_manifest_blocked = nil
+		return item
+	end
+	local itemsGameApplied = false
+	item, itemsGameApplied = ApplyTrustedItemsGameRuntime(self, item)
+	if itemsGameApplied then
+		return HydrateSupporterRuntimeMetadata(item, true)
+	end
+	if IsSupporterContentStudioRuntime(item) then
+		item.runtime_manifest_blocked = nil
+		return item
+	end
+	return StripUntrustedSupporterRuntime(item)
+end
+
 local function RequiredSupporterTier(value, fallback)
 	if type(value) ~= "table" then return fallback or 0 end
 	local tier = tonumber(value.required_tier or value.tier_id)
@@ -451,6 +793,16 @@ function Battlepass:ResolveSupporterItem(playerID, itemID, requestedSlot)
 			break
 		end
 	end
+	if self.FindSupporterPassShopItem ~= nil then
+		local resolver = self.FindSupporterPassRuntimeCatalogItem
+			or self.FindSupporterPassShopItem
+		local shopItem = resolver(self, item.item_id or itemID)
+		if shopItem == nil and tostring(resolvedRequestID) ~= tostring(itemID) then
+			shopItem = resolver(self, resolvedRequestID)
+		end
+		item = MergeSupporterRuntimeSource(item, shopItem)
+	end
+	item = self:HydrateSupporterRuntimeMetadata(item)
 
 	if item.slot_id == "companion" or item.slot_id == "effigy" then
 		item.unit = item.unit or item.unit_name or item.file
@@ -466,7 +818,7 @@ function Battlepass:ResolveSupporterItem(playerID, itemID, requestedSlot)
 		item.particle = item.particle or item.file
 	end
 
-	return item
+	return self:HydrateSupporterRuntimeMetadata(item)
 end
 
 local function HydrateSupporterLoadoutItem(battlepass, playerID, value, requestedSlot)
@@ -491,7 +843,7 @@ local function HydrateSupporterLoadoutItem(battlepass, playerID, value, requeste
 
 	if next(item) == nil then return nil end
 	item.slot_id = NormalizeSupporterSlot(item.slot_id or item.item_type or item.type or slot)
-	return item
+	return battlepass:HydrateSupporterRuntimeMetadata(item)
 end
 
 local SUPPORTER_BOT_EFFECT_SLOT_ORDER = {
@@ -834,7 +1186,24 @@ function Battlepass:AreSupporterRewardsEnabled(playerID)
 end
 
 function Battlepass:GetSupporterItemParticle(item, expectedAsset)
-	if type(item) ~= "table" or ItemsGame == nil then return nil end
+	if type(item) ~= "table" then return nil end
+	item = self:HydrateSupporterRuntimeMetadata(item)
+	local expectedKey = string.lower(tostring(expectedAsset or ""))
+	local directField = SUPPORTER_PARTICLE_FIELD_BY_ANCHOR[expectedKey]
+	if directField ~= nil and IsSupporterRuntimeParticlePath(item[directField]) then
+		return item[directField]
+	end
+
+	for _, visual in pairs(type(item.visuals) == "table" and item.visuals or {}) do
+		if type(visual) == "table"
+			and tostring(visual.type or "particle") == "particle"
+			and (expectedAsset == nil or tostring(visual.asset or "") == tostring(expectedAsset))
+			and IsSupporterRuntimeParticlePath(visual.modifier or visual.path) then
+			return visual.modifier or visual.path
+		end
+	end
+
+	if ItemsGame == nil then return nil end
 	local itemID = self:GetSupporterCatalogItemID(item)
 	if itemID == nil then return nil end
 	local visuals = ItemsGame:GetItemVisuals(itemID)
@@ -1369,7 +1738,7 @@ function Battlepass:ResolveSupporterDevTestItem(itemID, requestedSlot)
 	elseif actualSlot == "emblem" then
 		item.particle = item.particle or item.file
 	end
-	return item
+	return self:HydrateSupporterRuntimeMetadata(item)
 end
 
 function Battlepass:CleanupSupporterDevTest(playerID, restoreLoadout)
@@ -1896,6 +2265,249 @@ function Battlepass:SupporterPassDevStopTest(event_source_index, event)
 	self:SendSupporterDevTestResult(playerID, requestID, "", "", "idle", "#xhs_sp_dev_test_stopped")
 end
 
+local SUPPORTER_PUBLIC_PREVIEW_SLOTS = {
+	teleport = true,
+	levelup = true,
+	kill_effect = true,
+	emblem = true,
+	companion = true,
+	potion = true,
+	rebirth = true,
+	attack_lifesteal = true,
+	spell_lifesteal = true,
+	regen_aura = true,
+	immolation = true,
+	high_five = true,
+}
+
+local function IsSupporterPreviewPublished(value)
+	if value == true or value == 1 then return true end
+	local normalized = string.lower(tostring(value or ""))
+	return normalized == "true" or normalized == "1"
+end
+
+local function IsSupporterPreviewExplicitlyUnpublished(value)
+	if value == false or value == 0 then return true end
+	local normalized = string.lower(tostring(value or ""))
+	return normalized == "false" or normalized == "0"
+end
+
+local function CountSupporterPreviewHumans()
+	local count = 0
+	local maximumPlayers = DOTA_MAX_TEAM_PLAYERS or 24
+	for candidateID = 0, maximumPlayers - 1 do
+		if PlayerResource:IsValidPlayerID(candidateID) then
+			local fake = false
+			if PlayerResource.IsFakeClient ~= nil then
+				local ok, result = pcall(function()
+					return PlayerResource:IsFakeClient(candidateID)
+				end)
+				fake = ok and result == true
+			end
+			if not fake then count = count + 1 end
+		end
+	end
+	return count
+end
+
+function Battlepass:IsSupporterCatalogPreviewMapAllowed()
+	local mapName = GetMapName ~= nil and string.lower(GetMapName() or "") or ""
+	return mapName == "x_hero_siege_demo" or CountSupporterPreviewHumans() == 1
+end
+
+function Battlepass:SendSupporterCatalogPreviewResult(playerID, payload)
+	if playerID == nil or not PlayerResource:IsValidPlayerID(playerID) then return end
+	local player = PlayerResource:GetPlayer(playerID)
+	if player == nil then return end
+	CustomGameEventManager:Send_ServerToPlayer(
+		player,
+		"supporter_pass_catalog_preview_result",
+		payload or {}
+	)
+end
+
+function Battlepass:ResolveSupporterCatalogPreviewItem(itemID)
+	local source = self:FindSupporterPassRuntimeCatalogItem(itemID)
+	if type(source) ~= "table" then return nil, "#xhs_sp_dev_test_error_item" end
+	local parentItemID = tostring(source.parent_item_id or "")
+	local isBundleComponent = parentItemID ~= ""
+	if isBundleComponent
+		and (IsSupporterPreviewExplicitlyUnpublished(source.active)
+			or IsSupporterPreviewExplicitlyUnpublished(source.is_published)) then
+		return nil, "#xhs_sp_dev_test_error_item"
+	end
+	local ownPublicationProven = IsSupporterPreviewPublished(source.active)
+		and IsSupporterPreviewPublished(source.is_published)
+	local parentPublicationProven = isBundleComponent
+		and IsSupporterPreviewPublished(source.parent_active)
+		and IsSupporterPreviewPublished(source.parent_is_published)
+		and tostring(source.parent_release_id or "") ~= ""
+		and string.lower(tostring(source.parent_release_status or "")) == "published"
+	local rootPublicationProven = not isBundleComponent
+		and ownPublicationProven
+		and tostring(source.release_id or "") ~= ""
+		and string.lower(tostring(source.publication_status or "")) == "published"
+	if not rootPublicationProven
+		and not (isBundleComponent and (ownPublicationProven or parentPublicationProven)) then
+		return nil, "#xhs_sp_dev_test_error_item"
+	end
+	local runtimeStatus = string.lower(tostring(source.runtime_status or source.status or ""))
+	if runtimeStatus ~= "ready" and runtimeStatus ~= "available" then
+		return nil, "#xhs_sp_dev_test_error_asset"
+	end
+	local item = CopySupporterItem(source)
+	item.item_id = item.item_id or item.catalog_item_id or item.id or tostring(itemID)
+	item.slot_id = NormalizeSupporterSlot(
+		item.slot_id or item.item_type or item.type or item.category
+	)
+	if tostring(item.item_type or item.type or ""):lower() == "bundle"
+		or SUPPORTER_PUBLIC_PREVIEW_SLOTS[item.slot_id] ~= true then
+		return nil, "#xhs_sp_dev_test_error_type"
+	end
+	if item.slot_id == "high_five" and not isBundleComponent then
+		return nil, "#xhs_sp_dev_test_error_type"
+	end
+	item = self:HydrateSupporterRuntimeMetadata(item)
+	if item.runtime_manifest_blocked == true then
+		return nil, "#xhs_sp_dev_test_error_asset"
+	end
+	return item, nil
+end
+
+local function SupporterCatalogPreviewDuration(slot)
+	if slot == "teleport" then return 3.6 end
+	if slot == "kill_effect" then return 3.5 end
+	if slot == "attack_lifesteal" then return 3.25 end
+	if slot == "potion" then return 5.5 end
+	if slot == "emblem" or slot == "companion" then return 8.0 end
+	if slot == "regen_aura" or slot == "immolation" or slot == "high_five" then return 3.0 end
+	return 1.8
+end
+
+function Battlepass:SupporterPassCatalogPreview(event_source_index, event)
+	event = self:GetSupporterPassEventPayload(event_source_index, event)
+	local playerID = event.PlayerID
+	if playerID == nil then return end
+	local requestID = string.gsub(tostring(event.request_id or ""), "[%c]", ""):sub(1, 96)
+	local itemID = string.gsub(tostring(event.item_id or ""), "[%c]", ""):sub(1, 96)
+	local function Reply(status, message, slot, expiresIn)
+		self:SendSupporterCatalogPreviewResult(playerID, {
+			request_id = requestID,
+			item_id = itemID,
+			slot_id = slot or "",
+			status = status,
+			message = message,
+			expires_in = tonumber(expiresIn) or 0,
+		})
+	end
+
+	if tostring(event.action or "") ~= "preview"
+		or itemID == ""
+		or string.match(itemID, "^[%w_:%-%.]+$") == nil then
+		return Reply("error", "#xhs_sp_dev_test_error_item")
+	end
+	if not self:IsSupporterCatalogPreviewMapAllowed() then
+		return Reply(
+			"error",
+			"Preview is available on the demo map, or on a normal map with exactly one human player."
+		)
+	end
+	self.SupporterCatalogPreviewLastRequest = self.SupporterCatalogPreviewLastRequest or {}
+	local now = GameRules:GetGameTime()
+	if now - (self.SupporterCatalogPreviewLastRequest[playerID] or -10) < 0.35 then
+		return Reply("error", "#xhs_sp_dev_test_error_rate")
+	end
+	self.SupporterCatalogPreviewLastRequest[playerID] = now
+
+	local item, message = self:ResolveSupporterCatalogPreviewItem(itemID)
+	if item == nil then return Reply("error", message) end
+	local slot = item.slot_id
+	local hero = PlayerResource:GetSelectedHeroEntity(playerID)
+	if hero == nil or hero:IsNull() then
+		return Reply("error", "#xhs_sp_dev_test_error_hero", slot)
+	end
+
+	self.SUPPORTER_DEV_TESTS = self.SUPPORTER_DEV_TESTS or {}
+	local existing = self.SUPPORTER_DEV_TESTS[playerID]
+	if type(existing) == "table" and existing.public_catalog_preview ~= true then
+		return Reply("error", "#xhs_sp_dev_test_error_busy", slot)
+	end
+	self:CleanupSupporterDevTest(playerID, true)
+	local previewChannel = nil
+	if slot == "potion" then
+		for _, channel in ipairs({ "health", "mana", "light" }) do
+			if IsSupporterRuntimeParticlePath(item[channel .. "_pfx"]) then
+				previewChannel = channel
+				break
+			end
+		end
+	end
+	local duration = SupporterCatalogPreviewDuration(slot)
+	local state = {
+		item = item,
+		item_id = itemID,
+		slot = slot,
+		preview_channel = previewChannel,
+		request_id = requestID,
+		persistent = false,
+		transient = true,
+		public_catalog_preview = true,
+	}
+	self.SUPPORTER_DEV_TESTS[playerID] = state
+	Reply("pending", nil, slot, duration)
+	state.timer = Timers:CreateTimer(0.25, function()
+		if self.SUPPORTER_DEV_TESTS[playerID] ~= state or state.cancelled == true then return nil end
+		state.timer = nil
+		local currentHero = PlayerResource:GetSelectedHeroEntity(playerID)
+		local success, applyMessage = self:ApplySupporterDevTestItem(
+			playerID,
+			state,
+			currentHero,
+			false
+		)
+		if not success then
+			self:CleanupSupporterDevTest(playerID, true)
+			Reply("error", applyMessage, slot)
+			return nil
+		end
+		Reply("active", "#xhs_sp_dev_test_active", slot, duration)
+		state.timer = Timers:CreateTimer(duration, function()
+			if self.SUPPORTER_DEV_TESTS[playerID] == state then
+				self:CleanupSupporterDevTest(playerID, true)
+				Reply("success", "#xhs_sp_dev_test_success", slot)
+			end
+			return nil
+		end)
+		return nil
+	end)
+end
+
+function Battlepass:SupporterPassCatalogPreviewStop(event_source_index, event)
+	event = self:GetSupporterPassEventPayload(event_source_index, event)
+	local playerID = event.PlayerID
+	if playerID == nil then return end
+	local requestID = tostring(event.request_id or ""):sub(1, 96)
+	if tostring(event.action or "") ~= "stop" then
+		return self:SendSupporterCatalogPreviewResult(playerID, {
+			request_id = requestID,
+			status = "error",
+			message = "#xhs_sp_dev_test_error_item",
+		})
+	end
+	local state = self.SUPPORTER_DEV_TESTS and self.SUPPORTER_DEV_TESTS[playerID] or nil
+	if type(state) == "table" and state.public_catalog_preview == true then
+		self:CleanupSupporterDevTest(playerID, true)
+	end
+	self:SendSupporterCatalogPreviewResult(playerID, {
+		request_id = requestID,
+		item_id = type(state) == "table" and state.item_id or "",
+		slot_id = type(state) == "table" and state.slot or "",
+		status = "idle",
+		message = "#xhs_sp_dev_test_stopped",
+		expires_in = 0,
+	})
+end
+
 function Battlepass:SendSupporterDevLocalEquipResult(playerID, itemID, slot, action, success, message)
 	if not PlayerResource:IsValidPlayerID(playerID) then return end
 	local player = PlayerResource:GetPlayer(playerID)
@@ -2303,12 +2915,63 @@ function Battlepass:SupporterPassRequestCompanion(event_source_index, event)
 	return self:SupporterPassRequestAsset(event_source_index, event, "supporter_pass_companion_request_result")
 end
 
-function Battlepass:FindSupporterPassShopItem(itemID)
-	local featured = CustomNetTables:GetTableValue("supporter_pass_shop", "featured") or {}
-	for _, item in ipairs(NormalizeSupporterList(featured.items or featured)) do
-		if SupporterItemMatches(item, itemID) then
-			return item
+local function FindSupporterShopItemInSection(section, itemID, depth, includeComponents)
+	if type(section) ~= "table" or (tonumber(depth) or 0) > 4 then return nil end
+	if SupporterItemMatches(section, itemID) then return section end
+	for _, item in ipairs(NormalizeSupporterList(section.items or section)) do
+		if SupporterItemMatches(item, itemID) then return item end
+		if includeComponents == true and item ~= section then
+			local nested = FindSupporterShopItemInSection(
+				item,
+				itemID,
+				(tonumber(depth) or 0) + 1,
+				true
+			)
+			if nested ~= nil then return nested end
 		end
+	end
+	local fields = {
+		"item",
+		"primary",
+		"secondary",
+		"secondary_items",
+		"hero",
+		"featured",
+		"catalog",
+		"permanent",
+		"rotation",
+	}
+	if includeComponents == true then
+		table.insert(fields, "components")
+		table.insert(fields, "grants")
+		table.insert(fields, "payload")
+	end
+	for _, field in ipairs(fields) do
+		local found = FindSupporterShopItemInSection(
+			section[field],
+			itemID,
+			(tonumber(depth) or 0) + 1,
+			includeComponents
+		)
+		if found ~= nil then return found end
+	end
+	return nil
+end
+
+function Battlepass:FindSupporterPassShopItem(itemID)
+	for _, key in ipairs({ "catalog", "permanent", "featured", "rotation", "hero" }) do
+		local value = CustomNetTables:GetTableValue("supporter_pass_shop", key) or {}
+		local found = FindSupporterShopItemInSection(value, itemID, 0, false)
+		if found ~= nil then return found end
+	end
+	return nil
+end
+
+function Battlepass:FindSupporterPassRuntimeCatalogItem(itemID)
+	for _, key in ipairs({ "catalog", "permanent", "featured", "rotation", "hero" }) do
+		local value = CustomNetTables:GetTableValue("supporter_pass_shop", key) or {}
+		local found = FindSupporterShopItemInSection(value, itemID, 0, true)
+		if found ~= nil then return found end
 	end
 	return nil
 end
@@ -2444,6 +3107,64 @@ function Battlepass:SupporterPassClaimReward(event_source_index, event)
 	end)
 end
 
+local SUPPORTER_PASS_MUTATION_REQUEST_SEQUENCE = 0
+
+local function CreateSupporterPassMutationRequestID(action, playerID)
+	SUPPORTER_PASS_MUTATION_REQUEST_SEQUENCE = SUPPORTER_PASS_MUTATION_REQUEST_SEQUENCE + 1
+	local gameID = api ~= nil and api.GetApiGameId ~= nil and api:GetApiGameId() or 0
+	local matchID = api ~= nil and api.GetMatchID ~= nil and api:GetMatchID() or 0
+	local now = 0
+	if Time ~= nil then
+		local ok, value = pcall(Time)
+		if ok then now = tonumber(value) or 0 end
+	elseif GameRules ~= nil and GameRules.GetGameTime ~= nil then
+		local ok, value = pcall(function() return GameRules:GetGameTime() end)
+		if ok then now = tonumber(value) or 0 end
+	end
+	local unique = ""
+	if DoUniqueString ~= nil then
+		local ok, value = pcall(DoUniqueString, "supporter_loadout")
+		if ok and value ~= nil then unique = tostring(value) end
+	end
+	local requestID = table.concat({
+		"xhs",
+		tostring(action or "mutation"),
+		tostring(gameID or 0),
+		tostring(matchID or 0),
+		tostring(playerID or -1),
+		tostring(math.floor(now * 1000)),
+		tostring(SUPPORTER_PASS_MUTATION_REQUEST_SEQUENCE),
+		unique,
+	}, "_")
+	requestID = string.gsub(requestID, "[^%w_-]", "_")
+	return string.sub(requestID, 1, 160)
+end
+
+local function NormalizeSupporterUnequipScope(value)
+	if value == nil then return nil end
+	local scope = tostring(value)
+		:gsub("[%z\1-\31\127]", "")
+		:gsub("^%s+", "")
+		:gsub("%s+$", "")
+	if scope == "" then return nil end
+	return string.sub(scope, 1, 96)
+end
+
+local function ResolveSupporterUnequipTarget(battlepass, playerID, slot, fallbackHero)
+	local hero = tostring(fallbackHero or "global")
+	if slot == "all" or battlepass.GetEquippedSupporterItem == nil then
+		return hero, nil
+	end
+	local equipped = battlepass:GetEquippedSupporterItem(playerID, slot)
+	if type(equipped) ~= "table" then return hero, nil end
+	local metadata = type(equipped.metadata) == "table" and equipped.metadata or {}
+	hero = tostring(equipped.hero or metadata.hero or hero)
+	local scope = NormalizeSupporterUnequipScope(
+		equipped.scope or metadata.scope or equipped.item_type or equipped.type
+	)
+	return hero, scope
+end
+
 function Battlepass:SupporterPassEquipItem(event_source_index, event)
 	event = self:GetSupporterPassEventPayload(event_source_index, event)
 	local playerID = event.PlayerID
@@ -2496,12 +3217,14 @@ function Battlepass:SupporterPassEquipItem(event_source_index, event)
 		return
 	end
 
-	api:EquipSupporterPassItem(playerID, event.item_id, event.hero, itemSlot, function(success, data)
+	local requestID = CreateSupporterPassMutationRequestID("equip", playerID)
+	local equipHero = item.hero or event.hero or "global"
+	api:EquipSupporterPassItem(playerID, event.item_id, equipHero, itemSlot, requestID, function(success, data)
 		local player = PlayerResource:GetPlayer(playerID)
 		if not player then return end
 		if not success and item.legacy and Battlepass:SetLocalSupporterLoadoutItem(playerID, item) then
 			success = true
-			data = { local_only = true }
+			data = { local_only = true, request_id = requestID }
 		end
 		if success then
 			if SupporterPass and SupporterPass.PublishPlayer then
@@ -2514,6 +3237,7 @@ function Battlepass:SupporterPassEquipItem(event_source_index, event)
 		end
 		CustomGameEventManager:Send_ServerToPlayer(player, success and "supporter_pass_equip_success" or "supporter_pass_equip_failed", {
 			item_id = event.item_id,
+			request_id = requestID,
 			message = data and data.message or nil,
 			local_only = data and data.local_only or false,
 		})
@@ -2540,7 +3264,9 @@ function Battlepass:SupporterPassUnequipItem(event_source_index, event)
 		return
 	end
 
-	api:UnequipSupporterPassItem(playerID, event.hero, slot, function(success, data)
+	local unequipHero, scope = ResolveSupporterUnequipTarget(self, playerID, slot, event.hero)
+	local requestID = CreateSupporterPassMutationRequestID("unequip", playerID)
+	api:UnequipSupporterPassItem(playerID, unequipHero, slot, scope, requestID, function(success, data)
 		local player = PlayerResource:GetPlayer(playerID)
 		if not player then return end
 		if success then
@@ -2554,6 +3280,7 @@ function Battlepass:SupporterPassUnequipItem(event_source_index, event)
 		end
 		CustomGameEventManager:Send_ServerToPlayer(player, success and "supporter_pass_unequip_success" or "supporter_pass_unequip_failed", {
 			slot_id = slot,
+			request_id = requestID,
 			message = data and data.message or nil,
 		})
 	end)

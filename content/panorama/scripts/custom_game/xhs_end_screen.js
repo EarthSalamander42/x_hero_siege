@@ -51,6 +51,15 @@ var XHSEndScreen = (function () {
 	var rewardPanelSequence = 0;
 	var lastEndGameData = null;
 	var farmLeaderboardVisible = false;
+	var xpPresentationPhase = "idle";
+	var xpPresentationKey = "";
+	var xpPresentationGeneration = 0;
+	var xpPresentationModel = null;
+	var xpPresentationData = null;
+	var xpStepPanels = [];
+	var xpLastAnimatedLevel = 1;
+	var xpLevelBurstQueue = [];
+	var xpLevelBurstActive = false;
 
 	function Panel(id) {
 		return $("#" + id);
@@ -568,7 +577,7 @@ var XHSEndScreen = (function () {
 		}
 
 		var supporterPass = apiData.supporter_pass || apiData.supporterPass || {};
-		var season = supporterPass.season || {};
+		var season = apiData.season || supporterPass.season || {};
 
 		var seasonLevel = FirstDefined(season.level, supporterPass.season_level, supporterPass.level, apiData.supporter_pass_level);
 		var seasonXP = FirstDefined(season.xp, supporterPass.season_xp, supporterPass.current_exp, apiData.supporter_pass_xp);
@@ -590,6 +599,9 @@ var XHSEndScreen = (function () {
 		var xpBonus = FirstDefined(season.xp_bonus, supporterPass.xp_bonus, apiData.xp_bonus);
 		var xpEligible = FirstDefined(season.xp_eligible, supporterPass.xp_eligible, apiData.xp_eligible);
 		var xpIneligibleReason = FirstDefined(season.xp_ineligible_reason, supporterPass.xp_ineligible_reason, apiData.xp_ineligible_reason);
+		var seasonXPBefore = FirstDefined(season.xp_before, supporterPass.season_xp_before, apiData.season_xp_before);
+		var seasonLevelBefore = FirstDefined(season.level_before, supporterPass.season_level_before, apiData.season_level_before);
+		var xpBreakdown = FirstDefined(season.xp_breakdown, supporterPass.xp_breakdown, apiData.xp_breakdown);
 
 		if (seasonLevel !== undefined) {
 			merged.season_level = seasonLevel;
@@ -597,7 +609,14 @@ var XHSEndScreen = (function () {
 		}
 		if (seasonXP !== undefined) {
 			merged.season_xp = seasonXP;
+			merged.season_total_xp = seasonXP;
 			merged.XP = seasonXP;
+		}
+		if (seasonXPBefore !== undefined) {
+			merged.season_xp_before = seasonXPBefore;
+		}
+		if (seasonLevelBefore !== undefined) {
+			merged.season_level_before = seasonLevelBefore;
 		}
 		if (seasonMax !== undefined) {
 			merged.season_xp_max = seasonMax;
@@ -627,6 +646,9 @@ var XHSEndScreen = (function () {
 		}
 		if (xpIneligibleReason !== undefined && xpIneligibleReason !== null) {
 			merged.xp_ineligible_reason = xpIneligibleReason;
+		}
+		if (xpBreakdown !== undefined) {
+			merged.xp_breakdown = xpBreakdown;
 		}
 
 		merged.title = merged.title || "Supporter Pass";
@@ -736,6 +758,7 @@ var XHSEndScreen = (function () {
 			victory: IsPlayerVictory(data),
 			gameTime: ToNumber(data.game_time, Safe(function () { return Game.GetDOTATime(false, false); }, 0)),
 			api: api,
+			server: server,
 			battlepass: battlepass,
 		};
 	}
@@ -1216,6 +1239,464 @@ var XHSEndScreen = (function () {
 		return text;
 	}
 
+	function IntXP(value) {
+		return Math.max(0, Math.floor(ToNumber(value, 0)));
+	}
+
+	function BoolValue(value) {
+		return value === true || value === 1 || value === "1" || value === "true";
+	}
+
+	function GetXPPresentationKey(data, model) {
+		var completion = data && data.data && data.data.completion ? data.data.completion : {};
+		var info = data && data.info ? data.info : {};
+		var gameID = FirstDefined(completion.game_id, info.game_id, data && data.game_id, "local");
+		return gameID.toString() + ":" + (model ? model.steamID : "spectator");
+	}
+
+	function GetLocalPlayerModel(players) {
+		var localPlayerID = Safe(function () { return Players.GetLocalPlayer(); }, -1);
+		for (var i = 0; i < players.length; i++) {
+			if (Number(players[i].id) === Number(localPlayerID)) {
+				return players[i];
+			}
+		}
+		return null;
+	}
+
+	function GetXPPresentationData(model) {
+		var apiData = model.api || {};
+		var battlepass = model.battlepass || {};
+		var season = apiData.season || {};
+		var breakdown = apiData.xp_breakdown || season.xp_breakdown || battlepass.xp_breakdown || {};
+		var serverFacts = model.server && model.server.supporter_xp ? model.server.supporter_xp : {};
+		var xpPerLevel = Math.max(IntXP(FirstDefined(
+			season.xp_per_level,
+			battlepass.season_xp_max,
+			battlepass.MaxXP,
+			1000
+		)), 1);
+		var matchXP = IntXP(FirstDefined(breakdown.match, apiData.duration_xp, battlepass.duration_xp));
+		var muradinXP = IntXP(breakdown.muradin);
+		var heroImagesXP = IntXP(breakdown.hero_images);
+		var allHeroImagesXP = IntXP(breakdown.all_hero_images);
+		var frostInfernalXP = IntXP(breakdown.frost_infernal);
+		var spiritBeastXP = IntXP(breakdown.spirit_beast);
+		var heroicObjectivesXP = IntXP(FirstDefined(
+			breakdown.heroic_objectives,
+			heroImagesXP + allHeroImagesXP + frostInfernalXP + spiritBeastXP
+		));
+		var rameroBaristolXP = IntXP(breakdown.ramero_baristol);
+		var sogatXP = IntXP(breakdown.sogat);
+		var specialEventsXP = IntXP(FirstDefined(
+			breakdown.special_events,
+			rameroBaristolXP + sogatXP
+		));
+		var farmXP = IntXP(breakdown.farm_event);
+		var victoryXP = IntXP(FirstDefined(breakdown.victory, apiData.victory_xp_bonus, battlepass.victory_xp_bonus));
+		var supporterXP = IntXP(FirstDefined(breakdown.supporter, apiData.xp_bonus, battlepass.xp_bonus));
+		var supporterPercent = IntXP(FirstDefined(breakdown.supporter_percent, apiData.xp_boost, battlepass.xp_boost));
+		var calculatedTotal = matchXP + muradinXP + heroicObjectivesXP + specialEventsXP + farmXP + victoryXP + supporterXP;
+		var totalXP = IntXP(FirstDefined(breakdown.total, apiData.xp_change, season.xp_change, calculatedTotal));
+		var finalXP = IntXP(FirstDefined(
+			season.xp,
+			battlepass.season_total_xp,
+			battlepass.season_xp,
+			totalXP
+		));
+		var beforeXP = IntXP(FirstDefined(season.xp_before, battlepass.season_xp_before, finalXP - totalXP));
+		if (finalXP < beforeXP) {
+			finalXP = beforeXP + totalXP;
+		}
+
+		var eligibleValue = FirstDefined(apiData.xp_eligible, season.xp_eligible, battlepass.xp_eligible);
+		var reason = (FirstDefined(apiData.xp_ineligible_reason, season.xp_ineligible_reason, battlepass.xp_ineligible_reason, "") || "").toString();
+		var eligible = eligibleValue === undefined ? !reason : BoolValue(eligibleValue);
+		var heroImagesDone = IntXP(FirstDefined(breakdown.hero_images_done, serverFacts.hero_images_done));
+		var farmKills = IntXP(FirstDefined(breakdown.farm_event_kills, serverFacts.farm_event_kills));
+		var startLevel = Math.floor(beforeXP / xpPerLevel) + 1;
+		var endLevel = Math.floor(finalXP / xpPerLevel) + 1;
+		var ineligibleMessages = {
+			cheat_mode: "Cheats enabled",
+			cheat_mode_not_whitelisted: "Cheats enabled",
+			match_too_short: "Match under 30 minutes",
+			abandoned: "Match abandoned",
+			disconnected: "Player disconnected",
+		};
+
+		return {
+			beforeXP: beforeXP,
+			finalXP: finalXP,
+			xpPerLevel: xpPerLevel,
+			startLevel: startLevel,
+			endLevel: endLevel,
+			totalXP: totalXP,
+			eligible: eligible,
+			reason: reason,
+			reasonLabel: reason ? (ineligibleMessages[reason] || "Match ineligible") : "",
+			supporterPercent: supporterPercent,
+			subtotal: IntXP(FirstDefined(breakdown.subtotal, totalXP - supporterXP)),
+			steps: [
+				{ key: "match", title: "MATCH COMPLETE", amount: matchXP, details: eligible ? [] : [{ label: "Eligibility", value: ineligibleMessages[reason] || "No XP awarded", text: true }] },
+				{ key: "muradin", title: "MURADIN EVENT", amount: muradinXP, details: [{ label: "Challenge survived", value: muradinXP > 0 ? "+15" : "+0" }] },
+				{ key: "objectives", title: "HEROIC OBJECTIVES", amount: heroicObjectivesXP, details: [
+					{ label: "Hero Images " + heroImagesDone + " x 25", value: "+" + heroImagesXP },
+					{ label: "All Hero Images", value: "+" + allHeroImagesXP },
+					{ label: "Frost Infernal", value: "+" + frostInfernalXP },
+					{ label: "Spirit Beast", value: "+" + spiritBeastXP },
+				] },
+				{ key: "arenas", title: "SPECIAL ARENAS", amount: specialEventsXP, details: [
+					{ label: "Ramero & Baristol", value: "+" + rameroBaristolXP },
+					{ label: "Sogat", value: "+" + sogatXP },
+				] },
+				{ key: "farm", title: "FARM EVENT", amount: farmXP, details: [{ label: FormatNumber(farmKills) + " kills x 5% - rounded down", value: "+" + farmXP }] },
+				{ key: "victory", title: model.victory ? "VICTORY" : "DEFEAT", amount: victoryXP, details: [{ label: model.victory ? "Run completed" : "No victory bonus", value: "+" + victoryXP }] },
+				{ key: "supporter", title: "SUPPORTER BOOST", amount: supporterXP, supporter: true, details: [{ label: supporterPercent + "% of " + FormatNumber(IntXP(FirstDefined(breakdown.subtotal, totalXP - supporterXP))) + " XP", value: "+" + supporterXP }] },
+			],
+		};
+	}
+
+	function ScheduleXP(generation, delay, callback) {
+		$.Schedule(delay, function () {
+			if (generation !== xpPresentationGeneration || xpPresentationPhase !== "xp") {
+				return;
+			}
+			var container = Panel("XHSEndScreenXPContainer");
+			if (!container || (container.IsValid && !container.IsValid())) {
+				return;
+			}
+			callback();
+		});
+	}
+
+	function SetXPOverlayVisible(visible) {
+		var container = Panel("XHSEndScreenXPContainer");
+		if (container) {
+			container.SetHasClass("IsVisible", visible);
+		}
+		var root = $.GetContextPanel();
+		if (root) {
+			root.SetHasClass("HasPendingXP", visible);
+		}
+	}
+
+	function SetXPRewardEndpoint(prefix, reward, level) {
+		var image = Panel("XHSXP" + prefix + "RewardImage");
+		var name = Panel("XHSXP" + prefix + "RewardName");
+		var endpoint = image ? image.GetParent() : null;
+		if (!reward) {
+			if (image) image.style.backgroundImage = "none";
+			if (name) name.text = level > 50 ? "TRACK COMPLETE" : "REWARD UNAVAILABLE";
+			if (endpoint) endpoint.SetHasClass("HasReward", false);
+			return;
+		}
+		var rewardName = reward.name || reward.item_name || reward.reward_id || "Reward";
+		if (image) {
+			image.style.backgroundImage = 'url("' + ResolveRewardImageURL(reward.image || reward.image_inventory || reward.icon || reward.icon_path) + '")';
+			image.style.backgroundSize = "contain";
+			image.style.backgroundPosition = "50% 50%";
+			image.style.backgroundRepeat = "no-repeat";
+		}
+		if (name) name.text = "LVL " + level + " - " + LocalizeMaybeKey(rewardName);
+		if (endpoint) endpoint.SetHasClass("HasReward", true);
+	}
+
+	function UpdateXPRewardEndpoints(level) {
+		var previousLevel = Math.min(Math.max(level, 1), 50);
+		var nextLevel = level >= 50 ? 51 : level + 1;
+		var preferredTrack = xpPresentationModel && ToNumber(xpPresentationModel.supporterTier, 0) > 0
+			? "premium"
+			: "free";
+		var previousReward = GetSupporterRewardAtLevel(preferredTrack, previousLevel);
+		var nextReward = GetSupporterRewardAtLevel(preferredTrack, nextLevel);
+		if (preferredTrack === "premium") {
+			previousReward = previousReward || GetSupporterRewardAtLevel("free", previousLevel);
+			nextReward = nextReward || GetSupporterRewardAtLevel("free", nextLevel);
+		}
+		SetXPRewardEndpoint("Previous", previousReward, previousLevel);
+		SetXPRewardEndpoint("Next", nextReward, nextLevel);
+	}
+
+	function PlayNextXPLevelUp(generation) {
+		if (xpLevelBurstActive || xpLevelBurstQueue.length === 0 || generation !== xpPresentationGeneration) {
+			return;
+		}
+		xpLevelBurstActive = true;
+		var level = xpLevelBurstQueue.shift();
+		var modal = Panel("XHSXPModal");
+		var burst = Panel("XHSXPLevelUpBurst");
+		var text = Panel("XHSXPLevelUpText");
+		if (text) text.text = "+1 LEVEL";
+		if (modal) modal.AddClass("IsLevelUp");
+		if (burst) burst.AddClass("IsLevelUp");
+		UpdateXPRewardEndpoints(level);
+		ScheduleXP(generation, 1.06, function () {
+			if (modal) modal.RemoveClass("IsLevelUp");
+			if (burst) burst.RemoveClass("IsLevelUp");
+			xpLevelBurstActive = false;
+			ScheduleXP(generation, 0.08, function () { PlayNextXPLevelUp(generation); });
+		});
+	}
+
+	function TriggerXPLevelUp(level, generation) {
+		xpLevelBurstQueue.push(level);
+		PlayNextXPLevelUp(generation);
+	}
+
+	function UpdateXPProgress(totalXP, presentation, generation, animateLevelUps) {
+		totalXP = IntXP(totalXP);
+		var level = Math.floor(totalXP / presentation.xpPerLevel) + 1;
+		var inLevel = totalXP % presentation.xpPerLevel;
+		var percent = Clamp(inLevel / presentation.xpPerLevel * 100, 0, 100);
+		var fill = Panel("XHSXPProgressFill");
+		var progressText = Panel("XHSXPProgressText");
+		var currentLevel = Panel("XHSXPCurrentLevel");
+		var nextLevel = Panel("XHSXPNextLevel");
+		var totalGain = Panel("XHSXPTotalGain");
+		if (fill) fill.style.width = percent + "%";
+		if (progressText) progressText.text = FormatNumber(inLevel) + " / " + FormatNumber(presentation.xpPerLevel) + " XP";
+		if (currentLevel) currentLevel.text = "LEVEL " + level;
+		if (nextLevel) nextLevel.text = "LEVEL " + (level + 1);
+		if (totalGain) totalGain.text = "+" + FormatNumber(Math.max(0, totalXP - presentation.beforeXP)) + " XP";
+
+		if (animateLevelUps && level > xpLastAnimatedLevel) {
+			for (var crossedLevel = xpLastAnimatedLevel + 1; crossedLevel <= level; crossedLevel++) {
+				TriggerXPLevelUp(crossedLevel, generation);
+			}
+		}
+		if (level !== xpLastAnimatedLevel) {
+			xpLastAnimatedLevel = level;
+			// During an animated gain, reward endpoints advance with each queued
+			// +1 LEVEL burst instead of jumping to the final reward immediately.
+			if (!animateLevelUps) {
+				UpdateXPRewardEndpoints(level);
+			}
+		}
+	}
+
+	function AnimateXPInteger(fromValue, toValue, duration, generation, onUpdate, onComplete) {
+		var frames = Math.max(1, Math.floor(duration / 0.03));
+		var frame = 0;
+		function Tick() {
+			frame++;
+			var progress = Clamp(frame / frames, 0, 1);
+			var eased = 1 - Math.pow(1 - progress, 3);
+			onUpdate(Math.round(fromValue + (toValue - fromValue) * eased));
+			if (frame >= frames) {
+				if (onComplete) onComplete();
+				return;
+			}
+			ScheduleXP(generation, 0.03, Tick);
+		}
+		Tick();
+	}
+
+	function CreateXPTransfer(amount, generation) {
+		var layer = Panel("XHSXPTransferLayer");
+		if (!layer || amount <= 0) return;
+		var transfer = $.CreatePanel("Label", layer, "");
+		transfer.AddClass("XHSXPTransferGain");
+		transfer.text = "+" + FormatNumber(amount) + " XP";
+		ScheduleXP(generation, 0.0, function () { transfer.AddClass("IsFlying"); });
+		ScheduleXP(generation, 0.72, function () {
+			if (transfer && (!transfer.IsValid || transfer.IsValid())) transfer.DeleteAsync(0);
+		});
+	}
+
+	function AddXPStepDetail(parent, detail) {
+		var row = $.CreatePanel("Panel", parent, "");
+		row.AddClass("XHSXPStepDetail");
+		var bullet = $.CreatePanel("Label", row, "");
+		bullet.AddClass("XHSXPStepDetailBullet");
+		bullet.text = "\u2022";
+		var label = $.CreatePanel("Label", row, "");
+		label.AddClass("XHSXPStepDetailLabel");
+		label.text = detail.label;
+		var value = $.CreatePanel("Label", row, "");
+		value.AddClass("XHSXPStepDetailValue");
+		value.text = detail.text ? detail.value : detail.value + " XP";
+	}
+
+	function BuildXPSteps(presentation) {
+		var container = Panel("XHSXPSteps");
+		if (!container) return;
+		ClearPanel(container);
+		xpStepPanels = [];
+		for (var i = 0; i < presentation.steps.length; i++) {
+			var step = presentation.steps[i];
+			var row = $.CreatePanel("Panel", container, "XHSXPStep_" + step.key);
+			row.AddClass("XHSXPStep");
+			row.SetHasClass("IsZero", step.amount === 0);
+			row.SetHasClass("IsSupporter", step.supporter === true);
+			var marker = $.CreatePanel("Label", row, "");
+			marker.AddClass("XHSXPStepMarker");
+			marker.text = (i + 1).toString();
+			var copy = $.CreatePanel("Panel", row, "");
+			copy.AddClass("XHSXPStepCopy");
+			var title = $.CreatePanel("Label", copy, "");
+			title.AddClass("XHSXPStepTitle");
+			title.text = step.title;
+			var details = $.CreatePanel("Panel", copy, "");
+			details.AddClass("XHSXPStepDetails");
+			for (var detailIndex = 0; detailIndex < step.details.length; detailIndex++) {
+				AddXPStepDetail(details, step.details[detailIndex]);
+			}
+			if (step.supporter && presentation.supporterPercent === 0) {
+				var cta = $.CreatePanel("Button", copy, "");
+				cta.AddClass("XHSXPSupporterCTA");
+				cta.SetPanelEvent("onactivate", function () { OpenExternalURL(GetSupporterURL()); });
+				var ctaLabel = $.CreatePanel("Label", cta, "");
+				ctaLabel.text = "UNLOCK UP TO +40% XP";
+			}
+			var gain = $.CreatePanel("Label", row, "");
+			gain.AddClass("XHSXPStepGain");
+			gain.text = "+0 XP";
+			xpStepPanels.push({ panel: row, gain: gain, step: step });
+		}
+	}
+
+	function CompleteXPStep(index, generation) {
+		var item = xpStepPanels[index];
+		if (item && item.panel) {
+			item.panel.RemoveClass("IsActive");
+			item.panel.AddClass("IsResolved");
+		}
+		ScheduleXP(generation, 0.16, function () { RunXPStep(index + 1, generation); });
+	}
+
+	function RunXPStep(index, generation) {
+		if (!xpPresentationData || generation !== xpPresentationGeneration) return;
+		if (index >= xpStepPanels.length) {
+			UpdateXPProgress(xpPresentationData.finalXP, xpPresentationData, generation, true);
+			if (xpLevelBurstActive || xpLevelBurstQueue.length > 0) {
+				ScheduleXP(generation, 0.12, function () { RunXPStep(index, generation); });
+				return;
+			}
+			xpPresentationData.finished = true;
+			var modal = Panel("XHSXPModal");
+			var button = Panel("XHSXPContinueButton");
+			var label = Panel("XHSXPContinueButtonLabel");
+			if (modal) modal.AddClass("IsReady");
+			if (button) {
+				button.enabled = true;
+				button.AddClass("IsReady");
+			}
+			if (label) label.text = HasPendingLevelRewards(xpPresentationData)
+				? "CONTINUE TO REWARDS"
+				: "CONTINUE";
+			return;
+		}
+
+		var item = xpStepPanels[index];
+		var step = item.step;
+		item.panel.AddClass("IsActive");
+		if (typeof item.panel.ScrollParentToMakePanelFit === "function") {
+			try {
+				item.panel.ScrollParentToMakePanelFit(0.18, false);
+			} catch (scrollError) {
+			}
+		}
+		AnimateXPInteger(0, step.amount, 0.34, generation, function (value) {
+			item.gain.text = "+" + FormatNumber(value) + " XP";
+		}, function () {
+			if (step.amount <= 0) {
+				ScheduleXP(generation, 0.34, function () { CompleteXPStep(index, generation); });
+				return;
+			}
+			CreateXPTransfer(step.amount, generation);
+			var fromTotal = xpPresentationData.animatedXP;
+			var toTotal = fromTotal + step.amount;
+			var modal = Panel("XHSXPModal");
+			if (modal) modal.AddClass("IsAnimating");
+			ScheduleXP(generation, 0.18, function () {
+				AnimateXPInteger(fromTotal, toTotal, 0.68, generation, function (value) {
+					xpPresentationData.animatedXP = value;
+					UpdateXPProgress(value, xpPresentationData, generation, true);
+				}, function () {
+					xpPresentationData.animatedXP = toTotal;
+					if (modal) modal.RemoveClass("IsAnimating");
+					CompleteXPStep(index, generation);
+				});
+			});
+		});
+	}
+
+	function HasPendingLevelRewards(presentation) {
+		var includePremium = xpPresentationModel && ToNumber(xpPresentationModel.supporterTier, 0) > 0;
+		for (var level = presentation.startLevel + 1; level <= presentation.endLevel && level <= 50; level++) {
+			if (GetSupporterRewardAtLevel("free", level)) return true;
+			if (includePremium && GetSupporterRewardAtLevel("premium", level)) return true;
+		}
+		return false;
+	}
+
+	function ContinueXPPresentation() {
+		if (xpPresentationPhase !== "xp" || !xpPresentationData || !xpPresentationData.finished) {
+			return;
+		}
+		xpPresentationPhase = "rewards";
+		SetXPOverlayVisible(false);
+		var modal = Panel("XHSXPModal");
+		if (modal) modal.RemoveClass("IsReady");
+		Game.EmitSound("ui_generic_button_click");
+		var hasSupporterTier = xpPresentationModel && ToNumber(xpPresentationModel.supporterTier, 0) > 0;
+		for (var level = xpPresentationData.startLevel + 1; level <= xpPresentationData.endLevel && level <= 50; level++) {
+			var rewardKey = xpPresentationKey + ":" + level;
+			if (!shownRewardKeys[rewardKey]) {
+				shownRewardKeys[rewardKey] = true;
+				CreateBattlepassRewardPanels(level, level - xpPresentationData.startLevel, hasSupporterTier);
+			}
+		}
+		if (rewardQueue.length === 0 && !activeReward) {
+			xpPresentationPhase = "done";
+		}
+	}
+
+	function StartXPPresentation(data, players) {
+		var model = GetLocalPlayerModel(players);
+		if (!model) {
+			xpPresentationPhase = "done";
+			return;
+		}
+		var presentationKey = GetXPPresentationKey(data, model);
+		if (xpPresentationKey === presentationKey && xpPresentationPhase !== "idle") {
+			return;
+		}
+
+		xpPresentationKey = presentationKey;
+		xpPresentationPhase = "xp";
+		xpPresentationGeneration++;
+		xpPresentationModel = model;
+		xpPresentationData = GetXPPresentationData(model);
+		xpPresentationData.animatedXP = xpPresentationData.beforeXP;
+		xpPresentationData.finished = false;
+		xpLastAnimatedLevel = xpPresentationData.startLevel;
+		xpLevelBurstQueue = [];
+		xpLevelBurstActive = false;
+		var generation = xpPresentationGeneration;
+		var playerName = Panel("XHSXPPlayerName");
+		var totalGain = Panel("XHSXPTotalGain");
+		var continueButton = Panel("XHSXPContinueButton");
+		var continueLabel = Panel("XHSXPContinueButtonLabel");
+		var modal = Panel("XHSXPModal");
+		if (playerName) playerName.text = ResolvePlayerIdentity(model) + " - PERSONAL PROGRESSION";
+		if (totalGain) totalGain.text = "+0 XP";
+		if (continueButton) {
+			continueButton.enabled = false;
+			continueButton.RemoveClass("IsReady");
+		}
+		if (continueLabel) continueLabel.text = "CALCULATING XP";
+		if (modal) {
+			modal.RemoveClass("IsReady");
+			modal.RemoveClass("IsLevelUp");
+		}
+		BuildXPSteps(xpPresentationData);
+		UpdateXPRewardEndpoints(xpPresentationData.startLevel);
+		UpdateXPProgress(xpPresentationData.beforeXP, xpPresentationData, generation, false);
+		SetXPOverlayVisible(true);
+		ScheduleXP(generation, 0.42, function () { RunXPStep(0, generation); });
+	}
+
 	function CreateBattlepassCell(parent, model) {
 		var cell = $.CreatePanel("Panel", parent, "");
 		cell.AddClass("PlayerColBattlepass");
@@ -1274,13 +1755,6 @@ var XHSEndScreen = (function () {
 		var durationXP = Math.max(0, ToNumber(battlepass.duration_xp, baseXPChange));
 		var victoryXPBonus = Math.max(0, ToNumber(battlepass.victory_xp_bonus, 0));
 		var xpIneligibleReason = (battlepass.xp_ineligible_reason || "").toString();
-		if (battlepass.duration_xp === undefined && battlepass.victory_xp_bonus === undefined && model.victory && baseXPChange > 0) {
-			var durationEstimate = Math.max(Math.round(Math.max(model.gameTime, 0) / 6), 0);
-			if (durationEstimate > 0 && baseXPChange >= durationEstimate) {
-				durationXP = durationEstimate;
-				victoryXPBonus = baseXPChange - durationEstimate;
-			}
-		}
 
 		if (!xpEnabled) {
 			level.text = "N/A";
@@ -1312,7 +1786,7 @@ var XHSEndScreen = (function () {
 		var ineligibleMessages = {
 			cheat_mode: "No XP - cheats enabled",
 			cheat_mode_not_whitelisted: "No XP - cheats enabled",
-			match_too_short: "No XP - match under 40 minutes",
+			match_too_short: "No XP - match under 30 minutes",
 			abandoned: "No XP - abandoned match",
 			disconnected: "No XP - disconnected"
 		};
@@ -1355,19 +1829,13 @@ var XHSEndScreen = (function () {
 			$.DispatchEvent("UIHideTextTooltip", cell);
 		});
 
-		var levelUps = Math.floor((supporter.xp + supporterChange) / supporter.max);
+		var completionSeason = model.api && model.api.season ? model.api.season : {};
+		var finalTotalXP = IntXP(FirstDefined(completionSeason.xp, battlepass.season_total_xp, battlepass.season_xp));
+		var startingTotalXP = IntXP(FirstDefined(completionSeason.xp_before, battlepass.season_xp_before, finalTotalXP - supporterChange));
+		var startingLevel = Math.floor(startingTotalXP / supporter.max) + 1;
+		var finalLevel = Math.floor(finalTotalXP / supporter.max) + 1;
+		var levelUps = Math.max(0, finalLevel - startingLevel);
 		bar.SetHasClass("LevelUp", supporterChange > 0 && levelUps >= 1);
-
-		if (model.id === Players.GetLocalPlayer() && supporterChange > 0 && levelUps >= 1) {
-			for (var i = 1; i <= levelUps; i++) {
-				var rewardLevel = supporter.level + i;
-				var rewardKey = model.id + ":" + rewardLevel;
-				if (!shownRewardKeys[rewardKey]) {
-					shownRewardKeys[rewardKey] = true;
-					CreateBattlepassRewardPanels(rewardLevel, i, hasSupporterTier);
-				}
-			}
-		}
 	}
 
 	function CreatePlayerRow(parent, model) {
@@ -1609,6 +2077,9 @@ var XHSEndScreen = (function () {
 			reward: reward,
 		});
 		rewardBatchTotal++;
+		if (xpPresentationPhase === "xp") {
+			return;
+		}
 		SetRewardOverlayVisible(true);
 
 		if (!rewardRevealScheduled) {
@@ -1635,6 +2106,9 @@ var XHSEndScreen = (function () {
 			SetRewardOverlayVisible(false);
 			rewardBatchTotal = 0;
 			rewardBatchAccepted = 0;
+			if (xpPresentationPhase === "rewards") {
+				xpPresentationPhase = "done";
+			}
 			return;
 		}
 
@@ -1762,6 +2236,7 @@ var XHSEndScreen = (function () {
 			SetRewardOverlayVisible(false);
 			rewardBatchTotal = 0;
 			rewardBatchAccepted = 0;
+			xpPresentationPhase = "done";
 		});
 
 		var closeAllLabel = $.CreatePanel("Label", closeAllButton, "");
@@ -1852,6 +2327,11 @@ var XHSEndScreen = (function () {
 				Game.EmitSound("ui_generic_button_click");
 			});
 		}
+
+		var xpContinue = Panel("XHSXPContinueButton");
+		if (xpContinue) {
+			xpContinue.SetPanelEvent("onactivate", ContinueXPPresentation);
+		}
 	}
 
 	function SetLoading(isLoading) {
@@ -1883,6 +2363,7 @@ var XHSEndScreen = (function () {
 			if (root) {
 				root.SetHasClass("IsFallback", false);
 			}
+			StartXPPresentation(data, players);
 		} catch (error) {
 			$.Msg("[XHSEndScreen] Render failed; fallback remains armed: " + error);
 		}
