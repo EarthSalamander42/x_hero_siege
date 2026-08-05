@@ -13496,7 +13496,7 @@
 		"AbilityValues"
 		{
 			"radius"		"200 225 250 300"
-			"cleave_pct"	"40"
+			"cleave_pct"	"25"
 		}
 
 		"OnToggleOn"

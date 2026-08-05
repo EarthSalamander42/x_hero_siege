@@ -268,18 +268,18 @@ end
 -- Tools-only visual QA. This deliberately bypasses the danger registry and
 -- never invokes an ability, damage callback, modifier, movement, or AI state.
 local VISUAL_QA_FAMILIES = {
-	{ key = "arthas", primary = Vector(105, 215, 255), secondary = Vector(225, 250, 255) },
-	{ key = "balanar", primary = Vector(155, 55, 255), secondary = Vector(125, 255, 80) },
-	{ key = "grom", primary = Vector(255, 62, 34), secondary = Vector(255, 185, 65) },
-	{ key = "illidan", primary = Vector(102, 255, 64), secondary = Vector(180, 70, 255) },
-	{ key = "lich_king", primary = Vector(105, 215, 255), secondary = Vector(225, 250, 255) },
-	{ key = "magtheridon", primary = Vector(255, 110, 35), secondary = Vector(120, 255, 80) },
-	{ key = "proudmoore", primary = Vector(70, 190, 255), secondary = Vector(255, 200, 75) },
-	{ key = "special", primary = Vector(255, 185, 65), secondary = Vector(255, 70, 45) },
+	{ key = "arthas",        primary = Vector(105, 215, 255), secondary = Vector(225, 250, 255) },
+	{ key = "balanar",       primary = Vector(155, 55, 255),  secondary = Vector(125, 255, 80) },
+	{ key = "grom",          primary = Vector(255, 62, 34),   secondary = Vector(255, 185, 65) },
+	{ key = "illidan",       primary = Vector(102, 255, 64),  secondary = Vector(180, 70, 255) },
+	{ key = "lich_king",     primary = Vector(105, 215, 255), secondary = Vector(225, 250, 255) },
+	{ key = "magtheridon",   primary = Vector(255, 110, 35),  secondary = Vector(120, 255, 80) },
+	{ key = "proudmoore",    primary = Vector(70, 190, 255),  secondary = Vector(255, 200, 75) },
+	{ key = "special",       primary = Vector(255, 185, 65),  secondary = Vector(255, 70, 45) },
 	{ key = "spirit_master", primary = Vector(255, 255, 255), secondary = Vector(70, 210, 255) },
-	{ key = "spirit_storm", primary = Vector(70, 220, 255), secondary = Vector(210, 245, 255) },
-	{ key = "spirit_earth", primary = Vector(110, 220, 110), secondary = Vector(210, 255, 160) },
-	{ key = "spirit_fire", primary = Vector(255, 115, 35), secondary = Vector(255, 220, 90) },
+	{ key = "spirit_storm",  primary = Vector(70, 220, 255),  secondary = Vector(210, 245, 255) },
+	{ key = "spirit_earth",  primary = Vector(110, 220, 110), secondary = Vector(210, 255, 160) },
+	{ key = "spirit_fire",   primary = Vector(255, 115, 35),  secondary = Vector(255, 220, 90) },
 }
 
 local function FindVisualQAFamily(key)
@@ -328,21 +328,21 @@ function XHSBossTelegraphs:SpawnVisualGallery(origin, requestedFamily)
 	return true
 end
 
-if IsInToolsMode() and Convars ~= nil and Convars.RegisterCommand ~= nil and not XHSBossTelegraphs.visual_qa_registered then
-	XHSBossTelegraphs.visual_qa_registered = true
-	Convars:RegisterCommand("xhs_pfx_gallery", function(_, familyName)
-		local player = Convars.GetCommandClient ~= nil and Convars:GetCommandClient() or nil
-		local hero = player ~= nil and player.GetAssignedHero ~= nil and player:GetAssignedHero() or nil
-		if (hero == nil or hero:IsNull()) and PlayerResource ~= nil then
-			hero = PlayerResource:GetSelectedHeroEntity(0)
-		end
-		if hero == nil or hero:IsNull() then
-			print("[XHS PFX QA] no selected hero; start a Tools match first")
-			return
-		end
-		local origin = hero:GetAbsOrigin() + hero:GetForwardVector() * 1000
-		if not XHSBossTelegraphs:SpawnVisualGallery(origin, familyName) then
-			print("[XHS PFX QA] usage: xhs_pfx_gallery [all|arthas|balanar|grom|illidan|lich_king|magtheridon|proudmoore|special|spirit_master|spirit_storm|spirit_earth|spirit_fire]")
-		end
-	end, "Tools-only boss warning visual gallery", FCVAR_CHEAT)
-end
+-- if IsInToolsMode() and Convars ~= nil and Convars.RegisterCommand ~= nil and not XHSBossTelegraphs.visual_qa_registered then
+-- 	XHSBossTelegraphs.visual_qa_registered = true
+-- 	Convars:RegisterCommand("xhs_pfx_gallery", function(_, familyName)
+-- 		local player = Convars.GetCommandClient ~= nil and Convars:GetCommandClient() or nil
+-- 		local hero = player ~= nil and player.GetAssignedHero ~= nil and player:GetAssignedHero() or nil
+-- 		if (hero == nil or hero:IsNull()) and PlayerResource ~= nil then
+-- 			hero = PlayerResource:GetSelectedHeroEntity(0)
+-- 		end
+-- 		if hero == nil or hero:IsNull() then
+-- 			print("[XHS PFX QA] no selected hero; start a Tools match first")
+-- 			return
+-- 		end
+-- 		local origin = hero:GetAbsOrigin() + hero:GetForwardVector() * 1000
+-- 		if not XHSBossTelegraphs:SpawnVisualGallery(origin, familyName) then
+-- 			print("[XHS PFX QA] usage: xhs_pfx_gallery [all|arthas|balanar|grom|illidan|lich_king|magtheridon|proudmoore|special|spirit_master|spirit_storm|spirit_earth|spirit_fire]")
+-- 		end
+-- 	end, "Tools-only boss warning visual gallery", FCVAR_CHEAT)
+-- end

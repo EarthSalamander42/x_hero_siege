@@ -317,7 +317,7 @@ end
 function api:InitDonatorTableJS()
 	local donators = {}
 
-	for i = 0, PlayerResource:GetPlayerCount() - 1 do
+	for i = 0, DOTA_MAX_TEAM_PLAYERS - 1 do
 		local donator_status = self:GetDonatorStatus(i)
 		if donator_status ~= 0 and donator_status ~= 10 then
 			donators[PlayerResource:GetSteamID(i)] = donator_status
@@ -669,8 +669,8 @@ local function CollectSupporterClaimIDs(value, result, depth)
 		if type(nested) == "table" then
 			CollectSupporterClaimIDs(nested, result, depth + 1)
 		elseif not isRewardRecord
-		and IsSupporterClaimedValue(nested)
-		and type(key) == "string"
+			and IsSupporterClaimedValue(nested)
+			and type(key) == "string"
 		then
 			result[tostring(key)] = true
 		elseif tonumber(key) ~= nil and type(nested) == "string" and nested ~= "" then
@@ -959,7 +959,7 @@ function api:RefreshSupporterPassClaims(player_id, callback)
 			or currentState.mutation_revision ~= mutationRevision
 		then
 			if IsSupporterClaimPlayerStillBound(player_id, steamid)
-			and SupporterPass and SupporterPass.PublishPlayer
+				and SupporterPass and SupporterPass.PublishPlayer
 			then
 				SupporterPass:PublishPlayer(player_id)
 			end
@@ -996,7 +996,7 @@ function api:RefreshSupporterPassClaims(player_id, callback)
 		})
 		currentState.season_key = remoteSeason
 		if IsSupporterClaimPlayerStillBound(player_id, steamid)
-		and SupporterPass and SupporterPass.PublishPlayer
+			and SupporterPass and SupporterPass.PublishPlayer
 		then
 			SupporterPass:PublishPlayer(player_id)
 		end
@@ -1265,8 +1265,8 @@ function api:ClaimSupporterPassReward(player_id, reward_id, callback)
 			player.supporter_pass = player.supporter_pass or {}
 			local claimed = {}
 			if currentSeason ~= nil
-			and responseSeason ~= nil
-			and currentSeason == responseSeason
+				and responseSeason ~= nil
+				and currentSeason == responseSeason
 			then
 				MergeSupporterClaimIDs(claimed, currentClaims)
 			end
@@ -1580,15 +1580,34 @@ function api:GetKillsForTeam(team)
 	return GetTeamHeroKills(team)
 end
 
-function api:GetAllPlayerSteamIds()
+local function CollectGameRegisterPlayerSteamIds()
 	local players = {}
-	for id = 0, PlayerResource:GetPlayerCount() - 1 do
-		local steamid = self:GetPersistentPlayerSteamID(id)
-		if steamid ~= nil then
-			table.insert(players, steamid)
+	local seen = {}
+	local valid_player_count = 0
+
+	for id = 0, DOTA_MAX_TEAM_PLAYERS - 1 do
+		-- game-register is the bootstrap request: do not depend on the XHS
+		-- persistent-player registry here because it may be initialized after
+		-- PlayerResource on dedicated servers.
+		if IsValidApiPlayerID(id)
+			and not IsApiSpectatorPlayerID(id)
+			and not IsApiBotPlayerID(id) then
+			valid_player_count = valid_player_count + 1
+
+			local steamid = GetApiSteamID(id)
+			if steamid ~= nil and seen[steamid] ~= true then
+				seen[steamid] = true
+				table.insert(players, steamid)
+			end
 		end
 	end
 
+	table.sort(players)
+	return players, valid_player_count
+end
+
+function api:GetAllPlayerSteamIds()
+	local players = CollectGameRegisterPlayerSteamIds()
 	return players
 end
 
@@ -1934,7 +1953,7 @@ function api:Request(endpoint, okCallback, failCallback, method, payload)
 	end)
 end
 
-function api:RegisterGame(callback)
+function api:RegisterGame(callback, register_players)
 	local locked_bot_session = IsInToolsMode()
 		and XHSBots ~= nil
 		and XHSBots.enabled == true
@@ -1946,6 +1965,85 @@ function api:RegisterGame(callback)
 	if self.xhs_bot_session_backend_disabled == true or locked_bot_session then
 		print("game-register: rejected for a locked local XHS bot session.")
 		return false, "xhs_bot_session"
+	end
+
+	-- Tools mode generally exposes PlayerResource before this call, while a
+	-- dedicated server can invoke the same flow before any human SteamID is
+	-- readable. Poll without blocking the server thread, then submit the full
+	-- snapshot as soon as at least one valid human SteamID is available.
+	if type(register_players) ~= "table" or #register_players == 0 then
+		if self.game_register_state == "waiting_for_players" then
+			return true, "waiting_for_players"
+		elseif self.game_register_state == "pending" then
+			return true, "pending"
+		elseif self.game_register_state == "ready" then
+			return true, "ready"
+		end
+
+		register_players = self:GetAllPlayerSteamIds()
+
+		if #register_players == 0 then
+			self.game_register_state = "waiting_for_players"
+			self.game_register_wait_attempts = 0
+
+			local function WaitForGameRegisterPlayers()
+				if self.game_register_state ~= "waiting_for_players" then
+					return nil
+				end
+
+				local players, valid_player_count = CollectGameRegisterPlayerSteamIds()
+				if #players == 0 then
+					self.game_register_wait_attempts = (self.game_register_wait_attempts or 0) + 1
+
+					if self.game_register_wait_attempts == 1
+						or self.game_register_wait_attempts % 20 == 0 then
+						print("game-register: waiting for a valid human SteamID"
+							.. " (valid_player_ids=" .. tostring(valid_player_count)
+							.. ", attempt=" .. tostring(self.game_register_wait_attempts) .. ")")
+					end
+
+					return 0.25
+				end
+
+				print("game-register: player data ready; registering "
+					.. tostring(#players) .. " human player(s).")
+
+				self.game_register_state = nil
+				self.game_register_wait_attempts = nil
+				self:RegisterGame(callback, players)
+				return nil
+			end
+
+			if Timers ~= nil and Timers.CreateTimer ~= nil then
+				Timers:CreateTimer(0.25, WaitForGameRegisterPlayers)
+				return true, "waiting_for_players"
+			end
+
+			local game_mode = nil
+			if GameRules ~= nil and GameRules.GetGameModeEntity ~= nil then
+				local ok, entity = pcall(function()
+					return GameRules:GetGameModeEntity()
+				end)
+
+				if ok then
+					game_mode = entity
+				end
+			end
+
+			if game_mode ~= nil and game_mode.SetContextThink ~= nil then
+				game_mode:SetContextThink(
+					"api_game_register_wait_for_players",
+					WaitForGameRegisterPlayers,
+					0.25
+				)
+				return true, "waiting_for_players"
+			end
+
+			self.game_register_state = "failed"
+			self.game_register_wait_attempts = nil
+			print("game-register: unable to schedule the player readiness loop.")
+			return false, "player_wait_unavailable"
+		end
 	end
 
 	self.game_register_state = "pending"
@@ -1983,7 +2081,7 @@ function api:RegisterGame(callback)
 			CustomPolls:SetBackendPayload(api.custom_polls)
 		end
 
-		for player_id = 0, PlayerResource:GetPlayerCount() - 1 do
+		for player_id = 0, DOTA_MAX_TEAM_PLAYERS - 1 do
 			if api:IsPersistentPlayerID(player_id) then
 				api:PublishSupporterPassArmory(player_id)
 				api:RefreshSupporterPassClaims(player_id)
@@ -1991,7 +2089,7 @@ function api:RegisterGame(callback)
 		end
 
 		if IsInToolsMode() then
-			for player_id = 0, PlayerResource:GetPlayerCount() - 1 do
+			for player_id = 0, DOTA_MAX_TEAM_PLAYERS - 1 do
 				local steamid = api:GetPersistentPlayerSteamID(player_id)
 				if steamid ~= nil then
 					local player = api.players and api.players[steamid] or nil
@@ -2023,7 +2121,7 @@ function api:RegisterGame(callback)
 	end, "POST", {
 		map = GetMapName(),
 		match_id = self:GetMatchID(),
-		players = self:GetAllPlayerSteamIds(),
+		players = register_players,
 		cheat_mode = self:IsCheatGame(),
 	})
 
@@ -2248,7 +2346,7 @@ function api:CompleteGame()
 	end
 
 	local completed_hero_images = 0
-	for candidateID = 0, PlayerResource:GetPlayerCount() - 1 do
+	for candidateID = 0, DOTA_MAX_TEAM_PLAYERS - 1 do
 		if PlayerResource:IsValidPlayerID(candidateID)
 			and not IsApiSpectatorPlayerID(candidateID)
 			and self:IsPersistentPlayerID(candidateID) then
@@ -2288,7 +2386,7 @@ function api:CompleteGame()
 		return 0
 	end
 
-	for id = 0, PlayerResource:GetPlayerCount() - 1 do
+	for id = 0, DOTA_MAX_TEAM_PLAYERS - 1 do
 		if PlayerResource:IsValidPlayerID(id)
 			and not IsApiSpectatorPlayerID(id) then
 			local items = {}
@@ -2358,7 +2456,7 @@ function api:CompleteGame()
 				end
 			end
 
-			for i = 0, PlayerResource:GetPlayerCount() - 1 do
+			for i = 0, DOTA_MAX_TEAM_PLAYERS - 1 do
 				damage_done_to_heroes = damage_done_to_heroes + PlayerResource:GetDamageDoneToHero(id, i)
 				kills_done_to_hero[i] = PlayerResource:GetKillsDoneToHero(id, i)
 			end
@@ -2383,8 +2481,8 @@ function api:CompleteGame()
 			local supporter_xp = {
 				version = 1,
 				muradin_event_won = (SpecialEvents ~= nil
-					and SpecialEvents.muradin_winners_by_player ~= nil
-					and SpecialEvents.muradin_winners_by_player[id] == true)
+						and SpecialEvents.muradin_winners_by_player ~= nil
+						and SpecialEvents.muradin_winners_by_player[id] == true)
 					or (heroEntity ~= nil and heroEntity.paid == true),
 				hero_images_done = completed_hero_images,
 				all_hero_images_done = GameMode ~= nil and GameMode.AllHeroImagesDead == true,

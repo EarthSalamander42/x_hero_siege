@@ -163,7 +163,7 @@ function EnsureBotQuickBuy(quickBuy) {
 	// wash are the only custom cue, so inspecting a bot remains seamless.
 	xhsBotQuickBuy.style.backgroundColor = '#252627ac';
 	xhsBotQuickBuy.style.backgroundImage = 'url("s2r://panorama/images/hud/reborn/quickbuy_bg_psd.vtex")';
-	xhsBotQuickBuy.style.backgroundImageOpacity = '0.5';
+	xhsBotQuickBuy.style.opacity = '0.5';
 	xhsBotQuickBuy.style.border = '1px solid #77c8ff35';
 	xhsBotQuickBuy.style.boxShadow = 'inset 0px -1px 4px -1px rgba(0, 0, 0, 0.5)';
 	xhsBotQuickBuy.style.visibility = 'collapse';
