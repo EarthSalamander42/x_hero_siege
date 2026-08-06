@@ -3303,20 +3303,22 @@ function XHSBotEconomy:Think(playerID, hero, record, profile, difficulty)
 		and XHSBotTeamDirector.GetAssignment ~= nil
 		and XHSBotTeamDirector:GetAssignment(playerID)
 		or nil
-	local muradinSurvivalActive = XHSBotEncounterDirector ~= nil
-		and XHSBotEncounterDirector.IsMuradinSurvivalActive ~= nil
-		and XHSBotEncounterDirector:IsMuradinSurvivalActive(hero)
-	local encounter = muradinSurvivalActive
+	local encounter = XHSBotEncounterDirector ~= nil
 		and XHSBotEncounterDirector.Build ~= nil
 		and XHSBotEncounterDirector:Build(playerID, hero, record, assignment)
 		or nil
 	local noCombatEncounter = encounter ~= nil and encounter.no_combat == true
+	local shoppingLockedEncounter = encounter ~= nil
+		and (noCombatEncounter
+			or encounter.arena_combat == true
+			or encounter.shopping_locked == true)
 	record.economy_encounter_mode = encounter and encounter.id or ""
 	record.economy_no_combat = noCombatEncounter
-	if noCombatEncounter then
-		-- Muradin survival owns movement immediately, even if a shop trip or
-		-- recipe verification was active on the preceding tick. Only personal
-		-- emergency defense and urgent health recovery may consume this tick.
+	record.economy_shopping_locked = shoppingLockedEncounter
+	if shoppingLockedEncounter then
+		-- Closed encounters own movement immediately, even if a shop trip was
+		-- active on the preceding tick. Emergency items remain legal, but the
+		-- economy must never pull an arena fighter toward an unreachable shop.
 		self:ClearShoppingGoal(record)
 		record.defer_potion_for_spell_now = false
 		if self:UseEmergencyTacticalItems(hero, record) then return "item" end

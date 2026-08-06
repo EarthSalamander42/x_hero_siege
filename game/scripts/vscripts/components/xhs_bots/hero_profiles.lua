@@ -315,7 +315,14 @@ local PROFILE_BY_HERO = {
 		abilities = {
 			holdout_crushing_wave = { mode = "point_aoe", priority = 82, minimum_targets = 2 },
 			holdout_summon_water_elemental = { mode = "summon", priority = 58, require_combat = true },
-			holdout_drain = { mode = "enemy_unit", priority = 74 },
+			holdout_drain = {
+				mode = "enemy_unit",
+				priority = 74,
+				-- Damage is delivered by custom channel logic and is not exposed by
+				-- GetAbilityDamage, so the generic creep efficiency model needs an
+				-- explicit certified fallback.
+				allow_creep_cast_without_damage_model = true,
+			},
 			holdout_mana_shield = { mode = "defensive_toggle", priority = 85 },
 			holdout_elemental_wave = {
 				mode = "directional_point",
@@ -635,8 +642,7 @@ local STANDARD_HEROES = {
 	},
 }
 
-local COMPOSITION_ORDER = {
-	balanced = {
+local CERTIFIED_HERO_ORDER = {
 		"npc_dota_hero_sven",
 		"npc_dota_hero_sniper",
 		"npc_dota_hero_enchantress",
@@ -646,40 +652,6 @@ local COMPOSITION_ORDER = {
 		"npc_dota_hero_dragon_knight",
 		"npc_dota_hero_elder_titan",
 		"npc_dota_hero_windrunner",
-	},
-	damage = {
-		"npc_dota_hero_sniper",
-		"npc_dota_hero_enchantress",
-		"npc_dota_hero_windrunner",
-		"npc_dota_hero_sven",
-		"npc_dota_hero_abyssal_underlord",
-		"npc_dota_hero_elder_titan",
-		"npc_dota_hero_crystal_maiden",
-		"npc_dota_hero_dragon_knight",
-		"npc_dota_hero_omniknight",
-	},
-	support = {
-		"npc_dota_hero_omniknight",
-		"npc_dota_hero_dragon_knight",
-		"npc_dota_hero_crystal_maiden",
-		"npc_dota_hero_elder_titan",
-		"npc_dota_hero_windrunner",
-		"npc_dota_hero_enchantress",
-		"npc_dota_hero_sven",
-		"npc_dota_hero_abyssal_underlord",
-		"npc_dota_hero_sniper",
-	},
-	random = {
-		"npc_dota_hero_sniper",
-		"npc_dota_hero_enchantress",
-		"npc_dota_hero_sven",
-		"npc_dota_hero_omniknight",
-		"npc_dota_hero_crystal_maiden",
-		"npc_dota_hero_abyssal_underlord",
-		"npc_dota_hero_dragon_knight",
-		"npc_dota_hero_elder_titan",
-		"npc_dota_hero_windrunner",
-	},
 }
 
 local function CopyArray(source)
@@ -707,14 +679,14 @@ function XHSBotHeroProfiles:IsCertified(heroName)
 	return profile ~= nil and profile.certified == true
 end
 
-function XHSBotHeroProfiles:GetCertifiedHeroes(composition)
-	return CopyArray(COMPOSITION_ORDER[composition] or COMPOSITION_ORDER.balanced)
+function XHSBotHeroProfiles:GetCertifiedHeroes(_)
+	return CopyArray(CERTIFIED_HERO_ORDER)
 end
 
 function XHSBotHeroProfiles:GetCertifiedHeroOptions()
 	local options = {}
 	local seen = {}
-	for _, heroName in ipairs(COMPOSITION_ORDER.balanced) do
+	for _, heroName in ipairs(CERTIFIED_HERO_ORDER) do
 		local profile = self:Get(heroName)
 		if profile ~= nil and profile.certified == true and seen[heroName] ~= true then
 			table.insert(options, {
@@ -750,10 +722,10 @@ function XHSBotHeroProfiles:GetAvailableHeroCount(composition, unavailable)
 	return count
 end
 
-function XHSBotHeroProfiles:PickHeroes(count, composition, unavailable)
+function XHSBotHeroProfiles:PickHeroes(count, _, unavailable)
 	count = math.max(0, math.floor(tonumber(count) or 0))
 	unavailable = unavailable or {}
-	local candidates = self:GetCertifiedHeroes(composition)
+	local candidates = self:GetCertifiedHeroes()
 	local candidatePool = {}
 	local candidateSet = {}
 	local selected = {}
@@ -774,11 +746,8 @@ function XHSBotHeroProfiles:PickHeroes(count, composition, unavailable)
 	while #selected < count and #candidatePool > 0 do
 		local totalWeight = 0
 		for _, candidate in ipairs(candidatePool) do
-			local weight = composition == "random"
-				and 1
-				or math.max(1, #candidates - candidate.rank + 1)
-			candidate.weight = weight
-			totalWeight = totalWeight + weight
+			candidate.weight = 1
+			totalWeight = totalWeight + 1
 		end
 
 		local roll = RandomFloat ~= nil

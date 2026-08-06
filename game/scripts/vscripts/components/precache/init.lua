@@ -356,7 +356,6 @@ function XHSPrecache:PrecacheBattlepassCompanionAssets(context)
 end
 
 function XHSPrecache:NoteRuntimeAsset(kind, path, source)
-	if not IsInToolsMode() then return end
 	if kind == nil or path == nil or path == "" then return end
 	if self:IsAssetDeclared(kind, path) then return end
 
@@ -369,6 +368,11 @@ function XHSPrecache:NoteRuntimeAsset(kind, path, source)
 		path = path,
 		source = source or "runtime",
 	})
+	if XHSObservability ~= nil then
+		XHSObservability:Log("warning", "missing_" .. tostring(kind), "RUNTIME_ASSET_UNDECLARED", "Runtime asset was not declared in precache: " .. tostring(path), {
+			kind = tostring(kind), path = tostring(path), call = tostring(source or "runtime"),
+		})
+	end
 end
 
 function XHSPrecache:PrintReport()

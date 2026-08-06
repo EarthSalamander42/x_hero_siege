@@ -26,10 +26,31 @@ function modifier_custom_mechanics:OnCreated()
 
 	if not IsServer() then return end
 
-	--	self:StartIntervalThink(1.0)
+	self.last_logged_agility = nil
+	self:StartIntervalThink(1.0)
 	--	self.magical_resistance = 0
 	--	self.intellect =
 	--	self:SetHasCustomTransmitterData(true)
+end
+
+function modifier_custom_mechanics:LogAgilityArmorComparison()
+	local parent = self:GetParent()
+	if parent == nil or parent:IsNull() or not parent:IsRealHero() then return end
+
+	local agility = tonumber(parent:GetAgility()) or 0
+	if self.last_logged_agility ~= nil and math.abs(agility - self.last_logged_agility) < 0.01 then return end
+	self.last_logged_agility = agility
+
+	local currentArmor = tonumber(parent:GetPhysicalArmorValue(false)) or 0
+	local vanillaAgilityArmor = agility / 6
+	local xhsAgilityArmor = agility / 12
+	local removedArmor = vanillaAgilityArmor - xhsAgilityArmor
+
+	print(string.format(
+		"[XHS][AgilityArmor] hero=%s agility=%.2f actual_total=%.2f vanilla_agi=%.2f xhs_agi=%.2f removed=%.2f total_if_vanilla=%.2f",
+		parent:GetUnitName(), agility, currentArmor, vanillaAgilityArmor,
+		xhsAgilityArmor, removedArmor, currentArmor + removedArmor
+	))
 end
 
 --[[
@@ -42,6 +63,7 @@ function modifier_warpath_weaponsmith_basic_arms:HandleCustomTransmitterData(dat
 end
 --]]
 function modifier_custom_mechanics:OnIntervalThink()
+	self:LogAgilityArmorComparison()
 	--	self.armor_fix = (self:GetParent():GetAgility() * 0.16) * (-1) -- Don't ask.
 end
 

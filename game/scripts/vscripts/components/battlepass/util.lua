@@ -30,10 +30,12 @@ CustomGameEventManager:RegisterListener("supporter_pass_change_companion", Dynam
 CustomGameEventManager:RegisterListener("supporter_pass_change_effigy", Dynamic_Wrap(Battlepass, "DonatorStatueJS"))
 CustomGameEventManager:RegisterListener("supporter_pass_change_emblem", Dynamic_Wrap(Battlepass, "DonatorEmblemJS"))
 CustomGameEventManager:RegisterListener("supporter_pass_buy_shop_item", Dynamic_Wrap(Battlepass, "SupporterPassBuyShopItem"))
+CustomGameEventManager:RegisterListener("supporter_pass_open_bundle", Dynamic_Wrap(Battlepass, "SupporterPassOpenBundle"))
 CustomGameEventManager:RegisterListener("supporter_pass_claim_reward", Dynamic_Wrap(Battlepass, "SupporterPassClaimReward"))
 CustomGameEventManager:RegisterListener("supporter_pass_equip_item", Dynamic_Wrap(Battlepass, "SupporterPassEquipItem"))
 CustomGameEventManager:RegisterListener("supporter_pass_unequip_item", Dynamic_Wrap(Battlepass, "SupporterPassUnequipItem"))
 CustomGameEventManager:RegisterListener("supporter_pass_update_settings", Dynamic_Wrap(Battlepass, "SupporterPassUpdateSettings"))
+CustomGameEventManager:RegisterListener("supporter_pass_open_payment_portal", Dynamic_Wrap(Battlepass, "SupporterPassOpenPaymentPortal"))
 CustomGameEventManager:RegisterListener("supporter_pass_dev_test_reward", Dynamic_Wrap(Battlepass, "SupporterPassDevTestReward"))
 CustomGameEventManager:RegisterListener("supporter_pass_dev_stop_test", Dynamic_Wrap(Battlepass, "SupporterPassDevStopTest"))
 CustomGameEventManager:RegisterListener("supporter_pass_catalog_preview", Dynamic_Wrap(Battlepass, "SupporterPassCatalogPreview"))
@@ -1522,6 +1524,7 @@ function Battlepass:PlaySupporterKillEffect(hero, victim, item)
 			-- The Drow caster beam travels from CP1 above the caster to CP5,
 			-- whose child operator derives the lower endpoint from CP0.
 			ParticleManager:SetParticleControl(particle, 1, anchorOrigin + Vector(0, 0, 800))
+			ParticleManager:SetParticleControl(particle, 5, anchorOrigin + Vector(0, 0, 600))
 		elseif isDrowRevengeKillEffect then
 			-- Both Drow styles emit their arrow models around CP1. Keep CP0 on the
 			-- victim for smoke/impact, but lower CP1 so the arrows frame the hero.
@@ -3021,13 +3024,14 @@ function Battlepass:SupporterPassBuyShopItem(event_source_index, event)
 		item_id = event.item_id,
 	})
 
-	api:BuySupporterPassShopItem(playerID, event.item_id, function(success, data)
+	api:BuySupporterPassShopItem(playerID, event.item_id, event.request_id, function(success, data)
 		local player = PlayerResource:GetPlayer(playerID)
 		if not success then
 			if player then
 				CustomGameEventManager:Send_ServerToPlayer(player, "supporter_pass_purchase_failed", {
 					item_id = event.item_id,
 					message = data and data.message or nil,
+					code = data and data.code or nil,
 				})
 			end
 			return
@@ -3046,6 +3050,66 @@ function Battlepass:SupporterPassBuyShopItem(event_source_index, event)
 				already_owned = data and data.already_owned or false,
 			})
 		end
+	end)
+end
+
+function Battlepass:SupporterPassOpenPaymentPortal(event_source_index, event)
+	event = self:GetSupporterPassEventPayload(event_source_index, event)
+	local playerID = event.PlayerID
+	local player = playerID ~= nil and PlayerResource:GetPlayer(playerID) or nil
+	if playerID == nil or not player or not api or not api.CreateSupporterPaymentIntent then
+		return
+	end
+
+	api:CreateSupporterPaymentIntent(playerID, {
+		source = event.source or "supporter_pass",
+		locale = event.locale or "en",
+		game_mode = GetMapName and GetMapName() or "xhs",
+	}, function(success, data)
+		if not player or player:IsNull() then return end
+		if not success or type(data) ~= "table" or type(data.url) ~= "string" or data.url == "" then
+			CustomGameEventManager:Send_ServerToPlayer(player, "supporter_pass_payment_portal_failed", {
+				message = data and data.message or "Unable to create a secure supporter link.",
+				code = data and data.code or "supporter_payment_intent_failed",
+			})
+			return
+		end
+		CustomGameEventManager:Send_ServerToPlayer(player, "supporter_pass_payment_portal_ready", {
+			url = data.url,
+			expires_at = data.expires_at,
+		})
+	end)
+end
+
+function Battlepass:SupporterPassOpenBundle(event_source_index, event)
+	event = self:GetSupporterPassEventPayload(event_source_index, event)
+	local playerID = event.PlayerID
+	local player = playerID ~= nil and PlayerResource:GetPlayer(playerID) or nil
+	if playerID == nil or not player or not api or not api.OpenSupporterPassBundle then
+		self:SendSupporterPassFailure(playerID, "supporter_pass_bundle_open_failed", "#xhs_sp_error_shop_unavailable", {
+			instance_id = event.instance_id,
+		})
+		return
+	end
+	if event.instance_id == nil or tostring(event.instance_id) == "" then
+		self:SendSupporterPassFailure(playerID, "supporter_pass_bundle_open_failed", "#xhs_sp_bundle_open_failed", {})
+		return
+	end
+
+	api:OpenSupporterPassBundle(playerID, event.instance_id, event.request_id, function(success, data)
+		if not success then
+			CustomGameEventManager:Send_ServerToPlayer(player, "supporter_pass_bundle_open_failed", {
+				instance_id = event.instance_id,
+				message = data and data.message or nil,
+				code = data and data.code or nil,
+			})
+			return
+		end
+		if SupporterPass and SupporterPass.PublishPlayer then SupporterPass:PublishPlayer(playerID) end
+		if api and api.PublishSupporterPassArmory then api:PublishSupporterPassArmory(playerID, data and data.armory or nil) end
+		CustomGameEventManager:Send_ServerToPlayer(player, "supporter_pass_bundle_open_success", {
+			instance_id = event.instance_id,
+		})
 	end)
 end
 

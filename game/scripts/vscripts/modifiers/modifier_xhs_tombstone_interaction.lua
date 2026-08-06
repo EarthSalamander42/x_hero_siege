@@ -5,8 +5,8 @@ modifier_xhs_tombstone_interaction = modifier_xhs_tombstone_interaction or class
 local TOMBSTONE_UNIT_NAME = "npc_xhs_hero_tombstone"
 local GROUND_CLICK_RADIUS = 180
 local TARGET_ORDER_TYPES = {
-	[DOTA_UNIT_ORDER_MOVE_TO_TARGET] = true,
-	[DOTA_UNIT_ORDER_ATTACK_TARGET] = true,
+	[2] = true, -- DOTA_UNIT_ORDER_MOVE_TO_TARGET
+	[4] = true, -- DOTA_UNIT_ORDER_ATTACK_TARGET
 }
 
 local function IsValidEntityHandle(entity)
@@ -33,7 +33,9 @@ local function ResolveOrderedTombstone(params)
 end
 
 function modifier_xhs_tombstone_interaction:IsHidden() return true end
+
 function modifier_xhs_tombstone_interaction:IsPurgable() return false end
+
 function modifier_xhs_tombstone_interaction:RemoveOnDeath() return false end
 
 function modifier_xhs_tombstone_interaction:DeclareFunctions()

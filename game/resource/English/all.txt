@@ -1687,14 +1687,14 @@
 "npc_dota_boss_spirit_master_fire"					"Fire Spirit"
 
 //INCOMING WAVES
-"npc_dota_creature_necrolyte_event_1"				"Necrolyte"
-"npc_dota_creature_naga_siren_event_2"				"Naga Siren"
-"npc_dota_creature_vengeful_spirit_event_3"			"Vengeful Spirit"
-"npc_dota_creature_captain_event_4"					"Captain"
-"npc_dota_creature_slardar_event_5"					"Slardar"
-"npc_dota_creature_chaos_knight_event_6"			"Chaos Knight"
-"npc_dota_creature_luna_event_7"					"Luna"
-"npc_dota_creature_clockwerk_event_8"				"Space Marine"
+"npc_dota_creature_necrolyte_event_1"				"Frog Mage"
+"npc_dota_creature_naga_siren_event_2"				"Ancient Frog Mage"
+"npc_dota_creature_vengeful_spirit_event_3"			"Tadpole Skirmisher"
+"npc_dota_creature_captain_event_4"					"Kobold Captain"
+"npc_dota_creature_slardar_event_5"					"Dire Worg"
+"npc_dota_creature_chaos_knight_event_6"			"Jungle Stalker"
+"npc_dota_creature_luna_event_7"					"Gnoll Glaivethrower"
+"npc_dota_creature_clockwerk_event_8"				"Stone Gargoyle"
 
 //SPECIAL EVENTS
 "npc_dota_hero_secret"										"Gravity Lord"

@@ -54,7 +54,7 @@
 
 			// A CustomUIElement loaded later can otherwise paint above this one even
 			// with a large local z-index. Make the Studio a direct, last HUD child.
-			root.style.zIndex = "1000000";
+			root.style.zIndex = "1200";
 			var sibling = lastHudSibling(hud, root);
 			if (sibling) hud.MoveChildAfter(root, sibling);
 			return true;

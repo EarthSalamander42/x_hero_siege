@@ -292,14 +292,13 @@ local function FocusPlayerOnMuradinEntry(playerID, hero, Muradin)
 	-- Following the entity also keeps the camera with it when the delayed
 	-- teleport moves it to its assigned Muradin event position.
 	CameraMotion:Follow(playerID, hero, {
-		from = hero,
-		duration = 0,
+		duration = SPECIAL_EVENT_CAMERA_MOVE_DURATION,
 		easing = "smootherstep",
 		persistent = true,
 		owner = MURADIN_CAMERA_OWNER,
 		priority = 100,
 		policy = "replace",
-		origin_mode = "server",
+		origin_mode = "auto",
 	})
 
 	Timers:CreateTimer(MURADIN_TELEPORT_IN_DELAY, function()
@@ -538,6 +537,7 @@ end
 
 local function PlayStormEarthFireSound(entity, emitterKey, temporary)
 	if entity == nil or not IsValidEntity(entity) or entity:IsNull() then return end
+	if SpecialEvents.stormEarthFirePlaying == true then return end
 
 	emitterKey = emitterKey or "boss"
 	SpecialEvents.stormEarthFireEmitters = SpecialEvents.stormEarthFireEmitters or {}
@@ -601,7 +601,9 @@ local function PlayStormEarthFireSound(entity, emitterKey, temporary)
 			return nil
 		end
 
-		EmitSoundOn(STORM_EARTH_FIRE_SOUND, emitter)
+		-- Event music must be audible to every participant, including players in
+		-- the separated farm arenas. A spatial emitter silently falls out of range.
+		EmitGlobalSound(STORM_EARTH_FIRE_SOUND)
 		return nil
 	end, 0.03)
 end
@@ -812,6 +814,7 @@ function SpecialEvents:PublishFarmLeaderboard(active)
 				completed_waves = completedWaves,
 				last_wave_gold = math.max(0, tonumber(progress.last_wave_gold) or 0),
 				last_wave_xp = math.max(0, tonumber(progress.last_wave_xp) or 0),
+				supporter_xp_earned = math.max(0, tonumber(progress.total_wave_xp) or 0),
 				reward_serial = math.max(0, tonumber(progress.reward_serial) or 0),
 			})
 		end
@@ -1299,6 +1302,7 @@ function SpecialEvents:PayFarmEventWaveRewards(playerID, progress)
 	progress.pending_wave_xp = 0
 	progress.last_wave_gold = gold
 	progress.last_wave_xp = xp
+	progress.total_wave_xp = math.max(0, tonumber(progress.total_wave_xp) or 0) + xp
 	progress.reward_serial = (progress.reward_serial or 0) + 1
 end
 
@@ -1368,9 +1372,11 @@ function SpecialEvents:FarmEvent(time)
 	local difficulty = GameRules:GetCustomGameDifficulty()
 	local tp_delay = CINEMATIC_EVENT_PRE_TELEPORT_DELAY
 	local start_delay = tp_delay + CINEMATIC_EVENT_POST_TELEPORT_HOLD
+	local event_end_delay = start_delay + time
 
 	StopAllStormEarthFireSounds()
 	CustomTimers.current_time["special_event"] = time
+	CustomTimers.current_event_timer_paused = true
 	CustomTimers.timers_paused = 1
 	CustomTimers.enable_special_wave = false
 	CustomTimers:HideSpecialWaveCountdown()
@@ -1385,13 +1391,9 @@ function SpecialEvents:FarmEvent(time)
 	self.farm_exit_wave_spawned = false
 	self:SuspendNonFarmCreeps()
 	self:StartFarmLeaderboardPublisher()
-	ShowCurrentEventTimer("FARM EVENT", time)
-	UpdateGlobalObjective("farm_event", "Active", "Farm Event active", time)
-	if FragmentQuests ~= nil then
-		FragmentQuests:OnFarmEventStart(time)
-	end
+	UpdateGlobalObjective("farm_event", "Active", "Preparing Farm Event arenas", nil)
 
-	StunBuildings(time)
+	StunBuildings(event_end_delay)
 	CinematicPauseGame(SPECIAL_EVENT_CINEMATIC_PAUSE_RAMP)
 
 	for _, v in pairs(HeroList:GetAllHeroes()) do
@@ -1416,6 +1418,7 @@ function SpecialEvents:FarmEvent(time)
 						prepared_units = {},
 						pending_wave_gold = 0,
 						pending_wave_xp = 0,
+						total_wave_xp = 0,
 						reward_serial = 0,
 						point = point,
 						prep_token = 0,
@@ -1429,6 +1432,15 @@ function SpecialEvents:FarmEvent(time)
 	self:PublishFarmLeaderboard(true)
 
 	GameRules:GetGameModeEntity():SetContextThink(DoUniqueString("farm_event"), function()
+		CustomTimers.current_time["special_event"] = time
+		CustomTimers.current_event_timer_paused = false
+		ShowCurrentEventTimer("FARM EVENT", time)
+		CustomTimers:BroadcastTimer("special_event")
+		UpdateGlobalObjective("farm_event", "Active", "Farm Event active", time, true)
+		if FragmentQuests ~= nil then
+			FragmentQuests:OnFarmEventStart(time)
+		end
+
 		Notifications:TopToAll({
 			duration = 5.0,
 			segments = {
@@ -1460,7 +1472,7 @@ function SpecialEvents:FarmEvent(time)
 		end
 
 		return nil
-	end, time - 20)
+	end, start_delay + time - 20)
 
 	GameRules:GetGameModeEntity():SetContextThink(DoUniqueString("muradin_event"), function()
 		SpecialEvents:BeginFarmEventCelebration(FARM_EVENT_CELEBRATION_DURATION)
@@ -1469,13 +1481,13 @@ function SpecialEvents:FarmEvent(time)
 		CustomGameEventManager:Send_ServerToAllClients("update_special_event_label_final", {})
 
 		return nil
-	end, time)
+	end, event_end_delay)
 
 	GameRules:GetGameModeEntity():SetContextThink(DoUniqueString("farm_event_celebration_end"), function()
 		BT_ENABLED = 1
 		SpecialEvents:EndFarmEvent()
 		return nil
-	end, time + FARM_EVENT_CELEBRATION_DURATION)
+	end, event_end_delay + FARM_EVENT_CELEBRATION_DURATION)
 end
 
 function SpecialEvents:EndFarmEvent()
@@ -1537,6 +1549,15 @@ function SpecialEvents:EndFarmEvent()
 	end
 
 	-- Start Phase 2
+	-- Dedicated servers can have every lane marked closed after players destroy
+	-- the phase-one towers. Rebuild the participant lane mask before spawning
+	-- the mandatory destroyers, otherwise the phase-two quest can never advance.
+	if GetXHSActivePhaseOneLaneCount ~= nil
+		and GetXHSActivePhaseOneLaneCount() <= 0
+		and RefreshXHSCombatLanes ~= nil
+	then
+		RefreshXHSCombatLanes()
+	end
 	local magnataurBatchesPerLane = math.max(1, tonumber(MAGNATAURS_TO_KILL) or 1)
 	for lane = 1, 8 do
 		local laneState = CREEP_LANES ~= nil and CREEP_LANES[lane] or nil

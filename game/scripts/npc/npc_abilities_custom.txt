@@ -7364,6 +7364,11 @@
 		"LevelsBetweenUpgrades"			"3"
 		"AbilityModifierSupportBonus"	"25"
 
+		"precache"
+		{
+			"particle"						"particles/units/heroes/hero_slardar/slardar_bash.vpcf"
+		}
+
 		"AbilityValues"
 		{
 			"bonus_damage"				"100 250 450 700"

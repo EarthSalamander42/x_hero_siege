@@ -166,16 +166,16 @@ function CustomPolls:GetPendingKey(player_id, poll_id)
 end
 
 function CustomPolls:GetPlayerIDFromEvent(event_source_index, event)
-	local player_id = nil
+	local player_id = XHSResolveEventPlayerID ~= nil and XHSResolveEventPlayerID(event_source_index) or nil
 
-	if api ~= nil and api.GetEventPlayerID ~= nil then
+	if player_id == nil and api ~= nil and api.GetEventPlayerID ~= nil then
 		local ok, resolved_player_id = pcall(function()
 			return api:GetEventPlayerID(event_source_index, nil)
 		end)
 		if ok then
 			player_id = tonumber(resolved_player_id)
 		end
-	elseif CustomGameEventManager.GetPlayerIDFromEventSourceIndex ~= nil then
+	elseif player_id == nil and CustomGameEventManager.GetPlayerIDFromEventSourceIndex ~= nil then
 		local ok, resolved_player_id = pcall(function()
 			return CustomGameEventManager:GetPlayerIDFromEventSourceIndex(event_source_index)
 		end)

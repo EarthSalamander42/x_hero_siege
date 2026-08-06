@@ -1,4 +1,4 @@
-.SupporterContentStudioRoot { width: 100%; height: 100%; z-index: 1000000; }
+.SupporterContentStudioRoot { width: 100%; height: 100%; z-index: 1200; }
 .Hidden { visibility: collapse; }
 .StudioOpen { max-width: 310px; horizontal-align: right; vertical-align: top; margin-top: 112px; margin-right: 18px; padding: 8px 14px; border: 1px solid #96733a; background-color: gradient(linear,0% 0%,0% 100%,from(#493a20),to(#1c1b18)); box-shadow: #00000088 0 4px 12px; }
 .StudioOpen Label { color: #e1c484; font-size: 14px; letter-spacing: 1.7px; text-overflow: shrink; white-space: nowrap; }

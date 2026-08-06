@@ -854,12 +854,15 @@ end
 function SpawnBosses()
 	_G.RAMERO_DUMMY = CreateUnitByName("npc_ramero", Entities:FindByName(nil, "point_special_arena_1"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_GOODGUYS)
 	_G.RAMERO_DUMMY:SetAngles(0, 270, 0)
+	_G.RAMERO_DUMMY:SetMoveCapability(DOTA_UNIT_CAP_MOVE_NONE)
 	_G.RAMERO_DUMMY:AddNewModifier(_G.RAMERO_DUMMY, nil, "modifier_command_restricted", {})
 	_G.BARISTOL_DUMMY = CreateUnitByName("npc_baristol", Entities:FindByName(nil, "point_special_arena_2"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_GOODGUYS)
 	_G.BARISTOL_DUMMY:SetAngles(0, 270, 0)
+	_G.BARISTOL_DUMMY:SetMoveCapability(DOTA_UNIT_CAP_MOVE_NONE)
 	_G.BARISTOL_DUMMY:AddNewModifier(_G.BARISTOL_DUMMY, nil, "modifier_command_restricted", {})
 	_G.RAMERO_BIS_DUMMY = CreateUnitByName("npc_ramero_2", Entities:FindByName(nil, "point_special_arena_3"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_GOODGUYS)
 	_G.RAMERO_BIS_DUMMY:SetAngles(0, 270, 0)
+	_G.RAMERO_BIS_DUMMY:SetMoveCapability(DOTA_UNIT_CAP_MOVE_NONE)
 	_G.RAMERO_BIS_DUMMY:AddNewModifier(_G.RAMERO_BIS_DUMMY, nil, "modifier_command_restricted", {})
 
 	-- Special events

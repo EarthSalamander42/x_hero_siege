@@ -11,7 +11,7 @@ XHSBotConfig.DEFAULTS = {
 	enabled = false,
 	count = 0,
 	difficulty = "normal",
-	composition = "balanced",
+	composition = "random",
 	spectator_mode = false,
 	hero_selections = {},
 }
@@ -123,13 +123,6 @@ XHSBotConfig.DIFFICULTIES = {
 	},
 }
 
-XHSBotConfig.COMPOSITIONS = {
-	balanced = true,
-	damage = true,
-	support = true,
-	random = true,
-}
-
 local function CopyTable(source)
 	local copy = {}
 	for key, value in pairs(source or {}) do
@@ -189,10 +182,9 @@ function XHSBotConfig:Normalize(raw, humanCount)
 		difficulty = self.DEFAULTS.difficulty
 	end
 
-	local composition = string.lower(tostring(raw.composition or self.DEFAULTS.composition))
-	if self.COMPOSITIONS[composition] ~= true then
-		composition = self.DEFAULTS.composition
-	end
+	-- Composition presets were removed. Explicit hero dropdown choices remain;
+	-- every unassigned slot is drawn uniformly from the certified roster.
+	local composition = self.DEFAULTS.composition
 
 	local certifiedHeroCapacity = self.MAX_BOTS
 	if XHSBotHeroProfiles ~= nil

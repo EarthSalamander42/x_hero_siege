@@ -1,12 +1,11 @@
 "use strict";
 
 var XHSSupporterPass = (function () {
-	var SUPPORTER_URL = "https://www.patreon.com/bePatron?u=2533325";
+	var SUPPORTER_URL = "https://mods.frostrose-studio.com/supporter-pass";
 	var DISCORD_URL = "https://discord.frostrose-studio.com/";
 	var SUPPORTER_SHOP_URL = "https://mods.frostrose-studio.com/supporter-pass?tab=shop";
-	// Explicit 4.0 product decision: purchases happen on the website. The game
-	// must never initiate an economic mutation or emit economic telemetry.
-	var IN_GAME_SHOP_PURCHASES_ENABLED = false;
+	// Supporter Pass 4.0 purchases are available both in game and on the website.
+	var IN_GAME_SHOP_PURCHASES_ENABLED = true;
 	var DAILY_FRAGMENT_CAP = 190;
 	var WEEKLY_FRAGMENT_CAP = DAILY_FRAGMENT_CAP;
 	var SUPPORTER_PASS_LEVEL_COUNT = 50;
@@ -27,6 +26,11 @@ var XHSSupporterPass = (function () {
 		asset_request: { page: 0, page_size: 10 },
 	};
 	var assetRequestSerial = 0;
+	var shopPurchaseSerial = 0;
+	var bundleOpenSerial = 0;
+	var purchaseConfirmationUntil = {};
+	var purchaseRequestByItem = {};
+	var bundleOpenRequestByInstance = {};
 	var assetRequestResultState = {};
 	var assetRequestView = {
 		request_type: "companion",
@@ -222,7 +226,7 @@ var XHSSupporterPass = (function () {
 				return false;
 			}
 
-			host.style.zIndex = "10000";
+			host.style.zIndex = "800";
 			hud.MoveChildAfter(host, layerAnchor);
 			supporterLayerApplied = true;
 			return true;
@@ -281,6 +285,9 @@ var XHSSupporterPass = (function () {
 			preview_verified: true,
 			preview_fail: true,
 			preview_stop: true,
+			shop_purchase_intent: true,
+			shop_purchase_success: true,
+			shop_purchase_failed: true,
 		};
 		if (allowedEvents[eventName] !== true) {
 			return;
@@ -321,6 +328,7 @@ var XHSSupporterPass = (function () {
 		var integerLimits = {
 			query_length: 500,
 			duration_ms: 3600000,
+			price: 10000000,
 		};
 		for (var integerKey in integerLimits) {
 			if (!integerLimits.hasOwnProperty(integerKey) || fields[integerKey] === undefined || fields[integerKey] === null) {
@@ -2904,7 +2912,6 @@ var XHSSupporterPass = (function () {
 		ClearPanel(parent);
 
 		player = player || GetLocalPlayerData();
-		var supporterURL = player.supporter_url || SUPPORTER_URL;
 		var tiers = GetTiers();
 		for (var i = 0; i < tiers.length; i++) {
 			var tier = GetTierMeta(tiers[i]);
@@ -2917,12 +2924,9 @@ var XHSSupporterPass = (function () {
 			row.SetHasClass("IsClickable", !isOwnedTier);
 			row.hittest = true;
 			if (!isOwnedTier) {
-				(function (url) {
-					row.SetPanelEvent("onactivate", function () {
-						Game.EmitSound("General.ButtonClick");
-						OpenExternalURL(url);
-					});
-				})(supporterURL);
+				row.SetPanelEvent("onactivate", function () {
+					OpenSupporterPortal("tier_card");
+				});
 			}
 
 			var art = $.CreatePanel("Panel", row, "");
@@ -3180,10 +3184,11 @@ var XHSSupporterPass = (function () {
 			: (item.id || item.item_id);
 		var devRequestID = item.catalog_item_id || item.item_id || item.id;
 		var requestID = devLocalEquipMode ? devRequestID : backendRequestID;
-		var actionKind = mode === "armory" ? (devLocalEquipMode ? "dev_equip" : "equip") : "purchase";
+		var unopenedBundle = mode === "armory" && item.type === "Bundle" && String(item.state || "").toLowerCase() === "unopened";
+		var actionKind = unopenedBundle ? "bundle_open" : (mode === "armory" ? (devLocalEquipMode ? "dev_equip" : "equip") : "purchase");
 		var pending = IsActionPending(actionKind, requestID);
 		var canAfford = mode === "armory"
-			? item.locked !== true && item.equipped !== true && !pending
+			? (unopenedBundle || (item.locked !== true && item.equipped !== true)) && !pending
 			: player.fragments >= ToNumber(item.price || item.fragment_price, 0) && !pending;
 		button.SetHasClass("IsLocked", !canAfford);
 		button.SetPanelEvent("onactivate", function () {
@@ -3193,6 +3198,22 @@ var XHSSupporterPass = (function () {
 			}
 
 			if (mode === "armory") {
+				if (unopenedBundle) {
+					var bundleRequestID = bundleOpenRequestByInstance[requestID];
+					if (!bundleRequestID) {
+						bundleOpenSerial++;
+						bundleRequestID = "game_open_" + bundleOpenSerial + "_" + Math.floor(Safe(function () { return Game.GetGameTime(); }, 0) * 1000);
+						bundleOpenRequestByInstance[requestID] = bundleRequestID;
+					}
+					SetActionPending("bundle_open", requestID, true);
+					GameEvents.SendCustomGameEventToServer("supporter_pass_open_bundle", {
+						instance_id: requestID,
+						request_id: bundleRequestID,
+					});
+					Game.EmitSound("General.ButtonClick");
+					RenderArmory(GetLocalPlayerData());
+					return;
+				}
 				if (devLocalEquipMode) {
 					SetActionPending("dev_equip", requestID, true);
 					GameEvents.SendCustomGameEventToServer("supporter_pass_dev_equip_local", {
@@ -3215,11 +3236,7 @@ var XHSSupporterPass = (function () {
 				return;
 			}
 
-			SetActionPending("purchase", requestID, true);
-			GameEvents.SendCustomGameEventToServer("supporter_pass_buy_shop_item", {
-				item_id: requestID,
-			});
-			RenderShop(GetLocalPlayerData());
+			BeginShopPurchase(item, player, "legacy_card");
 		});
 
 		var label = $.CreatePanel("Label", button, "");
@@ -3227,6 +3244,8 @@ var XHSSupporterPass = (function () {
 			label.text = Text("xhs_sp_pending", "Pending...");
 		} else if (devLocalEquipMode) {
 			label.text = item.equipped ? "EQUIPPED LOCALLY" : "EQUIP LOCALLY";
+		} else if (unopenedBundle) {
+			label.text = Text("xhs_sp_open_bundle", "Open bundle");
 		} else if (mode === "armory") {
 			label.text = dormantUntil41
 				? Text("xhs_sp_activates_41", "Activates in 4.1")
@@ -3353,6 +3372,18 @@ var XHSSupporterPass = (function () {
 			CreatePermanentShopCard(parent, pageItems[i], player, "catalog", paginationState.shop.page * paginationState.shop.page_size + i);
 		}
 		RefreshShopDetail(player);
+	}
+
+	var supporterPortalRequestPending = false;
+	function OpenSupporterPortal(source) {
+		if (supporterPortalRequestPending) return;
+		supporterPortalRequestPending = true;
+		Game.EmitSound("General.ButtonClick");
+		GameEvents.SendCustomGameEventToServer("supporter_pass_open_payment_portal", {
+			source: source || "supporter_pass",
+			locale: $.Language ? $.Language() : "en"
+		});
+		$.Schedule(12, function () { supporterPortalRequestPending = false; });
 	}
 
 	function GetItemCategory(item) {
@@ -3688,13 +3719,10 @@ var XHSSupporterPass = (function () {
 				label: Text("xhs_sp_available_on_website", "Available on website"),
 			};
 		}
-		if (item.owned) {
-			return { allowed: false, label: Text("xhs_sp_owned", "Owned") };
-		}
 		if (ToNumber(player && player.fragments, 0) < price) {
 			return { allowed: false, label: Text("xhs_sp_need_fragments", "Need fragments") };
 		}
-		return { allowed: true, label: Text("xhs_sp_buy", "Buy") };
+		return { allowed: true, label: Text(item.owned ? "xhs_sp_buy_another" : "xhs_sp_buy", item.owned ? "Buy another" : "Buy") };
 	}
 
 	function BeginShopPurchase(item, player, placement) {
@@ -3710,9 +3738,35 @@ var XHSSupporterPass = (function () {
 			Game.EmitSound("General.Cancel");
 			return;
 		}
-		// Kept as an explicit no-op guard even if the UI state is accidentally
-		// changed later: 4.0 has no authorized in-game purchase transport.
-		Game.EmitSound("General.Cancel");
+		var confirmationKey = requestID.toString();
+		if ((item.owned || item.has_owned_components) && ToNumber(purchaseConfirmationUntil[confirmationKey], 0) < Date.now()) {
+			purchaseConfirmationUntil[confirmationKey] = Date.now() + 8000;
+			ShowActionMessage(item.is_bundle
+				? Text("xhs_sp_bundle_duplicate_warning", "You already own part of this bundle. Its full price will be charged and every included item will be granted again. Click Buy again to confirm.")
+				: Text("xhs_sp_purchase_duplicate_warning", "You already own this item. Buying it again creates another giftable copy. Click Buy again to confirm."), false);
+			Game.EmitSound("General.Cancel");
+			return;
+		}
+		delete purchaseConfirmationUntil[confirmationKey];
+		var economicRequestID = purchaseRequestByItem[confirmationKey];
+		if (!economicRequestID) {
+			shopPurchaseSerial++;
+			economicRequestID = "game_buy_" + shopPurchaseSerial + "_" + Math.floor(Safe(function () { return Game.GetGameTime(); }, 0) * 1000);
+			purchaseRequestByItem[confirmationKey] = economicRequestID;
+		}
+		SetActionPending("purchase", requestID, true);
+		EmitSupporterUIEvent("shop_purchase_intent", {
+			item_id: requestID,
+			category: ShopFacetKey(item.item_type || item.type),
+			result: "attempted",
+			price: Math.max(0, ToNumber(item.price || item.fragment_price, 0)),
+		});
+		GameEvents.SendCustomGameEventToServer("supporter_pass_buy_shop_item", {
+			item_id: requestID,
+			request_id: economicRequestID,
+		});
+		Game.EmitSound("General.ButtonClick");
+		RenderShop(GetLocalPlayerData());
 	}
 
 	function CreateShopPurchaseButton(parent, item, player, placement) {
@@ -3720,7 +3774,7 @@ var XHSSupporterPass = (function () {
 		var button = $.CreatePanel("Button", parent, "");
 		button.AddClass("XHSPassShopPurchaseButton");
 		button.SetHasClass("IsLocked", !state.allowed);
-		button.SetHasClass("IsOwned", item.owned === true && state.intent_only !== true);
+		button.SetHasClass("IsOwned", false);
 		button.SetHasClass("IsPending", state.pending === true);
 		button.SetPanelEvent("onactivate", function () { BeginShopPurchase(item, player, placement); });
 		var label = $.CreatePanel("Label", button, "");
@@ -3765,9 +3819,7 @@ var XHSSupporterPass = (function () {
 
 		var price = $.CreatePanel("Label", card, "");
 		price.AddClass("XHSPassShopPrice");
-		price.text = item.owned
-			? Text("xhs_sp_in_collection", "In collection")
-			: FormatNumber(item.price || item.fragment_price || 0) + " " + Text("xhs_sp_fragments_lower", "fragments");
+		price.text = FormatNumber(item.price || item.fragment_price || 0) + " " + Text("xhs_sp_fragments_lower", "fragments");
 
 		var actions = $.CreatePanel("Panel", card, "");
 		actions.AddClass("XHSPassShopCardActions");
@@ -4180,7 +4232,7 @@ var XHSSupporterPass = (function () {
 		if (item.has_owned_components) {
 			var duplicateWarning = $.CreatePanel("Label", content, "");
 			duplicateWarning.AddClass("XHSPassShopDetailWarning");
-			duplicateWarning.text = Text("xhs_sp_bundle_owned_warning", "You already own {owned}/{total} items. The bundle keeps its full price; only missing items are granted.", {
+			duplicateWarning.text = Text("xhs_sp_bundle_owned_warning", "You already own {owned}/{total} items. The bundle keeps its full price and grants every included item, including duplicate copies.", {
 				owned: item.owned_count,
 				total: item.component_count || item.components.length,
 			});
@@ -5542,15 +5594,14 @@ var XHSSupporterPass = (function () {
 		var support = Panel("XHSPassSupportButton");
 		if (support) {
 			support.SetPanelEvent("onactivate", function () {
-				OpenExternalURL(GetLocalPlayerData().supporter_url || SUPPORTER_URL);
+				OpenSupporterPortal("supporter_pass");
 			});
 		}
 
 		var premiumCTA = Panel("XHSPassPremiumCTAButton");
 		if (premiumCTA) {
 			premiumCTA.SetPanelEvent("onactivate", function () {
-				Game.EmitSound("General.ButtonClick");
-				OpenExternalURL(GetLocalPlayerData().supporter_url || SUPPORTER_URL);
+				OpenSupporterPortal("premium_cta");
 			});
 		}
 
@@ -5623,12 +5674,26 @@ var XHSSupporterPass = (function () {
 			});
 			GameEvents.Subscribe("supporter_pass_purchase_success", function (payload) {
 				SetActionPending("purchase", payload && payload.item_id, false);
-				ShowActionMessage(Text(payload && payload.already_owned ? "xhs_sp_already_owned" : "xhs_sp_purchase_complete", payload && payload.already_owned ? "Already owned." : "Purchase complete."), true);
+				if (payload && payload.item_id) { delete purchaseRequestByItem[payload.item_id]; }
+				EmitSupporterUIEvent("shop_purchase_success", { item_id: payload && payload.item_id, result: "succeeded" });
+				ShowActionMessage(Text(payload && payload.already_owned ? "xhs_sp_duplicate_purchase_complete" : "xhs_sp_purchase_complete", payload && payload.already_owned ? "Purchase complete. Another giftable copy was added." : "Purchase complete."), true);
 				RenderAll();
 			});
 			GameEvents.Subscribe("supporter_pass_purchase_failed", function (payload) {
 				SetActionPending("purchase", payload && payload.item_id, false);
+				EmitSupporterUIEvent("shop_purchase_failed", { item_id: payload && payload.item_id, result: "failed", error_code: payload && payload.code });
 				ShowActionMessage(LocalizeMaybeKey((payload && payload.message) || "#xhs_sp_purchase_failed"), false);
+				RenderAll();
+			});
+			GameEvents.Subscribe("supporter_pass_bundle_open_success", function (payload) {
+				SetActionPending("bundle_open", payload && payload.instance_id, false);
+				if (payload && payload.instance_id) { delete bundleOpenRequestByInstance[payload.instance_id]; }
+				ShowActionMessage(Text("xhs_sp_bundle_opened", "Bundle opened. Its items are now in your Armory."), true);
+				RenderAll();
+			});
+			GameEvents.Subscribe("supporter_pass_bundle_open_failed", function (payload) {
+				SetActionPending("bundle_open", payload && payload.instance_id, false);
+				ShowActionMessage(LocalizeMaybeKey((payload && payload.message) || "#xhs_sp_bundle_open_failed"), false);
 				RenderAll();
 			});
 			GameEvents.Subscribe("supporter_pass_claim_success", function (payload) {
@@ -5707,6 +5772,14 @@ var XHSSupporterPass = (function () {
 				settingsOriginal = CopySettings(settingsDraft);
 				UpdateSettingsSaveBar();
 				ShowActionMessage(Text("xhs_sp_settings_saved", "Settings saved."), true);
+			});
+			GameEvents.Subscribe("supporter_pass_payment_portal_ready", function (payload) {
+				supporterPortalRequestPending = false;
+				if (payload && payload.url) OpenExternalURL(payload.url);
+			});
+			GameEvents.Subscribe("supporter_pass_payment_portal_failed", function (payload) {
+				supporterPortalRequestPending = false;
+				ShowActionMessage(payload && payload.message ? payload.message : "Unable to open the supporter payment page.", false);
 			});
 			GameEvents.Subscribe("supporter_pass_catalog_preview_result", function (payload) {
 				payload = payload || {};

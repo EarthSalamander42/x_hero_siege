@@ -888,7 +888,7 @@ function SupporterPass:BuildPlayerTable(playerID)
 		winrate_toggle = FirstSupporterValue(settings.winrate_toggle, player.winrate_toggle, current.winrate_toggle),
 		xhs_ingame_advertize_hidden = FirstSupporterValue(settings.xhs_ingame_advertize_hidden, settings.ingame_advertize_hidden, player.xhs_ingame_advertize_hidden, player.ingame_advertize_hidden, current.xhs_ingame_advertize_hidden, current.ingame_advertize_hidden),
 		ingame_tag = FirstSupporterValue(player.ingame_tag, current.ingame_tag),
-		supporter_url = FirstSupporterValue(supporterPass.url, supporterPass.supporter_url, player.supporter_url, current.supporter_url, "https://www.patreon.com/bePatron?u=2533325"),
+		supporter_url = FirstSupporterValue(supporterPass.url, supporterPass.supporter_url, player.supporter_url, current.supporter_url, "https://mods.frostrose-studio.com/supporter-pass"),
 		purchases = supporterPass.purchases or current.purchases,
 		entitlements = supporterPass.entitlements or current.entitlements,
 		armory = supporterPass.armory or current.armory,

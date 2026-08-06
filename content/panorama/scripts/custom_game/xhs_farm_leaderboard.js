@@ -265,6 +265,7 @@
 		var wave = Math.max(1, ToNumber(player.wave, 1));
 		var wavesPerLevel = Math.max(1, ToNumber(player.waves_per_level, 1));
 		var kills = Math.max(0, ToNumber(player.kills, 0));
+		var supporterXP = Math.max(0, ToNumber(player.supporter_xp_earned, 0));
 		var remaining = Math.max(0, ToNumber(player.remaining, targetKills - kills));
 
 		var rankLabel = Panel("XHSFarmRank_" + playerID);
@@ -286,7 +287,7 @@
 		if (stageLabel) {
 			stageLabel.text = mode === "ramero_kill_race"
 				? (remaining > 0 ? "+" + remaining + " KILLS REMAINING" : "ARENA READY")
-				: "LEVEL " + level + "  \u00B7  WAVE " + wave + "/" + wavesPerLevel;
+				: "LEVEL " + level + "  \u00B7  WAVE " + wave + "/" + wavesPerLevel + "  \u00B7  +" + supporterXP + " XP";
 		}
 		if (killsLabel) {
 			killsLabel.text = String(kills);

@@ -67,6 +67,9 @@
 				</Panel>
 
 				<Panel class="XHSEndScreenHeaderActions">
+					<Button id="XHSEndScreenXPButton" class="XHSEndScreenButton XHSEndScreenButtonSecondary" enabled="false">
+						<Label text="XP Summary" />
+					</Button>
 					<Button id="XHSEndScreenFarmButton" class="XHSEndScreenButton XHSEndScreenButtonSecondary">
 						<Label id="XHSEndScreenFarmButtonLabel" text="Farm Event" />
 					</Button>

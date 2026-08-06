@@ -214,6 +214,10 @@ function XHSBotDecisionAudit:Reset()
 	self.event_count = 0
 	self.event_write_index = 1
 	self.event_slots = {}
+	-- Console chunks are drained as they are printed. Keep a separate append-only
+	-- chronology for the production backend so the admin copy contains the whole
+	-- match instead of only the unprinted tail.
+	self.backend_events = {}
 	self.last_events = {}
 	self.bot_stats = {}
 	self.event_progress = {}
@@ -307,6 +311,7 @@ function XHSBotDecisionAudit:Record(kind, playerID, signature, fields, aggregate
 		repeats = 1,
 		fields = fields or {},
 	}
+	table.insert(self.backend_events, event)
 	local slot = self.event_write_index
 	self.event_slots[slot] = event
 	if self.event_count < self.max_events then
@@ -924,6 +929,107 @@ function XHSBotDecisionAudit:GetOrderedEvents()
 		return (tonumber(first.seq) or 0) < (tonumber(second.seq) or 0)
 	end)
 	return result
+end
+
+local function CopyAuditFields(fields)
+	local copy = {}
+	for key, value in pairs(fields or {}) do
+		local valueType = type(value)
+		if valueType == "string" or valueType == "number" or valueType == "boolean" then
+			copy[tostring(key)] = value
+		elseif value == nil then
+			copy[tostring(key)] = "none"
+		else
+			copy[tostring(key)] = tostring(value)
+		end
+	end
+	return copy
+end
+
+function XHSBotDecisionAudit:BuildBackendPayload(reason)
+	if self.event_count <= 0 and #(self.backend_events or {}) <= 0 then
+		return nil
+	end
+	if self.active == true then self:SampleAll(true) end
+
+	local events = {}
+	for _, event in ipairs(self.backend_events or {}) do
+		table.insert(events, {
+			seq = tonumber(event.seq) or 0,
+			t = tonumber(event.t) or 0,
+			last_t = tonumber(event.last_t) or tonumber(event.t) or 0,
+			repeats = tonumber(event.repeats) or 1,
+			player_id = tonumber(event.player_id) or -1,
+			kind = tostring(event.kind or "unknown"),
+			fields = CopyAuditFields(event.fields),
+		})
+	end
+
+	local bots = {}
+	for playerID, stats in pairs(self.bot_stats or {}) do
+		local record = stats.final_record or {}
+		table.insert(bots, {
+			player_id = tonumber(playerID) or -1,
+			hero = tostring(stats.hero or ""),
+			deaths = tonumber(stats.deaths) or 0,
+			respawns = tonumber(stats.respawns) or 0,
+			decisions_planned = tonumber(stats.decisions_planned) or 0,
+			decisions_executed = tonumber(stats.decisions_executed) or 0,
+			decisions_rejected = tonumber(stats.decisions_rejected) or 0,
+			purchase_attempts = tonumber(stats.purchase_attempts) or 0,
+			purchases = tonumber(stats.purchases) or 0,
+			purchase_failures = tonumber(stats.purchase_failures) or 0,
+			orb_purchases = tonumber(stats.orb_purchases) or 0,
+			arena_preparation_tomes = tonumber(stats.arena_preparation_tomes) or 0,
+			arena_downtime_shop_assignments = tonumber(stats.arena_downtime_shop_assignments) or 0,
+			first_orb_at = tonumber(stats.first_orb_at) or -1,
+			max_gold_without_orb = tonumber(stats.max_gold_without_orb) or 0,
+			orb_affordable_seconds = tonumber(stats.orb_affordable_seconds) or 0,
+			shopping_seconds = tonumber(stats.shopping_seconds) or 0,
+			retreat_seconds = tonumber(stats.retreat_seconds) or 0,
+			retreat_stationary_seconds = tonumber(stats.retreat_stationary_seconds) or 0,
+			missing_hero_seconds = tonumber(stats.missing_hero_seconds) or 0,
+			phase1_off_lane_seconds = tonumber(stats.phase1_off_lane_seconds) or 0,
+			lane_mismatch_seconds = tonumber(stats.lane_mismatch_seconds) or 0,
+			base_response_ignored_seconds = tonumber(stats.base_response_ignored_seconds) or 0,
+			unnecessary_regroup_seconds = tonumber(stats.unnecessary_regroup_seconds) or 0,
+			final_gold = SafeGold(playerID),
+			final_state = tostring(record.state or ""),
+			final_goal = tostring(record.goal or ""),
+			final_item = tostring(record.planned_item or ""),
+			initial_lane = tonumber(stats.initial_lane) or 0,
+			final_ankh = tonumber(stats.last_ankh_charges) or 0,
+			issues = self:BuildIssues(stats, record),
+		})
+	end
+	table.sort(bots, function(first, second)
+		return (first.player_id or -1) < (second.player_id or -1)
+	end)
+
+	local progress = {}
+	for name, state in pairs(self.event_progress or {}) do
+		progress[tostring(name)] = CopyAuditFields(state)
+	end
+	local endedAt = self.stopped_at > 0 and self.stopped_at or AuditNow()
+	return {
+		schema = tonumber(self.schema) or 3,
+		session = tostring(self.console_session_id or ""),
+		reason = tostring(reason or "backend"),
+		start_reason = tostring(self.start_reason or ""),
+		started_at = tonumber(self.started_at) or 0,
+		ended_at = endedAt,
+		duration = math.max(0, endedAt - (tonumber(self.started_at) or endedAt)),
+		max_phase = tonumber(self.max_phase) or 0,
+		event_count = #events,
+		dropped_events = tonumber(self.dropped_events) or 0,
+		console_flushed_events = tonumber(self.console_flushed_events) or 0,
+		campaign_stage = tostring(
+			XHSBotCampaignDirector ~= nil and XHSBotCampaignDirector.stage or ""
+		),
+		event_progress = progress,
+		bots = bots,
+		events = events,
+	}
 end
 
 function XHSBotDecisionAudit:RebuildEventBuffer(events)

@@ -5,6 +5,15 @@ local function GetXHSLaneParticipantCount()
 	return math.max(1, math.min(8, tonumber(participantCount) or 1))
 end
 
+local function ShouldDeferXHSLaneStructureCleanup()
+	if XHSBots == nil or type(XHSBots.configuration) ~= "table" then return false end
+	local requestedBots = tonumber(XHSBots.configuration.count) or 0
+	if requestedBots <= 0 then return false end
+	return XHSBots.status ~= "provisioned"
+		and XHSBots.status ~= "locked"
+		and XHSBots.status ~= "error"
+end
+
 local function SetXHSLaneDoorState(lane, open)
 	if CREEP_LANES ~= nil and CREEP_LANES[lane] ~= nil then
 		CREEP_LANES[lane][1] = open and 1 or 0
@@ -22,7 +31,9 @@ local function SetXHSLaneDoorState(lane, open)
 		nil
 	)
 
-	if not open and XHSRemoveClosedPhaseOneLaneStructures ~= nil then
+	if not open
+		and not ShouldDeferXHSLaneStructureCleanup()
+		and XHSRemoveClosedPhaseOneLaneStructures ~= nil then
 		XHSRemoveClosedPhaseOneLaneStructures(lane)
 		return
 	end
@@ -32,6 +43,14 @@ local function SetXHSLaneDoorState(lane, open)
 			tower:RemoveModifierByName("modifier_invulnerable")
 		elseif not tower:HasModifier("modifier_invulnerable") then
 			tower:AddNewModifier(tower, nil, "modifier_invulnerable", nil)
+		end
+	end
+
+	for _, rax in pairs(Entities:FindAllByName("dota_badguys_barracks_" .. lane)) do
+		if open then
+			rax:RemoveModifierByName("modifier_invulnerable")
+		elseif not rax:HasModifier("modifier_invulnerable") then
+			rax:AddNewModifier(rax, nil, "modifier_invulnerable", nil)
 		end
 	end
 end
@@ -2730,16 +2749,16 @@ end
 ---------------------------------------------------------
 
 local function ResolveAuthenticatedPersistentPlayerID(eventSourceIndex)
-	local playerID = nil
+	local playerID = XHSResolveEventPlayerID ~= nil and XHSResolveEventPlayerID(eventSourceIndex) or nil
 
-	if api ~= nil and api.GetEventPlayerID ~= nil then
+	if playerID == nil and api ~= nil and api.GetEventPlayerID ~= nil then
 		local ok, resolvedPlayerID = pcall(function()
 			return api:GetEventPlayerID(eventSourceIndex, nil)
 		end)
 		if ok then
 			playerID = tonumber(resolvedPlayerID)
 		end
-	elseif CustomGameEventManager ~= nil
+	elseif playerID == nil and CustomGameEventManager ~= nil
 		and CustomGameEventManager.GetPlayerIDFromEventSourceIndex ~= nil then
 		local ok, resolvedPlayerID = pcall(function()
 			return CustomGameEventManager:GetPlayerIDFromEventSourceIndex(eventSourceIndex)
@@ -2747,7 +2766,7 @@ local function ResolveAuthenticatedPersistentPlayerID(eventSourceIndex)
 		if ok then
 			playerID = tonumber(resolvedPlayerID)
 		end
-	elseif tonumber(eventSourceIndex) ~= nil and tonumber(eventSourceIndex) > 0 then
+	elseif playerID == nil and tonumber(eventSourceIndex) ~= nil and tonumber(eventSourceIndex) > 0 then
 		-- Compatibility fallback for engine builds without
 		-- GetPlayerIDFromEventSourceIndex. The event source is authoritative;
 		-- payload PlayerID/nPlayerID is deliberately never consulted.

@@ -627,6 +627,78 @@ ignored_pfx_list["particles/units/heroes/hero_ember_spirit/ember_spirit_flamegua
 ignored_pfx_list["particles/act_2/campfire_flame.vpcf"] = true
 
 -- Keep runtime particle accounting centralized without changing particle paths.
+XHSParticleTelemetry = XHSParticleTelemetry or {
+	active = {},
+	active_by_path = {},
+	created_total = 0,
+	destroyed_total = 0,
+	released_total = 0,
+	dropped_records = 0,
+	tracked_count = 0,
+	maximum_records = 5000,
+}
+
+function XHSParticleTelemetry:Created(index, path, scope)
+	if index == nil then return end
+	self.created_total = self.created_total + 1
+	local replaced = self.active[index]
+	if replaced ~= nil then
+		self.active_by_path[replaced.path] = math.max(0, (self.active_by_path[replaced.path] or 1) - 1)
+		if self.active_by_path[replaced.path] == 0 then self.active_by_path[replaced.path] = nil end
+	end
+	if self.active[index] == nil and self.tracked_count >= self.maximum_records then
+		self.dropped_records = self.dropped_records + 1
+		return
+	end
+	path = tostring(path or "unknown")
+	self.active[index] = { path = path, scope = scope or "all", created_at = Time(), destroyed = false }
+	if replaced == nil then self.tracked_count = self.tracked_count + 1 end
+	self.active_by_path[path] = (self.active_by_path[path] or 0) + 1
+end
+
+function XHSParticleTelemetry:Destroyed(index)
+	local record = self.active[index]
+	if record == nil or record.destroyed == true then return end
+	record.destroyed = true
+	record.destroyed_at = Time()
+	self.destroyed_total = self.destroyed_total + 1
+end
+
+function XHSParticleTelemetry:Released(index)
+	local record = self.active[index]
+	if record ~= nil then
+		self.active_by_path[record.path] = math.max(0, (self.active_by_path[record.path] or 1) - 1)
+		if self.active_by_path[record.path] == 0 then self.active_by_path[record.path] = nil end
+		self.active[index] = nil
+		self.tracked_count = math.max(0, self.tracked_count - 1)
+	end
+	self.released_total = self.released_total + 1
+end
+
+function XHSParticleTelemetry:GetSnapshot()
+	local now = Time()
+	local alive, destroyedUnreleased, oldest = 0, 0, 0
+	local top = {}
+	for _, record in pairs(self.active) do
+		if record.destroyed then destroyedUnreleased = destroyedUnreleased + 1 else alive = alive + 1 end
+		oldest = math.max(oldest, now - (record.created_at or now))
+	end
+	for path, count in pairs(self.active_by_path) do table.insert(top, { path = path, count = count }) end
+	table.sort(top, function(a, b) return a.count > b.count end)
+	while #top > 10 do table.remove(top) end
+	return {
+		alive = alive,
+		destroyed_unreleased = destroyedUnreleased,
+		tracked = alive + destroyedUnreleased,
+		oldest_seconds = math.floor(oldest * 10 + 0.5) / 10,
+		created_total = self.created_total,
+		destroyed_total = self.destroyed_total,
+		released_total = self.released_total,
+		dropped_records = self.dropped_records,
+		top = top,
+	}
+end
+
 local original_CreateParticle = CScriptParticleManager.CreateParticle
 CScriptParticleManager.CreateParticle = function(self, sParticleName, iAttachType, hParent)
 	if XHSPrecache and XHSPrecache.NoteRuntimeAsset then
@@ -635,6 +707,7 @@ CScriptParticleManager.CreateParticle = function(self, sParticleName, iAttachTyp
 
 	-- call the original function
 	local response = original_CreateParticle(self, sParticleName, iAttachType, hParent)
+	XHSParticleTelemetry:Created(response, sParticleName, "all")
 
 	--	print("CreateParticle response:", sParticleName)
 
@@ -654,6 +727,7 @@ CScriptParticleManager.CreateParticleForTeam = function(self, sParticleName, iAt
 
 	-- call the original function
 	local response = original_CreateParticleForTeam(self, sParticleName, iAttachType, hParent, iTeamNumber)
+	XHSParticleTelemetry:Created(response, sParticleName, "team")
 
 	return response
 end
@@ -667,6 +741,19 @@ CScriptParticleManager.CreateParticleForPlayer = function(self, sParticleName, i
 
 	-- call the original function
 	local response = original_CreateParticleForPlayer(self, sParticleName, iAttachType, hParent, hPlayer)
+	XHSParticleTelemetry:Created(response, sParticleName, "player")
 
 	return response
+end
+
+local original_DestroyParticle = CScriptParticleManager.DestroyParticle
+CScriptParticleManager.DestroyParticle = function(self, particleIndex, immediate)
+	XHSParticleTelemetry:Destroyed(particleIndex)
+	return original_DestroyParticle(self, particleIndex, immediate)
+end
+
+local original_ReleaseParticleIndex = CScriptParticleManager.ReleaseParticleIndex
+CScriptParticleManager.ReleaseParticleIndex = function(self, particleIndex)
+	XHSParticleTelemetry:Released(particleIndex)
+	return original_ReleaseParticleIndex(self, particleIndex)
 end

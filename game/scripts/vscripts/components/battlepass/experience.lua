@@ -131,7 +131,7 @@ function Battlepass:GetPlayerInfoXP() -- yet it has too much useless loops, form
 			supporter_table.XP_change = supporter_table.XP_change or 0
 			if has_backend_player then supporter_table.ingame_tag = supporter_table.ingame_tag or api:GetPlayerIngameTag(player_id) end
 			if has_backend_player then supporter_table.achievements = supporter_table.achievements or api:GetPlayerAchievements(player_id) end
-			supporter_table.supporter_url = supporter_table.supporter_url or "https://www.patreon.com/bePatron?u=2533325"
+			supporter_table.supporter_url = supporter_table.supporter_url or "https://mods.frostrose-studio.com/supporter-pass"
 
 			CustomNetTables:SetTableValue("supporter_pass_player", tostring(player_id), supporter_table)
 		end

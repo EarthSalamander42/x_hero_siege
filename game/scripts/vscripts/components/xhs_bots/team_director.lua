@@ -1513,6 +1513,12 @@ function XHSBotTeamDirector:CanRespondToStructureEmergency(
 		or baseThreat == nil or baseThreat.structure_emergency ~= true then
 		return false
 	end
+	-- Once a sealed phase-three boss is active there is no legal route back to
+	-- a shop. Even emergency/recovery shopping must yield to the encounter;
+	-- otherwise the bot repeatedly walks into the closed south-west exit.
+	if self:GetPhase() >= 3 and IsValidEntityHandle(self.visible_boss) then
+		return false
+	end
 	local healthRatio = hero:GetHealth() / math.max(1, hero:GetMaxHealth())
 	local responseThreshold = math.max(
 		0.34,

@@ -1156,6 +1156,29 @@ function api:UpdateSupporterPassSettings(player_id, settings, callback)
 	end, "POST", payload)
 end
 
+function api:CreateSupporterPaymentIntent(player_id, context, callback)
+	callback = callback or function() end
+	context = context or {}
+	local steamid = self:GetPersistentPlayerSteamID(player_id)
+	if steamid == nil then
+		return callback(false, { code = "non_persistent_player", message = "Persistent human player required." })
+	end
+
+	local payload = {
+		steamid = steamid,
+		game_id = self:GetApiGameId(),
+		source = tostring(context.source or "supporter_pass"),
+		locale = tostring(context.locale or "en"),
+		game_mode = tostring(context.game_mode or "xhs"),
+	}
+
+	self:Request("supporter-pass/payment-intent", function(data)
+		callback(true, data or {})
+	end, function(error)
+		callback(false, error or { code = "supporter_payment_intent_failed" })
+	end, "POST", payload)
+end
+
 function api:RequestSupporterPassAsset(player_id, asset, callback)
 	callback = callback or function() end
 	local steamid = self:GetPersistentPlayerSteamID(player_id)
@@ -1183,10 +1206,12 @@ function api:RequestSupporterPassAsset(player_id, asset, callback)
 	})
 end
 
-function api:BuySupporterPassShopItem(player_id, item_id, callback)
+function api:BuySupporterPassShopItem(player_id, item_id, request_id, callback)
 	if callback == nil then
-		callback = function() end
+		callback = request_id
+		request_id = nil
 	end
+	if callback == nil then callback = function() end end
 
 	local steamid = self:GetPersistentPlayerSteamID(player_id)
 	if steamid == nil then
@@ -1195,7 +1220,9 @@ function api:BuySupporterPassShopItem(player_id, item_id, callback)
 
 	local payload = {
 		steamid = steamid,
+		game_id = self:GetApiGameId(),
 		item_id = item_id,
+		request_id = tostring(request_id or ""),
 	}
 
 	api:Request("supporter-pass/buy-shop-item", function(data)
@@ -1210,6 +1237,26 @@ function api:BuySupporterPassShopItem(player_id, item_id, callback)
 	end, function(error)
 		callback(false, error)
 	end, "POST", payload)
+end
+
+function api:OpenSupporterPassBundle(player_id, instance_id, request_id, callback)
+	if callback == nil then callback = function() end end
+	local steamid = self:GetPersistentPlayerSteamID(player_id)
+	if steamid == nil then
+		return callback(false, { code = "non_persistent_player", message = "Persistent human player required." })
+	end
+	self:Request("supporter-pass/open-bundle", function(data)
+		self:MergeSupporterPassResponse(steamid, data)
+		self:PublishSupporterPassArmory(player_id, data.armory)
+		callback(true, data)
+	end, function(error)
+		callback(false, error)
+	end, "POST", {
+		steamid = steamid,
+		game_id = self:GetApiGameId(),
+		instance_id = tostring(instance_id or ""),
+		request_id = tostring(request_id or ""),
+	})
 end
 
 function api:ClaimSupporterPassReward(player_id, reward_id, callback)
@@ -1650,6 +1697,10 @@ function api:Message(message, _type)
 end
 
 function api:GetEventPlayerID(event_source_index, payload)
+	if XHSResolveEventPlayerID ~= nil then
+		return XHSResolveEventPlayerID(event_source_index)
+	end
+
 	local player_id = nil
 	local source_index = nil
 
@@ -1670,7 +1721,9 @@ function api:GetEventPlayerID(event_source_index, payload)
 				player_id = resolved_player_id
 			end
 		end
-	elseif source_index ~= nil and source_index > 0 then
+	end
+
+	if player_id == nil and source_index ~= nil and source_index > 0 then
 		-- Compatibility fallback for engine builds without
 		-- GetPlayerIDFromEventSourceIndex. Never trust payload.PlayerID.
 		local ok, sender_player_id = pcall(function()
@@ -1850,7 +1903,7 @@ function api:Request(endpoint, okCallback, failCallback, method, payload)
 		return failCallback()
 	end
 
-	request:SetHTTPRequestAbsoluteTimeoutMS(timeout)
+	request:SetHTTPRequestAbsoluteTimeoutMS(endpoint == "bot-audit" and 20000 or timeout)
 
 	local header_key = nil
 
@@ -1886,7 +1939,8 @@ function api:Request(endpoint, okCallback, failCallback, method, payload)
 		-- print(result)
 		local code = result.StatusCode;
 		local response_body = tostring(result.Body or "")
-		if endpoint == "game-register" or endpoint == "game-complete" or endpoint == "performance" then
+		if endpoint == "game-register" or endpoint == "game-complete"
+			or endpoint == "performance" or endpoint == "bot-audit" then
 			local elapsed_ms = math.floor(math.max(Time() - request_started_at, 0) * 1000)
 			print("[XHS HTTP] destination=" .. tostring(request_url)
 				.. " | method=" .. tostring(method)
@@ -1902,6 +1956,11 @@ function api:Request(endpoint, okCallback, failCallback, method, payload)
 			end
 
 			print("Request to " .. endpoint .. " failed with message " .. message .. " (" .. tostring(code) .. ")")
+			if endpoint ~= "observability/logs" and XHSObservability ~= nil then
+				XHSObservability:Log("error", "backend_http", "HTTP_REQUEST_FAILED", "Request to " .. tostring(endpoint) .. " failed: " .. tostring(message), {
+					endpoint = tostring(endpoint), status_code = tonumber(code) or 0,
+				})
+			end
 			failCallback({
 				message = message,
 				status_code = code,
@@ -2638,6 +2697,40 @@ function api:CompleteGame()
 		completed_display_payload[key] = value
 	end
 	completed_display_payload.game_time = backend_payload.game_time
+
+	-- Production bot matches keep rewards disabled, but their decision audit is
+	-- valuable QA data. Tools sessions remain strictly local and never upload.
+	if has_xhs_bot_session
+		and not IsInToolsMode()
+		and not self:IsCheatGame()
+		and XHSBotDecisionAudit ~= nil
+		and type(XHSBotDecisionAudit.BuildBackendPayload) == "function" then
+		local auditBuildOK, auditPayload = pcall(function()
+			return XHSBotDecisionAudit:BuildBackendPayload("complete_game")
+		end)
+		if auditBuildOK and type(auditPayload) == "table" then
+			self:Request("bot-audit", function(data)
+				print("[XHSBots][AUDIT] backend_store=ok id=" .. tostring(data.id or 0))
+			end, function(error)
+				print("[XHSBots][AUDIT] backend_store=failed message="
+					.. tostring(error and error.message or "unknown"))
+			end, "POST", {
+				game_id = api_game_id,
+				match_id = self:GetMatchID(),
+				game_time = backend_payload.game_time,
+				winner = winnerTeam,
+				gamemode = api:GetCustomGamemode(),
+				difficulty = api:GetCustomDifficulty(),
+				mod_version = tostring(GAME_VERSION or ""),
+				map = GetMapName(),
+				bot_count = self:GetXHSBotParticipantCount(),
+				human_count = #self:GetAllPlayerSteamIds(),
+				audit = auditPayload,
+			})
+		else
+			print("[XHSBots][AUDIT] backend_store=skipped reason=payload_build_failed")
+		end
+	end
 
 	-- A private Tools bot run must not alter account XP, win rate, quests, or
 	-- any other persistent human result. Keep the complete marked local

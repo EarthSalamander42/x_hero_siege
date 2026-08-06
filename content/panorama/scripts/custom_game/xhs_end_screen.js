@@ -3,7 +3,8 @@
 var XHSEndScreen = (function () {
 	var WEBSITE_URL = "https://mods.frostrose-studio.com";
 	var DISCORD_URL = "https://discord.frostrose-studio.com/";
-	var SUPPORTER_URL = "https://www.patreon.com/bePatron?u=2533325";
+	var SUPPORTER_URL = "https://mods.frostrose-studio.com/supporter-pass";
+	var supporterPortalRequestPending = false;
 	var PLAYER_COLOR_FALLBACKS = [
 		"#0032c8ff",
 		"#00ffffff",
@@ -443,6 +444,16 @@ var XHSEndScreen = (function () {
 		}
 
 		$.DispatchEvent("ExternalBrowserGoToURL", url);
+	}
+
+	function OpenSupporterPortal() {
+		if (supporterPortalRequestPending) return;
+		supporterPortalRequestPending = true;
+		GameEvents.SendCustomGameEventToServer("supporter_pass_open_payment_portal", {
+			source: "end_screen",
+			locale: $.Language ? $.Language() : "en"
+		});
+		$.Schedule(12, function () { supporterPortalRequestPending = false; });
 	}
 
 	function FinishGame() {
@@ -1314,6 +1325,11 @@ var XHSEndScreen = (function () {
 		var eligible = eligibleValue === undefined ? !reason : BoolValue(eligibleValue);
 		var heroImagesDone = IntXP(FirstDefined(breakdown.hero_images_done, serverFacts.hero_images_done));
 		var farmKills = IntXP(FirstDefined(breakdown.farm_event_kills, serverFacts.farm_event_kills));
+		// New receipts expose the coefficient actually applied by the backend. The
+		// 5% fallback only describes receipts created before difficulty scaling.
+		var farmPercent = Clamp(IntXP(FirstDefined(breakdown.farm_event_percent, 5)), 1, 5);
+		var farmDifficulty = Clamp(IntXP(FirstDefined(breakdown.farm_event_difficulty, farmPercent)), 1, 5);
+		var farmDifficultyName = DIFFICULTY_NAMES[farmDifficulty] || ("Difficulty " + farmDifficulty);
 		var startLevel = Math.floor(beforeXP / xpPerLevel) + 1;
 		var endLevel = Math.floor(finalXP / xpPerLevel) + 1;
 		var ineligibleMessages = {
@@ -1349,7 +1365,7 @@ var XHSEndScreen = (function () {
 					{ label: "Ramero & Baristol", value: "+" + rameroBaristolXP },
 					{ label: "Sogat", value: "+" + sogatXP },
 				] },
-				{ key: "farm", title: "FARM EVENT", amount: farmXP, details: [{ label: FormatNumber(farmKills) + " kills x 5% - rounded down", value: "+" + farmXP }] },
+				{ key: "farm", title: "FARM EVENT", amount: farmXP, details: [{ label: FormatNumber(farmKills) + " kills x " + farmPercent + "% - " + farmDifficultyName + " - rounded down", value: "+" + farmXP }] },
 				{ key: "victory", title: model.victory ? "VICTORY" : "DEFEAT", amount: victoryXP, details: [{ label: model.victory ? "Run completed" : "No victory bonus", value: "+" + victoryXP }] },
 				{ key: "supporter", title: "SUPPORTER BOOST", amount: supporterXP, supporter: true, details: [{ label: supporterPercent + "% of " + FormatNumber(IntXP(FirstDefined(breakdown.subtotal, totalXP - supporterXP))) + " XP", value: "+" + supporterXP }] },
 			],
@@ -1383,22 +1399,47 @@ var XHSEndScreen = (function () {
 	function SetXPRewardEndpoint(prefix, reward, level) {
 		var image = Panel("XHSXP" + prefix + "RewardImage");
 		var name = Panel("XHSXP" + prefix + "RewardName");
-		var endpoint = image ? image.GetParent() : null;
+		var imageFrame = image ? image.GetParent() : null;
+		var endpoint = imageFrame ? imageFrame.GetParent() : null;
+		var rarityClasses = ["common", "uncommon", "rare", "mythical", "legendary", "immortal", "arcana", "ancient"];
+		if (endpoint) {
+			for (var rarityIndex = 0; rarityIndex < rarityClasses.length; rarityIndex++) {
+				endpoint.RemoveClass("RewardRarity-" + rarityClasses[rarityIndex]);
+			}
+		}
 		if (!reward) {
 			if (image) image.style.backgroundImage = "none";
 			if (name) name.text = level > 50 ? "TRACK COMPLETE" : "REWARD UNAVAILABLE";
-			if (endpoint) endpoint.SetHasClass("HasReward", false);
+			if (endpoint) {
+				endpoint.SetHasClass("HasReward", false);
+				endpoint.hittest = false;
+			}
 			return;
 		}
 		var rewardName = reward.name || reward.item_name || reward.reward_id || "Reward";
+		var localizedRewardName = LocalizeMaybeKey(rewardName);
+		var rarity = (reward.rarity || reward.item_rarity || "common").toString().toLowerCase();
+		var rewardType = DisplaySupporterRewardType(reward);
 		if (image) {
 			image.style.backgroundImage = 'url("' + ResolveRewardImageURL(reward.image || reward.image_inventory || reward.icon || reward.icon_path) + '")';
 			image.style.backgroundSize = "contain";
 			image.style.backgroundPosition = "50% 50%";
 			image.style.backgroundRepeat = "no-repeat";
 		}
-		if (name) name.text = "LVL " + level + " - " + LocalizeMaybeKey(rewardName);
-		if (endpoint) endpoint.SetHasClass("HasReward", true);
+		if (name) name.text = "LVL " + level + " - " + localizedRewardName;
+		if (endpoint) {
+			endpoint.SetHasClass("HasReward", true);
+			endpoint.AddClass("RewardRarity-" + rarity);
+			endpoint.hittest = true;
+			endpoint.hittestchildren = true;
+			var tooltip = "LEVEL " + level + "\n" + localizedRewardName + "\n" + rarity.toUpperCase() + " - " + rewardType;
+			endpoint.SetPanelEvent("onmouseover", function () {
+				$.DispatchEvent("UIShowTextTooltip", endpoint, tooltip);
+			});
+			endpoint.SetPanelEvent("onmouseout", function () {
+				$.DispatchEvent("UIHideTextTooltip", endpoint);
+			});
+		}
 	}
 
 	function UpdateXPRewardEndpoints(level) {
@@ -1575,12 +1616,14 @@ var XHSEndScreen = (function () {
 			xpPresentationData.finished = true;
 			var modal = Panel("XHSXPModal");
 			var button = Panel("XHSXPContinueButton");
+			var summaryButton = Panel("XHSEndScreenXPButton");
 			var label = Panel("XHSXPContinueButtonLabel");
 			if (modal) modal.AddClass("IsReady");
 			if (button) {
 				button.enabled = true;
 				button.AddClass("IsReady");
 			}
+			if (summaryButton) summaryButton.enabled = true;
 			if (label) label.text = HasPendingLevelRewards(xpPresentationData)
 				? "CONTINUE TO REWARDS"
 				: "CONTINUE";
@@ -1631,6 +1674,7 @@ var XHSEndScreen = (function () {
 	}
 
 	function ContinueXPPresentation() {
+		if (CloseReopenedXPSummary()) return;
 		if (xpPresentationPhase !== "xp" || !xpPresentationData || !xpPresentationData.finished) {
 			return;
 		}
@@ -1650,6 +1694,31 @@ var XHSEndScreen = (function () {
 		if (rewardQueue.length === 0 && !activeReward) {
 			xpPresentationPhase = "done";
 		}
+	}
+
+	function ReopenXPSummary() {
+		if (!xpPresentationData || !xpPresentationData.finished) return;
+		UpdateXPProgress(xpPresentationData.finalXP, xpPresentationData, xpPresentationGeneration, false);
+		var modal = Panel("XHSXPModal");
+		var button = Panel("XHSXPContinueButton");
+		var label = Panel("XHSXPContinueButtonLabel");
+		if (modal) modal.AddClass("IsReady");
+		if (button) {
+			button.enabled = true;
+			button.AddClass("IsReady");
+		}
+		if (label) label.text = "CLOSE SUMMARY";
+		xpPresentationPhase = "review";
+		SetXPOverlayVisible(true);
+		Game.EmitSound("ui_generic_button_click");
+	}
+
+	function CloseReopenedXPSummary() {
+		if (xpPresentationPhase !== "review") return false;
+		SetXPOverlayVisible(false);
+		xpPresentationPhase = "done";
+		Game.EmitSound("ui_generic_button_click");
+		return true;
 	}
 
 	function StartXPPresentation(data, players) {
@@ -2292,7 +2361,7 @@ var XHSEndScreen = (function () {
 		var support = Panel("XHSEndScreenSupportButton");
 		if (support) {
 			support.SetPanelEvent("onactivate", function () {
-				OpenExternalURL(GetSupporterURL());
+				OpenSupporterPortal();
 			});
 		}
 
@@ -2326,6 +2395,11 @@ var XHSEndScreen = (function () {
 				RenderHighlightPanel(BuildPlayerModels(lastEndGameData));
 				Game.EmitSound("ui_generic_button_click");
 			});
+		}
+
+		var xpSummary = Panel("XHSEndScreenXPButton");
+		if (xpSummary) {
+			xpSummary.SetPanelEvent("onactivate", ReopenXPSummary);
 		}
 
 		var xpContinue = Panel("XHSXPContinueButton");
@@ -2400,6 +2474,14 @@ var XHSEndScreen = (function () {
 		HideVanillaHud();
 		BindButtons();
 		SubscribeEndGameData();
+		GameEvents.Subscribe("supporter_pass_payment_portal_ready", function (payload) {
+			supporterPortalRequestPending = false;
+			if (payload && payload.url) OpenExternalURL(payload.url);
+		});
+		GameEvents.Subscribe("supporter_pass_payment_portal_failed", function (payload) {
+			supporterPortalRequestPending = false;
+			$.Msg("[XHSEndScreen] Supporter portal unavailable: " + (payload && payload.message || "unknown error"));
+		});
 		if (typeof XHSNameDisplay !== "undefined" && XHSNameDisplay.Subscribe) {
 			XHSNameDisplay.Subscribe(RefreshIdentitySurfaces);
 		}

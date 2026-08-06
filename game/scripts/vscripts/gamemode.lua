@@ -38,6 +38,7 @@ require('components/api/init')
 require('components/item_builds/init')
 require('components/performance_counters/init')
 require('components/performance_telemetry/init')
+require('components/observability/init')
 require('components/custom_polls/init')
 if IsInToolsMode() then
 	require('libraries/adv_log')
@@ -245,7 +246,9 @@ function GameMode:InitGameMode()
 	GameRules:SetCustomGameSetupTimeout(-1.0)        -- keep setup open until custom logic starts the game
 	GameRules:SetPreGameTime(PREGAMETIME)
 
-	-- mode:SetCustomAttributeDerivedStatValue(DOTA_ATTRIBUTE_AGILITY_ARMOR, 0) -- default: 0.016 armor per agility point
+	-- Vanilla grants 1 armor per 6 agility. XHS halves only this derived
+	-- contribution while preserving native armor and explicit armor bonuses.
+	mode:SetCustomAttributeDerivedStatValue(DOTA_ATTRIBUTE_AGILITY_ARMOR, 1 / 12)
 
 	--[[
 	--Disabling Derived Stats
@@ -436,6 +439,7 @@ function GameMode:InitGameMode()
 	if XHSPerformanceTelemetry ~= nil then
 		XHSPerformanceTelemetry:Init()
 	end
+	if XHSObservability ~= nil then XHSObservability:Init() end
 
 	if XHSPublishAllTomePurchaseStatuses ~= nil then
 		XHSPublishAllTomePurchaseStatuses()
@@ -768,8 +772,12 @@ function GameMode:FilterExecuteOrder(filterTable)
 	local numUnits = 0
 	local numBuildings = 0
 	if units then
+		-- Dedicated event tables expose string keys while Tools mode can retain
+		-- the numeric zero key. Resolve both so order-filter features receive the
+		-- actual ordered hero in either environment.
 		-- Skip Prevents order loops
-		unit = EntIndexToHScript(units["0"])
+		local primaryUnitIndex = units["0"] or units[0]
+		unit = primaryUnitIndex ~= nil and EntIndexToHScript(primaryUnitIndex) or nil
 		if unit then
 			if unit.skip then
 				unit.skip = false
@@ -778,10 +786,11 @@ function GameMode:FilterExecuteOrder(filterTable)
 		end
 
 		for n, unit_index in pairs(units) do
-			local unit = EntIndexToHScript(unit_index)
-			if unit and IsValidEntity(unit) then
-				unit.current_order = order_type -- Track the last executed order
-				unit.orderTable = filterTable -- Keep the whole order table, to resume it later if needed
+			local orderedUnit = EntIndexToHScript(unit_index)
+			if orderedUnit and IsValidEntity(orderedUnit) then
+				unit = unit or orderedUnit
+				orderedUnit.current_order = order_type -- Track the last executed order
+				orderedUnit.orderTable = filterTable -- Keep the whole order table, to resume it later if needed
 				--				local bBuilding = IsCustomBuilding(unit) and not IsUprooted(unit)
 				--				if bBuilding then
 				--					numBuildings = numBuildings + 1
@@ -2113,8 +2122,8 @@ function GameMode:OnSettingVote(event_source_index, keys)
 
 	local category = payload.category
 	local vote = payload.vote
-	local pid = nil
-	if api ~= nil and api.GetEventPlayerID ~= nil then
+	local pid = XHSResolveEventPlayerID ~= nil and XHSResolveEventPlayerID(event_source_index) or nil
+	if pid == nil and api ~= nil and api.GetEventPlayerID ~= nil then
 		local ok, sender_player_id = pcall(function()
 			return api:GetEventPlayerID(event_source_index, nil)
 		end)
@@ -2614,8 +2623,8 @@ function GameMode:OnCustomSetupReady(event_source_index, keys)
 		return
 	end
 
-	local player_id = nil
-	if api ~= nil and api.GetEventPlayerID ~= nil then
+	local player_id = XHSResolveEventPlayerID ~= nil and XHSResolveEventPlayerID(event_source_index) or nil
+	if player_id == nil and api ~= nil and api.GetEventPlayerID ~= nil then
 		local ok, sender_player_id = pcall(function()
 			return api:GetEventPlayerID(event_source_index, nil)
 		end)

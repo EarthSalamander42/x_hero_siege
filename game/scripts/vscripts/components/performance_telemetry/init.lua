@@ -172,6 +172,12 @@ function XHSPerformanceTelemetry:OnClientSample(sourceIndex, event)
 		fps_average = math.max(0, math.min(MAX_CLIENT_FPS, fpsAverage)),
 		fps_p5 = math.max(0, math.min(MAX_CLIENT_FPS, fpsP5)),
 		frame_ms_p95 = math.max(0, math.min(1000, frameP95)),
+		frame_ms_max = math.max(0, math.min(5000, tonumber(event.frame_ms_max) or 0)),
+		freezes_100ms = math.max(0, math.min(10000, tonumber(event.freezes_100ms) or 0)),
+		freezes_250ms = math.max(0, math.min(10000, tonumber(event.freezes_250ms) or 0)),
+		freezes_500ms = math.max(0, math.min(10000, tonumber(event.freezes_500ms) or 0)),
+		seconds_below_60fps = math.max(0, math.min(60, tonumber(event.seconds_below_60fps) or 0)),
+		seconds_below_30fps = math.max(0, math.min(60, tonumber(event.seconds_below_30fps) or 0)),
 		updated_at = Now(),
 	}
 end
@@ -190,6 +196,14 @@ function XHSPerformanceTelemetry:BuildPlayers()
 				fps_average = Round(report.fps_average, 1),
 				fps_p5 = Round(report.fps_p5, 1),
 				frame_ms_p95 = Round(report.frame_ms_p95, 1),
+				frame_ms_max = Round(report.frame_ms_max, 1),
+				freezes_100ms = report.freezes_100ms,
+				freezes_250ms = report.freezes_250ms,
+				freezes_500ms = report.freezes_500ms,
+				seconds_below_60fps = report.seconds_below_60fps,
+				seconds_below_30fps = report.seconds_below_30fps,
+				report_age_seconds = Round(now - report.updated_at, 1),
+				ping_ms = PlayerResource.GetPing ~= nil and math.max(0, tonumber(PlayerResource:GetPing(playerID)) or 0) or -1,
 			})
 		end
 	end
@@ -734,6 +748,10 @@ end
 function XHSPerformanceTelemetry:BuildSample()
 	local startedAt = ProfileNow()
 	local pacing = self:BuildServerPacingSnapshot(true)
+	local particleSnapshot = XHSParticleTelemetry ~= nil
+		and XHSParticleTelemetry.GetSnapshot ~= nil
+		and XHSParticleTelemetry:GetSnapshot() or {}
+	local previousParticles = self.previous_particle_snapshot or {}
 	local sample = {
 		sequence = self.next_sequence,
 		game_time = Round(GameRules:GetDOTATime(false, false), 1),
@@ -766,8 +784,17 @@ function XHSPerformanceTelemetry:BuildSample()
 		wave = CustomTimers ~= nil and tonumber(CustomTimers.special_wave or CustomTimers.creep_level) or 0,
 		difficulty = GameRules:GetCustomGameDifficulty() or 0,
 		players = self:BuildPlayers(),
+		pfx_alive = tonumber(particleSnapshot.alive) or 0,
+		pfx_destroyed_unreleased = tonumber(particleSnapshot.destroyed_unreleased) or 0,
+		pfx_oldest_seconds = tonumber(particleSnapshot.oldest_seconds) or 0,
+		pfx_created_per_second = math.max(0, ((tonumber(particleSnapshot.created_total) or 0) - (tonumber(previousParticles.created_total) or 0)) / SAMPLE_INTERVAL),
+		pfx_destroyed_per_second = math.max(0, ((tonumber(particleSnapshot.destroyed_total) or 0) - (tonumber(previousParticles.destroyed_total) or 0)) / SAMPLE_INTERVAL),
+		pfx_released_per_second = math.max(0, ((tonumber(particleSnapshot.released_total) or 0) - (tonumber(previousParticles.released_total) or 0)) / SAMPLE_INTERVAL),
+		pfx_dropped_records = tonumber(particleSnapshot.dropped_records) or 0,
+		pfx_top = particleSnapshot.top or {},
 		activity = {},
 	}
+	self.previous_particle_snapshot = particleSnapshot
 
 	local units = XHSPerformanceCounters:FindUnitsInRadiusUntracked(
 		DOTA_TEAM_NEUTRALS,
@@ -1104,6 +1131,7 @@ function XHSPerformanceTelemetry:Init()
 	self.local_report_dropped_samples = 0
 	self.local_report_auto_printed = false
 	self.local_bot_previous = nil
+	self.previous_particle_snapshot = XHSParticleTelemetry ~= nil and XHSParticleTelemetry:GetSnapshot() or nil
 	self.summary = {
 		schema_version = SCHEMA_VERSION,
 		sample_count = 0,

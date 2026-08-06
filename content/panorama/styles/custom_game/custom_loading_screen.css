@@ -5961,8 +5961,7 @@
 	text-shadow: 0px 1px 2px 2 #000000;
 }
 
-.xhs-bot-setup-field-label,
-.xhs-bot-setup-composition-label {
+.xhs-bot-setup-field-label {
 	width: 92px;
 	vertical-align: center;
 	color: #8fa9b7;
@@ -5972,24 +5971,11 @@
 	text-shadow: 0px 1px 2px 2 #000000;
 }
 
-.xhs-bot-setup-composition-label {
-	width: 100%;
-	height: 15px;
-	margin-top: 1px;
-}
-
 .xhs-bot-setup-inline-controls {
 	width: fill-parent-flow(1.0);
 	height: 29px;
 	horizontal-align: right;
 	flow-children: right;
-}
-
-.xhs-bot-setup-composition-controls {
-	width: 100%;
-	height: 52px;
-	margin-bottom: 2px;
-	flow-children: right-wrap;
 }
 
 .xhs-bot-setup-button {
@@ -6043,10 +6029,6 @@
 
 .xhs-bot-setup-button.Choice {
 	width: fill-parent-flow(1.0);
-}
-
-.xhs-bot-setup-button.CompositionChoice {
-	width: 24%;
 }
 
 .xhs-bot-setup-count-value {

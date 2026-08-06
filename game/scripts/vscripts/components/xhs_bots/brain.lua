@@ -1177,9 +1177,25 @@ function XHSBotBrain:EvaluateSingleTargetCreepSpell(
 		self:GetAbilityDamageAgainst(hero, ability, target, rule)
 	local attackDamage = self:GetAttackDamageAgainst(hero, target)
 	if rawSpellDamage <= 0 or spellDamage <= 0 or attackDamage <= 0 then
+		-- Many XHS abilities deliver damage through custom Lua and expose no
+		-- standard damage value. A certified control/channel spell must not
+		-- become unusable solely because that estimate is unavailable.
+		local health = math.max(1, tonumber(target:GetHealth()) or 1)
+		local modelFallback = rule ~= nil
+			and (rule.control == true
+				or rule.allow_creep_cast_without_damage_model == true)
+			and attackDamage > 0
+			and health > attackDamage * 1.10
 		return {
-			worthwhile = false,
-			reason = "damage model unavailable",
+			worthwhile = modelFallback,
+			fallback_cast = modelFallback,
+			reason = modelFallback and "certified spell on durable creep"
+				or "damage model unavailable",
+			spell_damage = 0,
+			attack_damage = attackDamage,
+			cast_lock = 0,
+			time_saved = 0,
+			efficiency = modelFallback and 1.15 or 0,
 		}
 	end
 
@@ -1897,6 +1913,78 @@ function XHSBotBrain:CanConsiderAbility(record, abilityName, difficulty)
 	return true
 end
 
+function XHSBotBrain:IsEtherealSpellTarget(unit)
+	if not self:IsCombatTarget(unit) then return false end
+	if unit.HasModifier ~= nil then
+		local modifiers = {
+			"modifier_astral_core_ethereal",
+			"modifier_item_ethereal_blade_ethereal",
+			"modifier_ghost_state",
+			"modifier_pugna_decrepify",
+		}
+		for _, modifierName in ipairs(modifiers) do
+			local ok, hasModifier = pcall(function()
+				return unit:HasModifier(modifierName)
+			end)
+			if ok and hasModifier then return true end
+		end
+	end
+	if unit.IsAttackImmune ~= nil then
+		local ok, attackImmune = pcall(function() return unit:IsAttackImmune() end)
+		if ok and attackImmune then return true end
+	end
+	return false
+end
+
+function XHSBotBrain:CanAbilityAffectEthereal(ability)
+	if not IsValidEntityHandle(ability) or ability.GetAbilityDamageType == nil then
+		return true
+	end
+	local ok, damageType = pcall(function()
+		return ability:GetAbilityDamageType()
+	end)
+	if not ok then return true end
+	return DAMAGE_TYPE_PHYSICAL == nil or damageType ~= DAMAGE_TYPE_PHYSICAL
+end
+
+function XHSBotBrain:FindEtherealSpellTarget(
+	hero,
+	ability,
+	enemies,
+	maximumRange,
+	useTargetFilter
+)
+	if not self:CanAbilityAffectEthereal(ability) then return nil end
+	local heroOrigin = hero:GetAbsOrigin()
+	local best = nil
+	local bestScore = -math.huge
+	for _, enemy in pairs(enemies or {}) do
+		if self:IsEtherealSpellTarget(enemy) then
+			local distance = Distance2D(heroOrigin, enemy:GetAbsOrigin())
+			if maximumRange == nil or distance <= maximumRange then
+				local accepted = true
+				if useTargetFilter == true
+					and ability.CastFilterResultTarget ~= nil then
+					local ok, result = pcall(function()
+						return ability:CastFilterResultTarget(enemy)
+					end)
+					accepted = ok and (result == nil or result == (UF_SUCCESS or 0))
+				end
+				if accepted then
+					local score = 10000 - distance
+						+ (XHSBotConfig:IsBossTarget(enemy) and 2500 or 0)
+						+ math.min(1500, tonumber(enemy:GetHealth()) or 0) * 0.10
+					if score > bestScore then
+						best = enemy
+						bestScore = score
+					end
+				end
+			end
+		end
+	end
+	return best
+end
+
 function XHSBotBrain:PassesCastFilter(ability, action)
 	if ability == nil or type(action) ~= "table" then
 		return false, "invalid cast filter input"
@@ -1966,8 +2054,35 @@ function XHSBotBrain:BuildAbilityAction(hero, ability, rule, target, enemies, di
 		self:RecordAbilityRejection(record, name, "cooldown or mana")
 		return nil
 	end
-	local creepSpellEfficiency = nil
+	local etherealPriority = false
 	if rule.mode == "enemy_unit"
+		or rule.mode == "point_aoe"
+		or rule.mode == "directional_point" then
+		local range = rule.mode == "directional_point"
+			and tonumber(rule.travel_range)
+			or self:GetAbilityRange(hero, ability, target)
+		local etherealTarget = self:FindEtherealSpellTarget(
+			hero,
+			ability,
+			enemies,
+			range,
+			rule.mode == "enemy_unit"
+		)
+		if etherealTarget ~= nil then
+			target = etherealTarget
+			etherealPriority = true
+		end
+	elseif rule.mode == "no_target_enemy" or rule.mode == "no_target_mixed" then
+		etherealPriority = self:FindEtherealSpellTarget(
+			hero,
+			ability,
+			enemies,
+			tonumber(rule.radius) or 550
+		) ~= nil
+	end
+	local creepSpellEfficiency = nil
+	if not etherealPriority
+		and rule.mode == "enemy_unit"
 		and self:IsEfficiencyCreepTarget(target) then
 		creepSpellEfficiency = self:EvaluateSingleTargetCreepSpell(
 			hero,
@@ -1997,7 +2112,24 @@ function XHSBotBrain:BuildAbilityAction(hero, ability, rule, target, enemies, di
 	local emergencySelfHeal = (rule.mode == "ally_heal" or rule.healing == true)
 		and (rule.include_self ~= false or rule.heals_caster == true)
 		and HealthRatio(hero) <= (tonumber(rule.self_save_threshold) or 0.40)
+	local creepPackOpportunity = false
+	if rule.mode == "no_target_enemy" then
+		creepPackOpportunity = self:CountEnemiesAround(
+			enemies,
+			hero:GetAbsOrigin(),
+			tonumber(rule.radius) or 450
+		) >= (tonumber(rule.minimum_targets) or 1)
+	elseif (rule.mode == "point_aoe" or rule.mode == "directional_point")
+		and self:IsCombatTarget(target) then
+		creepPackOpportunity = self:CountEnemiesAround(
+			enemies,
+			target:GetAbsOrigin(),
+			tonumber(rule.radius) or 325
+		) >= (tonumber(rule.minimum_targets) or 1)
+	end
 	if not emergencySelfHeal
+		and not etherealPriority
+		and not creepPackOpportunity
 		and not (
 			creepSpellEfficiency ~= nil
 			and creepSpellEfficiency.worthwhile == true
@@ -2012,6 +2144,10 @@ function XHSBotBrain:BuildAbilityAction(hero, ability, rule, target, enemies, di
 		reason = mode,
 		control = rule.control == true,
 	}
+	if etherealPriority then
+		action.score = action.score + 55
+		action.reason = "spell priority: ethereal target"
+	end
 
 	if mode == "enemy_unit" then
 		if not self:IsCombatTarget(target) then
@@ -2024,7 +2160,11 @@ function XHSBotBrain:BuildAbilityAction(hero, ability, rule, target, enemies, di
 		end
 		action.target = target
 		if XHSBotConfig:IsBossTarget(target) and rule.prefer_boss then action.score = action.score + 12 end
-		if creepSpellEfficiency ~= nil then
+		if creepSpellEfficiency ~= nil
+			and creepSpellEfficiency.fallback_cast == true then
+			action.score = action.score + 18
+			action.reason = creepSpellEfficiency.reason
+		elseif creepSpellEfficiency ~= nil then
 			action.score = action.score + math.min(
 				28,
 				math.max(0, creepSpellEfficiency.efficiency - 1) * 9
@@ -2113,7 +2253,8 @@ function XHSBotBrain:BuildAbilityAction(hero, ability, rule, target, enemies, di
 	elseif mode == "no_target_enemy" then
 		local nearby = self:CountEnemiesAround(enemies, hero:GetAbsOrigin(), rule.radius or 450)
 		if nearby < (rule.minimum_targets or 1)
-			and not XHSBotConfig:IsBossTarget(target) then return nil end
+			and not XHSBotConfig:IsBossTarget(target)
+			and not etherealPriority then return nil end
 		action.score = action.score + math.min(15, nearby * 3)
 		action.reason = tostring(nearby) .. " nearby enemies"
 	elseif mode == "no_target_mixed" then
@@ -2165,7 +2306,8 @@ function XHSBotBrain:BuildAbilityAction(hero, ability, rule, target, enemies, di
 		if Distance2D(hero:GetAbsOrigin(), target:GetAbsOrigin()) > range then return nil end
 		local nearby = self:CountEnemiesAround(enemies, target:GetAbsOrigin(), rule.radius or 325)
 		if nearby < (rule.minimum_targets or 1)
-			and not XHSBotConfig:IsBossTarget(target) then return nil end
+			and not XHSBotConfig:IsBossTarget(target)
+			and not etherealPriority then return nil end
 		action.position = target:GetAbsOrigin()
 		action.target = target
 		action.score = action.score + math.min(18, nearby * 4)
@@ -2180,7 +2322,8 @@ function XHSBotBrain:BuildAbilityAction(hero, ability, rule, target, enemies, di
 		end
 		local nearby = self:CountEnemiesAround(enemies, targetOrigin, rule.radius or 425)
 		if nearby < (rule.minimum_targets or 1)
-			and not XHSBotConfig:IsBossTarget(target) then return nil end
+			and not XHSBotConfig:IsBossTarget(target)
+			and not etherealPriority then return nil end
 		local direction = targetOrigin - heroOrigin
 		direction.z = 0
 		if direction:Length2D() <= 1 and hero.GetForwardVector ~= nil then

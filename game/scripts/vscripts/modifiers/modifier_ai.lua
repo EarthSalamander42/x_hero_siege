@@ -341,6 +341,31 @@ function modifier_ai:MaintainMovement(now)
 	if not IsLivingTarget(aggroTarget) then aggroTarget = nil end
 	if not IsLivingTarget(attackTarget) then attackTarget = nil end
 
+	local currentCombatTarget = attackTarget or aggroTarget
+	if currentCombatTarget ~= nil and not IsBreakableTarget(currentCombatTarget) then
+		self.last_combat_target = currentCombatTarget
+	end
+
+	-- Disarm can clear the engine attack target even though the creep is still
+	-- engaged. Preserve and follow that opponent instead of interpreting the
+	-- empty attack slot as permission to resume the Ancient march.
+	if self.parent:IsDisarmed() then
+		local heldTarget = currentCombatTarget
+		if not IsLivingTarget(heldTarget) then heldTarget = self.last_combat_target end
+		if IsLivingTarget(heldTarget) and not IsBreakableTarget(heldTarget) then
+			self.parent:SetForceAttackTarget(nil)
+			local followDistance = math.max(150, self.parent:Script_GetAttackRange() * 0.8)
+			if (self.parent:GetAbsOrigin() - heldTarget:GetAbsOrigin()):Length2D() > followDistance then
+				self:IssueMovementOrder({
+					UnitIndex = self.parent:entindex(),
+					OrderType = DOTA_UNIT_ORDER_MOVE_TO_TARGET,
+					TargetIndex = heldTarget:entindex(),
+				}, 0.75)
+			end
+			return true
+		end
+	end
+
 	if XHSPerformanceCounters ~= nil then
 		local target = attackTarget or aggroTarget
 		local targetIndex = target ~= nil and target:entindex() or -1

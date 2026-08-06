@@ -741,6 +741,36 @@ function XHSRemoveClosedPhaseOneLaneStructures(lane_number)
 	return removed
 end
 
+-- Resolve a CustomGameEvent sender without trusting payload PlayerID. Some
+-- dedicated-server builds expose GetPlayerIDFromEventSourceIndex but return no
+-- player for entity-backed event sources, so the authoritative entity fallback
+-- must still run when that API produces no usable result.
+function XHSResolveEventPlayerID(eventSourceIndex)
+	local sourceIndex = tonumber(eventSourceIndex)
+	if sourceIndex == nil or sourceIndex < 0 then return nil end
+
+	local playerID = nil
+	if CustomGameEventManager ~= nil
+		and CustomGameEventManager.GetPlayerIDFromEventSourceIndex ~= nil then
+		local ok, resolved = pcall(function()
+			return CustomGameEventManager:GetPlayerIDFromEventSourceIndex(sourceIndex)
+		end)
+		if ok then playerID = tonumber(resolved) end
+	end
+
+	if playerID == nil or playerID < 0 then
+		local ok, resolved = pcall(function()
+			local sender = EntIndexToHScript(sourceIndex)
+			return sender ~= nil and sender.GetPlayerID ~= nil and sender:GetPlayerID() or nil
+		end)
+		if ok then playerID = tonumber(resolved) end
+	end
+
+	if playerID == nil or playerID < 0 or PlayerResource == nil then return nil end
+	local ok, valid = pcall(function() return PlayerResource:IsValidPlayerID(playerID) end)
+	return ok and valid and playerID or nil
+end
+
 function OpenLane(lane_number)
 	if IsInToolsMode() then
 		OpenCreepLane(lane_number)

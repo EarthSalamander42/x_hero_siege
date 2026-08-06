@@ -29,7 +29,6 @@ var xhs_bot_setup_roster = { count: 0, players: {} };
 var xhs_bot_setup_draft = {
 	bot_count: 0,
 	ai_difficulty: "normal",
-	composition: "balanced",
 	spectator_mode: false,
 	hero_selections: {},
 };
@@ -210,12 +209,8 @@ var vote_fallbacks = {
 	loading_screen_bot_setup_count: "Allies",
 	loading_screen_bot_setup_performance_warning: "Performance warning: {total} total players (humans + AI). Above 4 players, bot resource usage may make the game less smooth.",
 	loading_screen_bot_setup_difficulty: "Difficulty",
-	loading_screen_bot_setup_composition: "Composition",
 	loading_screen_bot_setup_easy: "Easy",
 	loading_screen_bot_setup_normal: "Normal",
-	loading_screen_bot_setup_balanced: "Balanced",
-	loading_screen_bot_setup_damage: "Damage",
-	loading_screen_bot_setup_support: "Support",
 	loading_screen_bot_setup_random: "Random",
 	loading_screen_bot_setup_observer: "Observer",
 	loading_screen_bot_setup_spectator_off: "Play",
@@ -228,7 +223,7 @@ var vote_fallbacks = {
 	loading_screen_bot_setup_controller_only: "Only the first human player can edit AI allies.",
 	loading_screen_bot_setup_locked: "AI setup is locked for this launch.",
 	loading_screen_bot_setup_pending: "Applying configuration...",
-	loading_screen_bot_setup_summary: "{count} allied bot(s) / {difficulty} / {composition}",
+	loading_screen_bot_setup_summary: "{count} allied bot(s) / {difficulty}",
 	loading_screen_bot_setup_server_status: "Server: {status}",
 	loading_screen_ai_allies_section: "AI Allies",
 	loading_screen_ai_ally_status: "AI ALLY / {difficulty}",
@@ -388,7 +383,6 @@ function XHSBotSetupSnapshot() {
 			max_play_bots: Math.floor(ToNumber(config.max_play_bots, 0)),
 			max_spectator_bots: Math.floor(ToNumber(config.max_spectator_bots, 0)),
 			ai_difficulty: String(config.ai_difficulty || ""),
-			composition: String(config.composition || ""),
 			spectator_mode: IsTruthy(config.spectator_mode),
 			status: String(config.status || ""),
 			error: String(config.error || ""),
@@ -396,7 +390,6 @@ function XHSBotSetupSnapshot() {
 		draft: {
 			bot_count: Math.floor(ToNumber(xhs_bot_setup_draft.bot_count, 0)),
 			ai_difficulty: String(xhs_bot_setup_draft.ai_difficulty || ""),
-			composition: String(xhs_bot_setup_draft.composition || ""),
 			spectator_mode: !!xhs_bot_setup_draft.spectator_mode,
 		},
 	};
@@ -675,7 +668,6 @@ function XHSBotSetupSyncDraftFromConfig() {
 	var previous_draft = {
 		bot_count: xhs_bot_setup_draft.bot_count,
 		ai_difficulty: xhs_bot_setup_draft.ai_difficulty,
-		composition: xhs_bot_setup_draft.composition,
 		spectator_mode: xhs_bot_setup_draft.spectator_mode,
 	};
 	xhs_bot_setup_draft.spectator_mode = IsTruthy(xhs_bot_setup_config.spectator_mode);
@@ -687,11 +679,6 @@ function XHSBotSetupSyncDraftFromConfig() {
 		? "easy"
 		: "normal";
 
-	var composition = String(xhs_bot_setup_config.composition || "balanced").toLowerCase();
-	if (["balanced", "damage", "support", "random"].indexOf(composition) < 0) {
-		composition = "balanced";
-	}
-	xhs_bot_setup_draft.composition = composition;
 	xhs_bot_setup_draft.hero_selections = XHSBotSetupCopyHeroSelections(
 		xhs_bot_setup_config.hero_selections,
 		xhs_bot_setup_draft.bot_count
@@ -850,44 +837,6 @@ function XHSBotSetupSelectDifficulty(difficulty) {
 	});
 }
 
-function XHSBotSetupSelectComposition(composition) {
-	var edit_block_reason = XHSBotSetupGetEditBlockReason();
-	XHSBotSetupLog("composition_select_requested", {
-		requested: composition,
-		previous: xhs_bot_setup_draft.composition,
-		edit_block_reason: edit_block_reason || "none",
-	});
-	if (edit_block_reason) {
-		XHSBotSetupLog("composition_select_rejected", {
-			requested: composition,
-			reason: edit_block_reason,
-		});
-		return;
-	}
-	if (["balanced", "damage", "support", "random"].indexOf(composition) < 0) {
-		XHSBotSetupLog("composition_select_rejected", {
-			requested: composition,
-			reason: "invalid_composition",
-		});
-		return;
-	}
-	if (xhs_bot_setup_draft.composition !== composition) {
-		var previous_composition = xhs_bot_setup_draft.composition;
-		xhs_bot_setup_draft.composition = composition;
-		xhs_bot_setup_dirty = true;
-		XHSBotSetupLog("composition_select_applied", {
-			previous: previous_composition,
-			next: composition,
-		});
-		XHSBotSetupRender("composition_select");
-		return;
-	}
-	XHSBotSetupLog("composition_select_noop", {
-		composition: composition,
-		reason: "already_selected",
-	});
-}
-
 function XHSBotSetupSelectSpectatorMode(enabled) {
 	var edit_block_reason = XHSBotSetupGetEditBlockReason();
 	if (edit_block_reason) {
@@ -939,7 +888,6 @@ function XHSBotSetupConfirm() {
 	var request_payload = {
 		bot_count: requested_count,
 		ai_difficulty: xhs_bot_setup_draft.ai_difficulty,
-		composition: xhs_bot_setup_draft.composition,
 		spectator_mode: xhs_bot_setup_draft.spectator_mode ? 1 : 0,
 		hero_selections: XHSBotSetupCopyHeroSelections(xhs_bot_setup_draft.hero_selections, requested_count),
 	};
@@ -1047,23 +995,6 @@ function XHSBotSetupBuildCard() {
 		"Choice",
 		function () { XHSBotSetupSelectDifficulty("normal"); }
 	);
-
-	XHSBotSetupMakeLabel(card, "xhs-bot-setup-composition-label", L("loading_screen_bot_setup_composition"));
-	var composition_controls = $.CreatePanel("Panel", card, "");
-	composition_controls.AddClass("xhs-bot-setup-composition-controls");
-	xhs_bot_setup_ui.composition = {};
-	var compositions = ["balanced", "damage", "support", "random"];
-	for (var i = 0; i < compositions.length; i++) {
-		(function (composition) {
-			xhs_bot_setup_ui.composition[composition] = XHSBotSetupMakeButton(
-				composition_controls,
-				"XHSBotSetupComposition" + composition.charAt(0).toUpperCase() + composition.slice(1),
-				L("loading_screen_bot_setup_" + composition),
-				"CompositionChoice",
-				function () { XHSBotSetupSelectComposition(composition); }
-			);
-		})(compositions[i]);
-	}
 
 	var spectator_row = $.CreatePanel("Panel", card, "");
 	spectator_row.AddClass("xhs-bot-setup-field-row");
@@ -1212,11 +1143,6 @@ function XHSBotSetupRender(reason) {
 		difficulty_button.SetHasClass("Selected", difficulty === xhs_bot_setup_draft.ai_difficulty);
 		XHSBotSetupSetButtonEnabled(difficulty_button, can_edit);
 	}
-	for (var composition in xhs_bot_setup_ui.composition) {
-		var composition_button = xhs_bot_setup_ui.composition[composition];
-		composition_button.SetHasClass("Selected", composition === xhs_bot_setup_draft.composition);
-		XHSBotSetupSetButtonEnabled(composition_button, can_edit);
-	}
 	xhs_bot_setup_ui.spectator.off.SetHasClass("Selected", !xhs_bot_setup_draft.spectator_mode);
 	xhs_bot_setup_ui.spectator.on.SetHasClass("Selected", !!xhs_bot_setup_draft.spectator_mode);
 	XHSBotSetupSetButtonEnabled(xhs_bot_setup_ui.spectator.off, can_edit);
@@ -1226,11 +1152,9 @@ function XHSBotSetupRender(reason) {
 		: "collapse";
 
 	var difficulty_text = L("loading_screen_bot_setup_" + xhs_bot_setup_draft.ai_difficulty);
-	var composition_text = L("loading_screen_bot_setup_" + xhs_bot_setup_draft.composition);
 	xhs_bot_setup_ui.summary.text = LocalizeTemplate("loading_screen_bot_setup_summary", {
 		count: count.toString(),
 		difficulty: difficulty_text,
-		composition: composition_text,
 	});
 
 	if (xhs_bot_setup_pending) {
@@ -1258,7 +1182,6 @@ function XHSBotSetupRender(reason) {
 		count_minus_enabled: can_edit && count > 0,
 		count_plus_enabled: can_edit && count < maximum,
 		difficulty_enabled: can_edit,
-		composition_enabled: can_edit,
 		spectator_enabled: can_edit,
 		confirm_enabled: can_edit && xhs_bot_setup_dirty,
 		server_status: server_status,

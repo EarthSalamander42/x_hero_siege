@@ -4,7 +4,9 @@
 	var hoveredTarget = null;
 	var HOVER_INTERVAL = 0.05;
 	var TOOLTIP_LAYER_INTERVAL = 0.25;
-	var TOOLTIP_LAYER_Z_INDEX = "2147483647";
+	var TOOLTIP_LAYER_Z_INDEX = "14000";
+	var CINEMATIC_LAYER_Z_INDEX = "15000";
+	var HUD_LAYER_INTERVAL = 0.25;
 	var TOOLTIP_PANEL_IDS = [
 		"Tooltips",
 		"TooltipManager",
@@ -18,6 +20,21 @@
 		"HUDTeamItemTooltip",
 		"AbilityTooltip",
 		"ItemTooltip"
+	];
+	// Shared HUD layer contract. Values intentionally leave room for local
+	// children; ordering direct Hud children is what makes these priorities work
+	// across vanilla and custom Panorama branches.
+	var HUD_LAYER_RULES = [
+		{ key: "base", z: 100, ids: ["HUDElements"] },
+		{ key: "xhs_hud", z: 200, ids: ["DungeonHUDContents", "XHSTopHudRoot"] },
+		{ key: "leaderboards", z: 300, ids: ["XHSFarmLeaderboard"] },
+		{ key: "scoreboard", z: 400, ids: ["XHSScoreboard", "TeamsContainer"] },
+		{ key: "health", z: 600, ids: ["DiretidePanel", "CastleHP", "BossHP1"], classes: ["Diretide"] },
+		{ key: "windows", z: 800, ids: ["XHSSupporterPassWindow", "GameInfoPanel"] },
+		{ key: "modals", z: 1000, ids: ["EventPanel"] },
+		{ key: "notifications", z: 1100, ids: ["XHSRewardFlyoutLayer", "XHSWaveCountdown", "XHSPauseRoot"], classes: ["XHSNotificationsRoot"] },
+		{ key: "devtools", z: 1200, ids: ["XHSDevToolsPanel", "XHSUIRecoveryClose"], classes: ["SupporterContentStudioRoot", "XHSUIRecoveryRoot"] },
+		{ key: "cinematic", z: 15000, ids: ["XHSCinematicTopBar"], classes: ["XHSCinematicRoot"] }
 	];
 
 	var targets = [
@@ -58,6 +75,83 @@
 	function findPanel(id) {
 		var root = getHudRoot();
 		return root && root.FindChildTraverse ? root.FindChildTraverse(id) : null;
+	}
+
+	function directHudChild(panel, hud) {
+		var current = panel;
+		var parent = current && current.GetParent ? current.GetParent() : null;
+		while (current && parent && parent !== hud) {
+			current = parent;
+			parent = current.GetParent ? current.GetParent() : null;
+		}
+		return parent === hud ? current : null;
+	}
+
+	function childMatchesRule(child, rule) {
+		if (!isValid(child)) return false;
+		// HUDElements contains most vanilla panels. Never classify the whole
+		// vanilla tree from a nested signature such as TeamsContainer or shop.
+		if (child.id === "HUDElements") return rule.key === "base";
+		for (var i = 0; i < rule.ids.length; i++) {
+			if (child.id === rule.ids[i] || (child.FindChildTraverse && child.FindChildTraverse(rule.ids[i]))) {
+				return true;
+			}
+		}
+		for (var classIndex = 0; rule.classes && classIndex < rule.classes.length; classIndex++) {
+			if (child.BHasClass && child.BHasClass(rule.classes[classIndex])) return true;
+		}
+		return false;
+	}
+
+	function applyHudLayerOrder() {
+		var hud = findPanel("Hud") || getHudRoot();
+		if (!isValid(hud) || !hud.GetChildCount || !hud.GetChild || !hud.MoveChildAfter) {
+			$.Schedule(HUD_LAYER_INTERVAL, applyHudLayerOrder);
+			return;
+		}
+
+		var ordered = [];
+		for (var ruleIndex = 0; ruleIndex < HUD_LAYER_RULES.length; ruleIndex++) {
+			var rule = HUD_LAYER_RULES[ruleIndex];
+			for (var childIndex = 0; childIndex < hud.GetChildCount(); childIndex++) {
+				var child = hud.GetChild(childIndex);
+				if (childMatchesRule(child, rule)) {
+					child.style.zIndex = String(rule.z);
+					ordered.push({ panel: child, z: rule.z });
+				}
+			}
+		}
+
+		// Deduplicate hosts which contain more than one signature, then enforce
+		// ascending siblings. This coexists with intentional vanilla reparenting.
+		var seen = [];
+		var previous = null;
+		for (var orderIndex = 0; orderIndex < ordered.length; orderIndex++) {
+			var entry = ordered[orderIndex];
+			if (seen.indexOf(entry.panel) !== -1) continue;
+			seen.push(entry.panel);
+			if (previous && previous !== entry.panel) hud.MoveChildAfter(entry.panel, previous);
+			previous = entry.panel;
+		}
+
+		// Tooltips remain owned by vanilla. Raise their nearest direct host only
+		// when it is not HUDElements; raising HUDElements would cover all custom UI.
+		for (var tooltipIndex = 0; tooltipIndex < TOOLTIP_PANEL_IDS.length; tooltipIndex++) {
+			var tooltip = hud.FindChildTraverse(TOOLTIP_PANEL_IDS[tooltipIndex]);
+			var tooltipHost = directHudChild(tooltip, hud);
+			if (isValid(tooltipHost) && tooltipHost.id !== "HUDElements") {
+				tooltipHost.style.zIndex = TOOLTIP_LAYER_Z_INDEX;
+				var cinematic = hud.FindChildTraverse("XHSCinematicTopBar");
+				var cinematicHost = directHudChild(cinematic, hud);
+				if (isValid(cinematicHost) && cinematicHost !== tooltipHost) {
+					hud.MoveChildAfter(tooltipHost, previous || tooltipHost);
+					hud.MoveChildAfter(cinematicHost, tooltipHost);
+					cinematicHost.style.zIndex = CINEMATIC_LAYER_Z_INDEX;
+				}
+			}
+		}
+
+		$.Schedule(HUD_LAYER_INTERVAL, applyHudLayerOrder);
 	}
 
 	function isTooltipPanel(panel) {
@@ -272,5 +366,7 @@
 	}
 
 	keepNativeTooltipsOnTop();
+	GameUI.CustomUIConfig().XHSApplyHudLayerOrder = applyHudLayerOrder;
+	applyHudLayerOrder();
 	updateHover();
 })();

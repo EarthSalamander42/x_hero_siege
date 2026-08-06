@@ -371,9 +371,16 @@ function XHSTPScroll:Begin(caster, ability, destination, castID)
 	local abilityLevel = math.max(0, (ability.GetLevel ~= nil and ability:GetLevel() or 1) - 1)
 	local manaCost = ability.GetManaCost ~= nil and math.max(0, ability:GetManaCost(abilityLevel)) or 0
 	local cooldown = ability.GetCooldown ~= nil and math.max(0, ability:GetCooldown(abilityLevel)) or 0
-	local channelTime = ability.GetChannelTime ~= nil
-		and math.max(0.01, ability:GetChannelTime())
+	-- item_tpscroll keeps its native targeting implementation, so on dedicated
+	-- servers GetChannelTime() may report zero even though our KV override and
+	-- tooltip specify a three-second channel. Zero must mean "use the XHS
+	-- fallback", not an almost-instant 0.01-second teleport.
+	local nativeChannelTime = ability.GetChannelTime ~= nil
+		and tonumber(ability:GetChannelTime()) or nil
+	local channelTime = nativeChannelTime ~= nil and nativeChannelTime > 0.1
+		and nativeChannelTime
 		or GetSpecialValue(ability, "tooltip_channel_time", DEFAULT_CHANNEL_TIME)
+	channelTime = math.max(0.1, tonumber(channelTime) or DEFAULT_CHANNEL_TIME)
 
 	DebugLog(
 		castID,
