@@ -26,9 +26,9 @@ local MURADIN_CAMERA_OWNER = "muradin_entry"
 local MURADIN_CAMERA_HOLD_DURATION = math.max(
 	0,
 	MURADIN_TELEPORT_IN_CHANNEL_DURATION
-		+ MURADIN_ENTRY_POST_TELEPORT_HOLD
-		- SPECIAL_EVENT_CAMERA_MOVE_DURATION
-		- SPECIAL_EVENT_CAMERA_RETURN_DURATION
+	+ MURADIN_ENTRY_POST_TELEPORT_HOLD
+	- SPECIAL_EVENT_CAMERA_MOVE_DURATION
+	- SPECIAL_EVENT_CAMERA_RETURN_DURATION
 )
 local FARM_LEADERBOARD_NET_TABLE = "xhs_farm_leaderboard"
 local FARM_LEADERBOARD_NET_KEY = "state"
@@ -1543,18 +1543,24 @@ function SpecialEvents:EndFarmEvent()
 		if laneState ~= nil and laneState[1] == 1 then
 			local rax_spawner = Entities:FindByName(nil, "npc_dota_spawner_" .. lane)
 
-			if rax_spawner then
-				local laneAttacker = nil
-				for _ = 1, magnataurBatchesPerLane do
-					local magnataur, magnataurs = SpawnMagnataur(rax_spawner:GetAbsOrigin())
-					laneAttacker = laneAttacker or magnataur
-					for _, unit in ipairs(magnataurs or {}) do
-						self:SuspendNonFarmUnit(unit)
+			if rax_spawner and rax_spawner.GetAbsOrigin then
+				local raw_spawner_point = rax_spawner:GetAbsOrigin()
+
+				if rax_spawner then
+					local laneAttacker = nil
+					for _ = 1, magnataurBatchesPerLane do
+						local magnataur, magnataurs = SpawnMagnataur(raw_spawner_point)
+						laneAttacker = laneAttacker or magnataur
+						for _, unit in ipairs(magnataurs or {}) do
+							self:SuspendNonFarmUnit(unit)
+						end
 					end
+					CollapsePhaseOneLane(lane, laneAttacker)
+					print("npc_dota_spawner_" .. lane .. " removed.")
+					rax_spawner.disabled = true
 				end
-				CollapsePhaseOneLane(lane, laneAttacker)
-				print("npc_dota_spawner_" .. lane .. " removed.")
-				rax_spawner.disabled = true
+			else
+				print("ERROR: npc_dota_spawner_" .. lane .. " not found.")
 			end
 		end
 	end

@@ -230,6 +230,10 @@
 	z-index: 40;
 }
 
+.AspectRatio4x3 .XHSOverheadLabel {
+	margin-left: 80px;
+}
+
 .XHSOverheadLabel.XHSOverheadHidden {
 	opacity: 0;
 	visibility: visible;
@@ -3131,158 +3135,6 @@
 	width: 250px;
 }
 
-.AspectRatio4x3 #XHSTopHudBar {
-	width: 920px;
-	height: 100px;
-	padding: 0px;
-}
-
-.AspectRatio4x3 #XHSFocusTimers {
-	width: 450px;
-	/* TODO: Fix override */
-	margin-top: 89px;
-}
-
-.AspectRatio4x3 .XHSArenaFocusTimer {
-	width: 185px;
-}
-
-.AspectRatio4x3 .XHSArenaFocusTimer.XHSMuradinFrenzy {
-	width: 220px;
-	height: 78px;
-}
-
-.AspectRatio4x3 .XHSMuradinFrenzyLine {
-	width: 30px;
-}
-
-.AspectRatio4x3 .XHSPersonalFocusTimer {
-	width: 170px;
-}
-
-.AspectRatio4x3 .XHSFocusTimerValue {
-	font-size: 26px;
-}
-
-.AspectRatio4x3 #XHSTopHudLeftSlot {
-	/* TODO: Fix override */
-	width: 351px;
-	height: 82px;
-	margin-left: 0px;
-	/* TODO: Fix override */
-	margin-top: 9px;
-}
-
-.AspectRatio4x3 #XHSTopHudRightSlot {
-	/* TODO: Fix override */
-	width: 351px;
-	height: 82px;
-	margin-left: 0px;
-	margin-right: 0px;
-	/* TODO: Fix override */
-	margin-top: 9px;
-}
-
-.AspectRatio4x3 #XHSTopHudAllies,
-.AspectRatio4x3 #XHSTopHudRightAllies {
-	height: 82px;
-}
-
-.AspectRatio4x3 .XHSAllyRoster {
-	width: fit-children;
-	height: 80px;
-}
-
-.AspectRatio4x3 #XHSAllyRosterLeft {
-	/* TODO: Fix override */
-	margin-left: 55px;
-}
-
-.AspectRatio4x3 #XHSAllyRosterRight {
-	/* TODO: Fix override */
-	margin-left: 55px;
-}
-
-.AspectRatio4x3 .XHSAllyCard {
-	width: 54px;
-	height: 77px;
-	/* TODO: Fix override */
-	margin-right: 6px;
-	margin-bottom: 3px;
-	padding: 0px;
-}
-
-.AspectRatio4x3 .XHSAllySlot {
-	width: 54px;
-	height: 77px;
-	margin-right: 6px;
-	margin-bottom: 3px;
-}
-
-.AspectRatio4x3 .XHSAllyImageWrap {
-	width: 50px;
-	height: 32px;
-	margin-top: 3px;
-}
-
-.AspectRatio4x3 .XHSAllyBars {
-	width: 50px;
-	height: 9px;
-	margin-top: 37px;
-}
-
-.AspectRatio4x3 .XHSAllyHealthBar,
-.AspectRatio4x3 .XHSAllyManaBar {
-	height: 3px;
-}
-
-.AspectRatio4x3 .XHSAllyMeta {
-	width: 50px;
-	height: 13px;
-	margin-top: 48px;
-}
-
-.AspectRatio4x3 .XHSAllyName {
-	width: 50px;
-	height: 12px;
-	font-size: 8px;
-}
-
-.AspectRatio4x3 .XHSAllyColorStrip {
-	/* TODO: Fix override */
-	height: 27px;
-	margin-left: 3px;
-	margin-top: 4px;
-}
-
-.AspectRatio4x3 .XHSAnkhBadge {
-	width: 50px;
-	height: 13px;
-	margin-left: 5px;
-	margin-top: 62px;
-}
-
-.AspectRatio4x3 .XHSAnkhPip {
-	width: 4px;
-	height: 4px;
-	margin-left: 4px;
-}
-
-.AspectRatio4x3 .XHSAnkhLabel {
-	font-size: 7px;
-	letter-spacing: 0px;
-	margin-left: 3px;
-}
-
-.AspectRatio4x3 .XHSAnkhCount {
-	width: 15px;
-	height: 12px;
-	font-size: 9px;
-	margin-right: 2px;
-}
-
-
-
 /* Legacy overhead donor pieces stay hidden; top bar portraits use the lightweight treatment above. */
 .XHSOverheadBadge,
 .XHSOverheadTagWrap,
@@ -3291,24 +3143,6 @@
 	visibility: collapse;
 	opacity: 0;
 	animation-name: none;
-}
-
-
-
-
-.AspectRatio4x3 #XHSTopHudClock {
-	width: fit-children;
-	height: 82px;
-	/* TODO: Fix override */
-	margin-top: 9px;
-}
-
-.AspectRatio4x3 #XHSClockValue {
-	/* TODO: Fix override */
-	width: 218px;
-	height: 82px;
-	/* TODO: Fix override */
-	font-size: 30px;
 }
 
 #XHSNightfallVignette {

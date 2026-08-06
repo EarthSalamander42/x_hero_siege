@@ -1,6 +1,6 @@
 // Turn off some default UI
-		GameUI.SetDefaultUIEnabled( DotaDefaultUIElement_t.DOTA_DEFAULT_UI_TOP_BAR, false );
-		GameUI.SetDefaultUIEnabled( DotaDefaultUIElement_t.DOTA_DEFAULT_UI_TOP_TIMEOFDAY, false );
+GameUI.SetDefaultUIEnabled( DotaDefaultUIElement_t.DOTA_DEFAULT_UI_TOP_BAR, false );
+GameUI.SetDefaultUIEnabled( DotaDefaultUIElement_t.DOTA_DEFAULT_UI_TOP_TIMEOFDAY, false );
 GameUI.SetDefaultUIEnabled( DotaDefaultUIElement_t.DOTA_DEFAULT_UI_TOP_HEROES, false );
 GameUI.SetDefaultUIEnabled( DotaDefaultUIElement_t.DOTA_DEFAULT_UI_FLYOUT_SCOREBOARD, false );
 GameUI.SetDefaultUIEnabled( DotaDefaultUIElement_t.DOTA_DEFAULT_UI_INVENTORY_QUICKBUY, true );
@@ -1761,3 +1761,37 @@ function SetupLoadingScreen() {
 	Parent.FindChildTraverse("GameAndPlayersRoot").style.visibility = "collapse";
 	Parent.FindChildTraverse("TeamsList").style.visibility = "collapse";
 }
+
+var HudNotFoundException = /** @class */
+(function() {
+	function HudNotFoundException(message) {
+		this.message = message;
+	}
+	return HudNotFoundException;
+}());
+
+function FindDotaHudElement(id) {
+	return GetDotaHud().FindChildTraverse(id);
+}
+
+function GetDotaHud() {
+	var p = $.GetContextPanel();
+	while (p !== null && p.id !== 'Hud') {
+		p = p.GetParent();
+	}
+	if (p === null) {
+		throw new HudNotFoundException('Could not find Hud root as parent of panel with id: ' + $.GetContextPanel().id);
+	} else {
+		return p;
+	}
+}
+
+// 7.41e prod shop fix by 艾洛叔
+(() =>
+{
+    let pShop = FindDotaHudElement("GridBasicItems");
+    pShop.RemoveAndDeleteChildren();
+
+    let pShop2 = FindDotaHudElement("GridUpgradeItems");
+    pShop2.RemoveAndDeleteChildren();
+})();

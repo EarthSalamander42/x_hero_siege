@@ -1320,8 +1320,7 @@
 }
 
 .AspectRatio4x3 .FlyoutScoreboardRoot {
-	width: 540px;
-	margin-top: 104px;
+	height: 85%;
 }
 
 .KillEventHint {

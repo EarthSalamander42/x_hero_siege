@@ -2890,19 +2890,25 @@ function OpenProfileSteamPage() {
 }
 
 function OnCustomSetupReadyPressed() {
-
+	$.Msg("OnCustomSetupReadyPressed");
 	if (custom_setup_failed_state) {
+		$.Msg("OnCustomSetupReadyPressed: failed state, ignoring click");
 		PlayLoadingSound(LOADING_SCREEN_CONFIG.audio.failed_events);
 		return;
 	}
 
 	var local_player_id = GetLocalPlayerIDSafe();
+	$.Msg("OnCustomSetupReadyPressed: local_player_id=" + local_player_id);
 
 	if (local_player_id < 0) {
+		$.Msg("OnCustomSetupReadyPressed: invalid local player id, ignoring click");
+		PlayLoadingSound(LOADING_SCREEN_CONFIG.audio.failed_events);
 		return;
 	}
 
+	$.Msg("OnCustomSetupReadyPressed: sending custom_setup_ready event to server");
 	if (typeof GameEvents !== "undefined" && GameEvents && typeof GameEvents.SendCustomGameEventToServer === "function") {
+		$.Msg("OnCustomSetupReadyPressed: GameEvents.SendCustomGameEventToServer is available");
 		GameEvents.SendCustomGameEventToServer("custom_setup_ready", { PlayerID: local_player_id });
 		local_ready_click_pending = true;
 		local_ready_click_token = local_ready_click_token + 1;
@@ -2912,10 +2918,12 @@ function OnCustomSetupReadyPressed() {
 		UpdatePlayerLoadingSidebar();
 		$.Schedule(LOADING_SCREEN_CONFIG.ready.immediate_lock_fallback_seconds, function () {
 			if (pending_token !== local_ready_click_token) {
+				$.Msg("OnCustomSetupReadyPressed: pending token mismatch, ignoring lock");
 				return;
 			}
 
 			if (!local_ready_click_pending) {
+				$.Msg("OnCustomSetupReadyPressed: local_ready_click_pending is false, ignoring lock");
 				return;
 			}
 
@@ -2923,6 +2931,8 @@ function OnCustomSetupReadyPressed() {
 			UpdatePlayerLoadingSidebar();
 		});
 	} else {
+		$.Msg("OnCustomSetupReadyPressed: GameEvents.SendCustomGameEventToServer unavailable, ignoring click");
+		PlayLoadingSound(LOADING_SCREEN_CONFIG.audio.failed_events);
 	}
 }
 

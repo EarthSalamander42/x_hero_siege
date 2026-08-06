@@ -846,8 +846,8 @@
 
 .vote-category-tab-label {
 	width: 100%;
-	height: 100%;
-	text-align: center;
+	text-align: center center;
+	align: center center;
 	font-size: 15px;
 	font-weight: semi-bold;
 	letter-spacing: 1px;
@@ -1058,6 +1058,15 @@
 	background-color: gradient(linear, 0% 0%, 100% 0%, from(#0d1725ee), to(#182437cc));
 	border: 1px solid #d5b87855;
 	box-shadow: fill #00000066 0px 0px 6px 0px;
+}
+
+.AspectRatio4x3 .vote-selection-summary {
+	margin: 2px 6px 2px 6px;
+	height: 70px;
+}
+
+.AspectRatio4x3 .vote-category-tab-label {
+	font-size: 12px;
 }
 
 .vote-selection-summary-title {
@@ -3142,6 +3151,10 @@
 	font-size: 14px;
 }
 
+.AspectRatio4x3 .player-ready-button {
+	width: 95%;
+}
+
 .player-ready-button {
 	height: 28px;
 	margin-top: 6px;
@@ -3562,7 +3575,7 @@
 }
 
 .description-text-container > .vote-button {
-	width: 64%;
+	width: 65%;
 	height: 42px;
 	margin-top: 22px;
 }
@@ -4549,11 +4562,11 @@
 }
 
 #ProfileSummaryDataGrid .profile-summary-column {
-	width: fill-parent-flow(1.0);
+	width: 50%;
 }
 
 #ProfileSummaryDataGrid .profile-summary-column-right {
-	width: 132px;
+	width: 50%;
 	margin-left: 8px;
 }
 
@@ -4954,7 +4967,7 @@
 }
 
 .AspectRatio4x3 .vote-content {
-	width: 78%;
+	width: 90%;
 }
 
 .AspectRatio4x3 .vote-content-title {
@@ -5518,7 +5531,7 @@
 }
 
 .AspectRatio4x3 .vote-difficulty-description {
-	height: 74px;
+	height: 80px;
 	padding: 6px 7px 5px 7px;
 	margin-bottom: 5px;
 }
@@ -5552,7 +5565,7 @@
 }
 
 .AspectRatio4x3 .vote-difficulty-stat-row {
-	height: 34px;
+	height: 38px;
 	margin-bottom: 3px;
 }
 
@@ -5868,7 +5881,7 @@
 }
 
 .AspectRatio4x3 #ProfileSummaryTitle {
-	max-width: 150px;
+	width: 50%;
 	font-size: 12px;
 	line-height: 15px;
 }
@@ -5891,12 +5904,8 @@
 }
 
 .AspectRatio4x3 .vote-progress-option-row {
-	height: 36px;
+	height: 45px;
 	margin-bottom: 5px;
-}
-
-.AspectRatio4x3 .vote-selection-summary {
-	height: 52px;
 }
 
 .AspectRatio4x3 #MainVoteButton {

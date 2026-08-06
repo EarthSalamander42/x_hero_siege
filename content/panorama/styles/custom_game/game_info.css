@@ -474,3 +474,9 @@
 	font-size: 15px;
 	line-height: 20px;
 }
+
+.AspectRatio4x3 .IntroText,.AspectRatio4x3 .InfoLine {
+	font-size: 17px;
+	line-height: 22px;
+	text-overflow: ellipsis;
+}
