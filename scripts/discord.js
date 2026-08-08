@@ -50,6 +50,28 @@ function field(name, value, inline = true) {
 	};
 }
 
+function diffBlock(additions = [], deletions = []) {
+	const maxItemsPerType = 6;
+	const added = additions.filter(Boolean);
+	const removed = deletions.filter(Boolean);
+	const lines = [
+		...added.slice(0, maxItemsPerType).map(value => `+ ${truncate(value, 72)}`),
+		...(added.length > maxItemsPerType ? [`+ … ${added.length - maxItemsPerType} more addition(s)`] : []),
+		...removed.slice(0, maxItemsPerType).map(value => `- ${truncate(value, 72)}`),
+		...(removed.length > maxItemsPerType ? [`- … ${removed.length - maxItemsPerType} more deletion(s)`] : [])
+	];
+
+	return lines.length ? `\`\`\`diff\n${lines.join("\n")}\n\`\`\`` : "";
+}
+
+function uniqueCommitFiles(commits, key) {
+	return [
+		...new Set(
+			commits.flatMap(commit => (Array.isArray(commit[key]) ? commit[key] : []))
+		)
+	];
+}
+
 function baseEmbed({ title, description, url, color = COLORS.discord, fields = [] }) {
 	return {
 		title,
@@ -75,6 +97,9 @@ function baseEmbed({ title, description, url, color = COLORS.discord, fields = [
 function pushEmbed() {
 	const branch = (event.ref || "").replace("refs/heads/", "");
 	const commits = event.commits || [];
+	const addedFiles = uniqueCommitFiles(commits, "added");
+	const removedFiles = uniqueCommitFiles(commits, "removed");
+	const fileChanges = diffBlock(addedFiles, removedFiles);
 
 	const commitLines = commits
 		.slice(0, 10)
@@ -85,13 +110,14 @@ function pushEmbed() {
 
 	return baseEmbed({
 		title: "🚀 New Push",
-		description: commitLines || "No commits listed.",
+		description: `${commitLines || "No commits listed."}${extra}`,
 		url: event.compare || repoUrl,
 		color: COLORS.success,
 		fields: [
 			field("Branch", `\`${branch}\``),
 			field("Pusher", event.pusher?.name || sender.login),
-			field("Commit count", String(commits.length))
+			field("Commit count", String(commits.length)),
+			...(fileChanges ? [field("File additions / deletions", fileChanges, false)] : [])
 		]
 	});
 }
@@ -134,8 +160,11 @@ function pullRequestEmbed() {
 			field("Author", pr.user.login),
 			field("Branch", `\`${pr.head.ref}\` → \`${pr.base.ref}\``),
 			field("Changed files", String(pr.changed_files ?? "N/A")),
-			field("Additions", `+${pr.additions ?? 0}`),
-			field("Deletions", `-${pr.deletions ?? 0}`)
+			field(
+				"Line additions / deletions",
+				diffBlock([`${pr.additions ?? 0} additions`], [`${pr.deletions ?? 0} deletions`]),
+				false
+			)
 		]
 	});
 }
