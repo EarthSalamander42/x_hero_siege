@@ -1,6 +1,7 @@
 const fs = require("fs");
 
 const webhookUrl = process.env.DISCORD_WEBHOOK;
+const githubToken = process.env.GITHUB_TOKEN;
 const eventName = process.env.GITHUB_EVENT_NAME;
 const eventPath = process.env.GITHUB_EVENT_PATH;
 
@@ -72,6 +73,40 @@ function uniqueCommitFiles(commits, key) {
 	];
 }
 
+async function fetchPushLineChanges() {
+	if (!repoName || !event.before || !event.after) return null;
+
+	const headers = {
+		Accept: "application/vnd.github+json",
+		"X-GitHub-Api-Version": "2022-11-28"
+	};
+	if (githubToken) headers.Authorization = `Bearer ${githubToken}`;
+
+	try {
+		const response = await fetch(
+			`https://api.github.com/repos/${repoName}/compare/${event.before}...${event.after}`,
+			{ headers }
+		);
+		if (!response.ok) {
+			console.warn(`GitHub compare request failed: ${response.status}`);
+			return null;
+		}
+
+		const comparison = await response.json();
+		const files = Array.isArray(comparison.files) ? comparison.files : [];
+		return files.reduce(
+			(totals, file) => ({
+				additions: totals.additions + Number(file.additions || 0),
+				deletions: totals.deletions + Number(file.deletions || 0)
+			}),
+			{ additions: 0, deletions: 0 }
+		);
+	} catch (error) {
+		console.warn(`GitHub compare request failed: ${error.message}`);
+		return null;
+	}
+}
+
 function baseEmbed({ title, description, url, color = COLORS.discord, fields = [] }) {
 	return {
 		title,
@@ -94,12 +129,13 @@ function baseEmbed({ title, description, url, color = COLORS.discord, fields = [
 	};
 }
 
-function pushEmbed() {
+async function pushEmbed() {
 	const branch = (event.ref || "").replace("refs/heads/", "");
 	const commits = event.commits || [];
 	const addedFiles = uniqueCommitFiles(commits, "added");
 	const removedFiles = uniqueCommitFiles(commits, "removed");
 	const fileChanges = diffBlock(addedFiles, removedFiles);
+	const lineChanges = await fetchPushLineChanges();
 
 	const commitLines = commits
 		.slice(0, 10)
@@ -117,6 +153,15 @@ function pushEmbed() {
 			field("Branch", `\`${branch}\``),
 			field("Pusher", event.pusher?.name || sender.login),
 			field("Commit count", String(commits.length)),
+			...(lineChanges
+				? [
+						field(
+							"Line additions / deletions",
+							diffBlock([`${lineChanges.additions} additions`], [`${lineChanges.deletions} deletions`]),
+							false
+						)
+					]
+				: []),
 			...(fileChanges ? [field("File additions / deletions", fileChanges, false)] : [])
 		]
 	});
@@ -342,7 +387,7 @@ function buildEmbed() {
 }
 
 async function sendToDiscord() {
-	const embed = buildEmbed();
+	const embed = await buildEmbed();
 
 	const response = await fetch(webhookUrl, {
 		method: "POST",
