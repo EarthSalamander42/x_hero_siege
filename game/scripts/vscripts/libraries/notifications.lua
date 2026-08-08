@@ -110,6 +110,9 @@ local function BuildNotificationPayload(table)
     severity = table.severity,
     rewardType = table.rewardType,
     flyoutText = table.flyoutText,
+    aggregate_key = table.aggregate_key,
+    aggregate_amount = table.aggregate_amount,
+    aggregate_text = table.aggregate_text,
   }
 end
 

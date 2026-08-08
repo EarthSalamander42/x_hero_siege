@@ -15,6 +15,7 @@
 
 .FlyoutScoreboardRoot
 {
+	z-index: 1300;
     transform: translatex( -800px );
     transition-property: transform;
     transition-duration: 0.1s;

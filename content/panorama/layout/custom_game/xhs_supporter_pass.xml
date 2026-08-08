@@ -35,7 +35,17 @@
 				<Panel class="XHSPassHeaderMedia" hittest="false" ignore-parent-flow="true" />
 				<Panel class="XHSPassHeaderVeil" hittest="false" ignore-parent-flow="true" />
 				<Panel class="XHSPassHeaderCopy">
-					<Label class="XHSPassEyebrow" text="#xhs_sp_title" />
+					<Panel class="XHSPassHeaderProgressTop">
+						<Label id="XHSPassHeaderLevelLabel" class="XHSPassHeaderLevelLabel" text="LEVEL 1" />
+						<Panel class="XHSPassHeaderFragmentsInline" hittest="false">
+							<Image class="XHSPassFragmentLogo XHSPassFragmentLogoSmall" src="file://{images}/custom_game/battlepass/supporter_fragments_logo.png" />
+							<Label id="XHSPassHeaderFragmentsValue" class="XHSPassHeaderFragmentsValue" text="0" />
+						</Panel>
+					</Panel>
+					<Panel class="XHSPassHeaderProgressBar">
+						<Panel id="XHSPassHeaderXpProgress" class="XHSPassHeaderProgressFill" />
+					</Panel>
+					<Label id="XHSPassHeaderXPLabel" class="XHSPassHeaderXPLabel" text="0 / 1000 XP" />
 				</Panel>
 
 				<Panel class="XHSPassTopBar">
@@ -63,6 +73,11 @@
 				<Button id="XHSPassDevFreeUIButton" class="XHSPassDevUnlockUIButton XHSPassDevFreeUIButton">
 					<Label id="XHSPassDevFreeUILabel" text="DEV: FREE UI" />
 				</Button>
+
+				<Panel id="XHSPassHeaderFragmentsWallet" class="XHSPassHeaderFragmentsWallet" hittest="false">
+					<Image class="XHSPassFragmentLogo" src="file://{images}/custom_game/battlepass/supporter_fragments_logo.png" />
+					<Label id="XHSPassHeaderWalletValue" class="XHSPassHeaderWalletValue" text="0" />
+				</Panel>
 
 				<Button id="XHSPassCloseButton" class="XHSPassIconButton">
 					<Label text="X" />

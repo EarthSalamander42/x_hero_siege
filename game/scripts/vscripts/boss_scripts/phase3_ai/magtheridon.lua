@@ -130,7 +130,11 @@ local function CreateWarning(position, radius, delay, fel)
 	ParticleManager:SetParticleControl(particle, 4, position)
 	ParticleManager:SetParticleControl(particle, 15, color)
 	ParticleManager:SetParticleControl(particle, 16, Vector(1, 0, 0))
-	ParticleManager:ReleaseParticleIndex(particle)
+	Timers:CreateTimer(math.max(0.1, tonumber(delay) or 1.0), function()
+		ParticleManager:DestroyParticle(particle, true)
+		ParticleManager:ReleaseParticleIndex(particle)
+		return nil
+	end)
 end
 
 local function CreateImpact(position, radius, particleName)

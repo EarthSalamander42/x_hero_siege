@@ -577,7 +577,14 @@ function BuyMaxSmallTomesForPlayer(playerID, options)
 		return 0
 	end
 
-	Notifications:Bottom(player, { text = "You've bought " .. numberOfTomes .. " Tomes!", duration = 5.0, style = { color = "white" } })
+	Notifications:Bottom(player, {
+		text = "You've bought " .. numberOfTomes .. " Tomes!",
+		duration = 5.0,
+		style = { color = "white" },
+		aggregate_key = "tome_purchase",
+		aggregate_amount = numberOfTomes,
+		aggregate_text = "You've bought {count} Tomes!",
+	})
 	PlayerResource:SpendGold(playerID, numberOfTomes * cost, DOTA_ModifyGold_PurchaseItem)
 
 	if XHSRecordTomeStatsForPlayer ~= nil then

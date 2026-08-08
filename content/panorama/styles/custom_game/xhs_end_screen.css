@@ -1301,9 +1301,8 @@
 
 .XHSEndScreenSupportBoost {
 	width: 52px;
-	height: 18px;
 	margin-right: 5px;
-	padding-top: 1px;
+	padding-top: 2px;
 	background-color: #07131ee8;
 	border: 1px solid #ffffff22;
 	font-size: 11px;
@@ -2095,6 +2094,7 @@
 }
 
 .XHSXPContinueButton Label {
+	margin-left: 90px;
 	align: center center;
 	color: #84929b;
 	font-size: 14px;

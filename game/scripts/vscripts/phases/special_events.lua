@@ -803,10 +803,12 @@ function SpecialEvents:PublishFarmLeaderboard(active)
 			local round = math.max(0, tonumber(progress.round) or 0) % wavesPerLevel
 			local remaining = math.max(0, tonumber(progress.remaining) or 0)
 			local completedWaves = math.max(0, tonumber(progress.completed_waves) or 0)
+			local kills = math.max(0, tonumber(progress.kills) or 0)
+			local farmDifficulty = math.max(1, math.min(5, tonumber(GameRules:GetCustomGameDifficulty()) or 1))
 
 			table.insert(players, {
 				player_id = numericPlayerID,
-				kills = math.max(0, tonumber(progress.kills) or 0),
+				kills = kills,
 				level = level,
 				wave = round + 1,
 				waves_per_level = wavesPerLevel,
@@ -814,7 +816,9 @@ function SpecialEvents:PublishFarmLeaderboard(active)
 				completed_waves = completedWaves,
 				last_wave_gold = math.max(0, tonumber(progress.last_wave_gold) or 0),
 				last_wave_xp = math.max(0, tonumber(progress.last_wave_xp) or 0),
-				supporter_xp_earned = math.max(0, tonumber(progress.total_wave_xp) or 0),
+				-- Keep the live leaderboard identical to the authoritative backend
+				-- receipt: Farm Supporter XP = floor(kills * difficulty / 100).
+				supporter_xp_earned = math.floor(kills * farmDifficulty / 100),
 				reward_serial = math.max(0, tonumber(progress.reward_serial) or 0),
 			})
 		end

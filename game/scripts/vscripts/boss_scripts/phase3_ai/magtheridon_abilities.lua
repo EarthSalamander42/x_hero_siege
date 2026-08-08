@@ -254,7 +254,7 @@ local function CreateDarkmoonAOEPrecast(ability, position, radius, duration)
 	TrackPrecastParticle(ability, particle)
 
 	Timers:CreateTimer(math.max(duration or 1.0, 0.03), function()
-		ReleaseTrackedPrecastParticle(ability, particle, false)
+		ReleaseTrackedPrecastParticle(ability, particle, true)
 		return nil
 	end)
 
@@ -282,7 +282,7 @@ local function CreateEarthSplitterLine(ability, startPosition, endPosition, dela
 	TrackPrecastParticle(ability, particle)
 
 	Timers:CreateTimer(math.max((delay or 0) + EARTH_SPLITTER_RELEASE_BUFFER, 0.03), function()
-		ReleaseTrackedPrecastParticle(ability, particle, false)
+		ReleaseTrackedPrecastParticle(ability, particle, true)
 		return nil
 	end)
 end
@@ -315,7 +315,7 @@ local function CreateFissureLine(ability, startPosition, endPosition, delay, dur
 	TrackPrecastParticle(ability, particle)
 
 	Timers:CreateTimer((duration or 1.0) + (delay or 0), function()
-		ReleaseTrackedPrecastParticle(ability, particle, false)
+		ReleaseTrackedPrecastParticle(ability, particle, true)
 		return nil
 	end)
 end
@@ -405,7 +405,7 @@ end
 function xhs_magtheridon_fel_stomp:OnSpellStart()
 	if not IsServer() then return end
 
-	ClearPrecastParticles(self, false)
+	ClearPrecastParticles(self, true)
 
 	local caster = self:GetCaster()
 	local radius = self:GetSpecialValueFor("radius")
@@ -455,7 +455,7 @@ end
 function xhs_magtheridon_targeted_firestorms:OnSpellStart()
 	if not IsServer() then return end
 
-	ClearPrecastParticles(self, false)
+	ClearPrecastParticles(self, true)
 
 	local context = GetContext(self)
 	local caster = self:GetCaster()
@@ -558,7 +558,7 @@ end
 function xhs_magtheridon_infernal_rings:OnSpellStart()
 	if not IsServer() then return end
 
-	ClearPrecastParticles(self, false)
+	ClearPrecastParticles(self, true)
 
 	local context = GetContext(self)
 	local caster = self:GetCaster()
@@ -666,7 +666,7 @@ end
 function xhs_magtheridon_demonic_howl:OnSpellStart()
 	if not IsServer() then return end
 
-	ClearPrecastParticles(self, false)
+	ClearPrecastParticles(self, true)
 
 	local caster = self:GetCaster()
 	local radius = self:GetSpecialValueFor("radius")

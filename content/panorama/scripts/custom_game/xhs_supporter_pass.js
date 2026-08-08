@@ -226,7 +226,9 @@ var XHSSupporterPass = (function () {
 				return false;
 			}
 
-			host.style.zIndex = "800";
+			// Above quest/special-wave HUD (<= 1100), while remaining below
+			// dev tools, the scoreboard flyout, tooltips and cinematics.
+			host.style.zIndex = "1150";
 			hud.MoveChildAfter(host, layerAnchor);
 			supporterLayerApplied = true;
 			return true;
@@ -1869,7 +1871,9 @@ var XHSSupporterPass = (function () {
 			} else {
 				item.locked = requiredTier > 0 && player.tier_id < requiredTier;
 				item.lock_reason = item.locked ? Text("xhs_sp_tier_value", "Tier {tier}", { tier: requiredTier }) : "";
-				item.equipped = item.equipped === true || IsArmoryItemEquipped(player, item);
+				item.equipped = IsTruthy(item.equipped, false) ||
+					String(item.state || "").toLowerCase() === "equipped" ||
+					IsArmoryItemEquipped(player, item);
 			}
 			normalizedItems.push(item);
 		}
@@ -2861,6 +2865,11 @@ var XHSSupporterPass = (function () {
 			"XHSPassDevFreeUILabel",
 			devUnlockFreeUI ? "DEV: EXIT FREE" : "DEV: FREE UI"
 		);
+		SetText("XHSPassHeaderLevelLabel", Text("xhs_sp_season_level_value", "Season Level {level}", { level: player.season_level }));
+		SetText("XHSPassHeaderFragmentsValue", FormatNumber(player.fragments));
+		SetText("XHSPassHeaderWalletValue", FormatNumber(player.fragments));
+		SetText("XHSPassHeaderXPLabel", FormatNumber(player.season_xp) + " / " + FormatNumber(player.season_xp_max) + " " + Text("xhs_sp_xp", "XP"));
+		SetPercent(Panel("XHSPassHeaderXpProgress"), player.season_xp, player.season_xp_max);
 
 		var avatar = Panel("XHSPassAvatar");
 		if (avatar && player.steamID) {
@@ -3185,12 +3194,14 @@ var XHSSupporterPass = (function () {
 		var devRequestID = item.catalog_item_id || item.item_id || item.id;
 		var requestID = devLocalEquipMode ? devRequestID : backendRequestID;
 		var unopenedBundle = mode === "armory" && item.type === "Bundle" && String(item.state || "").toLowerCase() === "unopened";
+		button.SetHasClass("IsEquipped", mode === "armory" && item.equipped === true && !unopenedBundle);
 		var actionKind = unopenedBundle ? "bundle_open" : (mode === "armory" ? (devLocalEquipMode ? "dev_equip" : "equip") : "purchase");
 		var pending = IsActionPending(actionKind, requestID);
 		var canAfford = mode === "armory"
 			? (unopenedBundle || (item.locked !== true && item.equipped !== true)) && !pending
 			: player.fragments >= ToNumber(item.price || item.fragment_price, 0) && !pending;
 		button.SetHasClass("IsLocked", !canAfford);
+		button.hittest = canAfford;
 		button.SetPanelEvent("onactivate", function () {
 			if (!canAfford) {
 				Game.EmitSound("General.Cancel");
@@ -5624,7 +5635,7 @@ var XHSSupporterPass = (function () {
 					var payload = CopySettings(settingsDraft);
 					payload.player_id = Players.GetLocalPlayer();
 					GameEvents.SendCustomGameEventToServer("supporter_pass_update_settings", payload);
-					$.Schedule(8.0, function () {
+					$.Schedule(16.0, function () {
 						if (!settingsSaving) {
 							return;
 						}

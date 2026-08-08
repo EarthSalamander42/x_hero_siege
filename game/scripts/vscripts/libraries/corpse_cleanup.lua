@@ -1,4 +1,4 @@
-local CORPSE_CLEANUP_DELAY = 0.2
+local CORPSE_CLEANUP_DELAY = 3.0
 
 local function RemoveLegacyCustomCorpses()
 	for _, corpse in pairs(Entities:FindAllByName("dotacraft_corpse")) do
@@ -8,8 +8,9 @@ local function RemoveLegacyCustomCorpses()
 	end
 end
 
--- XHS no longer keeps gameplay corpses. Give every entity_killed listener the
--- current frame to consume the dead unit, then remove non-hero bodies entirely.
+-- Keep creep death animations readable without retaining gameplay corpses long
+-- enough to accumulate. Entity-killed listeners can safely consume the handle
+-- during the same grace period.
 ListenToGameEvent("entity_killed", function(keys)
 	local entityIndex = keys and tonumber(keys.entindex_killed) or nil
 	if entityIndex == nil then return end

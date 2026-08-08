@@ -109,7 +109,7 @@ local function CreateImmolationPrecast(ability, position, radius, duration)
 
 	Timers:CreateTimer(math.max(duration or 1.0, 0.03), function()
 		if ability.xhs_illidan_immolation_precast_particle == particle then
-			ClearImmolationPrecast(ability, false)
+			ClearImmolationPrecast(ability, true)
 		end
 		return nil
 	end)
@@ -366,7 +366,7 @@ end
 function xhs_illidan_metamorphosis:OnSpellStart()
 	if not IsServer() then return end
 
-	ClearImmolationPrecast(self, false)
+	ClearImmolationPrecast(self, true)
 	local caster = self:GetCaster()
 	local radius = self:GetSpecialValueFor("radius")
 	local damage = ScaleDamage(self:GetSpecialValueFor("damage"))
@@ -492,7 +492,7 @@ end
 
 function xhs_illidan_immolation_burst:OnSpellStart()
 	if not IsServer() then return end
-	ClearImmolationPrecast(self, false)
+	ClearImmolationPrecast(self, true)
 
 	local caster = self:GetCaster()
 	local radius = self:GetSpecialValueFor("radius")

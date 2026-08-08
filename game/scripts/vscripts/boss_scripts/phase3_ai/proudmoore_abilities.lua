@@ -70,7 +70,7 @@ local function CreateAnchorSmashWarning(ability, position, radius, duration)
 
 	Timers:CreateTimer(math.max(duration or 1.0, 0.03), function()
 		if ability.xhs_anchor_smash_warning == particle then
-			ClearAnchorSmashWarning(ability, false)
+			ClearAnchorSmashWarning(ability, true)
 		end
 		return nil
 	end)
@@ -380,7 +380,7 @@ end
 function xhs_proudmoore_anchor_smash:OnSpellStart()
 	if not IsServer() then return end
 
-	ClearAnchorSmashWarning(self, false)
+	ClearAnchorSmashWarning(self, true)
 	local caster = self:GetCaster()
 	local radius = self:GetSpecialValueFor("radius")
 	XHSBossTelegraphs:Release(caster:GetAbsOrigin(), radius, PROUDMOORE_COLORS)

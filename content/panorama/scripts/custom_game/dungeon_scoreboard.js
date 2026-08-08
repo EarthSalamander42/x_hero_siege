@@ -16,6 +16,7 @@ var KILL_EVENTS = [
 var KILL_EVENT_VISIBLE_RATIO = 0.8;
 var scoreboard_supporter_hover = null;
 var scoreboard_supporter_hover_player_id = -1;
+var SCOREBOARD_HUD_Z_INDEX = "1300";
 var scoreboard_hud_layer_applied = false;
 var scoreboard_hud_layer_retry_scheduled = false;
 
@@ -57,7 +58,7 @@ function GetScoreboardHudDirectChild(panel, hud) {
 }
 
 function ScheduleScoreboardHudLayerRetry() {
-	if (scoreboard_hud_layer_applied || scoreboard_hud_layer_retry_scheduled) {
+	if (scoreboard_hud_layer_retry_scheduled) {
 		return;
 	}
 
@@ -70,10 +71,6 @@ function ScheduleScoreboardHudLayerRetry() {
 
 function EnsureScoreboardAboveHudElements() {
 	SuppressVanillaFlyoutScoreboard();
-
-	if (scoreboard_hud_layer_applied) {
-		return true;
-	}
 
 	var host = $.GetContextPanel();
 	var hud = GetScoreboardHudAncestor(host);
@@ -93,13 +90,36 @@ function EnsureScoreboardAboveHudElements() {
 			return false;
 		}
 
+		host.style.zIndex = SCOREBOARD_HUD_Z_INDEX;
 		hud.MoveChildAfter(host, hudElementsChild);
+		var notifications = hud.FindChildTraverse ? hud.FindChildTraverse("XHSWaveCountdown") : null;
+		var notificationsChild = GetScoreboardHudDirectChild(notifications, hud);
+		if (notificationsChild && notificationsChild !== host) {
+			// Keep the flyout specifically above wave/rune notifications. The shared
+			// layer contract still decides its position relative to windows, modals,
+			// tooltips and cinematics.
+			hud.MoveChildAfter(host, notificationsChild);
+		}
+		if (!scoreboard_hud_layer_applied) {
+			var applyLayerOrder = GameUI.CustomUIConfig().XHSApplyHudLayerOrder;
+			if (typeof applyLayerOrder === "function") {
+				applyLayerOrder();
+			}
+		}
 		scoreboard_hud_layer_applied = true;
 		return true;
 	} catch (error) {
 		ScheduleScoreboardHudLayerRetry();
 		return false;
 	}
+}
+
+function ReassertScoreboardHudLayerAfterOpen() {
+	EnsureScoreboardAboveHudElements();
+	$.Schedule(0.0, EnsureScoreboardAboveHudElements);
+	$.Schedule(0.1, EnsureScoreboardAboveHudElements);
+	$.Schedule(0.3, EnsureScoreboardAboveHudElements);
+	$.Schedule(0.6, EnsureScoreboardAboveHudElements);
 }
 
 function intToARGB(i) 
@@ -1223,7 +1243,7 @@ function SetScoreboardZoneButtonEnabled(buttonName, enabled) {
 function SetFlyoutScoreboardVisible( bVisible )
 {
 	SuppressVanillaFlyoutScoreboard();
-	EnsureScoreboardAboveHudElements();
+	ReassertScoreboardHudLayerAfterOpen();
 
 	if(bVisible === true)
 	{

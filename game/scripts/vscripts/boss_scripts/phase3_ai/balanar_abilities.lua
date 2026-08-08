@@ -137,7 +137,7 @@ local function CreateDarkmoonPrecast(position, radius, duration)
 	ParticleManager:SetParticleControl(particle, 15, BALANAR_COLORS.primary)
 	ParticleManager:SetParticleControl(particle, 16, Vector(1, 0, 0))
 	Timers:CreateTimer(math.max(0.1, duration or 1.0) + 0.03, function()
-		ParticleManager:DestroyParticle(particle, false)
+		ParticleManager:DestroyParticle(particle, true)
 		ParticleManager:ReleaseParticleIndex(particle)
 		return nil
 	end)

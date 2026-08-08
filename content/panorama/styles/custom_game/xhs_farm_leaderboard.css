@@ -573,7 +573,7 @@
 
 .XHSFarmIdentity
 {
-	width: 116px;
+	width: 142px;
 	height: 100%;
 	margin-left: 8px;
 	padding-top: 8px;
@@ -594,11 +594,11 @@
 
 .XHSFarmPlayerStage
 {
-	width: 116px;
-	height: 17px;
+	width: 142px;
+	height: 18px;
 	margin-top: -1px;
 	color: #7fa8c1;
-	font-size: 10px;
+	font-size: 12px;
 	font-weight: bold;
 	letter-spacing: 0.5px;
 	text-overflow: shrink;
@@ -613,7 +613,7 @@
 
 .XHSFarmProgress
 {
-	width: 91px;
+	width: 51px;
 	height: 100%;
 	padding-top: 7px;
 	padding-right: 8px;

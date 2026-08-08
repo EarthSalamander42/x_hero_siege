@@ -1102,58 +1102,159 @@ function api:UpdateSupporterPassSettings(player_id, settings, callback)
 	if callback == nil then
 		callback = function() end
 	end
+	settings = settings or {}
 
 	local steamid = self:GetPersistentPlayerSteamID(player_id)
 	if steamid == nil then
 		return callback(false, { code = "non_persistent_player", message = "Persistent human player required." })
 	end
 
-	local payload = {
-		steamid = steamid,
-		game_id = self:GetApiGameId(),
-	}
+	local completed = false
+	local function Finish(success, data)
+		if completed then
+			return
+		end
+		completed = true
+		callback(success, data)
+	end
 
-	if settings.toggle_tag ~= nil then payload.toggle_tag = settings.toggle_tag == true or settings.toggle_tag == 1 end
-	if settings.pass_rewards ~= nil then payload.pass_rewards = settings.pass_rewards == true or settings.pass_rewards == 1 end
-	if settings.player_xp ~= nil then payload.player_xp = settings.player_xp == true or settings.player_xp == 1 end
-	if settings.winrate_toggle ~= nil then payload.winrate_toggle = settings.winrate_toggle == true or settings.winrate_toggle == 1 end
-	if settings.xhs_ingame_advertize_hidden ~= nil then payload.xhs_ingame_advertize_hidden = settings.xhs_ingame_advertize_hidden == true or settings.xhs_ingame_advertize_hidden == 1 end
+	local function SubmitSettingsUpdate(game_id)
+		if completed then
+			return
+		end
 
-	api:Request("supporter-pass/settings", function(data)
-		if api.players and api.players[steamid] then
-			if data.toggle_tag ~= nil then api.players[steamid].toggle_tag = data.toggle_tag elseif settings.toggle_tag ~= nil then api.players[steamid].toggle_tag = settings.toggle_tag end
-			if data.bp_rewards ~= nil then api.players[steamid].bp_rewards = data.bp_rewards end
-			if data.pass_rewards ~= nil then
-				api.players[steamid].pass_rewards = data.pass_rewards
-				api.players[steamid].bp_rewards = data.pass_rewards
-			elseif settings.pass_rewards ~= nil then
-				api.players[steamid].pass_rewards = settings.pass_rewards
-				api.players[steamid].bp_rewards = settings.pass_rewards
-			end
-			if data.player_xp ~= nil then api.players[steamid].player_xp = data.player_xp elseif settings.player_xp ~= nil then api.players[steamid].player_xp = settings.player_xp end
-			if data.winrate_toggle ~= nil then
-				api.players[steamid].winrate = data.winrate_toggle and 1 or 0
-				api.players[steamid].winrate_toggle = data.winrate_toggle
-			elseif settings.winrate_toggle ~= nil then
-				api.players[steamid].winrate = settings.winrate_toggle and 1 or 0
-				api.players[steamid].winrate_toggle = settings.winrate_toggle
-			end
-			if data.xhs_ingame_advertize_hidden ~= nil then
-				api.players[steamid].xhs_ingame_advertize_hidden = data.xhs_ingame_advertize_hidden
-			elseif settings.xhs_ingame_advertize_hidden ~= nil then
-				api.players[steamid].xhs_ingame_advertize_hidden = settings.xhs_ingame_advertize_hidden
-			end
-			if api.players[steamid].xhs_ingame_advertize_hidden ~= nil then
+		local payload = {
+			steamid = steamid,
+			game_id = game_id,
+		}
+
+		if settings.toggle_tag ~= nil then payload.toggle_tag = settings.toggle_tag == true or settings.toggle_tag == 1 end
+		if settings.pass_rewards ~= nil then payload.pass_rewards = settings.pass_rewards == true or settings.pass_rewards == 1 end
+		if settings.player_xp ~= nil then payload.player_xp = settings.player_xp == true or settings.player_xp == 1 end
+		if settings.winrate_toggle ~= nil then payload.winrate_toggle = settings.winrate_toggle == true or settings.winrate_toggle == 1 end
+		if settings.xhs_ingame_advertize_hidden ~= nil then payload.xhs_ingame_advertize_hidden = settings.xhs_ingame_advertize_hidden == true or settings.xhs_ingame_advertize_hidden == 1 end
+
+		api:Request("supporter-pass/settings", function(data)
+			if api.players and api.players[steamid] then
+				if data.toggle_tag ~= nil then api.players[steamid].toggle_tag = data.toggle_tag elseif settings.toggle_tag ~= nil then api.players[steamid].toggle_tag = settings.toggle_tag end
+				if data.bp_rewards ~= nil then api.players[steamid].bp_rewards = data.bp_rewards end
+				if data.pass_rewards ~= nil then
+					api.players[steamid].pass_rewards = data.pass_rewards
+					api.players[steamid].bp_rewards = data.pass_rewards
+				elseif settings.pass_rewards ~= nil then
+					api.players[steamid].pass_rewards = settings.pass_rewards
+					api.players[steamid].bp_rewards = settings.pass_rewards
+				end
+				if data.player_xp ~= nil then api.players[steamid].player_xp = data.player_xp elseif settings.player_xp ~= nil then api.players[steamid].player_xp = settings.player_xp end
+				if data.winrate_toggle ~= nil then
+					api.players[steamid].winrate = data.winrate_toggle and 1 or 0
+					api.players[steamid].winrate_toggle = data.winrate_toggle
+				elseif settings.winrate_toggle ~= nil then
+					api.players[steamid].winrate = settings.winrate_toggle and 1 or 0
+					api.players[steamid].winrate_toggle = settings.winrate_toggle
+				end
+				if data.xhs_ingame_advertize_hidden ~= nil then
+					api.players[steamid].xhs_ingame_advertize_hidden = data.xhs_ingame_advertize_hidden
+				elseif settings.xhs_ingame_advertize_hidden ~= nil then
+					api.players[steamid].xhs_ingame_advertize_hidden = settings.xhs_ingame_advertize_hidden
+				end
 				api.players[steamid].supporter_pass = api.players[steamid].supporter_pass or {}
 				api.players[steamid].supporter_pass.settings = api.players[steamid].supporter_pass.settings or {}
-				api.players[steamid].supporter_pass.settings.xhs_ingame_advertize_hidden = api.players[steamid].xhs_ingame_advertize_hidden
+				local persisted_settings = api.players[steamid].supporter_pass.settings
+				if api.players[steamid].toggle_tag ~= nil then persisted_settings.toggle_tag = api.players[steamid].toggle_tag end
+				if api.players[steamid].pass_rewards ~= nil then persisted_settings.pass_rewards = api.players[steamid].pass_rewards end
+				if api.players[steamid].player_xp ~= nil then persisted_settings.player_xp = api.players[steamid].player_xp end
+				if api.players[steamid].winrate_toggle ~= nil then persisted_settings.winrate_toggle = api.players[steamid].winrate_toggle end
+				if api.players[steamid].xhs_ingame_advertize_hidden ~= nil then persisted_settings.xhs_ingame_advertize_hidden = api.players[steamid].xhs_ingame_advertize_hidden end
+			end
+
+			Finish(true, data)
+		end, function(error)
+			Finish(false, error)
+		end, "POST", payload)
+	end
+
+	local game_id = tonumber(self:GetApiGameId())
+	if game_id ~= nil and game_id > 0 then
+		SubmitSettingsUpdate(game_id)
+		return
+	end
+
+	local locked_bot_session = IsInToolsMode()
+		and XHSBots ~= nil
+		and XHSBots.enabled == true
+		and XHSBots.locked == true
+		and self.HasXHSBotSession ~= nil
+		and self:HasXHSBotSession()
+	if self.xhs_bot_session_backend_disabled == true or locked_bot_session then
+		return Finish(false, {
+			code = "game_not_registered",
+			message = "Supporter settings cannot be saved in a local-only bot session.",
+		})
+	end
+
+	local register_state = tostring(self.game_register_state or "not_started")
+	print("supporter-pass/settings: waiting for game-register (state=" .. register_state .. ")")
+
+	local registration_retry_started = false
+	if self.game_register_state == nil or self.game_register_state == "failed" then
+		registration_retry_started = true
+		local started, reason = self:RegisterGame()
+		if started == false then
+			return Finish(false, {
+				code = "game_not_registered",
+				message = "Unable to register the match before saving supporter settings: " .. tostring(reason),
+			})
+		end
+	end
+
+	local wait_attempts = 0
+	local function WaitForRegisteredGame()
+		if completed then
+			return nil
+		end
+
+		local registered_game_id = tonumber(api:GetApiGameId())
+		if registered_game_id ~= nil and registered_game_id > 0 then
+			print("supporter-pass/settings: game-register ready; submitting settings")
+			SubmitSettingsUpdate(registered_game_id)
+			return nil
+		end
+
+		wait_attempts = wait_attempts + 1
+		if api.game_register_state == "failed" and not registration_retry_started then
+			registration_retry_started = true
+			print("supporter-pass/settings: game-register failed; retrying once before save")
+			local started, reason = api:RegisterGame()
+			if started == false then
+				Finish(false, {
+					code = "game_not_registered",
+					message = "Unable to retry match registration before saving supporter settings: " .. tostring(reason),
+				})
+				return nil
 			end
 		end
 
-		callback(true, data)
-	end, function(error)
-		callback(false, error)
-	end, "POST", payload)
+		if wait_attempts >= 40 or (api.game_register_state == "failed" and registration_retry_started) then
+			Finish(false, {
+				code = "game_not_registered",
+				message = "The match could not be registered. Supporter settings were not saved.",
+			})
+			return nil
+		end
+
+		return 0.25
+	end
+
+	if Timers ~= nil and Timers.CreateTimer ~= nil then
+		Timers:CreateTimer(0.25, WaitForRegisteredGame)
+		return
+	end
+
+	Finish(false, {
+		code = "game_registration_wait_unavailable",
+		message = "Unable to wait for match registration before saving supporter settings.",
+	})
 end
 
 function api:CreateSupporterPaymentIntent(player_id, context, callback)

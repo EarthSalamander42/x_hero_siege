@@ -4,6 +4,7 @@
 	var hoveredTarget = null;
 	var HOVER_INTERVAL = 0.05;
 	var TOOLTIP_LAYER_INTERVAL = 0.25;
+	var CONTEXT_MENU_LAYER_Z_INDEX = "13900";
 	var TOOLTIP_LAYER_Z_INDEX = "14000";
 	var CINEMATIC_LAYER_Z_INDEX = "15000";
 	var HUD_LAYER_INTERVAL = 0.25;
@@ -21,6 +22,20 @@
 		"AbilityTooltip",
 		"ItemTooltip"
 	];
+	var CONTEXT_MENU_PANEL_IDS = [
+		"ContextMenuManager",
+		"ContextMenu",
+		"DOTAContextMenu",
+		"ItemContextMenu",
+		"DOTAItemContextMenu",
+		"ContextMenuBody"
+	];
+	var CONTEXT_MENU_PANEL_CLASSES = [
+		"ContextMenuManager",
+		"ContextMenu",
+		"ItemContextMenu",
+		"ContextMenuBody"
+	];
 	// Shared HUD layer contract. Values intentionally leave room for local
 	// children; ordering direct Hud children is what makes these priorities work
 	// across vanilla and custom Panorama branches.
@@ -30,10 +45,12 @@
 		{ key: "leaderboards", z: 300, ids: ["XHSFarmLeaderboard"] },
 		{ key: "scoreboard", z: 400, ids: ["XHSScoreboard", "TeamsContainer"] },
 		{ key: "health", z: 600, ids: ["DiretidePanel", "CastleHP", "BossHP1"], classes: ["Diretide"] },
-		{ key: "windows", z: 800, ids: ["XHSSupporterPassWindow", "GameInfoPanel"] },
+		{ key: "windows", z: 800, ids: ["GameInfoPanel"] },
 		{ key: "modals", z: 1000, ids: ["EventPanel"] },
 		{ key: "notifications", z: 1100, ids: ["XHSRewardFlyoutLayer", "XHSWaveCountdown", "XHSPauseRoot"], classes: ["XHSNotificationsRoot"] },
+		{ key: "supporter_pass", z: 1150, ids: ["XHSSupporterPassWindow"], classes: ["XHSSupporterPassRoot"] },
 		{ key: "devtools", z: 1200, ids: ["XHSDevToolsPanel", "XHSUIRecoveryClose"], classes: ["SupporterContentStudioRoot", "XHSUIRecoveryRoot"] },
+		{ key: "flyout", z: 1300, ids: ["DungeonScoreboard"], classes: ["FlyoutScoreboardRoot"] },
 		{ key: "cinematic", z: 15000, ids: ["XHSCinematicTopBar"], classes: ["XHSCinematicRoot"] }
 	];
 
@@ -55,7 +72,6 @@
 		{ id: "FloatingDialogPanel", visibleClass: "Visible", removeClasses: ["Visible"] },
 		{ id: "ZoneToastPanel", visibleClass: "Visible", removeClasses: ["Visible"] },
 		{ id: "EventPanel", visibleClass: "XHSEventsPanelVisible", removeClasses: ["XHSEventsPanelVisible"] },
-		{ id: "XHSSupporterPassWindow", anyVisibleClass: ["IsVisible", "IsOpening"], removeClasses: ["IsVisible", "IsOpening", "IsClosing"] },
 		{ id: "XHSFarmLeaderboard", visibleClass: "IsVisible", removeClasses: ["IsVisible"] },
 		{ id: "XHSDevToolsPanel", visibleClass: "Visible", removeClasses: ["Visible"] }
 	];
@@ -87,11 +103,128 @@
 		return parent === hud ? current : null;
 	}
 
+	function promoteTooltipHost(tooltip, hud) {
+		var host = directHudChild(tooltip, hud);
+		if (!isValid(host) || host.id !== "HUDElements" || !tooltip.SetParent) return host;
+
+		// Native item/ability tooltips normally live below HUDElements, which
+		// means a direct custom HUD sibling can cover them regardless of z-index.
+		// Move only the dedicated tooltip branch to Hud; never move HUDElements.
+		var branch = tooltip;
+		var parent = branch.GetParent ? branch.GetParent() : null;
+		while (parent && parent !== host) {
+			branch = parent;
+			parent = branch.GetParent ? branch.GetParent() : null;
+		}
+		if (parent === host && isTooltipPanel(branch) && branch.SetParent) {
+			try {
+				branch.SetParent(hud);
+				return branch;
+			} catch (error) {
+				$.Msg("[XHS UI Layers] Could not promote native tooltip branch: " + error);
+			}
+		}
+		return host;
+	}
+
+	function isContextMenuPanel(panel) {
+		if (!isValid(panel)) return false;
+		var signature = (String(panel.id || "") + String(panel.paneltype || ""))
+			.toLowerCase().replace(/[^a-z0-9]/g, "");
+		if (signature.indexOf("contextmenu") !== -1) return true;
+		if (!panel.BHasClass) return false;
+		for (var classIndex = 0; classIndex < CONTEXT_MENU_PANEL_CLASSES.length; classIndex++) {
+			if (panel.BHasClass(CONTEXT_MENU_PANEL_CLASSES[classIndex])) return true;
+		}
+		return false;
+	}
+
+	function promoteContextMenuHost(contextMenu, hud) {
+		if (!isValid(contextMenu) || !isValid(hud)) return null;
+		var host = directHudChild(contextMenu, hud);
+		if (!isValid(host)) return null;
+
+		if (host.id === "HUDElements" && contextMenu.SetParent) {
+			var branch = contextMenu;
+			var parent = branch.GetParent ? branch.GetParent() : null;
+			while (parent && parent !== host) {
+				branch = parent;
+				parent = branch.GetParent ? branch.GetParent() : null;
+			}
+			// Never promote a broad lower-HUD branch based only on a nested menu.
+			// The immediate native branch must itself be dedicated to context menus.
+			if (parent === host && isContextMenuPanel(branch) && branch.SetParent) {
+				try {
+					branch.SetParent(hud);
+					host = branch;
+				} catch (error) {
+					$.Msg("[XHS UI Layers] Could not promote native context menu: " + error);
+				}
+			}
+		}
+
+		if (isValid(host) && host.id !== "HUDElements") {
+			host.style.zIndex = CONTEXT_MENU_LAYER_Z_INDEX;
+		}
+		return host;
+	}
+
+	function collectDynamicContextMenus(panel, depth, result) {
+		if (!isValid(panel) || depth > 5 || !panel.GetChildCount || !panel.GetChild) return;
+		for (var childIndex = 0; childIndex < panel.GetChildCount(); childIndex++) {
+			var child = panel.GetChild(childIndex);
+			if (!isValid(child)) continue;
+			if (isContextMenuPanel(child)) {
+				result.push(child);
+				continue;
+			}
+			collectDynamicContextMenus(child, depth + 1, result);
+		}
+	}
+
+	function keepNativeContextMenusOnTop(hud) {
+		if (!isValid(hud) || !hud.FindChildTraverse) return;
+		var seen = [];
+		for (var idIndex = 0; idIndex < CONTEXT_MENU_PANEL_IDS.length; idIndex++) {
+			var panel = hud.FindChildTraverse(CONTEXT_MENU_PANEL_IDS[idIndex]);
+			if (isValid(panel) && seen.indexOf(panel) === -1) {
+				seen.push(panel);
+				promoteContextMenuHost(panel, hud);
+			}
+		}
+		if (hud.FindChildrenWithClassTraverse) {
+			for (var classIndex = 0; classIndex < CONTEXT_MENU_PANEL_CLASSES.length; classIndex++) {
+				var panels = hud.FindChildrenWithClassTraverse(CONTEXT_MENU_PANEL_CLASSES[classIndex]) || [];
+				for (var panelIndex = 0; panelIndex < panels.length; panelIndex++) {
+					if (isValid(panels[panelIndex]) && seen.indexOf(panels[panelIndex]) === -1) {
+						seen.push(panels[panelIndex]);
+						promoteContextMenuHost(panels[panelIndex], hud);
+					}
+				}
+			}
+		}
+
+		var hudElements = hud.FindChildTraverse("HUDElements");
+		var dynamicPanels = [];
+		collectDynamicContextMenus(hudElements, 0, dynamicPanels);
+		for (var dynamicIndex = 0; dynamicIndex < dynamicPanels.length; dynamicIndex++) {
+			if (seen.indexOf(dynamicPanels[dynamicIndex]) === -1) {
+				seen.push(dynamicPanels[dynamicIndex]);
+				promoteContextMenuHost(dynamicPanels[dynamicIndex], hud);
+			}
+		}
+	}
+
 	function childMatchesRule(child, rule) {
 		if (!isValid(child)) return false;
 		// HUDElements contains most vanilla panels. Never classify the whole
 		// vanilla tree from a nested signature such as TeamsContainer or shop.
 		if (child.id === "HUDElements") return rule.key === "base";
+		// The flyout contains a TeamsContainer too. Give its direct Hud host one
+		// unambiguous priority instead of also classifying it as the base scoreboard.
+		if (child.FindChildTraverse && child.FindChildTraverse("DungeonScoreboard")) {
+			return rule.key === "flyout";
+		}
 		for (var i = 0; i < rule.ids.length; i++) {
 			if (child.id === rule.ids[i] || (child.FindChildTraverse && child.FindChildTraverse(rule.ids[i]))) {
 				return true;
@@ -138,7 +271,7 @@
 		// when it is not HUDElements; raising HUDElements would cover all custom UI.
 		for (var tooltipIndex = 0; tooltipIndex < TOOLTIP_PANEL_IDS.length; tooltipIndex++) {
 			var tooltip = hud.FindChildTraverse(TOOLTIP_PANEL_IDS[tooltipIndex]);
-			var tooltipHost = directHudChild(tooltip, hud);
+			var tooltipHost = promoteTooltipHost(tooltip, hud);
 			if (isValid(tooltipHost) && tooltipHost.id !== "HUDElements") {
 				tooltipHost.style.zIndex = TOOLTIP_LAYER_Z_INDEX;
 				var cinematic = hud.FindChildTraverse("XHSCinematicTopBar");
@@ -173,6 +306,7 @@
 
 	function keepNativeTooltipsOnTop() {
 		var root = getHudRoot();
+		var hud = findPanel("Hud") || root;
 		if (root && root.FindChildTraverse) {
 			for (var i = 0; i < TOOLTIP_PANEL_IDS.length; i++) {
 				var panel = root.FindChildTraverse(TOOLTIP_PANEL_IDS[i]);
@@ -181,6 +315,7 @@
 				}
 			}
 		}
+		keepNativeContextMenusOnTop(hud);
 		$.Schedule(TOOLTIP_LAYER_INTERVAL, keepNativeTooltipsOnTop);
 	}
 
