@@ -178,8 +178,16 @@
 						<Label id="XHSXPPlayerName" class="XHSXPPlayerName" text="Player" />
 					</Panel>
 					<Panel class="XHSXPTotalBlock">
-						<Label class="XHSXPTotalCaption" text="TOTAL EARNED" />
+						<Label id="XHSXPTotalCaption" class="XHSXPTotalCaption" text="TOTAL EARNED" />
 						<Label id="XHSXPTotalGain" class="XHSXPTotalGain" text="+0 XP" />
+					</Panel>
+				</Panel>
+
+				<Panel id="XHSXPSimulationNotice" class="XHSXPSimulationNotice">
+					<Label class="XHSXPSimulationIcon" text="!" />
+					<Panel class="XHSXPSimulationCopy">
+						<Label id="XHSXPSimulationTitle" class="XHSXPSimulationTitle" text="SIMULATION ONLY - MATCH NOT ELIGIBLE" />
+						<Label id="XHSXPSimulationText" class="XHSXPSimulationText" text="Theoretical XP is shown for preview. Nothing is saved." />
 					</Panel>
 				</Panel>
 
@@ -233,7 +241,7 @@
 				</Panel>
 
 				<Panel class="XHSXPFooter">
-					<Label class="XHSXPFooterHint" text="Your unlocked rewards will follow" />
+					<Label id="XHSXPFooterHint" class="XHSXPFooterHint" text="Your unlocked rewards will follow" />
 					<Button id="XHSXPContinueButton" class="XHSXPContinueButton" enabled="false">
 						<Label id="XHSXPContinueButtonLabel" text="CONTINUE TO REWARDS" />
 						<Panel class="XHSXPContinueArrow" hittest="false" />

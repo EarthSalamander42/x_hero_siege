@@ -8,8 +8,8 @@
 		<include src="file://{resources}/scripts/custom_game/boss_healthbar.js" />
 	</scripts>
 
-	<Panel class="Diretide" hittest="false">
-		<Panel id="DiretidePanel">
+	<Panel class="Diretide" hittest="false" hittestchildren="true">
+		<Panel id="DiretidePanel" hittest="false" hittestchildren="true">
 			<Panel id="CastleHP" class="HealthBarContainer CastleHealthBar" hittest="false">
 				<Panel class="BossHeader" hittest="false">
 					<Label id="CastleLabel" class="HoldoutLabelSmall" hittest="false" text=""/>
@@ -31,10 +31,11 @@
 				</Panel>
 			</Panel>
 
-			<Panel id="BossHP1" class="HealthBarContainer" hittest="false">
-				<Panel class="BossHeader" hittest="false">
+			<Panel id="BossHP1" class="HealthBarContainer" hittest="false" hittestchildren="true">
+				<Panel class="BossHeader" hittest="false" hittestchildren="true">
 					<Label id="BossLabel1" class="HoldoutLabelSmall" hittest="false" text=""/>
 					<Label id="BossLevel1" class="HoldoutLabelSmall_alt" hittest="false" text=""/>
+					<Button id="BossClose1" class="BossSelectionClose" hittest="true"><Label text="×" hittest="false"/></Button>
 				</Panel>
 				<Panel id="BossProgressBarContainer1" class="BossProgressBarContainer" hittest="false">
 					<Panel id="BossIcon1" class="BossIcon" hittest="false">
@@ -78,10 +79,11 @@
 				</Panel>
 			</Panel>
 
-			<Panel id="BossHP2" class="HealthBarContainer" hittest="false">
-				<Panel class="BossHeader" hittest="false">
+			<Panel id="BossHP2" class="HealthBarContainer" hittest="false" hittestchildren="true">
+				<Panel class="BossHeader" hittest="false" hittestchildren="true">
 					<Label id="BossLabel2" class="HoldoutLabelSmall" hittest="false" text=""/>
 					<Label id="BossLevel2" class="HoldoutLabelSmall_alt" hittest="false" text=""/>
+					<Button id="BossClose2" class="BossSelectionClose" hittest="true"><Label text="×" hittest="false"/></Button>
 				</Panel>
 				<Panel id="BossProgressBarContainer2" class="BossProgressBarContainer" hittest="false">
 					<Panel id="BossIcon2" class="BossIcon" hittest="false">
@@ -125,10 +127,11 @@
 				</Panel>
 			</Panel>
 
-			<Panel id="BossHP3" class="HealthBarContainer" hittest="false">
-				<Panel class="BossHeader" hittest="false">
+			<Panel id="BossHP3" class="HealthBarContainer" hittest="false" hittestchildren="true">
+				<Panel class="BossHeader" hittest="false" hittestchildren="true">
 					<Label id="BossLabel3" class="HoldoutLabelSmall" hittest="false" text=""/>
 					<Label id="BossLevel3" class="HoldoutLabelSmall_alt" hittest="false" text=""/>
+					<Button id="BossClose3" class="BossSelectionClose" hittest="true"><Label text="×" hittest="false"/></Button>
 				</Panel>
 				<Panel id="BossProgressBarContainer3" class="BossProgressBarContainer" hittest="false">
 					<Panel id="BossIcon3" class="BossIcon" hittest="false">
@@ -172,10 +175,11 @@
 				</Panel>
 			</Panel>
 
-			<Panel id="BossHP4" class="HealthBarContainer" hittest="false">
-				<Panel class="BossHeader" hittest="false">
+			<Panel id="BossHP4" class="HealthBarContainer" hittest="false" hittestchildren="true">
+				<Panel class="BossHeader" hittest="false" hittestchildren="true">
 					<Label id="BossLabel4" class="HoldoutLabelSmall" hittest="false" text=""/>
 					<Label id="BossLevel4" class="HoldoutLabelSmall_alt" hittest="false" text=""/>
+					<Button id="BossClose4" class="BossSelectionClose" hittest="true"><Label text="×" hittest="false"/></Button>
 				</Panel>
 				<Panel id="BossProgressBarContainer4" class="BossProgressBarContainer" hittest="false">
 					<Panel id="BossIcon4" class="BossIcon" hittest="false">

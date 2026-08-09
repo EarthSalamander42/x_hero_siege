@@ -85,6 +85,9 @@ function OpenPhase2Doors(side, cinematic, callback)
 	for _, door_name in ipairs(doors) do
 		DoEntFire(door_name, "SetAnimation", "gate_entrance002_open", 0, nil, nil)
 	end
+	if XHSKnockbackHeroesAtOpeningDoors ~= nil then
+		XHSKnockbackHeroesAtOpeningDoors(doors)
+	end
 	if callback ~= nil then callback() end
 	return true
 end

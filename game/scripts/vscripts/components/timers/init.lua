@@ -384,6 +384,20 @@ function CustomTimers:Think()
 		return
 	end
 
+	-- Farm exit has two dedicated callbacks, but this persistent campaign think
+	-- is the final watchdog for dedicated servers that lose a long-lived think.
+	if SpecialEvents ~= nil
+		and SpecialEvents.farm_event_leaderboard_phase == "celebration"
+		and SpecialEvents.farm_event_end_started ~= true
+		and tonumber(SpecialEvents.farm_event_exit_deadline) ~= nil
+		and GameRules:GetGameTime() >= tonumber(SpecialEvents.farm_event_exit_deadline)
+		and SpecialEvents.RequestFarmEventExit ~= nil then
+		SpecialEvents:RequestFarmEventExit(
+			"custom_timers_watchdog",
+			SpecialEvents.farm_event_generation
+		)
+	end
+
 	-- If no events is happening, keep running
 	if CustomTimers.timers_paused == 0 and GameMode.SpecialArena_occuring ~= true then
 		CustomTimers:Countdown("game_time")

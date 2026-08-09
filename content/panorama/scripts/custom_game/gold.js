@@ -170,6 +170,46 @@ function EnsureBotQuickBuy(quickBuy) {
 	return xhsBotQuickBuy;
 }
 
+function StyleBotQuickBuyRow(row, rowIndex) {
+	row.style.width = '176px';
+	row.style.height = '44px';
+	row.style.horizontalAlign = 'left';
+	row.style.verticalAlign = 'top';
+	row.style.flowChildren = 'right';
+	row.style.padding = '7px 0px 7px 4px';
+	row.style.marginTop = rowIndex === 0 ? '0px' : '44px';
+	row.style.opacity = '1';
+	row.style.visibility = 'visible';
+}
+
+function StyleBotQuickBuySlot(slot) {
+	slot.style.width = '42px';
+	slot.style.height = '30px';
+	slot.style.marginRight = '1px';
+	slot.style.backgroundColor = '#05090dcc';
+	slot.style.border = '1px solid #77c8ff24';
+	slot.style.boxShadow = 'inset #000000c0 0px 0px 3px 0px';
+	slot.style.brightness = '1';
+	slot.style.opacity = '1';
+	slot.style.visibility = 'visible';
+}
+
+function StyleBotQuickBuyItem(item) {
+	item.style.width = '40px';
+	item.style.height = '28px';
+	item.style.horizontalAlign = 'center';
+	item.style.verticalAlign = 'center';
+	item.style.opacity = '1';
+	item.style.visibility = 'visible';
+}
+
+function SetBotQuickBuySlotHovered(slot, hovered) {
+	slot.style.brightness = hovered ? '1.35' : '1';
+	slot.style.border = hovered
+		? '1px solid #77c8ff70'
+		: '1px solid #77c8ff24';
+}
+
 function RenderBotQuickBuy(panel, debug) {
 	panel.RemoveAndDeleteChildren();
 	var queue = GetBotPurchaseQueue(debug);
@@ -212,36 +252,31 @@ function RenderBotQuickBuy(panel, debug) {
 
 	for (var rowIndex = 0; rowIndex < Math.ceil(queue.length / 4); rowIndex++) {
 		var row = $.CreatePanel('Panel', panel, 'XHSBotQuickBuyRow' + rowIndex);
-		row.AddClass('QuickBuyRow');
-		row.style.paddingLeft = '4px';
-		row.style.flowChildren = 'right';
+		StyleBotQuickBuyRow(row, rowIndex);
 		// Valve hides native rows while showing its ALT hint. Bot planning is
 		// read-only telemetry and must remain visible in either input state.
-		row.style.visibility = 'visible';
-		if (rowIndex === 0) {
-			row.style.paddingTop = '8px';
-		} else {
-			row.style.marginTop = '30px';
-			row.style.paddingTop = '10px';
-			row.style.paddingBottom = '8px';
-		}
 
 		var rowEnd = Math.min(queue.length, (rowIndex + 1) * 4);
 		for (var index = rowIndex * 4; index < rowEnd; index++) {
 			var itemName = queue[index];
 			var slot = $.CreatePanel('Panel', row, 'XHSBotQuickBuySlot' + index);
-			slot.AddClass('QuickBuySlot');
+			StyleBotQuickBuySlot(slot);
 			var shopItem = $.CreatePanel('DOTAShopItem', slot, 'XHSBotQuickBuyItem' + index);
-			shopItem.AddClass('MainShopItem');
 			shopItem.itemname = itemName;
 			shopItem.hittest = false;
-			shopItem.style.opacity = '1';
+			StyleBotQuickBuyItem(shopItem);
 			slot.SetPanelEvent('onmouseover', (function (itemPanel, name) {
-				return function () { $.DispatchEvent('DOTAShowAbilityTooltip', itemPanel, name); };
+				return function () {
+					SetBotQuickBuySlotHovered(itemPanel, true);
+					$.DispatchEvent('DOTAShowAbilityTooltip', itemPanel, name);
+				};
 			})(slot, itemName));
-			slot.SetPanelEvent('onmouseout', function () {
-				$.DispatchEvent('DOTAHideAbilityTooltip');
-			});
+			slot.SetPanelEvent('onmouseout', (function (itemPanel) {
+				return function () {
+					SetBotQuickBuySlotHovered(itemPanel, false);
+					$.DispatchEvent('DOTAHideAbilityTooltip');
+				};
+			})(slot));
 		}
 	}
 }

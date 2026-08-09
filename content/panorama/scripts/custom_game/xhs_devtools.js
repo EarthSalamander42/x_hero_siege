@@ -439,6 +439,8 @@ function XHSDevToolsSetCompactMetric(id, value, low, critical) {
 function XHSDevToolsRenderCompactPerformance(data) {
 	data = data || {};
 	var simHealth = XHSDevToolsPerformanceNumber(data.sim_health_pct);
+	var hasSimHealth = data.sim_health_pct !== undefined && data.sim_health_pct !== null &&
+		!isNaN(Number(data.sim_health_pct));
 	var creeps = XHSDevToolsPerformanceNumber(data.creeps);
 	var simHealthLow = data.sim_health_low_pct === undefined ? -1 : XHSDevToolsPerformanceNumber(data.sim_health_low_pct);
 	var creepsHigh = data.creeps_high === undefined ? -1 : XHSDevToolsPerformanceNumber(data.creeps_high);
@@ -452,9 +454,9 @@ function XHSDevToolsRenderCompactPerformance(data) {
 	);
 	XHSDevToolsSetCompactMetric(
 		"#XHSDevToolsServerHealth",
-		simHealth > 0 ? Math.round(simHealth) + "%" : "--",
-		simHealth > 0 && simHealth < 90,
-		simHealth > 0 && simHealth < 70
+		hasSimHealth ? Math.round(simHealth) + "%" : "--",
+		hasSimHealth && simHealth < 90,
+		hasSimHealth && simHealth < 70
 	);
 	XHSDevToolsSetCompactMetric(
 		"#XHSDevToolsCreepCount",
@@ -802,8 +804,10 @@ function XHSDevToolsRenderPerformance() {
 	var creeps = XHSDevToolsPerformanceNumber(data.creeps);
 	var simLagMs = XHSDevToolsPerformanceNumber(data.sim_lag_ms);
 	var simHealth = XHSDevToolsPerformanceNumber(data.sim_health_pct);
-	panel.SetHasClass("Warning", (creeps >= 100 || simLagMs >= 15 || (simHealth > 0 && simHealth < 90)) && creeps < 125 && simLagMs < 30 && (simHealth <= 0 || simHealth >= 70));
-	panel.SetHasClass("Critical", creeps >= 125 || simLagMs >= 30 || (simHealth > 0 && simHealth < 70));
+	var hasSimHealth = data.sim_health_pct !== undefined && data.sim_health_pct !== null &&
+		!isNaN(Number(data.sim_health_pct));
+	panel.SetHasClass("Warning", (creeps >= 100 || simLagMs >= 15 || (hasSimHealth && simHealth < 90)) && creeps < 125 && simLagMs < 30 && (!hasSimHealth || simHealth >= 70));
+	panel.SetHasClass("Critical", creeps >= 125 || simLagMs >= 30 || (hasSimHealth && simHealth < 70));
 
 	XHSDevToolsRenderCompactPerformance(data);
 	XHSDevToolsSetPerformanceText("#XHSPerfTotalUnits", String(XHSDevToolsPerformanceNumber(data.total_units)));
@@ -2943,7 +2947,7 @@ function XHSDevToolsReadBotDebugFromRoster() {
 }
 
 function XHSDevToolsReadBotNetTables() {
-	if (!XHSDevToolsIsToolsMode() || typeof CustomNetTables === "undefined" || !CustomNetTables) {
+	if (typeof CustomNetTables === "undefined" || !CustomNetTables) {
 		return;
 	}
 	XHSDevToolsBotConfig = CustomNetTables.GetTableValue("xhs_bots", "config") || {};
@@ -2960,10 +2964,6 @@ function XHSDevToolsShouldRenderBots() {
 }
 
 function XHSDevToolsOnBots(tableName, key, data) {
-	if (!XHSDevToolsIsToolsMode()) {
-		return;
-	}
-
 	if (key === "config") {
 		XHSDevToolsBotConfig = data || {};
 	} else if (key === "roster") {
@@ -2997,6 +2997,8 @@ function XHSDevToolsOnGameOptions(tableName, key, data) {
 (function() {
 	CustomNetTables.SubscribeNetTableListener("xhs_devtools", XHSDevToolsOnState);
 	CustomNetTables.SubscribeNetTableListener("game_options", XHSDevToolsOnGameOptions);
+	CustomNetTables.SubscribeNetTableListener("xhs_bots", XHSDevToolsOnBots);
+	XHSDevToolsReadBotNetTables();
 		XHSDevToolsPerformance = CustomNetTables.GetTableValue("xhs_devtools", "performance") || {};
 		XHSDevToolsLagLab = CustomNetTables.GetTableValue("xhs_devtools", "lag_lab") || {};
 	XHSDevToolsPerformanceAccess = CustomNetTables.GetTableValue(
@@ -3010,13 +3012,11 @@ function XHSDevToolsOnGameOptions(tableName, key, data) {
 	XHSDevToolsClientFPSTick();
 
 	if (XHSDevToolsIsToolsMode()) {
-		CustomNetTables.SubscribeNetTableListener("xhs_bots", XHSDevToolsOnBots);
 		var state = CustomNetTables.GetTableValue("xhs_devtools", "state");
 		if (state) {
 			XHSDevToolsState = state;
 			XHSDevToolsHasServerState = true;
 		}
-		XHSDevToolsReadBotNetTables();
 		XHSDevToolsRender();
 		XHSDevToolsSpectatorCameraTick();
 		XHSDevToolsSpectatorTick();

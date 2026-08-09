@@ -1071,6 +1071,9 @@ function XHSDevTools:SetLaneDoor(lane, open)
 
 	if open then
 		DoEntFire("door_lane" .. lane, "SetAnimation", "gate_02_open", 0, nil, nil)
+		if XHSKnockbackHeroesAtOpeningDoors ~= nil then
+			XHSKnockbackHeroesAtOpeningDoors({ "door_lane" .. lane })
+		end
 	else
 		DoEntFire("door_lane" .. lane, "SetAnimation", "gate_02_close", 0, nil, nil)
 	end

@@ -32,8 +32,8 @@
 		// Attack
 		//----------------------------------------------------------------
 		"AttackCapabilities"		"DOTA_UNIT_CAP_MELEE_ATTACK"
-		"AttackDamageMin"			"28"							// Damage range min. Level 1 balance: -10%.
-		"AttackDamageMax"			"40"						// Damage range max. Level 1 balance: -10%.
+		"AttackDamageMin"			"20"							// Damage range min. Level 1 current damage reduced by 30%.
+		"AttackDamageMax"			"28"						// Damage range max. Level 1 current damage reduced by 30%.
 		"AttackRate"				"1.45"						// Speed of attack.
 		"AttackAnimationPoint"		"0.39"						// Normalized time in animation cycle to attack.
 		"AttackAcquisitionRange"	"1000"						// Range within a target can be acquired.
@@ -107,8 +107,8 @@
 		// Attack
 		//----------------------------------------------------------------
 		"AttackCapabilities"		"DOTA_UNIT_CAP_RANGED_ATTACK"
-		"AttackDamageMin"			"28"							// Damage range min. Level 1 balance: -10%.
-		"AttackDamageMax"			"40"						// Damage range max. Level 1 balance: -10%.
+		"AttackDamageMin"			"20"							// Damage range min. Level 1 current damage reduced by 30%.
+		"AttackDamageMax"			"28"						// Damage range max. Level 1 current damage reduced by 30%.
 		"AttackRate"				"1.45"						// Speed of attack.
 		"AttackAnimationPoint"		"0.39"						// Normalized time in animation cycle to attack.
 		"AttackAcquisitionRange"	"1000"						// Range within a target can be acquired.
@@ -185,8 +185,8 @@
 		// Attack
 		//----------------------------------------------------------------
 		"AttackCapabilities"		"DOTA_UNIT_CAP_MELEE_ATTACK"
-		"AttackDamageMin"			"28"							// Damage range min. Level 1 balance: -10%.
-		"AttackDamageMax"			"40"						// Damage range max. Level 1 balance: -10%.
+		"AttackDamageMin"			"20"							// Damage range min. Level 1 current damage reduced by 30%.
+		"AttackDamageMax"			"28"						// Damage range max. Level 1 current damage reduced by 30%.
 		"AttackRate"				"1.45"						// Speed of attack.
 		"AttackAnimationPoint"		"0.39"						// Normalized time in animation cycle to attack.
 		"AttackAcquisitionRange"	"1000"						// Range within a target can be acquired.
@@ -260,8 +260,8 @@
 		// Attack
 		//----------------------------------------------------------------
 		"AttackCapabilities"		"DOTA_UNIT_CAP_MELEE_ATTACK"
-		"AttackDamageMin"			"28"							// Damage range min. Level 1 balance: -10%.
-		"AttackDamageMax"			"40"						// Damage range max. Level 1 balance: -10%.
+		"AttackDamageMin"			"20"							// Damage range min. Level 1 current damage reduced by 30%.
+		"AttackDamageMax"			"28"						// Damage range max. Level 1 current damage reduced by 30%.
 		"AttackRate"				"1.45"						// Speed of attack.
 		"AttackAnimationPoint"		"0.39"						// Normalized time in animation cycle to attack.
 		"AttackAcquisitionRange"	"1000"						// Range within a target can be acquired.
@@ -336,8 +336,8 @@
 		// Attack
 		//----------------------------------------------------------------
 		"AttackCapabilities"		"DOTA_UNIT_CAP_RANGED_ATTACK"
-		"AttackDamageMin"			"40"						// Damage range min. Level 1 balance: -10%.
-		"AttackDamageMax"			"54"						// Damage range max. Level 1 balance: -10%.
+		"AttackDamageMin"			"28"						// Damage range min. Level 1 current damage reduced by 30%.
+		"AttackDamageMax"			"38"						// Damage range max. Level 1 current damage reduced by 30%.
 		"AttackRate"				"1.45"						// Speed of attack.
 		"AttackAnimationPoint"		"0.64"						// Normalized time in animation cycle to attack.
 		"AttackAcquisitionRange"	"1000"						// Range within a target can be acquired.
@@ -414,8 +414,8 @@
 		// Attack
 		//----------------------------------------------------------------
 		"AttackCapabilities"		"DOTA_UNIT_CAP_RANGED_ATTACK"
-		"AttackDamageMin"			"40"						// Damage range min. Level 1 balance: -10%.
-		"AttackDamageMax"			"54"						// Damage range max. Level 1 balance: -10%.
+		"AttackDamageMin"			"28"						// Damage range min. Level 1 current damage reduced by 30%.
+		"AttackDamageMax"			"38"						// Damage range max. Level 1 current damage reduced by 30%.
 		"AttackRate"				"1.45"						// Speed of attack.
 		"AttackAnimationPoint"		"0.64"						// Normalized time in animation cycle to attack.
 		"AttackAcquisitionRange"	"1000"						// Range within a target can be acquired.
@@ -492,8 +492,8 @@
 		// Attack
 		//----------------------------------------------------------------
 		"AttackCapabilities"		"DOTA_UNIT_CAP_RANGED_ATTACK"
-		"AttackDamageMin"			"40"						// Damage range min. Level 1 balance: -10%.
-		"AttackDamageMax"			"54"						// Damage range max. Level 1 balance: -10%.
+		"AttackDamageMin"			"28"						// Damage range min. Level 1 current damage reduced by 30%.
+		"AttackDamageMax"			"38"						// Damage range max. Level 1 current damage reduced by 30%.
 		"AttackRate"				"1.45"						// Speed of attack.
 		"AttackAnimationPoint"		"0.64"						// Normalized time in animation cycle to attack.
 		"AttackAcquisitionRange"	"1000"						// Range within a target can be acquired.
@@ -570,8 +570,8 @@
 		// Attack
 		//----------------------------------------------------------------
 		"AttackCapabilities"		"DOTA_UNIT_CAP_RANGED_ATTACK"
-		"AttackDamageMin"			"40"						// Damage range min. Level 1 balance: -10%.
-		"AttackDamageMax"			"54"						// Damage range max. Level 1 balance: -10%.
+		"AttackDamageMin"			"28"						// Damage range min. Level 1 current damage reduced by 30%.
+		"AttackDamageMax"			"38"						// Damage range max. Level 1 current damage reduced by 30%.
 		"AttackRate"				"1.45"						// Speed of attack.
 		"AttackAnimationPoint"		"0.64"						// Normalized time in animation cycle to attack.
 		"AttackAcquisitionRange"	"1000"						// Range within a target can be acquired.
@@ -2195,8 +2195,8 @@
 		// Attack
 		//----------------------------------------------------------------
 		"AttackCapabilities"		"DOTA_UNIT_CAP_RANGED_ATTACK"
-		"AttackDamageMin"			"722"						// Base damage range min. Tier balance: -20%.
-		"AttackDamageMax"			"763"						// Base damage range max. Tier balance: -20%.
+		"AttackDamageMin"			"542"						// Base damage range min. Reduced by an additional 25%.
+		"AttackDamageMax"			"572"						// Base damage range max. Reduced by an additional 25%.
 		"AttackRate"				"1.05"						// Speed of attack.
 		"AttackAnimationPoint"		"0.40"						// Normalized time in animation cycle to attack.
 		"AttackAcquisitionRange"	"1500"						// Range within a target can be acquired.

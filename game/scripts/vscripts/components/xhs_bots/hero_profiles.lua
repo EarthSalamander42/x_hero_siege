@@ -357,13 +357,30 @@ local PROFILE_BY_HERO = {
 			"holdout_innate_great_cleave",
 		},
 		abilities = {
-			holdout_firestorm = { mode = "point_aoe", priority = 82, radius = 400, minimum_targets = 2 },
-			holdout_war_thunder = { mode = "no_target_enemy", priority = 78, radius = 400, minimum_targets = 2, control = true },
+			holdout_firestorm = {
+				mode = "point_aoe",
+				priority = 82,
+				radius = 400,
+				minimum_targets = 2,
+				damage_key = "wave_damage",
+				-- Eight waves are possible, but moving creeps rarely remain in every
+				-- impact. Four waves keeps the engagement forecast conservative.
+				forecast_damage_multiplier = 4,
+			},
+			holdout_war_thunder = {
+				mode = "no_target_enemy",
+				priority = 78,
+				radius = 400,
+				minimum_targets = 2,
+				damage_key = "stomp_damage",
+				control = true,
+			},
 			holdout_rain_of_chaos = {
 				mode = "no_target_enemy",
 				priority = 91,
 				radius = 1000,
 				minimum_targets = 3,
+				damage_key = "damage_per_unit",
 				cast_on_boss = true,
 				control = true,
 			},

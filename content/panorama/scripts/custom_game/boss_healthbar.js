@@ -2,8 +2,14 @@
 
 var BossBarState = {};
 var BossBarIdentity = {};
+var BossBarEntityIndex = {};
+var BossBarSelectionOnly = {};
 var RetiredBossBarIdentity = {};
 var BossCastState = {};
+var LastPortraitEntityIndex = -1;
+var DismissedSelectedBossEntityIndex = -1;
+var LastSelectedBossRequestEntityIndex = -1;
+var LastSelectedBossRequestTime = -100;
 var MAX_BOSS_BARS = 4;
 var BOSS_BAR_RETIRE_SECONDS = 3.0;
 var DEFAULT_BOSS_FILL_BACKGROUND = "gradient( linear, 0% 0%, 100% 0%, from( #2a0610 ), color-stop( 0.55, #c72542 ), to( #f5fff7 ) )";
@@ -35,6 +41,7 @@ function GetBossPanels(index) {
 		castTime: $("#BossCastTime" + index),
 		castFill: $("#BossCastFill" + index),
 		castGlow: $("#BossCastGlow" + index),
+		close: $("#BossClose" + index),
 	};
 }
 
@@ -208,6 +215,7 @@ function ResetBossPanels(index, panels) {
 	panels.container.RemoveClass("BossDamaged");
 	panels.container.RemoveClass("BossHealed");
 	panels.container.RemoveClass("BossHeavyDamage");
+	panels.container.RemoveClass("SelectionCloseVisible");
 	panels.label.text = "";
 	panels.level.text = "";
 	panels.level.style.visibility = "collapse";
@@ -252,9 +260,14 @@ function ResetBossPanels(index, panels) {
 	}
 	SetBossCastIcon(panels, null);
 	SetBossBarMarkers(panels, null);
+	if (panels.close) {
+		panels.close.RemoveClass("Visible");
+	}
 
 	delete BossBarState[index];
 	delete BossBarIdentity[index];
+	delete BossBarEntityIndex[index];
+	delete BossBarSelectionOnly[index];
 	delete BossCastState[index];
 }
 
@@ -537,6 +550,8 @@ function ShowBossBar(args) {
 		}
 		ResetBossPanels(index, panels);
 		SetBossBarIdentity(index, args);
+		BossBarEntityIndex[index] = Number(args.boss_entindex) || -1;
+		BossBarSelectionOnly[index] = Number(args.selection_only) === 1;
 		SetBossIcon(panels, args.boss_icon);
 
 		panels.container.style.visibility = "visible";
@@ -546,6 +561,7 @@ function ShowBossBar(args) {
 		SetBossBarMarkers(panels, args.boss_bar_markers);
 		SetBossHealthFill(index, panels, health, maxHealth, args, true);
 		UpdateBossBarLayout();
+		RefreshSelectedBossFromPortrait();
 	}
 }
 
@@ -569,6 +585,12 @@ function UpdateBossBar(args) {
 			panels.container.style.visibility = "visible";
 		}
 		SetBossBarIdentity(index, args);
+		if (args.boss_entindex !== undefined && args.boss_entindex !== null) {
+			BossBarEntityIndex[index] = Number(args.boss_entindex) || -1;
+		}
+		if (Number(args.selection_only) !== 1) {
+			BossBarSelectionOnly[index] = false;
+		}
 
 		if (args.boss_name) {
 			panels.label.text = FormatBossName(args.boss_name);
@@ -581,6 +603,7 @@ function UpdateBossBar(args) {
 		SetBossBarMarkers(panels, args.boss_bar_markers);
 		SetBossHealthFill(index, panels, health, maxHealth, args, false);
 		UpdateBossBarLayout();
+		RefreshSelectedBossFromPortrait();
 	}
 }
 
@@ -603,7 +626,203 @@ function HideBossBar(args) {
 		}
 		ResetBossPanels(index, panels);
 		UpdateBossBarLayout();
+		RefreshSelectedBossFromPortrait();
 	}
+}
+
+function GetPortraitEntityIndex() {
+	if (!Players.GetLocalPlayerPortraitUnit) {
+		return -1;
+	}
+
+	return Number(Players.GetLocalPlayerPortraitUnit()) || -1;
+}
+
+function EntityHasBossHealthAbility(entityIndex) {
+	if (entityIndex < 0 || !Entities.IsValidEntity(entityIndex)) {
+		return false;
+	}
+	if (Entities.IsAlive && !Entities.IsAlive(entityIndex)) {
+		return false;
+	}
+
+	if (!Entities.GetAbility || typeof Abilities === "undefined" || !Abilities.GetAbilityName) {
+		return false;
+	}
+
+	for (var abilityIndex = 0; abilityIndex < 24; abilityIndex++) {
+		var ability = Entities.GetAbility(entityIndex, abilityIndex);
+		if (ability !== -1 && Abilities.GetAbilityName(ability) === "boss_health") {
+			return true;
+		}
+	}
+
+	return false;
+}
+
+function SetBossSelectionCloseVisible(panels, visible) {
+	if (!panels || !panels.container || !panels.close) {
+		return;
+	}
+
+	panels.container.SetHasClass("SelectionCloseVisible", visible);
+	panels.close.SetHasClass("Visible", visible);
+}
+
+function FindServerBossBarForEntity(entityIndex) {
+	for (var index = 1; index <= MAX_BOSS_BARS; index++) {
+		if (BossBarIdentity[index] && BossBarEntityIndex[index] === entityIndex) {
+			return index;
+		}
+	}
+
+	return -1;
+}
+
+function RestoreDismissedServerBossBar() {
+	var index = FindServerBossBarForEntity(DismissedSelectedBossEntityIndex);
+	if (index < 1 || BossBarSelectionOnly[index]) {
+		return;
+	}
+
+	var panels = GetBossPanels(index);
+	if (panels.container) {
+		panels.container.style.visibility = "visible";
+	}
+}
+
+function ClearSelectionOnlyBossBar(entityIndex) {
+	var index = FindServerBossBarForEntity(entityIndex);
+	if (index < 1 || !BossBarSelectionOnly[index]) {
+		return;
+	}
+
+	ResetBossPanels(index, GetBossPanels(index));
+}
+
+function GetSelectedBossRequestTime() {
+	return typeof Game !== "undefined" && Game.GetGameTime
+		? Game.GetGameTime()
+		: Date.now() / 1000;
+}
+
+function RequestCanonicalBossBar(entityIndex) {
+	var now = GetSelectedBossRequestTime();
+	if (LastSelectedBossRequestEntityIndex === entityIndex
+		&& now - LastSelectedBossRequestTime < 0.75) {
+		return;
+	}
+
+	LastSelectedBossRequestEntityIndex = entityIndex;
+	LastSelectedBossRequestTime = now;
+	GameEvents.SendCustomGameEventToServer("xhs_request_selected_boss_bar", {
+		boss_entindex: entityIndex,
+	});
+}
+
+function UpdateSelectionOnlyBossHealth(index, entityIndex) {
+	if (!BossBarSelectionOnly[index] || !Entities.IsValidEntity(entityIndex)) {
+		return;
+	}
+
+	var panels = GetBossPanels(index);
+	var health = Math.max(0, Number(Entities.GetHealth(entityIndex)) || 0);
+	var maxHealth = Math.max(1, Number(Entities.GetMaxHealth(entityIndex)) || 1);
+	panels.health.text = FormatBossHealth(health) + " / " + FormatBossHealth(maxHealth);
+	SetBossHealthFill(index, panels, health, maxHealth, null, false);
+}
+
+function ShowCanonicalSelectedBossBar(args) {
+	var entityIndex = Number(args && args.boss_entindex) || -1;
+	if (entityIndex < 0
+		|| entityIndex !== GetPortraitEntityIndex()
+		|| entityIndex === DismissedSelectedBossEntityIndex
+		|| !EntityHasBossHealthAbility(entityIndex)) {
+		return;
+	}
+
+	LastSelectedBossRequestEntityIndex = -1;
+	var existingIndex = FindServerBossBarForEntity(entityIndex);
+	if (existingIndex < 1) {
+		var identityIndex = GetBossBarIndex(args);
+		var identity = GetBossBarIdentity(args);
+		if (identity && BossBarIdentity[identityIndex] === identity) {
+			BossBarEntityIndex[identityIndex] = entityIndex;
+			existingIndex = identityIndex;
+		}
+	}
+	if (existingIndex < 1) {
+		args.selection_only = 1;
+		ShowBossBar(args);
+		existingIndex = FindServerBossBarForEntity(entityIndex);
+	}
+
+	if (existingIndex > 0) {
+		var panels = GetBossPanels(existingIndex);
+		panels.container.style.visibility = "visible";
+		SetBossSelectionCloseVisible(panels, true);
+		UpdateBossBarLayout();
+	}
+}
+
+function RefreshSelectedBossFromPortrait() {
+	var entityIndex = GetPortraitEntityIndex();
+	if (entityIndex !== LastPortraitEntityIndex) {
+		RestoreDismissedServerBossBar();
+		ClearSelectionOnlyBossBar(LastPortraitEntityIndex);
+		DismissedSelectedBossEntityIndex = -1;
+		LastSelectedBossRequestEntityIndex = -1;
+		LastPortraitEntityIndex = entityIndex;
+	}
+
+	for (var index = 1; index <= MAX_BOSS_BARS; index++) {
+		SetBossSelectionCloseVisible(GetBossPanels(index), false);
+	}
+
+	if (entityIndex === DismissedSelectedBossEntityIndex || !EntityHasBossHealthAbility(entityIndex)) {
+		UpdateBossBarLayout();
+		return;
+	}
+
+	var serverBarIndex = FindServerBossBarForEntity(entityIndex);
+	if (serverBarIndex > 0) {
+		var serverPanels = GetBossPanels(serverBarIndex);
+		serverPanels.container.style.visibility = "visible";
+		SetBossSelectionCloseVisible(serverPanels, true);
+		UpdateSelectionOnlyBossHealth(serverBarIndex, entityIndex);
+		UpdateBossBarLayout();
+		return;
+	}
+
+	RequestCanonicalBossBar(entityIndex);
+}
+
+function CloseSelectedServerBossBar(index) {
+	var entityIndex = GetPortraitEntityIndex();
+	if (BossBarEntityIndex[index] !== entityIndex) {
+		return;
+	}
+
+	DismissedSelectedBossEntityIndex = entityIndex;
+	var panels = GetBossPanels(index);
+	SetBossSelectionCloseVisible(panels, false);
+	if (BossBarSelectionOnly[index]) {
+		ResetBossPanels(index, panels);
+	} else {
+		panels.container.style.visibility = "collapse";
+	}
+	UpdateBossBarLayout();
+}
+
+function OnBossSelectionChanged() {
+	// The selection event fires before the stock portrait unit is refreshed.
+	$.Schedule(0.0, RefreshSelectedBossFromPortrait);
+	$.Schedule(0.05, RefreshSelectedBossFromPortrait);
+}
+
+function PollSelectedBossBar() {
+	RefreshSelectedBossFromPortrait();
+	$.Schedule(0.1, PollSelectedBossBar);
 }
 
 function GetCastlePanels() {
@@ -973,10 +1192,24 @@ function OnGamePauseState(args) {
 				ResetBossPanels(index, GetBossPanels(index));
 				UpdateBossBarLayout();
 			};
+
+			var close = $("#BossClose" + index);
+			if (close) {
+				close.SetPanelEvent("onactivate", function () {
+					CloseSelectedServerBossBar(index);
+				});
+				close.SetPanelEvent("onmouseover", function () {
+					$.DispatchEvent("DOTAShowTextTooltip", close, "Close boss bar");
+				});
+				close.SetPanelEvent("onmouseout", function () {
+					$.DispatchEvent("DOTAHideTextTooltip");
+				});
+			}
 		})(recoveryIndex);
 	}
 
 	GameEvents.Subscribe("show_boss_hp", ShowBossBar);
+	GameEvents.Subscribe("xhs_show_selected_boss_hp", ShowCanonicalSelectedBossBar);
 	GameEvents.Subscribe("update_boss_hp", UpdateBossBar);
 	GameEvents.Subscribe("hide_boss_hp", HideBossBar);
 	GameEvents.Subscribe("show_castle_hp", ShowCastleBar);
@@ -994,4 +1227,7 @@ function OnGamePauseState(args) {
 	GameEvents.Subscribe("xhs_boss_cast_start", StartBossCast);
 	GameEvents.Subscribe("xhs_boss_cast_hide", HideBossCast);
 	GameEvents.Subscribe("xhs_game_pause_state", OnGamePauseState);
+	GameEvents.Subscribe("dota_player_update_selected_unit", OnBossSelectionChanged);
+	GameEvents.Subscribe("dota_player_update_query_unit", OnBossSelectionChanged);
+	PollSelectedBossBar();
 })();

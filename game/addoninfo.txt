@@ -15,7 +15,7 @@
 
 	"x_hero_siege_8"
 	{
-		"MaxPlayers"			"9"
+		"MaxPlayers"			"8"
 	}
 
 	"x_hero_siege_demo"

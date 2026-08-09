@@ -4,7 +4,8 @@ end
 
 local SCHEMA_VERSION = 1
 local SAMPLE_INTERVAL = 5
-local SAMPLES_PER_BATCH = 6
+-- Keep the public live viewer within one website polling interval of the game state.
+local SAMPLES_PER_BATCH = 3
 local MAX_PENDING_BATCHES = 8
 local MAX_CLIENT_FPS = 500
 local CLIENT_REPORT_TIMEOUT = 12
@@ -13,7 +14,7 @@ local SERVER_PACING_INTERVAL = 0.1
 local SERVER_PACING_GRACE = 0.04
 local CLIENT_FPS_INCIDENT = 40
 local INCIDENT_CONTEXT_SAMPLES = 4
-local LOCAL_REPORT_SCHEMA_VERSION = 5
+local LOCAL_REPORT_SCHEMA_VERSION = 6
 local LOCAL_REPORT_MAX_SAMPLES = math.ceil(3 * 60 * 60 / SAMPLE_INTERVAL)
 local LOCAL_REPORT_TOP_SOURCES = 3
 local LOCAL_REPORT_PREFIX = "[XHS_PERF_REPORT"
@@ -80,11 +81,25 @@ local function ProfileNow()
 end
 
 local function PacingNow()
+	-- Time() follows the server simulation clock closely enough that comparing
+	-- it with GetGameTime() can report a perfect 100% while a dedicated server
+	-- is falling behind wall time. RealTime() is the independent clock needed
+	-- to observe scheduler stalls and actual simulation throughput.
+	if RealTime ~= nil then
+		local ok, value = pcall(RealTime)
+		if ok and tonumber(value) ~= nil then return tonumber(value) end
+	end
 	if Time ~= nil then
 		local ok, value = pcall(Time)
 		if ok and tonumber(value) ~= nil then return tonumber(value) end
 	end
-	return Now()
+	return GameRules:GetGameTime()
+end
+
+local function PacingClockName()
+	if RealTime ~= nil then return "RealTime" end
+	if Time ~= nil then return "Time" end
+	return "game_time"
 end
 
 local function ProfileClockName()
@@ -188,26 +203,72 @@ function XHSPerformanceTelemetry:BuildPlayers()
 	local maximumPlayers = DOTA_MAX_TEAM_PLAYERS or 24
 	for playerID = 0, maximumPlayers - 1 do
 		local report = self.client_reports[playerID]
-		if report ~= nil and now - report.updated_at <= CLIENT_REPORT_TIMEOUT then
-			local hero = PlayerResource:GetSelectedHeroEntity(playerID)
-			table.insert(players, {
+		local hero = PlayerResource:GetSelectedHeroEntity(playerID)
+		if PlayerResource:IsValidPlayerID(playerID)
+			and hero ~= nil and not hero:IsNull() and hero:IsRealHero() then
+			local origin = hero:GetAbsOrigin()
+			local isBot = PlayerResource.IsFakeClient ~= nil
+				and PlayerResource:IsFakeClient(playerID) or false
+			local player = {
 				slot = playerID,
-				hero = hero ~= nil and not hero:IsNull() and hero:GetUnitName() or nil,
-				fps_average = Round(report.fps_average, 1),
-				fps_p5 = Round(report.fps_p5, 1),
-				frame_ms_p95 = Round(report.frame_ms_p95, 1),
-				frame_ms_max = Round(report.frame_ms_max, 1),
-				freezes_100ms = report.freezes_100ms,
-				freezes_250ms = report.freezes_250ms,
-				freezes_500ms = report.freezes_500ms,
-				seconds_below_60fps = report.seconds_below_60fps,
-				seconds_below_30fps = report.seconds_below_30fps,
-				report_age_seconds = Round(now - report.updated_at, 1),
+				hero = hero:GetUnitName(),
+				player_name = tostring(PlayerResource:GetPlayerName(playerID) or ""),
+				steam_id = isBot and nil or tostring(PlayerResource:GetSteamID(playerID) or ""),
+				team = hero:GetTeamNumber(),
+				is_bot = isBot,
+				alive = hero:IsAlive(),
+				level = hero:GetLevel(),
+				health = math.max(0, hero:GetHealth()),
+				max_health = math.max(1, hero:GetMaxHealth()),
+				health_pct = Round(math.max(0, hero:GetHealth()) * 100 / math.max(1, hero:GetMaxHealth()), 1),
+				x = Round(origin.x, 1),
+				y = Round(origin.y, 1),
+				z = Round(origin.z, 1),
 				ping_ms = PlayerResource.GetPing ~= nil and math.max(0, tonumber(PlayerResource:GetPing(playerID)) or 0) or -1,
-			})
+			}
+			if report ~= nil and now - report.updated_at <= CLIENT_REPORT_TIMEOUT then
+				player.fps_average = Round(report.fps_average, 1)
+				player.fps_p5 = Round(report.fps_p5, 1)
+				player.frame_ms_p95 = Round(report.frame_ms_p95, 1)
+				player.frame_ms_max = Round(report.frame_ms_max, 1)
+				player.freezes_100ms = report.freezes_100ms
+				player.freezes_250ms = report.freezes_250ms
+				player.freezes_500ms = report.freezes_500ms
+				player.seconds_below_60fps = report.seconds_below_60fps
+				player.seconds_below_30fps = report.seconds_below_30fps
+				player.report_age_seconds = Round(now - report.updated_at, 1)
+			end
+			table.insert(players, player)
 		end
 	end
 	return players
+end
+
+function XHSPerformanceTelemetry:BuildWorldState()
+	local towers = {}
+	if Entities ~= nil and Entities.FindAllByClassname ~= nil then
+		for _, tower in pairs(Entities:FindAllByClassname("npc_dota_tower") or {}) do
+			if tower ~= nil and not tower:IsNull() and tower:IsAlive() then
+				local origin = tower:GetAbsOrigin()
+				table.insert(towers, {
+					entity_index = tower:entindex(),
+					name = tower:GetUnitName(),
+					team = tower:GetTeamNumber(),
+					health_pct = Round(math.max(0, tower:GetHealth()) * 100 / math.max(1, tower:GetMaxHealth()), 1),
+					x = Round(origin.x, 1),
+					y = Round(origin.y, 1),
+					z = Round(origin.z, 1),
+				})
+			end
+		end
+	end
+
+	return {
+		-- Matches resource/overviews/x_hero_siege_8.txt (pos_x/pos_y +/-12288,
+		-- scale 24 on the canonical 1024px overview canvas).
+		bounds = { min_x = -12288, max_x = 12288, min_y = -12288, max_y = 12288 },
+		towers = towers,
+	}
 end
 
 function XHSPerformanceTelemetry:BuildSessionPlayers()
@@ -661,7 +722,7 @@ function XHSPerformanceTelemetry:ObserveServerPacing(wallNow, hostTimescale)
 	local wallDelta = wallNow - previousWall
 	local gameDelta = gameNow - previousGame
 	hostTimescale = math.max(0.01, tonumber(hostTimescale) or 1)
-	if wallDelta <= 0 or gameDelta <= 0 then return end
+	if wallDelta <= 0 or gameDelta < 0 then return end
 
 	local expectedWallDelta = gameDelta / hostTimescale
 	local progressLagMs = math.max(0, wallDelta - expectedWallDelta) * 1000
@@ -689,12 +750,31 @@ function XHSPerformanceTelemetry:BuildServerPacingSnapshot(reset)
 	local health = self.server_sim_health_observations or {}
 	local observerIntervals = self.server_observer_interval_observations or {}
 	table.sort(lag)
-	table.sort(observerIntervals)
+	-- Keep the source interval order aligned with health[] for time weighting.
+	-- Percentiles use a sorted copy because live devtools snapshots call this
+	-- function repeatedly between the five-second reset points.
+	local observerIntervalsSorted = {}
+	for index, value in ipairs(observerIntervals) do
+		observerIntervalsSorted[index] = value
+	end
+	table.sort(observerIntervalsSorted)
 	local count = #lag
 	local lagSum = 0
 	for _, value in ipairs(lag) do lagSum = lagSum + value end
 	local healthSum = 0
-	for _, value in ipairs(health) do healthSum = healthSum + value end
+	local healthWeightedSum = 0
+	local healthWeight = 0
+	for index, value in ipairs(health) do
+		healthSum = healthSum + value
+		-- Weight by elapsed wall time rather than callback count. Otherwise one
+		-- one-second freeze surrounded by normal 100 ms callbacks contributes
+		-- only one bad sample and is almost invisible in the displayed health.
+		local weight = math.max(0, tonumber(observerIntervals[index]) or 0)
+		if weight > 0 then
+			healthWeightedSum = healthWeightedSum + value * weight
+			healthWeight = healthWeight + weight
+		end
+	end
 	local observerSum = 0
 	for _, value in ipairs(observerIntervals) do observerSum = observerSum + value end
 	local p95Index = math.max(1, math.min(count, math.ceil(count * 0.95)))
@@ -707,17 +787,22 @@ function XHSPerformanceTelemetry:BuildServerPacingSnapshot(reset)
 		lag_average_ms = Round(count > 0 and lagSum / count or 0, 2),
 		lag_p95_ms = Round(count > 0 and lag[p95Index] or 0, 2),
 		lag_max_ms = Round(count > 0 and lag[count] or 0, 2),
-		health_average_pct = Round(#health > 0 and healthSum / #health or 100, 1),
+		health_average_pct = Round(
+			healthWeight > 0 and healthWeightedSum / healthWeight
+				or (#health > 0 and healthSum / #health or 100),
+			1
+		),
+		clock_source = PacingClockName(),
 		observer_interval_average_ms = Round(
 			observerCount > 0 and observerSum / observerCount or 0,
 			2
 		),
 		observer_interval_p95_ms = Round(
-			observerCount > 0 and observerIntervals[observerP95Index] or 0,
+			observerCount > 0 and observerIntervalsSorted[observerP95Index] or 0,
 			2
 		),
 		observer_interval_max_ms = Round(
-			observerCount > 0 and observerIntervals[observerCount] or 0,
+			observerCount > 0 and observerIntervalsSorted[observerCount] or 0,
 			2
 		),
 	}
@@ -759,6 +844,7 @@ function XHSPerformanceTelemetry:BuildSample()
 		server_sim_lag_ms_p95 = pacing.lag_p95_ms,
 		server_sim_lag_ms_max = pacing.lag_max_ms,
 		server_sim_health_pct = pacing.health_average_pct,
+		server_pacing_clock = pacing.clock_source,
 		server_observer_interval_ms = pacing.observer_interval_average_ms,
 		server_observer_interval_ms_p95 = pacing.observer_interval_p95_ms,
 		server_observer_interval_ms_max = pacing.observer_interval_max_ms,
@@ -784,6 +870,7 @@ function XHSPerformanceTelemetry:BuildSample()
 		wave = CustomTimers ~= nil and tonumber(CustomTimers.special_wave or CustomTimers.creep_level) or 0,
 		difficulty = GameRules:GetCustomGameDifficulty() or 0,
 		players = self:BuildPlayers(),
+		world = self:BuildWorldState(),
 		pfx_alive = tonumber(particleSnapshot.alive) or 0,
 		pfx_destroyed_unreleased = tonumber(particleSnapshot.destroyed_unreleased) or 0,
 		pfx_oldest_seconds = tonumber(particleSnapshot.oldest_seconds) or 0,
@@ -1056,7 +1143,7 @@ end
 function XHSPerformanceTelemetry:TrySend()
 	if self.in_flight == true or #self.pending_batches == 0 then return end
 	if api == nil or api.Request == nil or api.game_id == nil then return end
-	if api.xhs_bot_session_backend_disabled == true then
+	if api.xhs_bot_session_backend_disabled == true and api.tools_telemetry_session ~= true then
 		self.pending_batches = {}
 		return
 	end
@@ -1085,7 +1172,8 @@ function XHSPerformanceTelemetry:Finalize()
 		table.insert(self.incidents, self.active_incident)
 		self.active_incident = nil
 	end
-	if api == nil or api.game_id == nil or api.xhs_bot_session_backend_disabled == true then
+	if api == nil or api.game_id == nil
+		or (api.xhs_bot_session_backend_disabled == true and api.tools_telemetry_session ~= true) then
 		self.current_samples = {}
 		self.pending_batches = {}
 		if IsInToolsMode() and self.local_report_auto_printed ~= true then

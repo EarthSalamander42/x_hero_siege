@@ -20,6 +20,7 @@
 "xhs_sp_fragments" "Fragments"
 "xhs_sp_fragments_lower" "fragments"
 "xhs_sp_daily_cap" "Daily Cap"
+"xhs_sp_daily_earnings" "Daily Fragments (Gameplay + Quest Potential)"
 "xhs_sp_xp_boost" "XP Boost"
 "xhs_sp_vote_power" "Vote Power"
 "xhs_sp_vote" "{count} vote"

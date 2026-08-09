@@ -4,7 +4,7 @@
 	m_bShouldHitboxesFallbackToRenderBounds = false
 	m_nMaxParticles = 35
 	m_flConstantRadius = 128.0
-	m_ConstantColor = [ 255, 110, 35, 255 ]
+	m_ConstantColor = [ 102, 255, 64, 255 ]
 	m_bShouldSort = false
 	m_Renderers = 
 	[
@@ -51,7 +51,7 @@
 		},
 		{
 			_class = "C_OP_ColorInterpolate"
-			m_ColorFade = [ 35, 8, 2, 255 ]
+			m_ColorFade = [ 9, 30, 4, 255 ]
 			m_flFadeEndTime = 0.9
 		},
 		{

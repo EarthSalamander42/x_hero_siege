@@ -323,8 +323,22 @@ function XHSSessionContainsBots()
 end
 
 function XHSBotOnlyAutonomyAllowed()
-	return XHSBotPlayerRegistry ~= nil
-		and XHSBotPlayerRegistry:IsBotOnlyCombatSession()
+	if XHSBotPlayerRegistry == nil then return false end
+
+	-- The setup snapshot is authoritative for the whole match. A temporary
+	-- PlayerResource gap (loading, reconnecting or hero replacement) must never
+	-- let bots seize campaign interactions from a human-controlled party.
+	local configuration = XHSBots ~= nil and XHSBots.configuration or nil
+	if type(configuration) == "table"
+		and configuration.spectator_mode ~= true
+		and math.max(
+			tonumber(configuration.combat_human_count) or 0,
+			tonumber(configuration.human_count) or 0
+		) > 0 then
+		return false
+	end
+
+	return XHSBotPlayerRegistry:IsBotOnlyCombatSession()
 end
 
 return XHSBotPlayerRegistry

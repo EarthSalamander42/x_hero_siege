@@ -354,6 +354,7 @@ function XHSBotEncounterDirector:Build(playerID, hero, record, assignment)
 	elseif IsValidCombatUnit(vanguardTarget) then
 		return {
 			id = "phase_3_vanguard",
+			shopping_locked = true,
 			anchor = self:GetPhase3VanguardAnchor(playerID, hero),
 			forced_target = vanguardTarget,
 			max_chase_distance = 2800,
@@ -363,11 +364,24 @@ function XHSBotEncounterDirector:Build(playerID, hero, record, assignment)
 		local assignedTarget = assignment
 			and GetEntityByIndex(assignment.target_entindex)
 			or nil
+		local assignedName = IsValidEntityHandle(assignedTarget)
+			and assignedTarget:GetUnitName() or ""
+		local gromMirrorTrial = assignedName
+			== "npc_dota_hero_grom_hellscream_clone"
+		if assignedName == "npc_dota_hero_grom_hellscream"
+			and assignedTarget.FindModifierByName ~= nil then
+			local mirrorAI = assignedTarget:FindModifierByName(
+				"modifier_xhs_grom_phase3_ai"
+			)
+			gromMirrorTrial = mirrorAI ~= nil
+				and mirrorAI.trial_active == true
+		end
 		return {
 			id = "phase_3",
 			no_combat = nonCombatObjective,
+			shopping_locked = not nonCombatObjective,
 			anchor = assignment and CopyPosition(assignment.anchor) or hero:GetAbsOrigin(),
-			forced_target = not nonCombatObjective
+			forced_target = not nonCombatObjective and not gromMirrorTrial
 				and IsValidCombatUnit(assignedTarget)
 				and not IsNonCombatCampaignUnit(assignedTarget)
 				and assignedTarget

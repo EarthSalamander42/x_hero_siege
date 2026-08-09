@@ -121,6 +121,10 @@ local function DamageEnemies(caster, ability, position, radius, damage, damageTy
 
 	for _, enemy in pairs(enemies) do
 		if IsValidAlive(enemy) and not enemy:IsInvulnerable() then
+			-- ApplyDamage can synchronously kill and remove disposable units. Keep
+			-- the impact position because the entity handle may already be [none]
+			-- by the time the post-hit callback runs.
+			local impactPosition = enemy:GetAbsOrigin()
 			ApplyDamage({
 				victim = enemy,
 				attacker = caster,
@@ -129,7 +133,7 @@ local function DamageEnemies(caster, ability, position, radius, damage, damageTy
 				damage_type = damageType or ability:GetAbilityDamageType(),
 			})
 			if onHit ~= nil then
-				onHit(enemy)
+				onHit(enemy, impactPosition)
 			end
 		end
 	end
@@ -287,11 +291,19 @@ function xhs_grom_blade_storm:OnSpellStart()
 		end
 
 		local now = GameRules:GetGameTime()
-		DamageEnemies(caster, self, caster:GetAbsOrigin(), radius, damagePerSecond * tick, self:GetAbilityDamageType(), function(enemy)
+		DamageEnemies(caster, self, caster:GetAbsOrigin(), radius, damagePerSecond * tick, self:GetAbilityDamageType(), function(enemy, impactPosition)
 			if now >= nextImpactFx then
-				enemy:EmitSound("Hero_Juggernaut.BladeFury.Impact")
-				local hit = ParticleManager:CreateParticle(BLADE_STORM_HIT_PARTICLE, PATTACH_ABSORIGIN_FOLLOW, enemy)
-				ParticleManager:SetParticleControlEnt(hit, 0, enemy, PATTACH_ABSORIGIN_FOLLOW, "attach_hitloc", enemy:GetAbsOrigin(), true)
+				local enemyStillValid = enemy ~= nil and IsValidEntity(enemy) and not enemy:IsNull()
+				local hit = nil
+				if enemyStillValid then
+					enemy:EmitSound("Hero_Juggernaut.BladeFury.Impact")
+					hit = ParticleManager:CreateParticle(BLADE_STORM_HIT_PARTICLE, PATTACH_ABSORIGIN_FOLLOW, enemy)
+					ParticleManager:SetParticleControlEnt(hit, 0, enemy, PATTACH_ABSORIGIN_FOLLOW, "attach_hitloc", enemy:GetAbsOrigin(), true)
+				else
+					EmitSoundOnLocationWithCaster(impactPosition, "Hero_Juggernaut.BladeFury.Impact", caster)
+					hit = ParticleManager:CreateParticle(BLADE_STORM_HIT_PARTICLE, PATTACH_WORLDORIGIN, nil)
+					ParticleManager:SetParticleControl(hit, 0, impactPosition)
+				end
 				ParticleManager:ReleaseParticleIndex(hit)
 			end
 		end)

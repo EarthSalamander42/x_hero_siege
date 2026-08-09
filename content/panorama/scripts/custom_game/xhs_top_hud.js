@@ -46,7 +46,6 @@ var XHSTopHud = (function () {
 	var overheadUiBlockerRefreshAt = 0;
 	var overheadUiBlockerRootWidth = 0;
 	var overheadUiBlockerRootHeight = 0;
-	var topHudLayerApplied = false;
 	var isSpecialEventPanelVisible = false;
 	var isGamePaused = false;
 	var isSupporterPassOccluding = false;
@@ -159,52 +158,6 @@ var XHSTopHud = (function () {
 		return null;
 	}
 
-	function GetHudDirectChild(panel, hud) {
-		var current = panel;
-		var parent = current && current.GetParent ? current.GetParent() : null;
-		while (current && parent && parent !== hud) {
-			current = parent;
-			parent = current.GetParent ? current.GetParent() : null;
-		}
-		return parent === hud ? current : null;
-	}
-
-
-	function EnsureTopHudBelowShop() {
-		if (topHudLayerApplied) {
-			return;
-		}
-
-		if (typeof FindDotaHudElement !== "function") {
-			$.Schedule(0.5, EnsureTopHudBelowShop);
-			return;
-		}
-
-		var host = $.GetContextPanel();
-		var shop = FindDotaHudElement("shop");
-		if (!host || !shop) {
-			$.Schedule(0.5, EnsureTopHudBelowShop);
-			return;
-		}
-
-		var hostHud = GetHudAncestor(host);
-		var shopHud = GetHudAncestor(shop);
-		var hud = hostHud || shopHud;
-		var hostChild = GetHudDirectChild(host, hud);
-		var shopChild = GetHudDirectChild(shop, hud);
-
-		if (!hud || !hostChild || !shopChild || hostChild === shopChild || typeof hud.MoveChildBefore !== "function") {
-			$.Schedule(0.5, EnsureTopHudBelowShop);
-			return;
-		}
-
-		try {
-			hud.MoveChildBefore(hostChild, shopChild);
-			topHudLayerApplied = true;
-		} catch (error) {
-			$.Schedule(0.5, EnsureTopHudBelowShop);
-		}
-	}
 	function SetText(id, value) {
 		var panel = Panel(id);
 		if (panel) {
@@ -557,7 +510,18 @@ var XHSTopHud = (function () {
 		$.Schedule(0.35, function () {
 			delete recentUnitSelections[key];
 		});
-		GameUI.SelectUnit(entIndex, false);
+
+		// The stock Radiant top-bar row is still present below the XHS HUD on
+		// dedicated clients. Its activation can run after this handler and put
+		// the portrait back on the local hero. Apply our selection on the next
+		// Panorama tick, once the click has finished propagating. This keeps the
+		// normal query-unit inspection semantics; it does not grant control of a
+		// teammate or fake-client bot.
+		$.Schedule(0.0, function () {
+			if (IsValidEntityIndex(entIndex)) {
+				GameUI.SelectUnit(entIndex, false);
+			}
+		});
 		return true;
 	}
 
@@ -3570,7 +3534,6 @@ var XHSTopHud = (function () {
 
 	function Initialize() {
 		SubscribeTimerEvents();
-		EnsureTopHudBelowShop();
 		CustomNetTables.SubscribeNetTableListener("vips", RefreshVipRoster);
 		CustomNetTables.SubscribeNetTableListener("supporter_pass_meta", function () {
 			RefreshAllyRoster();

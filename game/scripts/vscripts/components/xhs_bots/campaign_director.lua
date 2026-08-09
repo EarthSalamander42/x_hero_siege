@@ -209,7 +209,8 @@ function XHSBotCampaignDirector:AnyBotReached(position, distance)
 end
 
 function XHSBotCampaignDirector:ConfirmShalDialog(shal)
-	if self.shal_confirmed or not IsValidEntityHandle(shal)
+	if not self:IsAutonomyAllowed()
+		or self.shal_confirmed or not IsValidEntityHandle(shal)
 		or not IsQuestActive("teleport_top") then
 		return false
 	end
@@ -231,7 +232,8 @@ function XHSBotCampaignDirector:ConfirmShalDialog(shal)
 end
 
 function XHSBotCampaignDirector:ConfirmUtherDialog(uther)
-	if self.uther_confirmed or not IsValidEntityHandle(uther)
+	if not self:IsAutonomyAllowed()
+		or self.uther_confirmed or not IsValidEntityHandle(uther)
 		or not IsQuestActive("teleport_arthas") then
 		return false
 	end
@@ -387,15 +389,28 @@ function XHSBotCampaignDirector:Update(force)
 			)
 			local bossIsAlive = IsValidCombatUnit(boss)
 				and boss.deathStart ~= true
-			local position = bossIsAlive
+			local gromMirrorTrial = false
+			if bossDefinition.stage == "grom" and bossIsAlive
+				and boss.FindModifierByName ~= nil then
+				local mirrorAI = boss:FindModifierByName(
+					"modifier_xhs_grom_phase3_ai"
+				)
+				gromMirrorTrial = mirrorAI ~= nil
+					and mirrorAI.trial_active == true
+			end
+			local position = gromMirrorTrial
+				and FindNamedEntityPosition(bossDefinition.spawn_names)
+				or bossIsAlive
 				and CopyPosition(boss:GetAbsOrigin())
 				or FindNamedEntityPosition(bossDefinition.spawn_names)
 			self:SetObjective(bossDefinition.stage, position ~= nil and {
 				goal = bossDefinition.goal,
 				anchor = position,
-				target_entindex = bossIsAlive and boss:entindex() or nil,
-				label = (bossIsAlive and "FIGHTING " or "GOING TO ")
-					.. bossDefinition.label,
+				target_entindex = bossIsAlive and not gromMirrorTrial
+					and boss:entindex() or nil,
+				label = gromMirrorTrial and "SEARCHING GROM'S MIRRORS"
+					or (bossIsAlive and "FIGHTING " or "GOING TO ")
+						.. bossDefinition.label,
 				urgency = 1,
 				reached_distance = 500,
 			} or nil)

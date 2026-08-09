@@ -10,6 +10,7 @@ local METEOR_WARNING_PARTICLE = "particles/custom/boss_warnings/balanar/radius.v
 local METEOR_IMPACT_PARTICLE = "particles/units/heroes/hero_invoker/invoker_chaos_meteor_land_soil.vpcf"
 local METEOR_CRUMBLE_PARTICLE = "particles/units/heroes/hero_invoker/invoker_chaos_meteor_crumble.vpcf"
 local WARNING_LIFETIME = 1.2
+local METEOR_WARNING_COLOR = Vector(155, 55, 255)
 
 function balanar_rain_of_chaos:OnSpellStart()
 	local caster = self:GetCaster()
@@ -145,6 +146,8 @@ function modifier_balanar_rain_of_chaos:OnIntervalThink()
 		local warning = ParticleManager:CreateParticle(METEOR_WARNING_PARTICLE, PATTACH_CUSTOMORIGIN, self.caster)
 		ParticleManager:SetParticleControl(warning, 0, point)
 		ParticleManager:SetParticleControl(warning, 1, Vector(self.ability.radius_explosion, WARNING_LIFETIME, 0))
+		ParticleManager:SetParticleControl(warning, 15, METEOR_WARNING_COLOR)
+		ParticleManager:SetParticleControl(warning, 16, Vector(1, 0, 0))
 		Timers:CreateTimer(WARNING_LIFETIME + 0.1, function()
 			ParticleManager:DestroyParticle(warning, false)
 			ParticleManager:ReleaseParticleIndex(warning)

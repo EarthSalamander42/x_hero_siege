@@ -1,14 +1,15 @@
 (function () {
 	"use strict";
 
-	var NET_TABLE = "xhs_farm_leaderboard";
+	var contextPanel = $.GetContextPanel();
+	var INSTANCE_KEY = contextPanel.GetAttributeString("leaderboard_instance", "farm");
+	var NET_TABLE = contextPanel.GetAttributeString("leaderboard_net_table", "xhs_farm_leaderboard");
 	var NET_KEY = "state";
 	var ROW_HEIGHT = 50;
 	var ROW_GAP = 4;
 	var ROW_STRIDE = ROW_HEIGHT + ROW_GAP;
 	var ROWS_VERTICAL_PADDING = 8;
 	var cards = {};
-	var layerApplied = false;
 	var moveToken = 0;
 	var lastPhase = "";
 	var archiveExpanded = false;
@@ -17,9 +18,41 @@
 	var leaderboardArchived = false;
 	var leaderboardPlayerCount = 0;
 	var leaderboardWasActive = false;
+	var sharedRegistry = GameUI.CustomUIConfig().XHSEventLeaderboardRegistry;
+	if (!sharedRegistry) {
+		sharedRegistry = {};
+		GameUI.CustomUIConfig().XHSEventLeaderboardRegistry = sharedRegistry;
+	}
 
 	function Panel(id) {
 		return $("#" + id);
+	}
+
+	function IsOccupyingLeaderboardSlot() {
+		var leaderboard = Panel("XHSFarmLeaderboard");
+		if (!leaderboard || leaderboardHidden) {
+			return false;
+		}
+		return leaderboard.BHasClass("IsVisible")
+			&& (!leaderboardArchived || archiveExpanded);
+	}
+
+	function RefreshSharedPlacement() {
+		var farm = sharedRegistry.farm;
+		var bothVisible = INSTANCE_KEY !== "farm"
+			&& farm
+			&& farm.IsOccupyingLeaderboardSlot();
+		contextPanel.SetHasClass("HasConcurrentLeaderboard", bothVisible === true);
+	}
+
+	function RefreshAllSharedPlacements() {
+		for (var key in sharedRegistry) {
+			if (sharedRegistry.hasOwnProperty(key)
+				&& sharedRegistry[key]
+				&& sharedRegistry[key].RefreshSharedPlacement) {
+				sharedRegistry[key].RefreshSharedPlacement();
+			}
+		}
 	}
 
 	function ToNumber(value, fallbackValue) {
@@ -42,61 +75,6 @@
 		}
 
 		return values;
-	}
-
-	function GetHudAncestor(panel) {
-		var current = panel;
-		while (current) {
-			if (current.id === "Hud") {
-				return current;
-			}
-			current = current.GetParent();
-		}
-		return null;
-	}
-
-	function GetHudDirectChild(panel, hud) {
-		var current = panel;
-		var parent = current && current.GetParent ? current.GetParent() : null;
-		while (current && parent && parent !== hud) {
-			current = parent;
-			parent = current.GetParent ? current.GetParent() : null;
-		}
-		return parent === hud ? current : null;
-	}
-
-	function EnsureBelowShop() {
-		if (layerApplied) {
-			return;
-		}
-
-		var host = $.GetContextPanel();
-		var shop = null;
-		try {
-			shop = typeof FindDotaHudElement === "function" ? FindDotaHudElement("shop") : null;
-		} catch (error) {
-			shop = null;
-		}
-
-		if (!host || !shop) {
-			$.Schedule(0.5, EnsureBelowShop);
-			return;
-		}
-
-		var hud = GetHudAncestor(host) || GetHudAncestor(shop);
-		var hostChild = GetHudDirectChild(host, hud);
-		var shopChild = GetHudDirectChild(shop, hud);
-		if (!hud || !hostChild || !shopChild || hostChild === shopChild || typeof hud.MoveChildBefore !== "function") {
-			$.Schedule(0.5, EnsureBelowShop);
-			return;
-		}
-
-		try {
-			hud.MoveChildBefore(hostChild, shopChild);
-			layerApplied = true;
-		} catch (error) {
-			$.Schedule(0.5, EnsureBelowShop);
-		}
 	}
 
 	function GetPlayerName(playerID) {
@@ -285,7 +263,7 @@
 			nameLabel.text = GetPlayerIdentity(playerID, heroName);
 		}
 		if (stageLabel) {
-			stageLabel.text = mode === "ramero_kill_race"
+			stageLabel.text = mode === "ramero_kill_race" || mode === "sogat_kill_race"
 				? (remaining > 0 ? "+" + remaining + " KILLS REMAINING" : "ARENA READY")
 				: "LEVEL " + level + "  \u00B7  WAVE " + wave + "/" + wavesPerLevel + "  \u00B7  +" + supporterXP + " XP";
 		}
@@ -357,6 +335,7 @@
 			toggleLabel.text = archiveExpanded && !leaderboardHidden ? "\u203A" : "\u2039";
 		}
 		RefreshExternalToggle();
+		RefreshAllSharedPlacements();
 	}
 
 	function RefreshExternalToggle() {
@@ -390,6 +369,7 @@
 			toggleLabel.text = "\u2039";
 		}
 		RefreshExternalToggle();
+		RefreshAllSharedPlacements();
 	}
 
 	function SetLeaderboardCollapsed(collapsed) {
@@ -417,7 +397,9 @@
 		var winnerName = Panel("XHSFarmWinnerName");
 		var winnerScore = Panel("XHSFarmWinnerScore");
 		var celebrating = phase === "celebration";
-		var killRace = (data.mode || "").toString() === "ramero_kill_race";
+		var mode = (data.mode || "").toString();
+		var killRace = mode === "ramero_kill_race" || mode === "sogat_kill_race";
+		var sogatRace = mode === "sogat_kill_race";
 		var targetKills = Math.max(1, ToNumber(data.target_kills, 300));
 
 		if (leaderboard) {
@@ -425,7 +407,7 @@
 			leaderboard.SetHasClass("IsKillRace", killRace);
 		}
 		if (eyebrow) {
-			eyebrow.text = killRace ? "RAMERO & BARISTOL" : "FARM EVENT";
+			eyebrow.text = sogatRace ? "SOGAT EVENT" : (killRace ? "RAMERO & BARISTOL" : "FARM EVENT");
 		}
 		if (title) {
 			title.text = killRace ? "KILL PROGRESS" : (celebrating ? "FINAL RESULTS" : "LIVE LEADERBOARD");
@@ -459,6 +441,25 @@
 			Math.max(1, ToNumber(winner.level, 1));
 	}
 
+	function UpdateSupporterXPTotal(data, players, mode) {
+		var totalPanel = Panel("XHSFarmSupporterXPTotal");
+		var totalValue = Panel("XHSFarmSupporterXPTotalValue");
+		var isFarmEvent = mode === "farm_event";
+		if (totalPanel) {
+			totalPanel.SetHasClass("IsVisible", isFarmEvent);
+		}
+		if (!totalValue || !isFarmEvent) {
+			return;
+		}
+
+		var fallbackTotal = 0;
+		for (var index = 0; index < players.length; index++) {
+			fallbackTotal += Math.max(0, ToNumber(players[index].supporter_xp_earned, 0));
+		}
+		var total = Math.max(0, ToNumber(data.total_supporter_xp_earned, fallbackTotal));
+		totalValue.text = "+" + total + " XP";
+	}
+
 	function RenderState(data) {
 		data = data || {};
 		var leaderboard = Panel("XHSFarmLeaderboard");
@@ -479,6 +480,7 @@
 			leaderboard.SetHasClass("IsVisible", false);
 			SetLeaderboardHidden(false);
 			leaderboardWasActive = false;
+			RefreshAllSharedPlacements();
 			return;
 		}
 		if (active) {
@@ -499,8 +501,9 @@
 
 		var players = TableToArray(data.players);
 		SortPlayers(players);
-		UpdateCelebration(data, players, phase);
 		var mode = (data.mode || "farm_event").toString();
+		UpdateCelebration(data, players, phase);
+		UpdateSupporterXPTotal(data, players, mode);
 		var targetKills = Math.max(1, ToNumber(data.target_kills, 300));
 		var activePlayerIDs = {};
 		var localPlayerID = Players.GetLocalPlayer();
@@ -524,6 +527,7 @@
 		UpdateRowsHeight();
 		lastPhase = phase;
 		leaderboardWasActive = active;
+		RefreshAllSharedPlacements();
 	}
 
 	function OnNetTableChanged(tableName, key, data) {
@@ -533,7 +537,10 @@
 	}
 
 	function Initialize() {
-		EnsureBelowShop();
+		sharedRegistry[INSTANCE_KEY] = {
+			IsOccupyingLeaderboardSlot: IsOccupyingLeaderboardSlot,
+			RefreshSharedPlacement: RefreshSharedPlacement,
+		};
 		var toggle = Panel("XHSFarmLeaderboardToggle");
 		if (toggle) {
 			toggle.SetPanelEvent("onactivate", function () {
@@ -567,6 +574,7 @@
 				RenderState(CustomNetTables.GetTableValue(NET_TABLE, NET_KEY));
 			});
 		}
+		RefreshAllSharedPlacements();
 	}
 
 	Initialize();

@@ -15,6 +15,9 @@ local function ShouldDeferXHSLaneStructureCleanup()
 end
 
 local function SetXHSLaneDoorState(lane, open)
+	local wasOpen = CREEP_LANES ~= nil
+		and CREEP_LANES[lane] ~= nil
+		and CREEP_LANES[lane][1] == 1
 	if CREEP_LANES ~= nil and CREEP_LANES[lane] ~= nil then
 		CREEP_LANES[lane][1] = open and 1 or 0
 	end
@@ -52,6 +55,10 @@ local function SetXHSLaneDoorState(lane, open)
 		elseif not rax:HasModifier("modifier_invulnerable") then
 			rax:AddNewModifier(rax, nil, "modifier_invulnerable", nil)
 		end
+	end
+
+	if open and not wasOpen and XHSKnockbackHeroesAtOpeningDoors ~= nil then
+		XHSKnockbackHeroesAtOpeningDoors({ "door_lane" .. lane })
 	end
 end
 
@@ -1719,7 +1726,7 @@ ListenToGameEvent('entity_killed', function(keys)
 						killer = PlayerResource:GetSelectedHeroEntity(killer:GetPlayerOwnerID())
 
 						killer:IncrementKills(1)
-						SpecialEvents:RefreshRameroKillRace()
+						SpecialEvents:RefreshKillEventLeaderboard()
 						if killer:GetKills() >= XHS_RAMERO_BARISTOL_KILLS_REQUIRED
 							and SpecialEvents.Ramero_trigger == 0
 							and not (XHSDevTools ~= nil and XHSDevTools:IsSandboxActive()) then
@@ -1743,7 +1750,7 @@ ListenToGameEvent('entity_killed', function(keys)
 						ParticleManager:ReleaseParticleIndex(ParticleManager:CreateParticleForPlayer("particles/darkmoon_last_hit_effect.vpcf", PATTACH_ABSORIGIN_FOLLOW, killedUnit, killer:GetPlayerOwner()))
 
 						killer:IncrementKills(1)
-						SpecialEvents:RefreshRameroKillRace()
+						SpecialEvents:RefreshKillEventLeaderboard()
 
 						for _, Zone in pairs(GameMode.Zones) do
 							if Zone:ContainsUnit(killer) then
@@ -2296,8 +2303,16 @@ function GameMode:OnQuestCompleted(questZone, quest)
 				Notifications:TopToAll({ text = "Phase 2 Creeps enabled!", style = { color = "lightgreen" }, duration = 5.0 })
 			end
 
-			-- timers remains paused until magnataurs are killed
-			StartPhase2()
+			-- Timers remain paused until magnataurs are killed. The farm-exit
+			-- recovery path may already have advanced to phase two; keep this quest
+			-- callback idempotent so late destroyer deaths cannot skip to phase 3.
+			local currentPhase = CustomTimers ~= nil
+				and (tonumber(CustomTimers.game_phase) or 0) or 0
+			if currentPhase < 2 then
+				StartPhase2()
+			elseif CustomTimers ~= nil and currentPhase == 2 then
+				CustomTimers.timers_paused = 0
+			end
 		elseif quest.szQuestName == "kill_final_wave" then
 			if FragmentQuests ~= nil then
 				FragmentQuests:OnFinalWaveEnd()

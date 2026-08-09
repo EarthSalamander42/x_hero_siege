@@ -42,8 +42,8 @@ local RUPTURE_PRECAST_SOUND = "Hero_ElderTitan.EarthSplitter.Cast"
 local RUPTURE_IMPACT_SOUND = "Hero_ElderTitan.EarthSplitter.Destroy"
 
 local FEL_COLORS = {
-	primary = Vector(255, 110, 35),
-	secondary = Vector(120, 255, 80),
+	primary = Vector(102, 255, 64),
+	secondary = Vector(190, 255, 85),
 	family = "magtheridon",
 }
 

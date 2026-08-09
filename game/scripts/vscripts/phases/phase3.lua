@@ -343,6 +343,9 @@ function XHSOpenProudmooreFinalDoor()
 	for _, obstruction in ipairs(Entities:FindAllByName("obstruction_proudmoore2")) do
 		obstruction:SetEnabled(false, true)
 	end
+	if XHSKnockbackHeroesAtOpeningDoors ~= nil then
+		XHSKnockbackHeroesAtOpeningDoors({ "door_proudmoore3" })
+	end
 end
 
 function XHSReleaseUtherFromIce()

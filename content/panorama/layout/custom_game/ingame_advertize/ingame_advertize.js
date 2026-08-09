@@ -7,7 +7,6 @@ const ADS_HIDE_STORAGE_KEY = "xhs_ingame_advertize_hidden";
 let adsDoNotShowAgain = false;
 let adsDismissedThisSession = false;
 let adsForceOpened = false;
-let adsLastSentHidden = null;
 
 function IsAdsLocalSpectator() {
 	if (typeof Players === "undefined" || !Players.GetLocalPlayer || !Players.GetTeam) {
@@ -167,10 +166,9 @@ function SendAdsHiddenPreferenceToServer(value) {
 		return;
 	}
 
-	adsLastSentHidden = value === true;
 	GameEvents.SendCustomGameEventToServer("supporter_pass_update_settings", {
 		player_id: playerID,
-		xhs_ingame_advertize_hidden: adsLastSentHidden,
+		xhs_ingame_advertize_hidden: value === true ? 1 : 0,
 	});
 }
 
@@ -286,6 +284,11 @@ function UpdateAdsHiddenPreferenceFromCheckbox(sendToServer) {
 function OnAdsDoNotShowToggle() {
 	$.Schedule(0.0, function() {
 		UpdateAdsHiddenPreferenceFromCheckbox(true);
+		if (adsDoNotShowAgain) {
+			adsDismissedThisSession = true;
+			adsForceOpened = false;
+			SetAdsShown(false);
+		}
 	});
 }
 

@@ -364,7 +364,6 @@ function xhs_lich_king_remorseless_winter:OnAbilityPhaseStart()
 	ParticleManager:SetParticleControl(self.xhs_remorseless_winter_cast_particle, 1, Vector(radius, 0, 0))
 	StartBossCastBar(self, "Remorseless Winter")
 	XHSBossTelegraphs:Circle(caster:GetAbsOrigin(), radius, self:GetCastPoint(), LICH_COLORS)
-	XHSBossTelegraphs:Ring(caster:GetAbsOrigin(), radius * 0.65, 155, 12, self:GetCastPoint(), LICH_COLORS, 15)
 	StartAnimation(caster, { duration = self:GetCastPoint() + 0.25, activity = ACT_DOTA_CAST_ABILITY_4, rate = 0.75 })
 	caster:EmitSound("Hero_Crystal.FreezingField.Cast")
 	return true
@@ -435,7 +434,10 @@ function xhs_lich_king_howling_blast:OnAbilityPhaseStart()
 	local caster = self:GetCaster()
 	local direction = NormalizeDirection(GetContext(self).direction or caster:GetForwardVector())
 	StartBossCastBar(self, "Howling Blast")
-	XHSBossTelegraphs:Line(caster:GetAbsOrigin(), direction, self:GetSpecialValueFor("spacing"), self:GetSpecialValueFor("radius"), self:GetSpecialValueFor("nodes"), self:GetCastPoint(), LICH_COLORS, 160)
+	-- Howling Blast resolves as simultaneous circular impacts. Keeping every
+	-- node visible for the full cast point is much clearer than the fast line
+	-- sweep and matches the actual damage footprint exactly.
+	XHSBossTelegraphs:Line(caster:GetAbsOrigin(), direction, self:GetSpecialValueFor("spacing"), self:GetSpecialValueFor("radius"), self:GetSpecialValueFor("nodes"), self:GetCastPoint(), LICH_COLORS, 160, true)
 	StartAnimation(caster, { duration = self:GetCastPoint() + 0.1, activity = ACT_DOTA_CAST_ABILITY_2, rate = 0.95 })
 	caster:EmitSound("Hero_Lich.FrostBlast")
 	caster:EmitSound("Hero_Crystal.Frostbite")
@@ -543,7 +545,10 @@ function xhs_lich_king_sindragosa_flyby:OnAbilityPhaseStart()
 	StartBossCastBar(self, "Sindragosa Flyby")
 	for index, direction in pairs(directions) do
 		local start = center - NormalizeDirection(direction) * 850 + RotatePosition(Vector(0, 0, 0), QAngle(0, 90, 0), NormalizeDirection(direction)) * ((index - ((#directions + 1) / 2)) * self:GetSpecialValueFor("lane_offset"))
-		XHSBossTelegraphs:Line(start, direction, self:GetSpecialValueFor("spacing"), self:GetSpecialValueFor("radius"), self:GetSpecialValueFor("nodes"), self:GetCastPoint(), LICH_COLORS, 0)
+		-- Each flyby lane keeps its complete set of ground warnings alive until
+		-- Sindragosa starts moving. The optimized line particle can finish its
+		-- sweep too early (or cull on long lanes), leaving no readable precast.
+		XHSBossTelegraphs:Line(start, direction, self:GetSpecialValueFor("spacing"), self:GetSpecialValueFor("radius"), self:GetSpecialValueFor("nodes"), self:GetCastPoint(), LICH_COLORS, 0, true)
 	end
 	StartAnimation(self:GetCaster(), { duration = self:GetCastPoint() + 0.2, activity = ACT_DOTA_CAST_ABILITY_5, rate = 0.85 })
 	if XHSPhase3BossAI ~= nil then

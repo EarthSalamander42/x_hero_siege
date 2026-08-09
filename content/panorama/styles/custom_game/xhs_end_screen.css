@@ -1133,6 +1133,12 @@
 	color: #ff8b80;
 }
 
+.XHSBattlepassEarned.IsPreview {
+	width: 82px;
+	color: #f0b44d;
+	font-size: 10px;
+}
+
 .XHSBattlepassBar {
 	width: 100%;
 	height: 10px;
@@ -1207,10 +1213,25 @@
 	text-shadow: 0px 0px 5px #4ad88b45;
 }
 
-.XHSXPBreakdown.IsIneligible .XHSXPBreakdownBase {
+.XHSXPBreakdownSupporterRow {
 	width: 100%;
-	color: #ff8b80;
+	height: 13px;
+	margin-top: 0px;
+	font-size: 10px;
+	font-weight: bold;
+	letter-spacing: 0.35px;
+	text-align: left;
+	text-overflow: shrink;
+}
+
+.XHSXPBreakdown.IsIneligible .XHSXPBreakdownBase {
+	color: #f0b44d;
 	font-weight: semi-bold;
+}
+
+.XHSXPBreakdown.IsSimulation .XHSXPBreakdownVictory,
+.XHSBattlepassCell.IsSimulation .XHSXPBreakdownSupporterRow {
+	opacity: 0.85;
 }
 
 .XHSEndScreenSupportCta {
@@ -1582,6 +1603,81 @@
 	animation-name: xhs_xp_modal_reveal;
 	animation-duration: 0.42s;
 	animation-timing-function: ease-out;
+}
+
+.XHSXPSimulationNotice {
+	width: 100%;
+	height: 0px;
+	flow-children: right;
+	visibility: collapse;
+	opacity: 0;
+	margin-top: 4px;
+	padding: 8px 12px;
+	background-color: gradient( linear, 0% 0%, 100% 0%, from( #4b2607ee ), to( #1c1110ee ) );
+	border: 1px solid #d88a32;
+	border-left: 4px solid #f0b44d;
+	box-shadow: fill #d37c2633 0px 0px 12px 0px;
+}
+
+.XHSXPModal.IsSimulation .XHSXPSimulationNotice {
+	height: 54px;
+	visibility: visible;
+	opacity: 1;
+}
+
+.XHSXPSimulationIcon {
+	width: 30px;
+	height: 30px;
+	margin-right: 11px;
+	padding-top: 3px;
+	vertical-align: center;
+	color: #221404;
+	font-size: 19px;
+	font-weight: bold;
+	text-align: center;
+	background-color: #f0b44d;
+	border-radius: 50%;
+}
+
+.XHSXPSimulationCopy {
+	width: fill-parent-flow( 1 );
+	flow-children: down;
+	vertical-align: center;
+}
+
+.XHSXPSimulationTitle {
+	color: #ffd47b;
+	font-size: 13px;
+	font-weight: bold;
+	letter-spacing: 1.2px;
+}
+
+.XHSXPSimulationText {
+	margin-top: 2px;
+	color: #dbc6a5;
+	font-size: 12px;
+}
+
+.XHSXPModal.IsSimulation .XHSXPTotalCaption,
+.XHSXPModal.IsSimulation .XHSXPTotalGain {
+	color: #f0b44d;
+}
+
+.XHSXPModal.IsSimulation .XHSXPProgressFill {
+	background-color: gradient( linear, 0% 0%, 100% 0%, from( #ba681f ), color-stop( 0.58, #f0b44d ), to( #d98555 ) );
+	box-shadow: fill #e49a4366 0px 0px 9px 0px;
+}
+
+.XHSXPModal.IsSimulation .XHSXPStepsSection {
+	min-height: 370px;
+}
+
+.AspectRatio16x10 .XHSXPModal.IsSimulation .XHSXPStepsSection {
+	min-height: 315px;
+}
+
+.AspectRatio4x3 .XHSXPModal.IsSimulation .XHSXPStepsSection {
+	min-height: 295px;
 }
 
 .XHSXPTopAccent {

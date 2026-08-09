@@ -60,8 +60,16 @@ local COLORS = {
 	master = { primary = Vector(255, 255, 255), secondary = Vector(70, 210, 255), style = 4, family = "spirit_master" },
 	storm = { primary = Vector(70, 220, 255), secondary = Vector(210, 245, 255), style = 4, family = "spirit_storm" },
 	earth = { primary = Vector(110, 220, 110), secondary = Vector(210, 255, 160), style = 5, family = "spirit_earth" },
-	fire = { primary = Vector(255, 115, 35), secondary = Vector(255, 220, 90), style = 0, family = "spirit_fire" },
+	fire = { primary = Vector(255, 45, 20), secondary = Vector(255, 145, 35), style = 0, family = "spirit_fire" },
 	trinity = { primary = Vector(255, 255, 255), secondary = Vector(255, 185, 70), style = 2, family = "spirit_master" },
+}
+
+-- Elemental Mandala reads from the inside out. Keep its three precasts tied to
+-- the first-circle (radius) particle of the matching elemental family.
+local MANDALA_COLORS = {
+	fire = COLORS.fire,
+	earth = COLORS.earth,
+	storm = COLORS.storm,
 }
 
 local UNIT_STYLES = {
@@ -204,11 +212,12 @@ local function GetResonantPillarPositions(ability, center)
 	return positions
 end
 
-local function ClampSpiritDestination(position)
-	if XHSSpiritMasterEncounter ~= nil and XHSSpiritMasterEncounter.ClampArenaPosition ~= nil then
-		return XHSSpiritMasterEncounter:ClampArenaPosition(position)
+local function MoveSpiritWithinArena(spirit, position)
+	if XHSSpiritMasterEncounter ~= nil and XHSSpiritMasterEncounter.MoveSpiritToArenaPosition ~= nil then
+		return XHSSpiritMasterEncounter:MoveSpiritToArenaPosition(spirit, position)
 	end
-	return position
+	FindClearSpaceForUnit(spirit, position, true)
+	return true
 end
 
 local function GetPalmLine(ability)
@@ -436,7 +445,7 @@ function xhs_spirit_master_elemental_mandala:OnAbilityPhaseStart()
 	local center = GetContext(self).position or caster:GetAbsOrigin()
 	local ringRadius = self:GetSpecialValueFor("ring_radius")
 	StartBossCastBar(self, "Elemental Mandala")
-	XHSBossTelegraphs:Ring(center, ringRadius * 0.36, self:GetSpecialValueFor("node_radius"), 6, self:GetCastPoint(), COLORS.fire, 40)
+	XHSBossTelegraphs:Ring(center, ringRadius * 0.36, self:GetSpecialValueFor("node_radius"), 6, self:GetCastPoint(), MANDALA_COLORS.fire, 40)
 	StartAnimation(caster, { duration = self:GetCastPoint() + 0.4, activity = ACT_DOTA_CAST_ABILITY_4, rate = 0.75 })
 	caster:EmitSound("Hero_Brewmaster.PrimalSplit.Cast")
 	return true
@@ -455,9 +464,9 @@ function xhs_spirit_master_elemental_mandala:OnSpellStart()
 	local damage = ScaleDamage(self:GetSpecialValueFor("damage"))
 	local waveDelay = math.max(0.25, self:GetSpecialValueFor("wave_delay"))
 	local waves = {
-		{ key = "fire", radius = ringRadius * 0.36, count = 6, offset = 40, delay = 0, colors = COLORS.fire, particle = FIRE_WILDFIRE_PARTICLE, sound = "Ability.LightStrikeArray" },
-		{ key = "earth", radius = ringRadius * 0.68, count = 9, offset = 20, delay = waveDelay, colors = COLORS.earth, particle = EARTH_PILLAR_PARTICLE, sound = "Hero_ElderTitan.EarthSplitter.Destroy" },
-		{ key = "storm", radius = ringRadius, count = 12, offset = 0, delay = waveDelay * 2, colors = COLORS.storm, particle = STORM_OVERLOAD_PARTICLE, sound = "Hero_StormSpirit.StaticRemnantExplode" },
+		{ key = "fire", radius = ringRadius * 0.36, count = 6, offset = 40, delay = 0, colors = MANDALA_COLORS.fire, particle = FIRE_WILDFIRE_PARTICLE, sound = "Ability.LightStrikeArray" },
+		{ key = "earth", radius = ringRadius * 0.68, count = 9, offset = 20, delay = waveDelay, colors = MANDALA_COLORS.earth, particle = EARTH_PILLAR_PARTICLE, sound = "Hero_ElderTitan.EarthSplitter.Destroy" },
+		{ key = "storm", radius = ringRadius, count = 12, offset = 0, delay = waveDelay * 2, colors = MANDALA_COLORS.storm, particle = STORM_OVERLOAD_PARTICLE, sound = "Hero_StormSpirit.StaticRemnantExplode" },
 	}
 
 	for waveIndex, wave in ipairs(waves) do
@@ -549,7 +558,7 @@ function xhs_spirit_storm_arc_dash:OnSpellStart()
 			EmitSoundOnLocationWithCaster(pos, "Hero_StormSpirit.Overload", caster)
 		end
 	end
-	FindClearSpaceForUnit(caster, ClampSpiritDestination(caster:GetAbsOrigin() + direction * self:GetSpecialValueFor("dash_distance")), true)
+	MoveSpiritWithinArena(caster, caster:GetAbsOrigin() + direction * self:GetSpecialValueFor("dash_distance"))
 	ClearContext(self)
 end
 
@@ -787,7 +796,7 @@ function xhs_spirit_fire_cinder_step:OnSpellStart()
 			EmitSoundOnLocationWithCaster(pos, "Hero_EmberSpirit.FireRemnant.Explode", caster)
 		end
 	end
-	FindClearSpaceForUnit(caster, ClampSpiritDestination(caster:GetAbsOrigin() + direction * self:GetSpecialValueFor("dash_distance")), true)
+	MoveSpiritWithinArena(caster, caster:GetAbsOrigin() + direction * self:GetSpecialValueFor("dash_distance"))
 	ClearContext(self)
 end
 

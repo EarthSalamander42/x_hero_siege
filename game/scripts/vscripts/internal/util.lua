@@ -176,6 +176,74 @@ local function GetDoorCinematicCenter(doorNames)
 	return center / count
 end
 
+local XHS_DOOR_KNOCKBACK_RADIUS = 400
+local XHS_DOOR_KNOCKBACK_DISTANCE = 320
+local XHS_DOOR_KNOCKBACK_DURATION = 0.48
+
+-- Opening gates must not trap a player inside their prop or obstruction. This
+-- mirrors Lich's frost-breath knockback: no damage and no stun, only a short
+-- radial displacement away from the gate that actually opened.
+function XHSKnockbackHeroesAtOpeningDoors(doorNames, options)
+	options = options or {}
+	local radius = math.max(1, tonumber(options.radius) or XHS_DOOR_KNOCKBACK_RADIUS)
+	local distance = math.max(0, tonumber(options.distance) or XHS_DOOR_KNOCKBACK_DISTANCE)
+	local duration = math.max(FrameTime(), tonumber(options.duration) or XHS_DOOR_KNOCKBACK_DURATION)
+	local doors = {}
+
+	for _, doorName in ipairs(doorNames or {}) do
+		for _, door in ipairs(Entities:FindAllByName(doorName)) do
+			if door ~= nil and IsValidEntity(door) and not door:IsNull() then
+				doors[#doors + 1] = door
+			end
+		end
+	end
+	if #doors == 0 then return 0 end
+
+	local pushed = 0
+	for _, hero in pairs(HeroList:GetAllHeroes()) do
+		if hero ~= nil
+			and IsValidEntity(hero)
+			and not hero:IsNull()
+			and hero:IsAlive()
+			and hero:IsRealHero()
+			and hero:GetTeamNumber() == DOTA_TEAM_GOODGUYS
+			and (hero.IsOutOfGame == nil or not hero:IsOutOfGame()) then
+			local heroPosition = hero:GetAbsOrigin()
+			local closestDoor = nil
+			local closestDistance = nil
+			for _, door in ipairs(doors) do
+				local doorDistance = (heroPosition - door:GetAbsOrigin()):Length2D()
+				if closestDistance == nil or doorDistance < closestDistance then
+					closestDoor = door
+					closestDistance = doorDistance
+				end
+			end
+
+			if closestDoor ~= nil and closestDistance <= radius then
+				local center = closestDoor:GetAbsOrigin()
+				-- Give the built-in modifier a stable direction even if the hero is
+				-- standing exactly on the prop origin.
+				if closestDistance < 1 then
+					center = center - closestDoor:GetForwardVector() * 32
+				end
+				hero:AddNewModifier(hero, nil, "modifier_knockback", {
+					should_stun = 0,
+					knockback_duration = duration,
+					duration = duration,
+					knockback_distance = distance,
+					knockback_height = 0,
+					center_x = center.x,
+					center_y = center.y,
+					center_z = center.z,
+				})
+				pushed = pushed + 1
+			end
+		end
+	end
+
+	return pushed
+end
+
 -- Moves every active player's camera to a door group, executes the opening once
 -- the camera has arrived, then smoothly returns each player to their own hero.
 function XHSPlayDoorOpeningCinematic(doorNames, onCameraArrived, options)
@@ -255,6 +323,7 @@ function XHSOpenDoorsWithCinematic(doorNames, obstructionNames, animationName, o
 				obstruction:SetEnabled(false, true)
 			end
 		end
+		XHSKnockbackHeroesAtOpeningDoors(doorNames)
 
 		if onOpened ~= nil then onOpened() end
 	end, options)
@@ -748,10 +817,10 @@ function XHSRemoveClosedPhaseOneLaneStructures(lane_number)
 	return removed
 end
 
--- Resolve a CustomGameEvent sender without trusting payload PlayerID. Some
--- dedicated-server builds expose GetPlayerIDFromEventSourceIndex but return no
--- player for entity-backed event sources, so the authoritative entity fallback
--- must still run when that API produces no usable result.
+-- Resolve a CustomGameEvent sender without trusting payload PlayerID. Depending
+-- on the dedicated-server build and game state, the authoritative source can be
+-- exposed as an event-source handle, a player entity, a user ID, or the player
+-- slot itself. Try every engine-owned representation before rejecting it.
 function XHSResolveEventPlayerID(eventSourceIndex)
 	local sourceIndex = tonumber(eventSourceIndex)
 	if sourceIndex == nil or sourceIndex < 0 then return nil end
@@ -771,6 +840,35 @@ function XHSResolveEventPlayerID(eventSourceIndex)
 			return sender ~= nil and sender.GetPlayerID ~= nil and sender:GetPlayerID() or nil
 		end)
 		if ok then playerID = tonumber(resolved) end
+	end
+
+	if playerID == nil or playerID < 0 then
+		local maxPlayers = DOTA_MAX_TEAM_PLAYERS or 24
+		for candidateID = 0, maxPlayers - 1 do
+			local ok, matches = pcall(function()
+				local player = PlayerResource ~= nil and PlayerResource:GetPlayer(candidateID) or nil
+				return player ~= nil and player.entindex ~= nil and player:entindex() == sourceIndex
+			end)
+			if ok and matches then
+				playerID = candidateID
+				break
+			end
+		end
+	end
+
+	if (playerID == nil or playerID < 0) and PlayerResource ~= nil
+		and PlayerResource.GetPlayerIDForUserID ~= nil then
+		local ok, resolved = pcall(function()
+			return PlayerResource:GetPlayerIDForUserID(sourceIndex)
+		end)
+		if ok then playerID = tonumber(resolved) end
+	end
+
+	if (playerID == nil or playerID < 0) and PlayerResource ~= nil then
+		local ok, valid = pcall(function()
+			return PlayerResource:IsValidPlayerID(sourceIndex)
+		end)
+		if ok and valid then playerID = sourceIndex end
 	end
 
 	if playerID == nil or playerID < 0 or PlayerResource == nil then return nil end
@@ -830,6 +928,7 @@ function OpenCreepLane(lane_number)
 	Notifications:TopToAll({ text = "Host opened lane " .. lane_number .. "!", style = { color = "lightgreen" }, duration = 5.0 })
 	CREEP_LANES[lane_number][1] = 1
 	DoEntFire("door_lane" .. lane_number, "SetAnimation", "gate_02_open", 0, nil, nil)
+	XHSKnockbackHeroesAtOpeningDoors({ "door_lane" .. lane_number })
 end
 
 function CloseLane(ID, lane_number)
@@ -1901,6 +2000,7 @@ local function GetBossBarPayload(boss)
 	local colors = boss.xhs_boss_bar_colors or GetBossBarColor(unitName)
 
 	return {
+		boss_entindex = boss:entindex(),
 		boss_name = unitName,
 		difficulty = GameRules:GetCustomGameDifficulty(),
 		boss_icon = icon,
@@ -1913,6 +2013,33 @@ local function GetBossBarPayload(boss)
 		ankh_count = GetBossBarAnkhCount(boss),
 		boss_bar_markers = GetBossBarMarkers(boss),
 	}
+end
+
+local XHS_SELECTED_BOSS_BAR_REQUEST_TIME = {}
+
+function XHSRequestSelectedBossBar(eventSourceIndex, data)
+	local playerID = XHSResolveEventPlayerID(eventSourceIndex)
+	local bossIndex = tonumber(data and data.boss_entindex)
+	if playerID == nil or bossIndex == nil then return end
+
+	local now = GameRules:GetGameTime()
+	if now - (XHS_SELECTED_BOSS_BAR_REQUEST_TIME[playerID] or -100) < 0.1 then return end
+	XHS_SELECTED_BOSS_BAR_REQUEST_TIME[playerID] = now
+
+	local boss = EntIndexToHScript(bossIndex)
+	if boss == nil
+		or not IsValidEntity(boss)
+		or boss:IsNull()
+		or boss.IsAlive == nil
+		or not boss:IsAlive() then return end
+	if boss.FindAbilityByName == nil or boss:FindAbilityByName("boss_health") == nil then return end
+
+	local player = PlayerResource:GetPlayer(playerID)
+	if player == nil then return end
+
+	local payload = GetBossBarPayload(boss)
+	payload.selection_only = 1
+	CustomGameEventManager:Send_ServerToPlayer(player, "xhs_show_selected_boss_hp", payload)
 end
 
 local function SendBossBarUpdateIfChanged(boss, force)

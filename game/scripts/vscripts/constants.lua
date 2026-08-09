@@ -113,6 +113,11 @@ function GetXHSActivePhaseOneLaneCount()
 end
 
 function GetXHSDestroyerMagnataurKillLimit(difficulty)
+	local override = tonumber(_G.XHS_DESTROYER_MAGNATAUR_KILL_LIMIT_OVERRIDE)
+	if override ~= nil and override > 0 then
+		return math.max(1, math.floor(override))
+	end
+
 	if difficulty == nil and GameRules ~= nil then
 		difficulty = GameRules:GetCustomGameDifficulty()
 	end

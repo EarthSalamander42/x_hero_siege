@@ -17,61 +17,8 @@
 	var operationSequence = 0;
 	var latestGlobalOperation = "";
 	var activePreviewID = "";
-	var layerRaiseGeneration = 0;
 	var stopping = false;
 	var pendingPreviewInstruction = "";
-
-	function hudAncestor(panel) {
-		var current = panel;
-		while (current) {
-			if (current.id === "Hud") return current;
-			current = current.GetParent ? current.GetParent() : null;
-		}
-		return null;
-	}
-	function lastHudSibling(hud, host) {
-		if (!hud || typeof hud.GetChildCount !== "function" || typeof hud.GetChild !== "function") return null;
-		for (var index = hud.GetChildCount() - 1; index >= 0; index -= 1) {
-			var child = hud.GetChild(index);
-			if (child && child !== host) return child;
-		}
-		return null;
-	}
-	function ensureTopHudLayer() {
-		if (!root || typeof root.GetParent !== "function" || (root.IsValid && !root.IsValid())) return false;
-		var hud = null;
-		try {
-			hud = hudAncestor(root);
-			if (!hud && typeof FindDotaHudElement === "function") hud = hudAncestor(FindDotaHudElement("HUDElements"));
-		} catch (error) {
-			return false;
-		}
-		if (!hud || typeof root.SetParent !== "function" || typeof hud.MoveChildAfter !== "function") return false;
-
-		try {
-			if (root.GetParent() !== hud) root.SetParent(hud);
-			if (root.GetParent() !== hud) return false;
-
-			// A CustomUIElement loaded later can otherwise paint above this one even
-			// with a large local z-index. Make the Studio a direct, last HUD child.
-			root.style.zIndex = "1200";
-			var sibling = lastHudSibling(hud, root);
-			if (sibling) hud.MoveChildAfter(root, sibling);
-			return true;
-		} catch (error) {
-			return false;
-		}
-	}
-	function startLayerRaiseCycle() {
-		if (!root || typeof root.GetParent !== "function") return;
-		var generation = ++layerRaiseGeneration;
-		function raise(attempt) {
-			if (generation !== layerRaiseGeneration || !root || (root.IsValid && !root.IsValid())) return;
-			ensureTopHudLayer();
-			if (attempt < 8) $.Schedule(attempt < 3 ? 0.2 : 0.75, function () { raise(attempt + 1); });
-		}
-		raise(0);
-	}
 	function updateLayoutClass() {
 		if (!root) return;
 		var width = Number(root.actuallayoutwidth || 0);
@@ -327,7 +274,6 @@
 		status(message || "Preview stopped.", !!timedOut);
 	}
 	function toggle() {
-		startLayerRaiseCycle();
 		updateLayoutClass();
 		windowPanel.ToggleClass("Hidden");
 		if (!windowPanel.BHasClass("Hidden")) sync();
@@ -354,7 +300,7 @@
 		var scene = event.scene_panel || {};
 		$("#ContentStudioSceneNoticeText").text = truthy(scene.raw_vpcf_supported) ? "ScenePanel VPCF preview available." : "ScenePanel spike: raw VPCF needs an authored VMap. Category-matched live playback runs on the demo hero; teleport safely previews its exact start/end VPCFs without moving the hero.";
 		if (!activePreviewID) openButtonState("CONTENT STUDIO", "");
-		$("#ContentStudioOpen").RemoveClass("Hidden"); startLayerRaiseCycle(); renderFacets(); render();
+		$("#ContentStudioOpen").RemoveClass("Hidden"); renderFacets(); render();
 	}
 	GameEvents.Subscribe("supporter_content_studio_state", function (event) {
 		var responseID = Number(event.request_id || 0);
@@ -445,9 +391,8 @@
 		render(); status(event.message || (truthy(event.ok) ? "Candidate sent." : "Submission failed."), !truthy(event.ok));
 	});
 
-	var api = { Toggle: toggle, Close: closeStudio, Sync: sync, Stop: stop, Render: render, RaiseLayer: ensureTopHudLayer };
+	var api = { Toggle: toggle, Close: closeStudio, Sync: sync, Stop: stop, Render: render };
 	GameUI.CustomUIConfig().XHSContentStudio = api;
-	startLayerRaiseCycle();
 	updateLayoutClass();
 	$.Schedule(0.35, sync);
 })();

@@ -470,11 +470,18 @@ XHSPrecache:RegisterGroup("hero_abilities", {
 		"particles/units/heroes/hero_medusa/medusa_mana_shield.vpcf",
 		"particles/units/heroes/hero_medusa/medusa_mana_shield_impact.vpcf",
 		"particles/custom/human/blood_mage/invoker_sun_strike_team_immortal2.vpcf",
+		"particles/custom/human/blood_mage/exort_orb.vpcf",
 		"particles/econ/items/crystal_maiden/crystal_maiden_maiden_of_icewrack/maiden_freezing_field_cracks_arcana.vpcf",
 		"particles/econ/items/crystal_maiden/crystal_maiden_maiden_of_icewrack/maiden_freezing_field_darkcore_arcana1.vpcf",
 		"particles/econ/items/crystal_maiden/crystal_maiden_maiden_of_icewrack/maiden_freezing_field_explosion_arcana1.vpcf",
 		"particles/units/heroes/hero_ogre_magi/ogre_magi_bloodlust_cast.vpcf",
 		"particles/units/heroes/hero_ogre_magi/ogre_magi_bloodlust_buff.vpcf",
+		"particles/units/heroes/hero_luna/luna_lucent_beam_cast.vpcf",
+		"particles/units/heroes/hero_luna/luna_lucent_beam.vpcf",
+		"particles/units/heroes/hero_shadowshaman/shadowshaman_ether_shock.vpcf",
+		"particles/items_fx/aura_endurance.vpcf",
+		"particles/econ/courier/courier_faceless_rex/cour_rex_ground_a.vpcf",
+		"particles/econ/courier/courier_roshan_frost/courier_roshan_frost_steam.vpcf",
 	},
 	models = {
 		"models/heroes/doom/doom.vmdl",
@@ -493,6 +500,7 @@ XHSPrecache:RegisterGroup("hero_abilities", {
 
 XHSPrecache:RegisterGroup("events", {
 	particles = {
+		"particles/act_2/campfire_flame.vpcf",
 		"particles/custom/xhs_growth_overhead.vpcf",
 		"particles/units/heroes/hero_morphling/morphling_ambient_new.vpcf",
 		"particles/units/heroes/hero_ogre_magi/ogre_magi_ignite_debuff.vpcf",

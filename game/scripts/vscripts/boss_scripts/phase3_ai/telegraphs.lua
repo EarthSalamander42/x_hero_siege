@@ -241,7 +241,7 @@ function XHSBossTelegraphs:Ring(center, ringRadius, nodeRadius, count, duration,
 	end
 end
 
-function XHSBossTelegraphs:Line(startPosition, direction, spacing, nodeRadius, count, duration, colors, startDistance)
+function XHSBossTelegraphs:Line(startPosition, direction, spacing, nodeRadius, count, duration, colors, startDistance, forceNodeWarnings)
 	if not ValidVector(startPosition) or direction == nil then return end
 
 	direction.z = 0
@@ -256,7 +256,12 @@ function XHSBossTelegraphs:Line(startPosition, direction, spacing, nodeRadius, c
 		RegisterCircleDanger(position, nodeRadius or 180, duration)
 	end
 
-	if count > 1 and CreateLineWarning(positions[1], positions[count], nodeRadius, duration, colors) ~= nil then
+	-- Some abilities are resolved as discrete circular impacts. Keep their
+	-- precast on those exact nodes instead of replacing it with the optimized
+	-- continuous line particle, whose renderer/width contract differs.
+	if forceNodeWarnings ~= true
+		and count > 1
+		and CreateLineWarning(positions[1], positions[count], nodeRadius, duration, colors) ~= nil then
 		return
 	end
 
@@ -268,18 +273,18 @@ end
 -- Tools-only visual QA. This deliberately bypasses the danger registry and
 -- never invokes an ability, damage callback, modifier, movement, or AI state.
 local VISUAL_QA_FAMILIES = {
-	{ key = "arthas",        primary = Vector(105, 215, 255), secondary = Vector(225, 250, 255) },
-	{ key = "balanar",       primary = Vector(155, 55, 255),  secondary = Vector(125, 255, 80) },
-	{ key = "grom",          primary = Vector(255, 62, 34),   secondary = Vector(255, 185, 65) },
-	{ key = "illidan",       primary = Vector(102, 255, 64),  secondary = Vector(180, 70, 255) },
-	{ key = "lich_king",     primary = Vector(105, 215, 255), secondary = Vector(225, 250, 255) },
-	{ key = "magtheridon",   primary = Vector(255, 110, 35),  secondary = Vector(120, 255, 80) },
-	{ key = "proudmoore",    primary = Vector(70, 190, 255),  secondary = Vector(255, 200, 75) },
+	{ key = "arthas",        primary = Vector(105, 215, 255), secondary = Vector(235, 250, 255) },
+	{ key = "balanar",       primary = Vector(155, 55, 255),  secondary = Vector(45, 255, 105) },
+	{ key = "grom",          primary = Vector(255, 62, 34),   secondary = Vector(255, 185, 64) },
+	{ key = "illidan",       primary = Vector(255, 110, 35),  secondary = Vector(255, 200, 75) },
+	{ key = "lich_king",     primary = Vector(120, 220, 255), secondary = Vector(235, 250, 255) },
+	{ key = "magtheridon",   primary = Vector(102, 255, 64),  secondary = Vector(190, 255, 85) },
+	{ key = "proudmoore",    primary = Vector(70, 190, 255),  secondary = Vector(255, 215, 95) },
 	{ key = "special",       primary = Vector(255, 185, 65),  secondary = Vector(255, 70, 45) },
 	{ key = "spirit_master", primary = Vector(255, 255, 255), secondary = Vector(70, 210, 255) },
 	{ key = "spirit_storm",  primary = Vector(70, 220, 255),  secondary = Vector(210, 245, 255) },
 	{ key = "spirit_earth",  primary = Vector(110, 220, 110), secondary = Vector(210, 255, 160) },
-	{ key = "spirit_fire",   primary = Vector(255, 115, 35),  secondary = Vector(255, 220, 90) },
+	{ key = "spirit_fire",   primary = Vector(255, 45, 20),   secondary = Vector(255, 145, 35) },
 }
 
 local function FindVisualQAFamily(key)

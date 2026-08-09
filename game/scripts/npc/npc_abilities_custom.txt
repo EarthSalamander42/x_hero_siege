@@ -4409,7 +4409,7 @@
 		"AbilityValues"
 		{
 			"radius"			"250 300 350 400"
-			"damage_per_tick"		"40 60 80 100"
+			"damage_per_tick"		"80 120 160 200"
 			"CalculateSpellDamageTooltip"	"1"
 			"tick_time"			"1.0"
 		}
@@ -13817,7 +13817,7 @@
 		"AbilityValues"
 		{
 			"radius"				"300"
-			"cleave_pct"			"40"
+			"cleave_pct"			"25"
 		}
 
 		"OnToggleOn"
@@ -18976,7 +18976,8 @@
 	{
 		// General
 		//-------------------------------------------------------------------------------------------------------------
-		"BaseClass"             		"ability_datadriven"
+		"BaseClass"             		"ability_lua"
+		"ScriptFile"                    "abilities/creeps/creature_thunder_clap_low"
 		"AbilityTextureName"			"custom/brewmaster_thunder_clap_new"
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET"
 		"AbilityUnitTargetTeam"			"DOTA_UNIT_TARGET_TEAM_ENEMY"
@@ -19019,101 +19020,6 @@
 			"soundfile"		"soundevents/game_sounds_heroes/game_sounds_brewmaster.vsndevts"
 		}
 
-		"OnAbilityPhaseStart"
-		{
-			"RunScript"
-			{
-				"ScriptFile"	"abilities/heroes/magtheridon/magtheridon.lua"
-				"Function"		"ThunderClap"
-			}
-		}
-
-		"OnSpellStart"
-		{
-			"FireSound"
-			{
-				"EffectName"	"Hero_Brewmaster.ThunderClap"
-				"Target" 		"CASTER"
-			}
-			
-			"FireEffect"
-			{
-				"EffectName"		"particles/units/heroes/hero_brewmaster/brewmaster_thunder_clap.vpcf"
-				"EffectAttachType"	"follow_origin"
-				"EffectRadius"		"%radius"
-				"Target"			"CASTER"
-			}
-
-			"ApplyModifier"
-			{
-				"ModifierName"	"modifier_thunder_clap"
-				"Target"
-				{
-					"Center"	"CASTER"
-					"Radius"	"%radius"
-					"Teams"		"DOTA_UNIT_TARGET_TEAM_ENEMY"
-					"Types"		"DOTA_UNIT_TARGET_HERO"
-				}
-				"Duration"		"%duration"
-			}
-			
-			"ApplyModifier"
-			{
-				"ModifierName"	"modifier_thunder_clap"
-				"Target"
-				{
-					"Center"	"CASTER"
-					"Radius"	"%radius"
-					"Teams"		"DOTA_UNIT_TARGET_TEAM_ENEMY"
-					"Types"		"DOTA_UNIT_TARGET_BASIC"
-				}
-				"Duration"		"%duration_creeps"
-			}
-
-			"Damage"
-			{
-				"Target"
-				{
-					"Center"	"CASTER"
-					"Radius"	"%radius"
-					"Teams"		"DOTA_UNIT_TARGET_TEAM_ENEMY"
-					"Types"		"DOTA_UNIT_TARGET_HERO | DOTA_UNIT_TARGET_BASIC"
-				}
-				"Type"			"DAMAGE_TYPE_PURE"
-				"Damage"		"%damage"
-			}
-		}
-
-		"Modifiers"
-		{
-			"modifier_thunder_clap"
-			{
-				"Passive"			"0"
-				"IsHidden"			"0"
-				"IsDebuff"			"1"
-		
-				"EffectName"		"particles/units/heroes/hero_brewmaster/brewmaster_thunder_clap_debuff.vpcf"
-				"EffectAttachType"	"follow_origin"
-		
-				"StatusEffectName"		"particles/status_fx/status_effect_brewmaster_thunder_clap.vpcf" 	   
-				"StatusEffectPriority"	"10"
-
-				"Properties"
-				{
-					"MODIFIER_PROPERTY_ATTACKSPEED_BONUS_CONSTANT" "%attack_speed_slow"
-					"MODIFIER_PROPERTY_MOVESPEED_BONUS_PERCENTAGE" "%movement_slow" 
-				}
-
-				"OnCreated"
-				{
-					"FireSound"
-					{
-						"EffectName"	"Hero_Brewmaster.ThunderClap.Target"
-						"Target"		"TARGET"
-					}			
-				}		
-			}
-		}
 	}
 
 	//=================================================================================================================

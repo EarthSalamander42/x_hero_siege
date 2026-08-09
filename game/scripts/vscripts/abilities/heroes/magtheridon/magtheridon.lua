@@ -1,4 +1,10 @@
 local dummy = nil
+local FEL_PRECAST_COLOR = Vector(102, 255, 64)
+
+local function TintFelPrecast(particle)
+	ParticleManager:SetParticleControl(particle, 15, FEL_PRECAST_COLOR)
+	ParticleManager:SetParticleControl(particle, 16, Vector(1, 0, 0))
+end
 
 function modifier_start(event)
 	dummy = event.target
@@ -13,6 +19,7 @@ local units = FindUnitsInRadius(caster:GetTeamNumber(), dummy:GetAbsOrigin(), ni
 	local warning = ParticleManager:CreateParticle("particles/custom/boss_warnings/magtheridon/radius.vpcf", PATTACH_CUSTOMORIGIN, caster)
 	ParticleManager:SetParticleControl(warning, 0, dummy:GetAbsOrigin())
 	ParticleManager:SetParticleControl(warning, 1, Vector(radius, 6, 0))
+	TintFelPrecast(warning)
 
 	for _,v in pairs(units) do
 		local damageTable = {
@@ -35,6 +42,7 @@ local radius = ability:GetLevelSpecialValueFor("radius", ability:GetLevel()-1)
 	local warning = ParticleManager:CreateParticle("particles/custom/boss_warnings/magtheridon/radius.vpcf", PATTACH_CUSTOMORIGIN, caster)
 	ParticleManager:SetParticleControl(warning, 0, caster:GetAbsOrigin())
 	ParticleManager:SetParticleControl(warning, 1, Vector(radius, 6, 0))
+	TintFelPrecast(warning)
 end
 
 function channel_end(event)	

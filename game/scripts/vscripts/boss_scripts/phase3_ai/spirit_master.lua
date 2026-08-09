@@ -101,6 +101,8 @@ local SPIRIT_DEFS = {
 
 local THRESHOLDS = { 70, 40, 10 }
 local SPIRIT_ARENA_LEASH_RADIUS = 1850
+local SPIRIT_ARENA_SAFE_RADIUS = 1500
+local SPIRIT_ARENA_LEASH_INTERVAL = 0.10
 local SPIRIT_FINALE_END_DELAY = 10.0
 
 local SPIRIT_ROUNDS = {
@@ -267,7 +269,7 @@ local function GetPlayerId(hero)
 end
 
 local function CountLivingHeroes(center)
-	local heroes = XHSPhase3BossAI:GetLivingHeroes(center or Vector(0, 0, 0), 2600, true)
+	local heroes = XHSPhase3BossAI:GetLivingHeroes(center or Vector(0, 0, 0), SPIRIT_ARENA_LEASH_RADIUS, true)
 	local count = 0
 	for _, hero in pairs(heroes) do
 		if IsValidAlive(hero) and not hero:IsInvulnerable() then
@@ -278,7 +280,7 @@ local function CountLivingHeroes(center)
 end
 
 local function PickHero(center, avoidLocks)
-	local heroes = XHSPhase3BossAI:GetLivingHeroes(center, 2600, true)
+	local heroes = XHSPhase3BossAI:GetLivingHeroes(center, SPIRIT_ARENA_LEASH_RADIUS, true)
 	local now = GameRules:GetGameTime()
 	local best = nil
 	local bestLock = nil
@@ -485,12 +487,32 @@ function XHSSpiritMasterEncounter:ClampArenaPosition(position, radius)
 
 	local offset = position - center
 	offset.z = 0
-	local maxRadius = math.max(200, radius or SPIRIT_ARENA_LEASH_RADIUS)
+	local maxRadius = math.max(200, radius or SPIRIT_ARENA_SAFE_RADIUS)
 	if offset:Length2D() <= maxRadius then
 		return GetGroundPosition(position, nil)
 	end
 
 	return GetGroundPosition(center + offset:Normalized() * maxRadius, nil)
+end
+
+function XHSSpiritMasterEncounter:MoveSpiritToArenaPosition(spirit, position)
+	if not IsValidAlive(spirit) or position == nil then return false end
+	local destination = self:ClampArenaPosition(position, SPIRIT_ARENA_SAFE_RADIUS)
+	if destination == nil then return false end
+
+	FindClearSpaceForUnit(spirit, destination, true)
+
+	-- FindClearSpace can resolve collision on the far side of an arena wall.
+	-- Never accept such a result for a Spirit: fall back to the already clamped
+	-- inner point and resolve nearby units from there.
+	if self.arena_center ~= nil
+		and (spirit:GetAbsOrigin() - self.arena_center):Length2D() > (SPIRIT_ARENA_SAFE_RADIUS + 128)
+	then
+		spirit:SetAbsOrigin(destination)
+		ResolveNPCPositions(destination, 128)
+	end
+
+	return true
 end
 
 function XHSSpiritMasterEncounter:KeepSpiritInArena(spirit)
@@ -501,7 +523,7 @@ function XHSSpiritMasterEncounter:KeepSpiritInArena(spirit)
 	spirit:InterruptMotionControllers(true)
 	spirit:SetForceAttackTarget(nil)
 	spirit:Stop()
-	FindClearSpaceForUnit(spirit, self:ClampArenaPosition(position), true)
+	self:MoveSpiritToArenaPosition(spirit, position)
 	return true
 end
 
@@ -1037,17 +1059,18 @@ function modifier_xhs_tri_spirit_phase_ai:OnCreated()
 	self.boss = self:GetParent()
 	self.key = self.boss.xhs_spirit_key
 	self.next_action = GameRules:GetGameTime() + RandomFloat(1.0, 2.0)
-	self:StartIntervalThink(0.35)
+	self:StartIntervalThink(SPIRIT_ARENA_LEASH_INTERVAL)
 end
 
 function modifier_xhs_tri_spirit_phase_ai:OnIntervalThink()
 	if not IsServer() then return end
 	if XHSSpiritMasterEncounter.phase ~= "split" then return end
-	if not IsValidAlive(self.boss) or self.boss:HasModifier("modifier_xhs_spirit_dormant") then return end
+	if not IsValidAlive(self.boss) then return end
 	if XHSSpiritMasterEncounter:KeepSpiritInArena(self.boss) then
 		self.next_action = GameRules:GetGameTime() + 0.5
 		return
 	end
+	if self.boss:HasModifier("modifier_xhs_spirit_dormant") then return end
 	if XHSPhase3BossAI:IsCastBlocked(self.boss) then return end
 	local now = GameRules:GetGameTime()
 	if now < (self.next_action or 0) then return end

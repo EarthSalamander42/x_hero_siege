@@ -746,11 +746,11 @@
 					[
 						{
 							m_flPosition = 0.023256
-							m_Color = [ 255, 115, 35 ]
+							m_Color = [ 255, 45, 20 ]
 						},
 						{
 							m_flPosition = 0.98708
-							m_Color = [ 35, 7, 2 ]
+							m_Color = [ 35, 5, 2 ]
 						},
 					]
 				}

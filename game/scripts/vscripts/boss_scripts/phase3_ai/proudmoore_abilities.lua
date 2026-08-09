@@ -289,7 +289,19 @@ function xhs_proudmoore_torrent_line:OnAbilityPhaseStart()
 	local spacing = math.max(1, width * 1.25)
 
 	StartBossCastBar(self, "Torrent Line")
-	XHSBossTelegraphs:Line(caster:GetAbsOrigin(), direction, spacing, width, math.max(1, math.floor(length / spacing)), self:GetCastPoint(), PROUDMOORE_COLORS, 120)
+	-- Torrent Line lands as discrete overlapping torrents. Force the reliable
+	-- node warnings so every actual impact area remains visible during precast.
+	XHSBossTelegraphs:Line(
+		caster:GetAbsOrigin(),
+		direction,
+		spacing,
+		width,
+		math.max(1, math.floor(length / spacing)),
+		self:GetCastPoint(),
+		PROUDMOORE_COLORS,
+		120,
+		true
+	)
 	StartAnimation(caster, { duration = self:GetCastPoint() + 0.15, activity = ACT_DOTA_CAST_ABILITY_1, rate = 1.0 })
 	caster:EmitSound("Ability.Torrent")
 	return true

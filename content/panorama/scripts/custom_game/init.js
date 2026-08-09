@@ -18,8 +18,24 @@ GameUI.CustomUIConfig().team_colors[DOTATeam_t.DOTA_TEAM_BADGUYS ] = "#802020;";
 GameUI.CustomUIConfig().team_colors[DOTATeam_t.DOTA_TEAM_CUSTOM_3 ] = "#00b4c8;";
 GameUI.CustomUIConfig().team_colors[DOTATeam_t.DOTA_TEAM_CUSTOM_4 ] = "#00963c;";
 
-var hudElements = $.GetContextPanel().GetParent().GetParent().FindChildTraverse("HUDElements");
-var center_block = hudElements.FindChildTraverse("lower_hud").FindChildTraverse("center_with_stats").FindChildTraverse("center_block");
+function FindXHSHudElements() {
+	var panel = $.GetContextPanel();
+	try {
+		while (panel && panel.GetParent && panel.GetParent()) panel = panel.GetParent();
+		return panel && panel.FindChildTraverse ? panel.FindChildTraverse("HUDElements") : null;
+	} catch (error) {
+		return null;
+	}
+}
+
+function FindXHSCenterBlock(root) {
+	var lowerHud = root && root.FindChildTraverse ? root.FindChildTraverse("lower_hud") : null;
+	var centerWithStats = lowerHud && lowerHud.FindChildTraverse ? lowerHud.FindChildTraverse("center_with_stats") : null;
+	return centerWithStats && centerWithStats.FindChildTraverse ? centerWithStats.FindChildTraverse("center_block") : null;
+}
+
+var hudElements = FindXHSHudElements();
+var center_block = FindXHSCenterBlock(hudElements);
 
 function NormalizeXHSLocalizedText(text) {
 	var value = text === undefined || text === null ? "" : String(text);
@@ -894,47 +910,94 @@ CreateXHSAdvertizeButton();
 CreateXHSReportBugButton();
 CreateXHSSupporterPassButton();
 
-//Use this line if you want to keep 4 ability minimum size, and only use 160 if you want ~2 ability min size
-center_block.FindChildTraverse("AbilitiesAndStatBranch").style.minWidth = "386px";
-//center_block.FindChildTraverse("AbilitiesAndStatBranch").style.minWidth = "160px";
-center_block.FindChildTraverse("inventory_neutral_craft_holder").style.visibility = "collapse";
+function ApplyXHSStyle(panel, property, value, missing, name) {
+	if (!panel) {
+		missing.push(name);
+		return false;
+	}
+	try {
+		panel.style[property] = value;
+		return true;
+	} catch (error) {
+		missing.push(name + ":style_error");
+		return false;
+	}
+}
 
-var minimap_container = hudElements.FindChildTraverse("minimap_container");
-minimap_container.FindChildTraverse("GlyphScanContainer").style.visibility = "collapse";
+function DisableXHSHitTesting(panel, missing, name) {
+	if (!panel) {
+		missing.push(name);
+		return false;
+	}
+	try {
+		panel.hittest = false;
+		panel.hittestchildren = false;
+		return true;
+	} catch (error) {
+		missing.push(name + ":hittest_error");
+		return false;
+	}
+}
 
-minimap_container.FindChildTraverse("RoshanTimerContainer").style.visibility = "collapse";
-minimap_container.FindChildTraverse("TormentorTimerContainer").style.visibility = "collapse";
+function ApplyXHSVanillaCenterOverrides(attempt) {
+	hudElements = FindXHSHudElements();
+	center_block = FindXHSCenterBlock(hudElements);
+	var missing = [];
+	if (!hudElements || !center_block) {
+		missing.push(!hudElements ? "HUDElements" : "center_block");
+	} else {
+		ApplyXHSStyle(center_block.FindChildTraverse("AbilitiesAndStatBranch"), "minWidth", "386px", missing, "AbilitiesAndStatBranch");
+		ApplyXHSStyle(center_block.FindChildTraverse("inventory_neutral_craft_holder"), "visibility", "collapse", missing, "inventory_neutral_craft_holder");
 
-center_block.FindChildTraverse("StatBranch").style.visibility = "collapse";
+		var minimapContainer = hudElements.FindChildTraverse("minimap_container");
+		if (!minimapContainer) {
+			missing.push("minimap_container");
+		} else {
+			ApplyXHSStyle(minimapContainer.FindChildTraverse("GlyphScanContainer"), "visibility", "collapse", missing, "GlyphScanContainer");
+			ApplyXHSStyle(minimapContainer.FindChildTraverse("RoshanTimerContainer"), "visibility", "collapse", missing, "RoshanTimerContainer");
+			ApplyXHSStyle(minimapContainer.FindChildTraverse("TormentorTimerContainer"), "visibility", "collapse", missing, "TormentorTimerContainer");
+		}
 
-//you are not spawning the talent UI, fuck off (Disabling mouseover and onactivate)
-//We also don't want to crash, valve plz
-center_block.FindChildTraverse("StatBranch").SetPanelEvent("onmouseover", function(){});
-center_block.FindChildTraverse("StatBranch").SetPanelEvent("onactivate", function(){});
+		var statBranch = center_block.FindChildTraverse("StatBranch");
+		if (ApplyXHSStyle(statBranch, "visibility", "collapse", missing, "StatBranch")) {
+			statBranch.SetPanelEvent("onmouseover", function(){});
+			statBranch.SetPanelEvent("onactivate", function(){});
+		}
 
-center_block.FindChildrenWithClassTraverse("RootInnateDisplay")[0].style.visibility = "collapse";
+		var innateDisplays = center_block.FindChildrenWithClassTraverse("RootInnateDisplay") || [];
+		ApplyXHSStyle(innateDisplays.length > 0 ? innateDisplays[0] : null, "visibility", "collapse", missing, "RootInnateDisplay");
+		ApplyXHSStyle(center_block.FindChildTraverse("level_stats_frame"), "visibility", "collapse", missing, "level_stats_frame");
+		ApplyXHSStyle(center_block.FindChildTraverse("AghsStatusContainer"), "visibility", "collapse", missing, "AghsStatusContainer");
+		ApplyXHSStyle(center_block.FindChildTraverse("InvokerAghsStatusContainer"), "visibility", "collapse", missing, "InvokerAghsStatusContainer");
+		ApplyXHSStyle(center_block.FindChildTraverse("HUDSkinPortrait"), "visibility", "collapse", missing, "HUDSkinPortrait");
+		ApplyXHSStyle(center_block.FindChildTraverse("HUDSkinXPBackground"), "visibility", "collapse", missing, "HUDSkinXPBackground");
+		ApplyXHSStyle(center_block.FindChildTraverse("HUDSkinStatBranchBG"), "visibility", "collapse", missing, "HUDSkinStatBranchBG");
+		ApplyXHSStyle(center_block.FindChildTraverse("HUDSkinStatBranchGlow"), "visibility", "collapse", missing, "HUDSkinStatBranchGlow");
+		ApplyXHSStyle(center_block.FindChildTraverse("unitname"), "transform", "translateY(0px)", missing, "unitname.transform");
+		ApplyXHSStyle(center_block.FindChildTraverse("unitname"), "width", "159px", missing, "unitname.width");
+		ApplyXHSStyle(center_block.FindChildTraverse("HUDSkinAbilityContainerBG"), "visibility", "collapse", missing, "HUDSkinAbilityContainerBG");
+		ApplyXHSStyle(center_block.FindChildTraverse("center_bg"), "backgroundImage", "url('s2r://panorama/images/hud/reborn/ability_bg_psd.vtex')", missing, "center_bg");
 
-//Fuck that levelup button
-center_block.FindChildTraverse("level_stats_frame").style.visibility = "collapse";
+		var inventory = center_block.FindChildTraverse("inventory");
+		if (!inventory) {
+			missing.push("inventory");
+		} else {
+			ApplyXHSStyle(inventory.FindChildTraverse("HUDSkinInventoryBG"), "visibility", "collapse", missing, "HUDSkinInventoryBG");
+			ApplyXHSStyle(inventory.FindChildTraverse("inventory_list_container"), "backgroundColor", "#ffffff00", missing, "inventory_list_container");
+		}
+	}
 
-center_block.FindChildTraverse("AghsStatusContainer").style.visibility = "collapse";
+	if (missing.length > 0 && attempt < 20) {
+		$.Schedule(0.5, function() { ApplyXHSVanillaCenterOverrides(attempt + 1); });
+		return;
+	}
+}
 
-//Skin Killer - Portrait
-center_block.FindChildTraverse("HUDSkinPortrait").style.visibility = "collapse";
-center_block.FindChildTraverse("HUDSkinXPBackground").style.visibility = "collapse";
-center_block.FindChildTraverse("HUDSkinStatBranchBG").style.visibility = "collapse";
-center_block.FindChildTraverse("HUDSkinStatBranchGlow").style.visibility = "collapse";
-center_block.FindChildTraverse("unitname").style.transform = "translateY(0px)";
-center_block.FindChildTraverse("unitname").style.width = "159px";
-//Skin Killer - AbilityPanel
-center_block.FindChildTraverse("HUDSkinAbilityContainerBG").style.visibility = "collapse";
-center_block.FindChildTraverse("center_bg").style.backgroundImage = "url('s2r://panorama/images/hud/reborn/ability_bg_psd.vtex')";
-//Skin Killer - inventory
-center_block.FindChildTraverse("inventory").FindChildTraverse("HUDSkinInventoryBG").style.visibility = "collapse";
-center_block.FindChildTraverse("inventory").FindChildTraverse("inventory_list_container").style.backgroundColor = "#ffffff00"; //0% opacity on colour
+ApplyXHSVanillaCenterOverrides(0);
 
 function HideXHSTpCharges(retryCount) {
-	var tpCharges = center_block.FindChildTraverse("tpCharges");
+	center_block = center_block || FindXHSCenterBlock(FindXHSHudElements());
+	var tpCharges = center_block && center_block.FindChildTraverse("tpCharges");
 
 	if (tpCharges) {
 		tpCharges.style.opacity = "0";
@@ -1704,37 +1767,142 @@ RestoreXHSStockAbilityPanels(GetXHSPortraitUnit());
 ShowEnemyAbilityCooldown();
 
 
-//Skin Killer - minimap
-hudElements.FindChildTraverse("HUDSkinMinimap").style.visibility = "collapse";
+function ApplyXHSVanillaPeripheralOverrides(attempt) {
+	hudElements = FindXHSHudElements();
+	var missing = [];
+	if (!hudElements) {
+		missing.push("HUDElements");
+	} else {
+		ApplyXHSStyle(hudElements.FindChildTraverse("HUDSkinMinimap"), "visibility", "collapse", missing, "HUDSkinMinimap");
+		var lowerHud = hudElements.FindChildTraverse("lower_hud");
+		var buffBar = lowerHud && lowerHud.FindChildTraverse("buffs");
+		ApplyXHSStyle(buffBar, "width", "30%", missing, "buffs.width");
+		ApplyXHSStyle(buffBar, "marginLeft", "38.5%", missing, "buffs.marginLeft");
+		var debuffBar = lowerHud && lowerHud.FindChildTraverse("debuffs");
+		ApplyXHSStyle(debuffBar, "width", "30%", missing, "debuffs.width");
+		ApplyXHSStyle(debuffBar, "marginBottom", "45.5%", missing, "debuffs.marginBottom");
+		ApplyXHSStyle(debuffBar, "marginRight", "31.5%", missing, "debuffs.marginRight");
+		ApplyXHSStyle(debuffBar, "flowChildren", "right", missing, "debuffs.flowChildren");
 
-//Buff Bar
-var BuffBar = hudElements.FindChildTraverse("lower_hud").FindChildTraverse("buffs")
-BuffBar.style.width = "30%";
-BuffBar.style.marginLeft = "38.5%";
+		var heroDisplay = hudElements.FindChildTraverse("HeroDisplay");
+		var heroDisplayContainer = heroDisplay && heroDisplay.FindChildTraverse("HeroDisplayRowContainer");
+		ApplyXHSStyle(heroDisplay, "marginTop", "17.5%", missing, "HeroDisplay.marginTop");
+		ApplyXHSStyle(heroDisplay, "marginLeft", "1%", missing, "HeroDisplay.marginLeft");
+		ApplyXHSStyle(heroDisplay, "width", "500px", missing, "HeroDisplay.width");
+		ApplyXHSStyle(heroDisplay, "height", "76px", missing, "HeroDisplay.height");
+		ApplyXHSStyle(heroDisplayContainer, "width", "500px", missing, "HeroDisplayRowContainer.width");
+		ApplyXHSStyle(heroDisplayContainer, "flowChildren", "right", missing, "HeroDisplayRowContainer.flowChildren");
 
-//DeBuff Bar
-var DeBuffBar = hudElements.FindChildTraverse("lower_hud").FindChildTraverse("debuffs")
-DeBuffBar.style.width = "30%";
-DeBuffBar.style.marginBottom = "45.5%";
-DeBuffBar.style.marginRight = "31.5%";
-DeBuffBar.style.flowChildren = "right";
+		var topbar = hudElements.FindChildTraverse("topbar");
+		ApplyXHSStyle(topbar && topbar.FindChildTraverse("GameTime"), "visibility", "collapse", missing, "GameTime");
+		var radiantTopBar = hudElements.FindChildTraverse("TopBarRadiantTeam");
+		var direTopBar = hudElements.FindChildTraverse("TopBarDireTeam");
+		// XHSTopHud owns hero-card interactions. Leaving Valve's player rows
+		// interactive underneath it lets their click handler overwrite the bot
+		// query selection on dedicated clients.
+		DisableXHSHitTesting(radiantTopBar, missing, "TopBarRadiantTeam.hittest");
+		DisableXHSHitTesting(direTopBar, missing, "TopBarDireTeam.hittest");
+		ApplyXHSStyle(direTopBar, "visibility", "collapse", missing, "TopBarDireTeam");
+	}
 
-var HeroDisplay = $.GetContextPanel().GetParent().GetParent().FindChildTraverse("HeroDisplay")
-var HeroDisplayContainer = $.GetContextPanel().GetParent().GetParent().FindChildTraverse("HeroDisplay").FindChildTraverse("HeroDisplayRowContainer")
-HeroDisplay.style.marginTop = "17.5%"
-HeroDisplay.style.marginLeft = "1%"
-HeroDisplay.style.width = "500px"
-HeroDisplay.style.height = "76px"
-HeroDisplayContainer.style.width = "500px"
-HeroDisplayContainer.style.flowChildren = "right"
+	if (missing.length > 0 && attempt < 20) {
+		$.Schedule(0.5, function() { ApplyXHSVanillaPeripheralOverrides(attempt + 1); });
+		return;
+	}
+}
 
-hudElements.FindChildTraverse("topbar").FindChildTraverse("GameTime").style.visibility = "collapse";
+ApplyXHSVanillaPeripheralOverrides(0);
 
-//Top Bar Dire
-var TopBarDireTeam = hudElements.FindChildTraverse("TopBarDireTeam");
-TopBarDireTeam.style.visibility = "collapse";
+function FindXHSSetupRoot() {
+	var panel = $.GetContextPanel();
+	try {
+		while (panel && panel.GetParent && panel.GetParent()) {
+			panel = panel.GetParent();
+		}
+		return panel;
+	} catch (error) {
+		return null;
+	}
+}
 
-var Parent = $.GetContextPanel().GetParent().GetParent();
+function FindXHSPanelByIDOrClass(root, names) {
+	if (!root) {
+		return null;
+	}
+
+	for (var name_index = 0; name_index < names.length; name_index++) {
+		var name = names[name_index];
+		var panel = root.FindChildTraverse ? root.FindChildTraverse(name) : null;
+		if (panel) {
+			return panel;
+		}
+
+		if (root.FindChildrenWithClassTraverse) {
+			var matches = root.FindChildrenWithClassTraverse(name) || [];
+			if (matches.length > 0) {
+				return matches[0];
+			}
+		}
+	}
+
+	return null;
+}
+
+function IsXHSVanillaLoadingSidebar(panel) {
+	if (!panel) {
+		return false;
+	}
+
+	var sidebar_classes = ["CustomGameLoadingScreenSidebar", "CustomGameLoadingSidebar", "LoadingScreenSidebar"];
+	for (var class_index = 0; class_index < sidebar_classes.length; class_index++) {
+		if (panel.BHasClass && panel.BHasClass(sidebar_classes[class_index])) {
+			return true;
+		}
+	}
+
+	var mode_header = FindXHSPanelByIDOrClass(panel, ["ModeHeader"]);
+	var map_info = FindXHSPanelByIDOrClass(panel, ["MapInfo"]);
+	var status_box = FindXHSPanelByIDOrClass(panel, ["StatusBox"]);
+	return !!(mode_header && map_info && status_box);
+}
+
+function FindXHSVanillaLoadingSidebar(root) {
+	var direct = FindXHSPanelByIDOrClass(root, [
+		"CustomGameLoadingScreenSidebar",
+		"CustomGameLoadingSidebar",
+		"LoadingScreenSidebar",
+	]);
+	if (direct) {
+		return direct;
+	}
+
+	// Valve's current loading_screen_sidebar_custom_game.vxml exposes a
+	// TeamContainer below the sidebar root. Walk upward from that stable anchor
+	// instead of relying on the unrelated team-select GameAndPlayersRoot.
+	var anchor = FindXHSPanelByIDOrClass(root, ["TeamContainer"]);
+	var current = anchor;
+	while (current && current !== root) {
+		if (IsXHSVanillaLoadingSidebar(current)) {
+			return current;
+		}
+		current = current.GetParent ? current.GetParent() : null;
+	}
+
+	return null;
+}
+
+function ApplyXHSInvisiblePanel(panel) {
+	if (!panel) {
+		return false;
+	}
+	panel.style.opacity = "0";
+	panel.hittest = false;
+	panel.hittestchildren = false;
+	return true;
+}
+
+var Parent = FindXHSSetupRoot();
+var xhsLoadingScreenSetupAttempts = 0;
 
 // Loading screen custom UI runs in an isolated DotaLoadingScreen context and
 // cannot reliably reach these vanilla pregame panels. This override must stay
@@ -1742,24 +1910,29 @@ var Parent = $.GetContextPanel().GetParent().GetParent();
 SetupLoadingScreen();
 
 function SetupLoadingScreen() {
-	var required_panels = [
-		"GameAndPlayersRoot",
-		"TeamsList",
-		"TeamsListGroup",
-		"CancelAndUnlockButton",
-		"UnassignedPlayerPanel",
-		"ShuffleTeamAssignmentButton",
-	];
-
-	for (var i = 0; i < required_panels.length; i++) {
-		if (Parent.FindChildTraverse(required_panels[i]) == undefined) {
-			$.Schedule(0.1, SetupLoadingScreen);
-			return;
-		}
+	Parent = Parent || FindXHSSetupRoot();
+	xhsLoadingScreenSetupAttempts++;
+	if (!Parent || !Parent.FindChildTraverse) {
+		$.Schedule(0.1, SetupLoadingScreen);
+		return;
 	}
 
-	Parent.FindChildTraverse("GameAndPlayersRoot").style.visibility = "collapse";
-	Parent.FindChildTraverse("TeamsList").style.visibility = "collapse";
+	var loadingSidebar = FindXHSVanillaLoadingSidebar(Parent);
+	var sidebarHiddenNow = ApplyXHSInvisiblePanel(loadingSidebar);
+
+	// Retain the old team-select suppression as an optional compatibility path;
+	// it is not required for the native connection sidebar shown during load.
+	ApplyXHSInvisiblePanel(Parent.FindChildTraverse("GameAndPlayersRoot"));
+	ApplyXHSInvisiblePanel(Parent.FindChildTraverse("TeamsList"));
+	var teamSelectContainer = Parent.FindChildTraverse("TeamSelectContainer");
+	ApplyXHSInvisiblePanel(teamSelectContainer);
+
+	// Valve can recreate this panel while players connect. Keep opacity applied
+	// throughout setup without toggling visibility on this sensitive UI tree.
+	var setupState = Game.GetState ? Number(Game.GetState()) : 0;
+	if (isNaN(setupState) || setupState < 7) {
+		$.Schedule(sidebarHiddenNow ? 0.5 : 0.1, SetupLoadingScreen);
+	}
 }
 
 var HudNotFoundException = /** @class */
@@ -1787,11 +1960,23 @@ function GetDotaHud() {
 }
 
 // 7.41e prod shop fix by 艾洛叔
-(() =>
-{
-    let pShop = FindDotaHudElement("GridBasicItems");
-    pShop.RemoveAndDeleteChildren();
+function ApplyXHSProdShopFix(attempt) {
+	var basicShop = null;
+	var upgradeShop = null;
+	try {
+		basicShop = FindDotaHudElement("GridBasicItems");
+		upgradeShop = FindDotaHudElement("GridUpgradeItems");
+	} catch (error) {
+	}
+	if ((!basicShop || !upgradeShop) && attempt < 20) {
+		$.Schedule(0.5, function() { ApplyXHSProdShopFix(attempt + 1); });
+		return;
+	}
+	if (!basicShop || !upgradeShop) {
+		return;
+	}
+	basicShop.RemoveAndDeleteChildren();
+	upgradeShop.RemoveAndDeleteChildren();
+}
 
-    let pShop2 = FindDotaHudElement("GridUpgradeItems");
-    pShop2.RemoveAndDeleteChildren();
-})();
+ApplyXHSProdShopFix(0);

@@ -8,6 +8,32 @@ local endUrlWebsite = "website/"
 local endUrlFrostrose = string.lower(CUSTOM_GAME_TYPE or "xhs") .. "/"
 local timeout = 5000
 local native_print = print
+local RUNTIME_LOG_LEVEL_BY_NUMBER = {
+	[1] = "debug",
+	[2] = "info",
+	[3] = "warn",
+	[4] = "error",
+	[5] = "critical",
+}
+local VALID_RUNTIME_LOG_LEVELS = {
+	debug = true,
+	info = true,
+	warn = true,
+	error = true,
+	critical = true,
+}
+
+local function NormalizeRuntimeLogLevel(value)
+	local numeric = tonumber(value)
+	if numeric ~= nil and RUNTIME_LOG_LEVEL_BY_NUMBER[numeric] ~= nil then
+		return RUNTIME_LOG_LEVEL_BY_NUMBER[numeric]
+	end
+	local level = string.lower(tostring(value or "info"))
+	if level == "warning" then level = "warn" end
+	if level == "err" then level = "error" end
+	if level == "fatal" then level = "critical" end
+	return VALID_RUNTIME_LOG_LEVELS[level] and level or "info"
+end
 
 local function IsValidApiPlayerID(player_id)
 	player_id = tonumber(player_id)
@@ -39,9 +65,14 @@ local function IsApiBotPlayerID(player_id)
 		if ok and is_xhs_bot == true then return true end
 	end
 
-	-- The explicit XHS registry is authoritative. IsFakeClient is a defensive
-	-- fallback for the short provisioning window before a bot is registered.
-	if PlayerResource.IsFakeClient ~= nil then
+	-- The explicit XHS registry is authoritative. Tools can expose unrelated
+	-- Valve fake-client slots even when the XHS bot count is locked to zero, so
+	-- only use IsFakeClient during an actual configured provisioning window.
+	local configured_bot_count = XHSBots ~= nil
+		and type(XHSBots.configuration) == "table"
+		and (tonumber(XHSBots.configuration.count) or 0)
+		or 0
+	if configured_bot_count > 0 and PlayerResource.IsFakeClient ~= nil then
 		local ok, is_fake_client = pcall(function()
 			return PlayerResource:IsFakeClient(tonumber(player_id))
 		end)
@@ -126,6 +157,15 @@ function api:GetXHSBotParticipantCount()
 	return count
 end
 
+function api:GetXHSBotSessionCount()
+	local participant_count = self:GetXHSBotParticipantCount()
+	local configured_count = 0
+	if XHSBots ~= nil and type(XHSBots.configuration) == "table" then
+		configured_count = math.max(0, math.floor(tonumber(XHSBots.configuration.count) or 0))
+	end
+	return math.max(participant_count, configured_count)
+end
+
 function api:Init()
 	CustomGameEventManager:RegisterListener("api_change_companion", Dynamic_Wrap(self, "SetCompanion"))
 	CustomGameEventManager:RegisterListener("loading_screen_api_request", Dynamic_Wrap(self, "OnLoadingScreenApiRequest"))
@@ -143,8 +183,10 @@ function api:GetUrl(endpoint)
 
 	local full_url = url .. endpoint
 	local uses_combined_log = endpoint == "game-register"
+		or endpoint == "tools-session-register"
 		or endpoint == "game-complete"
 		or endpoint == "performance"
+		or endpoint == "runtime-logs"
 	if not uses_combined_log then
 		print("URL: " .. full_url)
 	end
@@ -833,6 +875,11 @@ function api:MergeSupporterPassResponse(steamid, data)
 	if daily_cap ~= nil then
 		supporter_pass.daily_cap = daily_cap
 		supporter_pass.weekly_cap = daily_cap
+	end
+	for _, field in ipairs({ "daily_gameplay_fragments", "daily_gameplay_cap", "daily_quest_fragments", "daily_quest_cap", "daily_potential_fragments" }) do
+		if profile[field] ~= nil then
+			supporter_pass[field] = profile[field]
+		end
 	end
 
 	if season.xp ~= nil or season.level ~= nil or season.xp_per_level ~= nil then
@@ -1780,21 +1827,168 @@ function api:Message(message, _type)
 		data = tostring(message)
 	end
 
-	local status, err = xpcall(function()
-		--[[
-		api:Request("game-event", nil, nil, "POST", {
-			type = _type,
-			game_id = api.game_id or 0,
-			message = data
-		})
---]]
-	end, function(err)
-		if err == nil then
-			err = "Unknown Error"
+	if _type == 2 and type(data) == "table" then
+		self:QueueRuntimeLog(data)
+	end
+end
+
+function api:ScheduleRuntimeLogFlush(delay)
+	if self.runtime_log_flush_scheduled == true then return end
+	self.runtime_log_flush_scheduled = true
+	local flushDelay = tonumber(delay) or 2
+	local function FlushQueuedRuntimeLogs()
+		self.runtime_log_flush_scheduled = false
+		local ok, failure = pcall(function() self:FlushRuntimeLogs() end)
+		if not ok and XHSBootstrapNativePrint ~= nil then
+			pcall(XHSBootstrapNativePrint, "[error][XHS_RUNTIME_LOG] flush threw: " .. tostring(failure))
+		end
+		return nil
+	end
+
+	if Timers ~= nil and Timers.CreateTimer ~= nil then
+		Timers:CreateTimer(flushDelay, FlushQueuedRuntimeLogs)
+		return
+	end
+
+	-- Bootstrap failures may happen after this API file is parsed but before
+	-- libraries/timers exists. The engine context think keeps those logs
+	-- deliverable instead of leaving a permanently dormant in-memory queue.
+	local mode = nil
+	if GameRules ~= nil and GameRules.GetGameModeEntity ~= nil then
+		pcall(function() mode = GameRules:GetGameModeEntity() end)
+	end
+	if mode ~= nil and mode.SetContextThink ~= nil then
+		local scheduled, scheduleError = pcall(function()
+			mode:SetContextThink("XHSRuntimeLogBootstrapFlush", function()
+				self.runtime_log_flush_scheduled = false
+				self.runtime_log_bootstrap_think_active = true
+				local ok, failure = pcall(function() self:FlushRuntimeLogs() end)
+				if not ok and XHSBootstrapNativePrint ~= nil then
+					pcall(XHSBootstrapNativePrint, "[error][XHS_RUNTIME_LOG] bootstrap flush threw: "
+						.. tostring(failure))
+				end
+
+				local gameID = tonumber(self:GetApiGameId())
+				if ok and type(self.runtime_logs) == "table" and #self.runtime_logs > 0
+					and (gameID == nil or gameID <= 0)
+					and (Timers == nil or Timers.CreateTimer == nil) then
+					self.runtime_log_flush_scheduled = true
+					return 2
+				end
+				self.runtime_log_bootstrap_think_active = false
+				return nil
+			end, flushDelay)
+		end)
+		if scheduled then return end
+		if XHSBootstrapNativePrint ~= nil then
+			pcall(XHSBootstrapNativePrint, "[error][XHS_RUNTIME_LOG] context think registration failed: "
+				.. tostring(scheduleError))
+		end
+	end
+
+	self.runtime_log_flush_scheduled = false
+end
+
+function api:QueueRuntimeLog(entry)
+	if type(entry) ~= "table" then return end
+	self.runtime_logs = self.runtime_logs or {}
+	self.runtime_log_next_sequence = (self.runtime_log_next_sequence or 0) + 1
+
+	local gameTime = 0
+	if GameRules ~= nil and GameRules.GetGameTime ~= nil then
+		local ok, value = pcall(function() return GameRules:GetGameTime() end)
+		if ok then gameTime = tonumber(value) or 0 end
+	end
+
+	table.insert(self.runtime_logs, {
+		sequence = self.runtime_log_next_sequence,
+		game_time = gameTime,
+		real_time = RealTime ~= nil and tonumber(RealTime()) or 0,
+		level = NormalizeRuntimeLogLevel(entry.level),
+		content = string.sub(tostring(entry.content or ""), 1, 4000),
+		trace = type(entry.trace) == "table" and entry.trace or {},
+	})
+
+	while #self.runtime_logs > 1000 do
+		table.remove(self.runtime_logs, 1)
+		self.runtime_logs_dropped = (self.runtime_logs_dropped or 0) + 1
+	end
+
+	self:ScheduleRuntimeLogFlush(#self.runtime_logs >= 100 and 0.1 or 2)
+end
+
+function api:FlushRuntimeLogs()
+	if self.runtime_log_flush_in_flight == true then return end
+	if type(self.runtime_logs) ~= "table" or #self.runtime_logs == 0 then return end
+
+	local gameID = tonumber(self:GetApiGameId())
+	if gameID == nil or gameID <= 0 then
+		if self.runtime_log_bootstrap_think_active ~= true then
+			self:ScheduleRuntimeLogFlush(2)
+		end
+		return
+	end
+
+	local batch = {}
+	for _ = 1, math.min(100, #self.runtime_logs) do
+		table.insert(batch, table.remove(self.runtime_logs, 1))
+	end
+	local droppedInBatch = self.runtime_logs_dropped or 0
+	self.runtime_log_flush_in_flight = true
+
+	self:Request("runtime-logs", function()
+		self.runtime_log_flush_in_flight = false
+		self.runtime_logs_dropped = math.max(0, (self.runtime_logs_dropped or 0) - droppedInBatch)
+		if #self.runtime_logs > 0 then self:ScheduleRuntimeLogFlush(0.1) end
+	end, function(errorData)
+		self.runtime_log_flush_in_flight = false
+		for index = #batch, 1, -1 do
+			table.insert(self.runtime_logs, 1, batch[index])
+		end
+		while #self.runtime_logs > 1000 do
+			table.remove(self.runtime_logs)
+			self.runtime_logs_dropped = (self.runtime_logs_dropped or 0) + 1
+		end
+		self:ScheduleRuntimeLogFlush(5)
+	end, "POST", {
+		game_id = gameID,
+		match_id = self:GetMatchID(),
+		logs = batch,
+		dropped = droppedInBatch,
+	}, { silent = true })
+end
+
+function api:RegisterToolsTelemetrySession()
+	if not IsInToolsMode() then return false, "tools_mode_required" end
+	if self.tools_session_register_state == "pending" then return true, "pending" end
+	if self.tools_session_register_state == "ready" and tonumber(self.game_id) ~= nil then return true, "ready" end
+
+	local botCount = self.GetXHSBotParticipantCount ~= nil and self:GetXHSBotParticipantCount() or 0
+	self.tools_session_register_state = "pending"
+	self:Request("tools-session-register", function(data)
+		local gameID = tonumber(data and data.game_id)
+		if gameID == nil or gameID <= 0 then
+			self.tools_session_register_state = "failed"
+			print("tools-session-register: backend returned an invalid game_id")
+			return
 		end
 
-		native_print(err)
-	end)
+		self.game_id = gameID
+		self.tools_telemetry_session = true
+		self.tools_session_register_state = "ready"
+		self:ScheduleRuntimeLogFlush(0.1)
+	end, function(errorData)
+		self.tools_session_register_state = "failed"
+		print("tools-session-register: failed; Lua logs remain local ("
+			.. tostring(errorData and errorData.message or "unknown error") .. ")")
+	end, "POST", {
+		map = GetMapName(),
+		match_id = self:GetMatchID(),
+		tools_mode = true,
+		cheat_mode = true,
+		bot_count = botCount,
+	})
+	return true, "pending"
 end
 
 function api:GetEventPlayerID(event_source_index, payload)
@@ -1978,7 +2172,9 @@ function api:OnLoadingScreenApiRequestSafe(event_source_index, keys)
 end
 
 -- Core
-function api:Request(endpoint, okCallback, failCallback, method, payload)
+function api:Request(endpoint, okCallback, failCallback, method, payload, options)
+	options = type(options) == "table" and options or {}
+	local silent = options.silent == true
 	local request_started_at = Time()
 	local encoded_payload_size = 0
 	if okCallback == nil then
@@ -2000,7 +2196,7 @@ function api:Request(endpoint, okCallback, failCallback, method, payload)
 	local request = CreateHTTPRequestScriptVM(method, request_url)
 
 	if request == nil then
-		print("Failed to create http request. skipping")
+		if not silent then print("Failed to create http request. skipping") end
 		return failCallback()
 	end
 
@@ -2040,15 +2236,22 @@ function api:Request(endpoint, okCallback, failCallback, method, payload)
 		-- print(result)
 		local code = result.StatusCode;
 		local response_body = tostring(result.Body or "")
-		if endpoint == "game-register" or endpoint == "game-complete"
+		if endpoint == "game-register" or endpoint == "tools-session-register" or endpoint == "game-complete"
 			or endpoint == "performance" or endpoint == "bot-audit" then
 			local elapsed_ms = math.floor(math.max(Time() - request_started_at, 0) * 1000)
-			print("[XHS HTTP] destination=" .. tostring(request_url)
+			local http_log_message = "[XHS HTTP] destination=" .. tostring(request_url)
 				.. " | method=" .. tostring(method)
 				.. " | status=" .. tostring(code or 0)
 				.. " | elapsed=" .. tostring(elapsed_ms) .. "ms"
 				.. " | request=" .. tostring(encoded_payload_size) .. "B"
-				.. " | response=" .. tostring(string.len(response_body)) .. "B")
+				.. " | response=" .. tostring(string.len(response_body)) .. "B"
+			if not silent then
+				if log ~= nil and type(log.debug) == "function" then
+					log.debug(http_log_message)
+				else
+					print(http_log_message)
+				end
+			end
 		end
 
 		local fail = function(message)
@@ -2056,8 +2259,8 @@ function api:Request(endpoint, okCallback, failCallback, method, payload)
 				code = 0
 			end
 
-			print("Request to " .. endpoint .. " failed with message " .. message .. " (" .. tostring(code) .. ")")
-			if endpoint ~= "observability/logs" and XHSObservability ~= nil then
+			if not silent then print("Request to " .. endpoint .. " failed with message " .. message .. " (" .. tostring(code) .. ")") end
+			if not silent and endpoint ~= "observability/logs" and endpoint ~= "runtime-logs" and XHSObservability ~= nil then
 				XHSObservability:Log("error", "backend_http", "HTTP_REQUEST_FAILED", "Request to " .. tostring(endpoint) .. " failed: " .. tostring(message), {
 					endpoint = tostring(endpoint), status_code = tonumber(code) or 0,
 				})
@@ -2074,7 +2277,7 @@ function api:Request(endpoint, okCallback, failCallback, method, payload)
 		elseif code >= 500 then
 			return fail("Server Error")
 		elseif code == 204 then
-			print("Request to " .. endpoint .. " succeeded with no content")
+			if not silent then print("Request to " .. endpoint .. " succeeded with no content") end
 			return okCallback({})
 		else
 			-- Express' default 403/404 responses can be empty or HTML when a
@@ -2114,16 +2317,11 @@ function api:Request(endpoint, okCallback, failCallback, method, payload)
 end
 
 function api:RegisterGame(callback, register_players)
-	local locked_bot_session = IsInToolsMode()
-		and XHSBots ~= nil
-		and XHSBots.enabled == true
-		and XHSBots.locked == true
-		and self:HasXHSBotSession()
-
-	-- Defense in depth for future/direct callers. The normal deferred flow
-	-- handles local API readiness itself and never reaches this branch.
-	if self.xhs_bot_session_backend_disabled == true or locked_bot_session then
-		print("game-register: rejected for a locked local XHS bot session.")
+	-- This flag is reserved for an explicitly telemetry-only caller. A normal
+	-- Tools bot match must register its human players so read-only Supporter Pass
+	-- state and vote power are available; Tools Mode remains XP-ineligible.
+	if self.xhs_bot_session_backend_disabled == true then
+		print("game-register: rejected for an explicitly telemetry-only session.")
 		return false, "xhs_bot_session"
 	end
 
@@ -2217,7 +2415,11 @@ function api:RegisterGame(callback, register_players)
 		end
 		api.game_register_state = "ready"
 		print("game-register: ready with game_id=" .. tostring(api.game_id))
-		api.players = data.players
+		if XHSFlushBootstrapLogs ~= nil then
+			XHSFlushBootstrapLogs()
+		end
+		api:ScheduleRuntimeLogFlush(0.1)
+		api.players = data.players or {}
 		api.companions = data.companions or nil
 		api.emblems = data.emblems or nil
 		api.effigies = data.effigies or data.statues or nil
@@ -2255,12 +2457,17 @@ function api:RegisterGame(callback, register_players)
 					local player = api.players and api.players[steamid] or nil
 					local supporter_pass = player and player.supporter_pass or {}
 					local season = supporter_pass.season or {}
+					local published = CustomNetTables:GetTableValue("supporter_pass_player", tostring(player_id)) or {}
 					print("XHS Supporter Pass register: player=" .. tostring(player_id)
 						.. " steamid=" .. steamid
+						.. " status=" .. tostring(player and player.status)
 						.. " tier=" .. tostring(supporter_pass.tier_id)
 						.. " fragments=" .. tostring(supporter_pass.fragments or supporter_pass.fragment_balance)
 						.. " season_xp=" .. tostring(season.xp or supporter_pass.season_xp or supporter_pass.current_exp)
-						.. " season_level=" .. tostring(season.level or supporter_pass.season_level or supporter_pass.level))
+						.. " season_level=" .. tostring(season.level or supporter_pass.season_level or supporter_pass.level)
+						.. " published_xp=" .. tostring(published.season_xp or published.XP)
+						.. " published_level=" .. tostring(published.season_level or published.Lvl)
+						.. " vote_power=" .. tostring(published.vote_power))
 					if not player then
 						print("XHS Supporter Pass register: missing backend player row for steamid=" .. steamid)
 					end
@@ -2283,6 +2490,9 @@ function api:RegisterGame(callback, register_players)
 		match_id = self:GetMatchID(),
 		players = register_players,
 		cheat_mode = self:IsCheatGame(),
+		tools_mode = IsInToolsMode(),
+		contains_xhs_bots = self:HasXHSBotSession(),
+		xhs_bot_count = self:GetXHSBotSessionCount(),
 	})
 
 	-- call in supporter pass scripts after supporter_pass_player is set to show mmr medal in loading screen
@@ -2365,6 +2575,9 @@ function api:ProcessCompletedGame(data, payload, skipWinner)
 		gamemode = gamemode,
 		game_time = payload.game_time,
 		map = payload.map or GetMapName(),
+		cheat_mode = payload.cheat_mode == true,
+		tools_mode = payload.tools_mode == true or IsInToolsMode(),
+		persistent_rewards_eligible = payload.persistent_rewards_eligible ~= false,
 		info = {
 			winner = GAME_WINNER_TEAM,
 			id = game_id,
@@ -2378,17 +2591,19 @@ function api:ProcessCompletedGame(data, payload, skipWinner)
 
 	if not skipWinner then
 		local winner_team = GAME_WINNER_TEAM
-		Timers:CreateTimer(0.5, function()
+		-- Give the final net-table snapshot enough time to reach every client
+		-- before POST_GAME freezes normal custom-game replication.
+		Timers:CreateTimer(2.0, function()
 			GameRules:SetGameWinner(winner_team, true)
 		end)
 	end
 end
 
 function api:CompleteGame()
-	print("CompleteGame")
 	local players = {}
 	local backend_players = {}
 	local has_xhs_bot_session = self:HasXHSBotSession()
+	local is_tools_session = IsInToolsMode()
 	if has_xhs_bot_session
 		and XHSBotDecisionAudit ~= nil
 		and type(XHSBotDecisionAudit.Finalize) == "function" then
@@ -2546,6 +2761,9 @@ function api:CompleteGame()
 		return 0
 	end
 
+	local farm_event_difficulty = math.max(1, math.min(5,
+		tonumber(GameRules:GetCustomGameDifficulty()) or tonumber(api:GetCustomDifficulty()) or 1))
+
 	for id = 0, DOTA_MAX_TEAM_PLAYERS - 1 do
 		if PlayerResource:IsValidPlayerID(id)
 			and not IsApiSpectatorPlayerID(id) then
@@ -2656,6 +2874,8 @@ function api:CompleteGame()
 					and SpecialEvents.sogat_winners_by_player ~= nil
 					and SpecialEvents.sogat_winners_by_player[id] == true,
 				farm_event_kills = GetFarmEventKills(id),
+				farm_event_difficulty = farm_event_difficulty,
+				farm_event_percent = farm_event_difficulty,
 			}
 			local player = {
 				id = id,
@@ -2774,12 +2994,16 @@ function api:CompleteGame()
 		rosh_hp = rosh_hp,
 		rosh_max_hp = rosh_max_hp,
 		cheat_mode = self:IsCheatGame(),
+		tools_mode = is_tools_session,
 		map = GetMapName(),
 		fragment_quests = fragment_quests,
 		performance_summary = performance_summary,
 		contains_xhs_bots = self:HasXHSBotParticipants(),
 		xhs_bot_count = self:GetXHSBotParticipantCount(),
-		persistent_rewards_eligible = not has_xhs_bot_session,
+		-- XHS bots never enter backend_players. A production match containing
+		-- both humans and bots can therefore reward only its persistent humans.
+		-- Every Tools session remains fully non-persistent, with or without bots.
+		persistent_rewards_eligible = not is_tools_session,
 	}
 	local backend_payload = {}
 	for key, value in pairs(payload) do
@@ -2800,7 +3024,8 @@ function api:CompleteGame()
 	completed_display_payload.game_time = backend_payload.game_time
 
 	-- Production bot matches keep rewards disabled, but their decision audit is
-	-- valuable QA data. Tools sessions remain strictly local and never upload.
+	-- valuable QA data. Tools sessions have a full account-state registration
+	-- for UI data, while their completion remains non-persistent.
 	if has_xhs_bot_session
 		and not IsInToolsMode()
 		and not self:IsCheatGame()
@@ -2833,19 +3058,17 @@ function api:CompleteGame()
 		end
 	end
 
-	-- A private Tools bot run must not alter account XP, win rate, quests, or
-	-- any other persistent human result. Keep the complete marked local
-	-- snapshot, but do not submit the match-complete payload at all.
-	if has_xhs_bot_session then
-		print("game-complete: skipped backend request for an XHS bot session.")
-		if FragmentQuests ~= nil then
-			FragmentQuests:OnBackendComplete(false, { code = "xhs_bot_session" })
-		end
-		self:ProcessCompletedGame({}, payload)
-		return
+	-- Tools Mode still submits game-complete so telemetry sessions close
+	-- cleanly. Never send player reward inputs from Tools: the backend also
+	-- recognizes tools_mode and bypasses every persistent reward operation.
+	if is_tools_session then
+		backend_players = {}
+		backend_payload.players = {}
+		backend_payload.fragment_quests = {}
+		backend_payload.persistent_rewards_eligible = false
 	end
 
-	if next(backend_players) == nil then
+	if next(backend_players) == nil and not is_tools_session then
 		print("game-complete: skipped backend request because no persistent human player is present.")
 		if FragmentQuests ~= nil then
 			FragmentQuests:OnBackendComplete(false, { code = "no_persistent_players" })
@@ -2855,8 +3078,11 @@ function api:CompleteGame()
 	end
 
 	if api_game_id == nil then
-		print("game-complete: skipped backend request because game-register has no valid game_id (state="
-			.. tostring(self.game_register_state or "unknown") .. ").")
+		local registrationState = self.tools_telemetry_session == true
+			and self.tools_session_register_state
+			or self.game_register_state
+		print("game-complete: skipped backend request because session registration has no valid game_id (state="
+			.. tostring(registrationState or "unknown") .. ").")
 		if FragmentQuests ~= nil then
 			FragmentQuests:OnBackendComplete(false, { code = "game_not_registered" })
 		end
@@ -2864,44 +3090,14 @@ function api:CompleteGame()
 		return
 	end
 
-	local outbound_players = {}
-	for steamid, player_data in pairs(backend_players) do
-		outbound_players[tostring(steamid)] = {
-			team = player_data.team,
-			abandon = player_data.abandon,
-			disconnected = player_data.disconnected,
-			connection_state = player_data.connection_state,
-			supporter_xp = player_data.supporter_xp,
-		}
-	end
-	print("[XHS game-complete] outbound " .. json.encode({
-		game_id = backend_payload.game_id,
-		game_time = backend_payload.game_time,
-		winner = backend_payload.winner,
-		cheat_mode = backend_payload.cheat_mode,
-		players = outbound_players,
-	}))
+	-- Publish the local match snapshot before starting the asynchronous request.
+	-- Some engine defeat paths can enter POST_GAME before an HTTP callback runs;
+	-- the EndScreen therefore always has replicated data when its context mounts.
+	-- A successful backend response replaces this snapshot with authoritative XP
+	-- before the deliberately delayed SetGameWinner transition.
+	self:ProcessCompletedGame({}, completed_display_payload, true)
 
 	self:Request("game-complete", function(data)
-			print("game-complete: Game complete successful!")
-			local inbound_players = {}
-			for steamid, player_data in pairs(data.players or {}) do
-				inbound_players[tostring(steamid)] = {
-					xp = player_data.xp,
-					xp_change = player_data.xp_change,
-					duration_xp = player_data.duration_xp,
-					victory_xp_bonus = player_data.victory_xp_bonus,
-					xp_boost = player_data.xp_boost,
-					xp_bonus = player_data.xp_bonus,
-					xp_breakdown = player_data.xp_breakdown,
-					xp_eligible = player_data.xp_eligible,
-					xp_ineligible_reason = player_data.xp_ineligible_reason,
-				}
-			end
-			print("[XHS game-complete] inbound " .. json.encode({
-				completion = data.completion,
-				players = inbound_players,
-			}))
 			if FragmentQuests ~= nil then
 				FragmentQuests:OnBackendComplete(true, data)
 			end

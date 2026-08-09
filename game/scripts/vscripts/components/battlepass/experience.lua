@@ -111,7 +111,11 @@ function Battlepass:GetPlayerInfoXP() -- yet it has too much useless loops, form
 			supporter_table.tier_color = supporter_table.tier_color or "#7DB9D8"
 			supporter_table.fragments = supporter_table.fragments or 0
 			supporter_table.daily_fragments = supporter_table.daily_fragments or supporter_table.weekly_fragments or 0
-			supporter_table.daily_cap = supporter_table.daily_cap or supporter_table.weekly_cap or 190
+			supporter_table.daily_gameplay_fragments = supporter_table.daily_gameplay_fragments or 0
+			supporter_table.daily_gameplay_cap = supporter_table.daily_gameplay_cap or 100
+			supporter_table.daily_quest_fragments = supporter_table.daily_quest_fragments or 0
+			supporter_table.daily_quest_cap = supporter_table.daily_quest_cap or 90
+			supporter_table.daily_cap = supporter_table.daily_cap or supporter_table.weekly_cap or (supporter_table.daily_gameplay_cap + supporter_table.daily_quest_cap)
 			supporter_table.weekly_fragments = supporter_table.daily_fragments
 			supporter_table.weekly_cap = supporter_table.daily_cap
 			supporter_table.monthly_fragments = supporter_table.monthly_fragments or 0

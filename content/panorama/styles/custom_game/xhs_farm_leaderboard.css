@@ -223,6 +223,56 @@
 	letter-spacing: 0.5px;
 }
 
+/* The objective instance moves beside Farm only while both independent panels
+ * are actually open. The two custom UI roots never have to replace each other. */
+.XHSFarmLeaderboardHost.XHSObjectiveLeaderboardInstance.HasConcurrentLeaderboard .XHSFarmLeaderboard
+{
+	margin-right: 362px;
+}
+
+.XHSFarmLeaderboardHost.XHSObjectiveLeaderboardInstance.HasConcurrentLeaderboard .XHSFarmLeaderboardToggle
+{
+	margin-right: 344px;
+}
+
+.XHSFarmSupporterXPTotal
+{
+	width: 100%;
+	height: 30px;
+	flow-children: right;
+	padding: 7px 11px 0px 12px;
+	visibility: collapse;
+	background-color: gradient( linear, 0% 0%, 100% 0%, from( #101b2bea ), to( #07111de8 ) );
+	border-left: 1px solid #61d5ff38;
+	border-right: 1px solid #61d5ff38;
+	border-bottom: 1px solid #61d5ff22;
+}
+
+.XHSFarmSupporterXPTotal.IsVisible
+{
+	visibility: visible;
+}
+
+.XHSFarmSupporterXPTotalLabel
+{
+	width: fill-parent-flow( 1.0 );
+	color: #8faabe;
+	font-size: 10px;
+	font-weight: bold;
+	letter-spacing: 1.2px;
+	text-shadow: 0px 1px 2px #000000;
+}
+
+.XHSFarmSupporterXPTotalValue
+{
+	color: #ffd477;
+	font-size: 12px;
+	font-weight: bold;
+	letter-spacing: 0.5px;
+	text-align: right;
+	text-shadow: 0px 0px 5px #ffad3544, 0px 1px 2px #000000;
+}
+
 .XHSFarmLeaderboardHeaderAccent
 {
 	width: 4px;
@@ -379,6 +429,7 @@
 }
 
 .XHSFarmLeaderboard.IsCollapsed .XHSFarmWinnerCelebration,
+.XHSFarmLeaderboard.IsCollapsed .XHSFarmSupporterXPTotal,
 .XHSFarmLeaderboard.IsCollapsed .XHSFarmLeaderboardColumnLabels
 {
 	height: 0px;

@@ -257,6 +257,100 @@ function info_already_available() {
 	return Game.GetMapInfo().map_name != "";
 }
 
+function GetPlayerIDCandidateFromInfo(player_info) {
+	if (!player_info) {
+		return -1;
+	}
+
+	var fields = ["player_id", "playerid", "player_slot", "player_slot_id"];
+	for (var field_index = 0; field_index < fields.length; field_index++) {
+		var raw_candidate = player_info[fields[field_index]];
+		if (raw_candidate === undefined || raw_candidate === null || raw_candidate === "") {
+			continue;
+		}
+		var candidate = Number(raw_candidate);
+		if (!isNaN(candidate) && candidate >= 0 && candidate < 24) {
+			return Math.floor(candidate);
+		}
+	}
+
+	return -1;
+}
+
+function HasLoadingScreenPlayerInfo(player_info) {
+	if (!player_info) {
+		return false;
+	}
+
+	if (GetPlayerIDCandidateFromInfo(player_info) >= 0) {
+		return true;
+	}
+
+	var name = player_info.player_name;
+	var steam_id = player_info.player_steamid || player_info.steamid || player_info.steam_id;
+	var hero = player_info.player_selected_hero;
+	var state = Number(player_info.player_connection_state);
+	return !!(name && String(name).trim()) ||
+		!!(steam_id && String(steam_id) !== "0") ||
+		!!(hero && String(hero).trim()) ||
+		(!isNaN(state) && state !== connection_state.UNKNOWN);
+}
+
+function GetLoadingScreenPlayerIDs() {
+	var ids = [];
+	function AddPlayerID(value) {
+		if (value === undefined || value === null || value === "") {
+			return;
+		}
+		var player_id = Number(value);
+		if (!isNaN(player_id) && player_id >= 0 && player_id < 24 && ids.indexOf(player_id) < 0) {
+			ids.push(player_id);
+		}
+	}
+
+	if (Game.GetAllPlayerIDs) {
+		var all_players = Game.GetAllPlayerIDs() || [];
+		for (var all_index = 0; all_index < all_players.length; all_index++) AddPlayerID(all_players[all_index]);
+	}
+
+	if (Game.GetAllTeamIDs && Game.GetPlayerIDsOnTeam) {
+		var teams = Game.GetAllTeamIDs() || [];
+		for (var team_index = 0; team_index < teams.length; team_index++) {
+			var team_players = Game.GetPlayerIDsOnTeam(teams[team_index]) || [];
+			for (var team_player_index = 0; team_player_index < team_players.length; team_player_index++) {
+				AddPlayerID(team_players[team_player_index]);
+			}
+		}
+	}
+
+	// During the native connection screen, the global player lists can remain
+	// empty even though Panorama already exposes individual lobby slots. Probe
+	// those client-side slots so our replacement roster does not depend on Lua
+	// or the custom setup nettable being initialized first.
+	if (typeof Game.GetPlayerInfo === "function") {
+		for (var player_slot = 0; player_slot < 24; player_slot++) {
+			var slot_info = null;
+			try {
+				slot_info = Game.GetPlayerInfo(player_slot);
+			} catch (slot_error) {}
+			if (HasLoadingScreenPlayerInfo(slot_info)) {
+				var info_player_id = GetPlayerIDCandidateFromInfo(slot_info);
+				AddPlayerID(info_player_id >= 0 ? info_player_id : player_slot);
+			}
+		}
+	}
+
+	var local_info = null;
+	try {
+		local_info = Game.GetLocalPlayerInfo ? Game.GetLocalPlayerInfo() : null;
+	} catch (local_info_error) {}
+	AddPlayerID(GetPlayerIDCandidateFromInfo(local_info));
+
+	var local_player_id = GetLocalPlayerIDSafe();
+	if (local_player_id >= 0) AddPlayerID(local_player_id);
+	return ids.sort(function (a, b) { return a - b; });
+}
+
 function isInt(n) {
 	return n % 1 === 0;
 }
@@ -1623,13 +1717,38 @@ function GetCurrentTime() {
 }
 
 function GetLocalPlayerIDSafe() {
-	var local_player_id = Game.GetLocalPlayerID();
+	var local_player_id = -1;
+	try {
+		if (Game.GetLocalPlayerID) {
+			var game_local_player_id = Game.GetLocalPlayerID();
+			if (game_local_player_id !== undefined && game_local_player_id !== null && game_local_player_id !== "") {
+				local_player_id = Number(game_local_player_id);
+			}
+		}
+	} catch (game_local_player_error) {}
 
-	if (local_player_id === undefined || local_player_id === null || local_player_id < 0) {
+	if ((isNaN(local_player_id) || local_player_id < 0) && typeof Players !== "undefined" && Players.GetLocalPlayer) {
+		try {
+			var players_local_player_id = Players.GetLocalPlayer();
+			if (players_local_player_id !== undefined && players_local_player_id !== null && players_local_player_id !== "") {
+				local_player_id = Number(players_local_player_id);
+			}
+		} catch (players_local_player_error) {}
+	}
+
+	if (isNaN(local_player_id) || local_player_id < 0) {
+		var local_info = null;
+		try {
+			local_info = Game.GetLocalPlayerInfo ? Game.GetLocalPlayerInfo() : null;
+		} catch (local_info_error) {}
+		local_player_id = GetPlayerIDCandidateFromInfo(local_info);
+	}
+
+	if (local_player_id === undefined || local_player_id === null || isNaN(local_player_id) || local_player_id < 0) {
 		return -1;
 	}
 
-	return local_player_id;
+	return Math.floor(local_player_id);
 }
 
 function GetSelectedProfilePlayerID() {
@@ -2182,6 +2301,10 @@ function GetProfileDataForPlayer(player_id) {
 		fragments: player_table.fragments || player_table.fragment_balance || 0,
 		daily_fragments: player_table.daily_fragments || player_table.daily_earned || player_table.weekly_fragments || player_table.weekly_earned || 0,
 		daily_cap: Math.max(1, ToNumber(player_table.daily_cap || player_table.weekly_cap, 100)),
+		daily_gameplay_fragments: Math.max(0, ToNumber(player_table.daily_gameplay_fragments, 0)),
+		daily_gameplay_cap: Math.max(1, ToNumber(player_table.daily_gameplay_cap, 100)),
+		daily_quest_fragments: Math.max(0, ToNumber(player_table.daily_quest_fragments, 0)),
+		daily_quest_cap: Math.max(1, ToNumber(player_table.daily_quest_cap, 90)),
 		weekly_fragments: player_table.daily_fragments || player_table.daily_earned || player_table.weekly_fragments || player_table.weekly_earned || 0,
 		weekly_cap: Math.max(1, ToNumber(player_table.daily_cap || player_table.weekly_cap, 100)),
 		mmr_title: player_table.mmr_title || L("loading_screen_na"),
@@ -2241,7 +2364,7 @@ function FormatLoadingDailyFragments(profile_data) {
 		return L("loading_screen_na");
 	}
 
-	return FormatIntegerValue(Math.max(0, ToNumber(profile_data.daily_fragments || profile_data.weekly_fragments, 0))) + " / " + FormatIntegerValue(Math.max(1, ToNumber(profile_data.daily_cap || profile_data.weekly_cap, 100)));
+	return "Game " + FormatIntegerValue(Math.max(0, ToNumber(profile_data.daily_gameplay_fragments, 0))) + "/" + FormatIntegerValue(Math.max(1, ToNumber(profile_data.daily_gameplay_cap, 100))) + " + Quests " + FormatIntegerValue(Math.max(0, ToNumber(profile_data.daily_quest_fragments, 0))) + "/" + FormatIntegerValue(Math.max(1, ToNumber(profile_data.daily_quest_cap, 90)));
 }
 
 function GetWindowRect(panel) {
@@ -3178,14 +3301,7 @@ function UpdatePlayerLoadingSidebar() {
 		return;
 	}
 
-	let player_ids = [];
-	if (Game.GetAllPlayerIDs) {
-		player_ids = Game.GetAllPlayerIDs() || [];
-	}
-
-	if (local_player_id >= 0 && player_ids.indexOf(local_player_id) < 0) {
-		player_ids.push(local_player_id);
-	}
+	let player_ids = GetLoadingScreenPlayerIDs();
 
 	var xhs_bot_roster_players = GetXHSBotRosterPlayers();
 	for (var xhs_bot_player_key in xhs_bot_roster_players) {
@@ -3197,9 +3313,14 @@ function UpdatePlayerLoadingSidebar() {
 
 	player_ids = player_ids.slice(0).sort(function (a, b) { return a - b; });
 
-	var local_player_info = local_player_id >= 0 ? Game.GetPlayerInfo(local_player_id) : null;
+	var local_player_info = null;
+	try {
+		local_player_info = local_player_id >= 0 ? Game.GetPlayerInfo(local_player_id) : null;
+	} catch (local_player_info_error) {}
 	if (!local_player_info) {
-		local_player_info = Game.GetLocalPlayerInfo();
+		try {
+			local_player_info = Game.GetLocalPlayerInfo();
+		} catch (local_player_fallback_error) {}
 	}
 	var local_team_id = GetPlayerTeamIDFromInfo(local_player_info, GetDefaultFriendlyTeamID());
 
@@ -3208,8 +3329,17 @@ function UpdatePlayerLoadingSidebar() {
 	for (var i = 0; i < player_ids.length; i++) {
 		const player_id = player_ids[i];
 		const roster_bot = GetXHSBotRosterEntry(player_id);
-		const raw_player_info = Game.GetPlayerInfo(player_id);
-		const player_info = raw_player_info || (roster_bot ? {
+		var raw_player_info = null;
+		var local_player_fallback = null;
+		try {
+			raw_player_info = Game.GetPlayerInfo(player_id);
+		} catch (player_info_error) {}
+		if (player_id == local_player_id) {
+			try {
+				local_player_fallback = Game.GetLocalPlayerInfo();
+			} catch (local_player_entry_error) {}
+		}
+		const player_info = raw_player_info || local_player_fallback || (roster_bot ? {
 			player_connection_state: IsTruthy(roster_bot.ready) ? connection_state.CONNECTED : connection_state.LOADING,
 			player_selected_hero: roster_bot.hero || "",
 			player_team_id: GetDefaultFriendlyTeamID(),
@@ -3219,11 +3349,16 @@ function UpdatePlayerLoadingSidebar() {
 			continue;
 		}
 
+		var display_name = roster_bot ? GetXHSBotDisplayName(player_id, roster_bot) : GetPlayerDisplayName(player_id, player_info);
+		if (!display_name) {
+			display_name = L("loading_screen_player") + " " + (player_id + 1).toString();
+		}
+
 		player_entries.push({
 			row_key: roster_bot ? ("bot_" + player_id) : player_id.toString(),
 			player_id: player_id,
 			player_info: player_info,
-			display_name: roster_bot ? GetXHSBotDisplayName(player_id, roster_bot) : GetPlayerDisplayName(player_id, player_info),
+			display_name: display_name,
 			team_id: GetPlayerTeamIDFromInfo(player_info, local_team_id),
 			can_open_profile: !roster_bot,
 			is_xhs_bot: !!roster_bot,
@@ -3243,7 +3378,9 @@ function UpdatePlayerLoadingSidebar() {
 		const seeded_entry = player_entries[entry_seed];
 		const seeded_state = seeded_entry.is_xhs_bot
 			? (IsTruthy(seeded_entry.bot_data && seeded_entry.bot_data.ready) ? connection_state.CONNECTED : connection_state.LOADING)
-			: seeded_entry.player_info.player_connection_state;
+			: (isNaN(Number(seeded_entry.player_info.player_connection_state))
+				? connection_state.NOT_YET_CONNECTED
+				: Number(seeded_entry.player_info.player_connection_state));
 		const seeded_team_id = seeded_entry.team_id !== undefined ? seeded_entry.team_id : GetPlayerTeamIDFromInfo(seeded_entry.player_info, local_team_id);
 		const seeded_team_key = GetTeamSectionKey(seeded_team_id);
 
@@ -5608,11 +5745,30 @@ function OnVoteButtonPressed(category, vote) {
 	RefreshLocalVoteCategoryUI(category);
 	UpdateVoteSelectionSummary();
 	UpdateMainVoteButtonState();
-	if (typeof GameEvents !== "undefined" && GameEvents && typeof GameEvents.SendCustomGameEventToServer === "function") {
-		GameEvents.SendCustomGameEventToServer("setting_vote", { "category": category, "vote": vote, "PlayerID": Game.GetLocalPlayerID() });
-	} else {
-	}
+	SendSettingVoteRequest(category, vote, 1);
 	return true;
+}
+
+function SendSettingVoteRequest(category, vote, attempt) {
+	var player_id = GetLocalPlayerIDSafe();
+	if (typeof GameEvents === "undefined" || !GameEvents
+		|| typeof GameEvents.SendCustomGameEventToServer !== "function") {
+		return;
+	}
+
+	GameEvents.SendCustomGameEventToServer("setting_vote", {
+		category: category,
+		vote: vote,
+		PlayerID: player_id,
+	});
+
+	if (attempt < 4) {
+		$.Schedule(0.75, function () {
+			if (local_vote_confirmed[category] === true
+				|| parseInt(local_votes[category]) !== parseInt(vote)) return;
+			SendSettingVoteRequest(category, vote, attempt + 1);
+		});
+	}
 }
 
 function GetVoteCounterFromTable(vote_table) {
@@ -5624,12 +5780,12 @@ function GetVoteCounterFromTable(vote_table) {
 
 	for (var player_id in vote_table) {
 		var vote_row = vote_table[player_id];
-		if (!vote_row || vote_row[1] === undefined) {
+		if (!vote_row) {
 			continue;
 		}
 
-		var gamemode = parseInt(vote_row[1]);
-		var amount_of_votes = parseInt(vote_row[2]);
+		var gamemode = GetVoteChoiceFromEntry(vote_row);
+		var amount_of_votes = GetVoteWeightFromEntry(vote_row);
 
 		if (isNaN(gamemode) || gamemode <= 0) {
 			continue;
@@ -5722,7 +5878,6 @@ function DisableRankingVoting() {
 }
 
 (function () {
-
 	var vote_title = $.GetContextPanel().FindChildrenWithClassTraverse("vote-title");
 
 	if (vote_title && vote_title[0]) {

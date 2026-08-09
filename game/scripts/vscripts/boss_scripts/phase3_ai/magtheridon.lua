@@ -122,7 +122,7 @@ end
 
 local function CreateWarning(position, radius, delay, fel)
 	local particle = ParticleManager:CreateParticle(fel == true and FEL_WARNING_PARTICLE or WARNING_PARTICLE, PATTACH_WORLDORIGIN, nil)
-	local color = fel == true and Vector(120, 255, 80) or Vector(255, 110, 35)
+	local color = fel == true and Vector(190, 255, 85) or Vector(102, 255, 64)
 	ParticleManager:SetParticleControl(particle, 0, position)
 	ParticleManager:SetParticleControl(particle, 1, Vector(radius, delay or 1.0, 0))
 	ParticleManager:SetParticleControl(particle, 2, Vector(delay or 1.0, 0, 1))

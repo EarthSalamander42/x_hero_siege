@@ -755,7 +755,7 @@
 		"item_type"					"levelup"
 		"item_unlock_level"			"12"
 		"item_rarity"				"legendary"
-		"image_inventory"			"custom_game/battlepass/levelup" // USE GAMEPEDIA WEBM VIDEO
+		"image_inventory"			"s2r://panorama/images/compendium/spring2016/rewards/levelup_fx_png.vtex"
 		"used_by_heroes"			"levelup"
 
 		"visuals"
@@ -775,7 +775,7 @@
 		"item_type"					"levelup"
 		"item_unlock_level"			"12"
 		"item_rarity"				"legendary"
-		"image_inventory"			"custom_game/battlepass/levelup2" // USE GAMEPEDIA WEBM VIDEO
+		"image_inventory"			"s2r://panorama/images/compendium/international2017/prestigerewards/levelup_fx_png.vtex"
 		"used_by_heroes"			"levelup"
 		"premium"					"1"
 
@@ -796,7 +796,7 @@
 		"item_type"					"levelup"
 		"item_unlock_level"			"14"
 		"item_rarity"				"legendary"
-		"image_inventory"			"custom_game/battlepass/levelup3" // USE GAMEPEDIA WEBM VIDEO
+		"image_inventory"			"s2r://panorama/images/compendium/international2018/prestigerewards/levelup_fx_png.vtex"
 		"used_by_heroes"			"levelup"
 
 		"visuals"
@@ -816,7 +816,7 @@
 		"item_type"					"levelup"
 		"item_unlock_level"			"14"
 		"item_rarity"				"legendary"
-		"image_inventory"			"custom_game/battlepass/levelup4" // USE GAMEPEDIA WEBM VIDEO
+		"image_inventory"			"s2r://panorama/images/compendium/international2019/prestigerewards/levelup_fx_png.vtex"
 		"used_by_heroes"			"levelup"
 		"premium"					"1"
 
@@ -1207,7 +1207,7 @@
 		"item_type"					"levelup"
 		"item_unlock_level"			"16"
 		"item_rarity"				"legendary"
-		"image_inventory"			"custom_game/battlepass/levelup5" // USE GAMEPEDIA WEBM VIDEO
+		"image_inventory"			"s2r://panorama/images/compendium/international2020/prestigerewards/levelup_fx_png.vtex"
 		"used_by_heroes"			"levelup"
 
 		"visuals"

@@ -2,82 +2,13 @@ local function PublishAllPlayersBattlepassLoaded()
 	CustomGameEventManager:Send_ServerToAllClients("all_players_battlepass_loaded", {})
 end
 
-local function CompleteApiSetupWithoutBackend(reason)
-	-- A Tools bot session is intentionally local-only. It must never create a
-	-- game-register row or unlock persistent rewards, but humans still need
-	-- their read-only donor identity for loading-screen and in-game visuals.
-	api.game_id = nil
-	api.players = {}
-	api.companions = {}
-	api.emblems = {}
-	api.effigies = {}
-	api.disabled_heroes = {}
-	api.supporter_pass = {}
-	api.custom_polls = {}
-	api.xhs_bot_session_backend_disabled = true
-
-	CustomNetTables:SetTableValue("supporter_pass_player", "companions", {})
-	CustomNetTables:SetTableValue("supporter_pass_player", "emblems", {})
-	CustomNetTables:SetTableValue("supporter_pass_player", "effigies", {})
-
-	if CustomPolls and CustomPolls.SetBackendPayload then
-		CustomPolls:SetBackendPayload({})
-	end
-
-	local human_steamids = {}
-	for player_id = 0, 23 do
-		if api:IsPersistentPlayerID(player_id) then
-			local steamid = api:GetPersistentPlayerSteamID(player_id)
-			if steamid ~= nil then
-				human_steamids[tostring(steamid)] = true
-			end
-		end
-	end
-
-	local completed = false
-	local function FinishLocalApiSetup(status_source)
-		if completed then return end
-		completed = true
-
-		if SupporterPass and SupporterPass.PublishPlayers then
-			SupporterPass:PublishPlayers()
-		end
-
-		print("game-register: skipped for local XHS bot session ("
-			.. tostring(reason or "bot_configured")
-			.. "); human donor metadata=" .. tostring(status_source or "unavailable") .. ".")
-		PublishAllPlayersBattlepassLoaded()
-	end
-
-	local request_ok = pcall(function()
-		api:Request("meta/donators", function(data)
-			local rows = type(data) == "table" and data.players or nil
-			if type(rows) == "table" then
-				for key, row in pairs(rows) do
-					if type(row) == "table" then
-						local steamid = tostring(row.steamid or row.steam_id or key)
-						local status = tonumber(row.status or row.donator_status)
-						if human_steamids[steamid] == true and status ~= nil then
-							api.players[steamid] = {
-								status = math.max(0, math.min(10, math.floor(status))),
-							}
-						end
-					end
-				end
-			end
-
-			FinishLocalApiSetup("loaded")
-		end, function()
-			FinishLocalApiSetup("unavailable")
-		end)
-	end)
-
-	if not request_ok then
-		FinishLocalApiSetup("unavailable")
-	end
-end
-
 local function RegisterGameAndLoadArmories()
+	-- A Tools match containing bots still needs the complete account-state
+	-- snapshot for Supporter Pass XP, tiers and vote power. game-register marks
+	-- the row as Tools Mode; both Lua completion and the backend independently
+	-- reject every persistent reward for that session.
+	api.xhs_bot_session_backend_disabled = false
+	api.tools_telemetry_session = false
 	api:RegisterGame(function(data)
 		print("Register game...")
 		for k, _ in pairs(data and data.players or {}) do
@@ -102,37 +33,11 @@ local function RegisterGameAndLoadArmories()
 	end)
 end
 
-local function RegisterOrSkipAfterBotConfiguration()
-	-- Production and Tools launches without the private package keep the
-	-- original eager registration behavior.
-	if not IsInToolsMode() or XHSBots == nil or XHSBots.enabled ~= true then
-		RegisterGameAndLoadArmories()
-		return
-	end
-
-	-- The loading-screen choice is still mutable when CUSTOM_GAME_SETUP first
-	-- begins. Wait until XHSBots locks it in BeforeCustomSetupFinish; if an
-	-- external launch bypasses that hook, leaving setup is also a terminal
-	-- decision point.
-	Timers:CreateTimer(0, function()
-		local state = GameRules:State_Get()
-		local configuration_locked = XHSBots ~= nil and XHSBots.locked == true
-		if not configuration_locked and state == DOTA_GAMERULES_STATE_CUSTOM_GAME_SETUP then
-			return 0.1
-		end
-
-		local has_bot_session = api.HasXHSBotSession ~= nil and api:HasXHSBotSession()
-		if not has_bot_session and XHSBots ~= nil and type(XHSBots.configuration) == "table" then
-			has_bot_session = (tonumber(XHSBots.configuration.count) or 0) > 0
-		end
-
-		if has_bot_session then
-			CompleteApiSetupWithoutBackend(configuration_locked and "configuration_locked" or "setup_left")
-		else
-			RegisterGameAndLoadArmories()
-		end
-		return nil
-	end)
+local function RegisterGameWithPlayerProfiles()
+	-- Register immediately instead of waiting for the mutable bot choice. Only
+	-- persistent human SteamIDs enter the request, and later enabling bots does
+	-- not change the account snapshot or its read-only use during setup.
+	RegisterGameAndLoadArmories()
 end
 
 ListenToGameEvent('game_rules_state_change', function()
@@ -140,7 +45,7 @@ ListenToGameEvent('game_rules_state_change', function()
 		api:DetectParties()
 		CustomNetTables:SetTableValue("game_options", "game_count", { value = 1 })
 
-		RegisterOrSkipAfterBotConfiguration()
+		RegisterGameWithPlayerProfiles()
 
 		CustomGameEventManager:Send_ServerToAllClients("all_players_loaded", {})
 	elseif GameRules:State_Get() == DOTA_GAMERULES_STATE_PRE_GAME then

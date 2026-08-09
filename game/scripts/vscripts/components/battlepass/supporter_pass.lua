@@ -1,6 +1,8 @@
 SupporterPass = SupporterPass or class({})
 
-SupporterPass.DAILY_FRAGMENT_CAP = 190
+SupporterPass.DAILY_GAMEPLAY_FRAGMENT_CAP = 100
+SupporterPass.DAILY_QUEST_FRAGMENT_CAP = 90
+SupporterPass.DAILY_FRAGMENT_CAP = SupporterPass.DAILY_GAMEPLAY_FRAGMENT_CAP + SupporterPass.DAILY_QUEST_FRAGMENT_CAP
 SupporterPass.WEEKLY_FRAGMENT_CAP = SupporterPass.DAILY_FRAGMENT_CAP
 SupporterPass.SEASON_XP_PER_LEVEL = 1000
 
@@ -25,6 +27,137 @@ local function CopySupporterTable(source)
 		copy[key] = value
 	end
 	return copy
+end
+
+-- Valve ships the TI reward thumbnails alongside their Panorama compendium
+-- assets. Prefer those canonical images over legacy/custom placeholders so a
+-- reward keeps the same preview in tracks, shop, Armory and bundle contents.
+local VANILLA_TI_REWARD_IMAGES = {
+	levelup = {
+		[6] = "s2r://panorama/images/compendium/spring2016/rewards/levelup_fx_png.vtex",
+		[7] = "s2r://panorama/images/compendium/international2017/prestigerewards/levelup_fx_png.vtex",
+		[8] = "s2r://panorama/images/compendium/international2018/prestigerewards/levelup_fx_png.vtex",
+		[9] = "s2r://panorama/images/compendium/international2019/prestigerewards/levelup_fx_png.vtex",
+		[10] = "s2r://panorama/images/compendium/international2020/prestigerewards/levelup_fx_png.vtex",
+	},
+	radiance = {
+		[6] = "s2r://panorama/images/compendium/spring2016/rewards/radiance_fx_png.vtex",
+		[7] = "s2r://panorama/images/compendium/international2017/prestigerewards/radiance_fx_png.vtex",
+		[8] = "s2r://panorama/images/compendium/international2018/prestigerewards/radiance_fx_png.vtex",
+		[9] = "s2r://panorama/images/compendium/international2019/prestigerewards/radiance_fx_png.vtex",
+		[10] = "s2r://panorama/images/compendium/international2020/prestigerewards/radiance_fx_png.vtex",
+	},
+	teleport = {
+		[4] = "s2r://panorama/images/econ/huds/hud_ti4_png.vtex",
+		[5] = "s2r://panorama/images/econ/huds/the_international_2015/hud_the_international_2015_png.vtex",
+		[6] = "s2r://panorama/images/compendium/spring2016/rewards/tp_fx_lv3_png.vtex",
+		[7] = "s2r://panorama/images/compendium/international2017/prestigerewards/tp_fx_lv3_png.vtex",
+		[8] = "s2r://panorama/images/compendium/international2018/prestigerewards/tp_fx_lv3_png.vtex",
+		[9] = "s2r://panorama/images/compendium/international2019/prestigerewards/tp_fx_lv3_png.vtex",
+		[10] = "s2r://panorama/images/compendium/international2020/prestigerewards/tp_fx_lv2_png.vtex",
+	},
+	fountain = {
+		[4] = "s2r://panorama/images/econ/huds/hud_ti4_png.vtex",
+		[5] = "s2r://panorama/images/econ/huds/the_international_2015/hud_the_international_2015_png.vtex",
+		[6] = "s2r://panorama/images/compendium/spring2016/rewards/fountain_fx_lv3_png.vtex",
+		[7] = "s2r://panorama/images/compendium/international2017/prestigerewards/fountain_fx_lv3_png.vtex",
+		[8] = "s2r://panorama/images/compendium/international2018/prestigerewards/fountain_fx_lv3_png.vtex",
+		[9] = "s2r://panorama/images/compendium/international2019/prestigerewards/fountain_fx_lv3_png.vtex",
+		[10] = "s2r://panorama/images/compendium/international2020/prestigerewards/fountain_fx_lv3_png.vtex",
+		[11] = "s2r://panorama/images/compendium/international2022/prestigerewards/fountain_fx_lv3_png.vtex",
+	},
+	bottle = {
+		[6] = "s2r://panorama/images/compendium/spring2016/rewards/bottle_fx_png.vtex",
+		[7] = "s2r://panorama/images/compendium/international2017/prestigerewards/bottle_fx_png.vtex",
+		[9] = "s2r://panorama/images/compendium/international2019/prestigerewards/bottle_fx_png.vtex",
+	},
+	high_five = {
+		[9] = "s2r://panorama/images/compendium/international2019/prestigerewards/high_five_lvl_1_png.vtex",
+		[10] = "s2r://panorama/images/compendium/international2020/prestigerewards/high_five_lvl_2_png.vtex",
+	},
+	emblem = {
+		[10] = "s2r://panorama/images/compendium/international2020/prestigerewards/scepter_lv2_png.vtex",
+		[11] = "s2r://panorama/images/compendium/international2022/prestigerewards/scepter_lv2_png.vtex",
+	},
+	shadow_kill = {
+		[7] = "s2r://panorama/images/econ/items/shadow_demon/ti7_immortal_back/sd_ti7_immortal_back_png.vtex",
+	},
+	shadow_kill_gold = {
+		[7] = "s2r://panorama/images/econ/items/shadow_demon/ti7_immortal_back/sd_ti7_immortal_back1_png.vtex",
+	},
+}
+
+local LEGACY_LEVELUP_TI = {
+	battlepass_levelup1 = 6,
+	battlepass_levelup2 = 7,
+	battlepass_levelup3 = 8,
+	battlepass_levelup4 = 9,
+	battlepass_levelup5 = 10,
+}
+
+local function ResolveVanillaTIRewardImage(item)
+	if type(item) ~= "table" then return nil end
+
+	local itemName = string.lower(tostring(item.item_name or item.name or ""))
+	local kind = table.concat({
+		string.lower(tostring(item.item_type or "")),
+		string.lower(tostring(item.type or "")),
+		string.lower(tostring(item.slot_id or "")),
+		string.lower(tostring(item.category or "")),
+		itemName,
+		string.lower(tostring(item.display_name or item.title or "")),
+	}, " ")
+	local imageKind = nil
+	if string.find(kind, "levelup", 1, true) or string.find(kind, "ascension", 1, true) then
+		imageKind = "levelup"
+	elseif string.find(kind, "immolation", 1, true) or string.find(kind, "radiance", 1, true) then
+		imageKind = "radiance"
+	elseif string.find(kind, "shadow poison", 1, true) or string.find(kind, "shadow_poison", 1, true) then
+		imageKind = (string.find(kind, "gold", 1, true) or string.find(kind, "golden", 1, true)) and "shadow_kill_gold" or "shadow_kill"
+	elseif string.find(kind, "teleport", 1, true) or string.find(kind, "tp_fx", 1, true) then
+		imageKind = "teleport"
+	elseif string.find(kind, "regen_aura", 1, true) or string.find(kind, "fountain", 1, true) then
+		imageKind = "fountain"
+	elseif string.find(kind, "potion", 1, true) or string.find(kind, "bottle", 1, true) then
+		imageKind = "bottle"
+	elseif string.find(kind, "high_five", 1, true) or string.find(kind, "high five", 1, true) then
+		imageKind = "high_five"
+	elseif string.find(kind, "emblem", 1, true) or string.find(kind, "aghanim_aura", 1, true) or string.find(kind, "scepter", 1, true) then
+		imageKind = "emblem"
+	end
+	if imageKind == nil then return nil end
+
+	local ti = imageKind == "levelup" and LEGACY_LEVELUP_TI[itemName] or nil
+	local evidence = table.concat({
+		itemName,
+		string.lower(tostring(item.ti_edition or item.edition or "")),
+		string.lower(tostring(item.display_name or item.title or "")),
+		string.lower(tostring(item.family or "")),
+		string.lower(tostring(item.asset_path or "")),
+		string.lower(tostring(item.pfx or item.particle or "")),
+		string.lower(tostring(item.owner_pfx or "")),
+		string.lower(tostring(item.target_pfx or "")),
+	}, " ")
+	if ti == nil then
+		ti = tonumber(string.match(evidence, "ti(%d+)"))
+	end
+	if ti == nil then
+		local internationalYear = tonumber(string.match(evidence, "international(20%d%d)"))
+		if internationalYear ~= nil and internationalYear >= 2016 and internationalYear <= 2020 then
+			ti = internationalYear - 2010
+		end
+	end
+
+	return VANILLA_TI_REWARD_IMAGES[imageKind][ti]
+end
+
+local function ApplyVanillaTIRewardImage(item)
+	local image = ResolveVanillaTIRewardImage(item)
+	if image ~= nil then
+		item.image = image
+		item.image_inventory = image
+	end
+	return item
 end
 
 local function IsSupporterShopItem(value)
@@ -126,6 +259,7 @@ end
 local function NormalizePublishedSupporterShopComponent(source, parent, depth)
 	local component = CopySupporterTable(source)
 	if type(source) ~= "table" then return component end
+	ApplyVanillaTIRewardImage(component)
 	depth = tonumber(depth) or 0
 
 	-- Bundle children are not necessarily published as standalone listings. Keep
@@ -155,6 +289,7 @@ local function NormalizePublishedSupporterShopItems(sourceItems, releaseID)
 	for _, source in ipairs(type(sourceItems) == "table" and sourceItems or {}) do
 		if type(source) == "table" then
 			local item = CopySupporterTable(source)
+			ApplyVanillaTIRewardImage(item)
 			local itemID = SupporterShopItemIdentity(item)
 			if releasePublished and itemID ~= nil then
 				-- getShop only returns rows from the published release where the
@@ -300,6 +435,7 @@ local function BuildPublishedSupporterLoadout(items)
 	local published = {}
 	for _, item in ipairs(type(items) == "table" and items or {}) do
 		if type(item) == "table" then
+			local resolvedImage = ResolveVanillaTIRewardImage(item)
 			local entry = {
 				id = item.id or item.item_id or item.catalog_item_id,
 				item_id = item.item_id or item.catalog_item_id or item.id,
@@ -311,8 +447,8 @@ local function BuildPublishedSupporterLoadout(items)
 				slot_id = item.slot_id or item.item_type or item.type,
 				rarity = item.rarity or item.item_rarity,
 				item_rarity = item.item_rarity or item.rarity,
-				image = item.image or item.image_inventory,
-				image_inventory = item.image_inventory or item.image,
+				image = resolvedImage or item.image or item.image_inventory,
+				image_inventory = resolvedImage or item.image_inventory or item.image,
 				asset_path = item.asset_path,
 				effect_paths = item.effect_paths,
 				equip = item.equip,
@@ -444,6 +580,7 @@ local function CollectSupporterRewards(value, forcedTrack, result)
 
 	if IsSupporterRewardRecord(value) then
 		local reward = CopySupporterTable(value)
+		ApplyVanillaTIRewardImage(reward)
 		reward.track = reward.track or forcedTrack
 		table.insert(result, reward)
 		return result
@@ -496,6 +633,7 @@ local function MergeRewardTracks(legacyRewards, backendRewards, track)
 
 	for index, reward in ipairs(legacyRewards or {}) do
 		local normalized = CopySupporterTable(reward)
+		ApplyVanillaTIRewardImage(normalized)
 		normalized.track = track
 		normalized.legacy = true
 		normalized.claimable = false
@@ -507,6 +645,7 @@ local function MergeRewardTracks(legacyRewards, backendRewards, track)
 	for index, reward in ipairs(CollectSupporterRewards(backendRewards)) do
 		if type(reward) == "table" and (reward.track or "free") == track then
 			local normalized = CopySupporterTable(reward)
+			ApplyVanillaTIRewardImage(normalized)
 			normalized.track = track
 			normalized.legacy = false
 			local key = RewardIdentity(normalized, index, "backend")
@@ -576,6 +715,7 @@ SupporterPass.TIERS = {
 		price = "$2",
 		color = "#45C46B",
 		fragments = 150,
+		daily_gameplay_fragments = 125,
 		xp_boost = 10,
 		vote_power = 2,
 		companion_unlocks = 3,
@@ -588,6 +728,7 @@ SupporterPass.TIERS = {
 		price = "$5",
 		color = "#F2C94C",
 		fragments = 400,
+		daily_gameplay_fragments = 150,
 		xp_boost = 20,
 		vote_power = 3,
 		companion_unlocks = 3,
@@ -600,6 +741,7 @@ SupporterPass.TIERS = {
 		price = "$10",
 		color = "#E4572E",
 		fragments = 900,
+		daily_gameplay_fragments = 175,
 		xp_boost = 30,
 		vote_power = 4,
 		companion_unlocks = 3,
@@ -612,6 +754,7 @@ SupporterPass.TIERS = {
 		price = "$20",
 		color = "#5AD0FF",
 		fragments = 1800,
+		daily_gameplay_fragments = 200,
 		xp_boost = 40,
 		vote_power = 5,
 		companion_unlocks = 3,
@@ -624,6 +767,7 @@ SupporterPass.TIERS = {
 		price = "$50",
 		color = "#C99CFF",
 		fragments = 1800,
+		daily_gameplay_fragments = 200,
 		xp_boost = 40,
 		vote_power = 5,
 		companion_unlocks = 3,
@@ -682,6 +826,8 @@ function SupporterPass:PublishMeta()
 	CustomNetTables:SetTableValue("supporter_pass_meta", "economy", {
 		season_length_months = 3,
 		daily_fragment_cap = self.DAILY_FRAGMENT_CAP,
+		daily_gameplay_fragment_cap = self.DAILY_GAMEPLAY_FRAGMENT_CAP,
+		daily_quest_fragment_cap = self.DAILY_QUEST_FRAGMENT_CAP,
 		weekly_fragment_cap = self.DAILY_FRAGMENT_CAP,
 	})
 end
@@ -853,6 +999,10 @@ function SupporterPass:BuildPlayerTable(playerID)
 		fragments = tonumber(FirstSupporterValue(supporterPass.fragments, supporterPass.fragment_balance, current.fragments, current.fragment_balance)) or 0,
 		daily_fragments = tonumber(FirstSupporterValue(supporterPass.daily_fragments, supporterPass.daily_earned, supporterPass.weekly_fragments, supporterPass.weekly_earned, current.daily_fragments, current.daily_earned, current.weekly_fragments, current.weekly_earned)) or 0,
 		daily_cap = tonumber(FirstSupporterValue(supporterPass.daily_cap, supporterPass.weekly_cap, current.daily_cap, current.weekly_cap)) or self.DAILY_FRAGMENT_CAP,
+		daily_gameplay_fragments = tonumber(FirstSupporterValue(supporterPass.daily_gameplay_fragments, current.daily_gameplay_fragments)) or 0,
+		daily_gameplay_cap = tonumber(FirstSupporterValue(supporterPass.daily_gameplay_cap, current.daily_gameplay_cap)) or (tier and tier.daily_gameplay_fragments or self.DAILY_GAMEPLAY_FRAGMENT_CAP),
+		daily_quest_fragments = tonumber(FirstSupporterValue(supporterPass.daily_quest_fragments, current.daily_quest_fragments)) or 0,
+		daily_quest_cap = tonumber(FirstSupporterValue(supporterPass.daily_quest_cap, current.daily_quest_cap)) or self.DAILY_QUEST_FRAGMENT_CAP,
 		weekly_fragments = tonumber(FirstSupporterValue(supporterPass.daily_fragments, supporterPass.daily_earned, supporterPass.weekly_fragments, supporterPass.weekly_earned, current.daily_fragments, current.daily_earned, current.weekly_fragments, current.weekly_earned)) or 0,
 		weekly_cap = tonumber(FirstSupporterValue(supporterPass.daily_cap, supporterPass.weekly_cap, current.daily_cap, current.weekly_cap)) or self.DAILY_FRAGMENT_CAP,
 		monthly_fragments = tonumber(FirstSupporterValue(supporterPass.monthly_fragments, current.monthly_fragments)) or (tier and tier.fragments or 0),
@@ -891,6 +1041,7 @@ function SupporterPass:BuildPlayerTable(playerID)
 		supporter_url = FirstSupporterValue(supporterPass.url, supporterPass.supporter_url, player.supporter_url, current.supporter_url, "https://mods.frostrose-studio.com/supporter-pass"),
 		purchases = supporterPass.purchases or current.purchases,
 		entitlements = supporterPass.entitlements or current.entitlements,
+		access_timeline = supporterPass.access_timeline or current.access_timeline,
 		armory = supporterPass.armory or current.armory,
 		loadout = loadout,
 		equipped_items = equippedItems,

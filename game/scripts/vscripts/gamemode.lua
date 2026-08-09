@@ -2,63 +2,112 @@ if GameMode == nil then
 	_G.GameMode = class({})
 end
 
+local function XHSStartupCheckpoint(moduleName)
+end
+
 require('addon_init')
+XHSStartupCheckpoint('addon_init')
 require('events')
+XHSStartupCheckpoint('events')
 require('constants') -- in cause?
+XHSStartupCheckpoint('constants')
 require('components/creep_passives/init')
+XHSStartupCheckpoint('components/creep_passives/init')
 require('components/creep_ai_director/init')
+XHSStartupCheckpoint('components/creep_ai_director/init')
 require('components/creep_order_ownership/init')
+XHSStartupCheckpoint('components/creep_order_ownership/init')
 require('components/wave_stager/init')
+XHSStartupCheckpoint('components/wave_stager/init')
 
 require('libraries/notifications')
+XHSStartupCheckpoint('libraries/notifications')
 require('libraries/animations')
+XHSStartupCheckpoint('libraries/animations')
 require('libraries/fun')()
+XHSStartupCheckpoint('libraries/fun')
 require('libraries/functional')
+XHSStartupCheckpoint('libraries/functional')
 require('libraries/physics')
+XHSStartupCheckpoint('libraries/physics')
 require('libraries/playerresource')
+XHSStartupCheckpoint('libraries/playerresource')
 require('libraries/playertables')
+XHSStartupCheckpoint('libraries/playertables')
 require('libraries/gold')
+XHSStartupCheckpoint('libraries/gold')
 require('libraries/rgb_to_hex')
+XHSStartupCheckpoint('libraries/rgb_to_hex')
 require('libraries/corpse_cleanup')
+XHSStartupCheckpoint('libraries/corpse_cleanup')
 
 -- require('phases/choose_hero') -- this should remain disabled as this is called through hero map triggers
 require('phases/creeps')
+XHSStartupCheckpoint('phases/creeps')
 require('phases/special_events')
+XHSStartupCheckpoint('phases/special_events')
 require('phases/phase1')
+XHSStartupCheckpoint('phases/phase1')
 require('phases/phase2')
+XHSStartupCheckpoint('phases/phase2')
 require('phases/phase3')
+XHSStartupCheckpoint('phases/phase3')
 require('zones/zones')
+XHSStartupCheckpoint('zones/zones')
 require('units/breakable_container_surprises')
+XHSStartupCheckpoint('units/breakable_container_surprises')
 require('units/treasure_chest_surprises')
+XHSStartupCheckpoint('units/treasure_chest_surprises')
 require('triggers')
+XHSStartupCheckpoint('triggers')
 -- The runtime is always loaded, but remains inert at zero bots until its
 -- server-authoritative unanimous setup vote succeeds. QA commands stay Tools-only.
-pcall(require, 'components/xhs_bots/init')
-require('components/api/init')
-require('components/item_builds/init')
-require('components/performance_counters/init')
-require('components/performance_telemetry/init')
-require('components/observability/init')
-require('components/custom_polls/init')
-if IsInToolsMode() then
-	require('libraries/adv_log')
+local xhsBotsLoaded, xhsBotsError = pcall(require, 'components/xhs_bots/init')
+if not xhsBotsLoaded and XHSBootstrapLog ~= nil then
+	XHSBootstrapLog("warn", "optional module components/xhs_bots/init ok="
+		.. tostring(xhsBotsLoaded) .. " error=" .. tostring(xhsBotsError or ""))
 end
+require('components/api/init')
+XHSStartupCheckpoint('components/api/init')
+require('components/item_builds/init')
+XHSStartupCheckpoint('components/item_builds/init')
+require('components/performance_counters/init')
+XHSStartupCheckpoint('components/performance_counters/init')
+require('components/performance_telemetry/init')
+XHSStartupCheckpoint('components/performance_telemetry/init')
+require('components/observability/init')
+XHSStartupCheckpoint('components/observability/init')
+require('components/custom_polls/init')
+XHSStartupCheckpoint('components/custom_polls/init')
+require('libraries/adv_log')
+XHSStartupCheckpoint('libraries/adv_log')
 require('components/battlepass/init')
+XHSStartupCheckpoint('components/battlepass/init')
 require('components/timers/init')
+XHSStartupCheckpoint('components/timers/init')
 require('components/tp_scroll/init')
+XHSStartupCheckpoint('components/tp_scroll/init')
 require('components/overhead_status/init')
+XHSStartupCheckpoint('components/overhead_status/init')
 require('components/runes/init')
+XHSStartupCheckpoint('components/runes/init')
 require('components/fragment_quests/init')
+XHSStartupCheckpoint('components/fragment_quests/init')
 require('components/cinematics/init')
+XHSStartupCheckpoint('components/cinematics/init')
 
 if GetMapName() == "x_hero_siege_demo" then
 	require('components/hero_selection/init')
+	XHSStartupCheckpoint('components/hero_selection/init')
 	require('components/demo/init')
+	XHSStartupCheckpoint('components/demo/init')
 end
 
 -- new bosses system
 require('boss_scripts/boss_functions')
+XHSStartupCheckpoint('boss_scripts/boss_functions')
 require('components/devtools/init')
+XHSStartupCheckpoint('components/devtools/init')
 
 LinkLuaModifier("modifier_xhs_end_screen_stat_tracker", "modifiers/modifier_xhs_end_screen_stat_tracker.lua", LUA_MODIFIER_MOTION_NONE)
 LinkLuaModifier("modifier_xhs_castle_health_bar", "modifiers/modifier_xhs_castle_health_bar.lua", LUA_MODIFIER_MOTION_NONE)
@@ -245,10 +294,27 @@ function GameMode:InitGameMode()
 	GameRules:SetCustomGameSetupAutoLaunchDelay(9999.0) -- disabled, custom setup flow handles launch
 	GameRules:SetCustomGameSetupTimeout(-1.0)        -- keep setup open until custom logic starts the game
 	GameRules:SetPreGameTime(PREGAMETIME)
+	-- Establish the non-vanilla selection path before optional mechanics. A
+	-- failure below must never expose Dota's stock hero picker in production.
+	mode:SetCustomGameForceHero("npc_dota_hero_wisp")
 
 	-- Vanilla grants 1 armor per 6 agility. XHS halves only this derived
 	-- contribution while preserving native armor and explicit armor bonuses.
-	mode:SetCustomAttributeDerivedStatValue(DOTA_ATTRIBUTE_AGILITY_ARMOR, 1 / 12)
+	local agilityArmorOK, agilityArmorError = xpcall(function()
+		if DOTA_ATTRIBUTE_AGILITY_ARMOR == nil then
+			error("DOTA_ATTRIBUTE_AGILITY_ARMOR is unavailable")
+		end
+		if mode.SetCustomAttributeDerivedStatValue == nil then
+			error("SetCustomAttributeDerivedStatValue is unavailable")
+		end
+		mode:SetCustomAttributeDerivedStatValue(DOTA_ATTRIBUTE_AGILITY_ARMOR, 1 / 12)
+	end, function(err)
+		return debug.traceback(tostring(err), 2)
+	end)
+	if not agilityArmorOK and XHSBootstrapLog ~= nil then
+		XHSBootstrapLog("error", "agility armor override disabled; startup continues\n"
+			.. tostring(agilityArmorError))
+	end
 
 	--[[
 	--Disabling Derived Stats
@@ -295,7 +361,6 @@ function GameMode:InitGameMode()
 	SetTeamCustomHealthbarColor(DOTA_TEAM_CUSTOM_1, 128, 32, 32) --Red	
 	SetTeamCustomHealthbarColor(DOTA_TEAM_CUSTOM_2, 128, 32, 32) --Red	
 
-	mode:SetCustomGameForceHero("npc_dota_hero_wisp")
 	GameRules:LockCustomGameSetupTeamAssignment(true)
 	mode:SetFixedRespawnTime(RESPAWN_TIME)
 	GameRules:SetCustomGameTeamMaxPlayers(DOTA_TEAM_GOODGUYS, 8)
@@ -402,6 +467,7 @@ function GameMode:InitGameMode()
 	CustomGameEventManager:RegisterListener("xhs_camera_focus_entity", function(...) return GameMode:OnCameraFocusEntityRequested(...) end)
 	CustomGameEventManager:RegisterListener("xhs_buy_tomes", function(...) return GameMode:OnBuyTomesRequested(...) end)
 	CustomGameEventManager:RegisterListener("xhs_toggle_auto_buy_tomes", function(...) return GameMode:OnToggleAutoBuyTomesRequested(...) end)
+	CustomGameEventManager:RegisterListener("xhs_request_selected_boss_bar", function(...) return XHSRequestSelectedBossBar(...) end)
 
 	ListenToGameEvent("dota_holdout_revive_complete", Dynamic_Wrap(GameMode, "OnPlayerRevived"), GameMode)
 	ListenToGameEvent("dota_pause_event", Dynamic_Wrap(GameMode, "OnDotaPauseEvent"), GameMode)
@@ -651,16 +717,33 @@ function GameMode:DamageFilter(filterTable)
 	end
 
 	local flDamage = filterTable["damage"]
+	local hVictim = nil
+	if filterTable["entindex_victim_const"] ~= nil then
+		hVictim = EntIndexToHScript(filterTable["entindex_victim_const"])
+	end
+
+	-- A dead fort makes the engine enter POST_GAME immediately, before the
+	-- asynchronous completion receipt and its end_game net table can resolve.
+	-- Cancel the lethal hit and finish exclusively through the delayed winner
+	-- path installed by components/api/events.lua.
+	if flDamage > 0
+		and hVictim ~= nil
+		and IsValidEntity(hVictim)
+		and not hVictim:IsNull()
+		and hVictim:GetClassname() == "npc_dota_fort"
+		and hVictim:GetTeamNumber() == DOTA_TEAM_GOODGUYS
+		and flDamage >= hVictim:GetHealth() then
+		if api == nil or api.end_game_started ~= true then
+			GameRules:SetGameWinner(DOTA_TEAM_BADGUYS)
+		end
+		return false
+	end
 
 	if filterTable["entindex_attacker_const"] == nil then
 		return true
 	end
 
 	local hAttackerHero = EntIndexToHScript(filterTable["entindex_attacker_const"])
-	local hVictim = nil
-	if filterTable["entindex_victim_const"] ~= nil then
-		hVictim = EntIndexToHScript(filterTable["entindex_victim_const"])
-	end
 
 	-- The Tools-only ally planner consumes a decayed physical/magical/pure
 	-- distribution. Keep this observer fail-closed so bot telemetry can never
@@ -2099,16 +2182,30 @@ function GameMode:RefreshSettingVotePower(pid)
 	local vote_power = GetPlayerVotePower(pid)
 	for category, votes in pairs(self.VoteTable) do
 		local player_vote = type(votes) == "table" and votes[pid] or nil
+		local desired_vote_power = category == "ai_allies" and 1 or vote_power
 		if category ~= "gamemode" and type(player_vote) == "table"
-			and player_vote[2] ~= (category == "ai_allies" and 1 or vote_power) then
-			player_vote[2] = category == "ai_allies" and 1 or vote_power
+			and (tonumber(player_vote[2]) or 1) ~= desired_vote_power then
+			player_vote[2] = desired_vote_power
 			CustomGameEventManager:Send_ServerToAllClients("send_votes", {
 				category = category,
 				vote = player_vote[1],
-				table = votes,
+				table = self:BuildSettingVoteBroadcastTable(votes),
 			})
 		end
 	end
+end
+
+function GameMode:BuildSettingVoteBroadcastTable(votes)
+	local broadcast = {}
+	for playerID, row in pairs(type(votes) == "table" and votes or {}) do
+		if type(row) == "table" then
+			broadcast[tostring(playerID)] = {
+				vote = tonumber(row[1]) or row[1],
+				weight = math.max(1, tonumber(row[2]) or 1),
+			}
+		end
+	end
+	return broadcast
 end
 
 function GameMode:OnSettingVote(event_source_index, keys)
@@ -2166,7 +2263,7 @@ function GameMode:OnSettingVote(event_source_index, keys)
 		CustomGameEventManager:Send_ServerToAllClients("send_votes", {
 			category = category,
 			vote = existingVote[1],
-			table = GameMode.VoteTable[category],
+			table = self:BuildSettingVoteBroadcastTable(GameMode.VoteTable[category]),
 		})
 		return
 	end
@@ -2189,7 +2286,7 @@ function GameMode:OnSettingVote(event_source_index, keys)
 
 	-- TODO: Finish votes show up
 	CustomGameEventManager:Send_ServerToAllClients("send_votes",
-		{ category = category, vote = vote, table = GameMode.VoteTable[category] })
+		{ category = category, vote = vote, table = self:BuildSettingVoteBroadcastTable(GameMode.VoteTable[category]) })
 end
 
 function GameMode:IsPlayerEligibleForCustomSetupReady(player_id)

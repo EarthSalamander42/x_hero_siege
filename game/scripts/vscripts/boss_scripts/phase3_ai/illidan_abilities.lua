@@ -18,8 +18,8 @@ modifier_xhs_illidan_demon_hunter = modifier_xhs_illidan_demon_hunter or class({
 modifier_xhs_illidan_demon_hunter.XHS_LINK_CLIENT = true
 
 local ILLIDAN_COLORS = {
-	primary = Vector(102, 255, 64),
-	secondary = Vector(142, 66, 255),
+	primary = Vector(255, 110, 35),
+	secondary = Vector(255, 200, 75),
 	style = 5,
 	family = "illidan",
 }

@@ -5,7 +5,6 @@
 	var MAX_PLAYER_ID = 23;
 	var POLL_INTERVAL = 0.10;
 	var DATA_REFRESH_INTERVAL = 0.50;
-	var LAYER_RETRY_INTERVAL = 0.25;
 
 	var DIFFICULTY_NAMES = {
 		1: "EASY",
@@ -60,7 +59,6 @@
 	var pauseShown = false;
 	var lastDataRefresh = -999;
 	var pauseEventState = false;
-	var layerOrderToken = 0;
 
 	function Safe(callback, fallbackValue) {
 		try {
@@ -98,81 +96,6 @@
 	function FindHudPanel(panelID) {
 		var hudRoot = GetHudRoot();
 		return hudRoot && hudRoot.FindChildTraverse ? hudRoot.FindChildTraverse(panelID) : null;
-	}
-
-	function GetHudAncestor(panel) {
-		var current = panel;
-		while (current) {
-			if (current.id === "Hud") {
-				return current;
-			}
-			current = current.GetParent();
-		}
-		return null;
-	}
-
-	function GetHudDirectChild(panel, hud) {
-		var current = panel;
-		var parent = current && current.GetParent ? current.GetParent() : null;
-		while (current && parent && parent !== hud) {
-			current = parent;
-			parent = current.GetParent ? current.GetParent() : null;
-		}
-		return parent === hud ? current : null;
-	}
-
-	function RetryPauseLayerOrder(paused, token) {
-		$.Schedule(LAYER_RETRY_INTERVAL, function () {
-			if (token === layerOrderToken && pauseShown === paused) {
-				ApplyPauseLayerOrder(paused, token);
-			}
-		});
-	}
-
-	function ApplyPauseLayerOrder(paused, token) {
-		var root = GetHudRoot();
-		var notificationsHost = $.GetContextPanel();
-		var topHudRoot = root && root.FindChildTraverse ? root.FindChildTraverse("XHSTopHudRoot") : null;
-		var shop = root && root.FindChildTraverse ? root.FindChildTraverse("shop") : null;
-		var hud = GetHudAncestor(notificationsHost) || GetHudAncestor(topHudRoot) || GetHudAncestor(shop);
-		var notificationsChild = GetHudDirectChild(notificationsHost, hud);
-		var topHudChild = GetHudDirectChild(topHudRoot, hud);
-		var shopChild = GetHudDirectChild(shop, hud);
-
-		if (!hud
-			|| !notificationsChild
-			|| !topHudChild
-			|| !shopChild
-			|| notificationsChild === topHudChild
-			|| notificationsChild === shopChild
-			|| topHudChild === shopChild
-			|| typeof hud.MoveChildBefore !== "function") {
-			RetryPauseLayerOrder(paused, token);
-			return;
-		}
-
-		try {
-			if (paused) {
-				hud.MoveChildBefore(notificationsChild, shopChild);
-				hud.MoveChildBefore(topHudChild, notificationsChild);
-			} else {
-				hud.MoveChildBefore(topHudChild, shopChild);
-				hud.MoveChildBefore(notificationsChild, topHudChild);
-			}
-		} catch (error) {
-			RetryPauseLayerOrder(paused, token);
-		}
-	}
-
-	function SetPauseLayerOrder(paused) {
-		layerOrderToken++;
-		var token = layerOrderToken;
-		ApplyPauseLayerOrder(paused, token);
-		$.Schedule(0.75, function () {
-			if (token === layerOrderToken && pauseShown === paused) {
-				ApplyPauseLayerOrder(paused, token);
-			}
-		});
 	}
 
 	function GetVanillaPausePanel() {
@@ -415,7 +338,6 @@
 		}
 
 		pauseShown = true;
-		SetPauseLayerOrder(true);
 		RefreshBriefing();
 		pauseRoot.RemoveClass("XHSPauseHidden");
 		pauseRoot.AddClass("XHSPauseIntro");
@@ -432,7 +354,6 @@
 		}
 
 		pauseShown = false;
-		SetPauseLayerOrder(false);
 		pauseRoot.AddClass("XHSPauseHidden");
 		pauseRoot.RemoveClass("XHSPauseIntro");
 	}

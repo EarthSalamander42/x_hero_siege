@@ -23,7 +23,6 @@
 .XHSSupporterPassRoot {
 	width: 100%;
 	height: 100%;
-	z-index: 1150;
 	overflow: noclip;
 }
 
@@ -901,6 +900,22 @@
 	font-size: 17px;
 	text-transform: uppercase;
 	text-overflow: shrink;
+}
+
+.XHSPassAccessTimeline {
+	visibility: collapse;
+	height: 0px;
+	margin-top: 2px;
+	color: #83b8cf;
+	font-size: 11px;
+	font-weight: semi-bold;
+	letter-spacing: 0.6px;
+	text-transform: uppercase;
+}
+
+.XHSPassAccessTimeline.IsVisible {
+	visibility: visible;
+	height: 16px;
 }
 
 .XHSPassProgressBlock {

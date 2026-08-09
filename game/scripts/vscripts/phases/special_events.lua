@@ -23,29 +23,51 @@ local MURADIN_TELEPORT_IN_CHANNEL_DURATION = 2.8
 local MURADIN_TELEPORT_ARRIVAL_EFFECT_DURATION = 0.8
 local MURADIN_TELEPORT_OUT_DURATION = 3.0
 local MURADIN_CAMERA_OWNER = "muradin_entry"
+local MURADIN_CAMERA_PRE_TELEPORT_HOLD = math.max(
+	0,
+	CINEMATIC_EVENT_PRE_TELEPORT_DELAY - SPECIAL_EVENT_CAMERA_MOVE_DURATION
+)
 local MURADIN_CAMERA_HOLD_DURATION = math.max(
 	0,
-	MURADIN_TELEPORT_IN_CHANNEL_DURATION
+	MURADIN_TELEPORT_IN_DELAY
+	+ MURADIN_TELEPORT_IN_CHANNEL_DURATION
 	+ MURADIN_ENTRY_POST_TELEPORT_HOLD
-	- SPECIAL_EVENT_CAMERA_MOVE_DURATION
+	- CINEMATIC_EVENT_PRE_TELEPORT_DELAY
+	- (SPECIAL_EVENT_CAMERA_MOVE_DURATION * 2)
 	- SPECIAL_EVENT_CAMERA_RETURN_DURATION
 )
 local FARM_LEADERBOARD_NET_TABLE = "xhs_farm_leaderboard"
 local FARM_LEADERBOARD_NET_KEY = "state"
 local FARM_LEADERBOARD_UPDATE_INTERVAL = 0.5
+local KILL_EVENT_LEADERBOARD_NET_TABLE = "xhs_sogat_leaderboard"
+local KILL_EVENT_LEADERBOARD_NET_KEY = "state"
+local KILL_EVENT_LEADERBOARD_UPDATE_INTERVAL = 0.25
 local RAMERO_KILL_RACE_START = 250
-local RAMERO_KILL_RACE_UPDATE_INTERVAL = 0.25
 local KILL_EVENT_OBJECTIVES_NET_TABLE = "xhs_kill_event_objectives"
 local KILL_EVENT_OBJECTIVES_NET_KEY = "state"
 local FARM_EVENT_RETURN_TELEPORT_DURATION = 3.0
 local FARM_EVENT_RETURN_GRACE_DURATION = 3.0
 local FARM_EVENT_RETURN_TOTAL_DELAY = FARM_EVENT_RETURN_TELEPORT_DURATION + FARM_EVENT_RETURN_GRACE_DURATION
 local FARM_EVENT_CREEPS_PER_WAVE = 10
-local FARM_EVENT_CELEBRATION_DURATION = 7.0
+local FARM_EVENT_CELEBRATION_DURATION = 10.0
 local FARM_EVENT_PRELOAD_INTERVAL = 0.1
 local FARM_EVENT_SPAWN_RADIUS = 260
 local FARM_EVENT_STAGING_ORIGIN = Vector(-15800, -15800, -2048)
 local FARM_EVENT_WAVE_DAMAGE = { 125, 150, 175, 200, 225 }
+
+local function LogFarmEventTransition(severity, code, message, context)
+	if XHSObservability ~= nil and XHSObservability.Log ~= nil then
+		XHSObservability:Log(
+			severity or "info",
+			"farm_event_transition",
+			code or "FARM_EVENT_TRANSITION",
+			message or "Farm event transition update",
+			context or {}
+		)
+		return
+	end
+	print("[XHS][FarmEventTransition][" .. tostring(code) .. "] " .. tostring(message))
+end
 local FARM_EVENT_ABILITY_BY_UNIT = {
 	npc_dota_creature_murloc = "xhs_creep_blood_hunger",
 	npc_dota_creature_wildkin = "xhs_creep_evasion",
@@ -285,66 +307,62 @@ local function FocusAllPlayersOnSpecialArena(point, intro_duration, return_camer
 	})
 end
 
-local function FocusPlayerOnMuradinEntry(playerID, hero, Muradin)
-	if CameraMotion == nil or hero == nil or hero:IsNull() then return end
+local function FocusPlayerOnMuradinEntry(playerID, hero, Muradin, teleportPoint)
+	if CameraMotion == nil
+		or hero == nil
+		or hero:IsNull()
+		or Muradin == nil
+		or Muradin:IsNull()
+		or teleportPoint == nil
+	then
+		return
+	end
 
-	-- Keep every player on their own hero while the party enters the arena.
-	-- Following the entity also keeps the camera with it when the delayed
-	-- teleport moves it to its assigned Muradin event position.
-	CameraMotion:Follow(playerID, hero, {
-		duration = SPECIAL_EVENT_CAMERA_MOVE_DURATION,
-		easing = "smootherstep",
-		persistent = true,
+	local cameraPlayerID = playerID
+	CameraMotion:Sequence(cameraPlayerID, {
+		{
+			type = "move",
+			to = hero,
+			duration = SPECIAL_EVENT_CAMERA_MOVE_DURATION,
+			easing = "smootherstep",
+		},
+		{
+			type = "hold",
+			duration = MURADIN_CAMERA_PRE_TELEPORT_HOLD,
+		},
+		{
+			-- This step starts with the physical hero teleport. Keeping it under
+			-- the Muradin camera owner prevents a persistent entity follow from
+			-- copying the hero's discontinuous position in a single frame.
+			type = "move",
+			to = teleportPoint,
+			duration = SPECIAL_EVENT_CAMERA_MOVE_DURATION,
+			easing = "smootherstep",
+		},
+		{
+			type = "move",
+			to = Muradin,
+			duration = SPECIAL_EVENT_CAMERA_MOVE_DURATION,
+			easing = "smootherstep",
+		},
+		{
+			type = "hold",
+			duration = MURADIN_CAMERA_HOLD_DURATION,
+		},
+		{
+			type = "return",
+			to = function()
+				return PlayerResource:GetSelectedHeroEntity(cameraPlayerID)
+			end,
+			duration = SPECIAL_EVENT_CAMERA_RETURN_DURATION,
+			easing = "smootherstep",
+		},
+	}, {
 		owner = MURADIN_CAMERA_OWNER,
 		priority = 100,
 		policy = "replace",
-		origin_mode = "auto",
+		release = "free",
 	})
-
-	Timers:CreateTimer(MURADIN_TELEPORT_IN_DELAY, function()
-		if CameraMotion == nil then return nil end
-		if Muradin == nil
-			or Muradin:IsNull()
-			or hero == nil
-			or hero:IsNull()
-		then
-			CameraMotion:Release(playerID, {
-				owner = MURADIN_CAMERA_OWNER,
-				mode = "free",
-				reason = "Muradin entry target became invalid",
-			})
-			return nil
-		end
-
-		local cameraPlayerID = playerID
-		CameraMotion:Sequence(cameraPlayerID, {
-			{
-				type = "move",
-				to = Muradin,
-				duration = SPECIAL_EVENT_CAMERA_MOVE_DURATION,
-				easing = "smootherstep",
-			},
-			{
-				type = "hold",
-				duration = MURADIN_CAMERA_HOLD_DURATION,
-			},
-			{
-				type = "return",
-				to = function()
-					return PlayerResource:GetSelectedHeroEntity(cameraPlayerID)
-				end,
-				duration = SPECIAL_EVENT_CAMERA_RETURN_DURATION,
-				easing = "smootherstep",
-			},
-		}, {
-			owner = MURADIN_CAMERA_OWNER,
-			priority = 100,
-			policy = "replace",
-			release = "free",
-		})
-
-		return nil
-	end)
 end
 
 local function ReturnSpecialArenaAllyCameras(arenaPlayerID)
@@ -666,8 +684,8 @@ function SpecialEvents:MuradinEvent(time)
 					DisableItems(hero, event_end_delay)
 				end
 				if hero:IsAlive() then
-					FocusPlayerOnMuradinEntry(nPlayerID, hero, Muradin)
 					if point ~= nil then
+						FocusPlayerOnMuradinEntry(nPlayerID, hero, Muradin, point:GetAbsOrigin())
 						StartCinematicDelayedTeleport(hero, point:GetAbsOrigin(), CINEMATIC_EVENT_PRE_TELEPORT_DELAY)
 					end
 				end
@@ -849,6 +867,11 @@ function SpecialEvents:PublishFarmLeaderboard(active)
 	end
 
 	local winner = players[1]
+	local totalSupporterXPEarned = 0
+	for _, player in ipairs(players) do
+		totalSupporterXPEarned = totalSupporterXPEarned
+			+ math.max(0, tonumber(player.supporter_xp_earned) or 0)
+	end
 
 	CustomNetTables:SetTableValue(FARM_LEADERBOARD_NET_TABLE, FARM_LEADERBOARD_NET_KEY, {
 		active = active == true,
@@ -856,6 +879,7 @@ function SpecialEvents:PublishFarmLeaderboard(active)
 		phase = phase,
 		winner_player_id = winner and winner.player_id or -1,
 		winner_kills = winner and winner.kills or 0,
+		total_supporter_xp_earned = totalSupporterXPEarned,
 		celebration_duration = FARM_EVENT_CELEBRATION_DURATION,
 		waves_per_level = wavesPerLevel,
 		creeps_per_wave = FARM_EVENT_CREEPS_PER_WAVE,
@@ -865,8 +889,27 @@ function SpecialEvents:PublishFarmLeaderboard(active)
 	self.farm_leaderboard_dirty = false
 end
 
-function SpecialEvents:GetRameroKillRacePlayers()
+function SpecialEvents:GetKillEventLeaderboardConfig()
+	local progression = tonumber(self.Ramero_trigger) or 0
+	if progression == 0 then
+		return {
+			mode = "ramero_kill_race",
+			target_kills = XHS_RAMERO_BARISTOL_KILLS_REQUIRED,
+			start_kills = RAMERO_KILL_RACE_START,
+		}
+	elseif progression == 1 then
+		return {
+			mode = "sogat_kill_race",
+			target_kills = XHS_SOGAT_KILLS_REQUIRED,
+			start_kills = XHS_RAMERO_BARISTOL_KILLS_REQUIRED,
+		}
+	end
+	return nil
+end
+
+function SpecialEvents:GetKillEventLeaderboardPlayers(targetKills)
 	local players = {}
+	targetKills = math.max(1, tonumber(targetKills) or XHS_RAMERO_BARISTOL_KILLS_REQUIRED)
 
 	for _, hero in ipairs(HeroList:GetAllHeroes()) do
 		if hero ~= nil
@@ -882,7 +925,7 @@ function SpecialEvents:GetRameroKillRacePlayers()
 				table.insert(players, {
 					player_id = playerID,
 					kills = kills,
-					remaining = math.max(0, XHS_RAMERO_BARISTOL_KILLS_REQUIRED - kills),
+					remaining = math.max(0, targetKills - kills),
 				})
 			end
 		end
@@ -902,73 +945,77 @@ function SpecialEvents:GetRameroKillRacePlayers()
 	return players, players[1] and players[1].kills or 0
 end
 
-function SpecialEvents:PublishRameroKillRace(active, players)
-	players = players or self:GetRameroKillRacePlayers()
-	CustomNetTables:SetTableValue(FARM_LEADERBOARD_NET_TABLE, FARM_LEADERBOARD_NET_KEY, {
+function SpecialEvents:PublishKillEventLeaderboard(active, players, config)
+	config = config or self:GetKillEventLeaderboardConfig()
+	local targetKills = config and config.target_kills or XHS_RAMERO_BARISTOL_KILLS_REQUIRED
+	players = players or self:GetKillEventLeaderboardPlayers(targetKills)
+	CustomNetTables:SetTableValue(KILL_EVENT_LEADERBOARD_NET_TABLE, KILL_EVENT_LEADERBOARD_NET_KEY, {
 		active = active == true,
 		available = active == true and #players > 0,
-		phase = active == true and "ramero_countdown" or "hidden",
-		mode = "ramero_kill_race",
-		target_kills = XHS_RAMERO_BARISTOL_KILLS_REQUIRED,
+		phase = active == true and "kill_event_countdown" or "hidden",
+		mode = config and config.mode or "ramero_kill_race",
+		target_kills = targetKills,
 		players = players,
 		updated_at = GameRules:GetGameTime(),
 	})
 end
 
+function SpecialEvents:RefreshKillEventLeaderboard()
+	local config = self:GetKillEventLeaderboardConfig()
+	if config == nil then
+		if self.kill_event_leaderboard_active == true then
+			self.kill_event_leaderboard_active = false
+			self:PublishKillEventLeaderboard(false, {}, nil)
+		end
+		return
+	end
+
+	local players, leaderKills = self:GetKillEventLeaderboardPlayers(config.target_kills)
+	if leaderKills < config.start_kills then return end
+
+	if leaderKills >= config.target_kills then
+		if self.kill_event_leaderboard_active == true then
+			self.kill_event_leaderboard_active = false
+			self:PublishKillEventLeaderboard(false, {}, config)
+		end
+		return
+	end
+
+	self.kill_event_leaderboard_active = true
+	self:PublishKillEventLeaderboard(true, players, config)
+	if self.kill_event_leaderboard_publisher_running == true then return end
+
+	self.kill_event_leaderboard_publisher_running = true
+	GameRules:GetGameModeEntity():SetContextThink("xhs_kill_event_leaderboard_publish", function()
+		if self.kill_event_leaderboard_active ~= true then
+			self.kill_event_leaderboard_publisher_running = false
+			return nil
+		end
+
+		local currentConfig = self:GetKillEventLeaderboardConfig()
+		if currentConfig == nil then
+			self.kill_event_leaderboard_active = false
+			self.kill_event_leaderboard_publisher_running = false
+			self:PublishKillEventLeaderboard(false, {}, nil)
+			return nil
+		end
+
+		local currentPlayers, currentLeaderKills = self:GetKillEventLeaderboardPlayers(currentConfig.target_kills)
+		if currentLeaderKills >= currentConfig.target_kills then
+			self.kill_event_leaderboard_active = false
+			self.kill_event_leaderboard_publisher_running = false
+			self:PublishKillEventLeaderboard(false, {}, currentConfig)
+			return nil
+		end
+
+		self:PublishKillEventLeaderboard(true, currentPlayers, currentConfig)
+		return KILL_EVENT_LEADERBOARD_UPDATE_INTERVAL
+	end, KILL_EVENT_LEADERBOARD_UPDATE_INTERVAL)
+end
+
+-- Kept as a compatibility entry point for callers outside this module.
 function SpecialEvents:RefreshRameroKillRace()
-	if GameMode.FarmEvent_occuring == true then
-		self.ramero_kill_race_active = false
-		return
-	end
-
-	if SpecialEvents.Ramero_trigger ~= 0 then
-		if self.ramero_kill_race_active == true then
-			self.ramero_kill_race_active = false
-			self:PublishRameroKillRace(false, {})
-		end
-		return
-	end
-
-	local players, leaderKills = self:GetRameroKillRacePlayers()
-	if leaderKills < RAMERO_KILL_RACE_START then return end
-
-	if leaderKills >= XHS_RAMERO_BARISTOL_KILLS_REQUIRED then
-		if self.ramero_kill_race_active == true then
-			self.ramero_kill_race_active = false
-			self:PublishRameroKillRace(false, {})
-		end
-		return
-	end
-
-	self.ramero_kill_race_active = true
-	self:PublishRameroKillRace(true, players)
-	if self.ramero_kill_race_publisher_running == true then return end
-
-	self.ramero_kill_race_publisher_running = true
-	GameRules:GetGameModeEntity():SetContextThink("xhs_ramero_kill_race_publish", function()
-		if GameMode.FarmEvent_occuring == true then
-			self.ramero_kill_race_active = false
-			self.ramero_kill_race_publisher_running = false
-			return nil
-		end
-
-		if self.ramero_kill_race_active ~= true then
-			self.ramero_kill_race_publisher_running = false
-			return nil
-		end
-
-		local currentPlayers, currentLeaderKills = self:GetRameroKillRacePlayers()
-		if SpecialEvents.Ramero_trigger ~= 0
-			or currentLeaderKills >= XHS_RAMERO_BARISTOL_KILLS_REQUIRED then
-			self.ramero_kill_race_active = false
-			self.ramero_kill_race_publisher_running = false
-			self:PublishRameroKillRace(false, {})
-			return nil
-		end
-
-		self:PublishRameroKillRace(true, currentPlayers)
-		return RAMERO_KILL_RACE_UPDATE_INTERVAL
-	end, RAMERO_KILL_RACE_UPDATE_INTERVAL)
+	self:RefreshKillEventLeaderboard()
 end
 
 function SpecialEvents:GetFarmEventActiveUnits(playerID)
@@ -1348,6 +1395,98 @@ function SpecialEvents:OnFarmEventCreepKilled(killedUnit)
 	end)
 end
 
+function SpecialEvents:ArchiveFarmEventLeaderboard()
+	self.farm_event_leaderboard_phase = "archived"
+	local ok, message = xpcall(function()
+		self:PublishFarmLeaderboard(false)
+	end, debug.traceback)
+	if not ok then
+		LogFarmEventTransition("error", "FARM_EVENT_ARCHIVE_FAILED", tostring(message), {
+			generation = tonumber(self.farm_event_generation) or 0,
+		})
+	end
+	return ok
+end
+
+function SpecialEvents:RecoverFarmEventExit(message, source)
+	LogFarmEventTransition("critical", "FARM_EVENT_EXIT_RECOVERY", tostring(message), {
+		source = tostring(source or "unknown"),
+		generation = tonumber(self.farm_event_generation) or 0,
+		game_phase = CustomTimers ~= nil and tonumber(CustomTimers.game_phase) or -1,
+	})
+
+	BT_ENABLED = 1
+	GameMode.FarmEvent_occuring = false
+	if CustomTimers ~= nil then
+		CustomTimers.current_event_timer_paused = false
+		CustomTimers.enable_special_wave = true
+		CustomTimers.timers_paused = 0
+	end
+
+	pcall(function() self:ArchiveFarmEventLeaderboard() end)
+	pcall(function() self:RemoveFarmEventCreeps() end)
+	pcall(function() self:ResumeNonFarmCreeps() end)
+	pcall(function() RestartCreeps(0.0) end)
+	pcall(function() RestartHeroes() end)
+	for _, hero in pairs(HeroList:GetAllHeroes()) do
+		if hero ~= nil and not hero:IsNull() and hero:IsRealHero() then
+			pcall(function() EnableItems(hero) end)
+		end
+	end
+
+	-- A broken destroyer transition must never leave the match at 18:00. Phase
+	-- two is the safe continuation if its gate quest could not be established.
+	if CustomTimers ~= nil
+		and tonumber(CustomTimers.game_phase) == 1
+		and StartPhase2 ~= nil then
+		local phaseOK, phaseError = xpcall(StartPhase2, debug.traceback)
+		if not phaseOK then
+			LogFarmEventTransition("critical", "FARM_EVENT_PHASE2_RECOVERY_FAILED", tostring(phaseError), {
+				source = tostring(source or "unknown"),
+			})
+		end
+	end
+end
+
+function SpecialEvents:RequestFarmEventExit(source, generation)
+	generation = tonumber(generation) or tonumber(self.farm_event_generation) or 0
+	if generation ~= (tonumber(self.farm_event_generation) or 0) then
+		LogFarmEventTransition("warn", "FARM_EVENT_EXIT_STALE", "Ignored stale farm event exit callback", {
+			source = tostring(source or "unknown"),
+			generation = generation,
+			current_generation = tonumber(self.farm_event_generation) or 0,
+		})
+		return false
+	end
+	if self.farm_event_end_started == true then return false end
+
+	self.farm_event_end_started = true
+	self.farm_event_exit_deadline = nil
+	BT_ENABLED = 1
+	-- Close the celebration UI before running gameplay cleanup. Even if a later
+	-- engine call fails, clients receive a terminal leaderboard state.
+	self:ArchiveFarmEventLeaderboard()
+	LogFarmEventTransition("info", "FARM_EVENT_EXIT_STARTED", "Farm event exit started", {
+		source = tostring(source or "unknown"),
+		generation = generation,
+	})
+
+	local ok, message = xpcall(function()
+		self:EndFarmEvent()
+	end, debug.traceback)
+	if not ok then
+		self:RecoverFarmEventExit(message, source)
+		return false
+	end
+
+	LogFarmEventTransition("info", "FARM_EVENT_EXIT_COMPLETED", "Farm event exit completed", {
+		source = tostring(source or "unknown"),
+		generation = generation,
+		spawned_magnataurs = tonumber(self.farm_exit_magnataur_count) or 0,
+	})
+	return true
+end
+
 function SpecialEvents:BeginFarmEventCelebration(duration)
 	duration = math.max(0, tonumber(duration) or FARM_EVENT_CELEBRATION_DURATION)
 
@@ -1370,6 +1509,19 @@ function SpecialEvents:BeginFarmEventCelebration(duration)
 			DisableItems(hero, duration)
 		end
 	end
+
+	local generation = tonumber(self.farm_event_generation) or 0
+	self.farm_event_exit_deadline = GameRules:GetGameTime() + duration
+	LogFarmEventTransition("info", "FARM_EVENT_CELEBRATION_STARTED", "Farm event celebration started", {
+		generation = generation,
+		duration = duration,
+	})
+	-- Schedule from the moment celebration actually begins instead of relying
+	-- only on a context think registered several minutes earlier.
+	Timers:CreateTimer(duration, function()
+		self:RequestFarmEventExit("celebration_timer", generation)
+		return nil
+	end)
 end
 
 function SpecialEvents:FarmEvent(time)
@@ -1391,8 +1543,11 @@ function SpecialEvents:FarmEvent(time)
 	self.farm_event_final_players = nil
 	self.farm_event_leaderboard_phase = "active"
 	self.farm_event_generation = (self.farm_event_generation or 0) + 1
+	self.farm_event_end_started = false
+	self.farm_event_exit_deadline = nil
 	self.farm_exit_wave_scheduled = false
 	self.farm_exit_wave_spawned = false
+	self.farm_exit_magnataur_count = 0
 	self:SuspendNonFarmCreeps()
 	self:StartFarmLeaderboardPublisher()
 	UpdateGlobalObjective("farm_event", "Active", "Preparing Farm Event arenas", nil)
@@ -1487,14 +1642,17 @@ function SpecialEvents:FarmEvent(time)
 		return nil
 	end, event_end_delay)
 
+	local farmEventGeneration = self.farm_event_generation
 	GameRules:GetGameModeEntity():SetContextThink(DoUniqueString("farm_event_celebration_end"), function()
-		BT_ENABLED = 1
-		SpecialEvents:EndFarmEvent()
+		SpecialEvents:RequestFarmEventExit("context_deadline", farmEventGeneration)
 		return nil
 	end, event_end_delay + FARM_EVENT_CELEBRATION_DURATION)
 end
 
 function SpecialEvents:EndFarmEvent()
+	-- RequestFarmEventExit normally archives first. Keep this idempotent call so
+	-- legacy/direct callers also terminate the celebration presentation.
+	self:ArchiveFarmEventLeaderboard()
 	CustomTimers.timers_paused = 2
 	StopAllStormEarthFireSounds()
 	if FragmentQuests ~= nil then
@@ -1563,6 +1721,12 @@ function SpecialEvents:EndFarmEvent()
 		RefreshXHSCombatLanes()
 	end
 	local magnataurBatchesPerLane = math.max(1, tonumber(MAGNATAURS_TO_KILL) or 1)
+	local activeLaneCount = GetXHSActivePhaseOneLaneCount ~= nil
+		and GetXHSActivePhaseOneLaneCount() or 0
+	local expectedMagnataurCount = activeLaneCount
+		* magnataurBatchesPerLane
+		* math.max(1, tonumber(GameRules:GetCustomGameDifficulty()) or 1)
+	local spawnedMagnataurCount = 0
 	for lane = 1, 8 do
 		local laneState = CREEP_LANES ~= nil and CREEP_LANES[lane] or nil
 		if laneState ~= nil and laneState[1] == 1 then
@@ -1577,6 +1741,7 @@ function SpecialEvents:EndFarmEvent()
 						local magnataur, magnataurs = SpawnMagnataur(raw_spawner_point)
 						laneAttacker = laneAttacker or magnataur
 						for _, unit in ipairs(magnataurs or {}) do
+							spawnedMagnataurCount = spawnedMagnataurCount + 1
 							self:SuspendNonFarmUnit(unit)
 						end
 					end
@@ -1589,6 +1754,32 @@ function SpecialEvents:EndFarmEvent()
 			end
 		end
 	end
+
+	self.farm_exit_magnataur_count = spawnedMagnataurCount
+	if spawnedMagnataurCount <= 0 then
+		error(
+			"Farm event exit created no Destroyer Magnataurs"
+				.. " active_lanes=" .. tostring(activeLaneCount)
+				.. " difficulty=" .. tostring(GameRules:GetCustomGameDifficulty())
+		)
+	end
+	-- The quest must match successful engine creations, not the theoretical
+	-- lane count. A partial asset/entity failure can otherwise make phase two
+	-- permanently impossible even though some destroyers are present.
+	_G.XHS_DESTROYER_MAGNATAUR_KILL_LIMIT_OVERRIDE = spawnedMagnataurCount
+	LogFarmEventTransition(
+		spawnedMagnataurCount < expectedMagnataurCount and "warn" or "info",
+		spawnedMagnataurCount < expectedMagnataurCount
+			and "FARM_EVENT_MAGNATAURS_PARTIAL" or "FARM_EVENT_MAGNATAURS_SPAWNED",
+		"Destroyer Magnataurs created",
+		{
+			generation = tonumber(self.farm_event_generation) or 0,
+			active_lanes = activeLaneCount,
+			spawned = spawnedMagnataurCount,
+			expected = expectedMagnataurCount,
+			difficulty = tonumber(GameRules:GetCustomGameDifficulty()) or 1,
+		}
+	)
 
 	if PHASE_2_QUEST_UNIT and IsValidEntity(PHASE_2_QUEST_UNIT) and PHASE_2_QUEST_UNIT:IsAlive() then
 		PHASE_2_QUEST_UNIT:Kill(nil, nil)

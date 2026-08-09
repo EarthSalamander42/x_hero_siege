@@ -1233,6 +1233,7 @@ function XHSBots:TestDumpFromConsole()
 	local playerIDs = XHSBotPlayerRegistry:GetXHSBotPlayerIDs()
 	for _, playerID in ipairs(playerIDs) do
 		local record = XHSBotPlayerRegistry:GetBot(playerID) or {}
+		local hero = XHSBotPlayerRegistry:GetBotHero(playerID)
 		local now = GameRules ~= nil and GameRules.GetGameTime ~= nil
 			and GameRules:GetGameTime() or 0
 		local operationsPerSecond = XHSBotExecutor:GetOrdersPerSecond(record, now)
@@ -1242,11 +1243,58 @@ function XHSBots:TestDumpFromConsole()
 		end
 		local shoppingGoal = type(record.shopping_goal) == "table"
 			and record.shopping_goal or {}
+		local abilityStates = {}
+		local profile = IsValidHero(hero)
+			and XHSBotHeroProfiles:Get(hero:GetUnitName()) or nil
+		for abilityName in pairs(profile and profile.abilities or {}) do
+			local ability = hero:FindAbilityByName(abilityName)
+			if ability == nil or ability:IsNull() then
+				table.insert(abilityStates, abilityName .. ":missing")
+			else
+				local level = math.max(0, tonumber(ability:GetLevel()) or 0)
+				local manaCost = 0
+				local cooldown = 0
+				if ability.GetManaCost ~= nil then
+					local ok, value = pcall(function()
+						return ability:GetManaCost(math.max(0, level - 1))
+					end)
+					if ok then manaCost = math.max(0, tonumber(value) or 0) end
+				end
+				if ability.GetCooldownTimeRemaining ~= nil then
+					local ok, value = pcall(function()
+						return ability:GetCooldownTimeRemaining()
+					end)
+					if ok then cooldown = math.max(0, tonumber(value) or 0) end
+				end
+				table.insert(
+					abilityStates,
+					abilityName
+						.. ":L" .. tostring(level)
+						.. ":ready=" .. tostring(ability:IsFullyCastable() and 1 or 0)
+						.. ":active=" .. tostring(ability:IsActivated() and 1 or 0)
+						.. ":mana=" .. tostring(math.floor(manaCost))
+						.. ":cd=" .. string.format("%.1f", cooldown)
+				)
+			end
+		end
+		table.sort(abilityStates)
 		self:PrintQAResult(
 			"xhs_bots_test_dump",
 			true,
 			"bot_state",
 			"pid=" .. tostring(tonumber(playerID) or -1)
+				.. " hero=" .. self:FormatQALogValue(
+					IsValidHero(hero) and hero:GetUnitName() or record.hero_name,
+					48
+				)
+				.. " level=" .. tostring(
+					IsValidHero(hero) and hero:GetLevel() or -1
+				)
+				.. " mana=" .. tostring(math.floor(
+					IsValidHero(hero) and hero:GetMana() or 0
+				)) .. "/" .. tostring(math.floor(
+					IsValidHero(hero) and hero:GetMaxMana() or 0
+				))
 				.. " state=" .. self:FormatQALogValue(record.state, 32)
 				.. " goal=" .. self:FormatQALogValue(
 					record.goal or record.macro_state,
@@ -1296,6 +1344,26 @@ function XHSBots:TestDumpFromConsole()
 				.. " last_shop=" .. self:FormatQALogValue(
 					record.last_purchase_shop_kind,
 					16
+				)
+				.. " target=" .. self:FormatQALogValue(
+					record.target_entindex,
+					16
+				)
+				.. " last_ability=" .. self:FormatQALogValue(
+					record.last_ability,
+					48
+				)
+				.. " ability_reason=" .. self:FormatQALogValue(
+					record.last_ability_reason,
+					96
+				)
+				.. " rejected_action=" .. self:FormatQALogValue(
+					record.last_rejected_action,
+					96
+				)
+				.. " abilities=" .. self:FormatQALogValue(
+					table.concat(abilityStates, ","),
+					384
 				)
 				.. " shop_distance=" .. tostring(math.floor(
 					tonumber(record.last_purchase_shop_distance) or -1

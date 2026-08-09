@@ -16,9 +16,6 @@ var KILL_EVENTS = [
 var KILL_EVENT_VISIBLE_RATIO = 0.8;
 var scoreboard_supporter_hover = null;
 var scoreboard_supporter_hover_player_id = -1;
-var SCOREBOARD_HUD_Z_INDEX = "1300";
-var scoreboard_hud_layer_applied = false;
-var scoreboard_hud_layer_retry_scheduled = false;
 
 function SuppressVanillaFlyoutScoreboard() {
 	try {
@@ -34,92 +31,6 @@ function SuppressVanillaFlyoutScoreboard() {
 		// Some spectator HUD panels are created after custom_ui_manifest.
 		// Reasserting this on scoreboard events is safe; failure must not block XHS UI.
 	}
-}
-
-function GetScoreboardHudAncestor(panel) {
-	var current = panel;
-	while (current) {
-		if (current.id === "Hud") {
-			return current;
-		}
-		current = current.GetParent ? current.GetParent() : null;
-	}
-	return null;
-}
-
-function GetScoreboardHudDirectChild(panel, hud) {
-	var current = panel;
-	var parent = current && current.GetParent ? current.GetParent() : null;
-	while (current && parent && parent !== hud) {
-		current = parent;
-		parent = current.GetParent ? current.GetParent() : null;
-	}
-	return parent === hud ? current : null;
-}
-
-function ScheduleScoreboardHudLayerRetry() {
-	if (scoreboard_hud_layer_retry_scheduled) {
-		return;
-	}
-
-	scoreboard_hud_layer_retry_scheduled = true;
-	$.Schedule(0.5, function () {
-		scoreboard_hud_layer_retry_scheduled = false;
-		EnsureScoreboardAboveHudElements();
-	});
-}
-
-function EnsureScoreboardAboveHudElements() {
-	SuppressVanillaFlyoutScoreboard();
-
-	var host = $.GetContextPanel();
-	var hud = GetScoreboardHudAncestor(host);
-	var hudElements = hud && hud.FindChildTraverse ? hud.FindChildTraverse("HUDElements") : null;
-	var hudElementsChild = GetScoreboardHudDirectChild(hudElements, hud);
-	if (!host || !hud || !hudElementsChild || typeof host.SetParent !== "function" || typeof hud.MoveChildAfter !== "function") {
-		ScheduleScoreboardHudLayerRetry();
-		return false;
-	}
-
-	try {
-		if (!host.GetParent || host.GetParent() !== hud) {
-			host.SetParent(hud);
-		}
-		if (!host.GetParent || host.GetParent() !== hud) {
-			ScheduleScoreboardHudLayerRetry();
-			return false;
-		}
-
-		host.style.zIndex = SCOREBOARD_HUD_Z_INDEX;
-		hud.MoveChildAfter(host, hudElementsChild);
-		var notifications = hud.FindChildTraverse ? hud.FindChildTraverse("XHSWaveCountdown") : null;
-		var notificationsChild = GetScoreboardHudDirectChild(notifications, hud);
-		if (notificationsChild && notificationsChild !== host) {
-			// Keep the flyout specifically above wave/rune notifications. The shared
-			// layer contract still decides its position relative to windows, modals,
-			// tooltips and cinematics.
-			hud.MoveChildAfter(host, notificationsChild);
-		}
-		if (!scoreboard_hud_layer_applied) {
-			var applyLayerOrder = GameUI.CustomUIConfig().XHSApplyHudLayerOrder;
-			if (typeof applyLayerOrder === "function") {
-				applyLayerOrder();
-			}
-		}
-		scoreboard_hud_layer_applied = true;
-		return true;
-	} catch (error) {
-		ScheduleScoreboardHudLayerRetry();
-		return false;
-	}
-}
-
-function ReassertScoreboardHudLayerAfterOpen() {
-	EnsureScoreboardAboveHudElements();
-	$.Schedule(0.0, EnsureScoreboardAboveHudElements);
-	$.Schedule(0.1, EnsureScoreboardAboveHudElements);
-	$.Schedule(0.3, EnsureScoreboardAboveHudElements);
-	$.Schedule(0.6, EnsureScoreboardAboveHudElements);
 }
 
 function intToARGB(i) 
@@ -1243,7 +1154,6 @@ function SetScoreboardZoneButtonEnabled(buttonName, enabled) {
 function SetFlyoutScoreboardVisible( bVisible )
 {
 	SuppressVanillaFlyoutScoreboard();
-	ReassertScoreboardHudLayerAfterOpen();
 
 	if(bVisible === true)
 	{
@@ -1330,7 +1240,6 @@ function SetFlyoutScoreboardChangeZone( nDir )
 {	
 	//InitializeScoreboard();
 	SuppressVanillaFlyoutScoreboard();
-	EnsureScoreboardAboveHudElements();
 	SetFlyoutScoreboardVisible(false);
 	UpdateFragmentQuests(CustomNetTables.GetTableValue("fragment_quests", "state"));
 	

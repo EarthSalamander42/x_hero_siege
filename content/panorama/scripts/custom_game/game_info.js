@@ -26,53 +26,6 @@
 		}
 	}
 
-	function FindHudAncestor(panel) {
-		for (var current = panel; current; current = current.GetParent ? current.GetParent() : null) {
-			if (current.id === "Hud") {
-				return current;
-			}
-		}
-
-		return null;
-	}
-
-	function GetHudDirectChild(panel, hud) {
-		var current = panel;
-
-		while (current && current.GetParent && current.GetParent() !== hud) {
-			current = current.GetParent();
-		}
-
-		return current && current.GetParent && current.GetParent() === hud ? current : null;
-	}
-
-	function RaiseGameInfoShell(shell) {
-		if (!shell) {
-			return false;
-		}
-
-		// Preserve Valve's complete Game Info branch so its open/close controller
-		// keeps working. Raise that branch above HUDElements instead of extracting
-		// GameInfoPanel from its native hierarchy.
-		shell.style.zIndex = "1000";
-
-		var hud = FindHudAncestor(shell);
-		if (!hud || !hud.FindChildTraverse || !hud.MoveChildAfter) {
-			return false;
-		}
-
-		var hudElements = hud.FindChildTraverse("HUDElements");
-		var hudElementsRoot = GetHudDirectChild(hudElements, hud);
-		var gameInfoRoot = GetHudDirectChild(shell, hud);
-		if (!hudElementsRoot || !gameInfoRoot || gameInfoRoot === hudElementsRoot) {
-			return false;
-		}
-
-		gameInfoRoot.style.zIndex = "1000";
-		hud.MoveChildAfter(gameInfoRoot, hudElementsRoot);
-		return true;
-	}
-
 	function StyleGameInfoShell() {
 		var shell = FindAncestorPanel("GameInfoPanel");
 
@@ -90,15 +43,12 @@
 		AddClass(button, "XHSGameInfoButton");
 		AddClass(icon, "XHSGameInfoIcon");
 		AddClass(openClose, "XHSGameInfoOpenClose");
-		RaiseGameInfoShell(shell);
-
 		// Fallback styles for Valve's wrapper, which lives outside this custom layout.
 		shell.style.width = "600px";
 		shell.style.backgroundColor = "#061421ee";
 		shell.style.boxShadow = "fill #000000aa 0px 0px 12px 0px";
 
 		if (button) {
-			button.style.zIndex = "1001";
 			button.style.width = "38px";
 			button.style.height = "70px";
 			button.style.backgroundColor = "#071827f4";
@@ -111,7 +61,6 @@
 		}
 
 		if (openClose) {
-			openClose.style.zIndex = "1002";
 			openClose.style.washColor = "#dff6ff";
 			openClose.style.opacity = "0.9";
 		}

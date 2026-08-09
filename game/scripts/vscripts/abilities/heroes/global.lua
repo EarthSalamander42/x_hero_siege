@@ -140,6 +140,26 @@ function CastleMuradin(event)
 	end
 end
 
+local XHS_PHYSICAL_IMMUNITY_MODIFIERS = {
+	modifier_holdout_wukong_army_buff = true,
+	modifier_holdout_guardian_angel_buff = true,
+	modifier_holdout_guardian_angel_summoned_buff = true,
+	modifier_omniknight_guardian_angel = true,
+}
+
+local function XHSHasPhysicalDamageImmunity(unit)
+	if unit == nil or unit:IsNull() then return true end
+	if unit:IsAttackImmune() then return true end
+
+	for modifierName in pairs(XHS_PHYSICAL_IMMUNITY_MODIFIERS) do
+		if unit:HasModifier(modifierName) then
+			return true
+		end
+	end
+
+	return false
+end
+
 -- Global Splash
 function Splash(event)
 	local attacker = event.caster
@@ -152,7 +172,7 @@ function Splash(event)
 
 	for _, unit in pairs(splash_targets) do
 		if target:IsBuilding() then return end
-		if unit ~= target and not unit:IsBuilding() then
+		if unit ~= target and not unit:IsBuilding() and not XHSHasPhysicalDamageImmunity(unit) then
 			if ability:IsItem() and attacker:GetAttackCapability() == DOTA_UNIT_CAP_RANGED_ATTACK then return end
 			local full_damage = attacker:GetRealDamageDone(unit)
 			local cleave_damage = cleave * full_damage / 100

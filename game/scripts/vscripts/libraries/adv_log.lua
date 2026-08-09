@@ -26,8 +26,8 @@ if Log == nil then
 			DEBUG = 1,
 			INFO = 2,
 			WARN = 3,
-			CRITICAL = 4,
-			ERROR = 5
+			ERROR = 4,
+			CRITICAL = 5
 		},
 		targets = {}
 	}
@@ -35,9 +35,15 @@ if Log == nil then
 	Log.config = {
 		{
 			matcher = ".*",
+			level = Log.Levels.DEBUG,
+			targets = {
+				"api"
+			}
+		},
+		{
+			matcher = ".*",
 			level = Log.Levels.INFO,
 			targets = {
-				"api",
 				"console"
 			}
 		}
@@ -48,16 +54,16 @@ if Log == nil then
 	-- Utility
 	---------------------------------------------
 	function Log:_LevelToString(lvl)
-		if lvl == 1 then
+		if lvl == self.Levels.DEBUG then
 			return "debug"
-		elseif lvl == 2 then
+		elseif lvl == self.Levels.INFO then
 			return "info"
-		elseif lvl == 3 then
+		elseif lvl == self.Levels.WARN then
 			return "warn"
-		elseif lvl == 4 then
-			return "critical"
-		elseif lvl == 5 then
+		elseif lvl == self.Levels.ERROR then
 			return "error"
+		elseif lvl == self.Levels.CRITICAL then
+			return "critical"
 		else
 			return "invalid"
 		end
@@ -205,10 +211,12 @@ if Log == nil then
 
 	function Log:_GetStackTrace(ptr)
 		local trace = {}
+		if debug == nil or debug.getinfo == nil then return trace end
 
 		-- gather info
 		while true do
-			local i = debug.getinfo(ptr, "nSl")
+			local ok, i = pcall(debug.getinfo, ptr, "nSl")
+			if not ok then break end
 			if i == nil or ptr > 20 then
 				break
 			end
@@ -241,19 +249,34 @@ if Log == nil then
 
 		local content = ""
 
-		if type(obj) == "table" then
-			content = self:_PrintTable(obj)
+		local contentOK, preparedContent = pcall(function()
+			if type(obj) == "table" then return self:_PrintTable(obj) end
+			return tostring(obj)
+		end)
+		if contentOK then
+			content = preparedContent
 		else
-			content = tostring(obj)
+			content = "<adv_log serialization failed: " .. tostring(preparedContent) .. ">"
 		end
 
 		local trace = self:_GetStackTrace(traceLevel);
 		local file = self:_GetFileFromTrace(trace)
 
+		local delivered = false
 		for i = 1, #self.targets do
 			if not self:_IsFiltered(self.targets[i].name, level, file) then
-				self.targets[i]:print(levelString, content, trace)
+				local targetOK, targetError = pcall(function()
+					self.targets[i]:print(levelString, content, trace)
+				end)
+				delivered = delivered or targetOK
+				if not targetOK and NativePrint ~= nil then
+					pcall(NativePrint, "[error][adv_log] target=" .. tostring(self.targets[i].name)
+						.. " failed: " .. tostring(targetError))
+				end
 			end
+		end
+		if not delivered and NativePrint ~= nil then
+			pcall(NativePrint, "[" .. levelString .. "][adv_log fallback] " .. tostring(content))
 		end
 	end
 
@@ -379,16 +402,20 @@ if Log == nil then
 	}
 
 	function ApiLogTarget:print(level, content, trace)
-		local trace = ""
-		for i = 1, #trace do
-			trace = trace .. ", " .. json.encode(trace[i])
+		local encodedTrace = {}
+		for i = 1, math.min(#trace, 12) do
+			local frame = trace[i] or {}
+			table.insert(encodedTrace, {
+				source = tostring(frame.short_src or frame.source or ""),
+				line = tonumber(frame.currentline or frame.line) or 0,
+				name = tostring(frame.name or ""),
+			})
 		end
 		if api then
-			-- prepare api request
 			api:Message({
 				level = level,
 				content = tostring(content),
-				trace = trace
+				trace = encodedTrace
 			}, 2)
 		end
 	end
@@ -398,12 +425,18 @@ if Log == nil then
 	}
 
 	function ConsoleLogTarget:print(level, content, trace)
+		local frame = type(trace) == "table" and trace[1] or nil
+		if type(frame) ~= "table" then
+			NativePrint("[" .. tostring(level) .. "][adv_log:no_trace] " .. tostring(content))
+			return
+		end
 		local name = ""
-		if trace[1]["name"] ~= nil then
-			name = "|" .. trace[1]["name"]
+		if frame["name"] ~= nil then
+			name = "|" .. frame["name"]
 		end
 		NativePrint("[" ..
-			level .. "][" .. trace[1]["short_src"] .. ":" .. trace[1]["currentline"] .. name .. "] " .. content)
+			level .. "][" .. tostring(frame["short_src"] or frame["source"] or "unknown")
+			.. ":" .. tostring(frame["currentline"] or 0) .. name .. "] " .. tostring(content))
 	end
 
 	-----------------------------------------------------------------

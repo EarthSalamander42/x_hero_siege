@@ -1,10 +1,131 @@
-require('libraries/camera_motion')
-require('internal/util')
-require('components/precache/init')
-require('internal/vanilla_extension')
-require('gamemode')
+local XHS_BOOT_NATIVE_PRINT = _G.XHSBootstrapNativePrint or print
+_G.XHSBootstrapNativePrint = XHS_BOOT_NATIVE_PRINT
+_G.XHSBootstrapLogBuffer = _G.XHSBootstrapLogBuffer or {}
+_G.XHSDiagnosticBuild = "runtime-errors-20260809"
+_G.XHSBootstrapSequence = _G.XHSBootstrapSequence or 0
 
-function Precache(context)
+local function XHSBootstrapTraceback(err)
+	local message = tostring(err or "Unknown bootstrap error")
+	if debug ~= nil and debug.traceback ~= nil then
+		return debug.traceback(message, 2)
+	end
+	return message
+end
+
+function XHSBootstrapLog(level, content)
+	level = string.lower(tostring(level or "info"))
+	if level ~= "error" and level ~= "critical" and level ~= "warn" then
+		return
+	end
+
+	_G.XHSBootstrapSequence = (_G.XHSBootstrapSequence or 0) + 1
+	local gameState = -1
+	if GameRules ~= nil and GameRules.State_Get ~= nil then
+		local stateOK, stateValue = pcall(function() return GameRules:State_Get() end)
+		if stateOK then gameState = tonumber(stateValue) or -1 end
+	end
+	local mapName = "unknown"
+	if GetMapName ~= nil then
+		local mapOK, mapValue = pcall(GetMapName)
+		if mapOK then mapName = tostring(mapValue or "unknown") end
+	end
+	local toolsMode = false
+	if IsInToolsMode ~= nil then
+		local toolsOK, toolsValue = pcall(IsInToolsMode)
+		if toolsOK then toolsMode = toolsValue == true end
+	end
+	local prefix = "build=" .. tostring(_G.XHSDiagnosticBuild)
+		.. " seq=" .. tostring(_G.XHSBootstrapSequence)
+		.. " state=" .. tostring(gameState)
+		.. " map=" .. mapName
+		.. " tools=" .. tostring(toolsMode)
+		.. " | "
+	local entry = {
+		level = level,
+		content = prefix .. tostring(content or ""),
+		trace = {},
+	}
+	local queued = false
+
+	if api ~= nil and type(api.QueueRuntimeLog) == "function" then
+		local ok = pcall(function()
+			api:QueueRuntimeLog(entry)
+		end)
+		queued = ok
+	end
+
+	if not queued then
+		table.insert(_G.XHSBootstrapLogBuffer, entry)
+		while #_G.XHSBootstrapLogBuffer > 200 do
+			table.remove(_G.XHSBootstrapLogBuffer, 1)
+		end
+	end
+
+	if XHS_BOOT_NATIVE_PRINT ~= nil then
+		pcall(XHS_BOOT_NATIVE_PRINT, "[" .. entry.level .. "][XHS_BOOT] " .. entry.content)
+	end
+
+end
+
+function XHSFlushBootstrapLogs()
+	if api == nil or type(api.QueueRuntimeLog) ~= "function" then return false end
+
+	local pending = _G.XHSBootstrapLogBuffer or {}
+	_G.XHSBootstrapLogBuffer = {}
+	for _, entry in ipairs(pending) do
+		local ok = pcall(function()
+			api:QueueRuntimeLog(entry)
+		end)
+		if not ok then
+			table.insert(_G.XHSBootstrapLogBuffer, entry)
+		end
+	end
+	return #_G.XHSBootstrapLogBuffer == 0
+end
+
+-- adv_log protects Dynamic_Wrap callbacks, but anonymous game-event listeners
+-- otherwise bypass it. Install this before any runtime module is required so
+-- production-only listener failures are captured with a traceback as well.
+_G.XHSNativeListenToGameEvent = _G.XHSNativeListenToGameEvent or ListenToGameEvent
+if _G.XHSNativeListenToGameEvent ~= nil then
+	ListenToGameEvent = function(eventName, callback, context)
+		if type(callback) ~= "function" then
+			return _G.XHSNativeListenToGameEvent(eventName, callback, context)
+		end
+
+		return _G.XHSNativeListenToGameEvent(eventName, function(...)
+			local args = { ... }
+			local result = nil
+			local ok, err = xpcall(function()
+				result = callback(unpack(args))
+			end, XHSBootstrapTraceback)
+			if not ok then
+				XHSBootstrapLog("error", "event=" .. tostring(eventName) .. "\n" .. tostring(err))
+			end
+			return result
+		end, context)
+	end
+end
+
+local function XHSBootstrapRequire(moduleName)
+	local result = nil
+	local ok, err = xpcall(function()
+		result = require(moduleName)
+	end, XHSBootstrapTraceback)
+	if not ok then
+		XHSBootstrapLog("error", "require failed module=" .. tostring(moduleName)
+			.. "\n" .. tostring(err))
+	end
+	return ok, result
+end
+
+XHSBootstrapRequire('libraries/camera_motion')
+XHSBootstrapRequire('internal/util')
+XHSBootstrapRequire('components/precache/init')
+XHSBootstrapRequire('internal/vanilla_extension')
+XHSBootstrapRequire('gamemode')
+
+local function XHSPrecacheImpl(context)
 	-- AddBotPlayerWithEntityScript bootstraps fake clients as Wisp. Keep the
 	-- model resident before any player can trigger bot provisioning.
 	PrecacheResource("model", "models/heroes/wisp/wisp.vmdl", context)
@@ -150,6 +271,10 @@ function Precache(context)
 
 	XHSPrecache:PrecacheUnitSync("npc_spirit_beast_bis", context)
 	XHSPrecache:PrecacheUnitSync("npc_frost_infernal_bis", context)
+	-- Wave 6 starts immediately after the farm event and intentionally skips the
+	-- normal 30-second staging job, so its unit must already be resident.
+	XHSPrecache:PrecacheUnitSync("npc_dota_creature_chaos_knight_event_6", context)
+	XHSPrecache:PrecacheUnitSync("npc_dota_creature_clockwerk_event_8", context)
 
 	XHSPrecache:PrecacheUnit("npc_dota_hero_grom_hellscream", nil, -1)
 	XHSPrecache:PrecacheUnit("npc_dota_hero_illidan", nil, -1)
@@ -209,8 +334,27 @@ function Precache(context)
 	XHSPrecache:PrecacheBattlepassCompanionAssets(context)
 end
 
+function Precache(context)
+	local ok, err = xpcall(function()
+		XHSPrecacheImpl(context)
+	end, XHSBootstrapTraceback)
+	if not ok then
+		XHSBootstrapLog("error", "precache failed\n" .. tostring(err))
+		return
+	end
+end
+
 -- Create the game mode when we activate
 function Activate()
-	GameRules.GameMode = GameMode()
-	GameRules.GameMode:InitGameMode()
+	local ok, err = xpcall(function()
+		if type(GameMode) ~= "table" then
+			error("GameMode class unavailable after bootstrap requires")
+		end
+		GameRules.GameMode = GameMode()
+		GameRules.GameMode:InitGameMode()
+	end, XHSBootstrapTraceback)
+	if not ok then
+		XHSBootstrapLog("error", "activate/InitGameMode failed\n" .. tostring(err))
+		return
+	end
 end

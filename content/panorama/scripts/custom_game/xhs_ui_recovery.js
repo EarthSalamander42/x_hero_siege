@@ -8,10 +8,14 @@
 	var TOOLTIP_LAYER_Z_INDEX = "14000";
 	var CINEMATIC_LAYER_Z_INDEX = "15000";
 	var HUD_LAYER_INTERVAL = 0.25;
+	var hudLayerLoopScheduled = false;
 	var TOOLTIP_PANEL_IDS = [
 		"Tooltips",
 		"TooltipManager",
 		"DOTATooltipManager",
+		"TextTooltip",
+		"DOTATextTooltip",
+		"DOTAUIOverlayTooltip",
 		"AbilityTooltips",
 		"ItemTooltips",
 		"DOTAAbilityTooltip",
@@ -40,8 +44,8 @@
 	// children; ordering direct Hud children is what makes these priorities work
 	// across vanilla and custom Panorama branches.
 	var HUD_LAYER_RULES = [
+		{ key: "xhs_hud", z: 90, ids: ["DungeonHUDContents", "XHSTopHudRoot", "QuestLog", "QuestLogCollapseButton"] },
 		{ key: "base", z: 100, ids: ["HUDElements"] },
-		{ key: "xhs_hud", z: 200, ids: ["DungeonHUDContents", "XHSTopHudRoot"] },
 		{ key: "leaderboards", z: 300, ids: ["XHSFarmLeaderboard"] },
 		{ key: "scoreboard", z: 400, ids: ["XHSScoreboard", "TeamsContainer"] },
 		{ key: "health", z: 600, ids: ["DiretidePanel", "CastleHP", "BossHP1"], classes: ["Diretide"] },
@@ -52,6 +56,20 @@
 		{ key: "devtools", z: 1200, ids: ["XHSDevToolsPanel", "XHSUIRecoveryClose"], classes: ["SupporterContentStudioRoot", "XHSUIRecoveryRoot"] },
 		{ key: "flyout", z: 1300, ids: ["DungeonScoreboard"], classes: ["FlyoutScoreboardRoot"] },
 		{ key: "cinematic", z: 15000, ids: ["XHSCinematicTopBar"], classes: ["XHSCinematicRoot"] }
+	];
+	// Some Panorama panels request their own composition layer. Register those
+	// panels here as well so their compositor order cannot bypass the direct-Hud
+	// host order above.
+	var COMPOSITION_LAYER_RULES = [
+		{ key: "quest_ui", z: 90, ids: ["QuestLog", "QuestLogCollapseButton"] },
+		{ key: "flyout", z: 1300, ids: ["DungeonScoreboard"], classes: ["FlyoutScoreboardRoot"] }
+	];
+	// These layouts previously reparented and reordered themselves from their
+	// feature scripts. Keep every cross-Hud move here so there is one owner for
+	// compositor order and one retry loop when Valve rebuilds a branch.
+	var HUD_HOST_PROMOTIONS = [
+		{ anchorID: "ContentStudioWindow", hostClass: "SupporterContentStudioRoot" },
+		{ anchorID: "DungeonScoreboard", hostClass: "FlyoutScoreboardRoot" }
 	];
 
 	var targets = [
@@ -71,7 +89,6 @@
 		{ id: "DialogPanel", visibleClass: "Visible", removeClasses: ["Visible"] },
 		{ id: "FloatingDialogPanel", visibleClass: "Visible", removeClasses: ["Visible"] },
 		{ id: "ZoneToastPanel", visibleClass: "Visible", removeClasses: ["Visible"] },
-		{ id: "EventPanel", visibleClass: "XHSEventsPanelVisible", removeClasses: ["XHSEventsPanelVisible"] },
 		{ id: "XHSFarmLeaderboard", visibleClass: "IsVisible", removeClasses: ["IsVisible"] },
 		{ id: "XHSDevToolsPanel", visibleClass: "Visible", removeClasses: ["Visible"] }
 	];
@@ -236,12 +253,64 @@
 		return false;
 	}
 
+	function findClassAncestor(panel, className, stopPanel) {
+		var current = panel;
+		while (isValid(current) && current !== stopPanel) {
+			if (current.BHasClass && current.BHasClass(className)) return current;
+			current = current.GetParent ? current.GetParent() : null;
+		}
+		return null;
+	}
+
+	function promoteDedicatedHudHosts(hud) {
+		if (!isValid(hud) || !hud.FindChildTraverse) return;
+		for (var promotionIndex = 0; promotionIndex < HUD_HOST_PROMOTIONS.length; promotionIndex++) {
+			var promotion = HUD_HOST_PROMOTIONS[promotionIndex];
+			var anchor = hud.FindChildTraverse(promotion.anchorID);
+			var host = findClassAncestor(anchor, promotion.hostClass, hud);
+			if (!isValid(host) || !host.SetParent || !host.GetParent || host.GetParent() === hud) continue;
+			try {
+				host.SetParent(hud);
+			} catch (error) {
+				$.Msg("[XHS UI Layers] Could not promote " + promotion.hostClass + ": " + error);
+			}
+		}
+	}
+
+	function applyCompositionLayerOrder(root) {
+		if (!isValid(root) || !root.FindChildTraverse) return;
+		for (var ruleIndex = 0; ruleIndex < COMPOSITION_LAYER_RULES.length; ruleIndex++) {
+			var rule = COMPOSITION_LAYER_RULES[ruleIndex];
+			for (var idIndex = 0; idIndex < rule.ids.length; idIndex++) {
+				var panel = root.FindChildTraverse(rule.ids[idIndex]);
+				if (isValid(panel)) panel.style.zIndex = String(rule.z);
+			}
+			if (!root.FindChildrenWithClassTraverse) continue;
+			for (var classIndex = 0; rule.classes && classIndex < rule.classes.length; classIndex++) {
+				var panels = root.FindChildrenWithClassTraverse(rule.classes[classIndex]) || [];
+				for (var panelIndex = 0; panelIndex < panels.length; panelIndex++) {
+					if (isValid(panels[panelIndex])) panels[panelIndex].style.zIndex = String(rule.z);
+				}
+			}
+		}
+	}
+
+	function scheduleHudLayerOrder() {
+		if (hudLayerLoopScheduled) return;
+		hudLayerLoopScheduled = true;
+		$.Schedule(HUD_LAYER_INTERVAL, function () {
+			hudLayerLoopScheduled = false;
+			applyHudLayerOrder();
+		});
+	}
+
 	function applyHudLayerOrder() {
 		var hud = findPanel("Hud") || getHudRoot();
 		if (!isValid(hud) || !hud.GetChildCount || !hud.GetChild || !hud.MoveChildAfter) {
-			$.Schedule(HUD_LAYER_INTERVAL, applyHudLayerOrder);
+			scheduleHudLayerOrder();
 			return;
 		}
+		promoteDedicatedHudHosts(hud);
 
 		var ordered = [];
 		for (var ruleIndex = 0; ruleIndex < HUD_LAYER_RULES.length; ruleIndex++) {
@@ -256,7 +325,8 @@
 		}
 
 		// Deduplicate hosts which contain more than one signature, then enforce
-		// ascending siblings. This coexists with intentional vanilla reparenting.
+		// ascending siblings. Cross-Hud reparenting is owned above, never by the
+		// individual feature scripts.
 		var seen = [];
 		var previous = null;
 		for (var orderIndex = 0; orderIndex < ordered.length; orderIndex++) {
@@ -266,6 +336,8 @@
 			if (previous && previous !== entry.panel) hud.MoveChildAfter(entry.panel, previous);
 			previous = entry.panel;
 		}
+
+		applyCompositionLayerOrder(hud);
 
 		// Tooltips remain owned by vanilla. Raise their nearest direct host only
 		// when it is not HUDElements; raising HUDElements would cover all custom UI.
@@ -284,7 +356,7 @@
 			}
 		}
 
-		$.Schedule(HUD_LAYER_INTERVAL, applyHudLayerOrder);
+		scheduleHudLayerOrder();
 	}
 
 	function isTooltipPanel(panel) {
@@ -312,6 +384,10 @@
 				var panel = root.FindChildTraverse(TOOLTIP_PANEL_IDS[i]);
 				if (isValid(panel)) {
 					promoteTooltipPanel(panel, root);
+					var host = promoteTooltipHost(panel, hud);
+					if (isValid(host) && host.id !== "HUDElements") {
+						host.style.zIndex = TOOLTIP_LAYER_Z_INDEX;
+					}
 				}
 			}
 		}
@@ -501,7 +577,6 @@
 	}
 
 	keepNativeTooltipsOnTop();
-	GameUI.CustomUIConfig().XHSApplyHudLayerOrder = applyHudLayerOrder;
 	applyHudLayerOrder();
 	updateHover();
 })();

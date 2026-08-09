@@ -78,25 +78,52 @@ end
 local MOON_GLAIVE_PROJECTILE = "particles/units/heroes/hero_luna/luna_moon_glaive_bounce.vpcf"
 local MOON_GLAIVE_IMPACT_SOUND = "Hero_Luna.MoonGlaive.Impact"
 
-local function IsValidMoonGlaiveTarget(caster, target)
-	return caster ~= nil
-		and not caster:IsNull()
-		and target ~= nil
-		and not target:IsNull()
-		and target:IsAlive()
-		and not target:IsBuilding()
-		and target:GetTeamNumber() ~= caster:GetTeamNumber()
+local function IsUsableEntity(entity)
+	if entity == nil then return false end
+	local ok, usable = pcall(function()
+		return not entity:IsNull()
+	end)
+	return ok and usable == true
 end
 
-function xhs_creep_moon_glaive:LaunchGlaiveProjectile(source, target, chain_id, damage, bounces_remaining)
-	if not IsServer() or not IsValidMoonGlaiveTarget(self:GetCaster(), target) then
+local function SafeEntityOrigin(entity, fallback)
+	if not IsUsableEntity(entity) then return fallback end
+	local ok, origin = pcall(function()
+		return entity:GetAbsOrigin()
+	end)
+	return ok and origin or fallback
+end
+
+local function IsValidMoonGlaiveTarget(caster, target)
+	if not IsUsableEntity(caster) or not IsUsableEntity(target) then return false end
+	local ok, valid = pcall(function()
+		return target:IsAlive()
+			and not target:IsBuilding()
+			and target:GetTeamNumber() ~= caster:GetTeamNumber()
+	end)
+	return ok and valid == true
+end
+
+function xhs_creep_moon_glaive:LaunchGlaiveProjectile(source, target, chain_id, damage, bounces_remaining, source_location)
+	local caster = self:GetCaster()
+	if not IsServer() or not IsValidMoonGlaiveTarget(caster, target) then
 		if self.xhs_glaive_chains ~= nil then
 			self.xhs_glaive_chains[chain_id] = nil
 		end
 		return
 	end
-	if source == nil or source:IsNull() then
-		source = self:GetCaster()
+	local source_is_usable = IsUsableEntity(source)
+	if not source_is_usable then
+		source = caster
+	end
+	local launch_location = source_is_usable
+		and SafeEntityOrigin(source, source_location)
+		or source_location
+	if launch_location == nil then
+		if self.xhs_glaive_chains ~= nil then
+			self.xhs_glaive_chains[chain_id] = nil
+		end
+		return
 	end
 
 	ProjectileManager:CreateTrackingProjectile({
@@ -106,7 +133,7 @@ function xhs_creep_moon_glaive:LaunchGlaiveProjectile(source, target, chain_id, 
 		EffectName = MOON_GLAIVE_PROJECTILE,
 		iMoveSpeed = math.max(1, Special(self, "projectile_speed")),
 		iSourceAttachment = DOTA_PROJECTILE_ATTACHMENT_HITLOCATION,
-		vSourceLoc = source:GetAbsOrigin(),
+		vSourceLoc = launch_location,
 		bDodgeable = false,
 		bIsAttack = false,
 		bReplaceExisting = false,
@@ -127,9 +154,11 @@ function xhs_creep_moon_glaive:StartGlaiveChain(primary_target, primary_damage)
 	if bounce_count <= 0 then return end
 
 	local caster = self:GetCaster()
+	local primary_location = SafeEntityOrigin(primary_target)
+	if primary_location == nil then return end
 	local candidates = FindUnitsInRadius(
 		caster:GetTeamNumber(),
-		primary_target:GetAbsOrigin(),
+		primary_location,
 		nil,
 		Special(self, "bounce_range"),
 		DOTA_UNIT_TARGET_TEAM_ENEMY,
@@ -175,7 +204,14 @@ function xhs_creep_moon_glaive:OnProjectileHit_ExtraData(target, location, extra
 		return true
 	end
 
-	chain.hit[target:entindex()] = true
+	local impact_location = SafeEntityOrigin(target, location)
+	if impact_location == nil then
+		chains[chain_id] = nil
+		return true
+	end
+	local target_index = target:entindex()
+	chain.hit[target_index] = true
+	EmitSoundOn(MOON_GLAIVE_IMPACT_SOUND, target)
 	ApplyDamage({
 		victim = target,
 		attacker = caster,
@@ -184,7 +220,6 @@ function xhs_creep_moon_glaive:OnProjectileHit_ExtraData(target, location, extra
 		damage_type = DAMAGE_TYPE_PHYSICAL,
 		damage_flags = DOTA_DAMAGE_FLAG_NO_SPELL_AMPLIFICATION,
 	})
-	EmitSoundOn(MOON_GLAIVE_IMPACT_SOUND, target)
 
 	local bounces_remaining = math.max(0, math.floor(tonumber(extra_data.bounces_remaining) or 0))
 	if bounces_remaining <= 1 then
@@ -194,7 +229,7 @@ function xhs_creep_moon_glaive:OnProjectileHit_ExtraData(target, location, extra
 
 	local candidates = FindUnitsInRadius(
 		caster:GetTeamNumber(),
-		target:GetAbsOrigin(),
+		impact_location,
 		nil,
 		Special(self, "bounce_range"),
 		DOTA_UNIT_TARGET_TEAM_ENEMY,
@@ -218,7 +253,7 @@ function xhs_creep_moon_glaive:OnProjectileHit_ExtraData(target, location, extra
 
 	local reduction = math.max(0, math.min(100, Special(self, "damage_reduction_pct"))) * 0.01
 	local next_damage = math.max(0, tonumber(extra_data.damage) or 0) * (1 - reduction)
-	self:LaunchGlaiveProjectile(target, next_target, chain_id, next_damage, bounces_remaining - 1)
+	self:LaunchGlaiveProjectile(target, next_target, chain_id, next_damage, bounces_remaining - 1, impact_location)
 	return true
 end
 
@@ -466,12 +501,14 @@ end
 function modifier_xhs_creep_passive:GetAuraSearchFlags() return DOTA_UNIT_TARGET_FLAG_NONE end
 
 function modifier_xhs_creep_passive:OnAttackLanded(params)
-	if not IsServer() or params.attacker ~= self:GetParent() or params.target == nil then return end
+	if not IsServer() or params.attacker ~= self:GetParent() or not IsUsableEntity(params.target) then return end
 	if params.target:GetTeamNumber() == params.attacker:GetTeamNumber() or params.target:IsBuilding() then return end
 
 	local ability = self:GetAbility()
 	local parent = self:GetParent()
 	local target = params.target
+	local target_origin = SafeEntityOrigin(target)
+	if target_origin == nil then return end
 	if ability:GetAbilityName() == "xhs_creep_moon_glaive" then
 		local attack_damage = math.max(0, tonumber(params.damage) or 0)
 		if parent.GetAttackDamage ~= nil then
@@ -501,12 +538,12 @@ function modifier_xhs_creep_passive:OnAttackLanded(params)
 	local bonus = Special(ability, "proc_damage_pct")
 	local proc_chance = Special(ability, "proc_chance")
 	if bonus > 0 and RollPseudoRandomPercentage(proc_chance, 1972, parent) then
-		ApplyDamage({ victim = target, attacker = parent, ability = ability, damage = parent:GetAverageTrueAttackDamage(target) * bonus * 0.01, damage_type = DAMAGE_TYPE_PHYSICAL })
 		-- sniper_headshot_slow is the looping visual of Sniper's slow modifier.
 		-- Creating it as a free-standing impact made one emitter survive every
 		-- proc, producing the accumulating golden star orbits. Skull Basher is a
 		-- lightweight one-shot impact and is already part of XHS precache.
 		PlayProcFeedback(parent, target, "particles/items_fx/abyssal_blade_crimson_impact_sparks.vpcf", "DOTA_Item.SkullBasher")
+		ApplyDamage({ victim = target, attacker = parent, ability = ability, damage = parent:GetAverageTrueAttackDamage(target) * bonus * 0.01, damage_type = DAMAGE_TYPE_PHYSICAL })
 	end
 
 	local mana_burn = Special(ability, "mana_burn_pct")
@@ -536,7 +573,7 @@ function modifier_xhs_creep_passive:OnAttackLanded(params)
 
 	local cleave = Special(ability, "cleave_pct")
 	if cleave > 0 then
-		local enemies = FindUnitsInRadius(parent:GetTeamNumber(), target:GetAbsOrigin(), nil, Special(ability, "splash_radius"), DOTA_UNIT_TARGET_TEAM_ENEMY, DOTA_UNIT_TARGET_HERO + DOTA_UNIT_TARGET_BASIC, DOTA_UNIT_TARGET_FLAG_NONE, FIND_ANY_ORDER, false)
+		local enemies = FindUnitsInRadius(parent:GetTeamNumber(), target_origin, nil, Special(ability, "splash_radius"), DOTA_UNIT_TARGET_TEAM_ENEMY, DOTA_UNIT_TARGET_HERO + DOTA_UNIT_TARGET_BASIC, DOTA_UNIT_TARGET_FLAG_NONE, FIND_ANY_ORDER, false)
 		for _, enemy in pairs(enemies) do
 			if enemy ~= target then
 				ApplyDamage({ victim = enemy, attacker = parent, ability = ability, damage = params.damage * cleave * 0.01, damage_type = DAMAGE_TYPE_PHYSICAL })
@@ -774,7 +811,14 @@ function modifier_xhs_creep_crushing_armor_debuff:SetAppliedArmorReduction(reduc
 	end
 	self:SetStackCount(stacks)
 	self:SendBuffRefreshToClients()
-	self:GetParent():CalculateStatBonus(true)
+
+	-- CalculateStatBonus is only exposed by hero-like NPC handles. Crushing
+	-- Armor can also land on summons and other basic units, whose modifier
+	-- properties refresh normally but which do not implement this method.
+	local parent = self:GetParent()
+	if parent.CalculateStatBonus ~= nil then
+		parent:CalculateStatBonus(true)
+	end
 end
 
 function modifier_xhs_creep_crushing_armor_debuff:OnIntervalThink()

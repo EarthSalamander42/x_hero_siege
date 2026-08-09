@@ -6,7 +6,9 @@ var XHSSupporterPass = (function () {
 	var SUPPORTER_SHOP_URL = "https://mods.frostrose-studio.com/supporter-pass?tab=shop";
 	// Supporter Pass 4.0 purchases are available both in game and on the website.
 	var IN_GAME_SHOP_PURCHASES_ENABLED = true;
-	var DAILY_FRAGMENT_CAP = 190;
+	var DAILY_GAMEPLAY_FRAGMENT_CAP = 100;
+	var DAILY_QUEST_FRAGMENT_CAP = 90;
+	var DAILY_FRAGMENT_CAP = DAILY_GAMEPLAY_FRAGMENT_CAP + DAILY_QUEST_FRAGMENT_CAP;
 	var WEEKLY_FRAGMENT_CAP = DAILY_FRAGMENT_CAP;
 	var SUPPORTER_PASS_LEVEL_COUNT = 50;
 	var currentShopFilter = "All";
@@ -47,8 +49,6 @@ var XHSSupporterPass = (function () {
 	var fragmentFlyoutIndex = 0;
 	var actionToastSerial = 0;
 	var pendingActions = {};
-	var supporterLayerApplied = false;
-	var supporterLayerRetryScheduled = false;
 	var windowAnimationSerial = 0;
 	var DEV_ASSET_FILTER = "Dev Assets";
 	var devUnlockAllUI = false;
@@ -115,11 +115,11 @@ var XHSSupporterPass = (function () {
 	var DISABLED_PAGES = {};
 
 	var DEFAULT_TIERS = [
-		{ id: 1, name: "Donator", price: "2\u20ac/month", color: "#70e39a", fragments: 150, xp_boost: 10, vote_power: 2 },
-		{ id: 2, name: "Golden Donator", price: "4.50\u20ac/month", color: "#ffcf66", fragments: 400, xp_boost: 20, vote_power: 3 },
-		{ id: 3, name: "Ember Donator", price: "9\u20ac/month", color: "#ff5a43", fragments: 900, xp_boost: 30, vote_power: 4 },
-		{ id: 4, name: "Stoneguard Donator", price: "18\u20ac/month", color: "#5ad0ff", fragments: 1800, xp_boost: 40, vote_power: 5 },
-		{ id: 5, name: "Earthwarden Donator", price: "27\u20ac/month", color: "#c99cff", fragments: 1800, xp_boost: 40, vote_power: 5, prestige: true },
+		{ id: 1, name: "Donator", price: "2\u20ac/month", color: "#70e39a", fragments: 150, daily_gameplay_fragments: 125, xp_boost: 10, vote_power: 2 },
+		{ id: 2, name: "Golden Donator", price: "4.50\u20ac/month", color: "#ffcf66", fragments: 400, daily_gameplay_fragments: 150, xp_boost: 20, vote_power: 3 },
+		{ id: 3, name: "Ember Donator", price: "9\u20ac/month", color: "#ff5a43", fragments: 900, daily_gameplay_fragments: 175, xp_boost: 30, vote_power: 4 },
+		{ id: 4, name: "Stoneguard Donator", price: "18\u20ac/month", color: "#5ad0ff", fragments: 1800, daily_gameplay_fragments: 200, xp_boost: 40, vote_power: 5 },
+		{ id: 5, name: "Earthwarden Donator", price: "27\u20ac/month", color: "#c99cff", fragments: 1800, daily_gameplay_fragments: 200, xp_boost: 40, vote_power: 5, prestige: true },
 	];
 
 	var SITE_TIER_META = {
@@ -163,79 +163,6 @@ var XHSSupporterPass = (function () {
 
 	function Panel(id) {
 		return $("#" + id);
-	}
-
-	function GetHudAncestor(panel) {
-		var current = panel;
-		while (current) {
-			if (current.id === "Hud") {
-				return current;
-			}
-			current = current.GetParent ? current.GetParent() : null;
-		}
-		return null;
-	}
-
-	function GetHudDirectChild(panel, hud) {
-		var current = panel;
-		var parent = current && current.GetParent ? current.GetParent() : null;
-		while (current && parent && parent !== hud) {
-			current = parent;
-			parent = current.GetParent ? current.GetParent() : null;
-		}
-		return parent === hud ? current : null;
-	}
-
-	function ScheduleSupporterLayerRetry() {
-		if (supporterLayerRetryScheduled) {
-			return;
-		}
-
-		supporterLayerRetryScheduled = true;
-		$.Schedule(0.5, function () {
-			supporterLayerRetryScheduled = false;
-			EnsureSupporterPassAboveVanillaHud();
-		});
-	}
-
-	function EnsureSupporterPassAboveVanillaHud() {
-		var host = $.GetContextPanel();
-		if (!host || typeof FindDotaHudElement !== "function") {
-			ScheduleSupporterLayerRetry();
-			return false;
-		}
-
-		var hudElements = FindDotaHudElement("HUDElements");
-		var hud = GetHudAncestor(hudElements) || GetHudAncestor(host);
-		var hudElementsChild = GetHudDirectChild(hudElements, hud);
-		var pauseRoot = hud && hud.FindChildTraverse ? hud.FindChildTraverse("XHSPauseRoot") : null;
-		var pauseChild = GetHudDirectChild(pauseRoot, hud);
-		var layerAnchor = pauseChild && pauseChild !== host ? pauseChild : hudElementsChild;
-		if (!hud || !hudElementsChild || typeof host.SetParent !== "function" || typeof hud.MoveChildAfter !== "function") {
-			ScheduleSupporterLayerRetry();
-			return false;
-		}
-
-		try {
-			if (host.GetParent && host.GetParent() !== hud) {
-				host.SetParent(hud);
-			}
-
-			if (!host.GetParent || host.GetParent() !== hud) {
-				ScheduleSupporterLayerRetry();
-				return false;
-			}
-
-			// Above quest/special-wave HUD (<= 1100), while remaining below
-			// dev tools, the scoreboard flyout, tooltips and cinematics.
-			host.style.zIndex = "1150";
-			hud.MoveChildAfter(host, layerAnchor);
-			supporterLayerApplied = true;
-			return true;
-		} catch (error) {
-			ScheduleSupporterLayerRetry();
-			return false;
-		}
 	}
 
 	function Safe(callback, fallbackValue) {
@@ -987,12 +914,17 @@ var XHSSupporterPass = (function () {
 			has_fragment_balance: data.fragments !== undefined || data.fragment_balance !== undefined,
 			daily_fragments: ToNumber(data.daily_fragments || data.daily_earned || data.weekly_fragments || data.weekly_earned, 0),
 			daily_cap: ToNumber(data.daily_cap || data.weekly_cap, DAILY_FRAGMENT_CAP),
+			daily_gameplay_fragments: ToNumber(data.daily_gameplay_fragments, 0),
+			daily_gameplay_cap: ToNumber(data.daily_gameplay_cap, [100, 125, 150, 175, 200, 200][tierID] || DAILY_GAMEPLAY_FRAGMENT_CAP),
+			daily_quest_fragments: ToNumber(data.daily_quest_fragments, 0),
+			daily_quest_cap: ToNumber(data.daily_quest_cap, DAILY_QUEST_FRAGMENT_CAP),
 			weekly_fragments: ToNumber(data.daily_fragments || data.daily_earned || data.weekly_fragments || data.weekly_earned, 0),
 			weekly_cap: ToNumber(data.daily_cap || data.weekly_cap, DAILY_FRAGMENT_CAP),
 			xp_boost: ToNumber(data.xp_boost, 0),
 			base_xp_change: ToNumber(data.base_xp_change, 0),
 			xp_bonus: ToNumber(data.xp_bonus, 0),
 			vote_power: Math.max(1, ToNumber(data.vote_power, tierID > 0 ? Math.min(tierID + 1, 5) : 1)),
+			access_timeline: data.access_timeline || {},
 			season_level: season.level,
 			season_xp: season.xp,
 			season_xp_max: season.maxXp,
@@ -1136,7 +1068,7 @@ var XHSSupporterPass = (function () {
 			name: Text("xhs_sp_tier_" + tierID + "_name", tier.name || meta.name || "Supporter"),
 			price: meta.price || tier.price || "",
 			text: LocalizeMaybeKey(meta.text || ""),
-			perks: (meta.perks || [
+			perks: ([FormatNumber(tier.daily_gameplay_fragments || DAILY_GAMEPLAY_FRAGMENT_CAP) + " gameplay/day", "+" + DAILY_QUEST_FRAGMENT_CAP + " quest potential"]).concat(meta.perks || [
 				FormatNumber(tier.fragments || 0) + " " + Text("xhs_sp_fragments_lower", "fragments"),
 				"+" + FormatNumber(tier.xp_boost || 0) + "% " + Text("xhs_sp_xp", "XP"),
 				FormatVotePower(tier.vote_power || (tierID > 0 ? Math.min(tierID + 1, 5) : 1)),
@@ -2600,7 +2532,6 @@ var XHSSupporterPass = (function () {
 	}
 
 	function ToggleWindow(forceVisible) {
-		EnsureSupporterPassAboveVanillaHud();
 		var window = Panel("XHSSupporterPassWindow");
 		if (!window) {
 			return;
@@ -2878,7 +2809,7 @@ var XHSSupporterPass = (function () {
 
 		SetText("XHSPassTierValue", player.tier_name);
 		SetText("XHSPassFragmentsValue", FormatNumber(player.fragments));
-		SetText("XHSPassWeeklyCapValue", FormatNumber(player.daily_fragments || player.weekly_fragments) + " / " + FormatNumber(player.daily_cap || player.weekly_cap));
+		SetText("XHSPassWeeklyCapValue", "Game " + FormatNumber(player.daily_gameplay_fragments) + "/" + FormatNumber(player.daily_gameplay_cap) + "  +  Quests " + FormatNumber(player.daily_quest_fragments) + "/" + FormatNumber(player.daily_quest_cap));
 		SetText("XHSPassGlobalXPValue", FormatXHSAccountXPSummary(player));
 		SetText("XHSPassSeasonXPValue", FormatSupporterXPSummary(player));
 		var xpBoostText = "+" + FormatNumber(player.xp_boost) + "%";
@@ -2889,6 +2820,28 @@ var XHSSupporterPass = (function () {
 		SetText("XHSPassVotePowerValue", FormatVotePower(player.vote_power));
 		SetText("XHSPassPlayerName", ResolveLocalPlayerIdentity(player));
 		SetText("XHSPassPlayerTier", player.tier_name);
+		var accessTimelineLabel = Panel("XHSPassAccessTimeline");
+		if (accessTimelineLabel) {
+			var accessPeriods = AsArray(player.access_timeline && player.access_timeline.periods || []);
+			var accessNow = Date.now();
+			var nextPeriod = null;
+			var currentEnd = null;
+			for (var accessIndex = 0; accessIndex < accessPeriods.length; accessIndex++) {
+				var accessPeriod = accessPeriods[accessIndex] || {};
+				var accessStart = new Date(accessPeriod.starts_at).getTime();
+				var accessEnd = new Date(accessPeriod.ends_at).getTime();
+				if (accessStart > accessNow && (!nextPeriod || accessStart < new Date(nextPeriod.starts_at).getTime())) nextPeriod = accessPeriod;
+				if (accessStart <= accessNow && accessEnd > accessNow && ToNumber(accessPeriod.tier_id, 0) === player.tier_id && (!currentEnd || accessEnd > currentEnd)) currentEnd = accessEnd;
+			}
+			var accessText = "";
+			if (nextPeriod) {
+				accessText = "NEXT: TIER " + FormatNumber(nextPeriod.tier_id) + " · " + FormatSupporterAccessDate(nextPeriod.starts_at);
+			} else if (currentEnd) {
+				accessText = "ACCESS PROTECTED UNTIL " + FormatSupporterAccessDate(currentEnd);
+			}
+			accessTimelineLabel.text = accessText;
+			accessTimelineLabel.SetHasClass("IsVisible", accessText.length > 0);
+		}
 		SetText("XHSPassLevelLabel", Text("xhs_sp_season_level_value", "Season Level {level}", { level: player.season_level }));
 		SetText("XHSPassXpLabel", FormatNumber(player.season_xp) + " / " + FormatNumber(player.season_xp_max) + " " + Text("xhs_sp_xp", "XP"));
 		SetPercent(Panel("XHSPassXpProgress"), player.season_xp, player.season_xp_max);
@@ -2914,6 +2867,14 @@ var XHSSupporterPass = (function () {
 			votePowerValue.style.color = player.tier_id > 0 ? player.tier_color : "#f3fbff";
 		}
 		UpdatePremiumCTA(player);
+	}
+
+	function FormatSupporterAccessDate(value) {
+		var date = new Date(value);
+		if (!isFinite(date.getTime())) return "";
+		var day = ("0" + date.getDate()).slice(-2);
+		var month = ("0" + (date.getMonth() + 1)).slice(-2);
+		return day + "/" + month + "/" + date.getFullYear();
 	}
 
 	function RenderTiers(player) {
@@ -5881,25 +5842,6 @@ var XHSSupporterPass = (function () {
 	}
 
 	function Init() {
-		if (GameEvents && GameEvents.Subscribe) {
-			GameEvents.Subscribe("xhs_game_pause_state", function () {
-				var window = Panel("XHSSupporterPassWindow");
-				if (!window || (!window.BHasClass("IsVisible") && !window.BHasClass("IsOpening"))) {
-					return;
-				}
-
-				$.Schedule(0.0, EnsureSupporterPassAboveVanillaHud);
-				$.Schedule(0.75, function () {
-					var currentWindow = Panel("XHSSupporterPassWindow");
-					if (currentWindow
-						&& (currentWindow.BHasClass("IsVisible") || currentWindow.BHasClass("IsOpening"))) {
-						EnsureSupporterPassAboveVanillaHud();
-					}
-				});
-			});
-		}
-
-		EnsureSupporterPassAboveVanillaHud();
 		BindButtons();
 		SwitchPage("overview");
 		RenderAll();

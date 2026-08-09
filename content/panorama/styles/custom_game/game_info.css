@@ -8,7 +8,6 @@
 
 #GameInfoPanel.XHSGameInfoPanel {
 	width: 600px;
-	z-index: 1000;
 	background-color: gradient( linear, 0% 0%, 100% 100%, from( #061421f4 ), color-stop( 0.62, #081827ef ), to( #050b14f2 ) );
 	border-right: 1px solid #5ad0ff55;
 	box-shadow: fill #000000aa 0px 0px 12px 0px;

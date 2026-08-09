@@ -83,6 +83,8 @@ local BOT_QUERY_BUCKET_PADDING = 500
 local BOT_QUERY_RADIUS_STEP = 250
 local BOT_ENEMY_QUERY_CACHE_TTL = 0.18
 local BOT_QUERY_CACHE_PRUNE_INTERVAL = 2.0
+local GROM_MIRROR_REAL_NAME = "npc_dota_hero_grom_hellscream"
+local GROM_MIRROR_CLONE_NAME = "npc_dota_hero_grom_hellscream_clone"
 
 local DEFENSIVE_STRUCTURE_NAMES = {
 	npc_dota_defender_fort = true,
@@ -455,6 +457,76 @@ function XHSBotBrain:ScoreTarget(hero, unit, profile)
 	return score
 end
 
+function XHSBotBrain:SelectGromMirrorTarget(
+	playerID,
+	hero,
+	record,
+	assignment,
+	difficulty,
+	visibleEnemies
+)
+	local candidates = {}
+	local candidateByIndex = {}
+	local cloneVisible = false
+	for _, enemy in pairs(visibleEnemies or {}) do
+		local name = IsValidEntityHandle(enemy) and enemy:GetUnitName() or ""
+		if name == GROM_MIRROR_CLONE_NAME then cloneVisible = true end
+		if (name == GROM_MIRROR_REAL_NAME or name == GROM_MIRROR_CLONE_NAME)
+			and self:IsCombatTarget(enemy)
+			and self:IsTeamVisible(hero, enemy)
+			and self:IsTargetAllowedByAssignment(
+				playerID,
+				hero,
+				enemy,
+				assignment,
+				difficulty
+			) then
+			table.insert(candidates, enemy)
+			candidateByIndex[enemy:entindex()] = enemy
+		end
+	end
+
+	if not cloneVisible then
+		record.grom_mirror_signature = nil
+		record.grom_mirror_target_entindex = nil
+		return nil, false
+	end
+	local assignedBoss = assignment ~= nil
+		and EntityFromIndex(assignment.target_entindex) or nil
+	if IsValidEntityHandle(assignedBoss)
+		and assignedBoss:GetUnitName() == GROM_MIRROR_REAL_NAME
+		and assignedBoss:IsAlive()
+		and assignedBoss:IsInvulnerable() then
+		-- The clones appear a fraction before the real image loses its split
+		-- invulnerability. Wait for the complete choice set instead of making the
+		-- first selection from a list that can only contain fakes.
+		return nil, true
+	end
+	if #candidates <= 0 then return nil, true end
+
+	-- Entindexes identify the real unit on the server, so they may only provide
+	-- stable ordering/state here. The actual choice is uniform across every
+	-- visible image and never uses boss flags, unit names, damage or max health.
+	table.sort(candidates, function(left, right)
+		return left:entindex() < right:entindex()
+	end)
+	local indices = {}
+	for _, candidate in ipairs(candidates) do
+		table.insert(indices, candidate:entindex())
+	end
+	local signature = table.concat(indices, ",")
+	local selected = candidateByIndex[
+		tonumber(record.grom_mirror_target_entindex) or -1
+	]
+	if record.grom_mirror_signature ~= signature or selected == nil then
+		selected = candidates[RandomInt(1, #candidates)]
+		record.grom_mirror_signature = signature
+		record.grom_mirror_target_entindex = selected:entindex()
+		record.grom_mirror_choices = (record.grom_mirror_choices or 0) + 1
+	end
+	return selected, true
+end
+
 function XHSBotBrain:RememberVisibleTarget(record, target, difficulty, now)
 	if not self:IsCombatTarget(target) then return end
 	now = tonumber(now) or GameRules:GetGameTime()
@@ -465,6 +537,24 @@ end
 
 function XHSBotBrain:SelectTarget(playerID, hero, profile, record, assignment, difficulty, visibleEnemies)
 	local now = GameRules:GetGameTime()
+	local mirrorTarget, mirrorHandled = self:SelectGromMirrorTarget(
+		playerID,
+		hero,
+		record,
+		assignment,
+		difficulty,
+		visibleEnemies
+	)
+	if mirrorHandled then
+		-- Do this before commitment and assigned-target handling: both retain the
+		-- real boss entindex from before the shuffle and would otherwise reveal it.
+		record.target_committed_until = now
+		if mirrorTarget ~= nil then
+			self:RememberVisibleTarget(record, mirrorTarget, difficulty, now)
+			return mirrorTarget, 75
+		end
+		return nil, -math.huge
+	end
 	local committed = EntityFromIndex(record.target_entindex)
 	if self:IsCombatTarget(committed)
 		and committed:GetTeamNumber() ~= hero:GetTeamNumber()
@@ -685,15 +775,29 @@ function XHSBotBrain:EvaluateThreatPacks(
 						if ok then cooldown = tonumber(value) or 0 end
 					end
 					if cooldown < 45 then
-						local damage = self:GetAbilityDamageAgainst(
-							hero,
-							ability,
-							representative,
-							rule
-						)
-						local areaTargets = rule.mode == "enemy_unit" and 1
-							or math.min(#pack.members, 3)
-						availableBurst = availableBurst + damage * areaTargets
+						local eligibleTarget = nil
+						local eligibleCount = 0
+						for _, member in ipairs(pack.members) do
+							if self:CanAbilityAffectEnemy(ability, member, rule) then
+								eligibleTarget = eligibleTarget or member
+								eligibleCount = eligibleCount + 1
+							end
+						end
+						if eligibleTarget ~= nil then
+							local _, damage = self:GetAbilityDamageAgainst(
+								hero,
+								ability,
+								eligibleTarget,
+								rule
+							)
+							damage = damage * math.max(
+								0,
+								tonumber(rule.forecast_damage_multiplier) or 1
+							)
+							local areaTargets = rule.mode == "enemy_unit" and 1
+								or math.min(eligibleCount, 3)
+							availableBurst = availableBurst + damage * areaTargets
+						end
 					end
 				end
 			end
@@ -1887,6 +1991,69 @@ function XHSBotBrain:CountEnemiesAround(enemies, position, radius)
 	return count
 end
 
+function XHSBotBrain:CanAbilityAffectEnemy(ability, enemy, rule)
+	if not IsValidEntityHandle(ability) or not self:IsCombatTarget(enemy) then
+		return false
+	end
+	local magicImmune = false
+	if enemy.IsMagicImmune ~= nil then
+		local ok, value = pcall(function() return enemy:IsMagicImmune() end)
+		magicImmune = ok and value == true
+	end
+	if not magicImmune then return true end
+	if rule ~= nil and rule.affects_magic_immune == true then return true end
+
+	-- Target flags are the engine/KV contract for spells which deliberately
+	-- pierce immunity. Without that explicit contract, treating an immune unit
+	-- as an AoE target only spends mana and cooldown for no useful effect.
+	if ability.GetAbilityTargetFlags ~= nil
+		and bit ~= nil
+		and bit.band ~= nil
+		and DOTA_UNIT_TARGET_FLAG_MAGIC_IMMUNE_ENEMIES ~= nil then
+		local ok, flags = pcall(function() return ability:GetAbilityTargetFlags() end)
+		if ok and bit.band(
+				tonumber(flags) or 0,
+				DOTA_UNIT_TARGET_FLAG_MAGIC_IMMUNE_ENEMIES
+			) ~= 0 then
+			return true
+		end
+	end
+	if ability.GetAbilityKeyValues ~= nil then
+		local ok, keyValues = pcall(function() return ability:GetAbilityKeyValues() end)
+		if ok and type(keyValues) == "table" then
+			local immunityType = tostring(keyValues.SpellImmunityType or "")
+			local targetFlags = tostring(keyValues.AbilityUnitTargetFlags or "")
+			if string.find(immunityType, "SPELL_IMMUNITY_ENEMIES_YES", 1, true)
+				or string.find(
+					targetFlags,
+					"DOTA_UNIT_TARGET_FLAG_MAGIC_IMMUNE_ENEMIES",
+					1,
+					true
+				) then
+				return true
+			end
+		end
+	end
+	return false
+end
+
+function XHSBotBrain:CountAbilityTargetsAround(
+	ability,
+	rule,
+	enemies,
+	position,
+	radius
+)
+	local count = 0
+	for _, enemy in pairs(enemies or {}) do
+		if self:CanAbilityAffectEnemy(ability, enemy, rule)
+			and Distance2D(enemy:GetAbsOrigin(), position) <= radius then
+			count = count + 1
+		end
+	end
+	return count
+end
+
 function XHSBotBrain:RecordAbilityRejection(record, abilityName, reason)
 	if type(record) ~= "table" then return end
 	local now = GameRules:GetGameTime()
@@ -1952,14 +2119,16 @@ function XHSBotBrain:FindEtherealSpellTarget(
 	ability,
 	enemies,
 	maximumRange,
-	useTargetFilter
+	useTargetFilter,
+	rule
 )
 	if not self:CanAbilityAffectEthereal(ability) then return nil end
 	local heroOrigin = hero:GetAbsOrigin()
 	local best = nil
 	local bestScore = -math.huge
 	for _, enemy in pairs(enemies or {}) do
-		if self:IsEtherealSpellTarget(enemy) then
+		if self:IsEtherealSpellTarget(enemy)
+			and self:CanAbilityAffectEnemy(ability, enemy, rule) then
 			local distance = Distance2D(heroOrigin, enemy:GetAbsOrigin())
 			if maximumRange == nil or distance <= maximumRange then
 				local accepted = true
@@ -2036,7 +2205,12 @@ function XHSBotBrain:BuildAbilityAction(hero, ability, rule, target, enemies, di
 	end
 
 	local name = ability:GetAbilityName()
-	if ability:GetLevel() <= 0 or ability:IsPassive() or not ability:IsActivated() then
+	if ability:GetLevel() <= 0 then
+		self:RecordAbilityRejection(record, name, "ability not learned")
+		return nil
+	end
+	if ability:IsPassive() or not ability:IsActivated() then
+		self:RecordAbilityRejection(record, name, "passive or deactivated")
 		return nil
 	end
 	local isToggleMode = rule.mode == "toggle_single"
@@ -2066,7 +2240,8 @@ function XHSBotBrain:BuildAbilityAction(hero, ability, rule, target, enemies, di
 			ability,
 			enemies,
 			range,
-			rule.mode == "enemy_unit"
+			rule.mode == "enemy_unit",
+			rule
 		)
 		if etherealTarget ~= nil then
 			target = etherealTarget
@@ -2077,8 +2252,16 @@ function XHSBotBrain:BuildAbilityAction(hero, ability, rule, target, enemies, di
 			hero,
 			ability,
 			enemies,
-			tonumber(rule.radius) or 550
+			tonumber(rule.radius) or 550,
+			false,
+			rule
 		) ~= nil
+	end
+	if rule.mode == "enemy_unit"
+		and self:IsCombatTarget(target)
+		and not self:CanAbilityAffectEnemy(ability, target, rule) then
+		self:RecordAbilityRejection(record, name, "target is magic immune")
+		return nil
 	end
 	local creepSpellEfficiency = nil
 	if not etherealPriority
@@ -2114,14 +2297,18 @@ function XHSBotBrain:BuildAbilityAction(hero, ability, rule, target, enemies, di
 		and HealthRatio(hero) <= (tonumber(rule.self_save_threshold) or 0.40)
 	local creepPackOpportunity = false
 	if rule.mode == "no_target_enemy" then
-		creepPackOpportunity = self:CountEnemiesAround(
+		creepPackOpportunity = self:CountAbilityTargetsAround(
+			ability,
+			rule,
 			enemies,
 			hero:GetAbsOrigin(),
 			tonumber(rule.radius) or 450
 		) >= (tonumber(rule.minimum_targets) or 1)
 	elseif (rule.mode == "point_aoe" or rule.mode == "directional_point")
 		and self:IsCombatTarget(target) then
-		creepPackOpportunity = self:CountEnemiesAround(
+		creepPackOpportunity = self:CountAbilityTargetsAround(
+			ability,
+			rule,
 			enemies,
 			target:GetAbsOrigin(),
 			tonumber(rule.radius) or 325
@@ -2144,6 +2331,8 @@ function XHSBotBrain:BuildAbilityAction(hero, ability, rule, target, enemies, di
 		reason = mode,
 		control = rule.control == true,
 	}
+	local bossSpellOpportunity = XHSBotConfig:IsBossTarget(target)
+		and self:CanAbilityAffectEnemy(ability, target, rule)
 	if etherealPriority then
 		action.score = action.score + 55
 		action.reason = "spell priority: ethereal target"
@@ -2251,14 +2440,34 @@ function XHSBotBrain:BuildAbilityAction(hero, ability, rule, target, enemies, di
 		action.reason = "teamfight buff for " .. tostring(role or "ally")
 			.. ", focused by " .. tostring(context and context.focused_by or 0)
 	elseif mode == "no_target_enemy" then
-		local nearby = self:CountEnemiesAround(enemies, hero:GetAbsOrigin(), rule.radius or 450)
+		local nearby = self:CountAbilityTargetsAround(
+			ability,
+			rule,
+			enemies,
+			hero:GetAbsOrigin(),
+			rule.radius or 450
+		)
 		if nearby < (rule.minimum_targets or 1)
-			and not XHSBotConfig:IsBossTarget(target)
-			and not etherealPriority then return nil end
+			and not bossSpellOpportunity
+			and not etherealPriority then
+			self:RecordAbilityRejection(
+				record,
+				name,
+				"nearby targets " .. tostring(nearby)
+					.. "/" .. tostring(rule.minimum_targets or 1)
+			)
+			return nil
+		end
 		action.score = action.score + math.min(15, nearby * 3)
 		action.reason = tostring(nearby) .. " nearby enemies"
 	elseif mode == "no_target_mixed" then
-		local nearby = self:CountEnemiesAround(enemies, hero:GetAbsOrigin(), rule.radius or 550)
+		local nearby = self:CountAbilityTargetsAround(
+			ability,
+			rule,
+			enemies,
+			hero:GetAbsOrigin(),
+			rule.radius or 550
+		)
 		local lowestAlly, allyRatio = self:GetLowestHealthAlly(hero, rule.radius or 550)
 		local selfRatio = HealthRatio(hero)
 		local emergencySelfOpportunity = rule.healing == true
@@ -2301,13 +2510,33 @@ function XHSBotBrain:BuildAbilityAction(hero, ability, rule, target, enemies, di
 				.. ", enemies=" .. tostring(nearby)
 		end
 	elseif mode == "point_aoe" then
-		if not self:IsCombatTarget(target) then return nil end
+		if not self:IsCombatTarget(target) then
+			self:RecordAbilityRejection(record, name, "no point target")
+			return nil
+		end
 		local range = self:GetAbilityRange(hero, ability, target)
-		if Distance2D(hero:GetAbsOrigin(), target:GetAbsOrigin()) > range then return nil end
-		local nearby = self:CountEnemiesAround(enemies, target:GetAbsOrigin(), rule.radius or 325)
+		if Distance2D(hero:GetAbsOrigin(), target:GetAbsOrigin()) > range then
+			self:RecordAbilityRejection(record, name, "point target out of range")
+			return nil
+		end
+		local nearby = self:CountAbilityTargetsAround(
+			ability,
+			rule,
+			enemies,
+			target:GetAbsOrigin(),
+			rule.radius or 325
+		)
 		if nearby < (rule.minimum_targets or 1)
-			and not XHSBotConfig:IsBossTarget(target)
-			and not etherealPriority then return nil end
+			and not bossSpellOpportunity
+			and not etherealPriority then
+			self:RecordAbilityRejection(
+				record,
+				name,
+				"point targets " .. tostring(nearby)
+					.. "/" .. tostring(rule.minimum_targets or 1)
+			)
+			return nil
+		end
 		action.position = target:GetAbsOrigin()
 		action.target = target
 		action.score = action.score + math.min(18, nearby * 4)
@@ -2320,9 +2549,15 @@ function XHSBotBrain:BuildAbilityAction(hero, ability, rule, target, enemies, di
 			and targetDistance > tonumber(rule.travel_range) then
 			return nil
 		end
-		local nearby = self:CountEnemiesAround(enemies, targetOrigin, rule.radius or 425)
+		local nearby = self:CountAbilityTargetsAround(
+			ability,
+			rule,
+			enemies,
+			targetOrigin,
+			rule.radius or 425
+		)
 		if nearby < (rule.minimum_targets or 1)
-			and not XHSBotConfig:IsBossTarget(target)
+			and not bossSpellOpportunity
 			and not etherealPriority then return nil end
 		local direction = targetOrigin - heroOrigin
 		direction.z = 0
@@ -2414,13 +2649,25 @@ function XHSBotBrain:BuildAbilityAction(hero, ability, rule, target, enemies, di
 	elseif mode == "toggle_single" then
 		local manaReady = rule.mana_gate == false
 			or ManaRatio(hero) > (tonumber(rule.mana_threshold) or 0.20)
-		action.desired_state = target ~= nil and #enemies < 3 and manaReady
+		action.desired_state = target ~= nil
+			and self:CanAbilityAffectEnemy(ability, target, rule)
+			and #enemies < 3
+			and manaReady
 		action.score = ability:GetToggleState() == action.desired_state
 			and 0 or math.max(action.score, tonumber(rule.state_change_floor) or 87)
 	elseif mode == "toggle_aoe" then
 		local manaReady = rule.mana_gate == false
 			or ManaRatio(hero) > (tonumber(rule.mana_threshold) or 0.20)
-		action.desired_state = target ~= nil and #enemies >= (rule.minimum_targets or 3) and manaReady
+		local nearby = self:CountAbilityTargetsAround(
+			ability,
+			rule,
+			enemies,
+			hero:GetAbsOrigin(),
+			tonumber(rule.radius) or 450
+		)
+		action.desired_state = target ~= nil
+			and nearby >= (rule.minimum_targets or 3)
+			and manaReady
 		action.score = ability:GetToggleState() == action.desired_state
 			and 0 or math.max(action.score, tonumber(rule.state_change_floor) or 87)
 	elseif mode == "defensive_toggle" then
@@ -2429,7 +2676,9 @@ function XHSBotBrain:BuildAbilityAction(hero, ability, rule, target, enemies, di
 			and 0 or math.max(action.score, tonumber(rule.state_change_floor) or 87)
 	elseif mode == "autocast_attack" then
 		local manaReady = ManaRatio(hero) >= (tonumber(rule.mana_threshold) or 0.20)
-		action.desired_state = target ~= nil and manaReady
+		action.desired_state = target ~= nil
+			and self:CanAbilityAffectEnemy(ability, target, rule)
+			and manaReady
 		local enabled = ability.GetAutoCastState ~= nil and ability:GetAutoCastState() or false
 		action.score = enabled == action.desired_state
 			and 0 or math.max(action.score, tonumber(rule.state_change_floor) or 87)

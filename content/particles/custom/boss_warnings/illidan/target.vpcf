@@ -33,7 +33,7 @@
 				{
 					m_iControlPoint = 15
 					m_iAttachType = "PATTACH_WORLDORIGIN"
-					m_vecOffset = [ 102.0, 255.0, 64.0 ]
+					m_vecOffset = [ 255.0, 110.0, 35.0 ]
 					m_entityName = "self"
 				},
 				{

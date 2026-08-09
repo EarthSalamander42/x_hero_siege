@@ -1576,7 +1576,16 @@ function XHSBotTeamDirector:BuildAssignment(playerID, slot, phase, now, snapshot
 		and XHSBotCampaignDirector.GetObjective ~= nil
 		and XHSBotCampaignDirector:GetObjective(playerID, hero)
 		or nil
+	local sealedBossActive = phase >= 3
+		and IsValidEntityHandle(self.visible_boss)
+		and self.visible_boss:IsAlive()
+	local campaignShoppingLocked = sealedBossActive or (
+		phase >= 3
+		and campaignObjective ~= nil
+		and campaignObjective.non_combat ~= true
+	)
 	if campaignObjective ~= nil
+		and not campaignShoppingLocked
 		and self:IsShoppingAssignmentAllowed(playerID, record, hero) then
 		campaignObjective = nil
 	end
@@ -2018,7 +2027,17 @@ function XHSBotTeamDirector:ShouldReplaceAssignment(existing, phase, now, snapsh
 		)
 	local campaignGoal = type(campaignObjective) == "table"
 		and campaignObjective.goal or nil
-	if campaignShoppingAllowed then campaignGoal = nil end
+	local sealedBossActive = phase >= 3
+		and IsValidEntityHandle(self.visible_boss)
+		and self.visible_boss:IsAlive()
+	local campaignShoppingLocked = sealedBossActive or (
+		phase >= 3
+		and type(campaignObjective) == "table"
+		and campaignObjective.non_combat ~= true
+	)
+	if campaignShoppingAllowed and not campaignShoppingLocked then
+		campaignGoal = nil
+	end
 	local profile = IsValidEntityHandle(hero)
 		and XHSBotHeroProfiles:Get(hero:GetUnitName()) or nil
 	local canRespondToStructure = structureEmergency
@@ -2076,6 +2095,7 @@ function XHSBotTeamDirector:ShouldReplaceAssignment(existing, phase, now, snapsh
 	end
 
 	local shoppingAllowed = campaignShoppingAllowed
+		and not campaignShoppingLocked
 	local shoppingActive = not farmEventActive
 		and campaignGoal == nil
 		and forcedGoal == nil

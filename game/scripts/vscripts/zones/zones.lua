@@ -1921,7 +1921,9 @@ function CDungeonZone:HoldoutThink()
 
 			if CDungeonZone.nVIPsKilled > CDungeonZone.nVIPDeathsAllowed then
 				GameRules.GameMode:OnGameFinished()
-				GameRules:MakeTeamLose(DOTA_TEAM_GOODGUYS)
+				-- Keep every defeat on the normal completion path. MakeTeamLose enters
+				-- POST_GAME immediately and bypasses the final EndScreen snapshot.
+				GameRules:SetGameWinner(DOTA_TEAM_BADGUYS)
 			end
 
 			return

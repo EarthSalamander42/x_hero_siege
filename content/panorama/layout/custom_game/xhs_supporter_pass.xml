@@ -95,6 +95,7 @@
 										<Panel class="XHSPassProfileCopy">
 											<Label id="XHSPassPlayerName" class="XHSPassProfileName" text="#xhs_sp_player" />
 											<Label id="XHSPassPlayerTier" class="XHSPassProfileTier" text="#xhs_sp_free_player" />
+											<Label id="XHSPassAccessTimeline" class="XHSPassAccessTimeline" text="" />
 										</Panel>
 									</Panel>
 									<Panel class="XHSPassProgressBlock">
@@ -129,7 +130,7 @@
 											<Label id="XHSPassFragmentsValue" class="XHSPassHeaderStatValue" text="0" />
 										</Panel>
 										<Panel class="XHSPassHeaderStat">
-											<Label class="XHSPassHeaderStatLabel" text="#xhs_sp_daily_cap" />
+											<Label class="XHSPassHeaderStatLabel" text="#xhs_sp_daily_earnings" />
 											<Label id="XHSPassWeeklyCapValue" class="XHSPassHeaderStatValue" text="0 / 100" />
 										</Panel>
 										<Panel class="XHSPassHeaderStat">

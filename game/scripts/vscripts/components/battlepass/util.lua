@@ -572,6 +572,44 @@ local function ApplyTrustedItemsGameRuntime(battlepass, item)
 	return item, true
 end
 
+-- Unique companions are assigned by the backend, so requiring one manifest
+-- entry per owner would make every assignment depend on a game update. Trust
+-- only the entitlement identity here; the actual runtime unit must still be a
+-- companion definition shipped in this addon. No backend-provided model,
+-- particle or arbitrary unit path survives this boundary.
+local function ApplyTrustedUniqueCompanionRuntime(item)
+	if type(item) ~= "table" or item.unique_companion ~= true then
+		return item, false
+	end
+
+	local slot = NormalizeSupporterSlot(item.slot_id or item.item_type or item.type)
+	local itemID = tostring(
+		item.item_id
+		or item.entitlement_id
+		or item.catalog_item_id
+		or item.id
+		or ""
+	)
+	local unitName = tostring(item.unit or item.unit_name or "")
+	if slot ~= "companion"
+		or string.match(string.lower(itemID), "^unique_companion_[a-z0-9_:%.%-]+$") == nil
+		or unitName == "" then
+		return item, false
+	end
+
+	local companions = LoadKeyValues("scripts/npc/units/companions.txt") or {}
+	if type(companions[unitName]) ~= "table" then
+		return item, false
+	end
+
+	item = StripUntrustedSupporterRuntime(item)
+	item.runtime_manifest_blocked = nil
+	item.unit = unitName
+	item.unit_name = unitName
+	item.trusted_unique_companion_unit = true
+	return item, true
+end
+
 function Battlepass:HydrateSupporterRuntimeMetadata(item)
 	item = HydrateSupporterRuntimeMetadata(item, false)
 	local manifestApplied = false
@@ -584,6 +622,11 @@ function Battlepass:HydrateSupporterRuntimeMetadata(item)
 	local itemsGameApplied = false
 	item, itemsGameApplied = ApplyTrustedItemsGameRuntime(self, item)
 	if itemsGameApplied then
+		return HydrateSupporterRuntimeMetadata(item, true)
+	end
+	local uniqueCompanionApplied = false
+	item, uniqueCompanionApplied = ApplyTrustedUniqueCompanionRuntime(item)
+	if uniqueCompanionApplied then
 		return HydrateSupporterRuntimeMetadata(item, true)
 	end
 	if IsSupporterContentStudioRuntime(item) then
@@ -2722,15 +2765,24 @@ function Battlepass:GetSupporterPassEventPayload(event_source_index, event)
 	end
 
 	payload.PlayerID = nil
+	local playerID = XHSResolveEventPlayerID ~= nil
+		and XHSResolveEventPlayerID(event_source_index) or nil
+	if playerID == nil and api ~= nil and api.GetEventPlayerID ~= nil then
+		local ok, resolved = pcall(function()
+			return api:GetEventPlayerID(event_source_index, nil)
+		end)
+		if ok then playerID = tonumber(resolved) end
+	end
+
 	local sourceIndex = tonumber(event_source_index)
-	if sourceIndex ~= nil and sourceIndex > 0 then
+	if playerID == nil and sourceIndex ~= nil and sourceIndex > 0 then
 		local ok, sender = pcall(EntIndexToHScript, sourceIndex)
 		if ok and sender ~= nil and sender.GetPlayerID then
-			local playerID = tonumber(sender:GetPlayerID())
-			if playerID ~= nil and PlayerResource:IsValidPlayerID(playerID) then
-				payload.PlayerID = playerID
-			end
+			playerID = tonumber(sender:GetPlayerID())
 		end
+	end
+	if playerID ~= nil and PlayerResource:IsValidPlayerID(playerID) then
+		payload.PlayerID = playerID
 	end
 
 	return payload
@@ -2837,8 +2889,13 @@ function Battlepass:SupporterPassRequestAsset(event_source_index, event, resultE
 	local requestKey = requestType .. ":" .. category .. ":" .. assetID
 	local function fail(message)
 		self:SendSupporterPassFailure(playerID, resultEvent, message, {
-			request_key = requestKey, request_type = requestType, category = category,
-			asset_id = assetID, item_def = itemDef, request_id = requestID, accepted = false,
+			request_key = requestKey,
+			request_type = requestType,
+			category = category,
+			asset_id = assetID,
+			item_def = itemDef,
+			request_id = requestID,
+			accepted = false,
 		})
 	end
 
@@ -2897,14 +2954,24 @@ function Battlepass:SupporterPassRequestAsset(event_source_index, event, resultE
 		if player == nil then return end
 		if not ok then
 			return self:SendSupporterPassFailure(playerID, resultEvent, response and response.message or "#xhs_sp_request_failed", {
-				request_key = requestKey, request_type = requestType, category = category,
-				asset_id = assetID, item_def = itemDef, request_id = requestID, accepted = false,
+				request_key = requestKey,
+				request_type = requestType,
+				category = category,
+				asset_id = assetID,
+				item_def = itemDef,
+				request_id = requestID,
+				accepted = false,
 			})
 		end
 		CustomGameEventManager:Send_ServerToPlayer(player, resultEvent, {
-			request_key = requestKey, request_type = requestType, category = category,
-			asset_id = assetID, item_def = itemDef, request_id = requestID,
-			accepted = true, request_count = response and response.request_count or 1,
+			request_key = requestKey,
+			request_type = requestType,
+			category = category,
+			asset_id = assetID,
+			item_def = itemDef,
+			request_id = requestID,
+			accepted = true,
+			request_count = response and response.request_count or 1,
 			message = "#xhs_sp_request_recorded",
 		})
 	end)

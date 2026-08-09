@@ -30,6 +30,7 @@
 	var activeCurrentEventNotificationOffset = false;
 	var activeChannelNotification = null;
 	var activeChannelNotificationVersion = 0;
+	var activeAggregatedToasts = {};
 
 	function resolvePlayerIdentity(playerID, playerName, heroName) {
 		if (typeof XHSNameDisplay !== "undefined" && XHSNameDisplay.Resolve) {
@@ -624,14 +625,15 @@
 			return;
 		}
 
+		toast.progressPanel.style.transitionDuration = "0s";
 		toast.progressPanel.style.width = "100%";
-		toast.progressPanel.style.transitionDuration = duration + "s";
 
 		$.Schedule(0.03, function () {
 			if (!toast || toast.deleted) {
 				return;
 			}
 
+			toast.progressPanel.style.transitionDuration = duration + "s";
 			toast.progressPanel.style.width = "0%";
 		});
 	}
@@ -642,6 +644,9 @@
 		}
 
 		toast.deleted = true;
+		if (toast.aggregateMapKey && activeAggregatedToasts[toast.aggregateMapKey] === toast) {
+			delete activeAggregatedToasts[toast.aggregateMapKey];
+		}
 		toast.AddClass("XHSNotificationClosing");
 		toast.DeleteAsync(0.28);
 	}
@@ -659,11 +664,39 @@
 		}
 
 		msg = msg || {};
-		var notification = createToast(container, lane, msg);
+		var aggregateKey = String(msg.aggregate_key || "");
+		var aggregateMapKey = aggregateKey ? lane + ":" + aggregateKey : "";
 		var duration = getDuration(msg);
+		if (aggregateMapKey) {
+			var existing = activeAggregatedToasts[aggregateMapKey];
+			if (existing && !existing.deleted && (!existing.IsValid || existing.IsValid())) {
+				existing.aggregateCount += Math.max(0, Number(msg.aggregate_amount) || 0);
+				existing.aggregateVersion++;
+				var refreshVersion = existing.aggregateVersion;
+				var template = String(msg.aggregate_text || msg.text || "{count}");
+				msg.text = template.replace(/\{count\}/g, String(existing.aggregateCount));
+				existing.contentPanel.RemoveAndDeleteChildren();
+				addSegments(existing, msg);
+				startProgress(existing, duration);
+				$.Schedule(duration, function () {
+					if (existing.aggregateVersion === refreshVersion) closeToast(existing);
+				});
+				return existing;
+			}
+			var initialCount = Math.max(0, Number(msg.aggregate_amount) || 0);
+			msg.text = String(msg.aggregate_text || msg.text || "{count}").replace(/\{count\}/g, String(initialCount));
+		}
+		var notification = createToast(container, lane, msg);
+		if (aggregateMapKey) {
+			notification.aggregateMapKey = aggregateMapKey;
+			notification.aggregateCount = Math.max(0, Number(msg.aggregate_amount) || 0);
+			notification.aggregateVersion = 1;
+			activeAggregatedToasts[aggregateMapKey] = notification;
+		}
 		startProgress(notification, duration);
+		var closeVersion = notification.aggregateVersion || 0;
 		$.Schedule(duration, function () {
-			closeToast(notification);
+			if (!notification.aggregateMapKey || notification.aggregateVersion === closeVersion) closeToast(notification);
 		});
 
 		trimStack(container);
