@@ -501,6 +501,11 @@ function XHSMagtheridon_OnRespawned(boss, bossCount, empowerStacks)
 
 	boss.boss_count = bossCount or boss.boss_count or 1
 	boss.xhs_boss_bar_id = "magtheridon_" .. tostring(boss.boss_count)
+	-- RespawnMagtheridon creates a new entity, which needs its own health poller
+	-- even when Source recycles the previous Magtheridon's entity index.
+	boss.deathStart = nil
+	boss.xhs_boss_bar_suppressed = nil
+	boss.xhs_boss_bar_think_active = nil
 	boss.zone = "xhs_holdout"
 	RegisterDevSpawn(boss)
 	XHSMagtheridon_AttachPhase3AI(boss)

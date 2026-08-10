@@ -1039,6 +1039,279 @@
 	margin-top: 186px;
 }
 
+/*
+ * Special/kill encounters reuse the authoritative boss-bar panels, but occupy
+ * a compact row. Major phase bosses deliberately retain the cinematic layout.
+ */
+#DiretidePanel.CompactEncounterBars
+{
+	width: 560px;
+	margin-top: 112px;
+	flow-children: right-wrap;
+}
+
+#DiretidePanel.CompactEncounterBars.MultiBossBars
+{
+	width: 900px;
+}
+
+#DiretidePanel.CompactEncounterBars .HealthBarContainer.EncounterBossBar
+{
+	width: 560px;
+	height: 52px;
+	margin: 0px 0px 6px 0px;
+	padding: 4px 8px 5px 8px;
+	horizontal-align: left;
+	border: 1px solid #77c8ff38;
+	border-left: 3px solid #5ad0ff;
+	background-color: gradient( linear, 0% 0%, 100% 100%, from( #071827f2 ), color-stop( .62, #0a1626f0 ), to( #040914f5 ) );
+	box-shadow: fill #000000a5 0px 0px 10px 0px;
+}
+
+#DiretidePanel.CompactEncounterBars.MultiBossBars .HealthBarContainer.EncounterBossBar
+{
+	width: 440px;
+	margin: 0px 5px 6px 5px;
+}
+
+#DiretidePanel.CompactEncounterBars .HealthBarContainer.KillEventBossBar
+{
+	border-color: #ffc86955;
+	border-left-color: #ffb842;
+	background-color: gradient( linear, 0% 0%, 100% 100%, from( #211405f2 ), color-stop( .55, #151321f0 ), to( #050914f5 ) );
+	box-shadow: fill #000000a5 0px 0px 10px 0px, #ffb84220 0px 0px 9px 0px;
+}
+
+#DiretidePanel.CompactEncounterBars .HealthBarContainer.SpecialEventBossBar
+{
+	border-color: #72e8be4d;
+	border-left-color: #72e8be;
+	background-color: gradient( linear, 0% 0%, 100% 100%, from( #071c1af2 ), color-stop( .55, #091728f0 ), to( #040914f5 ) );
+	box-shadow: fill #000000a5 0px 0px 10px 0px, #72e8be1c 0px 0px 9px 0px;
+}
+
+#DiretidePanel.CompactEncounterBars .EncounterBossBar.HasBossCounter
+{
+	height: 70px;
+}
+
+#DiretidePanel.CompactEncounterBars .EncounterBossBar.HasBossTimer
+{
+	height: 72px;
+}
+
+#DiretidePanel.CompactEncounterBars .EncounterBossBar.HasBossCounter.HasBossTimer
+{
+	height: 90px;
+}
+
+#DiretidePanel.CompactEncounterBars .EncounterBossBar.HasBossCast
+{
+	height: 78px;
+}
+
+#DiretidePanel.CompactEncounterBars .EncounterBossBar.HasBossCast.HasBossCounter
+{
+	height: 96px;
+}
+
+#DiretidePanel.CompactEncounterBars .EncounterBossBar.HasBossCast.HasBossTimer
+{
+	height: 98px;
+}
+
+#DiretidePanel.CompactEncounterBars .EncounterBossBar.HasBossCast.HasBossCounter.HasBossTimer
+{
+	height: 116px;
+}
+
+#DiretidePanel.CompactEncounterBars .EncounterBossBar .BossHeader
+{
+	height: 18px;
+}
+
+#DiretidePanel.CompactEncounterBars .EncounterBossBar .HoldoutLabelSmall
+{
+	font-size: 14px;
+	letter-spacing: 1px;
+}
+
+#DiretidePanel.CompactEncounterBars .EncounterBossBar .HoldoutLabelSmall_alt
+{
+	font-size: 9px;
+	letter-spacing: 1px;
+	color: #b9d9eb;
+}
+
+#DiretidePanel.CompactEncounterBars .EncounterBossBar .BossProgressBarContainer
+{
+	height: 25px;
+}
+
+#DiretidePanel.CompactEncounterBars .EncounterBossBar .BossIcon
+{
+	width: 30px;
+	height: 24px;
+	margin-right: 7px;
+}
+
+#DiretidePanel.CompactEncounterBars .EncounterBossBar .BossBarMain
+{
+	width: 500px;
+	height: 22px;
+}
+
+#DiretidePanel.CompactEncounterBars.MultiBossBars .EncounterBossBar .BossBarMain
+{
+	width: 380px;
+}
+
+#DiretidePanel.CompactEncounterBars .EncounterBossBar .BossProgressBar
+{
+	height: 14px;
+}
+
+#DiretidePanel.CompactEncounterBars .EncounterBossBar .BossHealthLabel
+{
+	font-size: 11px;
+	letter-spacing: 0px;
+}
+
+#DiretidePanel.CompactEncounterBars .EncounterBossBar .BossThresholdMarker
+{
+	width: 8px;
+	height: 18px;
+	margin-top: -3px;
+	margin-left: -4px;
+}
+
+#DiretidePanel.CompactEncounterBars .EncounterBossBar .BossSelectionClose
+{
+	width: 18px;
+	height: 18px;
+	margin-top: -3px;
+}
+
+#DiretidePanel.CompactEncounterBars .EncounterBossBar .BossSelectionClose Label
+{
+	font-size: 15px;
+}
+
+#DiretidePanel.CompactEncounterBars .EncounterBossBar.SelectionCloseVisible .HoldoutLabelSmall_alt
+{
+	margin-right: 22px;
+}
+
+#DiretidePanel.CompactEncounterBars .EncounterBossBar .BossCastBar
+{
+	width: 500px;
+	height: 24px;
+	margin-left: 37px;
+	margin-top: 2px;
+}
+
+#DiretidePanel.CompactEncounterBars.MultiBossBars .EncounterBossBar .BossCastBar
+{
+	width: 380px;
+}
+
+#DiretidePanel.CompactEncounterBars .EncounterBossBar .BossCastIcon
+{
+	width: 20px;
+	height: 20px;
+	margin-left: 3px;
+	margin-top: 2px;
+}
+
+#DiretidePanel.CompactEncounterBars .EncounterBossBar .BossCastBody
+{
+	height: 22px;
+	margin-left: 5px;
+	margin-right: 6px;
+	margin-top: 1px;
+}
+
+#DiretidePanel.CompactEncounterBars .EncounterBossBar .BossCastHeader
+{
+	height: 12px;
+}
+
+#DiretidePanel.CompactEncounterBars .EncounterBossBar .BossCastLabel
+{
+	width: 390px;
+	height: 12px;
+	font-size: 10px;
+	letter-spacing: 1px;
+}
+
+#DiretidePanel.CompactEncounterBars.MultiBossBars .EncounterBossBar .BossCastLabel
+{
+	width: 270px;
+}
+
+#DiretidePanel.CompactEncounterBars .EncounterBossBar .BossCastTime
+{
+	width: 42px;
+	height: 12px;
+	font-size: 10px;
+}
+
+#DiretidePanel.CompactEncounterBars .EncounterBossBar .BossCastTrack
+{
+	height: 6px;
+	margin-top: 1px;
+}
+
+#DiretidePanel.CompactEncounterBars .EncounterBossBar .BossCounter,
+#DiretidePanel.CompactEncounterBars .EncounterBossBar .BossTimer
+{
+	width: 500px;
+	margin-left: 37px;
+	margin-top: 1px;
+}
+
+#DiretidePanel.CompactEncounterBars.MultiBossBars .EncounterBossBar .BossCounter,
+#DiretidePanel.CompactEncounterBars.MultiBossBars .EncounterBossBar .BossTimer
+{
+	width: 380px;
+}
+
+#DiretidePanel.CompactEncounterBars .EncounterBossBar .BossCounter
+{
+	height: 17px;
+}
+
+#DiretidePanel.CompactEncounterBars .EncounterBossBar .BossTimer
+{
+	height: 19px;
+}
+
+#DiretidePanel.CompactEncounterBars .EncounterBossBar .BossCounterLabel,
+#DiretidePanel.CompactEncounterBars .EncounterBossBar .BossCounterValue,
+#DiretidePanel.CompactEncounterBars .EncounterBossBar .BossTimerLabel,
+#DiretidePanel.CompactEncounterBars .EncounterBossBar .BossTimerValue
+{
+	height: 16px;
+	font-size: 10px;
+}
+
+#DiretidePanel.CompactEncounterBars .EncounterBossBar .BossTimerLabel
+{
+	width: 390px;
+}
+
+#DiretidePanel.CompactEncounterBars.MultiBossBars .EncounterBossBar .BossTimerLabel
+{
+	width: 270px;
+}
+
+/* 16:10 already reserves a taller vanilla top-bar area. */
+.AspectRatio16x10 #DiretidePanel.CompactEncounterBars,
+.AspectRatio16x10 #DiretidePanel.CompactEncounterBars.XHSFocusTimerActive
+{
+	margin-top: 96px;
+}
+
 @keyframes 'XHSBossDamageFlash'
 {
 	0% { brightness: 1.7; transform: translateX( -1px ); }

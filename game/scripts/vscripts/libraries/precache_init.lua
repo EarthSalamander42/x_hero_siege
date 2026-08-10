@@ -561,6 +561,8 @@ XHSPrecache:RegisterGroup("bosses", {
 		"particles/custom/boss_warnings/magtheridon/target.vpcf",
 		"particles/custom/boss_warnings/magtheridon/target_core.vpcf",
 		"particles/custom/boss_warnings/magtheridon/release.vpcf",
+		"particles/custom/bosses/magtheridon/fel_radius_precast_green.vpcf",
+		"particles/custom/bosses/magtheridon/infernal_ring_green.vpcf",
 		"particles/custom/boss_warnings/proudmoore/radius.vpcf",
 		"particles/custom/boss_warnings/proudmoore/line.vpcf",
 		"particles/custom/boss_warnings/proudmoore/target.vpcf",

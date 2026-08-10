@@ -9,6 +9,7 @@ local SPAWN_PARTICLE = "particles/units/heroes/hero_undying/undying_tombstone.vp
 local AMBIENT_PARTICLE = "particles/econ/items/undying/fall20_undying_head/fall20_undying_tombstone_ambient.vpcf"
 local COMPLETE_SOUND = "Hero_Omniknight.GuardianAngel.Cast"
 local TOMBSTONE_UNIT_NAME = "npc_xhs_hero_tombstone"
+local TOMBSTONE_CLICK_RADIUS = 180
 local tombstoneHeroByEntindex = {}
 
 local SupporterRecoveryEffects = require("components/battlepass/recovery_effects"):Init()
@@ -359,6 +360,35 @@ function XHSUnitTombstone:IsTombstone(unit)
 	return unit.GetUnitName ~= nil and unit:GetUnitName() == TOMBSTONE_UNIT_NAME
 end
 
+function XHSUnitTombstone:IsActiveInteraction(caster, tombstone)
+	if not IsValid(caster) or not self:IsTombstone(tombstone) then return false end
+	local ability = caster:FindAbilityByName("xhs_tombstone_revive_channel")
+	return ability ~= nil
+		and IsValidEntity(ability)
+		and not ability:IsNull()
+		and ability:IsChanneling()
+		and ability.xhs_tombstone == tombstone
+end
+
+-- A second click on the tombstone currently being revived must be a no-op.
+-- This is queried by the execute-order filter before the engine can interrupt
+-- the existing channel. Every order that does not resolve to that exact same
+-- tombstone is left untouched and therefore cancels the channel normally.
+function XHSUnitTombstone:IsRepeatedActiveInteractionOrder(caster, orderType, target, position)
+	if not IsValid(caster) or not caster:IsRealHero() or not caster:IsAlive() then
+		return false
+	end
+
+	local orderedTombstone = nil
+	if orderType == DOTA_UNIT_ORDER_MOVE_TO_TARGET or orderType == DOTA_UNIT_ORDER_ATTACK_TARGET then
+		orderedTombstone = target
+	elseif orderType == DOTA_UNIT_ORDER_MOVE_TO_POSITION and position ~= nil then
+		orderedTombstone = Entities:FindByNameNearest(TOMBSTONE_UNIT_NAME, position, TOMBSTONE_CLICK_RADIUS)
+	end
+
+	return self:IsActiveInteraction(caster, orderedTombstone)
+end
+
 function XHSUnitTombstone:RegisterHero(hero)
 	if not IsValid(hero) or not hero:IsRealHero() then return false end
 	if not hero:HasModifier("modifier_xhs_tombstone_interaction") then
@@ -377,6 +407,9 @@ function XHSUnitTombstone:BeginInteraction(caster, tombstone)
 	local hero = GetHeroFromTombstone(tombstone)
 	if not IsValid(hero) or hero:IsAlive() or caster == hero then
 		return false
+	end
+	if self:IsActiveInteraction(caster, tombstone) then
+		return true
 	end
 
 	caster.xhs_pending_tombstone_entindex = tombstone:entindex()

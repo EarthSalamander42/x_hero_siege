@@ -6,6 +6,9 @@ XHSBotDecisionAudit.schema = 3
 XHSBotDecisionAudit.sample_interval = 0.5
 XHSBotDecisionAudit.heartbeat_interval = 10
 XHSBotDecisionAudit.max_events = 3000
+-- The backend owns the complete audit chronology. Keep VConsole quiet: the
+-- Tools commands still return one bounded [XHSBots][QA] acknowledgement.
+XHSBotDecisionAudit.console_output_enabled = false
 XHSBotDecisionAudit.console_chunk_size = 1000
 XHSBotDecisionAudit.console_chunk_batch_size = 8
 XHSBotDecisionAudit.console_chunk_batch_interval = 0.05
@@ -163,6 +166,10 @@ local function SortedFieldText(fields)
 end
 
 local function EmitAuditLine(line)
+	if XHSBotDecisionAudit == nil
+		or XHSBotDecisionAudit.console_output_enabled ~= true then
+		return
+	end
 	line = string.sub(tostring(line or ""), 1, 2048)
 	local emitted = false
 	if type(NativePrint) == "function" then
@@ -321,7 +328,6 @@ function XHSBotDecisionAudit:Record(kind, playerID, signature, fields, aggregate
 	end
 	self.event_write_index = (slot % self.max_events) + 1
 	self.last_events[lastKey] = event
-	self:MaybeQueueConsoleChunk()
 	return event
 end
 
@@ -336,13 +342,6 @@ function XHSBotDecisionAudit:Start(reason)
 		reason = self.start_reason,
 		game_state = GameRules ~= nil and GameRules:State_Get() or -1,
 	}, false)
-	EmitAuditLine(
-		"[XHSBots][AUDIT] type=recording"
-			.. " status=started"
-			.. " started_at=" .. string.format("%.1f", self.started_at)
-			.. " reason=" .. AuditValue(self.start_reason, 64)
-			.. " auto_dump=post_game"
-	)
 	return true
 end
 
@@ -1015,6 +1014,10 @@ function XHSBotDecisionAudit:BuildBackendPayload(reason)
 		schema = tonumber(self.schema) or 3,
 		session = tostring(self.console_session_id or ""),
 		reason = tostring(reason or "backend"),
+		-- Live checkpoints and the terminal audit share the same session key on
+		-- the backend. This flag lets the admin UI distinguish a recoverable
+		-- in-progress snapshot from the immutable end-of-match dump.
+		finalized = self.finalized == true,
 		start_reason = tostring(self.start_reason or ""),
 		started_at = tonumber(self.started_at) or 0,
 		ended_at = endedAt,
@@ -1109,6 +1112,7 @@ function XHSBotDecisionAudit:StartConsoleChunkPrinter()
 end
 
 function XHSBotDecisionAudit:MaybeQueueConsoleChunk()
+	if self.console_output_enabled ~= true then return false end
 	local chunkSize = math.max(
 		1,
 		math.min(
@@ -1235,130 +1239,21 @@ function XHSBotDecisionAudit:PrintSummary(reason)
 end
 
 function XHSBotDecisionAudit:Dump(reason)
-	if self.event_count <= 0 and self.active ~= true and self.finalized ~= true then
+	local backendEventCount = #(self.backend_events or {})
+	if backendEventCount <= 0 and self.active ~= true and self.finalized ~= true then
 		return false, "audit_not_started", "events=0"
 	end
 	if self.active == true then self:SampleAll(true) end
 	self.dump_count = (tonumber(self.dump_count) or 0) + 1
-	self:PrintSummary(reason or "manual_dump")
-	local orderedEvents = self:GetOrderedEvents()
-	EmitAuditLine(
-		"[XHSBots][AUDIT] type=tail_begin"
-			.. " session=" .. AuditValue(self.console_session_id, 32)
-			.. " dump=" .. tostring(self.dump_count)
-			.. " count=" .. tostring(#orderedEvents)
-			.. " seq_first=" .. tostring(
-				orderedEvents[1] and orderedEvents[1].seq or 0
-			)
-			.. " seq_last=" .. tostring(
-				orderedEvents[#orderedEvents] and orderedEvents[#orderedEvents].seq or 0
-			)
-	)
-	for _, event in ipairs(orderedEvents) do
-		EmitAuditLine(FormatEventLine(event))
-	end
-	EmitAuditLine(
-		"[XHSBots][AUDIT] type=tail_end"
-			.. " session=" .. AuditValue(self.console_session_id, 32)
-			.. " dump=" .. tostring(self.dump_count)
-			.. " count=" .. tostring(#orderedEvents)
-	)
 	local botCount = 0
-	for playerID, stats in pairs(self.bot_stats or {}) do
+	for _ in pairs(self.bot_stats or {}) do
 		botCount = botCount + 1
-		local record = stats.final_record or {}
-		EmitAuditLine(
-			"[XHSBots][AUDIT] type=bot_diagnostic"
-				.. " pid=" .. tostring(playerID)
-				.. " hero=" .. AuditValue(stats.hero, 64)
-				.. " deaths=" .. tostring(stats.deaths or 0)
-				.. " respawns=" .. tostring(stats.respawns or 0)
-				.. " decisions_planned=" .. tostring(stats.decisions_planned or 0)
-				.. " decisions_executed=" .. tostring(stats.decisions_executed or 0)
-				.. " decisions_rejected=" .. tostring(stats.decisions_rejected or 0)
-				.. " purchase_attempts=" .. tostring(stats.purchase_attempts or 0)
-				.. " purchases=" .. tostring(stats.purchases or 0)
-				.. " items_sold=" .. tostring(record.items_sold or 0)
-				.. " sale_gold=" .. tostring(
-					record.item_sale_gold_recovered or 0
-				)
-				.. " last_sale=" .. AuditValue(
-					record.last_sold_item,
-					64
-				)
-				.. " last_sale_reason=" .. AuditValue(
-					record.last_sold_item_reason,
-					80
-				)
-				.. " basic_potions_obsolete=" .. tostring(
-					record.basic_potions_obsolete == true and 1 or 0
-				)
-				.. " purchase_failures=" .. tostring(stats.purchase_failures or 0)
-				.. " orb_purchases=" .. tostring(stats.orb_purchases or 0)
-				.. " arena_prep_tomes=" .. tostring(
-					stats.arena_preparation_tomes or 0
-				)
-				.. " arena_downtime_shops=" .. tostring(
-					stats.arena_downtime_shop_assignments or 0
-				)
-				.. " first_orb_at=" .. string.format("%.1f", tonumber(stats.first_orb_at) or -1)
-				.. " max_gold_without_orb=" .. tostring(stats.max_gold_without_orb or 0)
-				.. " orb_affordable_s=" .. string.format("%.1f", stats.orb_affordable_seconds or 0)
-				.. " shopping_s=" .. string.format("%.1f", stats.shopping_seconds or 0)
-				.. " retreat_s=" .. string.format("%.1f", stats.retreat_seconds or 0)
-				.. " retreat_stationary_s=" .. string.format(
-					"%.1f",
-					stats.retreat_stationary_seconds or 0
-				)
-				.. " missing_hero_s=" .. string.format(
-					"%.1f",
-					stats.missing_hero_seconds or 0
-				)
-				.. " final_ankh=" .. tostring(stats.last_ankh_charges or 0)
-					.. "/" .. tostring(stats.last_ankh_target or 0)
-				.. " life_insurance=" .. tostring(
-					type(record.shopping_goal) == "table"
-						and record.shopping_goal.life_insurance == true and 1 or 0
-				)
-				.. " phase1_off_lane_s=" .. string.format("%.1f", stats.phase1_off_lane_seconds or 0)
-				.. " lane_mismatch_s=" .. string.format("%.1f", stats.lane_mismatch_seconds or 0)
-				.. " base_ignored_s=" .. string.format(
-					"%.1f",
-					stats.base_response_ignored_seconds or 0
-				)
-				.. " low_threat_regroup_s=" .. string.format(
-					"%.1f",
-					stats.unnecessary_regroup_seconds or 0
-				)
-				.. " final_gold=" .. tostring(SafeGold(playerID))
-				.. " final_state=" .. AuditValue(record.state, 40)
-				.. " final_goal=" .. AuditValue(record.goal, 40)
-				.. " campaign_stage=" .. AuditValue(
-					XHSBotCampaignDirector ~= nil
-						and XHSBotCampaignDirector.stage or "",
-					48
-				)
-				.. " final_item=" .. AuditValue(record.planned_item, 64)
-				.. " issues=" .. AuditValue(self:BuildIssues(stats, record), 320)
-		)
 	end
-	EmitAuditLine(
-		"[XHSBots][AUDIT] type=end"
-			.. " reason=" .. AuditValue(reason, 64)
-			.. " events=" .. tostring(self.event_count or 0)
-			.. " flushed=" .. tostring(self.console_flushed_events or 0)
-			.. " chunks=" .. tostring(self.console_chunk_count or 0)
-			.. " pending_chunks=" .. tostring(#(self.console_chunks or {}))
+	return true, "audit_snapshot_ready",
+		"events=" .. tostring(#(self.backend_events or {}))
 			.. " bots=" .. tostring(botCount)
 			.. " dropped=" .. tostring(self.dropped_events or 0)
-			.. " dump=" .. tostring(self.dump_count)
-	)
-	return true, "audit_dumped",
-		"events=" .. tostring(self.event_count or 0)
-			.. " flushed=" .. tostring(self.console_flushed_events or 0)
-			.. " chunks=" .. tostring(self.console_chunk_count or 0)
-			.. " bots=" .. tostring(botCount)
-			.. " dropped=" .. tostring(self.dropped_events or 0)
+			.. " storage=backend"
 end
 
 function XHSBotDecisionAudit:Finalize(reason)
@@ -1391,11 +1286,6 @@ function XHSBotDecisionAudit:Status()
 			.. " dropped=" .. tostring(self.dropped_events or 0)
 			.. " started_at=" .. string.format("%.1f", self.started_at or 0)
 			.. " max_phase=" .. tostring(self.max_phase or 0)
-	EmitAuditLine(
-		"[XHSBots][AUDIT] type=status"
-			.. " status=" .. AuditValue(message, 32)
-			.. " " .. fields
-	)
 	return true, message, fields
 end
 

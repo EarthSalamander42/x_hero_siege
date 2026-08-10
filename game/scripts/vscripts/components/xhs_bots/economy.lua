@@ -158,6 +158,62 @@ function XHSBotEconomy:GetOpeningAbilityPriority(ability)
 	return math.floor(priority)
 end
 
+function XHSBotEconomy:HasNativeAttackCleave(hero)
+	if not IsValidEntityHandle(hero)
+		or hero.GetAbilityByIndex == nil
+		or hero.GetAbilityCount == nil then
+		return false
+	end
+	local function PositiveValue(value)
+		if type(value) == "number" then return value > 0 end
+		if type(value) == "string" then
+			return (tonumber(string.match(value, "[-+]?%d+%.?%d*")) or 0) > 0
+		end
+		if type(value) == "table" then
+			for _, nested in pairs(value) do
+				if PositiveValue(nested) then return true end
+			end
+		end
+		return false
+	end
+	local function HasPositiveCleave(values)
+		if type(values) ~= "table" then return false end
+		for key, value in pairs(values) do
+			if tostring(key) == "cleave_pct" and PositiveValue(value) then
+				return true
+			end
+			if type(value) == "table" and HasPositiveCleave(value) then
+				return true
+			end
+		end
+		return false
+	end
+	for abilityIndex = 0, math.max(0, tonumber(hero:GetAbilityCount()) or 0) - 1 do
+		local ability = hero:GetAbilityByIndex(abilityIndex)
+		if IsValidEntityHandle(ability)
+			and ability.GetAbilityKeyValues ~= nil then
+			local ok, keyValues = pcall(function()
+				return ability:GetAbilityKeyValues()
+			end)
+			local behavior = ok and type(keyValues) == "table"
+				and tostring(keyValues.AbilityBehavior or "") or ""
+			local isPassive = ability.IsPassive ~= nil and ability:IsPassive()
+			if isPassive or string.find(
+					behavior,
+					"DOTA_ABILITY_BEHAVIOR_PASSIVE",
+					1,
+					true
+				) then
+				if HasPositiveCleave(keyValues.AbilityValues)
+					or HasPositiveCleave(keyValues.AbilitySpecial) then
+					return true
+				end
+			end
+		end
+	end
+	return false
+end
+
 function XHSBotEconomy:GetOpeningAbilities(hero)
 	local candidates = {}
 	if not IsValidEntityHandle(hero)
@@ -315,6 +371,73 @@ function XHSBotEconomy:ShouldUseHealthPotionFirst(hero, potion, profile, record,
 	return not safeToFinish, spell
 end
 
+function XHSBotEconomy:GetHealthPotionDecision(hero, potion, record, difficulty)
+	difficulty = difficulty or {}
+	local maximumHealth = math.max(1, hero:GetMaxHealth())
+	local currentHealth = math.max(0, hero:GetHealth())
+	local healthRatio = currentHealth / maximumHealth
+	local missingHealth = math.max(0, maximumHealth - currentHealth)
+	local potionHeal = math.max(1, AbilitySpecialValue(potion, "hp_restore"))
+	local threshold = math.max(0, math.min(
+		1,
+		tonumber(difficulty.health_potion_threshold) or 0.42
+	))
+	local reason = "health percentage"
+
+	-- A fixed 3k heal becomes a small fraction of a late-game health pool. Scale
+	-- the recovery band only once the hero reaches 20k max HP, leaving the
+	-- established early-game threshold intact while allowing repeated cooldown
+	-- casts to repair a genuinely large deficit.
+	local largeStart = math.max(
+		1,
+		tonumber(difficulty.health_potion_large_health_start) or 20000
+	)
+	local largeFull = math.max(
+		largeStart + 1,
+		tonumber(difficulty.health_potion_large_health_full) or 80000
+	)
+	local largeTarget = math.max(
+		threshold,
+		tonumber(difficulty.health_potion_large_health_threshold) or 0.66
+	)
+	if maximumHealth > largeStart then
+		local progress = math.max(0, math.min(
+			1,
+			(maximumHealth - largeStart) / (largeFull - largeStart)
+		))
+		local scaled = threshold + (largeTarget - threshold) * progress
+		if scaled > threshold then
+			threshold = scaled
+			reason = "large health deficit"
+		end
+	end
+
+	local danger = record.was_in_active_danger == true
+		or (tonumber(record.focused_by_count) or 0) > 0
+		or (tonumber(record.recent_damage_ratio) or 0) >= 0.08
+		or (tonumber(record.combat_threat) or 0) >= 0.80
+	if danger then
+		local dangerThreshold = tonumber(
+			difficulty.health_potion_danger_threshold
+		) or 0.62
+		if dangerThreshold > threshold then
+			threshold = dangerThreshold
+			reason = "incoming damage"
+		end
+	end
+
+	-- Never consume a charge for negligible overheal. This is mostly defensive
+	-- for future potion variants because all current thresholds leave ample room.
+	local meaningfulDeficit = missingHealth >= math.min(
+		potionHeal * 0.65,
+		maximumHealth * 0.08
+	)
+	record.health_potion_use_threshold = threshold
+	record.health_potion_missing_health = missingHealth
+	record.health_potion_decision_reason = reason
+	return meaningfulDeficit and healthRatio <= threshold, reason
+end
+
 function XHSBotEconomy:UseConsumables(hero, record, difficulty, profile, encounter)
 	if not IsValidEntityHandle(hero) or not hero:IsAlive() then return false end
 
@@ -325,8 +448,18 @@ function XHSBotEconomy:UseConsumables(hero, record, difficulty, profile, encount
 		local item = hero:GetItemInSlot(slot)
 		if IsCastable(item) then
 			local name = ItemName(item)
+			local healthPotionReason = nil
+			local shouldUseHealth = false
+			if name == "item_health_potion" then
+				shouldUseHealth, healthPotionReason = self:GetHealthPotionDecision(
+					hero,
+					item,
+					record,
+					difficulty
+				)
+			end
 			local shouldUse = name == "item_health_potion"
-				and healthRatio <= (difficulty.health_potion_threshold or 0.42)
+				and shouldUseHealth
 				or not noCombatEncounter
 				and name == "item_mana_potion"
 				and manaRatio <= (difficulty.mana_potion_threshold or 0.30)
@@ -347,11 +480,15 @@ function XHSBotEconomy:UseConsumables(hero, record, difficulty, profile, encount
 					return false
 				end
 			end
+			local chargesBefore = item.GetCurrentCharges ~= nil
+				and math.max(0, tonumber(item:GetCurrentCharges()) or 0)
+				or 0
 			if shouldUse and XHSBotExecutor:Cast(hero, {
 					ability = item,
 					mode = "no_target",
+					urgent = name == "item_health_potion",
 					reason = name == "item_health_potion"
-						and "health potion threshold"
+						and tostring(healthPotionReason or "health potion threshold")
 						or "mana potion threshold",
 				}, record, 0) then
 				record.consumables_used = (record.consumables_used or 0) + 1
@@ -365,9 +502,6 @@ function XHSBotEconomy:UseConsumables(hero, record, difficulty, profile, encount
 						GameRules:GetGameTime()
 				end
 				if name == "item_health_potion" then
-					local chargesBefore = item.GetCurrentCharges ~= nil
-						and math.max(0, tonumber(item:GetCurrentCharges()) or 0)
-						or 0
 					local reserveTrigger = math.max(
 						0,
 						math.floor(tonumber(
@@ -411,6 +545,7 @@ function XHSBotEconomy:UseEmergencyTacticalItems(hero, record)
 	local function Use(name, reason)
 		if self:CastNamedActiveItem(hero, name, {
 				mode = "no_target",
+				urgent = true,
 				reason = reason,
 			}, record) then
 			record.emergency_item_uses = (record.emergency_item_uses or 0) + 1
@@ -1800,6 +1935,7 @@ function XHSBotEconomy:BuildPlannerSnapshot(playerID, hero, record)
 		attacks_per_second = attacksPerSecond,
 		attack_dps = attackDamage * attacksPerSecond,
 		is_ranged_attacker = isRangedAttacker,
+		has_native_attack_cleave = self:HasNativeAttackCleave(hero),
 		lane_anchor_distance = tonumber(record.lane_anchor_distance) or 0,
 		stuck_recoveries = tonumber(record.stuck_recoveries) or 0,
 		at_home_shop = self:IsAtRequiredShop(hero, "base"),
@@ -1824,6 +1960,14 @@ function XHSBotEconomy:StabilizePlan(record, plan, now)
 	if nextFamily == "" then
 		record.economy_plan_lock_family = nil
 		record.economy_plan_lock_started_at = nil
+		return plan
+	end
+	if plan.melee_cleave_core_forced == true then
+		-- A melee cleave core is a strategic farm prerequisite. Do not let the
+		-- short generic score hysteresis restore the family that happened to be
+		-- attractive before the opening package completed.
+		record.economy_plan_lock_family = nextFamily
+		record.economy_plan_lock_started_at = now
 		return plan
 	end
 	local lockedFamily = tostring(record.economy_plan_lock_family or "")
@@ -1884,6 +2028,9 @@ function XHSBotEconomy:RecordPlan(record, snapshot, plan)
 	record.opening_mask_first = plan.opening_mask_first == true
 	record.opening_orb_target = plan.opening_orb_target or 0
 	record.opening_tome_target = plan.opening_tome_target or 0
+	record.melee_cleave_core_required =
+		plan.melee_cleave_core_required == true
+	record.melee_cleave_core_forced = plan.melee_cleave_core_forced == true
 	record.attack_dps = math.floor(tonumber(snapshot.attack_dps) or 0)
 	record.active_item_slots = snapshot.active_slots or 0
 	record.inventory_item_slots = snapshot.inventory_slots or 0
@@ -3315,22 +3462,28 @@ function XHSBotEconomy:Think(playerID, hero, record, profile, difficulty)
 	record.economy_encounter_mode = encounter and encounter.id or ""
 	record.economy_no_combat = noCombatEncounter
 	record.economy_shopping_locked = shoppingLockedEncounter
+	record.minimum_order_interval = difficulty.min_order_interval
+	record.max_orders_per_second = difficulty.max_orders_per_second
+	record.defer_potion_for_spell_now = false
+	if self:UseEmergencyTacticalItems(hero, record) then return "item" end
+	-- Survival consumables are combat reactions, not economic decisions. Check
+	-- them every bot think (0.28s Normal / 0.55s Easy), before any pending
+	-- purchase, stash work, or shop route can return early.
+	if self:UseConsumables(
+			hero,
+			record,
+			difficulty,
+			profile,
+			encounter
+		) then
+		return "healing"
+	end
+	if record.defer_potion_for_spell_now == true then return nil end
 	if shoppingLockedEncounter then
 		-- Closed encounters own movement immediately, even if a shop trip was
 		-- active on the preceding tick. Emergency items remain legal, but the
 		-- economy must never pull an arena fighter toward an unreachable shop.
 		self:ClearShoppingGoal(record)
-		record.defer_potion_for_spell_now = false
-		if self:UseEmergencyTacticalItems(hero, record) then return "item" end
-		if self:UseConsumables(
-				hero,
-				record,
-				difficulty,
-				profile,
-				encounter
-			) then
-			return "healing"
-		end
 		return nil
 	end
 
@@ -3353,8 +3506,6 @@ function XHSBotEconomy:Think(playerID, hero, record, profile, difficulty)
 	record.next_economy_think = record.next_economy_think or 0
 	if now < record.next_economy_think then return nil end
 	record.next_economy_think = now + (difficulty.economy_think_interval or 1.5)
-	record.minimum_order_interval = difficulty.min_order_interval
-	record.max_orders_per_second = difficulty.max_orders_per_second
 
 	local atHomeShop = self:IsAtRequiredShop(hero, "base")
 	if atHomeShop and self:GetStashItemCount(hero) > 0 then
@@ -3427,8 +3578,6 @@ function XHSBotEconomy:Think(playerID, hero, record, profile, difficulty)
 		return "shopping"
 	end
 
-	record.defer_potion_for_spell_now = false
-	if self:UseEmergencyTacticalItems(hero, record) then return "item" end
 	if self:ReconcileLightningSwordUpgrade(
 		playerID,
 		hero,
@@ -3459,9 +3608,6 @@ function XHSBotEconomy:Think(playerID, hero, record, profile, difficulty)
 	end
 	if self:UseLootedTomes(hero, record) then
 		return "item"
-	end
-	if self:UseConsumables(hero, record, difficulty, profile, encounter) then
-		return "healing"
 	end
 	if record.defer_potion_for_spell_now == true then return nil end
 	if self:UseTacticalItems(hero, record, encounter) then return "item" end

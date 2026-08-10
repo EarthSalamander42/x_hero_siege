@@ -36,6 +36,8 @@ CustomGameEventManager:RegisterListener("supporter_pass_equip_item", Dynamic_Wra
 CustomGameEventManager:RegisterListener("supporter_pass_unequip_item", Dynamic_Wrap(Battlepass, "SupporterPassUnequipItem"))
 CustomGameEventManager:RegisterListener("supporter_pass_update_settings", Dynamic_Wrap(Battlepass, "SupporterPassUpdateSettings"))
 CustomGameEventManager:RegisterListener("supporter_pass_open_payment_portal", Dynamic_Wrap(Battlepass, "SupporterPassOpenPaymentPortal"))
+CustomGameEventManager:RegisterListener("supporter_pass_payment_options", Dynamic_Wrap(Battlepass, "SupporterPassPaymentOptions"))
+CustomGameEventManager:RegisterListener("supporter_pass_direct_checkout", Dynamic_Wrap(Battlepass, "SupporterPassDirectCheckout"))
 CustomGameEventManager:RegisterListener("supporter_pass_dev_test_reward", Dynamic_Wrap(Battlepass, "SupporterPassDevTestReward"))
 CustomGameEventManager:RegisterListener("supporter_pass_dev_stop_test", Dynamic_Wrap(Battlepass, "SupporterPassDevStopTest"))
 CustomGameEventManager:RegisterListener("supporter_pass_catalog_preview", Dynamic_Wrap(Battlepass, "SupporterPassCatalogPreview"))
@@ -3029,6 +3031,15 @@ local function FindSupporterShopItemInSection(section, itemID, depth, includeCom
 end
 
 function Battlepass:FindSupporterPassShopItem(itemID)
+	if SupporterPass ~= nil and type(SupporterPass.PublishedShop) == "table" then
+		local found = FindSupporterShopItemInSection(
+			SupporterPass.PublishedShop,
+			itemID,
+			0,
+			false
+		)
+		if found ~= nil then return found end
+	end
 	for _, key in ipairs({ "catalog", "permanent", "featured", "rotation", "hero" }) do
 		local value = CustomNetTables:GetTableValue("supporter_pass_shop", key) or {}
 		local found = FindSupporterShopItemInSection(value, itemID, 0, false)
@@ -3038,6 +3049,15 @@ function Battlepass:FindSupporterPassShopItem(itemID)
 end
 
 function Battlepass:FindSupporterPassRuntimeCatalogItem(itemID)
+	if SupporterPass ~= nil and type(SupporterPass.PublishedShop) == "table" then
+		local found = FindSupporterShopItemInSection(
+			SupporterPass.PublishedShop,
+			itemID,
+			0,
+			true
+		)
+		if found ~= nil then return found end
+	end
 	for _, key in ipairs({ "catalog", "permanent", "featured", "rotation", "hero" }) do
 		local value = CustomNetTables:GetTableValue("supporter_pass_shop", key) or {}
 		local found = FindSupporterShopItemInSection(value, itemID, 0, true)
@@ -3145,6 +3165,108 @@ function Battlepass:SupporterPassOpenPaymentPortal(event_source_index, event)
 			url = data.url,
 			expires_at = data.expires_at,
 		})
+	end)
+end
+
+Battlepass.SupporterDirectCheckoutState = Battlepass.SupporterDirectCheckoutState or {}
+
+function Battlepass:SupporterPassPaymentOptions(event_source_index, event)
+	event = self:GetSupporterPassEventPayload(event_source_index, event)
+	local playerID = event.PlayerID
+	local player = playerID ~= nil and PlayerResource:GetPlayer(playerID) or nil
+	if playerID == nil or not player or not api or not api.GetSupporterPaymentOptions then return end
+
+	api:GetSupporterPaymentOptions(playerID, function(success, data)
+		if not player or player:IsNull() then return end
+		CustomGameEventManager:Send_ServerToPlayer(player, success and "supporter_pass_payment_options_ready" or "supporter_pass_payment_options_failed", success and (data or {}) or {
+			message = data and data.message or "Payment options are unavailable.",
+			code = data and data.code or "supporter_payment_options_failed",
+		})
+	end)
+end
+
+function Battlepass:PollSupporterDirectCheckout(playerID, orderKey, attempt)
+	attempt = tonumber(attempt) or 0
+	local state = self.SupporterDirectCheckoutState[playerID]
+	if not state or state.order_key ~= orderKey then
+		return
+	end
+	if attempt >= 75 then
+		local player = PlayerResource:GetPlayer(playerID)
+		if player and not player:IsNull() then
+			CustomGameEventManager:Send_ServerToPlayer(player, "supporter_pass_direct_checkout_status", {
+				order_key = orderKey,
+				status = "verification_timeout",
+				message = "Automatic verification paused. A completed payment will still activate through the provider confirmation.",
+			})
+		end
+		self.SupporterDirectCheckoutState[playerID] = nil
+		return
+	end
+
+	Timers:CreateTimer(attempt == 0 and 2.0 or 4.0, function()
+		local player = PlayerResource:GetPlayer(playerID)
+		local current = self.SupporterDirectCheckoutState[playerID]
+		if not player or player:IsNull() or not current or current.order_key ~= orderKey then return end
+		api:GetSupporterDirectCheckoutStatus(playerID, orderKey, function(success, data)
+			local livePlayer = PlayerResource:GetPlayer(playerID)
+			local liveState = self.SupporterDirectCheckoutState[playerID]
+			if not livePlayer or livePlayer:IsNull() or not liveState or liveState.order_key ~= orderKey then return end
+			if success then
+				CustomGameEventManager:Send_ServerToPlayer(livePlayer, "supporter_pass_direct_checkout_status", data or {})
+				if data and data.terminal == true then
+					self.SupporterDirectCheckoutState[playerID] = nil
+					return
+				end
+			elseif attempt == 0 or attempt % 5 == 0 then
+				CustomGameEventManager:Send_ServerToPlayer(livePlayer, "supporter_pass_direct_checkout_status", {
+					order_key = orderKey,
+					status = "verification_unavailable",
+					message = data and data.message or "Payment verification is temporarily unavailable.",
+				})
+			end
+			self:PollSupporterDirectCheckout(playerID, orderKey, attempt + 1)
+		end)
+	end)
+end
+
+function Battlepass:SupporterPassDirectCheckout(event_source_index, event)
+	event = self:GetSupporterPassEventPayload(event_source_index, event)
+	local playerID = event.PlayerID
+	local player = playerID ~= nil and PlayerResource:GetPlayer(playerID) or nil
+	if playerID == nil or not player or not api or not api.CreateSupporterDirectCheckout then return end
+
+	local provider = tostring(event.provider or "")
+	local billingID = tostring(event.billing_id or "")
+	local tierID = tonumber(event.tier_id)
+	local allowedProviders = { wechat_pay = true, alipay = true }
+	local allowedBilling = { ["30_days"] = true, ["90_days"] = true, ["365_days"] = true }
+	if not allowedProviders[provider] or not allowedBilling[billingID] or not tierID or tierID < 1 or tierID > 5 then
+		CustomGameEventManager:Send_ServerToPlayer(player, "supporter_pass_direct_checkout_failed", {
+			message = "Choose a valid tier, duration, and payment method.",
+			code = "supporter_payment_selection_invalid",
+		})
+		return
+	end
+
+	api:CreateSupporterDirectCheckout(playerID, {
+		provider = provider,
+		billing_id = billingID,
+		tier_id = tierID,
+		request_id = tostring(event.request_id or ""),
+		locale = tostring(event.locale or "en"),
+	}, function(success, data)
+		if not player or player:IsNull() then return end
+		if not success or type(data) ~= "table" or type(data.checkout_url) ~= "string" or data.checkout_url == "" or type(data.order_key) ~= "string" then
+			CustomGameEventManager:Send_ServerToPlayer(player, "supporter_pass_direct_checkout_failed", {
+				message = data and data.message or "Unable to create the secure checkout.",
+				code = data and data.code or "supporter_payment_checkout_failed",
+			})
+			return
+		end
+		self.SupporterDirectCheckoutState[playerID] = { order_key = data.order_key, started_at = GameRules:GetGameTime() }
+		CustomGameEventManager:Send_ServerToPlayer(player, "supporter_pass_direct_checkout_ready", data)
+		self:PollSupporterDirectCheckout(playerID, data.order_key, 0)
 	end)
 end
 

@@ -18,6 +18,8 @@ var XHSSupporterPass = (function () {
 	var shopSearchTelemetrySerial = 0;
 	var supporterUITelemetrySequence = 0;
 	var shopDetailItem = null;
+	var shopTransportCache = null;
+	var shopTransportGeneration = -1;
 	var activePageName = "overview";
 	var currentArmoryFilter = "All";
 	var armorySearchByCategory = {};
@@ -370,6 +372,15 @@ var XHSSupporterPass = (function () {
 
 	function ResolveImageURL(imagePath) {
 		var rawImagePath = imagePath ? imagePath.toString().replace(/\\/g, "/") : "";
+		var lowerImagePath = rawImagePath.toLowerCase();
+		if (lowerImagePath.indexOf(".vpcf") !== -1 || lowerImagePath.indexOf("particles/") === 0) {
+			return "";
+		}
+		var supporterCDNMatch = rawImagePath.match(/^https?:\/\/cdn\.frostrose-studio\.com\/static\/images\/battlepass\/xhs-4\.0\/([^/?#]+)/i);
+		if (supporterCDNMatch) {
+			var supporterImageName = supporterCDNMatch[1].replace(/\.[^.]+$/, "").replace(/-/g, "_");
+			return "file://{images}/custom_game/battlepass/" + supporterImageName + ".png";
+		}
 		if (rawImagePath.indexOf("s2r://panorama/images/") === 0 || rawImagePath.indexOf("file://{images}/") === 0) {
 			return rawImagePath;
 		}
@@ -382,8 +393,11 @@ var XHSSupporterPass = (function () {
 		if (normalized.indexOf("custom_game/") === 0) {
 			return "file://{images}/" + normalized + ".png";
 		}
+		if (normalized.indexOf("battlepass/") === 0) {
+			return "file://{images}/custom_game/" + normalized + ".png";
+		}
 
-		var dotaRoots = ["badges/", "battlepass/", "compendium/", "econ/", "events/", "game_modes/", "heroes/", "items/", "spellicons/", "status_icons/"];
+		var dotaRoots = ["badges/", "compendium/", "econ/", "events/", "game_modes/", "heroes/", "items/", "spellicons/", "status_icons/"];
 		for (var i = 0; i < dotaRoots.length; i++) {
 			if (normalized.indexOf(dotaRoots[i]) === 0) {
 				return "s2r://panorama/images/" + normalized + "_png.vtex";
@@ -1812,10 +1826,44 @@ var XHSSupporterPass = (function () {
 		return normalizedItems;
 	}
 
+	function ResolveTransportedShopPayload(catalog) {
+		if (!catalog || ToNumber(catalog.transport_version, 0) < 2) {
+			return catalog;
+		}
+
+		var generation = ToNumber(catalog.transport_generation, -1);
+		if (shopTransportCache && shopTransportGeneration === generation) {
+			return shopTransportCache;
+		}
+
+		var chunkCount = Math.max(0, ToNumber(catalog.item_chunk_count, 0));
+		var items = [];
+		for (var index = 1; index <= chunkCount; index++) {
+			var chunk = GetTable("supporter_pass_shop", "items_" + index, null);
+			if (!chunk || ToNumber(chunk.generation, -2) !== generation) {
+				// Keep the last complete generation during the very short replication
+				// window. The server publishes the manifest only after every chunk.
+				return shopTransportCache;
+			}
+			items = items.concat(AsShopList(chunk.items));
+		}
+
+		var expectedCount = Math.max(0, ToNumber(catalog.item_count, items.length));
+		if (items.length !== expectedCount) {
+			return shopTransportCache;
+		}
+
+		var payload = CopyObject(catalog);
+		payload.items = items;
+		shopTransportCache = payload;
+		shopTransportGeneration = generation;
+		return payload;
+	}
+
 	function GetRawShopPayload() {
 		var catalog = GetTable("supporter_pass_shop", "catalog", null);
 		if (catalog) {
-			return catalog;
+			return ResolveTransportedShopPayload(catalog) || {};
 		}
 
 		var permanent = GetTable("supporter_pass_shop", "permanent", null);
@@ -3356,6 +3404,230 @@ var XHSSupporterPass = (function () {
 			locale: $.Language ? $.Language() : "en"
 		});
 		$.Schedule(12, function () { supporterPortalRequestPending = false; });
+	}
+
+	var chinaPaymentState = {
+		visible: false,
+		loading: false,
+		pending: false,
+		providers: [],
+		offers: [],
+		tier_id: 1,
+		billing_id: "30_days",
+		provider: "",
+		order_key: "",
+		request_id: "",
+	};
+
+	function SetChinaPaymentStatus(message, statusClass) {
+		var label = Panel("XHSPassChinaPaymentStatus");
+		if (!label) return;
+		label.text = message || "";
+		label.SetHasClass("IsError", statusClass === "error");
+		label.SetHasClass("IsSuccess", statusClass === "success");
+	}
+
+	function SetChinaPaymentVisible(visible) {
+		var overlay = Panel("XHSPassChinaPaymentOverlay");
+		if (!overlay) return;
+		chinaPaymentState.visible = visible === true;
+		overlay.SetHasClass("IsVisible", chinaPaymentState.visible);
+		overlay.hittest = chinaPaymentState.visible;
+		if (!chinaPaymentState.visible) return;
+
+		var player = GetLocalPlayerData();
+		chinaPaymentState.tier_id = Math.max(1, Math.min(5, ToNumber(player.tier_id, 1)));
+		chinaPaymentState.loading = true;
+		chinaPaymentState.pending = false;
+		chinaPaymentState.order_key = "";
+		chinaPaymentState.request_id = "";
+		SetChinaPaymentStatus("Loading secure WeChat Pay and Alipay options...", "");
+		RenderChinaPaymentFallback();
+		GameEvents.SendCustomGameEventToServer("supporter_pass_payment_options", {});
+		EmitSupporterUIEvent("china_payment_open", { source: "ingame_fallback" });
+	}
+
+	function FindChinaPaymentOffer(tierID) {
+		for (var i = 0; i < chinaPaymentState.offers.length; i++) {
+			var offer = chinaPaymentState.offers[i] || {};
+			if (ToNumber(offer.tier_id, 0) === ToNumber(tierID, 0)) return offer;
+		}
+		return null;
+	}
+
+	function FindChinaPaymentAccessPass(offer, billingID) {
+		var passes = AsArray(offer && offer.access_passes);
+		for (var i = 0; i < passes.length; i++) {
+			if ((passes[i].id || "").toString() === billingID) return passes[i];
+		}
+		return null;
+	}
+
+	function FindChinaPaymentProvider(providerID) {
+		for (var i = 0; i < chinaPaymentState.providers.length; i++) {
+			var provider = chinaPaymentState.providers[i] || {};
+			if ((provider.id || "").toString() === providerID) return provider;
+		}
+		return null;
+	}
+
+	function FormatChinaPaymentAmount(amountMinor, currency) {
+		var amount = Math.max(0, ToNumber(amountMinor, 0)) / 100;
+		var formatted = amount.toFixed(2).replace(".", ",");
+		return (currency || "EUR").toString().toUpperCase() === "EUR" ? formatted + " €" : formatted + " " + (currency || "EUR").toString().toUpperCase();
+	}
+
+	function CreateChinaPaymentChoice(parent, title, detail, selected, disabled, onActivate) {
+		var button = $.CreatePanel("Button", parent, "");
+		button.AddClass("XHSPassChinaPaymentChoice");
+		button.SetHasClass("IsSelected", selected === true);
+		button.SetHasClass("IsDisabled", disabled === true);
+		button.enabled = disabled !== true;
+		button.hittest = disabled !== true;
+		var titleLabel = $.CreatePanel("Label", button, "");
+		titleLabel.AddClass("XHSPassChinaPaymentChoiceTitle");
+		titleLabel.text = title || "";
+		var detailLabel = $.CreatePanel("Label", button, "");
+		detailLabel.AddClass("XHSPassChinaPaymentChoiceDetail");
+		detailLabel.text = detail || "";
+		if (!disabled && onActivate) button.SetPanelEvent("onactivate", onActivate);
+		return button;
+	}
+
+	function RenderChinaPaymentFallback() {
+		var tiersPanel = Panel("XHSPassChinaPaymentTiers");
+		var durationsPanel = Panel("XHSPassChinaPaymentDurations");
+		var providersPanel = Panel("XHSPassChinaPaymentProviders");
+		if (!tiersPanel || !durationsPanel || !providersPanel) return;
+		tiersPanel.RemoveAndDeleteChildren();
+		durationsPanel.RemoveAndDeleteChildren();
+		providersPanel.RemoveAndDeleteChildren();
+
+		var offers = chinaPaymentState.offers;
+		for (var i = 0; i < offers.length; i++) {
+			(function (offer) {
+				var tierID = ToNumber(offer.tier_id, 0);
+				if (tierID < 1 || tierID > 5) return;
+				CreateChinaPaymentChoice(
+					tiersPanel,
+					offer.name || ("Tier " + tierID),
+					"TIER " + tierID,
+					chinaPaymentState.tier_id === tierID,
+					chinaPaymentState.pending,
+					function () {
+						chinaPaymentState.tier_id = tierID;
+						Game.EmitSound("General.ButtonClick");
+						RenderChinaPaymentFallback();
+					}
+				);
+			})(offers[i] || {});
+		}
+
+		var durationDefinitions = [
+			{ id: "30_days", title: "1 MONTH", detail: "30 DAYS  /  1 个月" },
+			{ id: "90_days", title: "3 MONTHS", detail: "90 DAYS  /  3 个月" },
+			{ id: "365_days", title: "1 YEAR", detail: "2 MONTHS FREE  /  免费 2 个月" },
+		];
+		var selectedOffer = FindChinaPaymentOffer(chinaPaymentState.tier_id);
+		for (var d = 0; d < durationDefinitions.length; d++) {
+			(function (duration) {
+				var pass = FindChinaPaymentAccessPass(selectedOffer, duration.id);
+				CreateChinaPaymentChoice(
+					durationsPanel,
+					duration.title,
+					duration.detail,
+					chinaPaymentState.billing_id === duration.id,
+					!pass || chinaPaymentState.pending,
+					function () {
+						chinaPaymentState.billing_id = duration.id;
+						Game.EmitSound("General.ButtonClick");
+						RenderChinaPaymentFallback();
+					}
+				);
+			})(durationDefinitions[d]);
+		}
+
+		var providerDefinitions = [
+			{ id: "wechat_pay", title: "WECHAT PAY · 微信支付", detail: "STRIPE SECURE CHECKOUT  /  安全支付" },
+			{ id: "alipay", title: "ALIPAY · 支付宝", detail: "STRIPE SECURE CHECKOUT  /  安全支付" },
+		];
+		var firstConfiguredProvider = "";
+		for (var providerScan = 0; providerScan < providerDefinitions.length; providerScan++) {
+			var scannedProvider = FindChinaPaymentProvider(providerDefinitions[providerScan].id);
+			if (scannedProvider && IsTruthy(scannedProvider.configured, false) && IsTruthy(scannedProvider.one_time, false)) {
+				firstConfiguredProvider = providerDefinitions[providerScan].id;
+				break;
+			}
+		}
+		var currentProvider = FindChinaPaymentProvider(chinaPaymentState.provider);
+		if (!currentProvider || !IsTruthy(currentProvider.configured, false) || !IsTruthy(currentProvider.one_time, false)) {
+			chinaPaymentState.provider = firstConfiguredProvider;
+		}
+		for (var p = 0; p < providerDefinitions.length; p++) {
+			(function (definition) {
+				var provider = FindChinaPaymentProvider(definition.id);
+				var configured = !!provider && IsTruthy(provider.configured, false) && IsTruthy(provider.one_time, false);
+				CreateChinaPaymentChoice(
+					providersPanel,
+					definition.title,
+					configured ? definition.detail : "UNAVAILABLE  /  暂不可用",
+					chinaPaymentState.provider === definition.id,
+					!configured || chinaPaymentState.pending,
+					function () {
+						chinaPaymentState.provider = definition.id;
+						Game.EmitSound("General.ButtonClick");
+						RenderChinaPaymentFallback();
+					}
+				);
+			})(providerDefinitions[p]);
+		}
+
+		selectedOffer = FindChinaPaymentOffer(chinaPaymentState.tier_id);
+		var selectedPass = FindChinaPaymentAccessPass(selectedOffer, chinaPaymentState.billing_id);
+		var selectedProvider = FindChinaPaymentProvider(chinaPaymentState.provider);
+		var ready = !!selectedOffer && !!selectedPass && !!selectedProvider && IsTruthy(selectedProvider.configured, false) && !chinaPaymentState.loading && !chinaPaymentState.pending;
+		SetText("XHSPassChinaPaymentSelection", selectedOffer && selectedPass
+			? (selectedOffer.name + "  ·  " + (chinaPaymentState.billing_id === "30_days" ? "1 month" : chinaPaymentState.billing_id === "90_days" ? "3 months" : "1 year"))
+			: "Select a tier and fixed access period");
+		SetText("XHSPassChinaPaymentPrice", selectedPass ? FormatChinaPaymentAmount(selectedPass.amount_minor, selectedOffer.currency) : "--");
+		var continueButton = Panel("XHSPassChinaPaymentContinueButton");
+		if (continueButton) {
+			continueButton.enabled = ready;
+			continueButton.hittest = ready;
+			continueButton.SetHasClass("IsDisabled", !ready);
+		}
+	}
+
+	function CreateChinaPaymentRequestID() {
+		var now = Date.now ? Date.now() : Math.floor(Safe(function () { return Game.Time(); }, 0) * 1000);
+		return ("xhs_ingame_" + Players.GetLocalPlayer() + "_" + now + "_" + Math.floor(Math.random() * 1000000)).slice(0, 128);
+	}
+
+	function BeginChinaPaymentCheckout() {
+		if (chinaPaymentState.loading || chinaPaymentState.pending || !chinaPaymentState.provider) return;
+		var offer = FindChinaPaymentOffer(chinaPaymentState.tier_id);
+		var pass = FindChinaPaymentAccessPass(offer, chinaPaymentState.billing_id);
+		var provider = FindChinaPaymentProvider(chinaPaymentState.provider);
+		if (!offer || !pass || !provider || !IsTruthy(provider.configured, false)) {
+			SetChinaPaymentStatus("Choose an available tier, duration, and payment method.", "error");
+			return;
+		}
+		chinaPaymentState.pending = true;
+		chinaPaymentState.request_id = CreateChinaPaymentRequestID();
+		SetChinaPaymentStatus("Creating a secure Stripe Checkout session...  /  正在创建安全支付页面…", "");
+		RenderChinaPaymentFallback();
+		GameEvents.SendCustomGameEventToServer("supporter_pass_direct_checkout", {
+			provider: chinaPaymentState.provider,
+			tier_id: chinaPaymentState.tier_id,
+			billing_id: chinaPaymentState.billing_id,
+			request_id: chinaPaymentState.request_id,
+			locale: $.Language ? $.Language() : "en",
+		});
+		EmitSupporterUIEvent("china_checkout_start", {
+			provider: chinaPaymentState.provider,
+			tier_id: chinaPaymentState.tier_id,
+			billing_id: chinaPaymentState.billing_id,
+		});
 	}
 
 	function GetItemCategory(item) {
@@ -5577,6 +5849,30 @@ var XHSSupporterPass = (function () {
 			});
 		}
 
+		var chinaPaymentButton = Panel("XHSPassChinaPaymentButton");
+		if (chinaPaymentButton) {
+			chinaPaymentButton.SetPanelEvent("onactivate", function () {
+				Game.EmitSound("General.ButtonClick");
+				SetChinaPaymentVisible(true);
+			});
+		}
+
+		var chinaPaymentClose = Panel("XHSPassChinaPaymentCloseButton");
+		var chinaPaymentBackdrop = Panel("XHSPassChinaPaymentBackdrop");
+		var chinaPaymentCancel = Panel("XHSPassChinaPaymentCancelButton");
+		var closeChinaPayment = function () {
+			SetChinaPaymentVisible(false);
+			Game.EmitSound("General.Cancel");
+		};
+		if (chinaPaymentClose) chinaPaymentClose.SetPanelEvent("onactivate", closeChinaPayment);
+		if (chinaPaymentBackdrop) chinaPaymentBackdrop.SetPanelEvent("onactivate", closeChinaPayment);
+		if (chinaPaymentCancel) chinaPaymentCancel.SetPanelEvent("onactivate", closeChinaPayment);
+
+		var chinaPaymentContinue = Panel("XHSPassChinaPaymentContinueButton");
+		if (chinaPaymentContinue) {
+			chinaPaymentContinue.SetPanelEvent("onactivate", BeginChinaPaymentCheckout);
+		}
+
 		var backToTop = Panel("XHSPassBackToTopButton");
 		if (backToTop) {
 			backToTop.SetPanelEvent("onactivate", ScrollCurrentPageToTop);
@@ -5753,6 +6049,73 @@ var XHSSupporterPass = (function () {
 				supporterPortalRequestPending = false;
 				ShowActionMessage(payload && payload.message ? payload.message : "Unable to open the supporter payment page.", false);
 			});
+			GameEvents.Subscribe("supporter_pass_payment_options_ready", function (payload) {
+				payload = payload || {};
+				chinaPaymentState.loading = false;
+				chinaPaymentState.providers = AsArray(payload.providers);
+				chinaPaymentState.offers = AsArray(payload.offers);
+				var configuredCount = 0;
+				for (var providerIndex = 0; providerIndex < chinaPaymentState.providers.length; providerIndex++) {
+					if (IsTruthy((chinaPaymentState.providers[providerIndex] || {}).configured, false)) configuredCount++;
+				}
+				SetChinaPaymentStatus(configuredCount > 0
+					? "Choose a fixed access pass. Checkout opens in the Steam overlay.  /  选择有效期，支付页面将在 Steam 界面中打开。"
+					: "WeChat Pay and Alipay are not enabled on this server yet.", configuredCount > 0 ? "" : "error");
+				RenderChinaPaymentFallback();
+			});
+			GameEvents.Subscribe("supporter_pass_payment_options_failed", function (payload) {
+				chinaPaymentState.loading = false;
+				SetChinaPaymentStatus(payload && payload.message ? payload.message : "Payment options are temporarily unavailable.", "error");
+				RenderChinaPaymentFallback();
+			});
+			GameEvents.Subscribe("supporter_pass_direct_checkout_ready", function (payload) {
+				payload = payload || {};
+				chinaPaymentState.order_key = (payload.order_key || "").toString();
+				var checkoutURL = (payload.checkout_url || "").toString();
+				if (checkoutURL.indexOf("https://checkout.stripe.com/") !== 0) {
+					chinaPaymentState.pending = false;
+					SetChinaPaymentStatus("The payment provider returned an invalid checkout address.", "error");
+					RenderChinaPaymentFallback();
+					return;
+				}
+				SetChinaPaymentStatus("Secure checkout opened. Complete payment there; the game is verifying it automatically.  /  安全支付页面已打开，游戏将自动验证支付。", "");
+				OpenExternalURL(checkoutURL);
+				EmitSupporterUIEvent("china_checkout_opened", { provider: payload.provider || chinaPaymentState.provider });
+			});
+			GameEvents.Subscribe("supporter_pass_direct_checkout_failed", function (payload) {
+				chinaPaymentState.pending = false;
+				SetChinaPaymentStatus(payload && payload.message ? payload.message : "Unable to create the secure checkout.", "error");
+				RenderChinaPaymentFallback();
+				EmitSupporterUIEvent("china_checkout_failed", { provider: chinaPaymentState.provider, error_code: payload && payload.code });
+			});
+			GameEvents.Subscribe("supporter_pass_direct_checkout_status", function (payload) {
+				payload = payload || {};
+				var orderKey = (payload.order_key || "").toString();
+				if (chinaPaymentState.order_key && orderKey && orderKey !== chinaPaymentState.order_key) return;
+				if (IsTruthy(payload.confirmed, false) || (payload.status || "").toString() === "paid") {
+					chinaPaymentState.pending = false;
+					SetChinaPaymentStatus("Payment confirmed. Your supporter access is active.  /  支付已确认，支持者权益已生效。", "success");
+					RenderChinaPaymentFallback();
+					RenderAll();
+					EmitSupporterUIEvent("china_checkout_confirmed", { provider: payload.provider || chinaPaymentState.provider, tier_id: payload.tier_id || chinaPaymentState.tier_id });
+					return;
+				}
+				if (IsTruthy(payload.terminal, false) || IsTruthy(payload.failed, false)) {
+					chinaPaymentState.pending = false;
+					SetChinaPaymentStatus("Payment was not completed. You can safely try again.", "error");
+					RenderChinaPaymentFallback();
+					return;
+				}
+				if ((payload.status || "").toString() === "verification_unavailable") {
+					SetChinaPaymentStatus(payload.message || "Payment received by the provider; verification will retry automatically.", "");
+				} else if ((payload.status || "").toString() === "verification_timeout") {
+					chinaPaymentState.pending = false;
+					SetChinaPaymentStatus(payload.message || "Automatic verification paused. A completed payment will still activate securely; you may also try again.", "");
+					RenderChinaPaymentFallback();
+				} else {
+					SetChinaPaymentStatus("Waiting for Stripe confirmation... Keep this game open.  /  正在等待 Stripe 确认…", "");
+				}
+			});
 			GameEvents.Subscribe("supporter_pass_catalog_preview_result", function (payload) {
 				payload = payload || {};
 				var requestID = (payload.request_id || "").toString();
@@ -5869,7 +6232,13 @@ var XHSSupporterPass = (function () {
 
 		if (CustomNetTables.SubscribeNetTableListener) {
 			CustomNetTables.SubscribeNetTableListener("supporter_pass_player", RenderAll);
-			CustomNetTables.SubscribeNetTableListener("supporter_pass_shop", RenderAll);
+			CustomNetTables.SubscribeNetTableListener("supporter_pass_shop", function (tableName, key) {
+				// Catalog is the normal atomic generation switch. Listening to chunk
+				// keys too makes late/out-of-order client replication self-healing.
+				if (key === "catalog" || /^items_\d+$/.test(key || "")) {
+					RenderAll();
+				}
+			});
 			CustomNetTables.SubscribeNetTableListener("supporter_pass_meta", RenderAll);
 			var renderPublishedTrack = function (tableName, key) {
 				// The server publishes all five chunks before switching this

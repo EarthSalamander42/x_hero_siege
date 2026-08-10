@@ -957,12 +957,22 @@ function XHSPerformanceTelemetry:BuildSample()
 end
 
 function XHSPerformanceTelemetry:DetectIncident(sample)
+	if type(sample) ~= "table" then return end
+
 	local reasons = {}
-	if sample.server_sim_lag_ms_p95 >= SERVER_SIM_LAG_INCIDENT_MS then
+	local serverSimLagP95 = tonumber(sample.server_sim_lag_ms_p95)
+	local serverSimLagThreshold = tonumber(SERVER_SIM_LAG_INCIDENT_MS)
+	if serverSimLagP95 ~= nil
+		and serverSimLagThreshold ~= nil
+		and serverSimLagP95 >= serverSimLagThreshold then
 		table.insert(reasons, "server_sim_lag")
 	end
 	for _, player in ipairs(sample.players or {}) do
-		if player.fps_p5 < CLIENT_FPS_INCIDENT then
+		local fpsP5 = type(player) == "table" and tonumber(player.fps_p5) or nil
+		local clientFpsThreshold = tonumber(CLIENT_FPS_INCIDENT)
+		if fpsP5 ~= nil
+			and clientFpsThreshold ~= nil
+			and fpsP5 < clientFpsThreshold then
 			table.insert(reasons, "client_fps")
 			break
 		end
@@ -983,8 +993,8 @@ function XHSPerformanceTelemetry:DetectIncident(sample)
 				start_sequence = math.max(0, sample.sequence - INCIDENT_CONTEXT_SAMPLES),
 				end_sequence = sample.sequence,
 				reasons = reasons,
-				peak_server_sim_lag_ms = sample.server_sim_lag_ms_max,
-				peak_server_frame_ms = sample.server_sim_lag_ms_max,
+				peak_server_sim_lag_ms = tonumber(sample.server_sim_lag_ms_max) or 0,
+				peak_server_frame_ms = tonumber(sample.server_sim_lag_ms_max) or 0,
 				min_client_fps_p5 = nil,
 				dirty = true,
 			}
@@ -1011,14 +1021,16 @@ function XHSPerformanceTelemetry:DetectIncident(sample)
 		self.active_incident.end_sequence = sample.sequence
 		self.active_incident.peak_server_sim_lag_ms = math.max(
 			self.active_incident.peak_server_sim_lag_ms or 0,
-			sample.server_sim_lag_ms_max
+			tonumber(sample.server_sim_lag_ms_max) or 0
 		)
 		self.active_incident.peak_server_frame_ms =
 			self.active_incident.peak_server_sim_lag_ms
 		for _, player in ipairs(sample.players or {}) do
-			if self.active_incident.min_client_fps_p5 == nil
-				or player.fps_p5 < self.active_incident.min_client_fps_p5 then
-				self.active_incident.min_client_fps_p5 = player.fps_p5
+			local fpsP5 = type(player) == "table" and tonumber(player.fps_p5) or nil
+			if fpsP5 ~= nil
+				and (self.active_incident.min_client_fps_p5 == nil
+					or fpsP5 < self.active_incident.min_client_fps_p5) then
+				self.active_incident.min_client_fps_p5 = fpsP5
 			end
 		end
 		self.active_incident.dirty = true
@@ -1033,16 +1045,21 @@ function XHSPerformanceTelemetry:DetectIncident(sample)
 end
 
 function XHSPerformanceTelemetry:UpdateSummary(sample)
+	if type(sample) ~= "table" then return end
+
 	local summary = self.summary
+	local serverSimLag = tonumber(sample.server_sim_lag_ms) or 0
+	local serverSimLagMax = tonumber(sample.server_sim_lag_ms_max) or 0
+	local serverSimHealth = tonumber(sample.server_sim_health_pct) or 100
 	summary.sample_count = summary.sample_count + 1
 	summary.first_game_time = summary.first_game_time or sample.game_time
 	summary.last_game_time = sample.game_time
 	summary.server_sim_lag_ms_sum =
-		summary.server_sim_lag_ms_sum + sample.server_sim_lag_ms
+		summary.server_sim_lag_ms_sum + serverSimLag
 	summary.server_sim_lag_ms_max =
-		math.max(summary.server_sim_lag_ms_max, sample.server_sim_lag_ms_max)
+		math.max(summary.server_sim_lag_ms_max, serverSimLagMax)
 	summary.server_sim_health_pct_sum =
-		summary.server_sim_health_pct_sum + sample.server_sim_health_pct
+		summary.server_sim_health_pct_sum + serverSimHealth
 	summary.server_observer_interval_ms_sum =
 		summary.server_observer_interval_ms_sum
 		+ (tonumber(sample.server_observer_interval_ms) or 0)
@@ -1053,8 +1070,8 @@ function XHSPerformanceTelemetry:UpdateSummary(sample)
 	-- Schema-1 aliases retained for the existing backend normalization.
 	summary.server_frame_ms_sum = summary.server_sim_lag_ms_sum
 	summary.server_frame_ms_max = summary.server_sim_lag_ms_max
-	summary.creeps_max = math.max(summary.creeps_max, sample.creeps)
-	summary.total_units_max = math.max(summary.total_units_max, sample.total_units)
+	summary.creeps_max = math.max(summary.creeps_max, tonumber(sample.creeps) or 0)
+	summary.total_units_max = math.max(summary.total_units_max, tonumber(sample.total_units) or 0)
 	for metricName, _ in pairs(ACTIVITY_INCIDENT_THRESHOLDS) do
 		local summaryName = metricName .. "_max"
 		summary[summaryName] = math.max(
@@ -1063,8 +1080,10 @@ function XHSPerformanceTelemetry:UpdateSummary(sample)
 		)
 	end
 	for _, player in ipairs(sample.players or {}) do
-		if summary.client_fps_p5_min == nil or player.fps_p5 < summary.client_fps_p5_min then
-			summary.client_fps_p5_min = player.fps_p5
+		local fpsP5 = type(player) == "table" and tonumber(player.fps_p5) or nil
+		if fpsP5 ~= nil
+			and (summary.client_fps_p5_min == nil or fpsP5 < summary.client_fps_p5_min) then
+			summary.client_fps_p5_min = fpsP5
 		end
 	end
 end

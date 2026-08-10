@@ -224,6 +224,24 @@ if Log == nil then
 			ptr = ptr + 1
 		end
 
+		-- Stack offsets are not stable when debug.getinfo is invoked through
+		-- pcall or another wrapper. Drop our own frames explicitly so trace[1]
+		-- always identifies the code that called print/log.*.
+		while #trace > 0 do
+			local frame = trace[1] or {}
+			local source = tostring(frame.short_src or frame.source or "")
+				:gsub("\\", "/")
+				:lower()
+			local isInternal = string.match(source, "libraries/adv_log%.lua$") ~= nil
+			local isCFrame = source == "[c]"
+				or source == "=[c]"
+				or tostring(frame.what or ""):upper() == "C"
+			if not isInternal and not isCFrame then
+				break
+			end
+			table.remove(trace, 1)
+		end
+
 		return trace
 	end
 

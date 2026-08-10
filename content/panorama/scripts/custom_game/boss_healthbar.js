@@ -4,6 +4,7 @@ var BossBarState = {};
 var BossBarIdentity = {};
 var BossBarEntityIndex = {};
 var BossBarSelectionOnly = {};
+var BossBarDisplayMode = {};
 var RetiredBossBarIdentity = {};
 var BossCastState = {};
 var LastPortraitEntityIndex = -1;
@@ -161,8 +162,61 @@ function SetBossBarIdentity(index, args) {
 	}
 }
 
+function NormalizeBossBarDisplayMode(args) {
+	var mode = String(args && args.boss_bar_display_mode || "major_boss").toLowerCase();
+	return mode === "kill_event" || mode === "special_event" ? mode : "major_boss";
+}
+
+function ApplyBossBarDisplayMode(index, panels, args) {
+	if (!panels || !panels.container) {
+		return;
+	}
+
+	var mode = NormalizeBossBarDisplayMode(args);
+	BossBarDisplayMode[index] = mode;
+	panels.container.SetHasClass("EncounterBossBar", mode !== "major_boss");
+	panels.container.SetHasClass("KillEventBossBar", mode === "kill_event");
+	panels.container.SetHasClass("SpecialEventBossBar", mode === "special_event");
+	panels.container.SetHasClass("MajorBossBar", mode === "major_boss");
+}
+
+function FindBossHudPanel(id) {
+	var panel = $.GetContextPanel();
+	while (panel) {
+		if (panel.id === id) {
+			return panel;
+		}
+		var found = panel.FindChildTraverse ? panel.FindChildTraverse(id) : null;
+		if (found) {
+			return found;
+		}
+		panel = panel.GetParent ? panel.GetParent() : null;
+	}
+	return null;
+}
+
+function SyncEncounterTimerLayout(encounterCount, encounterHasCast) {
+	var focusTimers = FindBossHudPanel("XHSFocusTimers");
+	if (focusTimers) {
+		focusTimers.SetHasClass("XHSEncounterBossBarsAbove", encounterCount > 0);
+		focusTimers.SetHasClass("XHSEncounterBossCastAbove", encounterCount > 0 && encounterHasCast);
+	}
+
+	var config = GameUI.CustomUIConfig ? GameUI.CustomUIConfig() : null;
+	if (config) {
+		config.xhsEncounterBossBarCount = encounterCount;
+		config.xhsEncounterBossCastVisible = encounterCount > 0 && encounterHasCast;
+		if (typeof config.XHSRefreshEncounterTimerLayout === "function") {
+			config.XHSRefreshEncounterTimerLayout();
+		}
+	}
+}
+
 function UpdateBossBarLayout() {
 	var visibleCount = 0;
+	var encounterCount = 0;
+	var majorCount = 0;
+	var encounterHasCast = false;
 	var root = $("#DiretidePanel");
 	var visiblePanels = [];
 
@@ -176,6 +230,12 @@ function UpdateBossBarLayout() {
 		if (visible) {
 			visibleCount++;
 			visiblePanels.push(panels.container);
+			if (BossBarDisplayMode[i] === "kill_event" || BossBarDisplayMode[i] === "special_event") {
+				encounterCount++;
+				encounterHasCast = encounterHasCast || panels.container.BHasClass("HasBossCast");
+			} else {
+				majorCount++;
+			}
 		}
 	}
 
@@ -183,11 +243,16 @@ function UpdateBossBarLayout() {
 		root.SetHasClass("SingleBossBar", visibleCount === 1);
 		root.SetHasClass("MultiBossBars", visibleCount > 1);
 		root.SetHasClass("OddBossBars", visibleCount > 1 && (visibleCount % 2) === 1);
+		root.SetHasClass("CompactEncounterBars", encounterCount > 0 && majorCount === 0);
+		root.SetHasClass("DualEncounterBars", encounterCount === 2 && majorCount === 0);
+		root.SetHasClass("MixedBossBarModes", encounterCount > 0 && majorCount > 0);
 	}
 
 	if (visibleCount > 1 && (visibleCount % 2) === 1) {
 		visiblePanels[visiblePanels.length - 1].SetHasClass("CenteredBossBar", true);
 	}
+
+	SyncEncounterTimerLayout(encounterCount, encounterHasCast);
 }
 
 function ResetBossPanels(index, panels) {
@@ -216,6 +281,10 @@ function ResetBossPanels(index, panels) {
 	panels.container.RemoveClass("BossHealed");
 	panels.container.RemoveClass("BossHeavyDamage");
 	panels.container.RemoveClass("SelectionCloseVisible");
+	panels.container.RemoveClass("EncounterBossBar");
+	panels.container.RemoveClass("KillEventBossBar");
+	panels.container.RemoveClass("SpecialEventBossBar");
+	panels.container.RemoveClass("MajorBossBar");
 	panels.label.text = "";
 	panels.level.text = "";
 	panels.level.style.visibility = "collapse";
@@ -268,6 +337,7 @@ function ResetBossPanels(index, panels) {
 	delete BossBarIdentity[index];
 	delete BossBarEntityIndex[index];
 	delete BossBarSelectionOnly[index];
+	delete BossBarDisplayMode[index];
 	delete BossCastState[index];
 }
 
@@ -440,6 +510,14 @@ function SetBossAnkhCount(panels, args) {
 		return;
 	}
 
+	var mode = NormalizeBossBarDisplayMode(args);
+	if (mode === "kill_event" || mode === "special_event") {
+		panels.level.text = mode === "kill_event" ? "KILL EVENT" : "SPECIAL EVENT";
+		panels.level.style.visibility = "visible";
+		panels.level.SetHasClass("BossAnkhBadge", false);
+		return;
+	}
+
 	panels.level.text = "";
 	panels.level.style.visibility = "collapse";
 	panels.level.SetHasClass("BossAnkhBadge", false);
@@ -550,6 +628,7 @@ function ShowBossBar(args) {
 		}
 		ResetBossPanels(index, panels);
 		SetBossBarIdentity(index, args);
+		ApplyBossBarDisplayMode(index, panels, args);
 		BossBarEntityIndex[index] = Number(args.boss_entindex) || -1;
 		BossBarSelectionOnly[index] = Number(args.selection_only) === 1;
 		SetBossIcon(panels, args.boss_icon);
@@ -585,6 +664,7 @@ function UpdateBossBar(args) {
 			panels.container.style.visibility = "visible";
 		}
 		SetBossBarIdentity(index, args);
+		ApplyBossBarDisplayMode(index, panels, args);
 		if (args.boss_entindex !== undefined && args.boss_entindex !== null) {
 			BossBarEntityIndex[index] = Number(args.boss_entindex) || -1;
 		}

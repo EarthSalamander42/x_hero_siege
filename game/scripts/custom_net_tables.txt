@@ -35,6 +35,7 @@
 		"xhs_sogat_leaderboard",
 		"xhs_castle_bar",
 		"xhs_clone_units",
+		"xhs_creep_health_bars",
 		"xhs_bootstrap_status",
 	]
 }

@@ -131,6 +131,20 @@ function XHSBotExecutor:Move(hero, position, record, label, jitter)
 	return true
 end
 
+-- Instant survival items must not lose a lethal race because a movement or
+-- attack order consumed the ordinary per-second budget just before the item
+-- became castable. Keep a very small duplicate guard, but deliberately bypass
+-- the shared movement/action throttle for this one urgent cast.
+function XHSBotExecutor:CanIssueUrgent(record, signature)
+	if type(record) ~= "table" then return false end
+	local now = GameTime()
+	if record.last_order_signature == signature
+		and now - (record.last_order_at or 0) < 0.12 then
+		return false
+	end
+	return true
+end
+
 function XHSBotExecutor:AttackMove(hero, position, record, label, jitter)
 	if not IsValidEntityHandle(hero) or position == nil then
 		return self:Reject(record, "invalid attack-move target")
@@ -409,7 +423,13 @@ function XHSBotExecutor:Cast(hero, abilityAction, record, jitter)
 		order.OrderType = DOTA_UNIT_ORDER_CAST_NO_TARGET
 	end
 
-	if not self:CanIssue(record, signature, 0.75) then return false end
+	local canIssue = nil
+	if abilityAction.urgent == true then
+		canIssue = self:CanIssueUrgent(record, signature)
+	else
+		canIssue = self:CanIssue(record, signature, 0.75)
+	end
+	if not canIssue then return false end
 	-- Read timing before issuing the order. Consumables can be removed from the
 	-- inventory synchronously, invalidating their ability handle immediately.
 	local castPoint = 0

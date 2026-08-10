@@ -20,6 +20,8 @@ var custom_poll_status_text = "";
 var player_loading_rows = {};
 var player_loading_section_rows = {};
 var player_loading_order_signature = "";
+var player_loading_panel_serial = 0;
+var loading_screen_context_panel = $.GetContextPanel();
 var player_loading_profile_hover = null;
 var player_loading_profile_hover_player_id = -1;
 var selected_profile_player_id = -1;
@@ -3276,7 +3278,24 @@ function GetPlayerDisplayName(player_id, player_info) {
 		: hero_name.replace(/^npc_dota_hero_/, "").replace(/_/g, " ").toUpperCase();
 }
 
+function IsLoadingScreenContextValid() {
+	return !!loading_screen_context_panel &&
+		(!loading_screen_context_panel.IsValid || loading_screen_context_panel.IsValid());
+}
+
+function SchedulePlayerLoadingSidebar(delay) {
+	$.Schedule(delay, function () {
+		if (IsLoadingScreenContextValid()) {
+			UpdatePlayerLoadingSidebar();
+		}
+	});
+}
+
 function UpdatePlayerLoadingSidebar() {
+	if (!IsLoadingScreenContextValid()) {
+		return;
+	}
+
 	try {
 	const list_parent = $("#PlayerLoadingList");
 	const title_label = $("#PlayerLoadingTitle");
@@ -3298,6 +3317,11 @@ function UpdatePlayerLoadingSidebar() {
 		(setup_status.ready_players[local_player_id] !== undefined || setup_status.ready_players[local_player_id.toString()] !== undefined);
 
 	if (!list_parent || !counter) {
+		return;
+	}
+
+	if (local_player_id < 0) {
+		SchedulePlayerLoadingSidebar(0.2);
 		return;
 	}
 
@@ -3424,14 +3448,6 @@ function UpdatePlayerLoadingSidebar() {
 	}
 
 	if (player_loading_order_signature != order_signature) {
-		var old_order_signature = player_loading_order_signature;
-		var display_rows = [];
-		for (var display_i = 0; display_i < player_entries.length; display_i++) {
-			var display_entry = player_entries[display_i];
-			var display_section = GetTeamDisplayName(display_entry.team_id);
-			display_rows.push(display_entry.display_name + ":" + GetConnectionStateDebugName(display_entry.connection_state) + ":" + display_section);
-		}
-
 		for (var stale_row_key in player_loading_rows) {
 			if (player_loading_rows[stale_row_key] && player_loading_rows[stale_row_key].panel) {
 				player_loading_rows[stale_row_key].panel.DeleteAsync(0);
@@ -3467,7 +3483,8 @@ function UpdatePlayerLoadingSidebar() {
 			active_sections[team_key] = true;
 
 			if (!player_loading_section_rows[team_key]) {
-				var section_row = $.CreatePanel("Label", list_parent, "PlayerLoadingSection_" + team_key);
+				player_loading_panel_serial = player_loading_panel_serial + 1;
+				var section_row = $.CreatePanel("Label", list_parent, "PlayerLoadingSection_" + team_key + "_" + player_loading_panel_serial);
 				section_row.AddClass("player-loading-section");
 				player_loading_section_rows[team_key] = section_row;
 			}
@@ -3494,7 +3511,8 @@ function UpdatePlayerLoadingSidebar() {
 
 		if (!player_loading_rows[row_key]) {
 			const safe_row_key = row_key.toString().replace(/[^a-zA-Z0-9_]/g, "_");
-			const row = $.CreatePanel("Panel", list_parent, "PlayerLoadingRow_" + safe_row_key);
+			player_loading_panel_serial = player_loading_panel_serial + 1;
+			const row = $.CreatePanel("Panel", list_parent, "PlayerLoadingRow_" + safe_row_key + "_" + player_loading_panel_serial);
 			row.AddClass("player-loading-row");
 
 			const dot = $.CreatePanel("Panel", row, "");
@@ -3944,9 +3962,9 @@ function UpdatePlayerLoadingSidebar() {
 		loading_screen_last_sidebar_summary_signature = sidebar_summary_signature;
 	}
 
-	$.Schedule(0.2, UpdatePlayerLoadingSidebar);
+	SchedulePlayerLoadingSidebar(0.2);
 	} catch (err) {
-		$.Schedule(0.5, UpdatePlayerLoadingSidebar);
+		SchedulePlayerLoadingSidebar(0.5);
 	}
 }
 
@@ -5915,13 +5933,21 @@ function DisableRankingVoting() {
 		profile_button.SetPanelEvent("onmouseout", function () {
 			$.DispatchEvent("UIHideTextTooltip", profile_button);
 		});
-	} else {
 	}
+
 	HoverableLoadingScreen();
+
 	fetch();
+
 	SetProfileName();
+
 	RefreshProfileDataLoop();
+
 	UpdatePlayerLoadingSidebar();
+
+	$.GetContextPanel().SetHasClass("ProfileModalVisible", false);
+	$.GetContextPanel().SetHasClass("ProfileModalClosing", false);
+
 	if (typeof XHSNameDisplay !== "undefined" && XHSNameDisplay.Subscribe) {
 		XHSNameDisplay.Subscribe(function () {
 			SetProfileName();
@@ -5929,8 +5955,6 @@ function DisableRankingVoting() {
 			UpdatePlayerLoadingSidebar();
 		});
 	}
-	$.GetContextPanel().SetHasClass("ProfileModalVisible", false);
-	$.GetContextPanel().SetHasClass("ProfileModalClosing", false);
 
 	if (typeof CustomNetTables !== "undefined" && CustomNetTables && typeof CustomNetTables.SubscribeNetTableListener === "function") {
 		CustomNetTables.SubscribeNetTableListener("supporter_pass_player", function (table_name, key, data) {
@@ -5947,7 +5971,6 @@ function DisableRankingVoting() {
 		if (initial_poll_state) {
 			OnCustomPollStateChanged(initial_poll_state);
 		}
-	} else {
 	}
 
 	if (typeof GameEvents !== "undefined" && GameEvents && typeof GameEvents.Subscribe === "function") {
@@ -5963,6 +5986,5 @@ function DisableRankingVoting() {
 			AllPlayersBattlepassLoaded();
 		});
 		GameEvents.Subscribe("xhs_custom_poll_vote_result", OnCustomPollVoteResult);
-	} else {
 	}
 })();

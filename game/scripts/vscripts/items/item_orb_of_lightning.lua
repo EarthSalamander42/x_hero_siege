@@ -147,7 +147,6 @@ function modifier_orb_of_lightning_active:OnCreated()
 	self.duration = self:GetAbility():GetSpecialValueFor("duration")
 	self.purge_chance = self:GetAbility():GetSpecialValueFor("purge_chance")
 	self.purge_cooldown = self:GetAbility():GetSpecialValueFor("purge_cooldown")
-	print(self.duration, self.purge_chance, self.purge_cooldown)
 end
 
 function modifier_orb_of_lightning_active:OnAttackLanded(params)

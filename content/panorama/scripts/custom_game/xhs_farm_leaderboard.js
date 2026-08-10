@@ -18,6 +18,7 @@
 	var leaderboardArchived = false;
 	var leaderboardPlayerCount = 0;
 	var leaderboardWasActive = false;
+	var soloLeaderboardLocked = false;
 	var sharedRegistry = GameUI.CustomUIConfig().XHSEventLeaderboardRegistry;
 	if (!sharedRegistry) {
 		sharedRegistry = {};
@@ -472,9 +473,15 @@
 		var available = IsTruthy(data.available);
 		var phase = (data.phase || (active ? "active" : "archived")).toString();
 		var archived = available && !active;
+		soloLeaderboardLocked = IsTruthy(data.solo_no_bots);
 		leaderboardArchived = archived;
 
 		leaderboard.SetHasClass("IsArchived", archived);
+		leaderboard.SetHasClass("IsSoloLocked", soloLeaderboardLocked);
+		var headerToggle = Panel("XHSFarmLeaderboardHeaderToggle");
+		if (headerToggle) {
+			headerToggle.hittest = !soloLeaderboardLocked;
+		}
 		RefreshExternalToggle();
 		if (!active && !available) {
 			leaderboard.SetHasClass("IsVisible", false);
@@ -485,8 +492,11 @@
 		}
 		if (active) {
 			if (!leaderboardWasActive) {
-				SetLeaderboardCollapsed(false);
+				SetLeaderboardCollapsed(soloLeaderboardLocked);
 				SetLeaderboardHidden(false);
+			}
+			if (soloLeaderboardLocked) {
+				SetLeaderboardCollapsed(true);
 			}
 			archiveExpanded = false;
 			leaderboard.SetHasClass("IsVisible", true);
@@ -555,6 +565,7 @@
 		var headerToggle = Panel("XHSFarmLeaderboardHeaderToggle");
 		if (headerToggle) {
 			headerToggle.SetPanelEvent("onactivate", function () {
+				if (soloLeaderboardLocked) { return; }
 				SetLeaderboardCollapsed(!leaderboardCollapsed);
 				Game.EmitSound("ui_generic_button_click");
 			});

@@ -30,7 +30,7 @@ local function IsAlive(unit)
 	return unit ~= nil and IsValidEntity(unit) and not unit:IsNull() and unit:IsAlive()
 end
 
-local function FindEnemy(boss)
+local function FindEnemy(boss, allowMagicImmune)
 	local enemies = FindUnitsInRadius(
 		boss:GetTeamNumber(),
 		boss:GetAbsOrigin(),
@@ -38,7 +38,7 @@ local function FindEnemy(boss)
 		1600,
 		DOTA_UNIT_TARGET_TEAM_ENEMY,
 		DOTA_UNIT_TARGET_HERO,
-		DOTA_UNIT_TARGET_FLAG_MAGIC_IMMUNE_ENEMIES,
+		allowMagicImmune == true and DOTA_UNIT_TARGET_FLAG_MAGIC_IMMUNE_ENEMIES or DOTA_UNIT_TARGET_FLAG_NONE,
 		FIND_CLOSEST,
 		false
 	)
@@ -188,7 +188,7 @@ function modifier_xhs_special_arena_ai:OnIntervalThink()
 		end
 	end
 
-	local target = FindEnemy(boss)
+	local target = FindEnemy(boss, true)
 	if target == nil then return end
 	local profile = PROFILES[boss.xhs_special_arena_profile] or {}
 
@@ -198,12 +198,21 @@ function modifier_xhs_special_arena_ai:OnIntervalThink()
 		local ability = boss:FindAbilityByName(spell.name)
 		if spell.partner_death_only ~= true and ability ~= nil and ability:IsFullyCastable() then
 			local castTarget = target
-			local canCast = spell.range == nil or (target:GetAbsOrigin() - boss:GetAbsOrigin()):Length2D() <= spell.range
-			if spell.cast == "friendly" then
+			local canCast = true
+			if spell.cast == "enemy" then
+				-- Unit-target spells such as Storm Bolt are rejected by the engine on
+				-- magic-immune heroes. Pick a valid spell target separately while still
+				-- allowing the boss to attack a magic-immune arena opponent normally.
+				castTarget = FindEnemy(boss, spell.pierces_magic_immunity == true)
+				canCast = castTarget ~= nil
+			elseif spell.cast == "friendly" then
 				castTarget = FindInjuredAlly(boss, spell.range or 900, spell.ally_health_below)
 				canCast = castTarget ~= nil
 			elseif spell.ally_health_below ~= nil then
 				canCast = FindInjuredAlly(boss, 1200, spell.ally_health_below) ~= nil
+			end
+			if canCast and spell.range ~= nil then
+				canCast = (castTarget:GetAbsOrigin() - boss:GetAbsOrigin()):Length2D() <= spell.range
 			end
 
 			if canCast then
@@ -214,7 +223,7 @@ function modifier_xhs_special_arena_ai:OnIntervalThink()
 				}
 				if spell.cast == "enemy" then
 					order.OrderType = DOTA_UNIT_ORDER_CAST_TARGET
-					order.TargetIndex = target:entindex()
+					order.TargetIndex = castTarget:entindex()
 				elseif spell.cast == "friendly" then
 					order.OrderType = DOTA_UNIT_ORDER_CAST_TARGET
 					order.TargetIndex = castTarget:entindex()

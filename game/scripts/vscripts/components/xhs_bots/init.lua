@@ -1113,7 +1113,7 @@ function XHSBots:RegisterQACommands()
 				"xhs_bots_audit_dump"
 			)
 		end,
-		"Tools-only: dump the complete chronological XHS bot decision audit",
+		"Tools-only: capture the current XHS bot audit for backend storage",
 		auditCommandFlags
 	)
 	self.qa_command_registration_revision = registrationRevision
@@ -1132,7 +1132,7 @@ function XHSBots:TestDecisionAuditFromConsole(action)
 		XHSBotDecisionAudit:Start("manual_command")
 		XHSBotDecisionAudit:SampleAll(true)
 		return true, "audit_recording",
-			"filter=[XHSBots][AUDIT] auto_dump=post_game"
+			"storage=backend console_dump=disabled auto_finalize=post_game"
 	elseif action == "status" then
 		return XHSBotDecisionAudit:Status()
 	elseif action == "dump" then

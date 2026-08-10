@@ -881,9 +881,9 @@ function CreepLevels(level)
 	if level == nil or level < 1 or level > 4 then return end
 
 	local dragons = {}
-	dragons[2] = "npc_dota_creature_red_dragon"
-	dragons[3] = "npc_dota_creature_black_dragon"
-	dragons[4] = "npc_dota_creature_green_dragon"
+	dragons[2] = "npc_dota_creature_green_dragon"
+	dragons[3] = "npc_dota_creature_red_dragon"
+	dragons[4] = "npc_dota_creature_blue_dragon"
 
 	SpawnDragons(dragons[level])
 
@@ -976,10 +976,10 @@ function SpawnMagnataur(hPos)
 	return firstMagnataur, spawnedMagnataurs
 end
 
-local DRAGON_RENDER_COLORS = {
-	npc_dota_creature_red_dragon = { 220, 70, 55 },
-	npc_dota_creature_black_dragon = { 70, 70, 80 },
-	npc_dota_creature_green_dragon = { 80, 180, 95 },
+local DRAGON_MATERIAL_GROUPS = {
+	npc_dota_creature_green_dragon = "default",
+	npc_dota_creature_red_dragon = "1",
+	npc_dota_creature_blue_dragon = "2",
 }
 
 function SpawnDragons(dragon)
@@ -993,9 +993,9 @@ function SpawnDragons(dragon)
 			for j = 1, difficulty do
 				local spawnedDragon = SpawnWaveCreep(dragon, point, waypoint)
 				if spawnedDragon ~= nil then
-					local color = DRAGON_RENDER_COLORS[dragon]
-					if color ~= nil then
-						spawnedDragon:SetRenderColor(color[1], color[2], color[3])
+					local materialGroup = DRAGON_MATERIAL_GROUPS[dragon]
+					if materialGroup ~= nil then
+						spawnedDragon:SetMaterialGroup(materialGroup)
 					end
 
 					-- Difficulty increases the number of dragons for combat, not

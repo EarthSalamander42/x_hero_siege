@@ -151,12 +151,41 @@ local function ResolveVanillaTIRewardImage(item)
 	return VANILLA_TI_REWARD_IMAGES[imageKind][ti]
 end
 
-local function ApplyVanillaTIRewardImage(item)
-	local image = ResolveVanillaTIRewardImage(item)
-	if image ~= nil then
-		item.image = image
-		item.image_inventory = image
+local function IsSupporterDisplayImage(value)
+	if value == nil then return false end
+	local path = string.lower(tostring(value)):gsub("\\", "/")
+	return path ~= ""
+		and string.find(path, ".vpcf", 1, true) == nil
+		and string.sub(path, 1, 10) ~= "particles/"
+end
+
+local function ResolveSupporterDisplayImage(item)
+	local tiImage = ResolveVanillaTIRewardImage(item)
+	if tiImage ~= nil then return tiImage end
+	if type(item) ~= "table" then return nil end
+
+	for _, key in ipairs({ "preview_image", "image_url", "image", "image_inventory", "icon", "icon_path" }) do
+		local value = item[key]
+		if IsSupporterDisplayImage(value) then
+			local image = tostring(value):gsub("\\", "/")
+			local cdnFilename = string.match(image, "^https?://cdn%.frostrose%-studio%.com/static/images/battlepass/xhs%-4%.0/([^/?#]+)")
+			if cdnFilename ~= nil then
+				local localName = cdnFilename:gsub("%.[^%.]+$", ""):gsub("%-", "_")
+				return "custom_game/battlepass/" .. localName
+			end
+			if string.sub(image, 1, 11) == "battlepass/" then
+				return "custom_game/" .. image
+			end
+			return image
+		end
 	end
+	return nil
+end
+
+local function ApplyVanillaTIRewardImage(item)
+	local image = ResolveSupporterDisplayImage(item)
+	item.image = image
+	item.image_inventory = image
 	return item
 end
 
@@ -435,7 +464,7 @@ local function BuildPublishedSupporterLoadout(items)
 	local published = {}
 	for _, item in ipairs(type(items) == "table" and items or {}) do
 		if type(item) == "table" then
-			local resolvedImage = ResolveVanillaTIRewardImage(item)
+			local resolvedImage = ResolveSupporterDisplayImage(item)
 			local entry = {
 				id = item.id or item.item_id or item.catalog_item_id,
 				item_id = item.item_id or item.catalog_item_id or item.id,
@@ -447,8 +476,8 @@ local function BuildPublishedSupporterLoadout(items)
 				slot_id = item.slot_id or item.item_type or item.type,
 				rarity = item.rarity or item.item_rarity,
 				item_rarity = item.item_rarity or item.rarity,
-				image = resolvedImage or item.image or item.image_inventory,
-				image_inventory = resolvedImage or item.image_inventory or item.image,
+				image = resolvedImage,
+				image_inventory = resolvedImage,
 				asset_path = item.asset_path,
 				effect_paths = item.effect_paths,
 				equip = item.equip,
@@ -832,14 +861,177 @@ function SupporterPass:PublishMeta()
 	})
 end
 
+local SUPPORTER_SHOP_CHUNK_TARGET_BYTES = 45000
+local SUPPORTER_SHOP_SECTION_ITEM_FIELDS = {
+	"items",
+	"item_ids",
+	"item",
+	"primary",
+	"secondary",
+	"secondary_items",
+}
+
+local function EstimateSupporterShopPayloadBytes(value, depth, visited)
+	local valueType = type(value)
+	if valueType == "nil" then return 4 end
+	if valueType == "boolean" then return value and 4 or 5 end
+	if valueType == "number" then return 24 end
+	if valueType == "string" then return #value + 2 end
+	if valueType ~= "table" then return #tostring(value) + 2 end
+
+	depth = tonumber(depth) or 0
+	if depth > 12 then return 16 end
+	visited = visited or {}
+	if visited[value] then return 4 end
+	visited[value] = true
+
+	local size = 2
+	for key, child in pairs(value) do
+		size = size + #tostring(key) + 4
+			+ EstimateSupporterShopPayloadBytes(child, depth + 1, visited)
+	end
+	visited[value] = nil
+	return size
+end
+
+local function BuildSupporterShopReferenceList(value)
+	local references = {}
+	local seen = {}
+	if type(value) ~= "table" then
+		AddSupporterShopReference(references, seen, value)
+		return references
+	end
+	if IsSupporterShopItem(value) then
+		AddSupporterShopReference(references, seen, value)
+		return references
+	end
+
+	local list = value.items
+	if type(list) ~= "table" then
+		list = value
+	end
+	for _, item in ipairs(list) do
+		AddSupporterShopReference(references, seen, item)
+	end
+	return references
+end
+
+local function CompactSupporterShopSection(section)
+	if type(section) ~= "table" then return section end
+	if IsSupporterShopItem(section) then
+		return SupporterShopItemIdentity(section)
+	end
+	local compact = CopySupporterTable(section)
+	for _, field in ipairs(SUPPORTER_SHOP_SECTION_ITEM_FIELDS) do
+		if section[field] ~= nil then
+			local references = BuildSupporterShopReferenceList(section[field])
+			if field == "item" or field == "primary" then
+				compact[field] = references[1]
+			else
+				compact[field] = references
+			end
+		end
+	end
+	if #section > 0 and section.items == nil then
+		compact = { items = BuildSupporterShopReferenceList(section) }
+	end
+	return compact
+end
+
+local function CompactSupporterShopSections(sections)
+	local compact = {}
+	for key, section in pairs(type(sections) == "table" and sections or {}) do
+		if key == "definitions" and type(section) == "table" then
+			compact[key] = {}
+			for index, definition in ipairs(section) do
+				compact[key][index] = CompactSupporterShopSection(definition)
+			end
+		else
+			compact[key] = CompactSupporterShopSection(section)
+		end
+	end
+	return compact
+end
+
+local function CompactSupporterShopDefinitions(definitions)
+	local compact = {}
+	for index, definition in ipairs(type(definitions) == "table" and definitions or {}) do
+		compact[index] = CompactSupporterShopSection(definition)
+	end
+	return compact
+end
+
+local function BuildSupporterShopChunks(items, generation)
+	local chunks = {}
+	local current = { generation = generation, items = {} }
+	local currentSize = EstimateSupporterShopPayloadBytes(current)
+	for _, item in ipairs(type(items) == "table" and items or {}) do
+		local itemSize = EstimateSupporterShopPayloadBytes(item)
+		if #current.items > 0
+		and currentSize + itemSize > SUPPORTER_SHOP_CHUNK_TARGET_BYTES then
+			table.insert(chunks, current)
+			current = { generation = generation, items = {} }
+			currentSize = EstimateSupporterShopPayloadBytes(current)
+		end
+		table.insert(current.items, item)
+		currentSize = currentSize + itemSize
+	end
+	if #current.items > 0 then
+		table.insert(chunks, current)
+	end
+	return chunks
+end
+
+local function BuildSupporterShopTransportManifest(shop, generation, chunkCount)
+	local manifest = {}
+	local transportedFields = {
+		items = true,
+		sections = true,
+		section_definitions = true,
+		permanent = true,
+		rotation = true,
+		hero = true,
+		featured = true,
+		catalog = true,
+		catalog_items = true,
+		permanent_items = true,
+		featured_items = true,
+	}
+	for key, value in pairs(type(shop) == "table" and shop or {}) do
+		if not transportedFields[key] and type(value) ~= "table" then
+			manifest[key] = value
+		end
+	end
+	manifest.transport_version = 2
+	manifest.transport_generation = generation
+	manifest.item_chunk_count = chunkCount
+	manifest.item_count = #(type(shop.items) == "table" and shop.items or {})
+	manifest.sections = CompactSupporterShopSections(shop.sections)
+	manifest.section_definitions = CompactSupporterShopDefinitions(shop.section_definitions)
+	manifest.permanent = CompactSupporterShopSection(shop.permanent)
+	manifest.rotation = CompactSupporterShopSection(shop.rotation)
+	manifest.hero = CompactSupporterShopSection(shop.hero)
+	manifest.featured = CompactSupporterShopSection(shop.featured)
+	manifest.catalog = CompactSupporterShopSection(shop.catalog)
+	manifest.catalog_items = BuildSupporterShopReferenceList(shop.catalog_items)
+	manifest.permanent_items = BuildSupporterShopReferenceList(shop.permanent_items)
+	manifest.featured_items = BuildSupporterShopReferenceList(shop.featured_items)
+	return manifest
+end
+
 function SupporterPass:PublishFeaturedShop()
 	local source = api
 		and api.supporter_pass
 		and api.supporter_pass.shop
 		or { items = {} }
 	local shop = BuildPublishedSupporterShop(source)
+	self.PublishedShop = shop
+	self.PublishedShopGeneration = (tonumber(self.PublishedShopGeneration) or 0) + 1
+	local generation = self.PublishedShopGeneration
+	local chunks = BuildSupporterShopChunks(shop.items, generation)
+	local manifest = BuildSupporterShopTransportManifest(shop, generation, #chunks)
 	local legacyFeatured = CopySupporterTable(shop.sections.featured)
-	legacyFeatured.items = shop.items
+	legacyFeatured = CompactSupporterShopSection(legacyFeatured)
 	legacyFeatured.release_id = shop.release_id
 	legacyFeatured.version = shop.version
 	legacyFeatured.schema_version = shop.schema_version
@@ -850,16 +1042,39 @@ function SupporterPass:PublishFeaturedShop()
 	legacyFeatured.season_id = legacyFeatured.season_id
 		or shop.season_id
 
-	CustomNetTables:SetTableValue("supporter_pass_shop", "catalog", shop)
-	CustomNetTables:SetTableValue("supporter_pass_shop", "permanent", shop.permanent)
-	CustomNetTables:SetTableValue("supporter_pass_shop", "rotation", shop.rotation)
-	CustomNetTables:SetTableValue("supporter_pass_shop", "hero", shop.sections.hero)
+	for index, chunk in ipairs(chunks) do
+		chunk.index = index
+		chunk.count = #chunks
+		CustomNetTables:SetTableValue(
+			"supporter_pass_shop",
+			"items_" .. tostring(index),
+			chunk
+		)
+	end
+	for staleIndex = #chunks + 1, tonumber(self.PublishedShopChunkCount) or 0 do
+		CustomNetTables:SetTableValue(
+			"supporter_pass_shop",
+			"items_" .. tostring(staleIndex),
+			{}
+		)
+	end
+	self.PublishedShopChunkCount = #chunks
+
+	CustomNetTables:SetTableValue("supporter_pass_shop", "permanent", manifest.permanent)
+	CustomNetTables:SetTableValue("supporter_pass_shop", "rotation", manifest.rotation)
+	CustomNetTables:SetTableValue("supporter_pass_shop", "hero", manifest.sections.hero)
 	CustomNetTables:SetTableValue("supporter_pass_shop", "featured", legacyFeatured)
 	CustomNetTables:SetTableValue("supporter_pass_shop", "meta", {
 		release_id = shop.release_id,
 		version = shop.version,
 		schema_version = shop.schema_version,
+		transport_version = 2,
+		transport_generation = generation,
+		item_chunk_count = #chunks,
 	})
+	-- Publish the manifest last. Panorama treats this key as the atomic switch
+	-- after every chunk for the new generation is already available.
+	CustomNetTables:SetTableValue("supporter_pass_shop", "catalog", manifest)
 end
 
 function SupporterPass:BuildPlayerTable(playerID)

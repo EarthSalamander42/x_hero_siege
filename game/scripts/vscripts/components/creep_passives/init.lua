@@ -41,9 +41,9 @@ local REGISTRY = {
 	npc_xhs_human_creep_ranged_4 = "xhs_creep_silencing_glaive",
 
 	-- Dragons
-	npc_dota_creature_red_dragon = "xhs_creep_scorching_breath",
-	npc_dota_creature_black_dragon = "xhs_creep_corrosive_scales",
-	npc_dota_creature_green_dragon = "xhs_creep_toxic_flight",
+	npc_dota_creature_green_dragon = "xhs_creep_scorching_breath",
+	npc_dota_creature_red_dragon = "xhs_creep_corrosive_scales",
+	npc_dota_creature_blue_dragon = "xhs_creep_toxic_flight",
 
 	-- Phase 2 assault and tower punishments
 	npc_ghul_II = "xhs_creep_unholy_sustain",

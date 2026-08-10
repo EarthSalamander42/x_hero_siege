@@ -15,12 +15,12 @@ LinkLuaModifier("modifier_xhs_magtheridon_demonic_howl", "boss_scripts/phase3_ai
 
 local BRUTAL_SLAM_PARTICLE = "particles/units/heroes/hero_centaur/centaur_warstomp.vpcf"
 local FEL_STOMP_PARTICLE = "particles/units/heroes/hero_brewmaster/brewmaster_thunder_clap.vpcf"
-local DARKMOON_AOE_PRECAST_PARTICLE = "particles/custom/boss_warnings/magtheridon/radius.vpcf"
+local DARKMOON_AOE_PRECAST_PARTICLE = "particles/custom/bosses/magtheridon/fel_radius_precast_green.vpcf"
 local FIRESTORM_PARTICLE = "particles/units/heroes/heroes_underlord/abyssal_underlord_firestorm_wave.vpcf"
 local FIRESTORM_PRECAST_PARTICLE = "particles/units/heroes/heroes_underlord/underlord_firestorm_pre.vpcf"
 local FEL_FISSURE_PARTICLE = "particles/units/heroes/hero_elder_titan/elder_titan_earth_splitter.vpcf"
-local INFERNAL_RING_PARTICLE = "particles/units/heroes/heroes_underlord/underlord_pitofmalice.vpcf"
-local INFERNAL_RING_PRECAST_PARTICLE = "particles/units/heroes/heroes_underlord/underlord_pitofmalice_pre.vpcf"
+local INFERNAL_RING_PARTICLE = "particles/custom/bosses/magtheridon/infernal_ring_green.vpcf"
+local INFERNAL_RING_PRECAST_PARTICLE = "particles/custom/bosses/magtheridon/fel_radius_precast_green.vpcf"
 local DEMONIC_HOWL_PARTICLE = "particles/units/heroes/hero_lycan/lycan_howl_cast.vpcf"
 local RUPTURE_PARTICLE = "particles/units/heroes/hero_elder_titan/elder_titan_earth_splitter.vpcf"
 local INFERNAL_RING_VISUAL_DURATION = 0.45
@@ -242,8 +242,8 @@ local function CreateRadialParticle(position, radius, particleName)
 	ParticleManager:ReleaseParticleIndex(particle)
 end
 
-local function CreateDarkmoonAOEPrecast(ability, position, radius, duration)
-	local particle = ParticleManager:CreateParticle(DARKMOON_AOE_PRECAST_PARTICLE, PATTACH_WORLDORIGIN, nil)
+local function CreateDarkmoonAOEPrecast(ability, position, radius, duration, particleName)
+	local particle = ParticleManager:CreateParticle(particleName or DARKMOON_AOE_PRECAST_PARTICLE, PATTACH_WORLDORIGIN, nil)
 	ParticleManager:SetParticleControl(particle, 0, position)
 	ParticleManager:SetParticleControl(particle, 1, Vector(radius, duration or 1.0, 0))
 	ParticleManager:SetParticleControl(particle, 2, Vector(duration or 1.0, 0, 1))
@@ -293,6 +293,8 @@ local function CreatePitOfMaliceZone(position, radius, duration)
 	ParticleManager:SetParticleControl(particle, 0, position)
 	ParticleManager:SetParticleControl(particle, 1, Vector(radius, 1, 1))
 	ParticleManager:SetParticleControl(particle, 2, Vector(duration, 0, 0))
+	ParticleManager:SetParticleControl(particle, 15, FEL_COLORS.primary)
+	ParticleManager:SetParticleControl(particle, 16, Vector(1, 0, 0))
 
 	Timers:CreateTimer(duration, function()
 		ParticleManager:DestroyParticle(particle, false)
@@ -302,7 +304,7 @@ local function CreatePitOfMaliceZone(position, radius, duration)
 end
 
 local function CreatePitOfMalicePrecast(ability, position, radius)
-	return CreateDarkmoonAOEPrecast(ability, position, radius, GetCastPoint(ability))
+	return CreateDarkmoonAOEPrecast(ability, position, radius, GetCastPoint(ability), INFERNAL_RING_PRECAST_PARTICLE)
 end
 
 local function CreateFissureLine(ability, startPosition, endPosition, delay, duration)

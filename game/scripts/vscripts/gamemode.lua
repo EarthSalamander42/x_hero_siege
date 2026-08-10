@@ -17,6 +17,8 @@ require('components/creep_ai_director/init')
 XHSStartupCheckpoint('components/creep_ai_director/init')
 require('components/creep_order_ownership/init')
 XHSStartupCheckpoint('components/creep_order_ownership/init')
+require('components/creep_health_bars/init')
+XHSStartupCheckpoint('components/creep_health_bars/init')
 require('components/wave_stager/init')
 XHSStartupCheckpoint('components/wave_stager/init')
 
@@ -708,6 +710,14 @@ end
 ---------------------------------------------------------------------------
 
 function GameMode:DamageFilter(filterTable)
+	-- Engine/custom damage callbacks can occasionally reach the filter without a
+	-- numeric damage field while the custom setup UI is bypassed. Treat those as
+	-- zero-damage observations so optional telemetry never spams or interrupts
+	-- the authoritative filter.
+	if type(filterTable) ~= "table" then
+		return true
+	end
+
 	if Runes and Runes.OnDamageFilter then
 		Runes:OnDamageFilter(filterTable)
 	end
@@ -716,7 +726,7 @@ function GameMode:DamageFilter(filterTable)
 		FragmentQuests:OnDamage(filterTable)
 	end
 
-	local flDamage = filterTable["damage"]
+	local flDamage = tonumber(filterTable["damage"]) or 0
 	local hVictim = nil
 	if filterTable["entindex_victim_const"] ~= nil then
 		hVictim = EntIndexToHScript(filterTable["entindex_victim_const"])
@@ -881,6 +891,20 @@ function GameMode:FilterExecuteOrder(filterTable)
 				--					numUnits = numUnits + 1
 				--				end
 			end
+		end
+	end
+
+	-- Re-clicking the exact tombstone already being channelled is idempotent.
+	-- Reject that one redundant order before Source can interrupt the channel;
+	-- movement, attacks, spells and interactions with any other target still
+	-- pass through and cancel the revive as usual.
+	if XHSUnitTombstone ~= nil and XHSUnitTombstone.IsRepeatedActiveInteractionOrder ~= nil
+		and unit ~= nil and not unit:IsNull() then
+		local numericTargetIndex = tonumber(targetIndex)
+		local target = numericTargetIndex ~= nil and numericTargetIndex > 0
+			and EntIndexToHScript(numericTargetIndex) or nil
+		if XHSUnitTombstone:IsRepeatedActiveInteractionOrder(unit, order_type, target, point) then
+			return false
 		end
 	end
 
@@ -1068,6 +1092,7 @@ local XHS_OPTIONAL_EVENT_BOSS_BARS = {
 		name = "npc_ramero",
 		icon = "npc_dota_hero_sven",
 		boss_count = 1,
+		display_mode = "kill_event",
 		global = true,
 		light_color = "#f6b54a",
 		dark_color = "#38200d",
@@ -1077,6 +1102,7 @@ local XHS_OPTIONAL_EVENT_BOSS_BARS = {
 		name = "npc_baristol",
 		icon = "npc_dota_hero_sven",
 		boss_count = 2,
+		display_mode = "kill_event",
 		global = true,
 		light_color = "#fff0a6",
 		dark_color = "#3b3212",
@@ -1086,6 +1112,7 @@ local XHS_OPTIONAL_EVENT_BOSS_BARS = {
 		name = "npc_ramero_2",
 		icon = "npc_dota_hero_sven",
 		boss_count = 1,
+		display_mode = "kill_event",
 		light_color = "#db82ff",
 		dark_color = "#30133d",
 	},
@@ -1093,6 +1120,7 @@ local XHS_OPTIONAL_EVENT_BOSS_BARS = {
 		id = "optional_spirit_beast",
 		name = "npc_spirit_beast",
 		icon = "npc_dota_hero_lone_druid",
+		display_mode = "special_event",
 		light_color = "#72e8be",
 		dark_color = "#123229",
 	},
@@ -1100,6 +1128,7 @@ local XHS_OPTIONAL_EVENT_BOSS_BARS = {
 		id = "optional_frost_infernal",
 		name = "npc_frost_infernal",
 		icon = "npc_dota_hero_tiny",
+		display_mode = "special_event",
 		light_color = "#8fe8ff",
 		dark_color = "#102b42",
 	},
@@ -1120,6 +1149,7 @@ function GameMode:ShowOptionalEventBossBar(eventName, boss, hero)
 	boss.xhs_boss_bar_id = config.id or eventName
 	boss.xhs_boss_bar_name = config.name or boss:GetUnitName()
 	boss.xhs_boss_bar_icon = config.icon
+	boss.xhs_boss_bar_display_mode = config.display_mode or "special_event"
 	boss.xhs_boss_bar_colors = {
 		light_color = config.light_color or "#9be7ff",
 		dark_color = config.dark_color or "#102533",
@@ -1431,6 +1461,7 @@ function GameMode:HeroImage(event)
 		GameMode.HeroImageTimerStarted = false
 
 		GameMode.HeroImageUnit = CreateUnitByName(hero:GetUnitName(), point_beast, true, nil, nil, DOTA_TEAM_CUSTOM_1)
+		GameMode.HeroImageUnit.xhs_custom_health_bar_kind = "creep_hero"
 		GameMode.HeroImageUnit:SetAngles(0, 210, 0)
 
 		GameMode.HeroImageUnit:SetBaseStrength(hero:GetStrength() * 4)
@@ -1456,6 +1487,7 @@ function GameMode:HeroImage(event)
 		GameMode.HeroImageUnit:AddNewModifier(GameMode.HeroImageUnit, nil, "modifier_pause_creeps", { Duration = HERO_IMAGE_INTRO_DURATION, IsHidden = true })
 		GameMode.HeroImageUnit:AddNewModifier(GameMode.HeroImageUnit, nil, "modifier_invulnerable", { Duration = HERO_IMAGE_INTRO_DURATION, IsHidden = true })
 		GameMode.HeroImageUnit:MakeIllusion()
+		if XHSCreepHealthBars ~= nil then XHSCreepHealthBars:Apply(GameMode.HeroImageUnit) end
 		GameMode.HeroImageUnit:AddAbility("hero_image_death")
 		GameMode.HeroImageUnit.Boss = true
 		GameMode.HeroImageUnit:SetHealth(99999999)
@@ -1779,6 +1811,7 @@ function GameMode:AllHeroImages(event)
 
 			XHSPrecache:CreateUnitByName(heroImageName, point_image:GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_2, function(heroImage)
 				GameMode.AllHeroImage = heroImage
+				GameMode.AllHeroImage.xhs_custom_health_bar_kind = "creep_hero"
 				GameMode.AllHeroImage:SetAngles(0, 45 - 45 * spawnIndex, 0)
 
 				GameMode.AllHeroImage:SetBaseStrength(hero:GetStrength() * 2)
@@ -1798,6 +1831,7 @@ function GameMode:AllHeroImages(event)
 				GameMode.AllHeroImage:AddNewModifier(GameMode.AllHeroImage, nil, "modifier_invulnerable", { Duration = OPTIONAL_EVENT_INTRO_DURATION, IsHidden = true })
 
 				GameMode.AllHeroImage:MakeIllusion()
+				if XHSCreepHealthBars ~= nil then XHSCreepHealthBars:Apply(GameMode.AllHeroImage) end
 				GameMode.AllHeroImage.Boss = true
 				GameMode.AllHeroImage:SetHealth(99999999)
 				GameMode.AllHeroImage:SetMana(99999999)

@@ -27,7 +27,7 @@ function modifier_custom_mechanics:OnCreated()
 	if not IsServer() then return end
 
 	self.last_logged_agility = nil
-	self:StartIntervalThink(1.0)
+	-- self:StartIntervalThink(1.0)
 	--	self.magical_resistance = 0
 	--	self.intellect =
 	--	self:SetHasCustomTransmitterData(true)
@@ -62,10 +62,10 @@ function modifier_warpath_weaponsmith_basic_arms:HandleCustomTransmitterData(dat
 	self.bonus_damage = data.bonus_damage
 end
 --]]
-function modifier_custom_mechanics:OnIntervalThink()
-	self:LogAgilityArmorComparison()
-	--	self.armor_fix = (self:GetParent():GetAgility() * 0.16) * (-1) -- Don't ask.
-end
+-- function modifier_custom_mechanics:OnIntervalThink()
+-- self:LogAgilityArmorComparison()
+--	self.armor_fix = (self:GetParent():GetAgility() * 0.16) * (-1) -- Don't ask.
+-- end
 
 function modifier_custom_mechanics:GetModifierPhysicalArmorBonus()
 	--	return self.armor_fix

@@ -303,7 +303,9 @@ AbilitiesHeroes_XX = {
 	npc_dota_hero_crystal_maiden = { { "holdout_rain_of_ice", 2 } },
 	npc_dota_hero_dragon_knight = { { "holdout_knights_armor", 6 } },
 	npc_dota_hero_elder_titan = { { "holdout_shockwave_20", 0 }, { "holdout_war_stomp_20", 1 }, { "holdout_roar_20", 4 }, { "holdout_reincarnation", 6 } },
-	npc_dota_hero_enchantress = { { "neutral_spell_immunity", 6 } },
+	-- Keep the level-20 immunity in one of the six HUD-visible slots. Trueshot
+	-- Aura moves to the extra slot but remains enabled and continues to apply.
+	npc_dota_hero_enchantress = { { "neutral_spell_immunity", 5 } },
 	npc_dota_hero_invoker = { { "holdout_rain_of_fire", 2 } },
 	npc_dota_hero_juggernaut = { { "brewmaster_primal_split", 2 } },
 	npc_dota_hero_lich = { { "holdout_frost_chaos", 4 } },

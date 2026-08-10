@@ -239,9 +239,9 @@ local XHS_PHASE_TWO_ARMOR_CREEPS = {
 }
 
 local XHS_DRAGON_ARMOR_CREEPS = {
-	npc_dota_creature_red_dragon = true,
-	npc_dota_creature_black_dragon = true,
 	npc_dota_creature_green_dragon = true,
+	npc_dota_creature_red_dragon = true,
+	npc_dota_creature_blue_dragon = true,
 }
 
 local function IsXHSPhaseOneArmorCreep(unitName)

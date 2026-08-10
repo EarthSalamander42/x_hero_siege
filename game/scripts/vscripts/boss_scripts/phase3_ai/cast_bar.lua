@@ -3,6 +3,7 @@ if XHSBossCastBar == nil then
 end
 
 local CAST_BAR_TEXTURES = {
+	roshan_stormbolt = "sven_storm_bolt",
 	xhs_magtheridon_brutal_slam = "custom/xhs_magtheridon_brutal_slam",
 	xhs_magtheridon_fel_stomp = "custom/xhs_magtheridon_fel_stomp",
 	xhs_magtheridon_targeted_firestorms = "custom/xhs_magtheridon_targeted_firestorms",

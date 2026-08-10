@@ -7,6 +7,7 @@
 	</scripts>
 
 	<Panel>
+		<CustomUIElement type="Hud"					layoutfile="file://{resources}/layout/custom_game/xhs_creep_health_bars.xml" />
 		<CustomUIElement type="GameInfo" layoutfile="file://{resources}/layout/custom_game/game_info.xml" />
 		<CustomUIElement type="Hud"					layoutfile="file://{resources}/layout/custom_game/xhs_notifications.xml" />
 		<CustomUIElement type="Hud"					layoutfile="file://{resources}/layout/custom_game/xhs_supporter_pass.xml" />

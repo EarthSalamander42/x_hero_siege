@@ -3185,9 +3185,23 @@ var XHSTopHud = (function () {
 
 		var hud = GetHudAncestor($.GetContextPanel());
 		var bossBars = hud && hud.FindChildTraverse ? hud.FindChildTraverse("DiretidePanel") : null;
+		var sharedConfig = GameUI.CustomUIConfig ? GameUI.CustomUIConfig() : null;
+		var encounterBossCount = sharedConfig ? ToNumber(sharedConfig.xhsEncounterBossBarCount, 0) : 0;
+		var hasEncounterBossBars = !!(
+			(bossBars && bossBars.BHasClass("CompactEncounterBars")) ||
+			encounterBossCount > 0
+		);
+		var encounterCastVisible = !!(sharedConfig && sharedConfig.xhsEncounterBossCastVisible);
+
+		focusTimers.SetHasClass("XHSEncounterBossBarsAbove", hasVisibleTimer && hasEncounterBossBars);
+		focusTimers.SetHasClass("XHSEncounterBossCastAbove", hasVisibleTimer && hasEncounterBossBars && encounterCastVisible);
 		if (bossBars) {
-			bossBars.SetHasClass("XHSFocusTimerActive", hasVisibleTimer);
+			bossBars.SetHasClass("XHSFocusTimerActive", hasVisibleTimer && !hasEncounterBossBars);
 		}
+	}
+
+	if (GameUI.CustomUIConfig) {
+		GameUI.CustomUIConfig().XHSRefreshEncounterTimerLayout = UpdateFocusTimersVisibility;
 	}
 
 	function ShowCurrentEventTimer(timerName, title, isVisible, duration) {
@@ -3604,6 +3618,7 @@ XHSTopHud.Initialize();
 		portraitWrap.AddClass("XHSRevivePortraitWrap");
 		var portrait = $.CreatePanel("DOTAHeroImage", portraitWrap, "");
 		portrait.AddClass("XHSRevivePortrait");
+		portrait.heroimagestyle = "landscape";
 		portrait.heroname = String(data.hero_name || "");
 		var rune = $.CreatePanel("Label", portraitWrap, "");
 		rune.AddClass("XHSReviveRune");

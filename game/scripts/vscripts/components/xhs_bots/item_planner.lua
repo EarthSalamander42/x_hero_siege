@@ -180,6 +180,66 @@ function XHSBotItemPlanner:IsFamilyCompatible(snapshot, profile, familyName)
 	return true, nil
 end
 
+function XHSBotItemPlanner:HasNativeAttackCleave(snapshot, profile)
+	if snapshot ~= nil and snapshot.has_native_attack_cleave ~= nil then
+		return snapshot.has_native_attack_cleave == true
+	end
+	-- Offline/legacy snapshots have no hero handle. The skill build remains a
+	-- conservative fallback, while live games read the ability KV directly.
+	for _, abilityName in ipairs(profile and profile.skill_build or {}) do
+		if tostring(abilityName) == "holdout_innate_great_cleave" then
+			return true
+		end
+	end
+	return false
+end
+
+function XHSBotItemPlanner:IsMeleeCleaveCoreHero(snapshot, profile)
+	return not self:IsRangedAttacker(snapshot, profile)
+		and not self:HasNativeAttackCleave(snapshot, profile)
+		and not (profile ~= nil
+			and profile.disable_melee_cleave_core == true)
+end
+
+function XHSBotItemPlanner:GetMeleeCleaveCoreState(snapshot, profile)
+	local fire = XHSBotItemCatalog:GetFamilies().fire
+	if fire == nil
+		or not self:IsMeleeCleaveCoreHero(snapshot, profile) then
+		return false, 0, 0, nil
+	end
+	local tier = self:GetFamilyProgress(snapshot, fire)
+	local maximumTier = #(fire.levels or {})
+	return tier < maximumTier, tier, maximumTier, fire
+end
+
+function XHSBotItemPlanner:GetMeleeCleaveCoreCandidate(snapshot, profile)
+	local required, tier, maximumTier, fire =
+		self:GetMeleeCleaveCoreState(snapshot, profile)
+	if not required or fire == nil then return nil end
+	local entry = self:GetNextFamilyEntry(snapshot, profile, "fire", fire)
+	if entry == nil then return nil end
+	local score, reasons = self:ScoreFamily(
+		snapshot,
+		profile,
+		"fire",
+		fire,
+		entry
+	)
+	if score < 0 then return nil end
+	-- Cleave is farming infrastructure for a melee hero, not a transient
+	-- response to the creeps currently on screen. Keep the whole Fire chain
+	-- ahead of ordinary adaptive cores until Searing Blade is complete.
+	score = math.max(score, 170 + tier * 5)
+	table.insert(reasons, "melee_cleave_core:" .. tostring(tier)
+		.. "/" .. tostring(maximumTier))
+	return {
+		entry = entry,
+		family = "fire",
+		score = math.floor(score * 10) / 10,
+		reason = table.concat(reasons, "+"),
+	}
+end
+
 function XHSBotItemPlanner:GetMinimumCoreScore(profile)
 	return math.max(0, tonumber(profile and profile.minimum_core_score) or 40)
 end
@@ -289,6 +349,13 @@ function XHSBotItemPlanner:BuildNeedScores(snapshot, profile)
 	local isMelee = preferredRange <= 250
 	local attackAoe = isMelee and cluster
 		* (0.70 + GetAffinity(affinities, "wave", "cleave") * 0.30) or 0
+	local cleaveCoreRequired = self:GetMeleeCleaveCoreState(snapshot, profile)
+	if cleaveCoreRequired then
+		-- Missing cleave is a persistent economy deficit even between waves.
+		-- Keeping it in telemetry also explains why Fire outranks a temporarily
+		-- attractive single-target or defensive purchase.
+		attackAoe = math.max(attackAoe, 0.90)
+	end
 	local physicalShare = Clamp(snapshot.physical_threat, 0, 1)
 	local physicalSurvival = Clamp(
 		physicalShare
@@ -444,6 +511,19 @@ function XHSBotItemPlanner:BuildOpeningOrbCandidates(snapshot, profile)
 	local openingOrder = profile and profile.opening_orb_order or nil
 	local expectedFamily = type(openingOrder) == "table"
 		and openingOrder[orbCount + 1] or nil
+	local cleaveRequired, fireTier =
+		self:GetMeleeCleaveCoreState(snapshot, profile)
+	if cleaveRequired then
+		-- Darkness remains the safe default first orb. Once one foundation orb
+		-- exists, Fire is non-negotiable for melee heroes that cannot cleave by
+		-- themselves; this prevents a defensive/damage family from consuming
+		-- the opening slots before they acquire basic wave clear.
+		if orbCount <= 0 and expectedFamily == nil then
+			expectedFamily = "darkness"
+		elseif orbCount >= 1 and fireTier <= 0 then
+			expectedFamily = "fire"
+		end
+	end
 	for familyName, family in pairs(XHSBotItemCatalog:GetFamilies()) do
 		local tier = self:GetFamilyProgress(snapshot, family)
 		if tier <= 0 and self:GetFamilyLimit(profile, familyName) > 0 then
@@ -782,7 +862,7 @@ function XHSBotItemPlanner:ScoreFamily(snapshot, profile, familyName, family, en
 		)
 	end
 	local meleeCleave = familyName == "fire"
-		and (tonumber(profile and profile.preferred_range) or 999) <= 250
+		and not self:IsRangedAttacker(snapshot, profile)
 	if meleeCleave then
 		score = score + 7 + (tonumber(affinities.wave) or 0) * 7
 		table.insert(reasons, "melee_cleave")
@@ -957,6 +1037,11 @@ function XHSBotItemPlanner:BuildTargetLoadout(snapshot, profile)
 			entry
 		)
 		local completed = Count(snapshot, terminal.name)
+		if familyName == "fire"
+			and self:IsMeleeCleaveCoreHero(scoringSnapshot, profile) then
+			baseScore = math.max(baseScore, 185)
+			table.insert(reasons, "melee_cleave_loadout_core")
+		end
 		-- ScoreFamily discounts duplicates based on current ownership. Remove
 		-- that stateful term here, then price each prospective slot explicitly.
 		baseScore = baseScore + completed * 9
@@ -1311,6 +1396,12 @@ function XHSBotItemPlanner:Plan(snapshot, profile, difficulty)
 	if opening ~= nil and opening.complete ~= true then
 		nextCandidate = opening.candidate
 	end
+	local cleaveCoreCandidate = nil
+	local cleaveCoreRequired = self:GetMeleeCleaveCoreState(snapshot, profile)
+	if opening == nil or opening.complete == true then
+		cleaveCoreCandidate = self:GetMeleeCleaveCoreCandidate(snapshot, profile)
+		if cleaveCoreCandidate ~= nil then nextCandidate = cleaveCoreCandidate end
+	end
 	if nextCandidate ~= nil
 		and (opening == nil or opening.complete == true)
 		and nextCandidate.entry.tier == 1
@@ -1372,6 +1463,9 @@ function XHSBotItemPlanner:Plan(snapshot, profile, difficulty)
 		opening_orb_target = opening and opening.desired_orbs or 0,
 		opening_tome_target = opening and opening.desired_tomes or 0,
 		maximum_orb_slots = self:GetMaximumOrbSlots(profile),
+		melee_cleave_core_required = cleaveCoreRequired == true,
+		melee_cleave_core_forced = cleaveCoreCandidate ~= nil
+			and nextCandidate == cleaveCoreCandidate,
 	}
 	plan.health_potion_restock = self:GetPotionRestockThreshold(
 		"health", snapshot, profile, difficulty

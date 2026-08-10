@@ -1258,7 +1258,7 @@
 		"Model"						"models/heroes/spectre/spectre.vmdl"	 //Add model
 		"ModelScale"				"1.25"
 		"BoundsHullName"			"DOTA_HULL_SIZE_HERO"
-		"HealthBarOffset"			"140"
+		"HealthBarOffset"			"230"
 
 		// Abilities
 		//----------------------------------------------------------------

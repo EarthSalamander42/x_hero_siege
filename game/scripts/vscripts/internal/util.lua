@@ -1979,6 +1979,7 @@ local function GetBossBarSnapshot(boss)
 		max_health = boss:GetMaxHealth(),
 		boss_count = boss.boss_count or 1,
 		boss_bar_id = GetBossBarId(boss),
+		display_mode = boss.xhs_boss_bar_display_mode or "major_boss",
 		ankh_count = GetBossBarAnkhCount(boss),
 		markers_key = GetBossBarMarkersKey(boss),
 	}
@@ -1990,6 +1991,7 @@ local function BossBarSnapshotChanged(previous, current)
 		or previous.max_health ~= current.max_health
 		or previous.boss_count ~= current.boss_count
 		or previous.boss_bar_id ~= current.boss_bar_id
+		or previous.display_mode ~= current.display_mode
 		or previous.ankh_count ~= current.ankh_count
 		or previous.markers_key ~= current.markers_key
 end
@@ -2010,6 +2012,7 @@ local function GetBossBarPayload(boss)
 		boss_max_health = boss:GetMaxHealth(),
 		boss_count = boss.boss_count or 1,
 		boss_bar_id = GetBossBarId(boss),
+		boss_bar_display_mode = boss.xhs_boss_bar_display_mode or "major_boss",
 		ankh_count = GetBossBarAnkhCount(boss),
 		boss_bar_markers = GetBossBarMarkers(boss),
 	}
@@ -2080,8 +2083,15 @@ local function StartBossBarHealthThink(boss)
 	if key == nil or boss.xhs_boss_bar_think_active == true then return end
 
 	boss.xhs_boss_bar_think_active = true
-	GameRules:GetGameModeEntity():SetContextThink("xhs_boss_bar_health_" .. key, function()
-		if boss == nil or not IsValidEntity(boss) or boss:IsNull() or boss.deathStart == true then
+	-- Entity indexes can be recycled when Magtheridon is recreated by his Ankh.
+	-- A unique think name prevents the dead entity's old poller from replacing or
+	-- suppressing the poller attached to the newly spawned entity.
+	GameRules:GetGameModeEntity():SetContextThink(DoUniqueString("xhs_boss_bar_health_" .. key), function()
+		if boss == nil or not IsValidEntity(boss) or boss:IsNull()
+			or boss.deathStart == true or not boss:IsAlive() then
+			if boss ~= nil and IsValidEntity(boss) and not boss:IsNull() then
+				boss.xhs_boss_bar_think_active = nil
+			end
 			XHS_BOSS_BAR_LAST[key] = nil
 			XHS_PRIVATE_BOSS_BAR_LAST[key] = nil
 			return nil

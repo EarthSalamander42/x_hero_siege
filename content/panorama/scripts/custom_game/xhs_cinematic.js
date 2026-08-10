@@ -10,6 +10,8 @@
 	var stateOrder = [];
 	var hiddenPanels = [];
 	var musicHandles = [];
+	var eventMusicHandle = null;
+	var eventMusicSerial = -1;
 	var renderSerial = 0;
 	var stateSerial = 0;
 
@@ -123,6 +125,28 @@
 		for (var i = 0; i < Math.max(1, Number(layers) || 1); i++) musicHandles.push(Game.EmitSound(soundName));
 	}
 
+	function StopEventMusic() {
+		if (eventMusicHandle !== undefined && eventMusicHandle !== null) Game.StopSound(eventMusicHandle);
+		eventMusicHandle = null;
+	}
+
+	function PlayEventMusic(data) {
+		data = data || {};
+		var serial = Number(data.serial) || 0;
+		if (serial < eventMusicSerial) return;
+		eventMusicSerial = serial;
+		StopEventMusic();
+		if (data.sound) eventMusicHandle = Game.EmitSound(String(data.sound));
+	}
+
+	function EndEventMusic(data) {
+		data = data || {};
+		var serial = Number(data.serial) || 0;
+		if (serial < eventMusicSerial) return;
+		eventMusicSerial = serial;
+		StopEventMusic();
+	}
+
 	function ApplyLetterbox(percent, transition) {
 		var numericPercent = Number(percent);
 		percent = Math.max(0, Math.min(25, isNaN(numericPercent) ? 10 : numericPercent));
@@ -207,6 +231,8 @@
 
 	GameEvents.Subscribe("xhs_cinematic_begin", Begin);
 	GameEvents.Subscribe("xhs_cinematic_end", End);
+	GameEvents.Subscribe("xhs_event_music_play", PlayEventMusic);
+	GameEvents.Subscribe("xhs_event_music_stop", EndEventMusic);
 	GameUI.CustomUIConfig().XHSCinematics = {
 		begin: Begin,
 		end: End,

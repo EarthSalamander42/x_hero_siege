@@ -119,6 +119,11 @@
 	z-index: 4;
 }
 
+.XHSFarmLeaderboard.IsSoloLocked .XHSFarmLeaderboardCollapse
+{
+	visibility: collapse;
+}
+
 .XHSFarmLeaderboardHide
 {
 	width: 24px;

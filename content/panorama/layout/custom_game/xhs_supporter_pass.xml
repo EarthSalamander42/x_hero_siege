@@ -146,9 +146,12 @@
 							</Panel>
 
 							<Panel class="XHSPassTiersCard XHSPanel">
-								<Panel class="XHSPassSectionHeader">
+								<Panel class="XHSPassSectionHeader XHSPassTierSectionHeader">
 									<Label class="XHSPassSectionTitle" text="#xhs_sp_supporter_tiers" />
 									<Label class="XHSPassSectionNote" text="#xhs_sp_supporter_tiers_note" />
+									<Button id="XHSPassChinaPaymentButton" class="XHSPassChinaPaymentButton">
+										<Label text="WECHAT PAY 微信支付 / ALIPAY 支付宝" />
+									</Button>
 								</Panel>
 								<Panel id="XHSPassTierRows" class="XHSPassTierRows" />
 							</Panel>
@@ -265,6 +268,47 @@
 				<Button id="XHSPassPremiumCTAButton" class="XHSPassPremiumCTAButton">
 					<Label text="#xhs_sp_premium_cta_button" />
 				</Button>
+			</Panel>
+
+			<Panel id="XHSPassChinaPaymentOverlay" class="XHSPassChinaPaymentOverlay" hittest="false">
+				<Button id="XHSPassChinaPaymentBackdrop" class="XHSPassChinaPaymentBackdrop" />
+				<Panel class="XHSPassChinaPaymentWindow">
+					<Panel class="XHSPassChinaPaymentHeader">
+						<Panel class="XHSPassChinaPaymentHeaderCopy">
+							<Label class="XHSPassChinaPaymentEyebrow" text="DIRECT IN-GAME FALLBACK  /  游戏内支付" />
+							<Label class="XHSPassChinaPaymentTitle" text="WECHAT PAY 微信支付 &amp; ALIPAY 支付宝" />
+							<Label class="XHSPassChinaPaymentCopy" text="Fixed supporter access through Stripe Checkout. The Frostrose website is not required.  /  通过 Stripe Checkout 安全购买，无需访问 Frostrose 网站。" />
+						</Panel>
+						<Button id="XHSPassChinaPaymentCloseButton" class="XHSPassChinaPaymentCloseButton"><Label text="X" /></Button>
+					</Panel>
+
+					<Label id="XHSPassChinaPaymentStatus" class="XHSPassChinaPaymentStatus" text="Loading secure payment options..." />
+
+					<Panel class="XHSPassChinaPaymentStep">
+						<Label class="XHSPassChinaPaymentStepLabel" text="1  SELECT SUPPORTER TIER  /  选择支持等级" />
+						<Panel id="XHSPassChinaPaymentTiers" class="XHSPassChinaPaymentChoices XHSPassChinaPaymentTierChoices" />
+					</Panel>
+
+					<Panel class="XHSPassChinaPaymentStep">
+						<Label class="XHSPassChinaPaymentStepLabel" text="2  SELECT FIXED ACCESS  /  选择有效期" />
+						<Panel id="XHSPassChinaPaymentDurations" class="XHSPassChinaPaymentChoices" />
+					</Panel>
+
+					<Panel class="XHSPassChinaPaymentStep">
+						<Label class="XHSPassChinaPaymentStepLabel" text="3  SELECT PAYMENT METHOD  /  选择支付方式" />
+						<Panel id="XHSPassChinaPaymentProviders" class="XHSPassChinaPaymentChoices" />
+					</Panel>
+
+					<Panel class="XHSPassChinaPaymentSummary">
+						<Panel class="XHSPassChinaPaymentSummaryCopy">
+							<Label id="XHSPassChinaPaymentSelection" class="XHSPassChinaPaymentSelection" text="Select an offer" />
+							<Label id="XHSPassChinaPaymentPrice" class="XHSPassChinaPaymentPrice" text="--" />
+						</Panel>
+						<Button id="XHSPassChinaPaymentCancelButton" class="XHSPassChinaPaymentSecondary"><Label text="CANCEL" /></Button>
+						<Button id="XHSPassChinaPaymentContinueButton" class="XHSPassChinaPaymentContinue"><Label text="OPEN SECURE CHECKOUT" /></Button>
+					</Panel>
+					<Label class="XHSPassChinaPaymentSafety" text="Your entitlement activates only after a signed webhook or authenticated Stripe verification. Keep this window open while the game confirms the payment." />
+				</Panel>
 			</Panel>
 
 			<Panel id="XHSPassActionToast" class="XHSPassActionToast" hittest="false">

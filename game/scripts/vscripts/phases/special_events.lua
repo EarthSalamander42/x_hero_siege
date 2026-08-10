@@ -512,6 +512,11 @@ end
 
 local STORM_EARTH_FIRE_SOUND = "Muradin.StormEarthFire"
 
+local function NextStormEarthFireMusicSerial()
+	SpecialEvents.stormEarthFireMusicSerial = (SpecialEvents.stormEarthFireMusicSerial or 0) + 1
+	return SpecialEvents.stormEarthFireMusicSerial
+end
+
 local function StopStormEarthFireSound(entity)
 	if entity == nil or not IsValidEntity(entity) or entity:IsNull() then return end
 
@@ -524,6 +529,9 @@ end
 local function StopAllStormEarthFireSounds()
 	SpecialEvents.stormEarthFireSoundGeneration = (SpecialEvents.stormEarthFireSoundGeneration or 0) + 1
 	SpecialEvents.stormEarthFirePlaying = false
+	CustomGameEventManager:Send_ServerToAllClients("xhs_event_music_stop", {
+		serial = NextStormEarthFireMusicSerial(),
+	})
 
 	-- Clean up a global instance left by the previous implementation.
 	StopGlobalSound(STORM_EARTH_FIRE_SOUND)
@@ -557,71 +565,21 @@ local function PlayStormEarthFireSound(entity, emitterKey, temporary)
 	if entity == nil or not IsValidEntity(entity) or entity:IsNull() then return end
 	if SpecialEvents.stormEarthFirePlaying == true then return end
 
-	emitterKey = emitterKey or "boss"
-	SpecialEvents.stormEarthFireEmitters = SpecialEvents.stormEarthFireEmitters or {}
-
-	local current = SpecialEvents.stormEarthFireEmitters[emitterKey]
-	if current ~= nil
-		and current.entity ~= nil
-		and IsValidEntity(current.entity)
-		and not current.entity:IsNull()
-	then
-		return
-	end
-
-	-- Never bind long event music to a boss: if it dies first, Source can keep
-	-- the sound on an entindex that is later recycled by a creep. A dedicated
-	-- invulnerable emitter remains valid until the event cleanup stops it.
 	SpecialEvents.stormEarthFirePlaying = true
-
 	local generation = SpecialEvents.stormEarthFireSoundGeneration
-	local emitter = temporary ~= true and SpecialEvents.stormEarthFireEmitter or nil
-	if emitter == nil or not IsValidEntity(emitter) or emitter:IsNull() then
-		emitter = CreateUnitByName(
-			"dummy_unit_invulnerable",
-			entity:GetAbsOrigin(),
-			false,
-			nil,
-			nil,
-			DOTA_TEAM_GOODGUYS
-		)
-		if emitter == nil then
-			return
-		end
-
-		emitter:AddNewModifier(emitter, nil, "modifier_invulnerable", {})
-		emitter:AddNewModifier(emitter, nil, "modifier_phased", {})
-		emitter:AddNoDraw()
-		if temporary ~= true then
-			SpecialEvents.stormEarthFireEmitter = emitter
-		end
-	else
-		emitter:SetAbsOrigin(entity:GetAbsOrigin())
-	end
-
-	SpecialEvents.stormEarthFireEmitters[emitterKey] = {
-		entity = emitter,
-		temporary = temporary == true,
-	}
 
 	-- StopGlobalSound and replaying the same event in one frame can suppress the
-	-- new instance. Start it on the next frame after the legacy cleanup.
+	-- new instance. Start it on the next frame after the legacy cleanup. Music is
+	-- played client-side so no temporary entity or recycled entindex can stop it.
 	GameRules:GetGameModeEntity():SetContextThink(DoUniqueString("storm_earth_fire_play"), function()
-		local registered = SpecialEvents.stormEarthFireEmitters
-			and SpecialEvents.stormEarthFireEmitters[emitterKey]
-		if SpecialEvents.stormEarthFireSoundGeneration ~= generation
-			or registered == nil
-			or registered.entity ~= emitter
-			or emitter == nil
-			or not IsValidEntity(emitter)
-			or emitter:IsNull()
-		then
+		if SpecialEvents.stormEarthFireSoundGeneration ~= generation then
 			return nil
 		end
 
-		-- Event music must be audible to every participant, including players in
-		-- the separated farm arenas. A spatial emitter silently falls out of range.
-		EmitGlobalSound(STORM_EARTH_FIRE_SOUND)
+		CustomGameEventManager:Send_ServerToAllClients("xhs_event_music_play", {
+			serial = NextStormEarthFireMusicSerial(),
+			sound = STORM_EARTH_FIRE_SOUND,
+		})
 		return nil
 	end, 0.03)
 end
@@ -810,6 +768,19 @@ local function GetFarmEventWaveCount()
 	return math.max(1, #(FarmEvent_Creeps or {}))
 end
 
+local function IsSoloHumanLeaderboard(players)
+	if type(players) ~= "table" or #players ~= 1 then return false end
+	local playerID = tonumber(players[1] and players[1].player_id)
+	if playerID == nil or playerID < 0 then return false end
+	if PlayerResource.IsFakeClient ~= nil then
+		local ok, isBot = pcall(function()
+			return PlayerResource:IsFakeClient(playerID)
+		end)
+		if ok and isBot == true then return false end
+	end
+	return true
+end
+
 function SpecialEvents:PublishFarmLeaderboard(active)
 	local wavesPerLevel = GetFarmEventWaveCount()
 	local players = {}
@@ -876,6 +847,7 @@ function SpecialEvents:PublishFarmLeaderboard(active)
 	CustomNetTables:SetTableValue(FARM_LEADERBOARD_NET_TABLE, FARM_LEADERBOARD_NET_KEY, {
 		active = active == true,
 		available = #players > 0,
+		solo_no_bots = IsSoloHumanLeaderboard(players),
 		phase = phase,
 		winner_player_id = winner and winner.player_id or -1,
 		winner_kills = winner and winner.kills or 0,
@@ -952,6 +924,7 @@ function SpecialEvents:PublishKillEventLeaderboard(active, players, config)
 	CustomNetTables:SetTableValue(KILL_EVENT_LEADERBOARD_NET_TABLE, KILL_EVENT_LEADERBOARD_NET_KEY, {
 		active = active == true,
 		available = active == true and #players > 0,
+		solo_no_bots = IsSoloHumanLeaderboard(players),
 		phase = active == true and "kill_event_countdown" or "hidden",
 		mode = config and config.mode or "ramero_kill_race",
 		target_kills = targetKills,
@@ -960,7 +933,29 @@ function SpecialEvents:PublishKillEventLeaderboard(active, players, config)
 	})
 end
 
+function SpecialEvents:SetKillEventLeaderboardSuppressedForFarm(suppressed)
+	self.kill_event_leaderboard_suppressed_by_farm = suppressed == true
+	if self.kill_event_leaderboard_suppressed_by_farm then
+		-- Stop the existing 0.25 s publisher and immediately remove its panel.
+		self.kill_event_leaderboard_active = false
+		self:PublishKillEventLeaderboard(false, {}, self:GetKillEventLeaderboardConfig())
+		return
+	end
+
+	-- The farm celebration is now fully over. Re-evaluate the current kill race
+	-- from authoritative hero kills instead of restoring a stale snapshot.
+	self:RefreshKillEventLeaderboard()
+end
+
 function SpecialEvents:RefreshKillEventLeaderboard()
+	if self.kill_event_leaderboard_suppressed_by_farm == true then
+		if self.kill_event_leaderboard_active == true then
+			self.kill_event_leaderboard_active = false
+			self:PublishKillEventLeaderboard(false, {}, self:GetKillEventLeaderboardConfig())
+		end
+		return
+	end
+
 	local config = self:GetKillEventLeaderboardConfig()
 	if config == nil then
 		if self.kill_event_leaderboard_active == true then
@@ -989,6 +984,12 @@ function SpecialEvents:RefreshKillEventLeaderboard()
 	GameRules:GetGameModeEntity():SetContextThink("xhs_kill_event_leaderboard_publish", function()
 		if self.kill_event_leaderboard_active ~= true then
 			self.kill_event_leaderboard_publisher_running = false
+			return nil
+		end
+		if self.kill_event_leaderboard_suppressed_by_farm == true then
+			self.kill_event_leaderboard_active = false
+			self.kill_event_leaderboard_publisher_running = false
+			self:PublishKillEventLeaderboard(false, {}, self:GetKillEventLeaderboardConfig())
 			return nil
 		end
 
@@ -1446,6 +1447,7 @@ function SpecialEvents:RecoverFarmEventExit(message, source)
 			})
 		end
 	end
+	self:SetKillEventLeaderboardSuppressedForFarm(false)
 end
 
 function SpecialEvents:RequestFarmEventExit(source, generation)
@@ -1542,6 +1544,7 @@ function SpecialEvents:FarmEvent(time)
 	self.farm_event_ability_locks = {}
 	self.farm_event_final_players = nil
 	self.farm_event_leaderboard_phase = "active"
+	self:SetKillEventLeaderboardSuppressedForFarm(true)
 	self.farm_event_generation = (self.farm_event_generation or 0) + 1
 	self.farm_event_end_started = false
 	self.farm_event_exit_deadline = nil
@@ -1800,6 +1803,7 @@ function SpecialEvents:EndFarmEvent()
 	GameMode.FarmEvent_occuring = false
 	self.farm_event_leaderboard_phase = "archived"
 	self:PublishFarmLeaderboard(false)
+	self:SetKillEventLeaderboardSuppressedForFarm(false)
 end
 
 function SpecialEvents:StartRameroAndBaristolEvent(hero)

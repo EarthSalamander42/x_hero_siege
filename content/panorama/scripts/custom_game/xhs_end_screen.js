@@ -2092,13 +2092,18 @@ var XHSEndScreen = (function () {
 		var inventory = $.CreatePanel("Panel", identity, "");
 		inventory.AddClass("XHSPlayerInventory");
 		var inventoryItems = [];
+		var inventoryItemNames = [];
 		for (var slot = 0; slot < 6; slot++) {
 			var itemName = model.inventory && model.inventory[slot] ? model.inventory[slot] : "";
 			var item = $.CreatePanel("DOTAItemImage", inventory, "");
 			item.AddClass("XHSPlayerInventoryItem");
 			item.SetHasClass("IsEmpty", !itemName);
 			item.itemname = itemName;
+			item.hittest = !!itemName;
+			item.hittestchildren = false;
+			item.style.tooltipPosition = "top";
 			inventoryItems.push(item);
+			inventoryItemNames.push(itemName);
 		}
 
 		CreateCell(row, "PlayerColSmall", model.level.toString());
@@ -2109,11 +2114,12 @@ var XHSEndScreen = (function () {
 		CreateCell(row, "PlayerColNumber", FormatNumber(model.potionsUsed), "XHSPlayerCellPotions");
 		CreateBattlepassCell(row, model);
 
+		var inventoryHoverActive = false;
+		var hideSupporterHover = null;
 		if (typeof XHSSupporterHover !== "undefined" && XHSSupporterHover.Create) {
 			var hoverID = "End_" + model.id;
 			var hoverRoot = Panel("XHSEndScreenMain") || row;
 			var hover = XHSSupporterHover.Create(hoverRoot, hoverID, { className: "XHSEndScreenSupporterHover" });
-			var inventoryHoverActive = false;
 			var showHover = function () {
 				if (inventoryHoverActive) {
 					XHSSupporterHover.Hide(row, hover);
@@ -2130,20 +2136,27 @@ var XHSEndScreen = (function () {
 			var hideHover = function () {
 				XHSSupporterHover.Hide(row, hover);
 			};
+			hideSupporterHover = hideHover;
 
 			row.SetPanelEvent("onmouseover", showHover);
 			row.SetPanelEvent("onmouseout", hideHover);
 			identity.SetPanelEvent("onmouseover", showHover);
 			identity.SetPanelEvent("onmouseout", hideHover);
-			for (var itemIndex = 0; itemIndex < inventoryItems.length; itemIndex++) {
-				inventoryItems[itemIndex].SetPanelEvent("onmouseover", function () {
+		}
+
+		for (var itemIndex = 0; itemIndex < inventoryItems.length; itemIndex++) {
+			(function (inventoryItem, inventoryItemName) {
+				if (!inventoryItemName) return;
+				inventoryItem.SetPanelEvent("onmouseover", function () {
 					inventoryHoverActive = true;
-					hideHover();
+					if (hideSupporterHover) hideSupporterHover();
+					$.DispatchEvent("DOTAShowAbilityTooltip", inventoryItem, inventoryItemName);
 				});
-				inventoryItems[itemIndex].SetPanelEvent("onmouseout", function () {
+				inventoryItem.SetPanelEvent("onmouseout", function () {
 					inventoryHoverActive = false;
+					$.DispatchEvent("DOTAHideAbilityTooltip", inventoryItem);
 				});
-			}
+			})(inventoryItems[itemIndex], inventoryItemNames[itemIndex]);
 		}
 	}
 

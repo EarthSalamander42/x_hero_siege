@@ -854,7 +854,7 @@
 
 .XHSPassTiersCard {
 	width: 100%;
-	height: 500px;
+	height: 554px;
 	margin-right: 0px;
 	margin-bottom: 14px;
 	padding: 16px;
@@ -1095,6 +1095,36 @@
 	vertical-align: center;
 }
 
+.XHSPassTierSectionHeader .XHSPassSectionNote {
+	width: 250px;
+}
+
+.XHSPassChinaPaymentButton {
+	width: 228px;
+	height: 30px;
+	margin-left: 14px;
+	vertical-align: center;
+	background-color: gradient( linear, 0% 0%, 100% 100%, from( #102e39 ), to( #08131f ) );
+	border: 1px solid #63dfd6a8;
+	box-shadow: fill #1ee8d526 0px 0px 8px 0px, inset #ffffff12 0px 1px 0px 0px;
+	transition-property: brightness, transform, border;
+	transition-duration: 0.12s;
+}
+
+.XHSPassChinaPaymentButton:hover {
+	brightness: 1.3;
+	transform: translateY( -1px );
+	border-color: #9bfff5e8;
+}
+
+.XHSPassChinaPaymentButton Label {
+	align: center center;
+	color: #b9fff7;
+	font-size: 9px;
+	font-weight: bold;
+	letter-spacing: 0.8px;
+}
+
 .XHSPassSectionFilterTabs {
 	width: fill-parent-flow( 1.0 );
 	height: 100%;
@@ -1217,7 +1247,7 @@
 
 .XHSPassTierRows {
 	width: 1190px;
-	height: fill-parent-flow( 1.0 );
+	height: 452px;
 	margin-top: 12px;
 	horizontal-align: center;
 	flow-children: right;
@@ -1226,7 +1256,7 @@
 
 .XHSPassTierCard {
 	width: 228px;
-	height: 398px;
+	height: 452px;
 	margin-right: 10px;
 	padding: 16px 14px 14px 14px;
 	flow-children: down;
@@ -1243,7 +1273,7 @@
 .XHSPassTierShade,
 .XHSPassTierSweep {
 	width: 228px;
-	height: 398px;
+	height: 452px;
 	margin-left: -14px;
 	margin-top: -16px;
 	ignore-parent-flow: true;
@@ -4006,6 +4036,276 @@ DropDownMenu.DropDownMenuVisible {
 	width: 760px;
 }
 
+.XHSPassChinaPaymentOverlay {
+	width: 100%;
+	height: 100%;
+	ignore-parent-flow: true;
+	background-color: #00000000;
+	opacity: 0;
+	visibility: collapse;
+	transition-property: opacity;
+	transition-duration: 0.14s;
+	z-index: 310;
+}
+
+.XHSPassChinaPaymentOverlay.IsVisible {
+	opacity: 1;
+	visibility: visible;
+}
+
+.XHSPassChinaPaymentBackdrop {
+	width: 100%;
+	height: 100%;
+	background-color: #01050bdc;
+}
+
+.XHSPassChinaPaymentWindow {
+	width: 980px;
+	height: 620px;
+	align: center center;
+	padding: 24px 26px 18px 26px;
+	flow-children: down;
+	background-color: gradient( linear, 0% 0%, 100% 100%, from( #071923fc ), color-stop( 0.62, #07101cfc ), to( #11132afc ) );
+	border: 1px solid #63dfd6b8;
+	box-shadow: fill #000000e8 0px 0px 30px 4px, fill #20e4d52a 0px 0px 18px 0px, inset #ffffff14 0px 1px 0px 0px;
+}
+
+.XHSPassChinaPaymentHeader {
+	width: 100%;
+	height: 104px;
+	flow-children: right;
+	border-bottom: 1px solid #63dfd638;
+}
+
+.XHSPassChinaPaymentHeaderCopy {
+	width: fill-parent-flow( 1.0 );
+	flow-children: down;
+}
+
+.XHSPassChinaPaymentEyebrow,
+.XHSPassChinaPaymentStepLabel {
+	color: #68e9dd;
+	font-size: 11px;
+	font-weight: bold;
+	letter-spacing: 1.6px;
+	text-transform: uppercase;
+}
+
+.XHSPassChinaPaymentTitle {
+	margin-top: 3px;
+	color: #f5ffff;
+	font-size: 28px;
+	font-weight: bold;
+	letter-spacing: 1px;
+	text-transform: uppercase;
+	text-shadow: 0px 0px 8px #45f2df58;
+}
+
+.XHSPassChinaPaymentCopy {
+	width: 780px;
+	margin-top: 4px;
+	color: #9fc8d2;
+	font-size: 12px;
+	line-height: 16px;
+}
+
+.XHSPassChinaPaymentCloseButton {
+	width: 38px;
+	height: 38px;
+	background-color: #050a12e8;
+	border: 1px solid #63dfd66b;
+}
+
+.XHSPassChinaPaymentCloseButton:hover {
+	brightness: 1.35;
+}
+
+.XHSPassChinaPaymentCloseButton Label {
+	align: center center;
+	color: #d8ffff;
+	font-size: 16px;
+	font-weight: bold;
+}
+
+.XHSPassChinaPaymentStatus {
+	width: 100%;
+	height: 35px;
+	margin-top: 10px;
+	padding: 8px 12px 0px 12px;
+	color: #d3f5f2;
+	font-size: 12px;
+	background-color: #0a2430c8;
+	border-left: 3px solid #63dfd6;
+	text-overflow: shrink;
+}
+
+.XHSPassChinaPaymentStatus.IsError {
+	color: #ffb7aa;
+	background-color: #2b1114d8;
+	border-left-color: #ff6655;
+}
+
+.XHSPassChinaPaymentStatus.IsSuccess {
+	color: #b8ffd0;
+	background-color: #0c281bd8;
+	border-left-color: #70e39a;
+}
+
+.XHSPassChinaPaymentStep {
+	width: 100%;
+	height: 92px;
+	padding-top: 10px;
+	flow-children: down;
+}
+
+.XHSPassChinaPaymentChoices {
+	width: 100%;
+	height: 55px;
+	margin-top: 6px;
+	flow-children: right;
+}
+
+.XHSPassChinaPaymentChoice {
+	width: 215px;
+	height: 50px;
+	margin-right: 10px;
+	padding: 5px 10px;
+	flow-children: down;
+	background-color: #06111ce8;
+	border: 1px solid #31566b;
+	transition-property: brightness, border, background-color, transform;
+	transition-duration: 0.12s;
+}
+
+.XHSPassChinaPaymentTierChoices .XHSPassChinaPaymentChoice {
+	width: 176px;
+}
+
+.XHSPassChinaPaymentChoice:hover {
+	brightness: 1.22;
+	transform: translateY( -1px );
+	border-color: #63dfd6;
+}
+
+.XHSPassChinaPaymentChoice.IsSelected {
+	background-color: gradient( linear, 0% 0%, 100% 100%, from( #123a42 ), to( #0a1728 ) );
+	border: 1px solid #9bfff5;
+	box-shadow: fill #22e3d42c 0px 0px 8px 0px, inset #ffffff12 0px 1px 0px 0px;
+}
+
+.XHSPassChinaPaymentChoice.IsDisabled {
+	brightness: 0.38;
+	saturation: 0.25;
+}
+
+.XHSPassChinaPaymentChoiceTitle {
+	width: 100%;
+	color: #f2ffff;
+	font-size: 13px;
+	font-weight: bold;
+	text-transform: uppercase;
+	text-overflow: shrink;
+}
+
+.XHSPassChinaPaymentChoiceDetail {
+	width: 100%;
+	margin-top: 2px;
+	color: #78b8c6;
+	font-size: 10px;
+	text-transform: uppercase;
+	text-overflow: shrink;
+}
+
+.XHSPassChinaPaymentSummary {
+	width: 100%;
+	height: 72px;
+	margin-top: 5px;
+	padding: 8px 10px 8px 14px;
+	flow-children: right;
+	background-color: #040a13e8;
+	border: 1px solid #d8af4c7a;
+}
+
+.XHSPassChinaPaymentSummaryCopy {
+	width: fill-parent-flow( 1.0 );
+	flow-children: down;
+}
+
+.XHSPassChinaPaymentSelection {
+	color: #a4c8d1;
+	font-size: 11px;
+	text-transform: uppercase;
+}
+
+.XHSPassChinaPaymentPrice {
+	margin-top: 2px;
+	color: #ffd768;
+	font-size: 22px;
+	font-weight: bold;
+}
+
+.XHSPassChinaPaymentSecondary,
+.XHSPassChinaPaymentContinue {
+	height: 42px;
+	margin-left: 10px;
+	vertical-align: center;
+}
+
+.XHSPassChinaPaymentSecondary {
+	width: 106px;
+	background-color: #101923e8;
+	border: 1px solid #4a7180;
+}
+
+.XHSPassChinaPaymentContinue {
+	width: 222px;
+	background-color: gradient( linear, 0% 0%, 100% 100%, from( #e8b94a ), to( #8e5a13 ) );
+	border: 1px solid #ffe394;
+	box-shadow: fill #e8b94a2c 0px 0px 9px 0px, inset #ffffff21 0px 1px 0px 0px;
+}
+
+.XHSPassChinaPaymentSecondary:hover,
+.XHSPassChinaPaymentContinue:hover {
+	brightness: 1.25;
+}
+
+.XHSPassChinaPaymentContinue.IsDisabled {
+	brightness: 0.35;
+	saturation: 0.3;
+}
+
+.XHSPassChinaPaymentSecondary Label,
+.XHSPassChinaPaymentContinue Label {
+	align: center center;
+	font-size: 11px;
+	font-weight: bold;
+	letter-spacing: 0.6px;
+}
+
+.XHSPassChinaPaymentSecondary Label {
+	color: #c6e4ea;
+}
+
+.XHSPassChinaPaymentContinue Label {
+	color: #160e05;
+}
+
+.XHSPassChinaPaymentSafety {
+	width: 100%;
+	margin-top: 6px;
+	color: #6f96a2;
+	font-size: 10px;
+	text-align: center;
+}
+
+.AspectRatio4x3 .XHSPassChinaPaymentWindow {
+	width: 820px;
+}
+
+.AspectRatio4x3 .XHSPassChinaPaymentTierChoices .XHSPassChinaPaymentChoice {
+	width: 145px;
+}
+
 .XHSPassActionToast {
 	width: 520px;
 	min-height: 48px;
@@ -4124,15 +4424,22 @@ DropDownMenu.DropDownMenuVisible {
 
 .AspectRatio16x10 .XHSPassTierRows {
 	width: 1130px;
+	height: 474px;
 }
 
 .AspectRatio16x10 .XHSPassTierCard {
 	width: 216px;
+	height: 474px;
 }
 
 .AspectRatio16x10 .XHSPassTierArt,
 .AspectRatio16x10 .XHSPassTierShade {
 	width: 216px;
+	height: 474px;
+}
+
+.AspectRatio16x10 .XHSPassTiersCard {
+	height: 576px;
 }
 
 .AspectRatio4x3 .XHSPassTopBar {
@@ -4185,15 +4492,22 @@ DropDownMenu.DropDownMenuVisible {
 
 .AspectRatio4x3 .XHSPassTierRows {
 	width: 890px;
+	height: 510px;
 }
 
 .AspectRatio4x3 .XHSPassTierCard {
 	width: 170px;
+	height: 510px;
 }
 
 .AspectRatio4x3 .XHSPassTierArt,
 .AspectRatio4x3 .XHSPassTierShade {
 	width: 170px;
+	height: 510px;
+}
+
+.AspectRatio4x3 .XHSPassTiersCard {
+	height: 612px;
 }
 
 .AspectRatio4x3 .XHSPassTierOwnedTooltip {

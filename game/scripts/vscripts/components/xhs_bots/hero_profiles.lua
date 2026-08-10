@@ -46,6 +46,31 @@ local ITEM_AFFINITIES = {
 		single_target = 0.85, wave = 0.60, sustain = 0.40,
 		mobility = 0.40, control = 0.25,
 	},
+	npc_dota_hero_luna = {
+		right_click = 1.00, attack_speed = 0.90, physical = 0.85,
+		wave = 1.00, magical = 0.60, caster = 0.45,
+		team = 0.45, survival = 0.30,
+	},
+	npc_dota_hero_phantom_assassin = {
+		right_click = 0.90, physical = 0.90, frontline = 0.55,
+		wave = 0.85, control = 0.70, damage_over_time = 0.55,
+		survival = 0.45, mobility = 0.45,
+	},
+	npc_dota_hero_terrorblade = {
+		right_click = 0.95, physical = 0.90, frontline = 0.75,
+		wave = 0.80, magical = 0.55, sustain = 0.90,
+		survival = 0.70, attack_speed = 0.70,
+	},
+	npc_dota_hero_lich = {
+		caster = 1.00, magical = 1.00, cooldown = 0.90,
+		control = 0.85, wave = 0.90, team = 0.75,
+		mana = 0.70, right_click = 0.45, survival = 0.30,
+	},
+	npc_dota_hero_mirana = {
+		caster = 0.90, magical = 0.90, cooldown = 0.80,
+		team = 0.90, sustain = 0.75, summons = 0.65,
+		wave = 0.85, ranged_dps = 0.55, survival = 0.30,
+	},
 }
 
 -- Roles are deliberately separate from the legacy combat label. The primary
@@ -530,6 +555,221 @@ local PROFILE_BY_HERO = {
 			},
 		},
 	},
+	npc_dota_hero_luna = {
+		certified = true,
+		runtime_validated = false,
+		display_name = "Huntress",
+		role = "ranged_dps",
+		primary_role = "ranged_dps",
+		secondary_role = "wave_clear",
+		preferred_range = 590,
+		safety_distance = 380,
+		retreat_health = 0.28,
+		target_priority = { "boss", "caster", "nearest" },
+		item_affinities = ITEM_AFFINITIES.npc_dota_hero_luna,
+		skill_build = {
+			"holdout_moon_explosion",
+			"holdout_elunes_grace",
+			"holdout_command_aura",
+			"holdout_forked_lightning",
+			"holdout_owl_lightning",
+			"holdout_innate_lunar_glaive",
+		},
+		abilities = {
+			holdout_forked_lightning = {
+				mode = "enemy_unit", priority = 84,
+				allow_creep_cast_without_damage_model = true,
+			},
+			holdout_owl_lightning = {
+				mode = "enemy_unit", priority = 80,
+				allow_creep_cast_without_damage_model = true,
+			},
+			holdout_moon_explosion = {
+				mode = "no_target_enemy", priority = 96, radius = 900,
+				minimum_targets = 3, cast_on_boss = true,
+				reserve_ultimate = true,
+			},
+		},
+	},
+	npc_dota_hero_phantom_assassin = {
+		certified = true,
+		runtime_validated = false,
+		display_name = "Warden",
+		role = "melee_control",
+		primary_role = "frontline",
+		secondary_role = "wave_clear",
+		preferred_range = 175,
+		safety_distance = 125,
+		retreat_health = 0.25,
+		target_priority = { "caster", "boss", "nearest" },
+		item_affinities = ITEM_AFFINITIES.npc_dota_hero_phantom_assassin,
+		skill_build = {
+			"holdout_vengeance",
+			"holdout_gust_pool",
+			"holdout_permanent_stats",
+			"holdout_heat_seeking_daggers",
+			"holdout_shadow_strike",
+			"holdout_innate_great_cleave",
+		},
+		abilities = {
+			holdout_heat_seeking_daggers = {
+				mode = "no_target_enemy", priority = 86, radius = 1000,
+				minimum_targets = 2,
+			},
+			holdout_shadow_strike = {
+				mode = "enemy_unit", priority = 82,
+				allow_creep_cast_without_damage_model = true,
+			},
+			holdout_gust_pool = {
+				mode = "point_aoe", priority = 89, radius = 500,
+				minimum_targets = 2, control = true,
+			},
+			holdout_vengeance = {
+				mode = "summon", priority = 94, require_combat = true,
+				reserve_ultimate = true,
+			},
+		},
+	},
+	npc_dota_hero_terrorblade = {
+		certified = true,
+		runtime_validated = false,
+		display_name = "Demon Hunter",
+		role = "frontline_dps",
+		primary_role = "frontline",
+		secondary_role = "right_click",
+		preferred_range = 180,
+		safety_distance = 125,
+		retreat_health = 0.23,
+		target_priority = { "boss", "caster", "nearest" },
+		item_affinities = ITEM_AFFINITIES.npc_dota_hero_terrorblade,
+		skill_build = {
+			"holdout_metamorphosis",
+			"holdout_roar",
+			"holdout_illidan_evasion",
+			"holdout_active_immolation",
+			"holdout_negative_energy",
+			"xhs_vampiric_aura",
+		},
+		abilities = {
+			holdout_negative_energy = {
+				mode = "enemy_unit", priority = 84,
+			},
+			holdout_active_immolation = {
+				mode = "toggle_aoe", priority = 90, radius = 400,
+				minimum_targets = 2, mana_threshold = 0.18,
+			},
+			holdout_roar = {
+				mode = "team_buff", priority = 90, radius = 900,
+				minimum_allies = 2, minimum_enemies = 3,
+				cast_on_boss = true, active_modifier = "modifier_roar",
+			},
+			holdout_metamorphosis = {
+				mode = "self_buff", priority = 97, require_combat = true,
+				radius = 800, minimum_targets = 3, cast_on_boss = true,
+				reserve_ultimate = true,
+			},
+		},
+	},
+	npc_dota_hero_lich = {
+		certified = true,
+		runtime_validated = false,
+		display_name = "Lich",
+		role = "ranged_control",
+		primary_role = "spellcaster",
+		secondary_role = "control",
+		preferred_range = 610,
+		safety_distance = 400,
+		retreat_health = 0.30,
+		target_priority = { "caster", "boss", "nearest" },
+		item_affinities = ITEM_AFFINITIES.npc_dota_hero_lich,
+		skill_build = {
+			"holdout_frost_beast",
+			"holdout_frost_arrows",
+			"holdout_frost_armor",
+			"holdout_frost_breath",
+			"holdout_frost_nova",
+			"holdout_frost_frenzy",
+		},
+		abilities = {
+			holdout_frost_nova = {
+				mode = "enemy_unit", priority = 84,
+			},
+			holdout_frost_breath = {
+				mode = "directional_point", priority = 88, radius = 250,
+				minimum_targets = 2, aim_distance = 240,
+				travel_range = 1000, control = true,
+			},
+			holdout_frost_armor = {
+				mode = "ally_buff", priority = 91, include_self = true,
+				prefer_roles = { "frontline", "frontline_control" },
+				active_modifier = "modifier_xhs_frost_shield",
+				require_combat = true,
+			},
+			holdout_frost_arrows = {
+				mode = "autocast_attack", priority = 87,
+				mana_threshold = 0.18,
+			},
+			holdout_frost_frenzy = {
+				mode = "self_buff", priority = 89, require_combat = true,
+				radius = 750, minimum_targets = 3, cast_on_boss = true,
+				minimum_health_ratio = 0.70,
+			},
+			holdout_frost_beast = {
+				mode = "point_aoe", priority = 97, radius = 500,
+				minimum_targets = 3, cast_on_boss = true,
+				control = true, reserve_ultimate = true,
+			},
+		},
+	},
+	npc_dota_hero_mirana = {
+		certified = true,
+		runtime_validated = false,
+		display_name = "Priestess of the Moon",
+		role = "ranged_support",
+		primary_role = "spellcaster",
+		secondary_role = "support",
+		preferred_range = 610,
+		safety_distance = 400,
+		retreat_health = 0.30,
+		target_priority = { "threat_to_ally", "boss", "nearest" },
+		item_affinities = ITEM_AFFINITIES.npc_dota_hero_mirana,
+		skill_build = {
+			"holdout_monsoon",
+			"holdout_storm_rain",
+			"holdout_distance_aura",
+			"zuus_arc_lightning",
+			"holdout_watery_minion",
+			"holdout_rejuvenation",
+		},
+		abilities = {
+			zuus_arc_lightning = {
+				mode = "enemy_unit", priority = 91,
+				aoe_unit_target = true, radius = 500, minimum_targets = 2,
+				allow_creep_cast_without_damage_model = true,
+			},
+			holdout_watery_minion = {
+				mode = "point_aoe", priority = 80, radius = 300,
+				minimum_targets = 1,
+			},
+			holdout_storm_rain = {
+				mode = "enemy_unit", priority = 94,
+				aoe_unit_target = true, radius = 800, minimum_targets = 2,
+				allow_creep_cast_without_damage_model = true,
+			},
+			holdout_rejuvenation = {
+				mode = "ally_heal", priority = 96, include_self = true,
+				heal_flat_key = "total_heal", heal_percent_key = "tick_heal_pct",
+				self_save_threshold = 0.46,
+				minimum_effective_heal_ratio = 0.05,
+				active_modifier = "modifier_imba_shadow_word_buff",
+			},
+			holdout_monsoon = {
+				mode = "point_aoe", priority = 98, radius = 500,
+				minimum_targets = 3, cast_on_boss = true,
+				reserve_ultimate = true,
+			},
+		},
+	},
 }
 
 local function ApplyRoleAffinities(profile)
@@ -574,10 +814,7 @@ end
 local STANDARD_HEROES = {
 	{ hero = "npc_dota_hero_enchantress" },
 	{ hero = "npc_dota_hero_crystal_maiden" },
-	{
-		hero = "npc_dota_hero_luna",
-		exclusion_reason = "Active ability timing and target selection have not been validated in Tools",
-	},
+	{ hero = "npc_dota_hero_luna" },
 	{
 		hero = "npc_dota_hero_lone_druid",
 		exclusion_reason = "Summon ownership, orders, death, and respawn lifecycle are not certified",
@@ -586,28 +823,16 @@ local STANDARD_HEROES = {
 		hero = "npc_dota_hero_pugna",
 		exclusion_reason = "Unit/point cast rules and defensive spell use have no validated Tools profile",
 	},
-	{
-		hero = "npc_dota_hero_lich",
-		exclusion_reason = "Ally buff and chained-spell target rules have no validated Tools profile",
-	},
+	{ hero = "npc_dota_hero_lich" },
 	{
 		hero = "npc_dota_hero_nyx_assassin",
 		exclusion_reason = "Burrow/invisibility state transitions and directional casts are not certified",
 	},
 	{ hero = "npc_dota_hero_abyssal_underlord" },
-	{
-		hero = "npc_dota_hero_terrorblade",
-		exclusion_reason = "Transformation and alternate-form ability behavior are not certified",
-	},
-	{
-		hero = "npc_dota_hero_phantom_assassin",
-		exclusion_reason = "Mobility target selection and melee commitment have no validated Tools profile",
-	},
+	{ hero = "npc_dota_hero_terrorblade" },
+	{ hero = "npc_dota_hero_phantom_assassin" },
 	{ hero = "npc_dota_hero_elder_titan" },
-	{
-		hero = "npc_dota_hero_mirana",
-		exclusion_reason = "Summon ownership and support-target selection are not certified",
-	},
+	{ hero = "npc_dota_hero_mirana" },
 	{ hero = "npc_dota_hero_dragon_knight" },
 	{ hero = "npc_dota_hero_windrunner" },
 	{
@@ -669,6 +894,11 @@ local CERTIFIED_HERO_ORDER = {
 		"npc_dota_hero_dragon_knight",
 		"npc_dota_hero_elder_titan",
 		"npc_dota_hero_windrunner",
+		"npc_dota_hero_luna",
+		"npc_dota_hero_phantom_assassin",
+		"npc_dota_hero_terrorblade",
+		"npc_dota_hero_lich",
+		"npc_dota_hero_mirana",
 }
 
 local function CopyArray(source)

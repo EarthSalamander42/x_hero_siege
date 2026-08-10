@@ -1,5 +1,6 @@
 -- Single server-side entry point for tombstone interaction and cleanup.
--- Keep order handling out of GameMode filters and keep Panorama visual-only.
+-- The GameMode filter only suppresses a repeated click on the tombstone whose
+-- revive is already channeling; interaction startup remains owned here.
 modifier_xhs_tombstone_interaction = modifier_xhs_tombstone_interaction or class({})
 
 local TOMBSTONE_UNIT_NAME = "npc_xhs_hero_tombstone"

@@ -8,6 +8,8 @@ local endUrlWebsite = "website/"
 local endUrlFrostrose = string.lower(CUSTOM_GAME_TYPE or "xhs") .. "/"
 local timeout = 5000
 local native_print = print
+local BOT_AUDIT_CHECKPOINT_INITIAL_DELAY = 5
+local BOT_AUDIT_CHECKPOINT_INTERVAL = 30
 local RUNTIME_LOG_LEVEL_BY_NUMBER = {
 	[1] = "debug",
 	[2] = "info",
@@ -187,6 +189,7 @@ function api:GetUrl(endpoint)
 		or endpoint == "game-complete"
 		or endpoint == "performance"
 		or endpoint == "runtime-logs"
+		or endpoint == "bot-audit"
 	if not uses_combined_log then
 		print("URL: " .. full_url)
 	end
@@ -1327,6 +1330,74 @@ function api:CreateSupporterPaymentIntent(player_id, context, callback)
 	end, "POST", payload)
 end
 
+function api:GetSupporterPaymentOptions(player_id, callback)
+	callback = callback or function() end
+	local steamid = self:GetPersistentPlayerSteamID(player_id)
+	if steamid == nil then
+		return callback(false, { code = "non_persistent_player", message = "Persistent human player required." })
+	end
+
+	self:Request("supporter-pass/payment-options", function(data)
+		callback(true, data or {})
+	end, function(error)
+		callback(false, error or { code = "supporter_payment_options_failed", message = "Payment options are unavailable." })
+	end, "POST", {
+		steamid = steamid,
+		game_id = self:GetApiGameId(),
+	})
+end
+
+function api:CreateSupporterDirectCheckout(player_id, selection, callback)
+	callback = callback or function() end
+	selection = type(selection) == "table" and selection or {}
+	local steamid = self:GetPersistentPlayerSteamID(player_id)
+	if steamid == nil then
+		return callback(false, { code = "non_persistent_player", message = "Persistent human player required." })
+	end
+
+	self:Request("supporter-pass/direct-checkout", function(data)
+		callback(true, data or {})
+	end, function(error)
+		callback(false, error or { code = "supporter_payment_checkout_failed", message = "Unable to create checkout." })
+	end, "POST", {
+		steamid = steamid,
+		game_id = self:GetApiGameId(),
+		provider = tostring(selection.provider or ""),
+		tier_id = tonumber(selection.tier_id),
+		billing_id = tostring(selection.billing_id or ""),
+		request_id = tostring(selection.request_id or ""),
+		locale = tostring(selection.locale or "en"),
+		game_mode = GetMapName and GetMapName() or "xhs",
+	})
+end
+
+function api:GetSupporterDirectCheckoutStatus(player_id, order_key, callback)
+	callback = callback or function() end
+	local steamid = self:GetPersistentPlayerSteamID(player_id)
+	if steamid == nil then
+		return callback(false, { code = "non_persistent_player", message = "Persistent human player required." })
+	end
+
+	self:Request("supporter-pass/checkout-status", function(data)
+		if type(data) == "table" and data.confirmed == true and type(data.supporter_pass) == "table" then
+			api.players = api.players or {}
+			api.players[steamid] = api.players[steamid] or { status = 0 }
+			api.players[steamid].status = tonumber(data.user_status) or api.players[steamid].status or 0
+			api.players[steamid].supporter_pass = data.supporter_pass
+			if SupporterPass and SupporterPass.PublishPlayer then
+				SupporterPass:PublishPlayer(player_id)
+			end
+		end
+		callback(true, data or {})
+	end, function(error)
+		callback(false, error or { code = "supporter_payment_status_failed", message = "Unable to verify checkout." })
+	end, "POST", {
+		steamid = steamid,
+		game_id = self:GetApiGameId(),
+		order_key = tostring(order_key or ""),
+	})
+end
+
 function api:RequestSupporterPassAsset(player_id, asset, callback)
 	callback = callback or function() end
 	local steamid = self:GetPersistentPlayerSteamID(player_id)
@@ -1958,6 +2029,96 @@ function api:FlushRuntimeLogs()
 	}, { silent = true })
 end
 
+function api:BuildBotAuditUploadPayload(reason)
+	local isToolsMode = IsInToolsMode()
+	-- Tools matches are deliberately reward-ineligible, but their bot decisions
+	-- are valuable QA data and use the same registered backend game session.
+	if (not isToolsMode and self:IsCheatGame()) or not self:HasXHSBotSession() then
+		return nil
+	end
+	local game_id = tonumber(self:GetApiGameId())
+	if game_id == nil or game_id <= 0 then return nil end
+	if XHSBotDecisionAudit == nil
+		or type(XHSBotDecisionAudit.BuildBackendPayload) ~= "function" then
+		return nil
+	end
+
+	local auditBuildOK, auditPayload = pcall(function()
+		return XHSBotDecisionAudit:BuildBackendPayload(reason or "live_checkpoint")
+	end)
+	if not auditBuildOK or type(auditPayload) ~= "table" then return nil end
+
+	return {
+		game_id = game_id,
+		match_id = self:GetMatchID(),
+		game_time = GameRules:GetDOTATime(false, false),
+		winner = self:GetWinnerTeam(),
+		gamemode = self:GetCustomGamemode(),
+		difficulty = self:GetCustomDifficulty(),
+		mod_version = tostring(GAME_VERSION or ""),
+		map = GetMapName(),
+		-- Keep the configured count as a fallback after end-game cleanup removes
+		-- bot player entities before the terminal HTTP request completes.
+		bot_count = self:GetXHSBotSessionCount(),
+		human_count = #self:GetAllPlayerSteamIds(),
+		tools_mode = isToolsMode,
+		cheat_mode = self:IsCheatGame(),
+		audit = auditPayload,
+	}
+end
+
+function api:SubmitBotAuditCheckpoint(reason)
+	if self.bot_audit_checkpoint_in_flight == true then return false end
+	local payload = self:BuildBotAuditUploadPayload(reason or "live_checkpoint")
+	if payload == nil or tonumber(payload.bot_count or 0) <= 0 then return false end
+
+	self.bot_audit_checkpoint_in_flight = true
+	self:Request("bot-audit", function(data)
+		self.bot_audit_checkpoint_in_flight = false
+		self.bot_audit_last_checkpoint_at = GameRules:GetGameTime()
+		self.bot_audit_last_checkpoint_id = tonumber(data and data.id) or 0
+		self.bot_audit_last_checkpoint_error = nil
+	end, function(error)
+		self.bot_audit_checkpoint_in_flight = false
+		self.bot_audit_last_checkpoint_error = tostring(
+			error and error.message or "unknown"
+		)
+	end, "POST", payload, { silent = true })
+	return true
+end
+
+function api:ScheduleBotAuditCheckpoints(delay)
+	if self.bot_audit_checkpoint_scheduled == true then return end
+	self.bot_audit_checkpoint_scheduled = true
+
+	local function UploadCheckpoint()
+		local state = GameRules ~= nil and GameRules:State_Get() or -1
+		if state >= DOTA_GAMERULES_STATE_POST_GAME then
+			self.bot_audit_checkpoint_scheduled = false
+			return nil
+		end
+		if XHSBotDecisionAudit ~= nil and XHSBotDecisionAudit:IsActive() then
+			self:SubmitBotAuditCheckpoint("live_checkpoint")
+		end
+		return BOT_AUDIT_CHECKPOINT_INTERVAL
+	end
+
+	if Timers ~= nil and Timers.CreateTimer ~= nil then
+		Timers:CreateTimer(tonumber(delay) or BOT_AUDIT_CHECKPOINT_INITIAL_DELAY, UploadCheckpoint)
+		return
+	end
+	local game_mode = GameRules ~= nil and GameRules:GetGameModeEntity() or nil
+	if game_mode ~= nil and game_mode.SetContextThink ~= nil then
+		game_mode:SetContextThink(
+			"XHSBotAuditCheckpoint",
+			UploadCheckpoint,
+			tonumber(delay) or BOT_AUDIT_CHECKPOINT_INITIAL_DELAY
+		)
+		return
+	end
+	self.bot_audit_checkpoint_scheduled = false
+end
+
 function api:RegisterToolsTelemetrySession()
 	if not IsInToolsMode() then return false, "tools_mode_required" end
 	if self.tools_session_register_state == "pending" then return true, "pending" end
@@ -1977,6 +2138,7 @@ function api:RegisterToolsTelemetrySession()
 		self.tools_telemetry_session = true
 		self.tools_session_register_state = "ready"
 		self:ScheduleRuntimeLogFlush(0.1)
+		self:ScheduleBotAuditCheckpoints(BOT_AUDIT_CHECKPOINT_INITIAL_DELAY)
 	end, function(errorData)
 		self.tools_session_register_state = "failed"
 		print("tools-session-register: failed; Lua logs remain local ("
@@ -2200,7 +2362,12 @@ function api:Request(endpoint, okCallback, failCallback, method, payload, option
 		return failCallback()
 	end
 
-	request:SetHTTPRequestAbsoluteTimeoutMS(endpoint == "bot-audit" and 20000 or timeout)
+	local request_timeout_ms = tonumber(options.timeout_ms)
+	if request_timeout_ms == nil then
+		request_timeout_ms = endpoint == "bot-audit" and 20000 or timeout
+	end
+	request_timeout_ms = math.max(1000, math.min(120000, math.floor(request_timeout_ms)))
+	request:SetHTTPRequestAbsoluteTimeoutMS(request_timeout_ms)
 
 	local header_key = nil
 
@@ -2274,8 +2441,6 @@ function api:Request(endpoint, okCallback, failCallback, method, payload, option
 
 		if code == 0 then
 			return fail("Request timeout")
-		elseif code >= 500 then
-			return fail("Server Error")
 		elseif code == 204 then
 			if not silent then print("Request to " .. endpoint .. " succeeded with no content") end
 			return okCallback({})
@@ -2290,6 +2455,9 @@ function api:Request(endpoint, okCallback, failCallback, method, payload, option
 			local obj, pos, err = json.decode(response_body)
 
 			if err then
+				if code >= 500 then
+					return fail("Server Error")
+				end
 				if code >= 400 then
 					return fail("HTTP " .. tostring(code) .. " returned a non-JSON response")
 				end
@@ -2419,6 +2587,7 @@ function api:RegisterGame(callback, register_players)
 			XHSFlushBootstrapLogs()
 		end
 		api:ScheduleRuntimeLogFlush(0.1)
+		api:ScheduleBotAuditCheckpoints(BOT_AUDIT_CHECKPOINT_INITIAL_DELAY)
 		api.players = data.players or {}
 		api.companions = data.companions or nil
 		api.emblems = data.emblems or nil
@@ -2430,10 +2599,6 @@ function api:RegisterGame(callback, register_players)
 		CustomNetTables:SetTableValue("supporter_pass_player", "companions", api.companions)
 		CustomNetTables:SetTableValue("supporter_pass_player", "emblems", api.emblems)
 		CustomNetTables:SetTableValue("supporter_pass_player", "effigies", api.effigies)
-
-		if data.supporter_pass and data.supporter_pass.shop then
-			CustomNetTables:SetTableValue("supporter_pass_shop", "featured", data.supporter_pass.shop)
-		end
 
 		if SupporterPass and SupporterPass.PublishPlayers then
 			SupporterPass:PublishPlayers()
@@ -2493,6 +2658,11 @@ function api:RegisterGame(callback, register_players)
 		tools_mode = IsInToolsMode(),
 		contains_xhs_bots = self:HasXHSBotSession(),
 		xhs_bot_count = self:GetXHSBotSessionCount(),
+	}, {
+		-- The first request after a backend restart can legitimately spend several
+		-- seconds verifying the Supporter Pass schema. Keep ordinary API calls on
+		-- the short timeout while allowing the match bootstrap to finish.
+		timeout_ms = 60000,
 	})
 
 	-- call in supporter pass scripts after supporter_pass_player is set to show mmr medal in loading screen
@@ -2611,11 +2781,11 @@ function api:CompleteGame()
 			return XHSBotDecisionAudit:Finalize("complete_game")
 		end)
 		if not auditCallOK then
-			print("[XHSBots][AUDIT] type=finalize_error reason=complete_game error="
-				.. tostring(auditOK))
+			self.bot_audit_finalize_error = tostring(auditOK)
 		elseif auditOK == false and auditMessage ~= "audit_already_finalized" then
-			print("[XHSBots][AUDIT] type=finalize_error reason=complete_game error="
-				.. tostring(auditMessage))
+			self.bot_audit_finalize_error = tostring(auditMessage)
+		else
+			self.bot_audit_finalize_error = nil
 		end
 	end
 
@@ -3023,38 +3193,21 @@ function api:CompleteGame()
 	end
 	completed_display_payload.game_time = backend_payload.game_time
 
-	-- Production bot matches keep rewards disabled, but their decision audit is
-	-- valuable QA data. Tools sessions have a full account-state registration
-	-- for UI data, while their completion remains non-persistent.
-	if has_xhs_bot_session
-		and not IsInToolsMode()
-		and not self:IsCheatGame()
-		and XHSBotDecisionAudit ~= nil
-		and type(XHSBotDecisionAudit.BuildBackendPayload) == "function" then
-		local auditBuildOK, auditPayload = pcall(function()
-			return XHSBotDecisionAudit:BuildBackendPayload("complete_game")
-		end)
-		if auditBuildOK and type(auditPayload) == "table" then
+	-- Production and Tools bot matches both retain the complete audit. Tools
+	-- sessions stay explicitly tagged and reward-ineligible on game-complete.
+	if has_xhs_bot_session then
+		local finalAuditPayload = self:BuildBotAuditUploadPayload("complete_game")
+		if finalAuditPayload ~= nil then
+			finalAuditPayload.game_time = backend_payload.game_time
+			finalAuditPayload.winner = winnerTeam
 			self:Request("bot-audit", function(data)
-				print("[XHSBots][AUDIT] backend_store=ok id=" .. tostring(data.id or 0))
+				self.bot_audit_final_store_id = tonumber(data and data.id) or 0
+				self.bot_audit_final_store_error = nil
 			end, function(error)
-				print("[XHSBots][AUDIT] backend_store=failed message="
-					.. tostring(error and error.message or "unknown"))
-			end, "POST", {
-				game_id = api_game_id,
-				match_id = self:GetMatchID(),
-				game_time = backend_payload.game_time,
-				winner = winnerTeam,
-				gamemode = api:GetCustomGamemode(),
-				difficulty = api:GetCustomDifficulty(),
-				mod_version = tostring(GAME_VERSION or ""),
-				map = GetMapName(),
-				bot_count = self:GetXHSBotParticipantCount(),
-				human_count = #self:GetAllPlayerSteamIds(),
-				audit = auditPayload,
-			})
-		else
-			print("[XHSBots][AUDIT] backend_store=skipped reason=payload_build_failed")
+				self.bot_audit_final_store_error = tostring(
+					error and error.message or "unknown"
+				)
+			end, "POST", finalAuditPayload, { silent = true })
 		end
 	end
 

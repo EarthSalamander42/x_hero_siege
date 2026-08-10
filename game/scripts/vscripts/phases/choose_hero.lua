@@ -36,6 +36,8 @@ local HERO_SELECTION_MARKERS = {
 	standard = {},
 	vip = {},
 }
+local HERO_SELECTION_MARKER_EFFECT =
+	"particles/econ/items/tinker/boots_of_travel/teleport_start_bots_cog.vpcf"
 local HERO_SELECTION_MARKER_SEARCH_RADIUS = 224
 local HERO_SELECTION_CLEANED_UP = false
 
@@ -247,6 +249,48 @@ function XHSRemoveRandomHeroSelectionMarker(position)
 	if nearest.Stop ~= nil then pcall(function() nearest:Stop() end) end
 	UTIL_Remove(nearest)
 	return 1
+end
+
+-- Most selection circles are authored directly in the map. Keep a runtime
+-- fallback for valid hero pedestals whose info_particle_system is missing
+-- (notably Priestess of the Moon) so every selectable hero has the same
+-- visual marker and the normal marker cleanup can still remove it.
+local function EnsureHeroSelectionMarkers()
+	local created = 0
+	for group, heroes in pairs({
+		standard = HEROLIST,
+		vip = HEROLIST_VIP,
+	}) do
+		HERO_SELECTION_MARKERS[group] = HERO_SELECTION_MARKERS[group] or {}
+		for index in ipairs(heroes) do
+			local marker = HERO_SELECTION_MARKERS[group][index]
+			local point = GetHeroSelectionPoint(group, index)
+			local triggerName = group == "vip"
+				and ("trigger_hero_vip_" .. tostring(index))
+				or ("trigger_hero_" .. tostring(index))
+			local trigger = Entities:FindByName(nil, triggerName)
+
+			if not IsValidSelectionUnit(marker)
+				and IsValidSelectionUnit(point)
+				and IsValidSelectionUnit(trigger) then
+				marker = SpawnEntityFromTableSynchronous("info_particle_system", {
+					effect_name = HERO_SELECTION_MARKER_EFFECT,
+					origin = point:GetAbsOrigin(),
+					start_active = "0",
+				})
+				if IsValidSelectionUnit(marker) then
+					marker:SetAbsOrigin(point:GetAbsOrigin())
+					marker.xhs_hero_selection_marker_fallback = true
+					HERO_SELECTION_MARKERS[group][index] = marker
+					if marker.Start ~= nil then
+						pcall(function() marker:Start() end)
+					end
+					created = created + 1
+				end
+			end
+		end
+	end
+	return created
 end
 
 -- XHS performs its physical pick screen during PRE_GAME, so the engine state
@@ -791,6 +835,7 @@ end
 function SpawnHeroesBis()
 	IndexHeroSelectionMarkers()
 	RemoveUnavailableHeroSelectionMarkers()
+	EnsureHeroSelectionMarkers()
 	local hero_count = 1
 	local hero_vip_count = 1
 

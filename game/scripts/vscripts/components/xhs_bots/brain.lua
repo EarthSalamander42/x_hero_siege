@@ -794,7 +794,9 @@ function XHSBotBrain:EvaluateThreatPacks(
 								0,
 								tonumber(rule.forecast_damage_multiplier) or 1
 							)
-							local areaTargets = rule.mode == "enemy_unit" and 1
+							local areaTargets = rule.mode == "enemy_unit"
+								and (rule.aoe_unit_target == true
+									and math.min(eligibleCount, 3) or 1)
 								or math.min(eligibleCount, 3)
 							availableBurst = availableBurst + damage * areaTargets
 						end
@@ -2263,10 +2265,26 @@ function XHSBotBrain:BuildAbilityAction(hero, ability, rule, target, enemies, di
 		self:RecordAbilityRejection(record, name, "target is magic immune")
 		return nil
 	end
+	local unitTargetAreaCount = 0
+	local unitTargetAreaOpportunity = false
+	if rule.mode == "enemy_unit"
+		and rule.aoe_unit_target == true
+		and self:IsCombatTarget(target) then
+		unitTargetAreaCount = self:CountAbilityTargetsAround(
+			ability,
+			rule,
+			enemies,
+			target:GetAbsOrigin(),
+			tonumber(rule.radius) or 500
+		)
+		unitTargetAreaOpportunity = unitTargetAreaCount
+			>= (tonumber(rule.minimum_targets) or 2)
+	end
 	local creepSpellEfficiency = nil
 	if not etherealPriority
 		and rule.mode == "enemy_unit"
-		and self:IsEfficiencyCreepTarget(target) then
+		and self:IsEfficiencyCreepTarget(target)
+		and not unitTargetAreaOpportunity then
 		creepSpellEfficiency = self:EvaluateSingleTargetCreepSpell(
 			hero,
 			ability,
@@ -2296,7 +2314,9 @@ function XHSBotBrain:BuildAbilityAction(hero, ability, rule, target, enemies, di
 		and (rule.include_self ~= false or rule.heals_caster == true)
 		and HealthRatio(hero) <= (tonumber(rule.self_save_threshold) or 0.40)
 	local creepPackOpportunity = false
-	if rule.mode == "no_target_enemy" then
+	if unitTargetAreaOpportunity then
+		creepPackOpportunity = true
+	elseif rule.mode == "no_target_enemy" then
 		creepPackOpportunity = self:CountAbilityTargetsAround(
 			ability,
 			rule,
@@ -2348,6 +2368,11 @@ function XHSBotBrain:BuildAbilityAction(hero, ability, rule, target, enemies, di
 			return nil
 		end
 		action.target = target
+		if unitTargetAreaOpportunity then
+			action.score = action.score + math.min(24, unitTargetAreaCount * 4)
+			action.reason = "unit-target AoE on "
+				.. tostring(unitTargetAreaCount) .. " enemies"
+		end
 		if XHSBotConfig:IsBossTarget(target) and rule.prefer_boss then action.score = action.score + 12 end
 		if creepSpellEfficiency ~= nil
 			and creepSpellEfficiency.fallback_cast == true then
@@ -2576,6 +2601,14 @@ function XHSBotBrain:BuildAbilityAction(hero, ability, rule, target, enemies, di
 		action.reason = "directional cast toward " .. tostring(nearby) .. " enemies"
 	elseif mode == "self_buff" then
 		if rule.require_combat and target == nil then return nil end
+		local minimumHealthRatio = math.max(
+			0,
+			math.min(1, tonumber(rule.minimum_health_ratio) or 0)
+		)
+		if HealthRatio(hero) < minimumHealthRatio then
+			self:RecordAbilityRejection(record, name, "health too low for risky self buff")
+			return nil
+		end
 		local nearby = self:CountEnemiesAround(
 			enemies,
 			hero:GetAbsOrigin(),

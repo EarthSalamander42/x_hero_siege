@@ -2,13 +2,16 @@ local function PublishAllPlayersBattlepassLoaded()
 	CustomGameEventManager:Send_ServerToAllClients("all_players_battlepass_loaded", {})
 end
 
-local function RegisterGameAndLoadArmories()
+local game_register_load_watch_generation = 0
+
+local function RegisterGameAndLoadArmories(trigger_reason)
 	-- A Tools match containing bots still needs the complete account-state
 	-- snapshot for Supporter Pass XP, tiers and vote power. game-register marks
 	-- the row as Tools Mode; both Lua completion and the backend independently
 	-- reject every persistent reward for that session.
 	api.xhs_bot_session_backend_disabled = false
 	api.tools_telemetry_session = false
+	print("game-register: starting after " .. tostring(trigger_reason or "player_load_fallback"))
 	api:RegisterGame(function(data)
 		print("Register game...")
 		for k, _ in pairs(data and data.players or {}) do
@@ -33,11 +36,52 @@ local function RegisterGameAndLoadArmories()
 	end)
 end
 
-local function RegisterGameWithPlayerProfiles()
-	-- Register immediately instead of waiting for the mutable bot choice. Only
-	-- persistent human SteamIDs enter the request, and later enabling bots does
-	-- not change the account snapshot or its read-only use during setup.
-	RegisterGameAndLoadArmories()
+local function RegisterGameWhenPlayersLoaded()
+	game_register_load_watch_generation = game_register_load_watch_generation + 1
+	local generation = game_register_load_watch_generation
+	local started_at = Time()
+	local fallback_after = 15
+
+	local function TryRegisterAfterPlayerLoad()
+		if generation ~= game_register_load_watch_generation then return nil end
+		if api.game_register_state == "ready" or api.game_register_state == "pending" then return nil end
+
+		local all_players_loaded = false
+		if GameMode ~= nil and type(GameMode.AreAllCustomSetupPlayersLoaded) == "function" then
+			local check_ok, loaded = pcall(function()
+				return GameMode:AreAllCustomSetupPlayersLoaded()
+			end)
+			all_players_loaded = check_ok and loaded == true
+		end
+
+		local elapsed = math.max(Time() - started_at, 0)
+		if all_players_loaded or elapsed >= fallback_after then
+			local reason = all_players_loaded and "all human players loaded"
+				or ("player-load fallback after " .. tostring(fallback_after) .. "s")
+			CustomGameEventManager:Send_ServerToAllClients("all_players_loaded", {
+				fallback = all_players_loaded and 0 or 1,
+			})
+			RegisterGameAndLoadArmories(reason)
+			return nil
+		end
+
+		return 0.25
+	end
+
+	if Timers ~= nil and type(Timers.CreateTimer) == "function" then
+		Timers:CreateTimer(0.1, TryRegisterAfterPlayerLoad)
+		return
+	end
+
+	local game_mode = GameRules ~= nil and GameRules.GetGameModeEntity ~= nil
+		and GameRules:GetGameModeEntity() or nil
+	if game_mode ~= nil and type(game_mode.SetContextThink) == "function" then
+		game_mode:SetContextThink("api_register_after_players_loaded", TryRegisterAfterPlayerLoad, 0.1)
+		return
+	end
+
+	-- Last-resort bootstrap: RegisterGame has its own SteamID readiness poll.
+	RegisterGameAndLoadArmories("scheduler unavailable fallback")
 end
 
 ListenToGameEvent('game_rules_state_change', function()
@@ -45,9 +89,7 @@ ListenToGameEvent('game_rules_state_change', function()
 		api:DetectParties()
 		CustomNetTables:SetTableValue("game_options", "game_count", { value = 1 })
 
-		RegisterGameWithPlayerProfiles()
-
-		CustomGameEventManager:Send_ServerToAllClients("all_players_loaded", {})
+		RegisterGameWhenPlayersLoaded()
 	elseif GameRules:State_Get() == DOTA_GAMERULES_STATE_PRE_GAME then
 		api:InitDonatorTableJS()
 

@@ -2094,6 +2094,15 @@
 	visibility: visible;
 }
 
+/* Compact encounter bars own the first row below the top HUD. */
+#XHSFocusTimers.XHSEncounterBossBarsAbove {
+	margin-top: 76px;
+}
+
+#XHSFocusTimers.XHSEncounterBossBarsAbove.XHSEncounterBossCastAbove {
+	margin-top: 102px;
+}
+
 #XHSDifficultyAltPanel {
 	width: 210px;
 	height: 24px;
@@ -3046,6 +3055,14 @@
 	margin-top: 97px;
 }
 
+.AspectRatio16x10 #XHSFocusTimers.XHSEncounterBossBarsAbove {
+	margin-top: 148px;
+}
+
+.AspectRatio16x10 #XHSFocusTimers.XHSEncounterBossBarsAbove.XHSEncounterBossCastAbove {
+	margin-top: 174px;
+}
+
 .AspectRatio16x10 #XHSTopHudLeftSlot {
 	width: 405px;
 	margin-left: 0px;
@@ -3230,8 +3247,8 @@
 
 .XHSRevivePortraitWrap
 {
-	width: 76px;
-	height: 76px;
+	width: 96px;
+	height: 64px;
 	vertical-align: center;
 	margin-left: 8px;
 	border: 1px solid #e4c76e8c;

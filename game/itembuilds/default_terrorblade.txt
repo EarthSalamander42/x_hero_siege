@@ -18,22 +18,23 @@
 			"item"		"item_orb_of_fire"
 			"item"		"item_tome_small"
 			"item"		"item_tome_small"
-			"item"		"item_lifesteal_mask"
 			"item"		"item_ankh_of_reincarnation"
 		}
 
 		"#DOTA_Item_Build_Mid_Items"
 		{
-			"item"		"item_orb_of_darkness2"
 			"item"		"item_orb_of_fire2"
-			"item"		"item_boots_of_speed"
+			"item"		"item_searing_blade"
+			"item"		"item_orb_of_darkness2"
+			"item"		"item_orb_of_earth"
+			"item"		"item_orb_of_earth2"
 			"item"		"item_xhs_cloak_of_flames"
 		}
 
 		"#DOTA_Item_Build_Late_Items"
 		{
 			"item"		"item_bracer_of_the_void"
-			"item"		"item_searing_blade"
+			"item"		"item_orb_of_earth3"
 			"item"		"item_tome_big"
 		}
 
