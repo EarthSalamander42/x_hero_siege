@@ -6,6 +6,25 @@ LinkLuaModifier("modifier_orb_of_fire_passive", "items/item_orb_of_fire.lua", LU
 
 require("items/orb_toggle")
 
+local XHS_INNATE_CLEAVE_ABILITIES = {
+	holdout_innate_great_cleave = true,
+}
+
+local function HasActiveInnateCleave(unit)
+	if unit == nil or unit:IsNull() or unit:PassivesDisabled() then
+		return false
+	end
+
+	for abilityName in pairs(XHS_INNATE_CLEAVE_ABILITIES) do
+		local innate = unit:FindAbilityByName(abilityName)
+		if innate ~= nil and innate:GetLevel() > 0 then
+			return true
+		end
+	end
+
+	return false
+end
+
 local function StartSpell(caster, ability)
 	XHSOrbToggle.Toggle(caster, ability, "modifier_orb_of_fire_active")
 end
@@ -103,6 +122,12 @@ end
 function modifier_orb_of_fire_active:OnAttackLanded(params)
 	if IsServer() then
 		if params.attacker == self:GetParent() and params.target:GetTeamNumber() ~= params.attacker:GetTeamNumber() then
+			-- Fire Orb, Blazing Gem and Searing Blade share this active modifier.
+			-- Their cleave must not add a second splash event while the hero's
+			-- innate cleave is functioning. If Break disables the innate, the item
+			-- remains a valid independent cleave source.
+			if HasActiveInnateCleave(self:GetParent()) then return end
+
 			local ability = self:GetAbility()
 
 			local items = {

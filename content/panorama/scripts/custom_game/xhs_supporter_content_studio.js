@@ -36,6 +36,12 @@
 	}
 	function text(value) { return String(value || ""); }
 	function truthy(value) { return value === true || value === 1 || value === "1" || String(value).toLowerCase() === "true"; }
+	function previewImagePath(value) {
+		var raw = text(value).replace(/\\/g, "/").replace(/^\/+/, "");
+		if (!raw) return "";
+		if (raw.indexOf("file://{images}/") === 0 || raw.indexOf("s2r://panorama/images/") === 0) return raw;
+		return "file://{images}/" + raw;
+	}
 	function normalizeSignature(value) {
 		var signature = text(value).toLowerCase();
 		return /^[a-f0-9]{64}$/.test(signature) ? signature : "";
@@ -171,9 +177,25 @@
 		var parent = $.CreatePanel("Panel", $("#ContentStudioCandidates"), "candidate_" + item.candidate_id); parent.AddClass("CandidateCard");
 		parent.AddClass("Rarity" + label(item.rarity || "common").replace(/[^A-Za-z0-9]/g, ""));
 		var art = $.CreatePanel("Panel", parent, ""); art.AddClass("CandidateArt");
-		var marker = $.CreatePanel("Label", art, ""); marker.AddClass("VPCFMarker"); marker.text = item.ti_edition ? text(item.ti_edition).toUpperCase() : "VPCF";
+		var imagePath = previewImagePath(item.preview_image);
+		if (imagePath) {
+			var previewImage = $.CreatePanel("Image", art, "");
+			previewImage.AddClass("CandidatePreviewImage");
+			previewImage.scaling = "stretch-to-fit-preserve-aspect";
+			previewImage.SetImage(imagePath);
+			previewImage.hittest = false;
+		} else {
+			var marker = $.CreatePanel("Label", art, ""); marker.AddClass("VPCFMarker"); marker.text = item.ti_edition ? text(item.ti_edition).toUpperCase() : "VPCF";
+		}
+		var descriptionText = text(item.metadata && item.metadata.description);
+		if (descriptionText) {
+			art.SetPanelEvent("onmouseover", function () { $.DispatchEvent("DOTAShowTextTooltip", art, descriptionText); });
+			art.SetPanelEvent("onmouseout", function () { $.DispatchEvent("DOTAHideTextTooltip", art); });
+		}
 		if (item.metadata && item.metadata.experimental) { var warning = $.CreatePanel("Label", art, ""); warning.AddClass("Experimental"); warning.text = "EXPERIMENTAL"; }
 		if (item.metadata && truthy(item.metadata.bundle_only)) { var bundleOnly = $.CreatePanel("Label", art, ""); bundleOnly.AddClass("BundleOnly"); bundleOnly.text = "TI BUNDLE ONLY - DORMANT UNTIL 4.1"; }
+		if (item.metadata && item.metadata.pricing_rule === "v2_above_v1") { var styleTwo = $.CreatePanel("Label", art, ""); styleTwo.AddClass("VariantBadge"); styleTwo.text = "STYLE II - PREMIUM"; }
+		if (item.metadata && (item.metadata.technical_risk || truthy(item.metadata.requires_distinctness_review))) { var review = $.CreatePanel("Label", art, ""); review.AddClass("ReviewBadge"); review.text = item.metadata.technical_risk ? "TECH REVIEW" : "COMPARE VARIANT"; }
 		var body = $.CreatePanel("Panel", parent, ""); body.AddClass("CandidateBody");
 		var meta = $.CreatePanel("Label", body, ""); meta.AddClass("CandidateMeta"); meta.text = label(item.category) + "  -  " + label(item.rarity) + "  -  " + Number(item.fragment_price || 0) + " fragments";
 		var name = $.CreatePanel("Label", body, ""); name.AddClass("CandidateName"); name.text = item.display_name;

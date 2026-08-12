@@ -29,61 +29,61 @@ local function CopySupporterTable(source)
 	return copy
 end
 
--- Valve ships the TI reward thumbnails alongside their Panorama compendium
--- assets. Prefer those canonical images over legacy/custom placeholders so a
--- reward keeps the same preview in tracks, shop, Armory and bundle contents.
+-- These thumbnails are byte-for-byte exports of Valve's Panorama compendium
+-- assets kept inside the addon. Keeping a local copy makes previews stable
+-- across Dota updates and lets the website CDN publish the exact same pixels.
 local VANILLA_TI_REWARD_IMAGES = {
 	levelup = {
-		[6] = "s2r://panorama/images/compendium/spring2016/rewards/levelup_fx_png.vtex",
-		[7] = "s2r://panorama/images/compendium/international2017/prestigerewards/levelup_fx_png.vtex",
-		[8] = "s2r://panorama/images/compendium/international2018/prestigerewards/levelup_fx_png.vtex",
-		[9] = "s2r://panorama/images/compendium/international2019/prestigerewards/levelup_fx_png.vtex",
-		[10] = "s2r://panorama/images/compendium/international2020/prestigerewards/levelup_fx_png.vtex",
+		[6] = "custom_game/battlepass/ti6_ascension",
+		[7] = "custom_game/battlepass/ti7_ascension",
+		[8] = "custom_game/battlepass/ti8_ascension",
+		[9] = "custom_game/battlepass/ti9_ascension",
+		[10] = "custom_game/battlepass/ti10_ascension",
 	},
 	radiance = {
-		[6] = "s2r://panorama/images/compendium/spring2016/rewards/radiance_fx_png.vtex",
-		[7] = "s2r://panorama/images/compendium/international2017/prestigerewards/radiance_fx_png.vtex",
-		[8] = "s2r://panorama/images/compendium/international2018/prestigerewards/radiance_fx_png.vtex",
-		[9] = "s2r://panorama/images/compendium/international2019/prestigerewards/radiance_fx_png.vtex",
-		[10] = "s2r://panorama/images/compendium/international2020/prestigerewards/radiance_fx_png.vtex",
+		[6] = "custom_game/battlepass/ti6_immolation",
+		[7] = "custom_game/battlepass/ti7_immolation",
+		[8] = "custom_game/battlepass/ti8_immolation",
+		[9] = "custom_game/battlepass/ti9_immolation",
+		[10] = "custom_game/battlepass/ti10_immolation",
 	},
 	teleport = {
-		[4] = "s2r://panorama/images/econ/huds/hud_ti4_png.vtex",
-		[5] = "s2r://panorama/images/econ/huds/the_international_2015/hud_the_international_2015_png.vtex",
-		[6] = "s2r://panorama/images/compendium/spring2016/rewards/tp_fx_lv3_png.vtex",
-		[7] = "s2r://panorama/images/compendium/international2017/prestigerewards/tp_fx_lv3_png.vtex",
-		[8] = "s2r://panorama/images/compendium/international2018/prestigerewards/tp_fx_lv3_png.vtex",
-		[9] = "s2r://panorama/images/compendium/international2019/prestigerewards/tp_fx_lv3_png.vtex",
-		[10] = "s2r://panorama/images/compendium/international2020/prestigerewards/tp_fx_lv2_png.vtex",
+		[4] = "custom_game/battlepass/ti4_edition",
+		[5] = "custom_game/battlepass/ti5_edition",
+		[6] = "custom_game/battlepass/ti6_teleport",
+		[7] = "custom_game/battlepass/ti7_teleport",
+		[8] = "custom_game/battlepass/ti8_teleport",
+		[9] = "custom_game/battlepass/ti9_teleport",
+		[10] = "custom_game/battlepass/ti10_teleport",
 	},
 	fountain = {
-		[4] = "s2r://panorama/images/econ/huds/hud_ti4_png.vtex",
-		[5] = "s2r://panorama/images/econ/huds/the_international_2015/hud_the_international_2015_png.vtex",
-		[6] = "s2r://panorama/images/compendium/spring2016/rewards/fountain_fx_lv3_png.vtex",
-		[7] = "s2r://panorama/images/compendium/international2017/prestigerewards/fountain_fx_lv3_png.vtex",
-		[8] = "s2r://panorama/images/compendium/international2018/prestigerewards/fountain_fx_lv3_png.vtex",
-		[9] = "s2r://panorama/images/compendium/international2019/prestigerewards/fountain_fx_lv3_png.vtex",
-		[10] = "s2r://panorama/images/compendium/international2020/prestigerewards/fountain_fx_lv3_png.vtex",
-		[11] = "s2r://panorama/images/compendium/international2022/prestigerewards/fountain_fx_lv3_png.vtex",
+		[4] = "custom_game/battlepass/ti4_edition",
+		[5] = "custom_game/battlepass/ti5_edition",
+		[6] = "custom_game/battlepass/ti6_regen_aura",
+		[7] = "custom_game/battlepass/ti7_regen_aura",
+		[8] = "custom_game/battlepass/ti8_regen_aura",
+		[9] = "custom_game/battlepass/ti9_regen_aura",
+		[10] = "custom_game/battlepass/ti10_regen_aura",
+		[11] = "custom_game/battlepass/ti11_regen_aura",
 	},
 	bottle = {
-		[6] = "s2r://panorama/images/compendium/spring2016/rewards/bottle_fx_png.vtex",
-		[7] = "s2r://panorama/images/compendium/international2017/prestigerewards/bottle_fx_png.vtex",
-		[9] = "s2r://panorama/images/compendium/international2019/prestigerewards/bottle_fx_png.vtex",
+		[6] = "custom_game/battlepass/ti6_potion",
+		[7] = "custom_game/battlepass/ti7_potion",
+		[9] = "custom_game/battlepass/ti9_potion",
 	},
 	high_five = {
-		[9] = "s2r://panorama/images/compendium/international2019/prestigerewards/high_five_lvl_1_png.vtex",
-		[10] = "s2r://panorama/images/compendium/international2020/prestigerewards/high_five_lvl_2_png.vtex",
+		[9] = "custom_game/battlepass/ti9_high_five",
+		[10] = "custom_game/battlepass/ti10_high_five",
 	},
 	emblem = {
-		[10] = "s2r://panorama/images/compendium/international2020/prestigerewards/scepter_lv2_png.vtex",
-		[11] = "s2r://panorama/images/compendium/international2022/prestigerewards/scepter_lv2_png.vtex",
+		[10] = "custom_game/battlepass/ti10_emblem",
+		[11] = "custom_game/battlepass/ti11_emblem",
 	},
 	shadow_kill = {
-		[7] = "s2r://panorama/images/econ/items/shadow_demon/ti7_immortal_back/sd_ti7_immortal_back_png.vtex",
+		[7] = "custom_game/battlepass/ti7_shadow_kill",
 	},
 	shadow_kill_gold = {
-		[7] = "s2r://panorama/images/econ/items/shadow_demon/ti7_immortal_back/sd_ti7_immortal_back1_png.vtex",
+		[7] = "custom_game/battlepass/ti7_shadow_kill_gold",
 	},
 }
 
@@ -1263,6 +1263,19 @@ function SupporterPass:BuildPlayerTable(playerID)
 		claimed_rewards = seasonStateAllowed
 			and (supporterPass.claimed_rewards or current.claimed_rewards)
 			or {},
+		fragment_reward_grants = FirstSupporterValue(
+			supporterPass.fragment_reward_grants,
+			player.fragment_reward_grants
+		) or {},
+		fragment_reward_total = tonumber(FirstSupporterValue(
+			supporterPass.fragment_reward_total,
+			player.fragment_reward_total
+		)) or 0,
+		fragment_reward_claim_event_id = FirstSupporterValue(
+			supporterPass.fragment_reward_claim_event_id,
+			player.fragment_reward_claim_event_id,
+			""
+		),
 	}
 end
 

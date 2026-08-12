@@ -660,6 +660,11 @@ var XHSTopHud = (function () {
 		if (!panel || panel.visible === false || (panel.style && panel.style.visibility === "collapse")) {
 			return false;
 		}
+		if (SafeValue(function () {
+			return panel.IsTransparent && panel.IsTransparent();
+		}, false)) {
+			return false;
+		}
 
 		// Vanilla shop toggles its open state through opacity rather than visibility.
 		if (panel.style && panel.style.opacity !== undefined && panel.style.opacity !== "" && Number(panel.style.opacity) <= 0) {
@@ -675,8 +680,7 @@ var XHSTopHud = (function () {
 		return width > 0 && height > 0;
 	}
 
-	function AddPanelOverheadBlocker(blockers, panelID, rootPosition, padding) {
-		var panel = Panel(panelID);
+	function AddExternalPanelOverheadBlocker(blockers, panel, rootPosition, padding) {
 		if (!IsPanelUsableOverheadBlocker(panel)) {
 			return;
 		}
@@ -684,7 +688,6 @@ var XHSTopHud = (function () {
 		var position = GetPanelWindowPosition(panel);
 		var width = Number(panel.actuallayoutwidth || panel.desiredlayoutwidth || 0);
 		var height = Number(panel.actuallayoutheight || panel.desiredlayoutheight || 0);
-
 		AddOverheadBlockerRect(
 			blockers,
 			position.x - rootPosition.x,
@@ -693,6 +696,53 @@ var XHSTopHud = (function () {
 			position.y - rootPosition.y + height,
 			padding
 		);
+	}
+
+	function AddPanelOverheadBlocker(blockers, panelID, rootPosition, padding) {
+		var panel = Panel(panelID);
+		AddExternalPanelOverheadBlocker(blockers, panel, rootPosition, padding);
+	}
+
+	function AddVisibleLeaderboardOverheadBlockers(blockers, rootPosition) {
+		var hud = SafeValue(function () {
+			return typeof GetDotaHud === "function" ? GetDotaHud() : null;
+		}, null);
+		if (!hud || !hud.FindChildrenWithClassTraverse) {
+			return;
+		}
+
+		var leaderboards = SafeValue(function () {
+			return hud.FindChildrenWithClassTraverse("XHSFarmLeaderboard") || [];
+		}, []);
+		for (var i = 0; i < leaderboards.length; i++) {
+			var leaderboard = leaderboards[i];
+			var isVisible = leaderboard && leaderboard.BHasClass && (
+				leaderboard.BHasClass("IsVisible") ||
+				(leaderboard.BHasClass("IsArchived") && leaderboard.BHasClass("IsReopened"))
+			);
+			if (!isVisible || leaderboard.BHasClass("IsFullyHidden")) {
+				continue;
+			}
+			AddExternalPanelOverheadBlocker(blockers, leaderboard, rootPosition, 8);
+		}
+	}
+
+	function FindVanillaShopSurface() {
+		if (typeof FindDotaHudElement !== "function") {
+			return null;
+		}
+
+		var candidateIDs = ["Main", "GridMainShopContentsV2", "shop"];
+		for (var i = 0; i < candidateIDs.length; i++) {
+			var candidate = SafeValue(function (id) {
+				return function () { return FindDotaHudElement(id); };
+			}(candidateIDs[i]), null);
+			if (IsPanelUsableOverheadBlocker(candidate)) {
+				return candidate;
+			}
+		}
+
+		return null;
 	}
 
 	function BuildOverheadUiBlockers(root, rootWidth, rootHeight) {
@@ -717,24 +767,10 @@ var XHSTopHud = (function () {
 		AddPanelOverheadBlocker(blockers, "XHSWavePressurePanel", rootPosition, 8);
 		AddPanelOverheadBlocker(blockers, "XHSDifficultyAltPanel", rootPosition, 8);
 		AddPanelOverheadBlocker(blockers, "XHSFragmentQuestIntro", rootPosition, 10);
-		// The vanilla shop is outside the custom HUD tree, so register it explicitly.
-		if (typeof FindDotaHudElement === "function") {
-			var shop = FindDotaHudElement("shop");
-			var shopUsable = IsPanelUsableOverheadBlocker(shop);
-			if (shopUsable) {
-				var shopPosition = GetPanelWindowPosition(shop);
-				var shopWidth = Number(shop.actuallayoutwidth || shop.desiredlayoutwidth || 0);
-				var shopHeight = Number(shop.actuallayoutheight || shop.desiredlayoutheight || 0);
-				AddOverheadBlockerRect(
-					blockers,
-					shopPosition.x - rootPosition.x,
-					shopPosition.y - rootPosition.y,
-					shopPosition.x - rootPosition.x + shopWidth,
-					shopPosition.y - rootPosition.y + shopHeight,
-					8
-				);
-			}
-		}
+		// Both leaderboards and the vanilla shop live outside this custom UI tree.
+		// Treat their visible rectangles as occluders instead of reparenting either UI.
+		AddVisibleLeaderboardOverheadBlockers(blockers, rootPosition);
+		AddExternalPanelOverheadBlocker(blockers, FindVanillaShopSurface(), rootPosition, 8);
 		if (IsSpecialEventPanelBlockingUi()) {
 			var eventWidth = Math.min(1040, rootWidth * 0.64);
 			var eventHeight = Math.min(620, rootHeight * 0.62);
@@ -965,7 +1001,7 @@ var XHSTopHud = (function () {
 		if (travelling) {
 			label = isSecret ? "TO SECRET SHOP" : forceBase ? "TO BASE SHOP" : "TO NORMAL SHOP";
 		} else {
-			label = isSecret ? "BUYING @ SECRET" : forceBase ? "BUYING @ BASE" : "BUYING ITEM";
+			label = isSecret ? "BUYING @ SECRET" : forceBase ? "BUYING @ BASE" : "BUYING @ NORMAL";
 		}
 		if (itemName) {
 			label += ": " + itemName;
@@ -1425,6 +1461,12 @@ var XHSTopHud = (function () {
 		tombstoneAction.AddClass("XHSOverheadTombstoneAction");
 		tombstoneAction.text = "RIGHT-CLICK TO REVIVE";
 		tombstoneAction.hittest = false;
+		var tombstoneProgressTrack = $.CreatePanel("Panel", tombstoneCopy, "XHSOverheadTombstoneProgressTrack_" + playerID);
+		tombstoneProgressTrack.AddClass("XHSOverheadTombstoneProgressTrack");
+		tombstoneProgressTrack.hittest = false;
+		var tombstoneProgress = $.CreatePanel("Panel", tombstoneProgressTrack, "XHSOverheadTombstoneProgress_" + playerID);
+		tombstoneProgress.AddClass("XHSOverheadTombstoneProgress");
+		tombstoneProgress.hittest = false;
 
 		var value = $.CreatePanel("Label", label, "XHSOverheadValue_" + playerID);
 		value.AddClass("XHSOverheadValue");
@@ -2232,6 +2274,7 @@ var XHSTopHud = (function () {
 		label.SetHasClass("IsReincarnating", reincarnationState.active);
 		label.SetHasClass("XHSOverheadLowHealth", clampedHealth > 0 && clampedHealth <= 30);
 		label.SetHasClass("XHSOverheadTombstone", hasTombstone);
+		label.SetHasClass("XHSOverheadTombstoneReviving", hasTombstone && tombstoneState.active);
 		label.SetHasClass("XHSNoMana", !hasMana);
 		label.SetAttributeInt("death_hidden", shouldHideDeadOverhead ? 1 : 0);
 		label.SetAttributeInt("position_ent_index", hasTombstone ? tombstoneEntIndex : -1);
@@ -2240,6 +2283,21 @@ var XHSTopHud = (function () {
 		if (hasTombstone) {
 			SetChildText(label, "XHSOverheadGameplayStatus_" + overheadKey, "TOMBSTONE");
 			SetChildText(label, "XHSOverheadAltStatus_" + overheadKey, "CLICK TO REVIVE");
+			var reviveRatio = tombstoneState.active && tombstoneState.duration > 0
+				? 1 - Math.min(1, tombstoneState.remaining / tombstoneState.duration)
+				: 0;
+			var tombstoneProgress = label.FindChildTraverse("XHSOverheadTombstoneProgress_" + overheadKey);
+			if (tombstoneProgress) {
+				tombstoneProgress.style.width = (reviveRatio * 100).toFixed(2) + "%";
+			}
+			SetChildText(
+				label,
+				"XHSOverheadTombstoneAction_" + overheadKey,
+				tombstoneState.active
+					? "REVIVING  " + tombstoneState.remaining.toFixed(1) + "s  •  "
+						+ tombstoneState.channels
+					: "RIGHT-CLICK TO REVIVE"
+			);
 		}
 		if (reincarnationState.active) {
 			SetChildText(label, "XHSOverheadGameplayStatus_" + overheadKey, FormatReincarnationStatus(reincarnationState));

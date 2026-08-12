@@ -2081,6 +2081,53 @@
 	overflow: noclip;
 }
 
+/*
+ * The frame texture supplies the sculpted metalwork. These three inset layers
+ * give every team scoreboard its own deep glass surface so the bar keeps its
+ * definition over bright maps without turning into one opaque black slab.
+ */
+.XHSTopHudFrameAtmosphere {
+	width: 100%;
+	height: 100%;
+	align: center top;
+	ignore-parent-flow: true;
+	overflow: noclip;
+	z-index: 0;
+}
+
+.XHSTopHudScoreboardBackplate {
+	height: 58px;
+	margin-top: 25px;
+	background-color: gradient( linear, 0% 0%, 0% 100%, from( #092039e8 ), color-stop( 0.42, #030c18f2 ), color-stop( 0.76, #01050df7 ), to( #07192af2 ) );
+	border-top: 1px solid #9beaff40;
+	border-bottom: 1px solid #2c91c85c;
+	box-shadow: inset #c5f6ff16 0px 1px 0px 0px, inset #38bce72b 0px -2px 8px 0px, fill #000000a8 0px 3px 10px 0px;
+	ignore-parent-flow: true;
+}
+
+.XHSTopHudScoreboardBackplateLeft {
+	width: 356px;
+	horizontal-align: left;
+	margin-left: 55px;
+	background-color: gradient( linear, 0% 0%, 100% 100%, from( #0b2943ec ), color-stop( 0.48, #030c18f5 ), to( #01050df8 ) );
+}
+
+.XHSTopHudScoreboardBackplateCenter {
+	width: 236px;
+	horizontal-align: center;
+	background-color: gradient( linear, 0% 0%, 0% 100%, from( #0c2842ef ), color-stop( 0.46, #030b17f5 ), to( #01040bf9 ) );
+	border-top: 1px solid #c8f5ff52;
+	border-bottom: 1px solid #42c8f26b;
+	box-shadow: inset #d9fbff1d 0px 1px 0px 0px, inset #31c5f23d 0px -3px 11px 0px, fill #000000b8 0px 4px 12px 0px;
+}
+
+.XHSTopHudScoreboardBackplateRight {
+	width: 356px;
+	horizontal-align: right;
+	margin-right: 55px;
+	background-color: gradient( linear, 100% 0%, 0% 100%, from( #0b2943ec ), color-stop( 0.48, #030c18f5 ), to( #01050df8 ) );
+}
+
 #XHSFocusTimers {
 	horizontal-align: center;
 	vertical-align: top;
@@ -2330,6 +2377,7 @@
 	vertical-align: top;
 	margin-top: 26px;
 	overflow: noclip;
+	z-index: 2;
 }
 
 #XHSTopHudLeftSlot {
@@ -2452,8 +2500,9 @@
 	border: 0px solid transparent;
 	box-shadow: none;
 	overflow: noclip;
-	transition-property: brightness, transform;
+	transition-property: brightness, transform, pre-transform-scale2d;
 	transition-duration: 0.12s;
+	transition-timing-function: ease-out;
 }
 
 #XHSAllyRosterRight .XHSAllySlot {
@@ -2480,32 +2529,33 @@
 
 .XHSAllyCard:hover,
 .XHSVipCard:hover {
-	brightness: 1.18;
-	transform: translateY( -1px );
+	brightness: 1.2;
+	transform: translateY( -2px );
+	pre-transform-scale2d: 1.025;
 }
 
 .XHSAllyColorStrip {
-	width: 2px;
+	width: 3px;
 	/* TODO: Fix override */
-	height: 38px;
+	height: 41px;
 	align: left top;
 	margin-left: 3px;
 	/* TODO: Fix override */
 	margin-top: 4px;
 	margin-bottom: 2px;
-	background-color: xhs_accent;
-	box-shadow: fill #6ee8ff80 0px 0px 2px 0px;
+	background-color: gradient( linear, 0% 0%, 0% 100%, from( #e9fbff ), color-stop( 0.25, xhs_accent ), to( #176d9d ) );
+	box-shadow: fill #6ee8ffad 0px 0px 4px 0px;
 }
 
 .XHSAllyImageWrap {
-	width: 68px;
-	height: 38px;
+	width: 70px;
+	height: 41px;
 	align: left top;
-	margin-top: 3px;
+	margin-top: 2px;
 	margin-left: 5px;
-	background-color: #020812;
-	border: 1px solid #000000dd;
-	box-shadow: inset #ffffff16 0px 1px 0px 0px, fill #0000008a 0px 0px 5px 0px;
+	background-color: gradient( linear, 0% 0%, 0% 100%, from( #09233a ), to( #01050c ) );
+	border: 1px solid #6ccce675;
+	box-shadow: inset #d9f8ff24 0px 1px 0px 0px, inset #12688952 0px -3px 8px 0px, fill #000000b8 0px 2px 7px 0px;
 	overflow: clip;
 }
 
@@ -2842,15 +2892,15 @@
 }
 
 .XHSAllyBars {
-	width: 68px;
+	width: 70px;
 	height: 10px;
 	align: left top;
 	margin-left: 5px;
-	margin-top: 43px;
+	margin-top: 45px;
 	flow-children: down;
-	background-color: #020711da;
-	border: 1px solid #000000b8;
-	box-shadow: fill #00000090 0px 0px 4px 0px, inset #ffffff10 0px 1px 0px 0px;
+	background-color: #01040bed;
+	border: 1px solid #071827e8;
+	box-shadow: fill #000000b8 0px 1px 5px 0px, inset #b9f4ff18 0px 1px 0px 0px;
 	visibility: visible;
 }
 
@@ -2897,17 +2947,17 @@
 }
 
 .XHSAllyMeta {
-	width: 68px;
+	width: 70px;
 	height: 15px;
 	align: left top;
 	margin-left: 5px;
-	margin-top: 55px;
+	margin-top: 57px;
 	flow-children: none;
 	overflow: noclip;
 }
 
 .XHSAllyName {
-	width: 68px;
+	width: 70px;
 	height: 14px;
 	align: left center;
 	font-size: 10px;
@@ -3019,6 +3069,7 @@
 	border: 0px solid transparent;
 	box-shadow: none;
 	overflow: noclip;
+	z-index: 2;
 }
 
 #XHSClockTitle {
@@ -3036,8 +3087,8 @@
 	font-weight: bold;
 	letter-spacing: 1px;
 	text-align: center;
-	color: #eef9ff;
-	text-shadow: 0px 0px 7px #5bd7ff88;
+	color: #f4fcff;
+	text-shadow: 0px 0px 10px #5bd7ffad, 0px 2px 4px #000000, 0px 0px 2px #ffffff88;
 }
 
 .XHSOptionalTimer {
@@ -3396,8 +3447,8 @@
 
 /* A dead hero gets a dedicated interaction card, never a recycled health-frame asset. */
 .XHSOverheadTombstoneCard {
-	width: 204px;
-	height: 48px;
+	width: 190px;
+	height: 42px;
 	horizontal-align: center;
 	margin-top: 7px;
 	flow-children: right;
@@ -3434,8 +3485,8 @@
 }
 
 .XHSOverheadTombstoneMark {
-	width: 42px;
-	height: 46px;
+	width: 38px;
+	height: 40px;
 	background-color: gradient( radial, 50% 50%, 0% 0%, 58% 58%, from( #b83f35b8 ), color-stop( .58, #4a1717b8 ), to( #13090a00 ) );
 	border-right: 1px solid #ff806a4f;
 }
@@ -3472,15 +3523,15 @@
 }
 
 .XHSOverheadTombstoneCopy {
-	width: 160px;
-	height: 46px;
+	width: 150px;
+	height: 40px;
 	flow-children: down;
-	padding: 6px 10px 4px 10px;
+	padding: 4px 8px 3px 8px;
 }
 
 .XHSOverheadTombstoneTitle {
-	width: 140px;
-	height: 18px;
+	width: 134px;
+	height: 16px;
 	color: #fff1ed;
 	font-size: 12px;
 	font-weight: bold;
@@ -3490,11 +3541,35 @@
 }
 
 .XHSOverheadTombstoneAction {
-	width: 140px;
-	height: 15px;
+	width: 134px;
+	height: 13px;
 	color: #ff9b84;
 	font-size: 9px;
 	font-weight: bold;
 	letter-spacing: 1px;
 	text-shadow: 0px 1px 2px #000000, 0px 0px 6px #ff5a4366;
+}
+
+.XHSOverheadTombstoneProgressTrack {
+	width: 134px;
+	height: 3px;
+	margin-top: 1px;
+	background-color: #120708e8;
+	overflow: clip;
+}
+
+.XHSOverheadTombstoneProgress {
+	width: 0%;
+	height: 100%;
+	background-color: gradient(linear, 0% 0%, 100% 0%, from(#8d2f29), to(#ffe38b));
+	box-shadow: #ffc65b70 0px 0px 5px 0px;
+}
+
+.XHSOverheadLabel.XHSOverheadTombstoneReviving .XHSOverheadTombstoneCard {
+	border-color: #ddb94faf;
+	box-shadow: fill #000000c4 0px 4px 11px 0px, fill #e9bd513b 0px 0px 13px 0px;
+}
+
+.XHSOverheadLabel.XHSOverheadTombstoneReviving .XHSOverheadTombstoneAction {
+	color: #ffe38b;
 }

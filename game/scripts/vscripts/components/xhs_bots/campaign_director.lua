@@ -15,7 +15,9 @@ local UTHER_NAME = "npc_xhs_paladin_2"
 local UTHER_PRISON_NAME = "npc_xhs_uther_ice_prison"
 local ARTHAS_NAME = "npc_dota_hero_arthas"
 local MAGTHERIDON_NAME = "npc_dota_hero_magtheridon"
-local SHAL_REACHED_DISTANCE = 340
+local DIALOG_CONFIRM_DISTANCE = 500
+local DIALOG_FORMATION_RADIUS = 400
+local DIALOG_FORMATION_REACHED_DISTANCE = 90
 
 local PHASE_THREE_BOSSES = {
 	{
@@ -64,6 +66,41 @@ end
 local function CopyPosition(position)
 	if position == nil then return nil end
 	return Vector(position.x, position.y, position.z or 0)
+end
+
+local function GetDialogFormationAnchor(center, playerID)
+	if center == nil or XHSBotPlayerRegistry == nil then return center end
+
+	local playerIDs = {}
+	for _, botPlayerID in ipairs(XHSBotPlayerRegistry:GetXHSBotPlayerIDs() or {}) do
+		local numericPlayerID = tonumber(botPlayerID)
+		if numericPlayerID ~= nil then
+			playerIDs[#playerIDs + 1] = numericPlayerID
+		end
+	end
+	table.sort(playerIDs)
+	if #playerIDs == 0 then return center end
+
+	local slot = 1
+	for index, botPlayerID in ipairs(playerIDs) do
+		if botPlayerID == tonumber(playerID) then
+			slot = index
+			break
+		end
+	end
+
+	-- Offset the first slot toward the bottom of the screen, then distribute
+	-- every other bot evenly so no two bots are sent onto the NPC itself.
+	local angle = math.rad(-90 + ((slot - 1) / #playerIDs) * 360)
+	local anchor = center + Vector(
+		math.cos(angle) * DIALOG_FORMATION_RADIUS,
+		math.sin(angle) * DIALOG_FORMATION_RADIUS,
+		0
+	)
+	if GetGroundPosition ~= nil then
+		anchor = GetGroundPosition(anchor, nil)
+	end
+	return anchor
 end
 
 local function FindUnitByName(name, team, requireAlive)
@@ -201,7 +238,7 @@ function XHSBotCampaignDirector:AnyBotReached(position, distance)
 		local hero = XHSBotPlayerRegistry:GetBotHero(playerID)
 		if IsValidCombatUnit(hero)
 			and (hero:GetAbsOrigin() - position):Length2D()
-				<= (tonumber(distance) or SHAL_REACHED_DISTANCE) then
+				<= (tonumber(distance) or DIALOG_CONFIRM_DISTANCE) then
 			return true
 		end
 	end
@@ -279,9 +316,8 @@ function XHSBotCampaignDirector:Update(force)
 			attack_move = false,
 			label = "WAITING FOR PLAYER",
 			urgency = 0.72,
-			-- Holding anywhere in this generous ring avoids oscillation while
-			-- leaving the NPC approachable for the human player.
-			reached_distance = 460,
+			dialog_formation_center = position,
+			reached_distance = DIALOG_FORMATION_REACHED_DISTANCE,
 		} or nil)
 		return
 	end
@@ -303,11 +339,12 @@ function XHSBotCampaignDirector:Update(force)
 			attack_move = false,
 			label = "TALKING TO SHAL LIGHTBINDER",
 			urgency = 0.92,
-			reached_distance = SHAL_REACHED_DISTANCE,
+			dialog_formation_center = position,
+			reached_distance = DIALOG_FORMATION_REACHED_DISTANCE,
 		} or nil)
 		if position ~= nil and self:AnyBotReached(
 			position,
-			SHAL_REACHED_DISTANCE
+			DIALOG_CONFIRM_DISTANCE
 		) then
 			self:ConfirmShalDialog(shal)
 		end
@@ -464,11 +501,12 @@ function XHSBotCampaignDirector:Update(force)
 			label = autonomous and "TALKING TO UTHER LIGHTBRINGER"
 				or "WAITING FOR PLAYER",
 			urgency = autonomous and 0.95 or 0.72,
-			reached_distance = autonomous and SHAL_REACHED_DISTANCE or 460,
+			dialog_formation_center = position,
+			reached_distance = DIALOG_FORMATION_REACHED_DISTANCE,
 		} or nil)
 		if autonomous and position ~= nil and self:AnyBotReached(
 			position,
-			SHAL_REACHED_DISTANCE
+			DIALOG_CONFIRM_DISTANCE
 		) then
 			self:ConfirmUtherDialog(uther)
 		end
@@ -519,6 +557,13 @@ function XHSBotCampaignDirector:GetObjective(playerID, hero)
 		objective[key] = value
 	end
 	objective.player_id = tonumber(playerID)
+	if objective.dialog_formation_center ~= nil then
+		objective.anchor = GetDialogFormationAnchor(
+			objective.dialog_formation_center,
+			playerID
+		)
+		objective.dialog_formation_center = nil
+	end
 	return objective
 end
 

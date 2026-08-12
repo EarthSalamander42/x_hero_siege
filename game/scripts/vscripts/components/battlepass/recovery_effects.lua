@@ -58,8 +58,10 @@ local function IsValidEntity(entity)
 end
 
 local function IsParticlePath(path)
-	return type(path) == "string"
-		and string.match(string.lower(path), "^particles/.+%.vpcf$") ~= nil
+	if type(path) ~= "string" then return false end
+	local normalized = string.lower(path)
+	return string.match(normalized, "^particles/.+%.vpcf$") ~= nil
+		or normalized == "models/heroes/muerta/debut/particles/revenant/muerta_debut_revenant_spawn_portal.vpcf"
 end
 
 local function NormalizePotionParticle(path, channel)

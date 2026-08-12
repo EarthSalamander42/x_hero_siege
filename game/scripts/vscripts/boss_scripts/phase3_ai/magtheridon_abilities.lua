@@ -19,8 +19,9 @@ local DARKMOON_AOE_PRECAST_PARTICLE = "particles/custom/bosses/magtheridon/fel_r
 local FIRESTORM_PARTICLE = "particles/units/heroes/heroes_underlord/abyssal_underlord_firestorm_wave.vpcf"
 local FIRESTORM_PRECAST_PARTICLE = "particles/units/heroes/heroes_underlord/underlord_firestorm_pre.vpcf"
 local FEL_FISSURE_PARTICLE = "particles/units/heroes/hero_elder_titan/elder_titan_earth_splitter.vpcf"
-local INFERNAL_RING_PARTICLE = "particles/custom/bosses/magtheridon/infernal_ring_green.vpcf"
-local INFERNAL_RING_PRECAST_PARTICLE = "particles/custom/bosses/magtheridon/fel_radius_precast_green.vpcf"
+local INFERNAL_RING_PARTICLE = "particles/custom/bosses/magtheridon/infernal_rings/underlord_pitofmalice.vpcf"
+local INFERNAL_RING_PRECAST_PARTICLE = "particles/custom/bosses/magtheridon/infernal_rings/underlord_pitofmalice_pre.vpcf"
+local INFERNAL_ROOT_PARTICLE = "particles/custom/bosses/magtheridon/infernal_rings/abyssal_underlord_pitofmalice_stun.vpcf"
 local DEMONIC_HOWL_PARTICLE = "particles/units/heroes/hero_lycan/lycan_howl_cast.vpcf"
 local RUPTURE_PARTICLE = "particles/units/heroes/hero_elder_titan/elder_titan_earth_splitter.vpcf"
 local INFERNAL_RING_VISUAL_DURATION = 0.45
@@ -261,6 +262,12 @@ local function CreateDarkmoonAOEPrecast(ability, position, radius, duration, par
 	return particle
 end
 
+local function ClearFelStompRadius(ability)
+	if ability == nil or ability.xhs_fel_stomp_radius == nil then return end
+	XHSBossTelegraphs:Destroy(ability.xhs_fel_stomp_radius, true)
+	ability.xhs_fel_stomp_radius = nil
+end
+
 local function CreateFirestormWave(position, radius)
 	local particle = ParticleManager:CreateParticle(FIRESTORM_PARTICLE, PATTACH_WORLDORIGIN, nil)
 	ParticleManager:SetParticleControl(particle, 0, position)
@@ -386,6 +393,16 @@ function xhs_magtheridon_fel_stomp:OnAbilityPhaseStart()
 
 	StartBossCastBar(self, "Fel Stomp")
 	CreateDarkmoonAOEPrecast(self, caster:GetAbsOrigin(), radius, castPoint)
+	ClearFelStompRadius(self)
+	-- Give the authored particle a longer internal lifetime so it does not begin
+	-- fading before impact; the explicit destroy below remains authoritative.
+	self.xhs_fel_stomp_radius = XHSBossTelegraphs:Circle(
+		caster:GetAbsOrigin(),
+		radius,
+		castPoint,
+		FEL_COLORS,
+		math.max(8.0, castPoint + 4.0)
+	)
 	caster:EmitSound(FEL_STOMP_PRECAST_SOUND)
 	local animationDuration = castPoint + 0.1
 	local animationRate = math.max(0.45, math.min(1.0, 1.6 / math.max(castPoint, 0.1)))
@@ -400,6 +417,7 @@ end
 function xhs_magtheridon_fel_stomp:OnAbilityPhaseInterrupted()
 	if IsServer() then
 		ClearPrecastParticles(self, true)
+		ClearFelStompRadius(self)
 		HideBossCastBar(self)
 	end
 end
@@ -408,6 +426,7 @@ function xhs_magtheridon_fel_stomp:OnSpellStart()
 	if not IsServer() then return end
 
 	ClearPrecastParticles(self, true)
+	ClearFelStompRadius(self)
 
 	local caster = self:GetCaster()
 	local radius = self:GetSpecialValueFor("radius")
@@ -653,6 +672,7 @@ function xhs_magtheridon_demonic_howl:OnAbilityPhaseStart()
 
 	StartBossCastBar(self, "Demonic Howl")
 	CreateDarkmoonAOEPrecast(self, caster:GetAbsOrigin(), radius, castPoint)
+	XHSBossTelegraphs:Circle(caster:GetAbsOrigin(), radius, castPoint, FEL_COLORS)
 	caster:EmitSound(DEMONIC_HOWL_PRECAST_SOUND)
 	StartAnimation(caster, { duration = castPoint + 0.2, activity = ACT_DOTA_CAST_ABILITY_4, rate = 0.85 })
 	return true
@@ -843,7 +863,7 @@ function modifier_xhs_magtheridon_infernal_root:CheckState()
 end
 
 function modifier_xhs_magtheridon_infernal_root:GetEffectName()
-	return "particles/units/heroes/heroes_underlord/abyssal_underlord_pitofmalice_stun.vpcf"
+	return INFERNAL_ROOT_PARTICLE
 end
 
 function modifier_xhs_magtheridon_infernal_root:GetEffectAttachType()

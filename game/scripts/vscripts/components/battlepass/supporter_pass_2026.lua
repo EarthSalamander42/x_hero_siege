@@ -140,6 +140,7 @@ function SupporterPass2026:LoadManifest()
 	self.manifest = loaded.SupporterPass2026 or loaded
 	self.catalog = self.manifest.catalog or {}
 	self.tracks = self.manifest.tracks or {}
+	self.rewardIDs = self.manifest.reward_ids or {}
 	self.types = self.manifest.types or {}
 	self:BuildIndexes()
 	return self.manifest
@@ -170,6 +171,10 @@ function SupporterPass2026:BuildIndexes()
 	for _, track in ipairs({ "free", "premium" }) do
 		for _, level in ipairs(SortedNumericKeys((self.tracks or {})[track])) do
 			local catalogID = tostring(ValueAt(self.tracks[track], level) or "")
+			local rewardID = tostring(
+				ValueAt((self.rewardIDs or {})[track], level)
+				or string.format("sp26_%s_%02d", track, level)
+			)
 			if catalogID ~= "" then
 				local seasonDefinition =
 					ValueAt(self.catalog, catalogID)
@@ -193,11 +198,7 @@ function SupporterPass2026:BuildIndexes()
 					track = track,
 					level = level,
 				}
-				self.catalogIDByIdentity[string.format(
-					"sp26_%s_%02d",
-					track,
-					level
-				)] = catalogID
+				self.catalogIDByIdentity[rewardID] = catalogID
 			end
 		end
 	end
@@ -282,11 +283,11 @@ function SupporterPass2026:ApplyCatalog(customKV)
 	return customKV
 end
 
-function SupporterPass2026:BuildReward(itemsGame, track, level, catalogID)
+function SupporterPass2026:BuildReward(itemsGame, track, level, catalogID, rewardID)
 	local definition = itemsGame:GetItemKV(catalogID)
 	if type(definition) ~= "table" then return nil end
 
-	local rewardID = string.format("sp26_%s_%02d", track, level)
+	rewardID = tostring(rewardID or string.format("sp26_%s_%02d", track, level))
 	local runtimeAssets = self:BuildRuntimeAssets(definition)
 	if #runtimeAssets == 0 and itemsGame.GetItemRuntimeAssets ~= nil then
 		runtimeAssets = itemsGame:GetItemRuntimeAssets(catalogID)
@@ -350,7 +351,14 @@ function SupporterPass2026:BuildTrack(itemsGame, track)
 	for level = 1, self.LEVEL_COUNT do
 		local catalogID = ValueAt(trackDefinition, level)
 		if catalogID ~= nil then
-			local reward = self:BuildReward(itemsGame, track, level, tostring(catalogID))
+			local rewardID = ValueAt((self.rewardIDs or {})[track], level)
+			local reward = self:BuildReward(
+				itemsGame,
+				track,
+				level,
+				tostring(catalogID),
+				rewardID
+			)
 			if reward ~= nil then
 				table.insert(result, reward)
 			end
@@ -726,30 +734,34 @@ function SupporterPass2026:IsBackendCatalog2026Ready(value)
 	if not valid or #entries ~= self.LEVEL_COUNT * 2 then return false end
 
 	local seen = {}
+	local seenLevels = { free = {}, premium = {} }
 	for _, entry in ipairs(entries) do
 		local rewardID = entry.reward_id
 		local isFreeID =
 			string.match(rewardID, "^sp26_free_%d%d$") ~= nil
 		local isPremiumID =
 			string.match(rewardID, "^sp26_premium_%d%d$") ~= nil
-		local idTrack, idLevelText =
+		local idTrack, idSequenceText =
 			string.match(rewardID, "^sp26_([%a]+)_(%d%d)$")
-		local idLevel = tonumber(idLevelText)
+		local idSequence = tonumber(idSequenceText)
 		local backendTrack, trackValid = StrictBackendTrack(entry.reward)
 		local backendLevel, levelValid = StrictBackendLevel(entry.reward)
 		if (not isFreeID and not isPremiumID)
 		or (idTrack ~= "free" and idTrack ~= "premium")
-		or idLevel == nil
-		or idLevel < 1
-		or idLevel > self.LEVEL_COUNT
+		or idSequence == nil
+		or idSequence < 1
+		or idSequence > self.LEVEL_COUNT
 		or not trackValid
 		or not levelValid
 		or backendTrack ~= idTrack
-		or backendLevel ~= idLevel
+		or backendLevel < 1
+		or backendLevel > self.LEVEL_COUNT
+		or seenLevels[backendTrack][backendLevel]
 		or seen[rewardID] then
 			return false
 		end
 		seen[rewardID] = true
+		seenLevels[backendTrack][backendLevel] = true
 	end
 
 	local seenCount = 0
@@ -757,7 +769,9 @@ function SupporterPass2026:IsBackendCatalog2026Ready(value)
 	if seenCount ~= self.LEVEL_COUNT * 2 then return false end
 	for level = 1, self.LEVEL_COUNT do
 		if not seen[string.format("sp26_free_%02d", level)]
-		or not seen[string.format("sp26_premium_%02d", level)] then
+		or not seen[string.format("sp26_premium_%02d", level)]
+		or not seenLevels.free[level]
+		or not seenLevels.premium[level] then
 			return false
 		end
 	end

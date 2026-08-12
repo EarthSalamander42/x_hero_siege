@@ -54,6 +54,8 @@ XHSBots.spectator_follow_enabled = false
 XHSBots.spectator_follow_player_id = -1
 XHSBots.spectator_follow_entindex = -1
 XHSBots.spectator_follow_monitor_generation = 0
+XHSBots.spectator_access_state = XHSBots.spectator_access_state or {}
+XHSBots.spectator_access_monitor_started = false
 XHSBots.first_human_pick_seen = false
 XHSBots.unique_hero_count_finalized = false
 XHSBots.safe_error_state = XHSBots.safe_error_state or {}
@@ -266,6 +268,65 @@ function XHSBots:GetSetupHumanIdentityCount()
 	return math.max(1, math.min(XHSBotConfig.MAX_SESSION_SIZE, humanCount))
 end
 
+function XHSBots:IsSpectatorAdmin(playerID)
+	if IsInToolsMode() then return true end
+	playerID = tonumber(playerID) or -1
+	if playerID < 0
+		or PlayerResource == nil
+		or PlayerResource.IsValidPlayerID == nil
+		or not PlayerResource:IsValidPlayerID(playerID)
+		or XHSBotPlayerRegistry:IsXHSBotPlayerID(playerID)
+		or api == nil
+		or type(api.IsDeveloper) ~= "function" then
+		return false
+	end
+
+	local ok, allowed = pcall(function()
+		return api:IsDeveloper(playerID)
+	end)
+	return ok and allowed == true
+end
+
+function XHSBots:PublishSpectatorAccessState()
+	if CustomNetTables == nil or PlayerResource == nil then return end
+	for playerID = 0, DOTA_MAX_TEAM_PLAYERS - 1 do
+		if PlayerResource.IsValidPlayerID ~= nil
+			and PlayerResource:IsValidPlayerID(playerID)
+			and not XHSBotPlayerRegistry:IsXHSBotPlayerID(playerID) then
+			local allowed = self:IsSpectatorAdmin(playerID) and 1 or 0
+			if self.spectator_access_state[playerID] ~= allowed then
+				self.spectator_access_state[playerID] = allowed
+				CustomNetTables:SetTableValue(
+					"xhs_bots",
+					"spectator_access_" .. tostring(playerID),
+					{
+						allowed = allowed,
+						tools_mode = IsInToolsMode() and 1 or 0,
+					}
+				)
+			end
+		end
+	end
+end
+
+function XHSBots:StartSpectatorAccessMonitor()
+	if self.spectator_access_monitor_started
+		or GameRules == nil
+		or GameRules.GetGameModeEntity == nil then return end
+	local gameModeEntity = GameRules:GetGameModeEntity()
+	if gameModeEntity == nil or gameModeEntity.SetContextThink == nil then return end
+
+	self.spectator_access_monitor_started = true
+	gameModeEntity:SetContextThink("XHSBotsSpectatorAccess", function()
+		XHSBots:PublishSpectatorAccessState()
+		if GameRules:State_Get() > DOTA_GAMERULES_STATE_CUSTOM_GAME_SETUP then
+			XHSBots.spectator_access_monitor_started = false
+			return nil
+		end
+		return 0.5
+	end, 0)
+end
+
 function XHSBots:Init()
 	SetupLog("init_called", {
 		already_initialized = self.initialized,
@@ -289,6 +350,8 @@ function XHSBots:Init()
 		else
 			self:PushConfiguration()
 		end
+		self:PublishSpectatorAccessState()
+		self:StartSpectatorAccessMonitor()
 		self:StartQAAutoSoakIfArmed()
 		return
 	end
@@ -331,6 +394,8 @@ function XHSBots:Init()
 				event_user_id = event and event.userid,
 			})
 			XHSBots:StartControllerRefresh("player_connect_full")
+			XHSBots:PublishSpectatorAccessState()
+			XHSBots:StartSpectatorAccessMonitor()
 			if not XHSBots.setup_vote_locked then
 				XHSBots:RefreshSetupVoteState()
 			end
@@ -344,6 +409,8 @@ function XHSBots:Init()
 
 	self:PushConfiguration()
 	self:PushRoster()
+	self:PublishSpectatorAccessState()
+	self:StartSpectatorAccessMonitor()
 	self:StartControllerRefresh("init")
 	self:RefreshSetupVoteState()
 	self:StartQAAutoSoakIfArmed()
@@ -571,8 +638,8 @@ end
 function XHSBots:SetControllerSpectatorMode(playerID, enabled)
 	playerID = tonumber(playerID) or -1
 	enabled = enabled == true
-	if enabled and not IsInToolsMode() then
-		return false, "Spectator bot setup is available in Tools mode only"
+	if enabled and not self:IsSpectatorAdmin(playerID) then
+		return false, "Spectator mode is restricted to XHS administrators"
 	end
 	if playerID < 0
 		or PlayerResource == nil
@@ -756,17 +823,17 @@ function XHSBots:StartSpectatorFollowMonitor(reason)
 end
 
 function XHSBots:OnSpectatorCamera(sourceIndex, event)
-	if not IsInToolsMode() then return end
-
 	local senderPlayerID = self:ResolveSenderPlayerID(sourceIndex)
 	local spectatorPlayerID = tonumber(self.spectator_controller_player_id) or -1
 	-- Observer clients can lack a normal hero/player entity while loading, and
 	-- some Source 2 builds consequently fail both source-index resolution
 	-- paths. This fallback is still locked to the single server-selected
-	-- spectator controller and exists only in Tools mode.
+	-- spectator controller. Production additionally requires the server-side
+	-- administrator authority; the claimed player id alone is never trusted.
 	if senderPlayerID < 0 then
 		local claimedPlayerID = math.floor(tonumber(event and event.local_player_id) or -1)
-		if claimedPlayerID == spectatorPlayerID then
+		if claimedPlayerID == spectatorPlayerID
+			and self:IsSpectatorAdmin(claimedPlayerID) then
 			senderPlayerID = claimedPlayerID
 		end
 	end
@@ -777,6 +844,7 @@ function XHSBots:OnSpectatorCamera(sourceIndex, event)
 		or -1
 	if senderPlayerID < 0
 		or senderPlayerID ~= spectatorPlayerID
+		or not self:IsSpectatorAdmin(senderPlayerID)
 		or self.configuration.spectator_mode ~= true
 		or senderTeam ~= XHS_SPECTATOR_TEAM
 		or PlayerResource == nil
@@ -2137,8 +2205,8 @@ function XHSBots:ApplyConfiguration(configuration)
 	self.unique_hero_count_finalized = false
 	local wantsSpectator = IsTruthy(configuration.spectator_mode)
 		and math.floor(tonumber(configuration.count) or 0) > 0
-	if wantsSpectator and not IsInToolsMode() then
-		self.error = "Spectator bot setup is available in Tools mode only"
+	if wantsSpectator and not self:IsSpectatorAdmin(self.controller_player_id) then
+		self.error = "Spectator mode is restricted to XHS administrators"
 		self:PushConfiguration()
 		return false, self.error
 	end

@@ -347,8 +347,10 @@ for field, _ in pairs(SUPPORTER_RUNTIME_PARTICLE_FIELDS) do
 end
 
 local function IsSupporterRuntimeParticlePath(value)
-	return type(value) == "string"
-		and string.match(string.lower(value), "^particles/.+%.vpcf$") ~= nil
+	if type(value) ~= "string" then return false end
+	local normalized = string.lower(value)
+	return string.match(normalized, "^particles/.+%.vpcf$") ~= nil
+		or normalized == "models/heroes/muerta/debut/particles/revenant/muerta_debut_revenant_spawn_portal.vpcf"
 end
 
 local function SetSupporterRuntimeParticle(item, field, value)
@@ -980,7 +982,8 @@ local SUPPORTER_BOT_DEFAULT_PARTICLES = {
 local function IsSupporterBotCustomParticle(path)
 	if type(path) ~= "string" then return false end
 	local normalized = string.lower(path)
-	return string.match(normalized, "^particles/.+%.vpcf$") ~= nil
+	return (string.match(normalized, "^particles/.+%.vpcf$") ~= nil
+		or normalized == "models/heroes/muerta/debut/particles/revenant/muerta_debut_revenant_spawn_portal.vpcf")
 		and SUPPORTER_BOT_DEFAULT_PARTICLES[normalized] ~= true
 end
 
@@ -1341,8 +1344,10 @@ local SUPPORTER_PLAYER_PARTICLE_CHANNELS = {
 }
 
 local function IsSupporterParticlePath(path)
-	return type(path) == "string"
-		and string.match(string.lower(path), "^particles/.+%.vpcf$") ~= nil
+	if type(path) ~= "string" then return false end
+	local normalized = string.lower(path)
+	return string.match(normalized, "^particles/.+%.vpcf$") ~= nil
+		or normalized == "models/heroes/muerta/debut/particles/revenant/muerta_debut_revenant_spawn_portal.vpcf"
 end
 
 function Battlepass:ApplySupporterPlayerParticleItem(playerID, slot, item)

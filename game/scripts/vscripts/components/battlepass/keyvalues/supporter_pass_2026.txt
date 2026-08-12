@@ -28,10 +28,10 @@
 	"catalog"
 	{
 		// Modern teleport pairs
-		"41" { "item_name" "sp26_teleport_fall_2025" "item_type" "teleport" "slot_id" "teleport" "item_rarity" "rare" "image_inventory" "s2r://panorama/images/compendium/fall2016/prestigerewards/teleport_psd.vtex" "start_pfx" "particles/econ/events/fall_2022/teleport/teleport_fall2022_lvl3.vpcf" "end_pfx" "particles/econ/events/fall_2022/teleport/teleport_fall2022_end_lvl3.vpcf" }
-		"42" { "item_name" "sp26_teleport_spring_2026" "item_type" "teleport" "slot_id" "teleport" "item_rarity" "mythical" "image_inventory" "s2r://panorama/images/compendium/spring2016/prestigerewards/teleport_psd.vtex" "start_pfx" "particles/econ/events/compendium_2023/compendium_2023_teleport_lvl3.vpcf" "end_pfx" "particles/econ/events/compendium_2023/compendium_2023_teleport_lvl3_end.vpcf" }
-		"43" { "item_name" "sp26_teleport_winter_2025" "item_type" "teleport" "slot_id" "teleport" "item_rarity" "mythical" "image_inventory" "s2r://panorama/images/compendium/winter2017/prestigerewards/teleport_psd.vtex" "start_pfx" "particles/econ/events/seasonal_reward_line_winter_2025/teleport_start_winterrewardline_2025.vpcf" "end_pfx" "particles/econ/events/seasonal_reward_line_winter_2025/teleport_end_winterrewardline_2025.vpcf" }
-		"44" { "item_name" "sp26_teleport_summer_2026" "item_type" "teleport" "slot_id" "teleport" "item_rarity" "legendary" "image_inventory" "s2r://panorama/images/compendium/international2020/prestigerewards/teleport_psd.vtex" "start_pfx" "particles/econ/events/compendium_2024/compendium_2024_teleport_lvl3.vpcf" "end_pfx" "particles/econ/events/compendium_2024/compendium_2024_teleport_lvl3_end.vpcf" }
+		"41" { "item_name" "sp26_teleport_fall_2025" "item_type" "teleport" "slot_id" "teleport" "item_rarity" "rare" "image_inventory" "custom_game/battlepass/rewards/sp26_teleport_fall_2025" "start_pfx" "particles/econ/events/fall_2022/teleport/teleport_fall2022_lvl3.vpcf" "end_pfx" "particles/econ/events/fall_2022/teleport/teleport_fall2022_end_lvl3.vpcf" }
+		"42" { "item_name" "sp26_teleport_spring_2026" "item_type" "teleport" "slot_id" "teleport" "item_rarity" "mythical" "image_inventory" "custom_game/battlepass/rewards/sp26_teleport_spring_2026" "start_pfx" "particles/econ/events/compendium_2023/compendium_2023_teleport_lvl3.vpcf" "end_pfx" "particles/econ/events/compendium_2023/compendium_2023_teleport_lvl3_end.vpcf" }
+		"43" { "item_name" "sp26_teleport_winter_2025" "item_type" "teleport" "slot_id" "teleport" "item_rarity" "mythical" "image_inventory" "custom_game/battlepass/rewards/sp26_teleport_winter_2025" "start_pfx" "particles/econ/events/seasonal_reward_line_winter_2025/teleport_start_winterrewardline_2025.vpcf" "end_pfx" "particles/econ/events/seasonal_reward_line_winter_2025/teleport_end_winterrewardline_2025.vpcf" }
+		"44" { "item_name" "sp26_teleport_summer_2026" "item_type" "teleport" "slot_id" "teleport" "item_rarity" "legendary" "image_inventory" "custom_game/battlepass/rewards/sp26_teleport_summer_2026" "start_pfx" "particles/econ/events/compendium_2024/compendium_2024_teleport_lvl3.vpcf" "end_pfx" "particles/econ/events/compendium_2024/compendium_2024_teleport_lvl3_end.vpcf" }
 
 		// Modern ascension/level-up parents
 		"45" { "item_name" "sp26_ascension_fall_2025" "item_type" "levelup" "slot_id" "levelup" "item_rarity" "rare" "image_inventory" "custom_game/battlepass/ascension_fall_2025" "pfx" "particles/econ/events/seasonal_reward_line_fall_2025/hero_levelup_fallrewardline_2025.vpcf" }
@@ -104,17 +104,17 @@
 		"96" { "item_name" "sp26_spell_lifesteal_skywrath_style2" "item_type" "spell_lifesteal" "slot_id" "spell_lifesteal" "item_rarity" "arcana" "image_inventory" "custom_game/battlepass/spell_lifesteal_skywrath_style2" "pfx" "particles/econ/items/skywrath_mage/skywrath_arcana/skywrath_arcana_spell_lifesteal_v2.vpcf" }
 
 		// Recipient-centric regeneration
-		"97" { "item_name" "sp26_regen_fall_2025" "item_type" "regen_aura" "slot_id" "regen_aura" "item_rarity" "rare" "image_inventory" "s2r://panorama/images/compendium/fall2016/prestigerewards/fountain_psd.vtex" "pfx" "particles/econ/events/seasonal_reward_line_fall_2025/radiant_fountain_regen_fallrewardline_2025.vpcf" }
-		"98" { "item_name" "sp26_regen_winter_2025" "item_type" "regen_aura" "slot_id" "regen_aura" "item_rarity" "mythical" "image_inventory" "s2r://panorama/images/compendium/winter2017/prestigerewards/fountain_psd.vtex" "pfx" "particles/econ/events/seasonal_reward_line_winter_2025/radiant_fountain_regen_winterrewardline_2025.vpcf" }
-		"99" { "item_name" "sp26_regen_spring_2026" "item_type" "regen_aura" "slot_id" "regen_aura" "item_rarity" "legendary" "image_inventory" "s2r://panorama/images/compendium/spring2016/prestigerewards/fountain_psd.vtex" "pfx" "particles/econ/events/seasonal_reward_line_spring_2026/radiant_fountain_regen_springrewardline_2026.vpcf" }
-		"100" { "item_name" "sp26_regen_summer_2026" "item_type" "regen_aura" "slot_id" "regen_aura" "item_rarity" "immortal" "image_inventory" "s2r://panorama/images/compendium/international2020/prestigerewards/fountain_psd.vtex" "pfx" "particles/econ/events/seasonal_reward_line_summer_2026/radiant_fountain_regen_summerrewardline_2026.vpcf" }
+		"97" { "item_name" "sp26_regen_fall_2025" "item_type" "regen_aura" "slot_id" "regen_aura" "item_rarity" "rare" "image_inventory" "custom_game/battlepass/rewards/sp26_regen_fall_2025" "pfx" "particles/econ/events/seasonal_reward_line_fall_2025/radiant_fountain_regen_fallrewardline_2025.vpcf" }
+		"98" { "item_name" "sp26_regen_winter_2025" "item_type" "regen_aura" "slot_id" "regen_aura" "item_rarity" "mythical" "image_inventory" "custom_game/battlepass/rewards/sp26_regen_winter_2025" "pfx" "particles/econ/events/seasonal_reward_line_winter_2025/radiant_fountain_regen_winterrewardline_2025.vpcf" }
+		"99" { "item_name" "sp26_regen_spring_2026" "item_type" "regen_aura" "slot_id" "regen_aura" "item_rarity" "legendary" "image_inventory" "custom_game/battlepass/rewards/sp26_regen_spring_2026" "pfx" "particles/econ/events/seasonal_reward_line_spring_2026/radiant_fountain_regen_springrewardline_2026.vpcf" }
+		"100" { "item_name" "sp26_regen_summer_2026" "item_type" "regen_aura" "slot_id" "regen_aura" "item_rarity" "immortal" "image_inventory" "custom_game/battlepass/rewards/sp26_regen_summer_2026" "pfx" "particles/econ/events/seasonal_reward_line_summer_2026/radiant_fountain_regen_summerrewardline_2026.vpcf" }
 
 		// Immolation: atomic, coherent owner/target families. Targets are never capped.
-		"101" { "item_name" "sp26_immolation_fall_2022" "item_type" "immolation" "slot_id" "immolation" "item_rarity" "rare" "image_inventory" "s2r://panorama/images/compendium/international2022/prestigerewards/radiance_fx_png.vtex" "family" "fall_2022" "owner_pfx" "particles/econ/events/fall_2022/radiance/radiance_owner_fall2022.vpcf" "target_pfx" "particles/econ/events/fall_2022/radiance_target_fall2022.vpcf" }
-		"102" { "item_name" "sp26_immolation_fall_2025" "item_type" "immolation" "slot_id" "immolation" "item_rarity" "mythical" "image_inventory" "s2r://panorama/images/compendium/international2018/prestigerewards/radiance_fx_png.vtex" "family" "fall_2025" "owner_pfx" "particles/econ/events/seasonal_reward_line_fall_2025/radiance_owner_fallrewardline_2025.vpcf" "target_pfx" "particles/econ/events/seasonal_reward_line_fall_2025/radiance_target_fallrewardline_2025.vpcf" }
-		"103" { "item_name" "sp26_immolation_winter_2025" "item_type" "immolation" "slot_id" "immolation" "item_rarity" "legendary" "image_inventory" "s2r://panorama/images/compendium/international2017/prestigerewards/radiance_fx_png.vtex" "family" "ti7" "owner_pfx" "particles/econ/events/ti7/radiance_owner_ti7.vpcf" "target_pfx" "particles/econ/events/ti7/radiance_owner_ti7_ground_splash.vpcf" }
-		"104" { "item_name" "sp26_immolation_spring_2026" "item_type" "immolation" "slot_id" "immolation" "item_rarity" "legendary" "image_inventory" "s2r://panorama/images/compendium/international2019/prestigerewards/radiance_fx_png.vtex" "family" "spring_2026" "owner_pfx" "particles/econ/events/seasonal_reward_line_spring_2026/radiance_owner_springrewardline_2026.vpcf" "target_pfx" "particles/econ/events/seasonal_reward_line_spring_2026/radiance_springrewardline_2026.vpcf" }
-		"105" { "item_name" "sp26_immolation_summer_2026" "item_type" "immolation" "slot_id" "immolation" "item_rarity" "immortal" "image_inventory" "s2r://panorama/images/compendium/international2020/prestigerewards/radiance_fx_png.vtex" "family" "summer_2026" "owner_pfx" "particles/econ/events/seasonal_reward_line_summer_2026/radiance_owner_summerrewardline_2026.vpcf" "target_pfx" "particles/econ/events/seasonal_reward_line_summer_2026/radiance_target_summerrewardline_2026.vpcf" }
+		"101" { "item_name" "sp26_immolation_fall_2022" "item_type" "immolation" "slot_id" "immolation" "item_rarity" "rare" "image_inventory" "custom_game/battlepass/rewards/sp26_immolation_fall_2022" "family" "fall_2022" "owner_pfx" "particles/econ/events/fall_2022/radiance/radiance_owner_fall2022.vpcf" "target_pfx" "particles/econ/events/fall_2022/radiance_target_fall2022.vpcf" }
+		"102" { "item_name" "sp26_immolation_fall_2025" "item_type" "immolation" "slot_id" "immolation" "item_rarity" "mythical" "image_inventory" "custom_game/battlepass/rewards/sp26_immolation_fall_2025" "family" "fall_2025" "owner_pfx" "particles/econ/events/seasonal_reward_line_fall_2025/radiance_owner_fallrewardline_2025.vpcf" "target_pfx" "particles/econ/events/seasonal_reward_line_fall_2025/radiance_target_fallrewardline_2025.vpcf" }
+		"103" { "item_name" "sp26_immolation_winter_2025" "item_type" "immolation" "slot_id" "immolation" "item_rarity" "legendary" "image_inventory" "custom_game/battlepass/rewards/sp26_immolation_winter_2025" "family" "ti7" "owner_pfx" "particles/econ/events/ti7/radiance_owner_ti7.vpcf" "target_pfx" "particles/econ/events/ti7/radiance_owner_ti7_ground_splash.vpcf" }
+		"104" { "item_name" "sp26_immolation_spring_2026" "item_type" "immolation" "slot_id" "immolation" "item_rarity" "legendary" "image_inventory" "custom_game/battlepass/rewards/sp26_immolation_spring_2026" "family" "spring_2026" "owner_pfx" "particles/econ/events/seasonal_reward_line_spring_2026/radiance_owner_springrewardline_2026.vpcf" "target_pfx" "particles/econ/events/seasonal_reward_line_spring_2026/radiance_springrewardline_2026.vpcf" }
+		"105" { "item_name" "sp26_immolation_summer_2026" "item_type" "immolation" "slot_id" "immolation" "item_rarity" "immortal" "image_inventory" "custom_game/battlepass/rewards/sp26_immolation_summer_2026" "family" "summer_2026" "owner_pfx" "particles/econ/events/seasonal_reward_line_summer_2026/radiance_owner_summerrewardline_2026.vpcf" "target_pfx" "particles/econ/events/seasonal_reward_line_summer_2026/radiance_target_summerrewardline_2026.vpcf" }
 
 		// High Five triplets
 		"106" { "item_name" "sp26_high_five_crownfall" "item_type" "high_five" "slot_id" "high_five" "item_rarity" "mythical" "image_inventory" "spellicons/consumables/high_five" "family" "crownfall" "overhead_pfx" "particles/econ/events/crownfall/high_five_crownfall_overhead.vpcf" "travel_pfx" "particles/econ/events/crownfall/high_five_crownfall_travel.vpcf" "impact_pfx" "particles/econ/events/crownfall/high_five_crownfall_impact.vpcf" }
@@ -163,29 +163,62 @@
 	{
 		"free"
 		{
-			"1" "41"  "2" "52"  "3" "74"  "4" "90"  "5" "27"
-			"6" "111" "7" "53"  "8" "83"  "9" "45"  "10" "21"
-			"11" "112" "12" "125" "13" "75" "14" "94" "15" "29"
-			"16" "113" "17" "54" "18" "100" "19" "131" "20" "101"
-			"21" "114" "22" "55" "23" "84" "24" "126" "25" "33"
-			"26" "115" "27" "56" "28" "91" "29" "46" "30" "22"
-			"31" "116" "32" "57" "33" "77" "34" "102" "35" "35"
-			"36" "117" "37" "58" "38" "85" "39" "97" "40" "132"
-			"41" "118" "42" "59" "43" "133" "44" "127" "45" "103"
-			"46" "119" "47" "86" "48" "95" "49" "42" "50" "31"
+			"1" "41"  "2" "52"  "3" "111" "4" "74"  "5" "90"
+			"6" "112" "7" "27"  "8" "53"  "9" "125" "10" "83"
+			"11" "45" "12" "113" "13" "21" "14" "75" "15" "131"
+			"16" "94" "17" "29" "18" "114" "19" "54" "20" "100"
+			"21" "101" "22" "126" "23" "55" "24" "84" "25" "115"
+			"26" "33" "27" "56" "28" "116" "29" "91" "30" "46"
+			"31" "117" "32" "22" "33" "57" "34" "132" "35" "77"
+			"36" "102" "37" "118" "38" "35" "39" "58" "40" "133"
+			"41" "85" "42" "97" "43" "59" "44" "127" "45" "103"
+			"46" "86" "47" "95" "48" "119" "49" "42" "50" "31"
 		}
 		"premium"
 		{
-			"1" "43"  "2" "60"  "3" "99"  "4" "47"  "5" "28"
-			"6" "82"  "7" "61"  "8" "79"  "9" "62"  "10" "24"
-			"11" "108" "12" "128" "13" "63" "14" "50" "15" "134"
-			"16" "120" "17" "64" "18" "80" "19" "34" "20" "25"
-			"21" "121" "22" "129" "23" "104" "24" "65" "25" "36"
-			"26" "109" "27" "93" "28" "89" "29" "48" "30" "23"
-			"31" "122" "32" "66" "33" "96" "34" "105" "35" "49"
-			"36" "110" "37" "67" "38" "87" "39" "92" "40" "26"
-			"41" "123" "42" "135" "43" "88" "44" "98" "45" "30"
-			"46" "124" "47" "130" "48" "32" "49" "44" "50" "51"
+			"1" "43"  "2" "82"  "3" "60"  "4" "99"  "5" "108"
+			"6" "47"  "7" "28"  "8" "128" "9" "61"  "10" "79"
+			"11" "134" "12" "62" "13" "120" "14" "50" "15" "24"
+			"16" "121" "17" "63" "18" "64" "19" "80" "20" "129"
+			"21" "34" "22" "25" "23" "109" "24" "104" "25" "65"
+			"26" "122" "27" "36" "28" "93" "29" "110" "30" "89"
+			"31" "48" "32" "123" "33" "23" "34" "66" "35" "135"
+			"36" "96" "37" "105" "38" "49" "39" "67" "40" "87"
+			"41" "124" "42" "92" "43" "26" "44" "88" "45" "30"
+			"46" "98" "47" "130" "48" "32" "49" "44" "50" "51"
+		}
+	}
+
+	// Reward ids identify the immutable grant, not its current display level.
+	// They move with their reward whenever the progression is rebalanced so
+	// existing claims always keep pointing at the exact same item or fragments.
+	"reward_ids"
+	{
+		"free"
+		{
+			"1" "sp26_free_01" "2" "sp26_free_02" "3" "sp26_free_06" "4" "sp26_free_03" "5" "sp26_free_04"
+			"6" "sp26_free_11" "7" "sp26_free_05" "8" "sp26_free_07" "9" "sp26_free_12" "10" "sp26_free_08"
+			"11" "sp26_free_09" "12" "sp26_free_16" "13" "sp26_free_10" "14" "sp26_free_13" "15" "sp26_free_19"
+			"16" "sp26_free_14" "17" "sp26_free_15" "18" "sp26_free_21" "19" "sp26_free_17" "20" "sp26_free_18"
+			"21" "sp26_free_20" "22" "sp26_free_24" "23" "sp26_free_22" "24" "sp26_free_23" "25" "sp26_free_26"
+			"26" "sp26_free_25" "27" "sp26_free_27" "28" "sp26_free_31" "29" "sp26_free_28" "30" "sp26_free_29"
+			"31" "sp26_free_36" "32" "sp26_free_30" "33" "sp26_free_32" "34" "sp26_free_40" "35" "sp26_free_33"
+			"36" "sp26_free_34" "37" "sp26_free_41" "38" "sp26_free_35" "39" "sp26_free_37" "40" "sp26_free_43"
+			"41" "sp26_free_38" "42" "sp26_free_39" "43" "sp26_free_42" "44" "sp26_free_44" "45" "sp26_free_45"
+			"46" "sp26_free_47" "47" "sp26_free_48" "48" "sp26_free_46" "49" "sp26_free_49" "50" "sp26_free_50"
+		}
+		"premium"
+		{
+			"1" "sp26_premium_01" "2" "sp26_premium_06" "3" "sp26_premium_02" "4" "sp26_premium_03" "5" "sp26_premium_11"
+			"6" "sp26_premium_04" "7" "sp26_premium_05" "8" "sp26_premium_12" "9" "sp26_premium_07" "10" "sp26_premium_08"
+			"11" "sp26_premium_15" "12" "sp26_premium_09" "13" "sp26_premium_16" "14" "sp26_premium_14" "15" "sp26_premium_10"
+			"16" "sp26_premium_21" "17" "sp26_premium_13" "18" "sp26_premium_17" "19" "sp26_premium_18" "20" "sp26_premium_22"
+			"21" "sp26_premium_19" "22" "sp26_premium_20" "23" "sp26_premium_26" "24" "sp26_premium_23" "25" "sp26_premium_24"
+			"26" "sp26_premium_31" "27" "sp26_premium_25" "28" "sp26_premium_27" "29" "sp26_premium_36" "30" "sp26_premium_28"
+			"31" "sp26_premium_29" "32" "sp26_premium_41" "33" "sp26_premium_30" "34" "sp26_premium_32" "35" "sp26_premium_42"
+			"36" "sp26_premium_33" "37" "sp26_premium_34" "38" "sp26_premium_35" "39" "sp26_premium_37" "40" "sp26_premium_38"
+			"41" "sp26_premium_46" "42" "sp26_premium_39" "43" "sp26_premium_40" "44" "sp26_premium_43" "45" "sp26_premium_45"
+			"46" "sp26_premium_44" "47" "sp26_premium_47" "48" "sp26_premium_48" "49" "sp26_premium_49" "50" "sp26_premium_50"
 		}
 	}
 }

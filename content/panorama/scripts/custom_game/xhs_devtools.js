@@ -15,6 +15,7 @@ var XHSDevToolsFPSWindowStartedAt = Date.now();
 var XHSDevToolsFPSLastSentAt = 0;
 var XHSDevToolsLocalFPS = -1;
 var XHSDevToolsCompactHidden = false;
+var XHSDevToolsSpectatorLoopsStarted = false;
 var XHSDevToolsSpectatorState = {
 	currentPlayerID: -1,
 	// Spectator mode is follow-first by default. Camera tracking is deliberately
@@ -196,8 +197,10 @@ function XHSDevToolsApplyAccess() {
 
 	var toolsMode = XHSDevToolsIsToolsMode();
 	var canViewLog = XHSDevToolsCanViewPerformanceLog();
-	root.style.visibility = canViewLog ? "visible" : "collapse";
+	var localSpectator = XHSDevToolsIsLocalSpectator();
+	root.style.visibility = (canViewLog || localSpectator) ? "visible" : "collapse";
 	root.SetHasClass("LogOnly", canViewLog && !toolsMode);
+	root.SetHasClass("SpectatorOnly", localSpectator && !canViewLog && !toolsMode);
 
 	if (!toolsMode) {
 		var panel = XHSDevToolsPanel();
@@ -984,7 +987,7 @@ function XHSDevToolsRenderTimescale() {
 }
 
 function XHSDevToolsIsLocalSpectator() {
-	if (!XHSDevToolsIsToolsMode() || typeof Players === "undefined" || !Players.GetTeam) {
+	if (typeof Players === "undefined" || !Players.GetTeam) {
 		return false;
 	}
 	var localPlayerID = Game.GetLocalPlayerID();
@@ -1547,6 +1550,15 @@ function XHSDevToolsSpectatorTick() {
 	XHSDevToolsUpdateVanillaSpectatorUI();
 	XHSDevToolsRenderSpectator();
 	$.Schedule(0.25, XHSDevToolsSpectatorTick);
+}
+
+function XHSDevToolsStartSpectatorLoops() {
+	if (XHSDevToolsSpectatorLoopsStarted || !XHSDevToolsIsLocalSpectator()) {
+		return;
+	}
+	XHSDevToolsSpectatorLoopsStarted = true;
+	XHSDevToolsSpectatorCameraTick();
+	XHSDevToolsSpectatorTick();
 }
 
 function XHSDevToolsRenderTabs() {
@@ -2982,6 +2994,8 @@ function XHSDevToolsOnBots(tableName, key, data) {
 
 	XHSDevToolsRenderBotPerformance();
 	XHSDevToolsRenderSpectator();
+	XHSDevToolsApplyAccess();
+	XHSDevToolsStartSpectatorLoops();
 	if (XHSDevToolsShouldRenderBots()) {
 		XHSDevToolsRender();
 	}
@@ -3010,6 +3024,7 @@ function XHSDevToolsOnGameOptions(tableName, key, data) {
 	XHSDevToolsApplyPerformanceColumns();
 	XHSDevToolsApplyAccess();
 	XHSDevToolsClientFPSTick();
+	XHSDevToolsStartSpectatorLoops();
 
 	if (XHSDevToolsIsToolsMode()) {
 		var state = CustomNetTables.GetTableValue("xhs_devtools", "state");
@@ -3018,8 +3033,6 @@ function XHSDevToolsOnGameOptions(tableName, key, data) {
 			XHSDevToolsHasServerState = true;
 		}
 		XHSDevToolsRender();
-		XHSDevToolsSpectatorCameraTick();
-		XHSDevToolsSpectatorTick();
 		XHSDevToolsRequestStateLoop();
 	}
 })();

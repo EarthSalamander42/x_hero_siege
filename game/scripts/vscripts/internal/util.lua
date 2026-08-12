@@ -1923,6 +1923,8 @@ end
 local XHS_BOSS_BAR_POLL_INTERVAL = 0.2
 local XHS_BOSS_BAR_LAST = {}
 local XHS_PRIVATE_BOSS_BAR_LAST = {}
+local XHS_BOSS_BAR_POLLER_SERIAL = 0
+local XHS_BOSS_BAR_ACTIVE_POLLER = {}
 
 local XHS_PRIVATE_BOSS_BAR_BOSSES = {
 }
@@ -2080,16 +2082,24 @@ end
 
 local function StartBossBarHealthThink(boss)
 	local key = GetBossBarStateKey(boss)
-	if key == nil or boss.xhs_boss_bar_think_active == true then return end
+	if key == nil or boss.xhs_boss_bar_think_active ~= nil then return end
 
-	boss.xhs_boss_bar_think_active = true
+	XHS_BOSS_BAR_POLLER_SERIAL = XHS_BOSS_BAR_POLLER_SERIAL + 1
+	local pollerSerial = XHS_BOSS_BAR_POLLER_SERIAL
+	boss.xhs_boss_bar_think_active = pollerSerial
+	XHS_BOSS_BAR_ACTIVE_POLLER[key] = pollerSerial
 	-- Entity indexes can be recycled when Magtheridon is recreated by his Ankh.
-	-- A unique think name prevents the dead entity's old poller from replacing or
-	-- suppressing the poller attached to the newly spawned entity.
+	-- The serial prevents the old entity's poller from clearing the new entity's
+	-- snapshot when both generations briefly share the same index.
 	GameRules:GetGameModeEntity():SetContextThink(DoUniqueString("xhs_boss_bar_health_" .. key), function()
+		if XHS_BOSS_BAR_ACTIVE_POLLER[key] ~= pollerSerial then
+			return nil
+		end
 		if boss == nil or not IsValidEntity(boss) or boss:IsNull()
 			or boss.deathStart == true or not boss:IsAlive() then
-			if boss ~= nil and IsValidEntity(boss) and not boss:IsNull() then
+			XHS_BOSS_BAR_ACTIVE_POLLER[key] = nil
+			if boss ~= nil and IsValidEntity(boss) and not boss:IsNull()
+				and boss.xhs_boss_bar_think_active == pollerSerial then
 				boss.xhs_boss_bar_think_active = nil
 			end
 			XHS_BOSS_BAR_LAST[key] = nil

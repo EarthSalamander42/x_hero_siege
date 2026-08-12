@@ -648,8 +648,8 @@
 		// Attack
 		//----------------------------------------------------------------
 		"AttackCapabilities"		"DOTA_UNIT_CAP_MELEE_ATTACK"
-		"AttackDamageMin"			"238"						// Base damage range min. Tier balance: 72% of original.
-		"AttackDamageMax"			"258"						// Base damage range max. Tier balance: 72% of original.
+		"AttackDamageMin"			"214"						// Base damage range min. Tier balance: 64.8% of original.
+		"AttackDamageMax"			"232"						// Base damage range max. Tier balance: 64.8% of original.
 		"AttackRate"				"1.25"						// Speed of attack.
 		"AttackAnimationPoint"		"0.3"						// Normalized time in animation cycle to attack.
 		"AttackAcquisitionRange"	"1000"						// Range within a target can be acquired.
@@ -726,8 +726,8 @@
 		// Attack
 		//----------------------------------------------------------------
 		"AttackCapabilities"		"DOTA_UNIT_CAP_MELEE_ATTACK"
-		"AttackDamageMin"			"238"						// Base damage range min. Tier balance: 72% of original.
-		"AttackDamageMax"			"258"						// Base damage range max. Tier balance: 72% of original.
+		"AttackDamageMin"			"214"						// Base damage range min. Tier balance: 64.8% of original.
+		"AttackDamageMax"			"232"						// Base damage range max. Tier balance: 64.8% of original.
 		"AttackRate"				"1.25"						// Speed of attack.
 		"AttackAnimationPoint"		"0.3"						// Normalized time in animation cycle to attack.
 		"AttackAcquisitionRange"	"1000"						// Range within a target can be acquired.
@@ -804,8 +804,8 @@
 		// Attack
 		//----------------------------------------------------------------
 		"AttackCapabilities"		"DOTA_UNIT_CAP_MELEE_ATTACK"
-		"AttackDamageMin"			"238"						// Base damage range min. Tier balance: 72% of original.
-		"AttackDamageMax"			"258"						// Base damage range max. Tier balance: 72% of original.
+		"AttackDamageMin"			"214"						// Base damage range min. Tier balance: 64.8% of original.
+		"AttackDamageMax"			"232"						// Base damage range max. Tier balance: 64.8% of original.
 		"AttackRate"				"1.25"						// Speed of attack.
 		"AttackAnimationPoint"		"0.3"						// Normalized time in animation cycle to attack.
 		"AttackAcquisitionRange"	"1000"						// Range within a target can be acquired.
@@ -879,8 +879,8 @@
 		// Attack
 		//----------------------------------------------------------------
 		"AttackCapabilities"		"DOTA_UNIT_CAP_MELEE_ATTACK"
-		"AttackDamageMin"			"238"						// Base damage range min. Tier balance: 72% of original.
-		"AttackDamageMax"			"258"						// Base damage range max. Tier balance: 72% of original.
+		"AttackDamageMin"			"214"						// Base damage range min. Tier balance: 64.8% of original.
+		"AttackDamageMax"			"232"						// Base damage range max. Tier balance: 64.8% of original.
 		"AttackRate"				"1.25"						// Speed of attack.
 		"AttackAnimationPoint"		"0.3"						// Normalized time in animation cycle to attack.
 		"AttackAcquisitionRange"	"1000"						// Range within a target can be acquired.
@@ -955,8 +955,8 @@
 		// Attack
 		//----------------------------------------------------------------
 		"AttackCapabilities"		"DOTA_UNIT_CAP_RANGED_ATTACK"
-		"AttackDamageMin"			"161"						// Base damage range min. Tier balance: 72% of original.
-		"AttackDamageMax"			"184"						// Base damage range max. Tier balance: 72% of original.
+		"AttackDamageMin"			"145"						// Base damage range min. Tier balance: 64.8% of original.
+		"AttackDamageMax"			"166"						// Base damage range max. Tier balance: 64.8% of original.
 		"AttackRate"				"1.3"						// Speed of attack.
 		"AttackAnimationPoint"		"0.53"						// Normalized time in animation cycle to attack.
 		"AttackAcquisitionRange"	"1000"						// Range within a target can be acquired.
@@ -1033,8 +1033,8 @@
 		// Attack
 		//----------------------------------------------------------------
 		"AttackCapabilities"		"DOTA_UNIT_CAP_RANGED_ATTACK"
-		"AttackDamageMin"			"161"						// Base damage range min. Tier balance: 72% of original.
-		"AttackDamageMax"			"184"						// Base damage range max. Tier balance: 72% of original.
+		"AttackDamageMin"			"145"						// Base damage range min. Tier balance: 64.8% of original.
+		"AttackDamageMax"			"166"						// Base damage range max. Tier balance: 64.8% of original.
 		"AttackRate"				"1.3"						// Speed of attack.
 		"AttackAnimationPoint"		"0.53"						// Normalized time in animation cycle to attack.
 		"AttackAcquisitionRange"	"1000"						// Range within a target can be acquired.
@@ -1111,8 +1111,8 @@
 		// Attack
 		//----------------------------------------------------------------
 		"AttackCapabilities"		"DOTA_UNIT_CAP_RANGED_ATTACK"
-		"AttackDamageMin"			"161"						// Base damage range min. Tier balance: 72% of original.
-		"AttackDamageMax"			"184"						// Base damage range max. Tier balance: 72% of original.
+		"AttackDamageMin"			"145"						// Base damage range min. Tier balance: 64.8% of original.
+		"AttackDamageMax"			"166"						// Base damage range max. Tier balance: 64.8% of original.
 		"AttackRate"				"1.3"						// Speed of attack.
 		"AttackAnimationPoint"		"0.4"						// Normalized time in animation cycle to attack.
 		"AttackAcquisitionRange"	"1000"						// Range within a target can be acquired.
@@ -1186,8 +1186,8 @@
 		// Attack
 		//----------------------------------------------------------------
 		"AttackCapabilities"		"DOTA_UNIT_CAP_RANGED_ATTACK"
-		"AttackDamageMin"			"161"						// Base damage range min. Tier balance: 72% of original.
-		"AttackDamageMax"			"184"						// Base damage range max. Tier balance: 72% of original.
+		"AttackDamageMin"			"145"						// Base damage range min. Tier balance: 64.8% of original.
+		"AttackDamageMax"			"166"						// Base damage range max. Tier balance: 64.8% of original.
 		"AttackRate"				"1.3"						// Speed of attack.
 		"AttackAnimationPoint"		"0.53"						// Normalized time in animation cycle to attack.
 		"AttackAcquisitionRange"	"1000"						// Range within a target can be acquired.

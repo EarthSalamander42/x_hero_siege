@@ -34,8 +34,8 @@
 		// Attack
 		//----------------------------------------------------------------
 		"AttackCapabilities"		"DOTA_UNIT_CAP_RANGED_ATTACK"
-		"AttackDamageMin"			"414"		// Damage range min. Reduced by 20%.
-		"AttackDamageMax"			"442"		// Damage range max. Reduced by 20%.
+		"AttackDamageMin"			"352"		// Damage range min. Reduced by an additional 15%.
+		"AttackDamageMax"			"376"		// Damage range max. Reduced by an additional 15%.
 		"AttackRate"				"0.95"		// Speed of attack.
 		"AttackAnimationPoint"		"0.35"		// Normalized time in animation cycle to attack.
 		"AttackAcquisitionRange"	"800"		// Range within a target can be acquired.
@@ -111,8 +111,8 @@
 		// Attack
 		//----------------------------------------------------------------
 		"AttackCapabilities"		"DOTA_UNIT_CAP_RANGED_ATTACK"
-		"AttackDamageMin"			"1538"		// Damage range min. Reduced by 20%.
-		"AttackDamageMax"			"1559"		// Damage range max. Reduced by 20%.
+		"AttackDamageMin"			"1307"		// Damage range min. Reduced by an additional 15%.
+		"AttackDamageMax"			"1325"		// Damage range max. Reduced by an additional 15%.
 		"AttackRate"				"0.9"		// Speed of attack.
 		"AttackAnimationPoint"		"0.35"		// Normalized time in animation cycle to attack.
 		"AttackAcquisitionRange"	"800"		// Range within a target can be acquired.
@@ -189,8 +189,8 @@
 		// Attack
 		//----------------------------------------------------------------
 		"AttackCapabilities"		"DOTA_UNIT_CAP_RANGED_ATTACK"
-		"AttackDamageMin"			"4171"		// Damage range min. Reduced by 20%.
-		"AttackDamageMax"			"4206"		// Damage range max. Reduced by 20%.
+		"AttackDamageMin"			"3545"		// Damage range min. Reduced by an additional 15%.
+		"AttackDamageMax"			"3575"		// Damage range max. Reduced by an additional 15%.
 		"AttackRate"				"0.9"		// Speed of attack.
 		"AttackAnimationPoint"		"0.35"		// Normalized time in animation cycle to attack.
 		"AttackAcquisitionRange"	"800"		// Range within a target can be acquired.

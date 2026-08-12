@@ -17,6 +17,7 @@ function modifier_custom_mechanics:DeclareFunctions()
 	return {
 		--	MODIFIER_PROPERTY_PHYSICAL_ARMOR_BONUS,
 		MODIFIER_PROPERTY_SPELL_AMPLIFY_PERCENTAGE,
+		MODIFIER_EVENT_ON_ABILITY_EXECUTED,
 		MODIFIER_EVENT_ON_TAKEDAMAGE,
 	}
 end
@@ -73,6 +74,25 @@ end
 
 function modifier_custom_mechanics:GetModifierSpellAmplify_Percentage()
 	return self:GetParent():GetIntellect(true) * (1 / self.required_intellect)
+end
+
+function modifier_custom_mechanics:OnAbilityExecuted(keys)
+	if not IsServer() or keys.unit ~= self:GetParent() then return end
+
+	local ability = keys.ability
+	if ability == nil or (ability.IsNull ~= nil and ability:IsNull()) then return end
+	local level = math.floor(tonumber(ability:GetLevel()) or 0)
+	if level <= 0 then return end
+
+	-- Summoned NPCs frequently keep their KV unit level at 1 even when the
+	-- summoning spell was upgraded. Preserve the cast-time level on the owner;
+	-- the health-bar spawn relay consumes this immutable snapshot.
+	local parent = self:GetParent()
+	parent.xhs_last_executed_ability = {
+		name = ability:GetAbilityName(),
+		level = level,
+		cast_time = GameRules:GetGameTime(),
+	}
 end
 
 function modifier_custom_mechanics:OnTakeDamage(keys)

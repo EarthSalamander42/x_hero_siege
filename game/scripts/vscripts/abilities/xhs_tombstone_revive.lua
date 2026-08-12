@@ -308,6 +308,9 @@ function xhs_tombstone_revive_channel:OnSpellStart()
 	end
 
 	local now = GameRules:GetGameTime()
+	caster.xhs_bot_revive_channel_started_at = now
+	caster.xhs_bot_revive_target_entindex = IsValid(tombstone)
+		and tombstone:entindex() or nil
 	local state = GetState(hero, true)
 	self.xhs_channel_end_time = now + self:GetChannelTime()
 	state.channels[caster:entindex()] = {
@@ -340,6 +343,9 @@ function xhs_tombstone_revive_channel:OnChannelFinish(interrupted)
 	local state = GetState(hero, false)
 	if state ~= nil then state.channels[caster:entindex()] = nil end
 	if interrupted then
+		caster.xhs_bot_revive_interruption_serial =
+			(tonumber(caster.xhs_bot_revive_interruption_serial) or 0) + 1
+		caster.xhs_bot_revive_interrupted_at = GameRules:GetGameTime()
 		SendLocalChannelState(caster, false)
 		PublishState(hero, state)
 		ScheduleAbilityRemoval(caster, self)
@@ -409,6 +415,9 @@ function XHSUnitTombstone:BeginInteraction(caster, tombstone)
 		return false
 	end
 	if self:IsActiveInteraction(caster, tombstone) then
+		return true
+	end
+	if tonumber(caster.xhs_pending_tombstone_entindex) == tombstone:entindex() then
 		return true
 	end
 

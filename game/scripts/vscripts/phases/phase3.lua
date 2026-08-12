@@ -156,10 +156,59 @@ local UTHER_ICE_BREAK_PARTICLE = "particles/units/heroes/hero_crystalmaiden/maid
 local UTHER_RELEASE_PARTICLE = "particles/units/heroes/hero_omniknight/omniknight_purification.vpcf"
 local UTHER_RELEASE_CINEMATIC_ID = "xhs_uther_freed"
 local UTHER_RELEASE_CINEMATIC_DURATION = 4.75
+local UTHER_RUN_START_DELAY = 0.15
+local UTHER_RUN_ORDER_REFRESH = 0.75
+local UTHER_RUN_TIMEOUT = 30.0
+local UTHER_RUN_PROGRESS_LOG_INTERVAL = 5.0
 local UTHER_DESTINATION_NAME = "xhs_spawner_paladin_2_vip"
 
 local function IsUsableEntity(entity)
 	return entity ~= nil and IsValidEntity(entity) and not entity:IsNull()
+end
+
+local function LogUtherRescue(severity, code, message, context)
+	if XHSObservability ~= nil and type(XHSObservability.Log) == "function" then
+		local ok = pcall(function()
+			XHSObservability:Log(
+				severity or "info",
+				"uther_rescue",
+				code or "UTHER_RESCUE_DIAGNOSTIC",
+				message or "Uther rescue diagnostic",
+				context or {}
+			)
+		end)
+		if ok then return end
+	end
+	print("[XHS][UtherRescue][" .. tostring(code) .. "] " .. tostring(message))
+end
+
+local function ReadUtherRuntimeState(uther, destination)
+	if not IsUsableEntity(uther) then return { valid = false } end
+	local origin = uther:GetAbsOrigin()
+	local state = {
+		valid = true,
+		entindex = uther:entindex(),
+		distance = destination ~= nil and (origin - destination):Length2D() or -1,
+		x = origin.x,
+		y = origin.y,
+		z = origin.z,
+		move_capability = uther.GetMoveCapability ~= nil and uther:GetMoveCapability() or -1,
+		has_movement = uther.HasMovementCapability ~= nil and uther:HasMovementCapability() or false,
+		day_vision = uther.GetDayTimeVisionRange ~= nil and uther:GetDayTimeVisionRange() or -1,
+		night_vision = uther.GetNightTimeVisionRange ~= nil and uther:GetNightTimeVisionRange() or -1,
+		stunned = uther.IsStunned ~= nil and uther:IsStunned() or false,
+		frozen = uther.IsFrozen ~= nil and uther:IsFrozen() or false,
+		command_restricted = uther.IsCommandRestricted ~= nil and uther:IsCommandRestricted() or false,
+		pause_modifier = uther:HasModifier("modifier_pause_creeps"),
+		dialog_modifier = uther:HasModifier("modifier_npc_dialog"),
+		cinematic_modifier = uther:HasModifier("modifier_cinematic_pause"),
+		animation_modifier = uther:HasModifier("modifier_animation"),
+	}
+	if destination ~= nil and GridNav ~= nil and GridNav.CanFindPath ~= nil then
+		local ok, canFindPath = pcall(GridNav.CanFindPath, GridNav, origin, destination)
+		if ok then state.nav_path = canFindPath == true end
+	end
+	return state
 end
 
 local function FindUtherLightbringer()
@@ -185,6 +234,16 @@ local function CreateWorldParticle(particleName, position)
 	ParticleManager:ReleaseParticleIndex(particle)
 end
 
+local function RefreshUtherRescueHealthBar(unit, ensureTracked)
+	if not IsUsableEntity(unit) or XHSCreepHealthBars == nil then return end
+	if ensureTracked == true and XHSCreepHealthBars.Apply ~= nil then
+		XHSCreepHealthBars:Apply(unit)
+	end
+	if XHSCreepHealthBars.RefreshPresentation ~= nil then
+		XHSCreepHealthBars:RefreshPresentation(unit)
+	end
+end
+
 local function FinishUtherRun()
 	local rescue = GameMode.UtherRescue
 	if rescue == nil or rescue.finished == true or not IsUsableEntity(rescue.uther) then return end
@@ -192,7 +251,9 @@ local function FinishUtherRun()
 	rescue.finished = true
 	local uther = rescue.uther
 	uther:Stop()
-	FindClearSpaceForUnit(uther, rescue.destination, true)
+	-- Face the dialog area/player approach after either a successful walk or the
+	-- timeout teleport recovery. Dota map south is the negative Y axis.
+	FaceUnitTowardsPosition(uther, uther:GetAbsOrigin() + Vector(0, -100, 0))
 	uther:SetMoveCapability(DOTA_UNIT_CAP_MOVE_NONE)
 	uther:AddNewModifier(uther, nil, "modifier_npc_dialog", { duration = -1 })
 	local animation = uther:AddNewModifier(uther, nil, "modifier_stack_count_animation_controller", {})
@@ -211,33 +272,95 @@ local function FinishUtherRun()
 		style = { color = "lightgreen" },
 		duration = 8.0,
 	})
+	LogUtherRescue("info", "UTHER_RUN_FINISHED", "Uther reached his dialog destination", ReadUtherRuntimeState(uther, rescue.destination))
 end
 
 local function BeginUtherRun()
 	local rescue = GameMode.UtherRescue
-	if rescue == nil or not IsUsableEntity(rescue.uther) or rescue.destination == nil then return end
+	if rescue == nil or not IsUsableEntity(rescue.uther) or rescue.destination == nil then
+		LogUtherRescue("error", "UTHER_RUN_START_INVALID", "Uther run could not start because its state or destination is invalid", {
+			has_rescue = rescue ~= nil,
+			has_destination = rescue ~= nil and rescue.destination ~= nil,
+		})
+		return
+	end
 
 	local uther = rescue.uther
+	rescue.run_started = true
+	rescue.run_started_at = GameRules:GetGameTime()
+	-- Re-clear every movement-blocking state after the cinematic. This is
+	-- intentionally repeated here because a global cinematic lock can be added
+	-- after the prison release cleanup but before this delayed callback.
+	uther:RemoveModifierByName("modifier_pause_creeps")
+	uther:RemoveModifierByName("modifier_npc_dialog")
+	uther:RemoveModifierByName("modifier_cinematic_pause")
+	uther:RemoveModifierByName("modifier_animation_freeze")
+	EndAnimation(uther)
 	uther:FadeGesture(ACT_DOTA_SPAWN)
 	uther:SetMoveCapability(DOTA_UNIT_CAP_MOVE_GROUND)
-	ExecuteOrderFromTable({
-		UnitIndex = uther:entindex(),
-		OrderType = DOTA_UNIT_ORDER_MOVE_TO_POSITION,
-		Position = rescue.destination,
-		Queue = false,
-	})
+	if uther.SetBaseMoveSpeed ~= nil then uther:SetBaseMoveSpeed(325) end
+	FindClearSpaceForUnit(uther, uther:GetAbsOrigin(), true)
+	local function MoveUtherToDestination()
+		if not IsUsableEntity(uther) or rescue.finished == true then return end
+		if uther.MoveToPosition ~= nil then
+			uther:MoveToPosition(rescue.destination)
+		end
+		ExecuteOrderFromTable({
+			UnitIndex = uther:entindex(),
+			OrderType = DOTA_UNIT_ORDER_MOVE_TO_POSITION,
+			Position = rescue.destination,
+			Queue = false,
+		})
+	end
+	MoveUtherToDestination()
+	LogUtherRescue("info", "UTHER_RUN_STARTED", "Uther movement to his dialog destination started", ReadUtherRuntimeState(uther, rescue.destination))
 
-	local startedAt = GameRules:GetGameTime()
+	local nextOrderRefresh = GameRules:GetGameTime() + UTHER_RUN_ORDER_REFRESH
+	local nextProgressLog = GameRules:GetGameTime() + UTHER_RUN_PROGRESS_LOG_INTERVAL
+	local bestDistance = (uther:GetAbsOrigin() - rescue.destination):Length2D()
+	local lastProgressDistance = bestDistance
 	Timers:CreateTimer(function()
-		if not IsUsableEntity(uther) then return nil end
-		if (uther:GetAbsOrigin() - rescue.destination):Length2D() <= 90 then
+		if not IsUsableEntity(uther) then
+			LogUtherRescue("critical", "UTHER_RUN_UNIT_LOST", "Uther became invalid while moving to his destination", {})
+			return nil
+		end
+		local now = GameRules:GetGameTime()
+		local distance = (uther:GetAbsOrigin() - rescue.destination):Length2D()
+		if distance <= 90 then
 			FinishUtherRun()
 			return nil
 		end
-		if GameRules:GetGameTime() - startedAt >= 25.0 then
-			-- Do not soft-lock the campaign if a future map revision blocks this path.
+		bestDistance = math.min(bestDistance, distance)
+		if now - rescue.run_started_at >= UTHER_RUN_TIMEOUT then
+			local state = ReadUtherRuntimeState(uther, rescue.destination)
+			state.elapsed = now - rescue.run_started_at
+			state.best_distance = bestDistance
+			LogUtherRescue("error", "UTHER_RUN_TIMEOUT_RECOVERY", "Uther did not reach his destination within 30 seconds; teleport recovery applied", state)
+			uther:RemoveModifierByName("modifier_pause_creeps")
+			uther:RemoveModifierByName("modifier_npc_dialog")
+			uther:RemoveModifierByName("modifier_cinematic_pause")
+			FindClearSpaceForUnit(uther, rescue.destination, true)
 			FinishUtherRun()
 			return nil
+		end
+		if now >= nextProgressLog then
+			nextProgressLog = now + UTHER_RUN_PROGRESS_LOG_INTERVAL
+			local state = ReadUtherRuntimeState(uther, rescue.destination)
+			state.elapsed = now - rescue.run_started_at
+			state.best_distance = bestDistance
+			local stalled = distance >= lastProgressDistance - 5
+			LogUtherRescue(
+				stalled and "warn" or "info",
+				stalled and "UTHER_RUN_STALLED" or "UTHER_RUN_PROGRESS",
+				stalled and "Uther made no meaningful movement progress during the last sample"
+					or "Uther is moving to his destination",
+				state
+			)
+			lastProgressDistance = distance
+		end
+		if now >= nextOrderRefresh then
+			nextOrderRefresh = now + UTHER_RUN_ORDER_REFRESH
+			MoveUtherToDestination()
 		end
 		return 0.1
 	end)
@@ -276,12 +399,21 @@ function XHSSetupUtherIcePrison(proudmoore)
 	uther:RemoveModifierByName("modifier_npc_dialog_notify")
 	uther:AddNewModifier(uther, nil, "modifier_invulnerable", {})
 	uther:AddNewModifier(uther, nil, "modifier_phased", {})
+	local utherDayVision = uther.GetDayTimeVisionRange ~= nil and uther:GetDayTimeVisionRange() or 850
+	local utherNightVision = uther.GetNightTimeVisionRange ~= nil and uther:GetNightTimeVisionRange() or 800
+	-- A friendly considered-hero can keep contributing its KV vision on dedicated
+	-- servers despite fixed-vision modifier properties. Disable the actual unit
+	-- ranges while imprisoned so it cannot reveal Proudmoore or his arena early.
+	uther:SetDayTimeVisionRange(0)
+	uther:SetNightTimeVisionRange(0)
 	-- Unlike invulnerability/phasing, this modifier supplies the actual
 	-- MODIFIER_STATE_FROZEN state and keeps Uther's pose locked in the prison.
 	uther:AddNewModifier(uther, nil, "modifier_pause_creeps", {})
-	-- Frozen Uther reveals only his position; modifier_pause_creeps suppresses
-	-- the normal day/night vision supplied by the friendly unit itself.
-	uther:AddNewModifier(uther, nil, "modifier_provides_fow_position", {})
+	-- Remove any stale reveal modifier left by an older setup path. An imprisoned
+	-- Uther must contribute neither area vision nor a forced FOW position.
+	uther:RemoveModifierByName("modifier_provides_fow_position")
+	RefreshUtherRescueHealthBar(prison, true)
+	RefreshUtherRescueHealthBar(uther, true)
 	FindClearSpaceForUnit(uther, prisonOrigin, true)
 	uther:SetAbsOrigin(prisonOrigin)
 	local animation = uther:FindModifierByName("modifier_stack_count_animation_controller")
@@ -300,10 +432,13 @@ function XHSSetupUtherIcePrison(proudmoore)
 		prison = prison,
 		ice_particle = iceParticle,
 		destination = destination,
+		free_day_vision = utherDayVision,
+		free_night_vision = utherNightVision,
 		activated = false,
 		released = false,
 		finished = false,
 	}
+	LogUtherRescue("info", "UTHER_RESCUE_CONFIGURED", "Uther ice-prison rescue state configured", ReadUtherRuntimeState(uther, destination))
 end
 
 function XHSActivateUtherIcePrison()
@@ -311,12 +446,18 @@ function XHSActivateUtherIcePrison()
 	if rescue == nil or rescue.activated == true or not IsUsableEntity(rescue.prison) then return end
 
 	rescue.activated = true
+	-- Reassert the server-authoritative ranges when the prison becomes
+	-- attackable; engine state changes must not restore friendly vision here.
+	rescue.uther:SetDayTimeVisionRange(0)
+	rescue.uther:SetNightTimeVisionRange(0)
+	rescue.uther:RemoveModifierByName("modifier_provides_fow_position")
 	-- Uther stays friendly, but is temporarily deny-targetable at any health.
 	-- The order filter redirects the actual attack to the prison, while Uther's
 	-- frozen state and invulnerability remain until the prison is destroyed.
 	rescue.uther:AddNewModifier(rescue.uther, nil, "modifier_xhs_uther_prison_target", {})
 	rescue.prison:RemoveModifierByName("modifier_invulnerable")
 	rescue.prison:SetHealth(rescue.prison:GetMaxHealth())
+	RefreshUtherRescueHealthBar(rescue.prison, true)
 	Notifications:TopToAll({
 		text = "Proudmoore's spell is broken. Shatter Uther's ice prison!",
 		style = { color = "lightblue" },
@@ -374,6 +515,10 @@ function XHSReleaseUtherFromIce()
 	uther:RemoveModifierByName("modifier_provides_fow_position")
 	uther:RemoveModifierByName("modifier_invulnerable")
 	uther:RemoveModifierByName("modifier_phased")
+	uther:SetDayTimeVisionRange(rescue.free_day_vision or 850)
+	uther:SetNightTimeVisionRange(rescue.free_night_vision or 800)
+	RefreshUtherRescueHealthBar(uther, true)
+	LogUtherRescue("info", "UTHER_RELEASED", "Uther was released from the ice prison; movement will start after the cinematic", ReadUtherRuntimeState(uther, rescue.destination))
 	StartAnimation(uther, { duration = UTHER_RELEASE_CINEMATIC_DURATION, activity = ACT_DOTA_SPAWN, rate = 0.7 })
 
 	if XHSCinematics ~= nil then
@@ -391,7 +536,38 @@ function XHSReleaseUtherFromIce()
 		})
 	end
 
-	Timers:CreateTimer(UTHER_RELEASE_CINEMATIC_DURATION, BeginUtherRun)
+	-- Start just after the cinematic order lock has been released. The movement
+	-- think then keeps the route alive instead of teleporting Uther on timeout.
+	Timers:CreateTimer(UTHER_RELEASE_CINEMATIC_DURATION + UTHER_RUN_START_DELAY, BeginUtherRun)
+
+	-- Independent engine-context watchdog: this still fires if the shared timer
+	-- callback never starts or throws before arming its own 30-second recovery.
+	local watchdogDeadline = GameRules:GetGameTime()
+		+ UTHER_RELEASE_CINEMATIC_DURATION
+		+ UTHER_RUN_START_DELAY
+		+ UTHER_RUN_TIMEOUT
+		+ 2.0
+	GameRules:GetGameModeEntity():SetContextThink("xhs_uther_run_watchdog", function()
+		local currentRescue = GameMode.UtherRescue
+		if currentRescue == nil or currentRescue.finished == true then return nil end
+		if GameRules:GetGameTime() < watchdogDeadline then return 0.5 end
+		if not IsUsableEntity(currentRescue.uther) or currentRescue.destination == nil then
+			LogUtherRescue("critical", "UTHER_RUN_WATCHDOG_INVALID", "Uther watchdog could not recover an invalid unit or destination", {
+				has_rescue = currentRescue ~= nil,
+				has_destination = currentRescue ~= nil and currentRescue.destination ~= nil,
+			})
+			return nil
+		end
+		local recoveryState = ReadUtherRuntimeState(currentRescue.uther, currentRescue.destination)
+		recoveryState.run_started = currentRescue.run_started == true
+		LogUtherRescue("error", "UTHER_RUN_WATCHDOG_RECOVERY", "Independent Uther watchdog applied teleport recovery", recoveryState)
+		currentRescue.uther:RemoveModifierByName("modifier_pause_creeps")
+		currentRescue.uther:RemoveModifierByName("modifier_npc_dialog")
+		currentRescue.uther:RemoveModifierByName("modifier_cinematic_pause")
+		FindClearSpaceForUnit(currentRescue.uther, currentRescue.destination, true)
+		FinishUtherRun()
+		return nil
+	end, 0.5)
 end
 
 local function SpawnBanehallowRevenant(spawnerName, banehallow, pauseDuration)
@@ -939,6 +1115,12 @@ function StartArthasArena(bConsole)
 end
 
 function StartBanehallowArena()
+	-- Banehallow starts a fresh encounter beat: dead allies must enter the
+	-- arena with the team. Use the phase-transition respawn path so pending
+	-- Ankh timers, inventory locks and tombstone state are cleaned before TP.
+	if RespawnDeadHeroesForPhase3Start ~= nil then
+		RespawnDeadHeroesForPhase3Start()
+	end
 	TeleportAllHeroes("point_teleport_boss_", 25.0, 3.0)
 	local banehallow
 	local index = 1

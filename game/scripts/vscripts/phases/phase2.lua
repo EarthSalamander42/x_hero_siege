@@ -627,11 +627,14 @@ end
 local FINAL_WAVE_QUEST_NAME = "kill_final_wave"
 local FINAL_WAVE_TOTAL_UNITS = 52
 local FINAL_WAVE_INTRO_DURATION = 52.0
+local FINAL_WAVE_PREP_DURATION = 5.0
 local FINAL_WAVE_CARDINAL_REVEAL_DELAY = 2.8
 local FINAL_WAVE_BOSS_SUMMON_DELAY = 0.65
 local FINAL_WAVE_UNIT_SPAWN_INTERVAL = 0.18
 local FINAL_WAVE_PORTAL_FOW_RADIUS = 900
 local FINAL_WAVE_PORTAL_FOW_DURATION = 9.0
+local FINAL_WAVE_FOW_TRANSITION_OVERLAP = 0.35
+local FINAL_WAVE_CAMERA_RETURN_DURATION = 0.85
 local FINAL_WAVE_MUSIC_SOUND = "XHS.FinalWaveMusic"
 local FINAL_WAVE_PLAYER_TELEPORT_DELAY = 1.5
 local FINAL_WAVE_CINEMATIC_ID = "final_wave_intro"
@@ -690,6 +693,25 @@ local FINAL_WAVE_CARDINALS = {
 		creeps = { "npc_captain", "npc_marine", "npc_marine", "npc_knight" },
 	},
 }
+
+local function GetFinalWaveCardinalFowDuration(config)
+	if config == nil then return FINAL_WAVE_PORTAL_FOW_DURATION end
+
+	for index, cardinal in ipairs(FINAL_WAVE_CARDINALS) do
+		if cardinal == config or cardinal.direction == config.direction then
+			local nextCardinal = FINAL_WAVE_CARDINALS[index + 1]
+			local revealEnd = nextCardinal ~= nil
+				and nextCardinal.delay
+				or (FINAL_WAVE_INTRO_DURATION + FINAL_WAVE_CAMERA_RETURN_DURATION)
+			return math.max(
+				FINAL_WAVE_PORTAL_FOW_DURATION,
+				revealEnd - (cardinal.delay or 0) + FINAL_WAVE_FOW_TRANSITION_OVERLAP
+			)
+		end
+	end
+
+	return FINAL_WAVE_PORTAL_FOW_DURATION
+end
 
 local function FindFinalWaveQuest()
 	if GameMode == nil or GameMode.Zones == nil then
@@ -802,6 +824,27 @@ local function SendFinalWaveCamera(position, speed)
 	end
 end
 
+local function LockFinalWaveCamerasToHeroes()
+	if CameraMotion == nil then return end
+
+	for _, hero in pairs(HeroList:GetAllHeroes()) do
+		if hero:IsRealHero() and hero:GetTeam() == DOTA_TEAM_GOODGUYS then
+			local playerID = hero:GetPlayerOwnerID()
+			if playerID ~= nil and playerID >= 0 then
+				CameraMotion:Follow(playerID, hero, {
+					from = hero,
+					duration = 0.35,
+					easing = "smootherstep",
+					owner = "final_wave_intro",
+					priority = 100,
+					policy = "replace",
+					persistent = true,
+				})
+			end
+		end
+	end
+end
+
 local function ApplyFinalWaveCinematicLock(unit, duration)
 	if unit == nil or unit:IsNull() then return end
 	if duration <= 0 then return end
@@ -875,8 +918,14 @@ local function CreateFinalWaveTeleportChannel(origin)
 	return particle
 end
 
-local function CreateFinalWavePortalEffects(origin)
-	AddFOWViewer(DOTA_TEAM_GOODGUYS, origin, FINAL_WAVE_PORTAL_FOW_RADIUS, FINAL_WAVE_PORTAL_FOW_DURATION, false)
+local function CreateFinalWavePortalEffects(origin, fowDuration)
+	AddFOWViewer(
+		DOTA_TEAM_GOODGUYS,
+		origin,
+		FINAL_WAVE_PORTAL_FOW_RADIUS,
+		fowDuration or FINAL_WAVE_PORTAL_FOW_DURATION,
+		false
+	)
 	return CreateFinalWaveTeleportChannel(origin)
 end
 
@@ -952,7 +1001,18 @@ function FinalWave(force)
 	RefreshPlayers()
 	GameRules:SetHeroRespawnEnabled(false)
 
-	TeleportAllHeroes("final_wave_player_", FINAL_WAVE_INTRO_DURATION, FINAL_WAVE_PLAYER_TELEPORT_DELAY)
+	TeleportAllHeroes(
+		"final_wave_player_",
+		FINAL_WAVE_INTRO_DURATION,
+		FINAL_WAVE_PLAYER_TELEPORT_DELAY,
+		function()
+			if not IsFinalWaveSequenceActive(finalWaveSequenceId) then return end
+			-- Establish the hero-follow camera before the first cardinal reveal.
+			-- Without an explicit target, the cinematic overlay starts while the
+			-- teleport camera is still free and the first reveal appears to snap.
+			LockFinalWaveCamerasToHeroes()
+		end
+	)
 
 	Timers:CreateTimer(FINAL_WAVE_PLAYER_TELEPORT_DELAY, function()
 		if not IsFinalWaveSequenceActive(finalWaveSequenceId) then return end
@@ -996,7 +1056,7 @@ function FinalWave(force)
 				CameraMotion:Return(playerID, function()
 					return PlayerResource:GetSelectedHeroEntity(playerID)
 				end, {
-					duration = 0.85,
+					duration = FINAL_WAVE_CAMERA_RETURN_DURATION,
 					easing = "smootherstep",
 					owner = "final_wave_intro",
 					priority = 100,
@@ -1006,16 +1066,27 @@ function FinalWave(force)
 			end
 		end
 
-		ReleaseFinalWavePendingUnits()
-
 		if XHSCinematics ~= nil then
 			XHSCinematics:EndForAll(FINAL_WAVE_CINEMATIC_ID)
 		end
 
-		local finalWaveFort = GetFinalWaveFort()
-		if finalWaveFort ~= nil then
-			EmitSoundOn("Hero_TemplarAssassin.Trap", finalWaveFort)
-		end
+		Notifications:TopToAll({
+			text = "Prepare! The final wave attacks in " .. math.floor(FINAL_WAVE_PREP_DURATION) .. " seconds.",
+			duration = FINAL_WAVE_PREP_DURATION,
+			style = { color = "#ffdc73", ["font-size"] = "26px", ["font-weight"] = "bold" },
+		})
+
+		-- Heroes are released by their teleport modifiers at this point and can
+		-- reposition while every final-wave unit remains paused and invulnerable.
+		Timers:CreateTimer(FINAL_WAVE_PREP_DURATION, function()
+			if not IsFinalWaveSequenceActive(finalWaveSequenceId) then return end
+			ReleaseFinalWavePendingUnits()
+
+			local finalWaveFort = GetFinalWaveFort()
+			if finalWaveFort ~= nil then
+				EmitSoundOn("Hero_TemplarAssassin.Trap", finalWaveFort)
+			end
+		end)
 	end)
 end
 
@@ -1044,12 +1115,15 @@ function FinalWaveSpawner(configOrCreep1, creep2, creep3, creep4, bossName, angl
 	if config == nil or config.direction == nil or config.boss == nil then return end
 
 	local releaseWaypoint = Entities:FindByName(nil, config.waypoint)
-	local lockDuration = math.max(1.0, FINAL_WAVE_INTRO_DURATION - (config.delay or 0))
+	local lockDuration = math.max(
+		1.0,
+		FINAL_WAVE_INTRO_DURATION + FINAL_WAVE_PREP_DURATION - (config.delay or 0)
+	)
 	local portalOrigin = GetFinalWavePortalOrigin(config)
 	local bossSpawner = FindFinalWaveSpawner(config.direction, 13)
 	if bossSpawner == nil then return end
 
-	local teleportChannel = CreateFinalWavePortalEffects(portalOrigin)
+	local teleportChannel = CreateFinalWavePortalEffects(portalOrigin, GetFinalWaveCardinalFowDuration(config))
 	NotifyFinalWaveArrival(config)
 
 	local spawnMarkers = {}

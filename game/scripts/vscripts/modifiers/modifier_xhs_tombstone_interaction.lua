@@ -73,6 +73,12 @@ function modifier_xhs_tombstone_interaction:OnOrder(params)
 		local system = _G.XHSUnitTombstone
 		if IsValidEntityHandle(hero) and hero:IsAlive()
 			and IsTombstone(tombstone) and system ~= nil and system.BeginInteraction ~= nil then
+			-- This marker debounces duplicate engine orders until the deferred
+			-- handler runs. Release it before handing ownership to BeginInteraction,
+			-- which installs its own pending marker for the move/channel sequence.
+			if hero.xhs_pending_tombstone_entindex == tombstoneEntindex then
+				hero.xhs_pending_tombstone_entindex = nil
+			end
 			if system:BeginInteraction(hero, tombstone) then return nil end
 		end
 		if IsValidEntityHandle(hero) and hero.xhs_pending_tombstone_entindex == tombstoneEntindex then

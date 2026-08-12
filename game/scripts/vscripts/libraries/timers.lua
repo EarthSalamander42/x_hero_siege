@@ -133,7 +133,14 @@ function Timers:_xpcall(f, ...)
 	local result = xpcall(function() return f(unpack(arg)) end,
 		function(msg)
 			-- build the error message
-			return msg .. '\n' .. debug.traceback() .. '\n'
+			local message = tostring(msg or "Unknown timer runtime error")
+			if debug ~= nil and type(debug.traceback) == "function" then
+				local ok, trace = pcall(debug.traceback, message, 2)
+				if ok and trace ~= nil then
+					return tostring(trace) .. '\n'
+				end
+			end
+			return message .. '\n'
 		end)
 
 	print(result)
@@ -260,6 +267,15 @@ function Timers:_ArmThinker()
 	self.thinker:SetContextThink(TIMER_CONTEXT_NAME, self.thinkCallback, delay)
 end
 
+local function BuildTimerErrorTrace(err)
+	local message = tostring(err == nil and "unknown timer error" or err)
+	if debug ~= nil and type(debug.traceback) == "function" then
+		local ok, trace = pcall(debug.traceback, message, 2)
+		if ok and trace ~= nil then return tostring(trace) end
+	end
+	return message
+end
+
 function Timers:_RunDueHeap(heap, now)
 	while true do
 		local entry = self:_PeekCurrent(heap)
@@ -273,13 +289,9 @@ function Timers:_RunDueHeap(heap, now)
 
 			local status, nextCall
 			if timer.context then
-				status, nextCall = xpcall(function() return timer.callback(timer.context, timer) end, function(msg)
-					return msg .. '\n' .. debug.traceback() .. '\n'
-				end)
+				status, nextCall = xpcall(function() return timer.callback(timer.context, timer) end, BuildTimerErrorTrace)
 			else
-				status, nextCall = xpcall(function() return timer.callback(timer) end, function(msg)
-					return msg .. '\n' .. debug.traceback() .. '\n'
-				end)
+				status, nextCall = xpcall(function() return timer.callback(timer) end, BuildTimerErrorTrace)
 			end
 
 			if status then
@@ -321,12 +333,30 @@ function Timers:Think(schedulerGeneration)
 end
 
 function Timers:HandleEventError(name, event, err)
-	print(err)
-
 	-- Ensure we have data
 	name = tostring(name or 'unknown')
 	event = tostring(event or 'unknown')
 	err = tostring(err or 'unknown')
+
+	-- Never allow diagnostics to throw here: this function is the last line of
+	-- defence for the shared scheduler. In particular, Lua errors may be tables
+	-- or engine userdata rather than strings.
+	if XHSObservability ~= nil and type(XHSObservability.Log) == "function" then
+		pcall(function()
+			XHSObservability:Log("error", "timer", "TIMER_CALLBACK_FAILED", err, {
+				timer_name = event,
+				event_type = name,
+				server_game_time = GameRules ~= nil and GameRules.GetGameTime ~= nil
+					and GameRules:GetGameTime() or 0,
+			})
+		end)
+	end
+	local printed = false
+	if XHSBootstrapNativePrint ~= nil then
+		printed = pcall(XHSBootstrapNativePrint,
+			"[error][XHS_TIMER][" .. event .. "] " .. err)
+	end
+	if not printed then pcall(print, "[error][XHS_TIMER][" .. event .. "] " .. err) end
 
 	-- Tell everyone there was an error
 	--GameRules:SendCustomMessage(nil, name .. ' threw an error on event '..event, 0, 0)

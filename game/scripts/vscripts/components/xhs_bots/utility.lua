@@ -277,6 +277,36 @@ function XHSBotUtility:Build(context)
 	end
 
 	local combatThreat = tonumber(context.combat_threat) or 0
+	if context.revive_channeling == true then
+		local mustAbort = (tonumber(context.raw_danger) or 0)
+			>= (tonumber(context.channel_interrupt_danger) or 0.75)
+			or combatThreat >= 0.85
+			or (tonumber(context.recent_damage_ratio) or 0) >= 0.16
+			or (tonumber(context.focused_by) or 0) >= 1
+		if mustAbort and context.retreat_position ~= nil then
+			AddAction(
+				actions,
+				"retreat",
+				200,
+				{ position = context.retreat_position, interrupt_channel = true },
+				"abort threatened tombstone channel"
+			)
+		else
+			AddAction(actions, "wait", 200, {}, "protect tombstone channel")
+		end
+		return self:Sort(actions)
+	end
+
+	if context.revive_target ~= nil then
+		AddAction(
+			actions,
+			"revive_ally",
+			188,
+			{ target = context.revive_target },
+			"safe tombstone revive opportunity"
+		)
+		return self:Sort(actions)
+	end
 
 	if context.shopping == true then
 		for _, abilityAction in ipairs(context.ability_actions or {}) do
@@ -553,7 +583,8 @@ function XHSBotUtility:Build(context)
 		)
 	end
 
-	local engagementHolding = context.target ~= nil
+	local engagementHolding = context.force_combat ~= true
+		and context.target ~= nil
 		and context.engagement_allow_attack == false
 	if engagementHolding then
 		local holdPosition = context.reposition_position
@@ -589,12 +620,15 @@ function XHSBotUtility:Build(context)
 			actions,
 			"attack_target",
 			66 + (context.target_priority or 0)
+				+ (context.force_combat == true and 44 or 0)
 				+ (context.last_stand == true and 45 or 0),
 			{
 				target = context.target,
 				maximum_distance = context.max_chase_distance,
 			},
-			context.last_stand == true
+			context.force_combat == true
+				and "committed phase 3/4 boss combat"
+				or context.last_stand == true
 				and "fight under Ancient or tower cover"
 				or "combat target available"
 		)

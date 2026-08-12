@@ -102,8 +102,10 @@ function ContentStudio:StopPreview(playerID)
 end
 
 local function IsParticlePath(value)
-	return type(value) == "string"
-		and string.match(string.lower(value), "^particles/.+%.vpcf$") ~= nil
+	if type(value) ~= "string" then return false end
+	local normalized = string.lower(value)
+	return string.match(normalized, "^particles/.+%.vpcf$") ~= nil
+		or normalized == "models/heroes/muerta/debut/particles/revenant/muerta_debut_revenant_spawn_portal.vpcf"
 end
 
 local function CandidateAssetSignature(candidate)

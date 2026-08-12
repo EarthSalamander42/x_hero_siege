@@ -22,11 +22,9 @@ XHSBotEconomy.RESOURCE_SHARE_POWER_RATIO = 1.50
 XHSBotEconomy.RESOURCE_SHARE_COOLDOWN = 5
 XHSBotEconomy.resource_share_claims =
 	XHSBotEconomy.resource_share_claims or {}
--- Purchases are direct server transactions. Home/base inventory may be bought
--- remotely exactly like a player purchase, but it is moved immediately into
--- a stash slot (9-14) and remains inactive until the bot returns home.
--- Secret-shop inventory still
--- requires the bot to enter the real castle-shop volume.
+-- Purchases are direct server transactions, but every item still requires the
+-- bot to stand in a legal shop volume, exactly like a human player. The direct
+-- transaction only replaces the engine UI click; it never replaces travel.
 XHSBotEconomy.BASE_SHOP_RADIUS = 650
 XHSBotEconomy.LANE_SHOP_RADIUS = 550
 XHSBotEconomy.SECRET_SHOP_RADIUS = 550
@@ -487,6 +485,8 @@ function XHSBotEconomy:UseConsumables(hero, record, difficulty, profile, encount
 					ability = item,
 					mode = "no_target",
 					urgent = name == "item_health_potion",
+					instant_overlay = name == "item_health_potion"
+						or name == "item_mana_potion",
 					reason = name == "item_health_potion"
 						and tostring(healthPotionReason or "health potion threshold")
 						or "mana potion threshold",
@@ -1948,6 +1948,296 @@ function XHSBotEconomy:BuildPlannerSnapshot(playerID, hero, record)
 	}
 end
 
+function XHSBotEconomy:ResolveGiftCatalogEntry(itemName)
+	itemName = tostring(itemName or "")
+	local entry = XHSBotItemCatalog:Get(itemName)
+	if entry ~= nil then return entry, false end
+	-- Recipes are the purchasable representation of the superior item. Resolve
+	-- them back to that item so a human may finish an upgrade for a bot without
+	-- bypassing the same build rules used by the economy planner.
+	for _, candidate in pairs(XHSBotItemCatalog:GetItems() or {}) do
+		if tostring(candidate.purchase_name or "") == itemName then
+			return candidate, true
+		end
+	end
+	return nil, false
+end
+
+function XHSBotEconomy:GetGiftFamilyInventory(hero, familyName)
+	local state = {
+		count = 0,
+		highest_tier = 0,
+		handles = {},
+	}
+	if not IsValidEntityHandle(hero) or familyName == nil then return state end
+	for slot = 0, self.SCAN_LAST_SLOT do
+		local item = hero:GetItemInSlot(slot)
+		local name = ItemName(item)
+		local entry, isRecipe = self:ResolveGiftCatalogEntry(name)
+		if entry ~= nil and entry.family == familyName then
+			table.insert(state.handles, item)
+			if not isRecipe then
+				state.count = state.count + 1
+				state.highest_tier = math.max(
+					state.highest_tier,
+					tonumber(entry.tier) or 0
+				)
+			end
+		end
+	end
+	return state
+end
+
+function XHSBotEconomy:IsGiftTargetLoadoutItem(entry, plan)
+	if entry == nil then return false end
+	if entry.family ~= nil then
+		for _, detail in ipairs(plan and plan.target_loadout_details or {}) do
+			if detail.family == entry.family then return true end
+		end
+		return false
+	end
+	for _, name in ipairs(plan and plan.target_loadout or {}) do
+		if name == entry.name then return true end
+	end
+	if plan ~= nil and plan.next_entry ~= nil
+		and plan.next_entry.name == entry.name then
+		return true
+	end
+	if plan ~= nil and plan.tactical_entry ~= nil
+		and plan.tactical_entry.name == entry.name then
+		return true
+	end
+	for _, candidate in ipairs(plan and plan.candidates or {}) do
+		if candidate.entry ~= nil and candidate.entry.name == entry.name then
+			return true
+		end
+	end
+	return false
+end
+
+function XHSBotEconomy:GetGiftMergeState(hero, itemName, entry, isRecipe, snapshot)
+	local result = {
+		can_merge = false,
+		upgrade = false,
+		recipe_ready = false,
+		stack = false,
+		normalize = {},
+	}
+	if not IsValidEntityHandle(hero) or entry == nil then return result end
+
+	if entry.stackable == true then
+		for slot = 0, self.SCAN_LAST_SLOT do
+			local ownedItem = hero:GetItemInSlot(slot)
+			if ItemName(ownedItem) == itemName or ItemName(ownedItem) == entry.name then
+				result.can_merge = true
+				result.stack = true
+				table.insert(result.normalize, ownedItem)
+			end
+		end
+	end
+
+	if entry.family ~= nil then
+		local familyState = self:GetGiftFamilyInventory(hero, entry.family)
+		local predecessorOwned = entry.predecessor ~= nil
+			and (tonumber(snapshot.owned[entry.predecessor]) or 0) > 0
+		if (tonumber(entry.tier) or 0) > 1 then
+			if isRecipe and predecessorOwned then
+				result.can_merge = true
+				result.upgrade = true
+				result.recipe_ready = true
+			elseif not isRecipe
+				and familyState.highest_tier > 0
+				and familyState.highest_tier < (tonumber(entry.tier) or 0) then
+				-- A completed superior item is a strategic upgrade, but it does
+				-- not consume the old item and therefore still needs a free slot.
+				result.upgrade = true
+			end
+		end
+		-- The complementary case is a player donating the base while a recipe
+		-- already waits in the bot inventory. It is still the same valid upgrade.
+		if not isRecipe then
+			for _, ownedItem in ipairs(familyState.handles) do
+				local ownedEntry, ownedIsRecipe =
+					self:ResolveGiftCatalogEntry(ItemName(ownedItem))
+				if ownedIsRecipe and ownedEntry ~= nil
+					and ownedEntry.predecessor == entry.name then
+					result.can_merge = true
+					result.upgrade = true
+					result.recipe_ready = true
+				end
+			end
+		end
+		if result.upgrade then
+			for _, ownedItem in ipairs(familyState.handles) do
+				table.insert(result.normalize, ownedItem)
+			end
+		end
+	end
+
+	if entry.replaces ~= nil
+		and (tonumber(snapshot.owned[entry.replaces]) or 0) > 0 then
+		result.upgrade = true
+	end
+	return result
+end
+
+function XHSBotEconomy:EvaluateIncomingGift(botPlayerID, hero, item)
+	botPlayerID = tonumber(botPlayerID)
+	local record = botPlayerID ~= nil and XHSBotPlayerRegistry:GetBot(botPlayerID) or nil
+	if record == nil or not IsValidEntityHandle(hero)
+		or not IsValidEntityHandle(item) then
+		return false, "#error_xhs_bot_item_unsupported", nil
+	end
+	local itemName = ItemName(item)
+	local entry, isRecipe = self:ResolveGiftCatalogEntry(itemName)
+	if entry == nil then
+		return false, "#error_xhs_bot_item_unsupported", nil
+	end
+	local profile = XHSBotHeroProfiles:Get(hero:GetUnitName())
+	if profile == nil then
+		return false, "#error_xhs_bot_item_unsupported", nil
+	end
+	local snapshot = self:BuildPlannerSnapshot(botPlayerID, hero, record)
+	local difficulty = XHSBotConfig:GetDifficulty(record.difficulty)
+	local plan = XHSBotItemPlanner:Plan(snapshot, profile, difficulty)
+	local merge = self:GetGiftMergeState(
+		hero,
+		itemName,
+		entry,
+		isRecipe,
+		snapshot
+	)
+
+	if XHSBotItemPlanner:IsItemRedundant(profile, entry.name)
+		or entry.name == self.LIFESTEAL_MASK_ITEM_NAME
+			and XHSBotItemPlanner:HasIntrinsicLifesteal(profile) then
+		return false, "#error_xhs_bot_item_build_mismatch", nil
+	end
+	if entry.name == self.LIFESTEAL_MASK_ITEM_NAME
+		and (tonumber(snapshot.owned[self.LIGHTNING_SWORD_ITEM_NAME]) or 0) > 0 then
+		return false, "#error_xhs_bot_item_not_upgrade", nil
+	end
+	if entry.stackable ~= true
+		and entry.family == nil
+		and (tonumber(snapshot.owned[entry.name]) or 0) > 0
+		and merge.upgrade ~= true then
+		return false, "#error_xhs_bot_item_not_upgrade", nil
+	end
+
+	if entry.family ~= nil then
+		local compatible = XHSBotItemPlanner:IsFamilyCompatible(
+			snapshot,
+			profile,
+			entry.family
+		)
+		if compatible ~= true then
+			return false, "#error_xhs_bot_item_build_mismatch", nil
+		end
+		local familyState = self:GetGiftFamilyInventory(hero, entry.family)
+		local familyLimit = XHSBotItemPlanner:GetFamilyLimit(profile, entry.family)
+		if familyLimit <= 0 then
+			return false, "#error_xhs_bot_item_build_mismatch", nil
+		end
+		if isRecipe and merge.upgrade ~= true then
+			return false, "#error_xhs_bot_item_missing_base", nil
+		end
+		if familyState.count <= 0
+			and not self:IsGiftTargetLoadoutItem(entry, plan) then
+			return false, "#error_xhs_bot_item_build_mismatch", nil
+		end
+		if merge.upgrade ~= true and familyState.count >= familyLimit then
+			return false, "#error_xhs_bot_item_not_upgrade", nil
+		end
+		if merge.upgrade ~= true
+			and XHSBotItemPlanner:GetOwnedOrbSlotCount(snapshot)
+				>= XHSBotItemPlanner:GetMaximumOrbSlots(profile) then
+			return false, "#error_xhs_bot_full_build", nil
+		end
+	elseif entry.kind == "core" then
+		local isReward = entry.purchasable == false
+		local replacesOwned = entry.replaces ~= nil
+			and (tonumber(snapshot.owned[entry.replaces]) or 0) > 0
+		if not isReward and not replacesOwned
+			and not self:IsGiftTargetLoadoutItem(entry, plan) then
+			return false, "#error_xhs_bot_item_build_mismatch", nil
+		end
+	elseif entry.kind ~= "consumable"
+		and entry.kind ~= "revive"
+		and entry.kind ~= "tactical"
+		and entry.kind ~= "utility"
+		and entry.kind ~= "tome"
+		and entry.kind ~= "reward" then
+		return false, "#error_xhs_bot_item_build_mismatch", nil
+	end
+
+	if entry.name == "item_health_potion"
+		and snapshot.basic_potions_obsolete == true then
+		return false, "#error_xhs_bot_item_build_mismatch", nil
+	end
+	if (tonumber(snapshot.inventory_slots) or 0) >= 9
+		and merge.can_merge ~= true then
+		return false, "#error_xhs_bot_full_build", nil
+	end
+
+	return true, nil, {
+		entry = entry,
+		item_name = itemName,
+		is_recipe = isRecipe,
+		merge = merge,
+	}
+end
+
+function XHSBotEconomy:PrepareAcceptedGift(botPlayerID, hero, item, context)
+	if not IsValidEntityHandle(hero) or not IsValidEntityHandle(item) then return end
+	local function NormalizePurchaser(candidate)
+		if IsValidEntityHandle(candidate) and candidate.SetPurchaser ~= nil then
+			pcall(function() candidate:SetPurchaser(hero) end)
+		end
+	end
+	NormalizePurchaser(item)
+	for _, ownedItem in ipairs(
+		context and context.merge and context.merge.normalize or {}
+	) do
+		NormalizePurchaser(ownedItem)
+	end
+	item.xhs_bot_external_gift_target = tonumber(botPlayerID)
+	local record = XHSBotPlayerRegistry:GetBot(botPlayerID)
+	if record ~= nil then
+		record.external_gifts_accepted =
+			(tonumber(record.external_gifts_accepted) or 0) + 1
+		record.last_external_gift = tostring(context and context.item_name or "unknown")
+	end
+end
+
+function XHSBotEconomy:RecordExternalGiftDecision(
+	botPlayerID,
+	itemName,
+	accepted,
+	reason,
+	issuer
+)
+	local record = XHSBotPlayerRegistry:GetBot(botPlayerID)
+	if record ~= nil and accepted ~= true then
+		record.external_gifts_rejected =
+			(tonumber(record.external_gifts_rejected) or 0) + 1
+		record.last_external_gift_rejection = tostring(reason or "unknown")
+	end
+	if XHSBotDecisionAudit ~= nil and XHSBotDecisionAudit.Record ~= nil then
+		XHSBotDecisionAudit:Record(
+			"external_item_offer",
+			botPlayerID,
+			tostring(itemName or "unknown") .. ":" .. tostring(accepted == true),
+			{
+				item = tostring(itemName or "unknown"),
+				accepted = accepted == true,
+				reason = tostring(reason or "accepted"),
+				issuer = tonumber(issuer) or -1,
+			},
+			false
+		)
+	end
+end
+
 function XHSBotEconomy:FindPlanCandidate(plan, family)
 	for _, candidate in ipairs(plan and plan.candidates or {}) do
 		if candidate.family == family then return candidate end
@@ -2492,16 +2782,23 @@ function XHSBotEconomy:RefreshEmergencyHealthResupply(hero, record, difficulty)
 			difficulty and difficulty.health_resupply_trigger_charges
 		) or 3)
 	)
-	local target = math.max(
+	local strategicTarget = math.max(
 		15,
 		math.floor(tonumber(record.health_potion_target)
 			or tonumber(difficulty and difficulty.target_health_potion_charges)
 			or 15)
 	)
+	-- Emergency routing restores a fightable reserve. Filling the later 30/45
+	-- strategic stock is ordinary downtime shopping and must not preempt combat.
+	local emergencyTarget = math.min(
+		strategicTarget,
+		math.max(15, trigger + 1)
+	)
+	record.health_potion_emergency_target = emergencyTarget
 	local emergencyActive = record.emergency_health_resupply_active == true
 		or type(record.shopping_goal) == "table"
 		and record.shopping_goal.emergency_health_resupply == true
-	if emergencyActive and carriedCharges >= target then
+	if emergencyActive and carriedCharges >= emergencyTarget then
 		self:ClearShoppingGoal(record, "item_health_potion")
 		return false
 	end
@@ -2524,10 +2821,22 @@ function XHSBotEconomy:RefreshEmergencyHealthResupply(hero, record, difficulty)
 		)
 	end
 	if emergencyActive then
+		if type(record.shopping_goal) ~= "table" then
+			return self:ScheduleEmergencyHealthResupply(
+				hero,
+				record,
+				difficulty,
+				"repair missing emergency health route",
+				false
+			)
+		end
 		local forceHome = type(record.shopping_goal) == "table"
 			and record.shopping_goal.force_home == true
 		local anchor = self:GetEmergencyHealthShopAnchor(hero, forceHome)
 		if anchor ~= nil then
+			-- Heal potions are general-shop inventory. Repair any stale/mutated
+			-- route defensively so it can never inherit a secret-shop goal.
+			record.shopping_goal.shop = "home"
 			record.shopping_goal.anchor = CopyPosition(anchor)
 			record.shopping_goal.force_home = forceHome
 		end
@@ -2946,12 +3255,10 @@ function XHSBotEconomy:TryPurchaseBuildEntry(
 			or deathsSinceGear >= 1 and purchaseAge >= 18
 		)
 	local atRequiredShop = self:IsAtRequiredShop(hero, requiredShop)
-	-- Like a real player, a bot may buy any normal-shop item remotely. Every
-	-- such purchase, including consumables, is delivered to stash and grants no
-	-- immediate combat benefit: the bot must still collect it at home. Secret
-	-- shop inventory remains strictly purchase-on-site.
-	local remoteStashDelivery = not atRequiredShop
-		and requiredShop ~= "secret"
+	-- Buying requires the matching real shop volume. This includes consumables:
+	-- a planned health-potion stack may never be created at the secret shop,
+	-- Ancient, lane, or boss arena merely because the server owns the bot.
+	local remoteStashDelivery = false
 	if not atRequiredShop and not remoteStashDelivery then
 		local shop = requiredShop
 		local anchor = continuingHealthRestock
@@ -3459,6 +3766,7 @@ function XHSBotEconomy:Think(playerID, hero, record, profile, difficulty)
 		and (noCombatEncounter
 			or encounter.arena_combat == true
 			or encounter.shopping_locked == true)
+	local now = GameRules:GetGameTime()
 	record.economy_encounter_mode = encounter and encounter.id or ""
 	record.economy_no_combat = noCombatEncounter
 	record.economy_shopping_locked = shoppingLockedEncounter
@@ -3476,10 +3784,20 @@ function XHSBotEconomy:Think(playerID, hero, record, profile, difficulty)
 			profile,
 			encounter
 		) then
-		return "healing"
+		-- Potions are IMMEDIATE/IGNORE_CHANNEL. Healing is a survival overlay;
+		-- the brain must still choose an attack, movement or spell this tick.
+		return "instant_item"
 	end
 	if record.defer_potion_for_spell_now == true then return nil end
-	if shoppingLockedEncounter then
+	-- Phase three has a reachable normal shop. Re-evaluate the potion reserve
+	-- before applying the generic sealed-encounter lock, otherwise a wounded bot
+	-- can retreat forever while carrying enough gold to restock.
+	self:RefreshEmergencyHealthResupply(hero, record, difficulty)
+	local phaseThreeEmergencyResupply = encounter ~= nil
+		and (encounter.id == "phase_3" or encounter.id == "phase_3_vanguard")
+		and type(record.shopping_goal) == "table"
+		and record.shopping_goal.emergency_health_resupply == true
+	if shoppingLockedEncounter and not phaseThreeEmergencyResupply then
 		-- Closed encounters own movement immediately, even if a shop trip was
 		-- active on the preceding tick. Emergency items remain legal, but the
 		-- economy must never pull an arena fighter toward an unreachable shop.
@@ -3487,8 +3805,6 @@ function XHSBotEconomy:Think(playerID, hero, record, profile, difficulty)
 		return nil
 	end
 
-	local now = GameRules:GetGameTime()
-	self:RefreshEmergencyHealthResupply(hero, record, difficulty)
 	local arenaPreparation =
 		self:GetSpecialArenaPreparation(playerID, hero)
 	if arenaPreparation ~= nil

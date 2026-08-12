@@ -11,6 +11,7 @@ end
 local NET_TABLE = "xhs_creep_health_bars"
 local NET_KEY = "units"
 local THINK_INTERVAL = 0.25
+local SUMMON_CAST_CAPTURE_WINDOW = 2.0
 local PRESENTATION_BLOCKED_BIT = 1
 local GOODGUYS_VISION_BIT = 2
 
@@ -18,6 +19,12 @@ local EXCLUDED_UNIT_NAMES = {
 	npc_dota_crate = true,
 	npc_dota_vase = true,
 	npc_dota_dungeon_checkpoint = true,
+	npc_dota_lich_king_sindragosa = true,
+	npc_xhs_hero_tombstone = true,
+}
+
+local HEALTH_BAR_HIDDEN_ILLUSION_NAMES = {
+	npc_dota_hero_grom_hellscream = true,
 }
 
 local function IsUsableUnit(unit)
@@ -47,6 +54,26 @@ local function SafeBooleanCall(unit, methodName)
 	return ok and result == true
 end
 
+local function ShouldHideIllusionHealthBar(unit)
+	if not IsUsableUnit(unit) or not SafeBooleanCall(unit, "IsIllusion") then
+		return false
+	end
+	local unitName = unit.GetUnitName ~= nil and tostring(unit:GetUnitName() or "") or ""
+	return HEALTH_BAR_HIDDEN_ILLUSION_NAMES[unitName] == true
+end
+
+local function ApplyNoHealthBarModifier(unit)
+	if not IsUsableUnit(unit)
+		or unit.HasModifier == nil
+		or unit.AddNewModifier == nil
+		or unit:HasModifier("modifier_xhs_custom_creep_health_bar") then
+		return
+	end
+	pcall(function()
+		unit:AddNewModifier(unit, nil, "modifier_xhs_custom_creep_health_bar", {})
+	end)
+end
+
 local function HasPlayerController(unit)
 	if not IsUsableUnit(unit) then return false end
 	if SafeBooleanCall(unit, "IsControllableByAnyPlayer") then return true end
@@ -58,10 +85,85 @@ local function HasPlayerController(unit)
 		or PlayerResource:IsValidPlayerID(tonumber(playerID))
 end
 
+local function GetSummonOwnerHero(unit)
+	if not IsUsableUnit(unit) then return nil end
+
+	local current = unit
+	local visited = {}
+	for _ = 1, 4 do
+		local owner = nil
+		for _, methodName in ipairs({ "GetOwnerEntity", "GetOwner" }) do
+			if current ~= nil and type(current[methodName]) == "function" then
+				local ok, candidate = pcall(function()
+					return current[methodName](current)
+				end)
+				if ok and IsUsableUnit(candidate) and candidate ~= current then
+					owner = candidate
+					break
+				end
+			end
+		end
+
+		if owner == nil or visited[owner] then break end
+		visited[owner] = true
+		if SafeBooleanCall(owner, "IsRealHero") then return owner end
+		current = owner
+	end
+
+	if unit.GetPlayerOwnerID ~= nil and PlayerResource ~= nil then
+		local ok, playerID = pcall(function() return unit:GetPlayerOwnerID() end)
+		playerID = ok and tonumber(playerID) or nil
+		if playerID ~= nil and playerID >= 0
+			and PlayerResource.GetSelectedHeroEntity ~= nil then
+			local hero = PlayerResource:GetSelectedHeroEntity(playerID)
+			if IsUsableUnit(hero) then return hero end
+		end
+	end
+
+	return nil
+end
+
+local function CaptureSummonAbilityLevel(unit)
+	if not IsUsableUnit(unit) or tonumber(unit.xhs_summon_ability_level) ~= nil then return end
+	local ownerHero = GetSummonOwnerHero(unit)
+	local cast = ownerHero ~= nil and ownerHero.xhs_last_executed_ability or nil
+	if type(cast) ~= "table" then return end
+
+	local level = math.floor(tonumber(cast.level) or 0)
+	local castTime = tonumber(cast.cast_time)
+	local now = GameRules ~= nil and GameRules.GetGameTime ~= nil
+		and GameRules:GetGameTime() or nil
+	if level <= 0 or castTime == nil or now == nil
+		or now < castTime or now - castTime > SUMMON_CAST_CAPTURE_WINDOW then
+		return
+	end
+
+	unit.xhs_summon_ability_level = level
+	unit.xhs_summon_ability_name = tostring(cast.name or "")
+end
+
 local function IsPresentationBlocked(unit)
 	if not IsUsableUnit(unit) then return true end
 	if SafeBooleanCall(unit, "IsInvisible") or SafeBooleanCall(unit, "IsOutOfGame") then
 		return true
+	end
+	local unitName = unit.GetUnitName ~= nil and tostring(unit:GetUnitName() or "") or ""
+	if unit.HasModifier ~= nil then
+		-- The prison is only a combat target after Proudmoore's protection is
+		-- removed. Before that point neither its Vanilla nor custom bar should
+		-- disclose it as an enemy target.
+		if unitName == "npc_xhs_uther_ice_prison"
+			and unit:HasModifier("modifier_invulnerable") then
+			return true
+		end
+		-- Uther's own bar stays hidden for the complete imprisoned/frozen state.
+		-- The shared no-health-bar modifier suppresses Vanilla while this relay
+		-- suppresses the replacement bar.
+		if unitName == "npc_xhs_paladin_2"
+			and (unit:HasModifier("modifier_pause_creeps")
+				or unit:HasModifier("modifier_xhs_uther_prison_target")) then
+			return true
+		end
 	end
 	return unit.HasModifier ~= nil and (
 		unit:HasModifier("modifier_eul_cyclone")
@@ -72,23 +174,41 @@ end
 
 function XHSCreepHealthBars:GetBarKind(unit)
 	if not IsUsableUnit(unit) then return false end
+	local unitName = unit.GetUnitName ~= nil and tostring(unit:GetUnitName() or "") or ""
+	-- The prison uses a ward relationship for targeting, but still needs the
+	-- custom bar pipeline so its Vanilla bar can remain hidden until activation.
+	if unitName == "npc_xhs_uther_ice_prison" then return "creep" end
 	if unit.xhs_custom_health_bar_kind == "creep_hero" then return "creep_hero" end
+	if XHSIsBossDamageTarget ~= nil and XHSIsBossDamageTarget(unit) then
+		return false
+	end
+
+	-- Enemy hero illusions must use the same segmented bar as their original
+	-- creep-hero. Leaving the Vanilla illusion bar visible makes the real unit
+	-- immediately identifiable. Radiant player illusions stay on the Vanilla
+	-- hero presentation so they continue to match their owning player hero.
+	if SafeBooleanCall(unit, "IsIllusion") then
+		local isHeroUnit = SafeBooleanCall(unit, "IsHero")
+			or SafeBooleanCall(unit, "IsConsideredHero")
+			or SafeBooleanCall(unit, "IsRealHero")
+		local unitTeam = unit.GetTeamNumber ~= nil and unit:GetTeamNumber() or nil
+		if isHeroUnit and unitTeam ~= DOTA_TEAM_GOODGUYS then
+			return "creep_hero"
+		end
+		return false
+	end
+
 	if SafeBooleanCall(unit, "IsRealHero")
 		or SafeBooleanCall(unit, "IsBuilding")
 		or SafeBooleanCall(unit, "IsWard")
 		or SafeBooleanCall(unit, "IsCourier")
-		or SafeBooleanCall(unit, "IsOther")
-		or SafeBooleanCall(unit, "IsIllusion") then
-		return false
-	end
-	if XHSIsBossDamageTarget ~= nil and XHSIsBossDamageTarget(unit) then
+		or SafeBooleanCall(unit, "IsOther") then
 		return false
 	end
 	if unit.HasModifier ~= nil and unit:HasModifier("modifier_breakable_container") then
 		return false
 	end
 
-	local unitName = unit.GetUnitName ~= nil and tostring(unit:GetUnitName() or "") or ""
 	if EXCLUDED_UNIT_NAMES[unitName]
 		or string.find(unitName, "dummy", 1, true) ~= nil
 		or string.find(unitName, "thinker", 1, true) ~= nil
@@ -116,6 +236,9 @@ function XHSCreepHealthBars:ShouldTrack(unit)
 end
 
 local function GetDisplayedUnitLevel(unit, kind)
+	local summonLevel = unit ~= nil
+		and math.floor(tonumber(unit.xhs_summon_ability_level) or 0) or 0
+	if summonLevel > 0 then return summonLevel end
 	if kind ~= "creep_controlled" or unit == nil or unit.GetLevel == nil then return nil end
 	local ok, level = pcall(function() return unit:GetLevel() end)
 	level = ok and math.floor(tonumber(level) or 0) or 0
@@ -161,6 +284,26 @@ function XHSCreepHealthBars:QueuePublish()
 end
 
 function XHSCreepHealthBars:Apply(unit)
+	local unitName = IsUsableUnit(unit) and unit.GetUnitName ~= nil
+		and tostring(unit:GetUnitName() or "") or ""
+	if EXCLUDED_UNIT_NAMES[unitName] then
+		local entityIndex = IsUsableUnit(unit) and tostring(unit:entindex()) or nil
+		local wasTracked = entityIndex ~= nil and self.units[entityIndex] ~= nil
+		if entityIndex ~= nil then self.units[entityIndex] = nil end
+		ApplyNoHealthBarModifier(unit)
+		if wasTracked then self:QueuePublish() end
+		return false
+	end
+	if ShouldHideIllusionHealthBar(unit) then
+		local hiddenEntityIndex = tostring(unit:entindex())
+		local wasTracked = self.units[hiddenEntityIndex] ~= nil
+		self.units[hiddenEntityIndex] = nil
+		ApplyNoHealthBarModifier(unit)
+		if wasTracked then self:QueuePublish() end
+		return true
+	end
+
+	CaptureSummonAbilityLevel(unit)
 	local kind = self:GetBarKind(unit)
 	if kind == false then return false end
 	local entityIndex = unit:entindex()
@@ -169,13 +312,10 @@ function XHSCreepHealthBars:Apply(unit)
 		level = GetDisplayedUnitLevel(unit, kind),
 	}
 
-	if unit.HasModifier ~= nil
-		and unit.AddNewModifier ~= nil
-		and not unit:HasModifier("modifier_xhs_custom_creep_health_bar") then
-		pcall(function()
-			unit:AddNewModifier(unit, nil, "modifier_xhs_custom_creep_health_bar", {})
-		end)
-	end
+	ApplyNoHealthBarModifier(unit)
+	-- Establish visibility before publishing the entity to Panorama. This avoids
+	-- a one-frame flash for intentionally hidden targets such as Uther's prison.
+	self:RefreshPresentation(unit)
 	self:QueuePublish()
 	self:EnsureThink()
 	return true
@@ -206,10 +346,21 @@ function XHSCreepHealthBars:EnsureThink()
 	gameModeEntity:SetContextThink("xhs_creep_health_bars_visibility", function()
 		local hasUnits = false
 		local registryChanged = false
-		for entityIndex in pairs(self.units or {}) do
+		for entityIndex, unitData in pairs(self.units or {}) do
 			local unit = EntIndexToHScript(tonumber(entityIndex) or -1)
 			if IsUsableUnit(unit) and SafeBooleanCall(unit, "IsAlive") then
 				hasUnits = true
+				-- Ownership and MODIFIER_EVENT_ON_ABILITY_EXECUTED can settle just
+				-- after npc_spawned. Retry during the short capture window so the
+				-- initial unit-level fallback cannot become permanently cached.
+				CaptureSummonAbilityLevel(unit)
+				if type(unitData) == "table" then
+					local displayedLevel = GetDisplayedUnitLevel(unit, unitData.kind)
+					if unitData.level ~= displayedLevel then
+						unitData.level = displayedLevel
+						registryChanged = true
+					end
+				end
 				self:RefreshPresentation(unit)
 			else
 				self.units[entityIndex] = nil

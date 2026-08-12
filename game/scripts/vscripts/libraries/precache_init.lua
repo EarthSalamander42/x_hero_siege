@@ -399,6 +399,7 @@ end
 
 XHSPrecache:RegisterGroup("core", {
 	particles = {
+		"particles/dev/empty_particle.vpcf",
 		"particles/items2_fx/teleport_start.vpcf",
 		"particles/items2_fx/teleport_end.vpcf",
 		"particles/econ/events/fall_major_2016/teleport_start_fm06_lvl3.vpcf",
@@ -412,6 +413,7 @@ XHSPrecache:RegisterGroup("core", {
 		"particles/items_fx/blink_dagger_start.vpcf",
 		"particles/items_fx/blink_dagger_end.vpcf",
 		"particles/world_outpost/world_outpost_radiant_ambient.vpcf",
+		"particles/units/heroes/hero_wisp/wisp_relocate_marker.vpcf",
 	},
 	models = {
 		"models/items/juggernaut/ward/ancient_exile_ward/ancient_exile_ward.vmdl",
@@ -437,6 +439,8 @@ XHSPrecache:RegisterGroup("runes", {
 		"particles/generic_gameplay/rune_shield.vpcf",
 		"particles/generic_gameplay/rune_water.vpcf",
 		"particles/generic_gameplay/rune_wisdom.vpcf",
+		"particles/neutral_fx/miniboss_shield.vpcf",
+		"particles/neutral_fx/miniboss_damage_impact.vpcf",
 		"particles/units/heroes/hero_zuus/zuus_arc_lightning.vpcf",
 		"particles/units/heroes/hero_stormspirit/stormspirit_overload_ambient.vpcf",
 	},
@@ -471,6 +475,7 @@ XHSPrecache:RegisterGroup("hero_abilities", {
 		"particles/econ/items/crystal_maiden/crystal_maiden_maiden_of_icewrack/maiden_freezing_field_explosion_arcana1.vpcf",
 		"particles/units/heroes/hero_ogre_magi/ogre_magi_bloodlust_cast.vpcf",
 		"particles/units/heroes/hero_ogre_magi/ogre_magi_bloodlust_buff.vpcf",
+		"particles/units/heroes/hero_sven/sven_warcry_buff.vpcf",
 	},
 	models = {
 		"models/heroes/doom/doom.vmdl",

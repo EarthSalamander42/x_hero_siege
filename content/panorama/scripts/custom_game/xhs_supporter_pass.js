@@ -48,7 +48,11 @@ var XHSSupporterPass = (function () {
 	var backToTopPollScheduled = false;
 	var fragmentCounterInitialized = false;
 	var lastLocalFragmentBalance = 0;
+	var lastFragmentRewardEventID = "";
 	var fragmentFlyoutIndex = 0;
+	var displayedFragmentBalance = 0;
+	var fragmentCounterAnimationSerial = 0;
+	var fragmentCounterAnimating = false;
 	var actionToastSerial = 0;
 	var pendingActions = {};
 	var windowAnimationSerial = 0;
@@ -449,8 +453,10 @@ var XHSSupporterPass = (function () {
 			rare: "RarityRare",
 			mythical: "RarityMythical",
 			legendary: "RarityLegendary",
+			ancient: "RarityAncient",
 			immortal: "RarityImmortal",
 			arcana: "RarityArcana",
+			seasonal: "RaritySeason",
 			premium: "RarityPremium",
 			supporter: "RaritySupporter",
 			season: "RaritySeason",
@@ -1432,8 +1438,11 @@ var XHSSupporterPass = (function () {
 			rare: "Rare",
 			mythical: "Mythical",
 			legendary: "Legendary",
+			ancient: "Ancient",
 			immortal: "Immortal",
 			arcana: "Arcana",
+			season: "Seasonal",
+			seasonal: "Seasonal",
 		};
 		return Text("xhs_sp_" + rarity, labels[rarity] || rarity);
 	}
@@ -2089,6 +2098,8 @@ var XHSSupporterPass = (function () {
 			|| GetShopArmoryFlag(item, ownershipIndex, "giftable");
 		item.favorite = IsTruthy(item.favorite, false) || IsTruthy(item.is_favorite, false)
 			|| GetShopArmoryFlag(item, ownershipIndex, "favorite");
+		item.is_new = IsTruthy(item.is_new, false)
+			|| IsTruthy(item.metadata && item.metadata.is_new, false);
 		item.runtime_status = (item.runtime_status || item.status || "ready").toString().toLowerCase();
 		item.description = item.description || item.long_description || item.subtitle || "";
 
@@ -2517,7 +2528,6 @@ var XHSSupporterPass = (function () {
 		}
 
 		var fragments = Math.max(0, ToNumber(player.fragments, 0));
-		SetText("XHSSupporterFragmentsCounterValue", FormatNumber(fragments));
 
 		var counter = Panel("XHSSupporterFragmentsCounter");
 		if (counter) {
@@ -2530,12 +2540,82 @@ var XHSSupporterPass = (function () {
 
 		if (!fragmentCounterInitialized) {
 			lastLocalFragmentBalance = fragments;
+			displayedFragmentBalance = fragments;
+			lastFragmentRewardEventID = (player.raw.fragment_reward_claim_event_id || "").toString();
 			fragmentCounterInitialized = true;
+			SetText("XHSSupporterFragmentsCounterValue", FormatNumber(fragments));
 			return;
 		}
 
 		if (fragments > lastLocalFragmentBalance) {
-			ShowFragmentGainFlyout(fragments - lastLocalFragmentBalance, player.tier_id);
+			var balanceGain = Math.max(0, fragments - displayedFragmentBalance);
+			var rewardEventID = (player.raw.fragment_reward_claim_event_id || "").toString();
+			var rawGrants = player.raw.fragment_reward_grants || {};
+			var rewardAmounts = [];
+			var remainingGain = balanceGain;
+			if (rewardEventID && rewardEventID !== lastFragmentRewardEventID) {
+				for (var grantKey in rawGrants) {
+					if (!rawGrants.hasOwnProperty(grantKey) || !rawGrants[grantKey]) {
+						continue;
+					}
+					var rewardAmount = Math.min(
+						remainingGain,
+						Math.max(0, ToNumber(rawGrants[grantKey].amount, 0))
+					);
+					if (rewardAmount > 0) {
+						rewardAmounts.push(rewardAmount);
+						remainingGain -= rewardAmount;
+					}
+				}
+				lastFragmentRewardEventID = rewardEventID;
+			}
+
+			var visualAmounts = rewardAmounts.slice(0);
+			if (remainingGain > 0) {
+				visualAmounts.push(remainingGain);
+			}
+			if (visualAmounts.length === 0 && balanceGain > 0) {
+				visualAmounts.push(balanceGain);
+			}
+
+			var animationSerial = ++fragmentCounterAnimationSerial;
+			fragmentCounterAnimating = visualAmounts.length > 0;
+			SetText("XHSSupporterFragmentsCounterValue", FormatNumber(displayedFragmentBalance));
+			var animationDelay = 0;
+			for (var visualIndex = 0; visualIndex < visualAmounts.length; visualIndex++) {
+				(function (amount, delay, serial) {
+					$.Schedule(delay, function () {
+						if (serial !== fragmentCounterAnimationSerial) {
+							return;
+						}
+						ShowFragmentGainFlyout(amount, player.tier_id);
+					});
+					$.Schedule(delay + 0.46, function () {
+						if (serial !== fragmentCounterAnimationSerial) {
+							return;
+						}
+						displayedFragmentBalance = Math.min(fragments, displayedFragmentBalance + amount);
+						SetText("XHSSupporterFragmentsCounterValue", FormatNumber(displayedFragmentBalance));
+					});
+				})(visualAmounts[visualIndex], animationDelay, animationSerial);
+				animationDelay += 0.18;
+			}
+			$.Schedule(animationDelay + 0.5, function () {
+				if (animationSerial !== fragmentCounterAnimationSerial) {
+					return;
+				}
+				displayedFragmentBalance = fragments;
+				fragmentCounterAnimating = false;
+				SetText("XHSSupporterFragmentsCounterValue", FormatNumber(fragments));
+			});
+		} else if (fragments < lastLocalFragmentBalance) {
+			fragmentCounterAnimationSerial++;
+			fragmentCounterAnimating = false;
+			displayedFragmentBalance = fragments;
+			SetText("XHSSupporterFragmentsCounterValue", FormatNumber(fragments));
+		} else if (!fragmentCounterAnimating) {
+			displayedFragmentBalance = fragments;
+			SetText("XHSSupporterFragmentsCounterValue", FormatNumber(fragments));
 		}
 
 		lastLocalFragmentBalance = fragments;
@@ -3641,6 +3721,9 @@ var XHSSupporterPass = (function () {
 		if (category === "All") {
 			return "all";
 		}
+		if (category === "New") {
+			return "new";
+		}
 		return (category || "Cosmetic")
 			.toString()
 			.toLowerCase()
@@ -3650,6 +3733,7 @@ var XHSSupporterPass = (function () {
 	function GetItemCategories(items, player) {
 		var available = {};
 		var hasFavorites = false;
+		var hasNewItems = false;
 		for (var i = 0; i < items.length; i++) {
 			var type = GetItemCategory(items[i]);
 			var key = GetCategoryKey(type);
@@ -3659,9 +3743,15 @@ var XHSSupporterPass = (function () {
 			if (items[i].favorite === true) {
 				hasFavorites = true;
 			}
+			if (items[i].is_new === true) {
+				hasNewItems = true;
+			}
 		}
 
 		var filters = ["All"];
+		if (hasNewItems) {
+			filters.push("New");
+		}
 		if (hasFavorites) {
 			filters.push("Favorites");
 		}
@@ -3705,6 +3795,9 @@ var XHSSupporterPass = (function () {
 		}
 		if (category === "Favorites") {
 			return items.filter(function (item) { return item.favorite === true; });
+		}
+		if (category === "New") {
+			return items.filter(function (item) { return item.is_new === true; });
 		}
 
 		var filtered = [];
@@ -3777,7 +3870,7 @@ var XHSSupporterPass = (function () {
 			values.push(value.toString());
 		}
 		if (facet === "rarity") {
-			var rarityOrder = { common: 1, uncommon: 2, rare: 3, mythical: 4, legendary: 5, immortal: 6, arcana: 7 };
+			var rarityOrder = { common: 1, uncommon: 2, rare: 3, mythical: 4, legendary: 5, immortal: 6, arcana: 7, ancient: 8, season: 9, seasonal: 9 };
 			values.sort(function (a, b) {
 				return (rarityOrder[ShopFacetKey(a)] || 99) - (rarityOrder[ShopFacetKey(b)] || 99);
 			});
@@ -3911,6 +4004,9 @@ var XHSSupporterPass = (function () {
 			label.AddClass("XHSPassShopBadge");
 			if (className) { label.AddClass(className); }
 			label.text = text;
+		}
+		if (item.is_new) {
+			badge(Text("xhs_sp_new", "New"), "IsNew");
 		}
 		if (item.edition && ShopFacetKey(item.edition) !== "global") {
 			badge(ShopEditionLabel(item.edition), "IsEdition");
@@ -4572,6 +4668,7 @@ var XHSSupporterPass = (function () {
 				var button = $.CreatePanel("Button", parent, "");
 				button.AddClass("XHSPassFilterTab");
 				button.SetHasClass("IsActive", activeFilter === filterName);
+				button.SetHasClass("IsNewFilter", filterName === "New");
 				button.SetPanelEvent("onactivate", function () {
 					SetCourierRequestViewerVisible(false);
 					onSelect(filterName);
@@ -4580,7 +4677,9 @@ var XHSSupporterPass = (function () {
 				var label = $.CreatePanel("Label", button, "");
 				label.text = filterName === "All"
 					? Text("xhs_sp_filter_all", "All")
-					: (filterName === "Favorites" ? Text("xhs_sp_filter_favorites", "Favorites") : DisplayRewardType(filterName));
+					: (filterName === "New"
+						? Text("xhs_sp_filter_new", "New")
+						: (filterName === "Favorites" ? Text("xhs_sp_filter_favorites", "Favorites") : DisplayRewardType(filterName)));
 			})(filters[i]);
 		}
 

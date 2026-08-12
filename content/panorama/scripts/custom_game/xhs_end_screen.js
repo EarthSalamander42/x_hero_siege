@@ -2286,6 +2286,45 @@ var XHSEndScreen = (function () {
 		}
 	}
 
+	function FindCompletedFragmentGrant(reward) {
+		if (!reward || !xpPresentationModel) return null;
+		var api = xpPresentationModel.api || {};
+		var season = api.season || {};
+		var supporterPass = api.supporter_pass || api.supporterPass || {};
+		var grants = TableToArray(FirstDefined(
+			api.fragment_reward_grants,
+			season.fragment_reward_grants,
+			supporterPass.fragment_reward_grants,
+			{}
+		));
+		var rewardID = (reward.reward_id || reward.id || "").toString();
+		for (var i = 0; i < grants.length; i++) {
+			var grant = grants[i] || {};
+			if ((grant.reward_id || "").toString() === rewardID && ToNumber(grant.amount, 0) > 0) {
+				return grant;
+			}
+		}
+		return null;
+	}
+
+	function AnimateFragmentRewardCounter(label, fromValue, toValue, onComplete) {
+		var frames = 18;
+		var frame = 0;
+		function Tick() {
+			if (!label || (label.IsValid && !label.IsValid())) return;
+			frame++;
+			var progress = Clamp(frame / frames, 0, 1);
+			var eased = 1 - Math.pow(1 - progress, 3);
+			label.text = FormatNumber(Math.round(fromValue + (toValue - fromValue) * eased));
+			if (frame >= frames) {
+				if (onComplete) onComplete();
+				return;
+			}
+			$.Schedule(0.025, Tick);
+		}
+		Tick();
+	}
+
 	function QueueBattlepassReward(level, levelupCount, track, reward) {
 		if (!reward) {
 			return;
@@ -2295,6 +2334,7 @@ var XHSEndScreen = (function () {
 			levelupCount: levelupCount,
 			track: track,
 			reward: reward,
+			fragmentGrant: FindCompletedFragmentGrant(reward),
 		});
 		rewardBatchTotal++;
 		if (xpPresentationPhase === "xp") {
@@ -2336,6 +2376,8 @@ var XHSEndScreen = (function () {
 		var level = activeReward.level;
 		var track = activeReward.track;
 		var reward = activeReward.reward;
+		var fragmentGrant = activeReward.fragmentGrant;
+		var fragmentAmount = fragmentGrant ? Math.max(0, ToNumber(fragmentGrant.amount, 0)) : 0;
 
 		var rewardName = reward.name || reward.item_name || reward.reward_id || "xhs_sp_reward";
 		var rarity = (reward.rarity || reward.item_rarity || "common").toString().toLowerCase();
@@ -2374,6 +2416,7 @@ var XHSEndScreen = (function () {
 			panel.AddClass("RevealTier" + revealTier);
 		}
 		panel.SetHasClass("IsPremiumReward", track === "premium");
+		panel.SetHasClass("IsFragmentReward", fragmentAmount > 0);
 
 		var accent = $.CreatePanel("Panel", panel, "");
 		accent.AddClass("XHSRewardAccent");
@@ -2421,6 +2464,32 @@ var XHSEndScreen = (function () {
 		rarityPanel.AddClass(rarity);
 		rarityPanel.text = rarity;
 
+		var fragmentBalance = null;
+		var fragmentGain = null;
+		var fragmentBalanceBefore = 0;
+		var fragmentBalanceAfter = 0;
+		if (fragmentAmount > 0) {
+			fragmentBalanceBefore = Math.max(0, ToNumber(
+				fragmentGrant.balance_before,
+				ToNumber(fragmentGrant.balance_after, fragmentAmount) - fragmentAmount
+			));
+			fragmentBalanceAfter = Math.max(
+				fragmentBalanceBefore + fragmentAmount,
+				ToNumber(fragmentGrant.balance_after, fragmentBalanceBefore + fragmentAmount)
+			);
+			var fragmentCounter = $.CreatePanel("Panel", panel, "");
+			fragmentCounter.AddClass("XHSRewardFragmentCounter");
+			var fragmentCaption = $.CreatePanel("Label", fragmentCounter, "");
+			fragmentCaption.AddClass("XHSRewardFragmentCaption");
+			fragmentCaption.text = "AUTO-CLAIMED · FRAGMENTS";
+			fragmentBalance = $.CreatePanel("Label", fragmentCounter, "");
+			fragmentBalance.AddClass("XHSRewardFragmentBalance");
+			fragmentBalance.text = FormatNumber(fragmentBalanceBefore);
+			fragmentGain = $.CreatePanel("Label", fragmentCounter, "");
+			fragmentGain.AddClass("XHSRewardFragmentGain");
+			fragmentGain.text = "+" + FormatNumber(fragmentAmount);
+		}
+
 		var button = $.CreatePanel("Button", panel, "");
 		button.AddClass("XHSRewardButton");
 		var accepting = false;
@@ -2441,6 +2510,31 @@ var XHSEndScreen = (function () {
 
 		var label = $.CreatePanel("Label", button, "");
 		label.text = rewardQueue.length > 0 ? Localize("#xhs_sp_accept") + "  ›" : Localize("#xhs_sp_accept");
+		if (fragmentAmount > 0) {
+			button.enabled = false;
+			label.text = "AUTO-CLAIMING...";
+			$.Schedule(0.36, function () {
+				if (fragmentGain && (!fragmentGain.IsValid || fragmentGain.IsValid())) {
+					fragmentGain.AddClass("IsFlying");
+				}
+			});
+			$.Schedule(0.72, function () {
+				AnimateFragmentRewardCounter(fragmentBalance, fragmentBalanceBefore, fragmentBalanceAfter, function () {
+					if (fragmentBalance && (!fragmentBalance.IsValid || fragmentBalance.IsValid())) {
+						fragmentBalance.AddClass("HasIncreased");
+					}
+					if (button && (!button.IsValid || button.IsValid())) {
+						button.enabled = true;
+						label.text = rewardQueue.length > 0 ? "CONTINUE  ›" : "CONTINUE";
+					}
+				});
+			});
+			$.Schedule(1.28, function () {
+				if (fragmentGain && (!fragmentGain.IsValid || fragmentGain.IsValid())) {
+					fragmentGain.DeleteAsync(0);
+				}
+			});
+		}
 
 		var closeAllButton = $.CreatePanel("Button", panel, "");
 		closeAllButton.AddClass("XHSRewardCloseAllButton");

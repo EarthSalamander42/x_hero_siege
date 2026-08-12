@@ -119,6 +119,11 @@ function modifier_xhs_castle_health_bar:UpdateBar(force)
 end
 
 function modifier_xhs_castle_health_bar:ShowBar()
+	if GameMode ~= nil and GameMode.SpecialArena_occuring == true then
+		self:HideBar()
+		return
+	end
+
 	self.lastAttackTime = GameRules:GetGameTime()
 	if self.barVisible ~= true then
 		self.barVisible = true
@@ -132,12 +137,13 @@ function modifier_xhs_castle_health_bar:ShowBar()
 	self:StartIntervalThink(CASTLE_BAR_POLL_INTERVAL)
 end
 
-function modifier_xhs_castle_health_bar:HideBar()
-	if self.barVisible ~= true then return end
+function modifier_xhs_castle_health_bar:HideBar(force)
+	local shouldPublish = self.barVisible == true or force == true
 
 	self.barVisible = false
 	self.snapshot = nil
 	self:StartIntervalThink(-1)
+	if not shouldPublish then return end
 	self:PublishState(false)
 	CustomGameEventManager:Send_ServerToAllClients("hide_castle_hp", {})
 end

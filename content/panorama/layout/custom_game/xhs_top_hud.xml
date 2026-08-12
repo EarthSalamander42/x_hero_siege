@@ -16,6 +16,12 @@
 	<Panel class="XHSTopHudHost" hittest="false" hittestchildren="true">
 		<Panel id="XHSTopHudRoot" hittest="false" hittestchildren="true">
 			<Panel id="XHSTopHudBar" hittest="false" hittestchildren="true">
+				<Panel class="XHSTopHudFrameAtmosphere" hittest="false">
+					<Panel class="XHSTopHudScoreboardBackplate XHSTopHudScoreboardBackplateLeft" hittest="false" />
+					<Panel class="XHSTopHudScoreboardBackplate XHSTopHudScoreboardBackplateCenter" hittest="false" />
+					<Panel class="XHSTopHudScoreboardBackplate XHSTopHudScoreboardBackplateRight" hittest="false" />
+				</Panel>
+
 				<Panel id="XHSTopHudLeftSlot" hittest="true" hittestchildren="true">
 					<Panel id="XHSTopHudAllies" hittest="true" hittestchildren="true">
 						<Panel id="XHSAllyRosterLeft" class="XHSAllyRoster" hittest="true" hittestchildren="true" />
@@ -75,8 +81,6 @@
 					</Panel>
 				</Panel>
 			</Panel>
-
-			<Panel id="XHSReviveFrameStack" class="XHSReviveFrameStack" hittest="false" />
 
 			<Panel id="XHSFragmentQuestIntro" class="XHSFragmentQuestIntro" hittest="false">
 				<Panel class="XHSFragmentQuestIntroHeader">

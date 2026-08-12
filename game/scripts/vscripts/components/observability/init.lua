@@ -1,5 +1,7 @@
 if XHSObservability == nil then _G.XHSObservability = class({}) end
-local MAX_EVENTS, MAX_BATCH, SEND_INTERVAL, MAX_MESSAGE = 300, 50, 2.0, 1000
+-- Keep enough room for a useful Lua traceback while staying below the
+-- runtime-log transport's 4 KB content cap after metadata is prefixed.
+local MAX_EVENTS, MAX_BATCH, SEND_INTERVAL, MAX_MESSAGE = 300, 50, 2.0, 3200
 local LOG_LEVEL_BY_NUMBER = {
 	[1] = "debug",
 	[2] = "info",
@@ -19,6 +21,52 @@ local function SafeGameTime()
 	if GameRules == nil or GameRules.GetDOTATime == nil then return 0 end
 	local ok, value = pcall(function() return GameRules:GetDOTATime(false, false) end)
 	return ok and (tonumber(value) or 0) or 0
+end
+local function SafeServerGameTime()
+	if GameRules == nil or GameRules.GetGameTime == nil then return 0 end
+	local ok, value = pcall(function() return GameRules:GetGameTime() end)
+	return ok and (tonumber(value) or 0) or 0
+end
+local function SafeRealTime()
+	if RealTime ~= nil then
+		local ok, value = pcall(RealTime)
+		if ok and (tonumber(value) or 0) > 0 then return tonumber(value) end
+	end
+	if Time ~= nil then
+		local ok, value = pcall(Time)
+		if ok and tonumber(value) ~= nil then return tonumber(value) end
+	end
+	return 0
+end
+local function SafeWallClock()
+	local unixTime = 0
+	local utc = "unavailable"
+	if os ~= nil and type(os.time) == "function" then
+		local ok, value = pcall(os.time)
+		if ok then unixTime = tonumber(value) or 0 end
+	end
+	if unixTime > 0 and os ~= nil and type(os.date) == "function" then
+		local ok, value = pcall(os.date, "!%Y-%m-%dT%H:%M:%SZ", unixTime)
+		if ok and type(value) == "string" and value ~= "" then utc = value end
+	end
+	if utc == "unavailable" and GetSystemDate ~= nil and GetSystemTime ~= nil then
+		local dateOK, dateValue = pcall(GetSystemDate)
+		local timeOK, timeValue = pcall(GetSystemTime)
+		if dateOK and timeOK then utc = tostring(dateValue) .. " " .. tostring(timeValue) end
+	end
+	return unixTime, utc
+end
+local function FormatGameTime(value)
+	local seconds = tonumber(value) or 0
+	local sign = seconds < 0 and "-" or ""
+	seconds = math.floor(math.abs(seconds))
+	local hours = math.floor(seconds / 3600)
+	local minutes = math.floor((seconds % 3600) / 60)
+	local remaining = seconds % 60
+	if hours > 0 then
+		return string.format("%s%d:%02d:%02d", sign, hours, minutes, remaining)
+	end
+	return string.format("%s%02d:%02d", sign, minutes, remaining)
 end
 local function Bounded(value, maximum)
 	value = tostring(value == nil and "" or value):gsub("[\r\n\t]", " ")
@@ -69,9 +117,18 @@ function XHSObservability:Log(severity, category, code, message, context, source
 	message = Bounded(message, MAX_MESSAGE)
 	local fingerprint = Fingerprint(category, code, message)
 	local existing = self.pending_by_fingerprint[fingerprint]
-	if existing ~= nil then existing.count = existing.count + 1 return end
+	if existing ~= nil then
+		local lastUnix, lastUtc = SafeWallClock()
+		existing.count = existing.count + 1
+		existing.last_seen_unix = lastUnix
+		existing.last_seen_utc = lastUtc
+		existing.last_seen_game_time = SafeGameTime()
+		existing.last_seen_server_game_time = SafeServerGameTime()
+		return
+	end
 	self.sequence = self.sequence + 1
-	local event = { sequence=self.sequence, game_time=SafeGameTime(), phase=CustomTimers ~= nil and tonumber(CustomTimers.game_phase) or 0, severity=NormalizeLogLevel(severity), category=category or "diagnostic", code=Bounded(code or "XHS_LOG",96), fingerprint=fingerprint, message=message, source=source or "server_lua", count=1, context=type(context)=="table" and context or {} }
+	local loggedAtUnix, loggedAtUtc = SafeWallClock()
+	local event = { sequence=self.sequence, logged_at_unix=loggedAtUnix, logged_at_utc=loggedAtUtc, game_time=SafeGameTime(), server_game_time=SafeServerGameTime(), real_time=SafeRealTime(), phase=CustomTimers ~= nil and tonumber(CustomTimers.game_phase) or 0, severity=NormalizeLogLevel(severity), category=category or "diagnostic", code=Bounded(code or "XHS_LOG",96), fingerprint=fingerprint, message=message, source=source or "server_lua", count=1, context=type(context)=="table" and context or {} }
 	table.insert(self.pending,event) self.pending_by_fingerprint[fingerprint]=event
 	if #self.pending > MAX_EVENTS then local dropped=table.remove(self.pending,1); self.pending_by_fingerprint[dropped.fingerprint]=nil; self.dropped=self.dropped+1 end
 end
@@ -92,13 +149,27 @@ function XHSObservability:FallbackToRuntimeLogs(events, reason)
 				local encodedOK, encoded = pcall(json.encode, event.context)
 				if encodedOK then contextText = " context=" .. Bounded(encoded, 700) end
 			end
+			local timeText = "[utc=" .. tostring(event.logged_at_utc or "unavailable")
+				.. " game=" .. FormatGameTime(event.server_game_time)
+				.. " dota=" .. FormatGameTime(event.game_time)
+				.. " phase=" .. tostring(tonumber(event.phase) or -1) .. "] "
+			if (tonumber(event.count) or 1) > 1 then
+				timeText = timeText .. "[count=" .. tostring(event.count)
+					.. " last_utc=" .. tostring(event.last_seen_utc or event.logged_at_utc or "unavailable")
+					.. " last_game=" .. FormatGameTime(event.last_seen_server_game_time or event.server_game_time) .. "] "
+			end
 			api:QueueRuntimeLog({
 				level = NormalizeLogLevel(event.severity),
-				content = "[XHS_OBSERVABILITY][" .. tostring(event.category or "diagnostic")
+				content = timeText .. "[XHS_OBSERVABILITY][" .. tostring(event.category or "diagnostic")
 					.. "][" .. tostring(event.code or "XHS_LOG") .. "] "
 					.. tostring(event.message or "") .. contextText
 					.. " fallback=" .. tostring(reason or "runtime_logs"),
 				trace = {},
+				game_time = event.server_game_time,
+				dota_time = event.game_time,
+				real_time = event.real_time,
+				logged_at_unix = event.logged_at_unix,
+				logged_at_utc = event.logged_at_utc,
 			})
 		end
 	end)

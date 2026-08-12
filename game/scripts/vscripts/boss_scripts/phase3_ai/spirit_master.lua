@@ -328,6 +328,8 @@ local function UpdateBossTimer(label, remaining, duration)
 			remaining = math.max(0, remaining or 0),
 			duration = math.max(1, duration or 1),
 			style = "spirit_master",
+			count = XHSSpiritMasterEncounter.dormant_count or 0,
+			total = 3,
 		})
 	end
 end
@@ -337,18 +339,6 @@ local function HideBossTimer()
 		CustomGameEventManager:Send_ServerToAllClients("xhs_boss_timer_hide", {
 			boss_count = def.boss_count,
 			boss_bar_id = GetActiveSpiritBossBarId(def),
-		})
-	end
-end
-
-local function UpdateDormantCounter()
-	for _, def in pairs(SPIRIT_DEFS) do
-		CustomGameEventManager:Send_ServerToAllClients("xhs_boss_counter_update", {
-			boss_count = def.boss_count,
-			boss_bar_id = GetActiveSpiritBossBarId(def),
-			label = "Dormant Spirits",
-			remaining = XHSSpiritMasterEncounter.dormant_count or 0,
-			total = 3,
 		})
 	end
 end
@@ -643,7 +633,9 @@ function XHSSpiritMasterEncounter:BeginSplit(master, threshold)
 		self.spirit_defs[def.key] = def
 	end
 
-	UpdateDormantCounter()
+	-- Clear the legacy standalone Dormant Spirits row. The dormant count is now
+	-- carried by the Spirit Sync timer and is only visible while that timer runs.
+	HideDormantCounter()
 end
 
 function XHSSpiritMasterEncounter:HandleSpiritLethal(spirit, attacker)
@@ -667,7 +659,6 @@ function XHSSpiritMasterEncounter:HandleSpiritLethal(spirit, attacker)
 	local trinityCycle = self.master ~= nil and self.master:FindAbilityByName("xhs_spirit_master_trinity_cycle") or nil
 	local window = trinityCycle ~= nil and trinityCycle:GetSpecialValueFor("sync_window") or (SYNC_WINDOWS[GetDifficulty()] or 20)
 	self.sync_deadline = GameRules:GetGameTime() + window
-	UpdateDormantCounter()
 	UpdateBossTimer("Spirit Sync", window, window)
 
 	if self.dormant_count >= 3 then
@@ -722,7 +713,7 @@ function XHSSpiritMasterEncounter:FailSync()
 	self.dormant_count = 0
 	self.sync_deadline = nil
 	HideBossTimer()
-	UpdateDormantCounter()
+	HideDormantCounter()
 end
 
 function XHSSpiritMasterEncounter:CompleteSplit()

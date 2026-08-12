@@ -5,6 +5,17 @@ end
 local function XHSStartupCheckpoint(moduleName)
 end
 
+local function BuildGameModeErrorTrace(errorMessage)
+	local message = tostring(errorMessage or "Unknown game mode runtime error")
+	if debug ~= nil and type(debug.traceback) == "function" then
+		local ok, trace = pcall(debug.traceback, message, 2)
+		if ok and trace ~= nil then
+			return tostring(trace)
+		end
+	end
+	return message
+end
+
 require('addon_init')
 XHSStartupCheckpoint('addon_init')
 require('events')
@@ -287,14 +298,22 @@ end
 
 function GameMode:InitGameMode()
 	local mode = GameRules:GetGameModeEntity()
+	local isDemoMap = GetMapName() == "x_hero_siege_demo"
 	-- Timer Rules
 	GameRules:SetPostGameTime(600.0)
 	GameRules:SetTreeRegrowTime(240.0)
 	GameRules:SetHeroSelectionTime(0.0)
 	GameRules:SetGoldTickTime(0.0)
 	GameRules:SetGoldPerTick(0.0)
-	GameRules:SetCustomGameSetupAutoLaunchDelay(9999.0) -- disabled, custom setup flow handles launch
-	GameRules:SetCustomGameSetupTimeout(-1.0)        -- keep setup open until custom logic starts the game
+	if isDemoMap then
+		-- The demo is a direct sandbox: it has no setup choices to collect and
+		-- must never enter the loading-screen vote/readiness countdown.
+		GameRules:SetCustomGameSetupAutoLaunchDelay(0.0)
+		GameRules:SetCustomGameSetupTimeout(0.0)
+	else
+		GameRules:SetCustomGameSetupAutoLaunchDelay(9999.0) -- disabled, custom setup flow handles launch
+		GameRules:SetCustomGameSetupTimeout(-1.0)        -- keep setup open until custom logic starts the game
+	end
 	GameRules:SetPreGameTime(PREGAMETIME)
 	-- Establish the non-vanilla selection path before optional mechanics. A
 	-- failure below must never expose Dota's stock hero picker in production.
@@ -310,9 +329,7 @@ function GameMode:InitGameMode()
 			error("SetCustomAttributeDerivedStatValue is unavailable")
 		end
 		mode:SetCustomAttributeDerivedStatValue(DOTA_ATTRIBUTE_AGILITY_ARMOR, 1 / 12)
-	end, function(err)
-		return debug.traceback(tostring(err), 2)
-	end)
+	end, BuildGameModeErrorTrace)
 	if not agilityArmorOK and XHSBootstrapLog ~= nil then
 		XHSBootstrapLog("error", "agility armor override disabled; startup continues\n"
 			.. tostring(agilityArmorError))
@@ -935,6 +952,70 @@ function GameMode:FilterExecuteOrder(filterTable)
 		end
 	end
 
+	-- Human item donations to bots are validated before Source executes the
+	-- transfer. This keeps unsuitable items out of the inventory entirely and
+	-- gives the donor an immediate HUD explanation instead of silently letting
+	-- the bot discard or ignore the item later.
+	if DOTA_UNIT_ORDER_GIVE_ITEM ~= nil
+		and order_type == DOTA_UNIT_ORDER_GIVE_ITEM
+		and issuer ~= nil and issuer >= 0
+		and XHSBotPlayerRegistry ~= nil
+		and not XHSBotPlayerRegistry:IsXHSBotPlayerID(issuer) then
+		local numericTargetIndex = tonumber(targetIndex)
+		local numericItemIndex = tonumber(abilityIndex)
+		local targetHero = numericTargetIndex ~= nil and numericTargetIndex > 0
+			and EntIndexToHScript(numericTargetIndex) or nil
+		local giftedItem = numericItemIndex ~= nil and numericItemIndex > 0
+			and EntIndexToHScript(numericItemIndex) or nil
+		local targetPlayerID = targetHero ~= nil and not targetHero:IsNull()
+			and tonumber(targetHero.xhs_bot_player_id)
+			or nil
+		if targetPlayerID ~= nil
+			and XHSBotPlayerRegistry:IsXHSBotPlayerID(targetPlayerID)
+			and XHSBotEconomy ~= nil
+			and XHSBotEconomy.EvaluateIncomingGift ~= nil then
+			local ok, accepted, errorKey, context = pcall(function()
+				return XHSBotEconomy:EvaluateIncomingGift(
+					targetPlayerID,
+					targetHero,
+					giftedItem
+				)
+			end)
+			if not ok then
+				accepted = false
+				errorKey = "#error_xhs_bot_item_unsupported"
+				context = nil
+			end
+			local offeredName = giftedItem ~= nil and not giftedItem:IsNull()
+				and giftedItem.GetAbilityName ~= nil
+				and giftedItem:GetAbilityName() or "unknown"
+			if XHSBotEconomy.RecordExternalGiftDecision ~= nil then
+				XHSBotEconomy:RecordExternalGiftDecision(
+					targetPlayerID,
+					offeredName,
+					accepted,
+					errorKey,
+					issuer
+				)
+			end
+			if accepted ~= true then
+				SendErrorMessage(
+					issuer,
+					tostring(errorKey or "#error_xhs_bot_item_unsupported")
+				)
+				return false
+			end
+			if XHSBotEconomy.PrepareAcceptedGift ~= nil then
+				XHSBotEconomy:PrepareAcceptedGift(
+					targetPlayerID,
+					targetHero,
+					giftedItem,
+					context
+				)
+			end
+		end
+	end
+
 	-- Don't need this.
 	if order_type == DOTA_UNIT_ORDER_RADAR or order_type == DOTA_UNIT_ORDER_GLYPH then return end
 
@@ -1113,6 +1194,7 @@ local XHS_OPTIONAL_EVENT_BOSS_BARS = {
 		icon = "npc_dota_hero_sven",
 		boss_count = 1,
 		display_mode = "kill_event",
+		global = true,
 		light_color = "#db82ff",
 		dark_color = "#30133d",
 	},
@@ -1121,6 +1203,7 @@ local XHS_OPTIONAL_EVENT_BOSS_BARS = {
 		name = "npc_spirit_beast",
 		icon = "npc_dota_hero_lone_druid",
 		display_mode = "special_event",
+		global = true,
 		light_color = "#72e8be",
 		dark_color = "#123229",
 	},
@@ -1129,6 +1212,7 @@ local XHS_OPTIONAL_EVENT_BOSS_BARS = {
 		name = "npc_frost_infernal",
 		icon = "npc_dota_hero_tiny",
 		display_mode = "special_event",
+		global = true,
 		light_color = "#8fe8ff",
 		dark_color = "#102b42",
 	},
@@ -1881,6 +1965,7 @@ function GameMode:AllHeroImages(event)
 
 			if ALL_HERO_IMAGE_DEAD == 0 then
 				GameMode.AllHeroImagesDead = true
+				GameMode.AllHeroImagesCompletedByPlayerID = PlayerID
 				GameMode.AllHeroImages_occuring = false
 				GameMode.AllHeroImagesTimerStarted = false
 				if FragmentQuests ~= nil then
@@ -2100,7 +2185,22 @@ ListenToGameEvent('game_rules_state_change', function(keys)
 	local game_state = GameRules:State_Get()
 
 	if game_state == DOTA_GAMERULES_STATE_CUSTOM_GAME_SETUP then
-		GameMode:StartCustomSetupFlow()
+		if GetMapName() == "x_hero_siege_demo" then
+			-- Do not let the ordinary XHS setup flow recreate its 30-second
+			-- deadline after the demo configured an immediate engine launch.
+			GameRules:GetGameModeEntity():SetContextThink("xhs_demo_skip_custom_setup", function()
+				if GameRules:State_Get() == DOTA_GAMERULES_STATE_CUSTOM_GAME_SETUP then
+					if GameRules.FinishCustomGameSetup ~= nil then
+						GameRules:FinishCustomGameSetup()
+					else
+						GameRules:SetCustomGameSetupRemainingTime(0.0)
+					end
+				end
+				return nil
+			end, 0)
+		else
+			GameMode:StartCustomSetupFlow()
+		end
 	elseif game_state == DOTA_GAMERULES_STATE_HERO_SELECTION then
 		local default_gamemode = XHS_GAMEMODE_REBORN or 2
 		local default_difficulty = 1

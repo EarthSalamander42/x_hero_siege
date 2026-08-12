@@ -4,11 +4,21 @@
 	var hoveredTarget = null;
 	var HOVER_INTERVAL = 0.05;
 	var TOOLTIP_LAYER_INTERVAL = 0.25;
+	var END_SCREEN_LAYER_Z_INDEX = "1350";
 	var CONTEXT_MENU_LAYER_Z_INDEX = "13900";
 	var TOOLTIP_LAYER_Z_INDEX = "14000";
 	var CINEMATIC_LAYER_Z_INDEX = "15000";
+	var TOOLTIP_BLOCKING_PANEL_IDS = [
+		"XHSTopHudRoot",
+		"XHSDevToolsRoot",
+		"XHSDevToolsPerformance",
+		"XHSDevToolsPanel",
+		"XHSEndScreenMain"
+	];
 	var HUD_LAYER_INTERVAL = 0.25;
 	var hudLayerLoopScheduled = false;
+	var WORLD_HEALTH_FRAME_IDS = ["XHSOverheadRoot", "XHSCreepHealthBarsRoot"];
+	var SHOP_PANEL_IDS = ["shop", "Shop", "DOTAShop", "ShopContainer"];
 	var TOOLTIP_PANEL_IDS = [
 		"Tooltips",
 		"TooltipManager",
@@ -44,6 +54,7 @@
 	// children; ordering direct Hud children is what makes these priorities work
 	// across vanilla and custom Panorama branches.
 	var HUD_LAYER_RULES = [
+		{ key: "world_health_bars", z: 70, ids: ["XHSCreepHealthBarsRoot"], classes: ["XHSCreepHealthBars"] },
 		{ key: "xhs_hud", z: 90, ids: ["DungeonHUDContents", "XHSTopHudRoot", "QuestLog", "QuestLogCollapseButton"] },
 		{ key: "base", z: 100, ids: ["HUDElements"] },
 		{ key: "leaderboards", z: 300, ids: ["XHSFarmLeaderboard"] },
@@ -55,12 +66,14 @@
 		{ key: "supporter_pass", z: 1150, ids: ["XHSSupporterPassWindow"], classes: ["XHSSupporterPassRoot"] },
 		{ key: "devtools", z: 1200, ids: ["XHSDevToolsPanel", "XHSUIRecoveryClose"], classes: ["SupporterContentStudioRoot", "XHSUIRecoveryRoot"] },
 		{ key: "flyout", z: 1300, ids: ["DungeonScoreboard"], classes: ["FlyoutScoreboardRoot"] },
+		{ key: "end_screen", z: 1350, ids: ["XHSEndScreenMain"], classes: ["XHSEndScreenRoot"] },
 		{ key: "cinematic", z: 15000, ids: ["XHSCinematicTopBar"], classes: ["XHSCinematicRoot"] }
 	];
 	// Some Panorama panels request their own composition layer. Register those
 	// panels here as well so their compositor order cannot bypass the direct-Hud
 	// host order above.
 	var COMPOSITION_LAYER_RULES = [
+		{ key: "world_health_bars", z: 70, ids: ["XHSCreepHealthBarsRoot", "XHSOverheadRoot"], classes: ["XHSCreepHealthBars"] },
 		{ key: "quest_ui", z: 90, ids: ["QuestLog", "QuestLogCollapseButton"] },
 		{ key: "flyout", z: 1300, ids: ["DungeonScoreboard"], classes: ["FlyoutScoreboardRoot"] }
 	];
@@ -68,6 +81,7 @@
 	// feature scripts. Keep every cross-Hud move here so there is one owner for
 	// compositor order and one retry loop when Valve rebuilds a branch.
 	var HUD_HOST_PROMOTIONS = [
+		{ anchorID: "XHSCreepHealthBarsRoot", hostClass: "XHSCreepHealthBars" },
 		{ anchorID: "ContentStudioWindow", hostClass: "SupporterContentStudioRoot" },
 		{ anchorID: "DungeonScoreboard", hostClass: "FlyoutScoreboardRoot" }
 	];
@@ -89,7 +103,6 @@
 		{ id: "DialogPanel", visibleClass: "Visible", removeClasses: ["Visible"] },
 		{ id: "FloatingDialogPanel", visibleClass: "Visible", removeClasses: ["Visible"] },
 		{ id: "ZoneToastPanel", visibleClass: "Visible", removeClasses: ["Visible"] },
-		{ id: "XHSFarmLeaderboard", visibleClass: "IsVisible", removeClasses: ["IsVisible"] },
 		{ id: "XHSDevToolsPanel", visibleClass: "Visible", removeClasses: ["Visible"] }
 	];
 
@@ -122,7 +135,14 @@
 
 	function promoteTooltipHost(tooltip, hud) {
 		var host = directHudChild(tooltip, hud);
-		if (!isValid(host) || host.id !== "HUDElements" || !tooltip.SetParent) return host;
+		if (!isValid(host)) {
+			// An end-screen tooltip may already have been promoted to the common
+			// ancestor above Hud by a previous recovery pass.
+			var root = getHudRoot();
+			var rootHost = directHudChild(tooltip, root);
+			return isValid(rootHost) && isTooltipPanel(rootHost) ? rootHost : null;
+		}
+		if (host.id !== "HUDElements" || !tooltip.SetParent) return host;
 
 		// Native item/ability tooltips normally live below HUDElements, which
 		// means a direct custom HUD sibling can cover them regardless of z-index.
@@ -142,6 +162,48 @@
 			}
 		}
 		return host;
+	}
+
+	function promoteTooltipAboveCustomHud(tooltipHost) {
+		if (!isValid(tooltipHost) || !isTooltipPanel(tooltipHost)) return tooltipHost;
+		var root = getHudRoot();
+		if (!isValid(root) || !root.FindChildTraverse) return tooltipHost;
+
+		// The top bar, devtools and end screen can each establish a separate
+		// composition context. A tooltip left anywhere below Hud can therefore
+		// still be covered even with a larger local z-index. Promote only the
+		// dedicated native tooltip branch to the shared root.
+		var blockingHosts = [];
+		for (var blockerIndex = 0; blockerIndex < TOOLTIP_BLOCKING_PANEL_IDS.length; blockerIndex++) {
+			var blocker = root.FindChildTraverse(TOOLTIP_BLOCKING_PANEL_IDS[blockerIndex]);
+			var blockerHost = directHudChild(blocker, root);
+			if (isValid(blockerHost)
+				&& blockerHost !== tooltipHost
+				&& blockingHosts.indexOf(blockerHost) === -1) {
+				blockingHosts.push(blockerHost);
+			}
+		}
+		if (!blockingHosts.length) return tooltipHost;
+
+		if (tooltipHost.GetParent
+			&& tooltipHost.GetParent() !== root
+			&& tooltipHost.SetParent) {
+			try {
+				tooltipHost.SetParent(root);
+			} catch (error) {
+				$.Msg("[XHS UI Layers] Could not promote tooltip above custom HUD: " + error);
+				return tooltipHost;
+			}
+		}
+		tooltipHost.style.zIndex = TOOLTIP_LAYER_Z_INDEX;
+		if (root.MoveChildAfter
+			&& tooltipHost.GetParent
+			&& tooltipHost.GetParent() === root) {
+			for (var hostIndex = 0; hostIndex < blockingHosts.length; hostIndex++) {
+				root.MoveChildAfter(tooltipHost, blockingHosts[hostIndex]);
+			}
+		}
+		return tooltipHost;
 	}
 
 	function isContextMenuPanel(panel) {
@@ -264,6 +326,24 @@
 
 	function promoteDedicatedHudHosts(hud) {
 		if (!isValid(hud) || !hud.FindChildTraverse) return;
+		// XHSOverheadRoot belongs to the xhs_top_hud layout context. Moving it to
+		// Hud makes the feature script lose its scoped #ID lookup and all real-hero
+		// frames disappear. Repair older/hot-reloaded moves, then control this
+		// branch through its composition z-index only.
+		var overheadRoot = hud.FindChildTraverse("XHSOverheadRoot");
+		var topHudRoot = hud.FindChildTraverse("XHSTopHudRoot");
+		var topHudHost = findClassAncestor(topHudRoot, "XHSTopHudHost", hud);
+		if (isValid(overheadRoot)
+			&& isValid(topHudHost)
+			&& overheadRoot.GetParent
+			&& overheadRoot.GetParent() !== topHudHost
+			&& overheadRoot.SetParent) {
+			try {
+				overheadRoot.SetParent(topHudHost);
+			} catch (error) {
+				$.Msg("[XHS UI Layers] Could not restore XHSOverheadRoot: " + error);
+			}
+		}
 		for (var promotionIndex = 0; promotionIndex < HUD_HOST_PROMOTIONS.length; promotionIndex++) {
 			var promotion = HUD_HOST_PROMOTIONS[promotionIndex];
 			var anchor = hud.FindChildTraverse(promotion.anchorID);
@@ -292,6 +372,47 @@
 					if (isValid(panels[panelIndex])) panels[panelIndex].style.zIndex = String(rule.z);
 				}
 			}
+		}
+	}
+
+	function isVanillaShopOpen(hud) {
+		try {
+			if (typeof Game.IsShopOpen === "function") {
+				return !!Game.IsShopOpen();
+			}
+		} catch (error) {}
+
+		if (!isValid(hud) || !hud.FindChildTraverse) return false;
+		var openClasses = ["ShopOpen", "shop_open", "Visible", "visible"];
+		for (var panelIndex = 0; panelIndex < SHOP_PANEL_IDS.length; panelIndex++) {
+			var shop = hud.FindChildTraverse(SHOP_PANEL_IDS[panelIndex]);
+			if (!isValid(shop) || !shop.BHasClass) continue;
+			for (var classIndex = 0; classIndex < openClasses.length; classIndex++) {
+				if (shop.BHasClass(openClasses[classIndex])) return true;
+			}
+		}
+		return false;
+	}
+
+	function isFlyoutScoreboardOpen(hud) {
+		if (!isValid(hud) || !hud.FindChildTraverse) return false;
+		var scoreboard = hud.FindChildTraverse("DungeonScoreboard");
+		var flyoutRoot = findClassAncestor(scoreboard, "FlyoutScoreboardRoot", null);
+		return isValid(flyoutRoot)
+			&& flyoutRoot.BHasClass
+			&& (flyoutRoot.BHasClass("flyout_scoreboard_visible") || flyoutRoot.BHasClass("ZoneComplete"));
+	}
+
+	function syncWorldHealthFrameOcclusion(hud) {
+		// World-space Panorama branches can compose above vanilla panels even with
+		// a lower local z-index. Hide only those frames while a blocking overlay is
+		// open; the rest of the custom HUD keeps its normal layer ordering.
+		var occluded = isVanillaShopOpen(hud) || isFlyoutScoreboardOpen(hud);
+		for (var frameIndex = 0; frameIndex < WORLD_HEALTH_FRAME_IDS.length; frameIndex++) {
+			var frameRoot = hud.FindChildTraverse(WORLD_HEALTH_FRAME_IDS[frameIndex]);
+			if (!isValid(frameRoot)) continue;
+			frameRoot.style.visibility = occluded ? "collapse" : null;
+			frameRoot.style.opacity = occluded ? "0" : null;
 		}
 	}
 
@@ -338,17 +459,20 @@
 		}
 
 		applyCompositionLayerOrder(hud);
+		syncWorldHealthFrameOcclusion(hud);
 
 		// Tooltips remain owned by vanilla. Raise their nearest direct host only
 		// when it is not HUDElements; raising HUDElements would cover all custom UI.
 		for (var tooltipIndex = 0; tooltipIndex < TOOLTIP_PANEL_IDS.length; tooltipIndex++) {
 			var tooltip = hud.FindChildTraverse(TOOLTIP_PANEL_IDS[tooltipIndex]);
 			var tooltipHost = promoteTooltipHost(tooltip, hud);
+			tooltipHost = promoteTooltipAboveCustomHud(tooltipHost);
 			if (isValid(tooltipHost) && tooltipHost.id !== "HUDElements") {
 				tooltipHost.style.zIndex = TOOLTIP_LAYER_Z_INDEX;
 				var cinematic = hud.FindChildTraverse("XHSCinematicTopBar");
 				var cinematicHost = directHudChild(cinematic, hud);
-				if (isValid(cinematicHost) && cinematicHost !== tooltipHost) {
+				var tooltipInHud = tooltipHost.GetParent && tooltipHost.GetParent() === hud;
+				if (tooltipInHud && isValid(cinematicHost) && cinematicHost !== tooltipHost) {
 					hud.MoveChildAfter(tooltipHost, previous || tooltipHost);
 					hud.MoveChildAfter(cinematicHost, tooltipHost);
 					cinematicHost.style.zIndex = CINEMATIC_LAYER_Z_INDEX;
@@ -385,6 +509,7 @@
 				if (isValid(panel)) {
 					promoteTooltipPanel(panel, root);
 					var host = promoteTooltipHost(panel, hud);
+					host = promoteTooltipAboveCustomHud(host);
 					if (isValid(host) && host.id !== "HUDElements") {
 						host.style.zIndex = TOOLTIP_LAYER_Z_INDEX;
 					}

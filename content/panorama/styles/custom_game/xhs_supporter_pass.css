@@ -1212,6 +1212,16 @@
 	text-shadow: 0px 1px 2px #000000;
 }
 
+.XHSPassFilterTab.IsNewFilter Label {
+	color: #f4cf70;
+}
+
+.XHSPassFilterTab.IsNewFilter:hover,
+.XHSPassFilterTab.IsNewFilter.IsActive {
+	border-bottom-color: #f4c95d;
+	box-shadow: fill #f2b93d18 0px 0px 10px 0px;
+}
+
 .XHSSupporterPassWindow.SupporterTier1 .XHSPassFilterTab:hover,
 .XHSSupporterPassWindow.SupporterTier1 .XHSPassFilterTab.IsActive { border-bottom: 2px solid #70e39a; }
 
@@ -1797,12 +1807,14 @@
 	text-transform: uppercase;
 }
 
-.RarityUncommon .XHSPassRewardRarity { color: #70e39a; }
-.RarityRare .XHSPassRewardRarity,
-.RaritySeason .XHSPassRewardRarity { color: #5ad0ff; }
-.RarityMythical .XHSPassRewardRarity,
+.RarityCommon .XHSPassRewardRarity { color: #b0c3d9; }
+.RarityUncommon .XHSPassRewardRarity { color: #5e98d9; }
+.RarityRare .XHSPassRewardRarity { color: #4b69ff; }
+.RaritySeason .XHSPassRewardRarity { color: #fff34f; }
+.RarityMythical .XHSPassRewardRarity { color: #8847ff; }
 .RaritySupporter .XHSPassRewardRarity { color: #c99cff; }
-.RarityLegendary .XHSPassRewardRarity,
+.RarityLegendary .XHSPassRewardRarity { color: #d32ce6; }
+.RarityAncient .XHSPassRewardRarity { color: #eb4b4b; }
 .RarityPremium .XHSPassRewardRarity { color: #ffcf66; }
 .RarityImmortal .XHSPassRewardRarity { color: #e4ae39; }
 .RarityArcana .XHSPassRewardRarity { color: #ade55c; }
@@ -1974,31 +1986,44 @@
 /* Reward cards use their item rarity as the single accent source in every
  * state. Track colors still belong to the rows, not to individual cards. */
 .XHSPassRewardCard.RarityCommon {
-	border-color: #aeb8c45c;
-	box-shadow: fill #000000a8 0px 4px 10px 0px, inset #dce5ee12 0px 0px 10px 0px;
+	border-color: #b0c3d95c;
+	box-shadow: fill #000000a8 0px 4px 10px 0px, inset #b0c3d912 0px 0px 10px 0px;
 }
 .XHSPassRewardCard.RarityUncommon {
-	border-color: #70e39a70;
-	box-shadow: fill #000000a8 0px 4px 10px 0px, inset #70e39a14 0px 0px 12px 0px;
+	border-color: #5e98d970;
+	box-shadow: fill #000000a8 0px 4px 10px 0px, inset #5e98d914 0px 0px 12px 0px;
 }
-.XHSPassRewardCard.RarityRare,
+.XHSPassRewardCard.RarityRare {
+	border-color: #4b69ff78;
+	box-shadow: fill #000000a8 0px 4px 10px 0px, inset #4b69ff16 0px 0px 12px 0px;
+}
 .XHSPassRewardCard.RaritySeason {
-	border-color: #5ad0ff78;
-	box-shadow: fill #000000a8 0px 4px 10px 0px, inset #5ad0ff16 0px 0px 12px 0px;
+	border-color: #fff34f78;
+	box-shadow: fill #000000a8 0px 4px 10px 0px, inset #fff34f16 0px 0px 12px 0px;
 }
-.XHSPassRewardCard.RarityMythical,
+.XHSPassRewardCard.RarityMythical {
+	border-color: #8847ff82;
+	box-shadow: fill #000000a8 0px 4px 10px 0px, inset #8847ff18 0px 0px 14px 0px;
+}
 .XHSPassRewardCard.RaritySupporter {
 	border-color: #c99cff82;
 	box-shadow: fill #000000a8 0px 4px 10px 0px, inset #c99cff18 0px 0px 14px 0px;
 }
-.XHSPassRewardCard.RarityLegendary,
+.XHSPassRewardCard.RarityLegendary {
+	border-color: #d32ce690;
+	box-shadow: fill #000000a8 0px 4px 10px 0px, inset #d32ce61c 0px 0px 16px 0px;
+}
+.XHSPassRewardCard.RarityAncient {
+	border-color: #eb4b4b94;
+	box-shadow: fill #000000a8 0px 4px 10px 0px, inset #eb4b4b20 0px 0px 17px 0px;
+}
 .XHSPassRewardCard.RarityPremium {
 	border-color: #ffcf6690;
 	box-shadow: fill #000000a8 0px 4px 10px 0px, inset #ffcf661c 0px 0px 16px 0px;
 }
 .XHSPassRewardCard.RarityImmortal {
-	border-color: #f0a83c9c;
-	box-shadow: fill #000000a8 0px 4px 10px 0px, inset #f0a83c22 0px 0px 18px 0px;
+	border-color: #e4ae399c;
+	box-shadow: fill #000000a8 0px 4px 10px 0px, inset #e4ae3922 0px 0px 18px 0px;
 }
 .XHSPassRewardCard.RarityArcana {
 	border-color: #ade55ca8;
@@ -2006,79 +2031,86 @@
 }
 
 .XHSPassRewardCard.RarityCommon.IsUnlocked,
-.XHSPassRewardCard.RarityCommon.IsClaimed { border-color: #dbe4ec9c; box-shadow: fill #000000b0 0px 4px 11px 0px, fill #dbe4ec18 0px 0px 8px 0px, inset #dbe4ec18 0px 0px 12px 0px; }
+.XHSPassRewardCard.RarityCommon.IsClaimed { border-color: #b0c3d99c; box-shadow: fill #000000b0 0px 4px 11px 0px, fill #b0c3d918 0px 0px 8px 0px, inset #b0c3d918 0px 0px 12px 0px; }
 .XHSPassRewardCard.RarityUncommon.IsUnlocked,
-.XHSPassRewardCard.RarityUncommon.IsClaimed { border-color: #70e39aaa; box-shadow: fill #000000b0 0px 4px 11px 0px, fill #70e39a20 0px 0px 9px 0px, inset #70e39a1c 0px 0px 13px 0px; }
+.XHSPassRewardCard.RarityUncommon.IsClaimed { border-color: #5e98d9aa; box-shadow: fill #000000b0 0px 4px 11px 0px, fill #5e98d920 0px 0px 9px 0px, inset #5e98d91c 0px 0px 13px 0px; }
 .XHSPassRewardCard.RarityRare.IsUnlocked,
-.XHSPassRewardCard.RarityRare.IsClaimed,
+.XHSPassRewardCard.RarityRare.IsClaimed { border-color: #4b69ffb0; box-shadow: fill #000000b0 0px 4px 11px 0px, fill #4b69ff22 0px 0px 9px 0px, inset #4b69ff20 0px 0px 13px 0px; }
 .XHSPassRewardCard.RaritySeason.IsUnlocked,
-.XHSPassRewardCard.RaritySeason.IsClaimed { border-color: #5ad0ffb0; box-shadow: fill #000000b0 0px 4px 11px 0px, fill #5ad0ff22 0px 0px 9px 0px, inset #5ad0ff20 0px 0px 13px 0px; }
+.XHSPassRewardCard.RaritySeason.IsClaimed { border-color: #fff34fb0; box-shadow: fill #000000b0 0px 4px 11px 0px, fill #fff34f22 0px 0px 9px 0px, inset #fff34f20 0px 0px 13px 0px; }
 .XHSPassRewardCard.RarityMythical.IsUnlocked,
-.XHSPassRewardCard.RarityMythical.IsClaimed,
+.XHSPassRewardCard.RarityMythical.IsClaimed { border-color: #8847ffb8; box-shadow: fill #000000b0 0px 4px 11px 0px, fill #8847ff26 0px 0px 10px 0px, inset #8847ff22 0px 0px 14px 0px; }
 .XHSPassRewardCard.RaritySupporter.IsUnlocked,
 .XHSPassRewardCard.RaritySupporter.IsClaimed { border-color: #c99cffb8; box-shadow: fill #000000b0 0px 4px 11px 0px, fill #c99cff26 0px 0px 10px 0px, inset #c99cff22 0px 0px 14px 0px; }
 .XHSPassRewardCard.RarityLegendary.IsUnlocked,
-.XHSPassRewardCard.RarityLegendary.IsClaimed,
+.XHSPassRewardCard.RarityLegendary.IsClaimed { border-color: #d32ce6c4; box-shadow: fill #000000b0 0px 4px 11px 0px, fill #d32ce62a 0px 0px 11px 0px, inset #d32ce626 0px 0px 15px 0px; }
+.XHSPassRewardCard.RarityAncient.IsUnlocked,
+.XHSPassRewardCard.RarityAncient.IsClaimed { border-color: #eb4b4bc8; box-shadow: fill #000000b0 0px 4px 11px 0px, fill #eb4b4b2c 0px 0px 11px 0px, inset #eb4b4b28 0px 0px 15px 0px; }
 .XHSPassRewardCard.RarityPremium.IsUnlocked,
 .XHSPassRewardCard.RarityPremium.IsClaimed { border-color: #ffcf66c4; box-shadow: fill #000000b0 0px 4px 11px 0px, fill #ffcf662a 0px 0px 11px 0px, inset #ffcf6626 0px 0px 15px 0px; }
 .XHSPassRewardCard.RarityImmortal.IsUnlocked,
-.XHSPassRewardCard.RarityImmortal.IsClaimed { border-color: #f0a83cd0; box-shadow: fill #000000b0 0px 4px 11px 0px, fill #f0a83c30 0px 0px 12px 0px, inset #f0a83c2a 0px 0px 16px 0px; }
+.XHSPassRewardCard.RarityImmortal.IsClaimed { border-color: #e4ae39d0; box-shadow: fill #000000b0 0px 4px 11px 0px, fill #e4ae3930 0px 0px 12px 0px, inset #e4ae392a 0px 0px 16px 0px; }
 .XHSPassRewardCard.RarityArcana.IsUnlocked,
 .XHSPassRewardCard.RarityArcana.IsClaimed { border-color: #ade55cd8; box-shadow: fill #000000b0 0px 4px 11px 0px, fill #ade55c34 0px 0px 13px 0px, inset #ade55c2c 0px 0px 17px 0px; }
 
-.RarityCommon .XHSPassRewardType { color: #aeb8c4; }
-.RarityUncommon .XHSPassRewardType { color: #70e39a; }
-.RarityRare .XHSPassRewardType,
-.RaritySeason .XHSPassRewardType { color: #5ad0ff; }
-.RarityMythical .XHSPassRewardType,
+.RarityCommon .XHSPassRewardType { color: #b0c3d9; }
+.RarityUncommon .XHSPassRewardType { color: #5e98d9; }
+.RarityRare .XHSPassRewardType { color: #4b69ff; }
+.RaritySeason .XHSPassRewardType { color: #fff34f; }
+.RarityMythical .XHSPassRewardType { color: #8847ff; }
 .RaritySupporter .XHSPassRewardType { color: #c99cff; }
-.RarityLegendary .XHSPassRewardType,
+.RarityLegendary .XHSPassRewardType { color: #d32ce6; }
+.RarityAncient .XHSPassRewardType { color: #eb4b4b; }
 .RarityPremium .XHSPassRewardType { color: #ffcf66; }
-.RarityImmortal .XHSPassRewardType { color: #f0a83c; }
+.RarityImmortal .XHSPassRewardType { color: #e4ae39; }
 .RarityArcana .XHSPassRewardType { color: #ade55c; }
 
-.RarityCommon .XHSPassItemPreview { border-color: #aeb8c46c; box-shadow: inset #aeb8c412 0px 0px 16px 0px; }
-.RarityUncommon .XHSPassItemPreview { border-color: #70e39a78; box-shadow: inset #70e39a16 0px 0px 17px 0px; }
-.RarityRare .XHSPassItemPreview,
-.RaritySeason .XHSPassItemPreview { border-color: #5ad0ff88; box-shadow: inset #5ad0ff18 0px 0px 18px 0px; }
-.RarityMythical .XHSPassItemPreview,
+.RarityCommon .XHSPassItemPreview { border-color: #b0c3d96c; box-shadow: inset #b0c3d912 0px 0px 16px 0px; }
+.RarityUncommon .XHSPassItemPreview { border-color: #5e98d978; box-shadow: inset #5e98d916 0px 0px 17px 0px; }
+.RarityRare .XHSPassItemPreview { border-color: #4b69ff88; box-shadow: inset #4b69ff18 0px 0px 18px 0px; }
+.RaritySeason .XHSPassItemPreview { border-color: #fff34f88; box-shadow: inset #fff34f18 0px 0px 18px 0px; }
+.RarityMythical .XHSPassItemPreview { border-color: #8847ff90; box-shadow: inset #8847ff1c 0px 0px 19px 0px; }
 .RaritySupporter .XHSPassItemPreview { border-color: #c99cff90; box-shadow: inset #c99cff1c 0px 0px 19px 0px; }
-.RarityLegendary .XHSPassItemPreview,
+.RarityLegendary .XHSPassItemPreview { border-color: #d32ce69c; box-shadow: inset #d32ce620 0px 0px 20px 0px; }
+.RarityAncient .XHSPassItemPreview { border-color: #eb4b4ba0; box-shadow: inset #eb4b4b22 0px 0px 20px 0px; }
 .RarityPremium .XHSPassItemPreview { border-color: #ffcf669c; box-shadow: inset #ffcf6620 0px 0px 20px 0px; }
-.RarityImmortal .XHSPassItemPreview { border-color: #f0a83cac; box-shadow: inset #f0a83c24 0px 0px 21px 0px, fill #f0a83c12 0px 0px 7px 0px; }
+.RarityImmortal .XHSPassItemPreview { border-color: #e4ae39ac; box-shadow: inset #e4ae3924 0px 0px 21px 0px, fill #e4ae3912 0px 0px 7px 0px; }
 .RarityArcana .XHSPassItemPreview { border-color: #ade55cbc; box-shadow: inset #ade55c28 0px 0px 22px 0px, fill #ade55c16 0px 0px 8px 0px; }
 
-.XHSPassRewardCard.RarityCommon:hover { border-color: #edf3f8; box-shadow: fill #000000d0 0px 8px 18px 0px, fill #dbe4ec38 0px 0px 16px 0px, inset #dbe4ec24 0px 0px 13px 0px; }
-.XHSPassRewardCard.RarityUncommon:hover { border-color: #8ff3ad; box-shadow: fill #000000d0 0px 8px 18px 0px, fill #70e39a42 0px 0px 17px 0px, inset #70e39a28 0px 0px 14px 0px; }
-.XHSPassRewardCard.RarityRare:hover,
-.XHSPassRewardCard.RaritySeason:hover { border-color: #8fe4ff; box-shadow: fill #000000d0 0px 8px 18px 0px, fill #5ad0ff46 0px 0px 18px 0px, inset #5ad0ff2c 0px 0px 15px 0px; }
-.XHSPassRewardCard.RarityMythical:hover,
+.XHSPassRewardCard.RarityCommon:hover { border-color: #d6e4f2; box-shadow: fill #000000d0 0px 8px 18px 0px, fill #b0c3d938 0px 0px 16px 0px, inset #b0c3d924 0px 0px 13px 0px; }
+.XHSPassRewardCard.RarityUncommon:hover { border-color: #82b5ee; box-shadow: fill #000000d0 0px 8px 18px 0px, fill #5e98d942 0px 0px 17px 0px, inset #5e98d928 0px 0px 14px 0px; }
+.XHSPassRewardCard.RarityRare:hover { border-color: #7189ff; box-shadow: fill #000000d0 0px 8px 18px 0px, fill #4b69ff46 0px 0px 18px 0px, inset #4b69ff2c 0px 0px 15px 0px; }
+.XHSPassRewardCard.RaritySeason:hover { border-color: #fff982; box-shadow: fill #000000d0 0px 8px 18px 0px, fill #fff34f46 0px 0px 18px 0px, inset #fff34f2c 0px 0px 15px 0px; }
+.XHSPassRewardCard.RarityMythical:hover { border-color: #ac7aff; box-shadow: fill #000000d0 0px 8px 18px 0px, fill #8847ff4c 0px 0px 19px 0px, inset #8847ff30 0px 0px 16px 0px; }
 .XHSPassRewardCard.RaritySupporter:hover { border-color: #dfbdff; box-shadow: fill #000000d0 0px 8px 18px 0px, fill #c99cff4c 0px 0px 19px 0px, inset #c99cff30 0px 0px 16px 0px; }
-.XHSPassRewardCard.RarityLegendary:hover,
+.XHSPassRewardCard.RarityLegendary:hover { border-color: #ef72f5; box-shadow: fill #000000d0 0px 8px 18px 0px, fill #d32ce654 0px 0px 20px 0px, inset #d32ce634 0px 0px 17px 0px; }
+.XHSPassRewardCard.RarityAncient:hover { border-color: #ff7777; box-shadow: fill #000000d0 0px 8px 18px 0px, fill #eb4b4b58 0px 0px 20px 0px, inset #eb4b4b36 0px 0px 17px 0px; }
 .XHSPassRewardCard.RarityPremium:hover { border-color: #ffe39a; box-shadow: fill #000000d0 0px 8px 18px 0px, fill #ffcf6654 0px 0px 20px 0px, inset #ffcf6634 0px 0px 17px 0px; }
-.XHSPassRewardCard.RarityImmortal:hover { border-color: #ffc361; box-shadow: fill #000000d0 0px 8px 18px 0px, fill #f0a83c5c 0px 0px 21px 0px, inset #f0a83c38 0px 0px 18px 0px; }
+.XHSPassRewardCard.RarityImmortal:hover { border-color: #f3c85c; box-shadow: fill #000000d0 0px 8px 18px 0px, fill #e4ae395c 0px 0px 21px 0px, inset #e4ae3938 0px 0px 18px 0px; }
 .XHSPassRewardCard.RarityArcana:hover { border-color: #ccff7d; box-shadow: fill #000000d0 0px 8px 18px 0px, fill #ade55c64 0px 0px 22px 0px, inset #ade55c3c 0px 0px 19px 0px; }
 
-.XHSPassRewardCard.RarityCommon:hover .XHSPassItemPreview { border-color: #edf3f8; box-shadow: inset #dbe4ec2c 0px 0px 18px 0px, fill #dbe4ec2c 0px 0px 11px 0px; }
-.XHSPassRewardCard.RarityUncommon:hover .XHSPassItemPreview { border-color: #8ff3ad; box-shadow: inset #70e39a30 0px 0px 19px 0px, fill #70e39a30 0px 0px 11px 0px; }
-.XHSPassRewardCard.RarityRare:hover .XHSPassItemPreview,
-.XHSPassRewardCard.RaritySeason:hover .XHSPassItemPreview { border-color: #8fe4ff; box-shadow: inset #5ad0ff34 0px 0px 20px 0px, fill #5ad0ff34 0px 0px 12px 0px; }
-.XHSPassRewardCard.RarityMythical:hover .XHSPassItemPreview,
+.XHSPassRewardCard.RarityCommon:hover .XHSPassItemPreview { border-color: #d6e4f2; box-shadow: inset #b0c3d92c 0px 0px 18px 0px, fill #b0c3d92c 0px 0px 11px 0px; }
+.XHSPassRewardCard.RarityUncommon:hover .XHSPassItemPreview { border-color: #82b5ee; box-shadow: inset #5e98d930 0px 0px 19px 0px, fill #5e98d930 0px 0px 11px 0px; }
+.XHSPassRewardCard.RarityRare:hover .XHSPassItemPreview { border-color: #7189ff; box-shadow: inset #4b69ff34 0px 0px 20px 0px, fill #4b69ff34 0px 0px 12px 0px; }
+.XHSPassRewardCard.RaritySeason:hover .XHSPassItemPreview { border-color: #fff982; box-shadow: inset #fff34f34 0px 0px 20px 0px, fill #fff34f34 0px 0px 12px 0px; }
+.XHSPassRewardCard.RarityMythical:hover .XHSPassItemPreview { border-color: #ac7aff; box-shadow: inset #8847ff38 0px 0px 21px 0px, fill #8847ff38 0px 0px 12px 0px; }
 .XHSPassRewardCard.RaritySupporter:hover .XHSPassItemPreview { border-color: #dfbdff; box-shadow: inset #c99cff38 0px 0px 21px 0px, fill #c99cff38 0px 0px 12px 0px; }
-.XHSPassRewardCard.RarityLegendary:hover .XHSPassItemPreview,
+.XHSPassRewardCard.RarityLegendary:hover .XHSPassItemPreview { border-color: #ef72f5; box-shadow: inset #d32ce63c 0px 0px 22px 0px, fill #d32ce63c 0px 0px 13px 0px; }
+.XHSPassRewardCard.RarityAncient:hover .XHSPassItemPreview { border-color: #ff7777; box-shadow: inset #eb4b4b3e 0px 0px 22px 0px, fill #eb4b4b3e 0px 0px 13px 0px; }
 .XHSPassRewardCard.RarityPremium:hover .XHSPassItemPreview { border-color: #ffe39a; box-shadow: inset #ffcf663c 0px 0px 22px 0px, fill #ffcf663c 0px 0px 13px 0px; }
-.XHSPassRewardCard.RarityImmortal:hover .XHSPassItemPreview { border-color: #ffc361; box-shadow: inset #f0a83c40 0px 0px 23px 0px, fill #f0a83c40 0px 0px 13px 0px; }
+.XHSPassRewardCard.RarityImmortal:hover .XHSPassItemPreview { border-color: #f3c85c; box-shadow: inset #e4ae3940 0px 0px 23px 0px, fill #e4ae3940 0px 0px 13px 0px; }
 .XHSPassRewardCard.RarityArcana:hover .XHSPassItemPreview { border-color: #ccff7d; box-shadow: inset #ade55c44 0px 0px 24px 0px, fill #ade55c44 0px 0px 14px 0px; }
 
-.XHSPassRewardCard.RarityCommon:hover .XHSPassRewardName { text-shadow: 0px 0px 7px 2.0 #dbe4ec72; }
-.XHSPassRewardCard.RarityUncommon:hover .XHSPassRewardName { text-shadow: 0px 0px 7px 2.0 #70e39a78; }
-.XHSPassRewardCard.RarityRare:hover .XHSPassRewardName,
-.XHSPassRewardCard.RaritySeason:hover .XHSPassRewardName { text-shadow: 0px 0px 7px 2.0 #5ad0ff80; }
-.XHSPassRewardCard.RarityMythical:hover .XHSPassRewardName,
+.XHSPassRewardCard.RarityCommon:hover .XHSPassRewardName { text-shadow: 0px 0px 7px 2.0 #b0c3d972; }
+.XHSPassRewardCard.RarityUncommon:hover .XHSPassRewardName { text-shadow: 0px 0px 7px 2.0 #5e98d978; }
+.XHSPassRewardCard.RarityRare:hover .XHSPassRewardName { text-shadow: 0px 0px 7px 2.0 #4b69ff80; }
+.XHSPassRewardCard.RaritySeason:hover .XHSPassRewardName { text-shadow: 0px 0px 7px 2.0 #fff34f80; }
+.XHSPassRewardCard.RarityMythical:hover .XHSPassRewardName { text-shadow: 0px 0px 7px 2.0 #8847ff88; }
 .XHSPassRewardCard.RaritySupporter:hover .XHSPassRewardName { text-shadow: 0px 0px 7px 2.0 #c99cff88; }
-.XHSPassRewardCard.RarityLegendary:hover .XHSPassRewardName,
+.XHSPassRewardCard.RarityLegendary:hover .XHSPassRewardName { text-shadow: 0px 0px 7px 2.0 #d32ce690; }
+.XHSPassRewardCard.RarityAncient:hover .XHSPassRewardName { text-shadow: 0px 0px 7px 2.0 #eb4b4b94; }
 .XHSPassRewardCard.RarityPremium:hover .XHSPassRewardName { text-shadow: 0px 0px 7px 2.0 #ffcf6690; }
-.XHSPassRewardCard.RarityImmortal:hover .XHSPassRewardName { text-shadow: 0px 0px 7px 2.0 #f0a83c98; }
+.XHSPassRewardCard.RarityImmortal:hover .XHSPassRewardName { text-shadow: 0px 0px 7px 2.0 #e4ae3998; }
 .XHSPassRewardCard.RarityArcana:hover .XHSPassRewardName { text-shadow: 0px 0px 7px 2.0 #ade55ca0; }
 
 .XHSPassShopGrid {
@@ -3383,6 +3415,7 @@ DropDownMenu.DropDownMenuVisible {
 }
 
 .XHSPassShopBadge.IsEdition { color: #8edfff; border-color: #5ad0ff60; }
+.XHSPassShopBadge.IsNew { color: #241500; background-color: gradient(linear, 0% 0%, 100% 0%, from(#f1b83f), to(#ffe39a)); border-color: #fff0b8; box-shadow: fill #f0b53b30 0px 0px 6px 0px; }
 .XHSPassShopBadge.IsGiftable { color: #a8efc0; border-color: #70e39a62; }
 .XHSPassShopBadge.IsTier { color: #e1c1ff; border-color: #c99cff65; }
 .XHSPassShopBadge.IsOwned { color: #a8efc0; border-color: #70e39a72; }

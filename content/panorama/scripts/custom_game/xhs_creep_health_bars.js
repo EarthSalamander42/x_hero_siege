@@ -5,7 +5,7 @@
 	var BAR_METRICS = {
 		creep: { width: 82, height: 31, fallbackZ: 125 },
 		creep_controlled: { width: 82, height: 31, fallbackZ: 125 },
-		creep_hero: { width: 132, height: 29, fallbackZ: 185 }
+		creep_hero: { width: 132, height: 42, fallbackZ: 185 }
 	};
 	var SCREEN_Y_OFFSET = 10;
 	var POSITION_RATE = 0.0;
@@ -81,6 +81,10 @@
 	}
 
 	function IsVisibleToLocalPlayer(entityIndex, bar, localTeam) {
+		var relayStack = GetPresentationStack(entityIndex, bar);
+		// Server-side presentation blocks are authoritative. Visibility APIs only
+		// answer FOW and would otherwise reveal frozen/locked quest targets.
+		if (relayStack >= 0 && (relayStack & 1) !== 0) { return false; }
 		try {
 			if (typeof Entities.IsVisibleToTeam === "function") {
 				return !!Entities.IsVisibleToTeam(entityIndex, localTeam);
@@ -92,8 +96,6 @@
 		try {
 			if (typeof Entities.IsEntityVisible === "function") { return !!Entities.IsEntityVisible(entityIndex); }
 		} catch (error) {}
-		var relayStack = GetPresentationStack(entityIndex, bar);
-		if ((relayStack & 1) !== 0) { return false; }
 		return relayStack >= 0 && (localTeam !== 2 || (relayStack & 2) !== 0);
 	}
 
@@ -113,13 +115,19 @@
 		}
 
 		var unitName = null;
+		var heroFrame = null;
 		if (kind === "creep_hero") {
 			unitName = $.CreatePanel("Label", panel, "");
 			unitName.AddClass("XHSCreepHeroName");
 			unitName.hittest = false;
-		}
 
-		var track = $.CreatePanel("Panel", panel, "");
+			heroFrame = $.CreatePanel("Panel", panel, "");
+			heroFrame.AddClass("XHSCreepHeroFrame");
+			heroFrame.hittest = false;
+		}
+		var healthContainer = heroFrame || panel;
+
+		var track = $.CreatePanel("Panel", healthContainer, "");
 		track.AddClass("XHSCreepHealthTrack");
 		track.hittest = false;
 
@@ -137,7 +145,7 @@
 
 		var healthValue = null;
 		if (kind === "creep_hero") {
-			healthValue = $.CreatePanel("Label", panel, "");
+			healthValue = $.CreatePanel("Label", heroFrame, "");
 			healthValue.AddClass("XHSCreepHeroHealthValue");
 			healthValue.hittest = false;
 		}
@@ -152,6 +160,7 @@
 			healthDividers: dividers,
 			levelLabel: levelLabel,
 			unitName: unitName,
+			heroFrame: heroFrame,
 			healthValue: healthValue,
 			lastUnitName: "",
 			lastLevel: level > 0 ? level : 0,
@@ -177,7 +186,7 @@
 
 	function EnsureFrozenIndicator(bar) {
 		if (!bar || bar.frozenIndicator) { return; }
-		var indicator = $.CreatePanel("Label", bar.panel, "");
+		var indicator = $.CreatePanel("Label", bar.heroFrame || bar.panel, "");
 		indicator.AddClass("XHSCreepFrozenIndicator");
 		indicator.text = "FROZEN";
 		indicator.hittest = false;

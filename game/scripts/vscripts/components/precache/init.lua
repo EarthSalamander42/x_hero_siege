@@ -403,6 +403,7 @@ end
 
 XHSPrecache:RegisterGroup("core", {
 	particles = {
+		"particles/dev/empty_particle.vpcf",
 		"particles/items2_fx/teleport_start.vpcf",
 		"particles/items2_fx/teleport_end.vpcf",
 		"particles/econ/events/fall_major_2016/teleport_start_fm06_lvl3.vpcf",
@@ -415,7 +416,10 @@ XHSPrecache:RegisterGroup("core", {
 		"particles/units/heroes/hero_juggernaut/juggernaut_healing_ward_variation02.vpcf",
 		"particles/items_fx/blink_dagger_start.vpcf",
 		"particles/items_fx/blink_dagger_end.vpcf",
+		"particles/items2_fx/pipe_of_insight.vpcf",
+		"particles/items2_fx/mekanism.vpcf",
 		"particles/world_outpost/world_outpost_radiant_ambient.vpcf",
+		"particles/units/heroes/hero_wisp/wisp_relocate_marker.vpcf",
 	},
 	models = {
 		"models/items/juggernaut/ward/ancient_exile_ward/ancient_exile_ward.vmdl",
@@ -441,6 +445,8 @@ XHSPrecache:RegisterGroup("runes", {
 		"particles/generic_gameplay/rune_shield.vpcf",
 		"particles/generic_gameplay/rune_water.vpcf",
 		"particles/generic_gameplay/rune_wisdom.vpcf",
+		"particles/neutral_fx/miniboss_shield.vpcf",
+		"particles/neutral_fx/miniboss_damage_impact.vpcf",
 		"particles/units/heroes/hero_zuus/zuus_arc_lightning.vpcf",
 		"particles/units/heroes/hero_stormspirit/stormspirit_overload_ambient.vpcf",
 	},
@@ -479,6 +485,7 @@ XHSPrecache:RegisterGroup("hero_abilities", {
 		"particles/units/heroes/hero_luna/luna_lucent_beam_cast.vpcf",
 		"particles/units/heroes/hero_luna/luna_lucent_beam.vpcf",
 		"particles/units/heroes/hero_shadowshaman/shadowshaman_ether_shock.vpcf",
+		"particles/units/heroes/hero_sven/sven_warcry_buff.vpcf",
 		"particles/items_fx/aura_endurance.vpcf",
 		"particles/econ/courier/courier_faceless_rex/cour_rex_ground_a.vpcf",
 		"particles/econ/courier/courier_roshan_frost/courier_roshan_frost_steam.vpcf",
@@ -575,6 +582,9 @@ XHSPrecache:RegisterGroup("bosses", {
 		"particles/custom/boss_warnings/magtheridon/release.vpcf",
 		"particles/custom/bosses/magtheridon/fel_radius_precast_green.vpcf",
 		"particles/custom/bosses/magtheridon/infernal_ring_green.vpcf",
+		"particles/custom/bosses/magtheridon/infernal_rings/underlord_pitofmalice_pre.vpcf",
+		"particles/custom/bosses/magtheridon/infernal_rings/underlord_pitofmalice.vpcf",
+		"particles/custom/bosses/magtheridon/infernal_rings/abyssal_underlord_pitofmalice_stun.vpcf",
 		"particles/custom/boss_warnings/proudmoore/radius.vpcf",
 		"particles/custom/boss_warnings/proudmoore/line.vpcf",
 		"particles/custom/boss_warnings/proudmoore/target.vpcf",
@@ -666,6 +676,7 @@ XHSPrecache:RegisterGroup("bosses", {
 		"particles/units/heroes/hero_stormspirit/stormspirit_static_remnant.vpcf",
 		"particles/units/heroes/hero_earth_spirit/espirit_bouldersmash_caster.vpcf",
 		"particles/units/heroes/hero_earth_spirit/espirit_stoneremnant.vpcf",
+		"particles/units/heroes/hero_ember_spirit/ember_spirit_fire_remnant.vpcf",
 		"particles/units/heroes/hero_lina/lina_spell_light_strike_array.vpcf",
 		"particles/units/heroes/hero_invoker/invoker_sun_strike_team.vpcf",
 		"particles/econ/items/invoker/invoker_apex/invoker_sun_strike_immortal1.vpcf",
@@ -772,11 +783,22 @@ XHSPrecache:RegisterGroup("waves", {
 		"models/heroes/lycan/lycan.vmdl",
 		"models/heroes/witchdoctor/witchdoctor_ward.vmdl",
 	},
+	model_folders = {
+		-- Phase 2 Destroyer Magnataur. AttachWearables ItemDefs are not enough to
+		-- make econ models resident on dedicated servers, even when Magnus itself
+		-- has already been precached.
+		"models/items/magnataur/seismic_berserker_head",
+		"models/items/magnataur/seismic_berserker_misc",
+		"models/items/magnataur/seismic_berserker_weapon",
+		"models/items/magnataur/seismic_berserker_arms",
+		"models/items/magnataur/seismic_berserker_belt",
+	},
 	units = {
 		"npc_abomination_final_wave",
 		"npc_dota_lycan_wolf1",
 		"npc_dota_shadowshaman_serpentward",
 		"npc_dota_furbolg",
+		"npc_magnataur_destroyer_crypt",
 	},
 	soundfiles = {
 		"soundevents/game_sounds_heroes/game_sounds_silencer.vsndevts",

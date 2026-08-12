@@ -85,10 +85,10 @@
 
 						<Panel id="VoteCategoryTabs" class="vote-category-tabs">
 							<Button id="VoteCategoryTabDifficulty" class="vote-category-tab" onactivate="ShowVoteProgressCategory('difficulty');">
-								<Label class="vote-category-tab-label" text="#loading_screen_vote_tab_game_mode" />
+								<Label id="VoteCategoryTabGameModeLabel" class="vote-category-tab-label" text="#loading_screen_vote_tab_game_mode" />
 							</Button>
 							<Button id="VoteCategoryTabAIAllies" class="vote-category-tab" onactivate="ShowVoteProgressCategory('ai_allies');">
-								<Label class="vote-category-tab-label" text="#vote_ai_allies" />
+								<Label id="VoteCategoryTabAIAlliesLabel" class="vote-category-tab-label" text="#vote_ai_allies" />
 							</Button>
 						</Panel>
 
@@ -98,7 +98,7 @@
 								<Panel id="VoteProgressDifficultyRows" class="vote-progress-options" />
 							</Panel>
 							<Panel id="VoteProgressAIAllies" class="vote-progress-tab">
-								<Label class="vote-progress-tab-title" text="#vote_ai_allies" />
+								<Label id="VoteProgressAIAlliesTitle" class="vote-progress-tab-title" text="#vote_ai_allies" />
 								<Label id="VoteProgressAIAlliesRule" class="vote-ai-unanimity-rule" text="#loading_screen_ai_vote_unanimity_rule" />
 								<Label id="VoteProgressAIAlliesStatus" class="vote-ai-unanimity-status" text="" />
 								<Panel id="VoteProgressAIAlliesRows" class="vote-progress-options" />
@@ -112,7 +112,7 @@
 								<Label id="VoteSelectionDifficulty" class="vote-selection-summary-value" text="#loading_screen_not_selected" />
 							</Panel>
 							<Panel class="vote-selection-summary-row">
-								<Label class="vote-selection-summary-key" text="#vote_ai_allies" />
+								<Label id="VoteSelectionAIAlliesKey" class="vote-selection-summary-key" text="#vote_ai_allies" />
 								<Label id="VoteSelectionAIAllies" class="vote-selection-summary-value" text="#loading_screen_not_selected" />
 							</Panel>
 						</Panel>

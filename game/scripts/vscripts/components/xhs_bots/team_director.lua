@@ -1579,11 +1579,14 @@ function XHSBotTeamDirector:BuildAssignment(playerID, slot, phase, now, snapshot
 	local sealedBossActive = phase >= 3
 		and IsValidEntityHandle(self.visible_boss)
 		and self.visible_boss:IsAlive()
-	local campaignShoppingLocked = sealedBossActive or (
+	local phaseThreeEmergencyShopping = phase >= 3
+		and type(shoppingGoal) == "table"
+		and shoppingGoal.emergency_health_resupply == true
+	local campaignShoppingLocked = not phaseThreeEmergencyShopping and (sealedBossActive or (
 		phase >= 3
 		and campaignObjective ~= nil
 		and campaignObjective.non_combat ~= true
-	)
+	))
 	if campaignObjective ~= nil
 		and not campaignShoppingLocked
 		and self:IsShoppingAssignmentAllowed(playerID, record, hero) then

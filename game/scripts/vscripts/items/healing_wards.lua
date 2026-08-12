@@ -16,6 +16,8 @@ modifier_healing_ward2_datadriven.XHS_LINK_CLIENT = true
 
 local WARD_AMBIENT_PARTICLE = "particles/econ/items/juggernaut/ancient_exile/ancient_exile_healing_ward.vpcf"
 local WARD_ERUPTION_PARTICLE = "particles/units/heroes/hero_juggernaut/juggernaut_healing_ward_eruption.vpcf"
+local WARD_RADIUS_PARTICLE = "particles/custom/xhs_boss_warning_circle.vpcf"
+local WARD_RADIUS_PULSE_INTERVAL = 0.9
 -- The Supporter Pass regen controller owns the recipient visual. Keep the
 -- gameplay modifier intact while routing its old persistent PFX to an empty
 -- anchor, so equipped regen cosmetics never stack with the legacy effect.
@@ -54,6 +56,21 @@ local function ConfigureAuraModifier(modifier, auraModifierName)
 	function modifier:GetAuraSearchType() return DOTA_UNIT_TARGET_HERO + DOTA_UNIT_TARGET_BASIC end
 	function modifier:GetAuraSearchFlags() return DOTA_UNIT_TARGET_FLAG_NOT_ANCIENTS end
 	function modifier:GetAuraDuration() return 0.3 end
+	function modifier:EmitRadiusPulse()
+		if not IsServer() then return end
+		local parent = self:GetParent()
+		local ability = self:GetAbility()
+		if parent == nil or parent:IsNull() or ability == nil then return end
+		local radius = ability:GetSpecialValueFor("aura_radius")
+		if radius <= 0 then radius = ability:GetSpecialValueFor("radius") end
+		local pulse = ParticleManager:CreateParticle(WARD_RADIUS_PARTICLE, PATTACH_WORLDORIGIN, nil)
+		ParticleManager:SetParticleControl(pulse, 0, parent:GetAbsOrigin())
+		ParticleManager:SetParticleControl(pulse, 1, Vector(radius, 0, 0))
+		ParticleManager:SetParticleControl(pulse, 2, Vector(1.0, 0, 0))
+		ParticleManager:SetParticleControl(pulse, 3, Vector(90, 255, 155))
+		ParticleManager:SetParticleControl(pulse, 4, Vector(135, 235, 255))
+		ParticleManager:ReleaseParticleIndex(pulse)
+	end
 
 	function modifier:OnCreated()
 		if not IsServer() then return end
@@ -66,6 +83,13 @@ local function ConfigureAuraModifier(modifier, auraModifierName)
 
 		local eruption = ParticleManager:CreateParticle(WARD_ERUPTION_PARTICLE, PATTACH_ABSORIGIN_FOLLOW, parent)
 		ParticleManager:ReleaseParticleIndex(eruption)
+
+		self:EmitRadiusPulse()
+		self:StartIntervalThink(WARD_RADIUS_PULSE_INTERVAL)
+	end
+
+	function modifier:OnIntervalThink()
+		self:EmitRadiusPulse()
 	end
 end
 

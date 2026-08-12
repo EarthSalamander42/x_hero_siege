@@ -976,6 +976,35 @@ function api:MergeSupporterPassResponse(steamid, data)
 	if data.claimed_rewards ~= nil then
 		supporter_pass.claimed_rewards = data.claimed_rewards
 	end
+	local fragment_reward_grants = data.fragment_reward_grants or season.fragment_reward_grants
+	if fragment_reward_grants ~= nil then
+		supporter_pass.fragment_reward_grants = fragment_reward_grants
+		player.fragment_reward_grants = fragment_reward_grants
+
+		-- Fragment rewards are claimed atomically by game-complete. Reflect those
+		-- claims immediately so the reward track cannot briefly offer them again
+		-- while the next full claim refresh is still pending.
+		local claimed_rewards = CollectSupporterClaimIDs(supporter_pass.claimed_rewards or {})
+		for _, grant in pairs(fragment_reward_grants) do
+			if type(grant) == "table" and grant.reward_id ~= nil then
+				claimed_rewards[tostring(grant.reward_id)] = true
+			end
+		end
+		supporter_pass.claimed_rewards = claimed_rewards
+	end
+	local fragment_reward_total = FirstNonNil(data.fragment_reward_total, season.fragment_reward_total)
+	if fragment_reward_total ~= nil then
+		supporter_pass.fragment_reward_total = fragment_reward_total
+		player.fragment_reward_total = fragment_reward_total
+	end
+	local fragment_reward_claim_event_id = FirstNonNil(
+		data.fragment_reward_claim_event_id,
+		season.fragment_reward_claim_event_id
+	)
+	if fragment_reward_claim_event_id ~= nil then
+		supporter_pass.fragment_reward_claim_event_id = fragment_reward_claim_event_id
+		player.fragment_reward_claim_event_id = fragment_reward_claim_event_id
+	end
 end
 
 function api:RefreshSupporterPassClaims(player_id, callback)
@@ -1904,11 +1933,26 @@ function api:Message(message, _type)
 end
 
 function api:ScheduleRuntimeLogFlush(delay)
-	if self.runtime_log_flush_scheduled == true then return end
-	self.runtime_log_flush_scheduled = true
 	local flushDelay = tonumber(delay) or 2
+	local now = 0
+	if Time ~= nil then
+		local ok, value = pcall(Time)
+		if ok then now = tonumber(value) or 0 end
+	end
+	local requestedAt = now + flushDelay
+	if self.runtime_log_flush_scheduled == true
+		and tonumber(self.runtime_log_flush_deadline) ~= nil
+		and requestedAt >= tonumber(self.runtime_log_flush_deadline) then
+		return
+	end
+	self.runtime_log_flush_scheduled = true
+	self.runtime_log_flush_deadline = requestedAt
+	self.runtime_log_flush_generation = (self.runtime_log_flush_generation or 0) + 1
+	local flushGeneration = self.runtime_log_flush_generation
 	local function FlushQueuedRuntimeLogs()
+		if flushGeneration ~= self.runtime_log_flush_generation then return nil end
 		self.runtime_log_flush_scheduled = false
+		self.runtime_log_flush_deadline = nil
 		local ok, failure = pcall(function() self:FlushRuntimeLogs() end)
 		if not ok and XHSBootstrapNativePrint ~= nil then
 			pcall(XHSBootstrapNativePrint, "[error][XHS_RUNTIME_LOG] flush threw: " .. tostring(failure))
@@ -1931,7 +1975,9 @@ function api:ScheduleRuntimeLogFlush(delay)
 	if mode ~= nil and mode.SetContextThink ~= nil then
 		local scheduled, scheduleError = pcall(function()
 			mode:SetContextThink("XHSRuntimeLogBootstrapFlush", function()
+				if flushGeneration ~= self.runtime_log_flush_generation then return nil end
 				self.runtime_log_flush_scheduled = false
+				self.runtime_log_flush_deadline = nil
 				self.runtime_log_bootstrap_think_active = true
 				local ok, failure = pcall(function() self:FlushRuntimeLogs() end)
 				if not ok and XHSBootstrapNativePrint ~= nil then
@@ -1971,11 +2017,30 @@ function api:QueueRuntimeLog(entry)
 		if ok then gameTime = tonumber(value) or 0 end
 	end
 
+	local dotaTime = tonumber(entry.dota_time) or 0
+	if dotaTime == 0 and GameRules ~= nil and GameRules.GetDOTATime ~= nil then
+		local ok, value = pcall(function() return GameRules:GetDOTATime(false, false) end)
+		if ok then dotaTime = tonumber(value) or 0 end
+	end
+	local realTime = tonumber(entry.real_time)
+	if (realTime == nil or realTime <= 0) and RealTime ~= nil then
+		local ok, value = pcall(RealTime)
+		if ok then realTime = tonumber(value) end
+	end
+	if (realTime == nil or realTime <= 0) and Time ~= nil then
+		local ok, value = pcall(Time)
+		if ok then realTime = tonumber(value) end
+	end
+
+	local normalizedLevel = NormalizeRuntimeLogLevel(entry.level)
 	table.insert(self.runtime_logs, {
 		sequence = self.runtime_log_next_sequence,
-		game_time = gameTime,
-		real_time = RealTime ~= nil and tonumber(RealTime()) or 0,
-		level = NormalizeRuntimeLogLevel(entry.level),
+		game_time = tonumber(entry.game_time) or gameTime,
+		dota_time = dotaTime,
+		real_time = realTime or 0,
+		logged_at_unix = tonumber(entry.logged_at_unix) or 0,
+		logged_at_utc = tostring(entry.logged_at_utc or ""),
+		level = normalizedLevel,
 		content = string.sub(tostring(entry.content or ""), 1, 4000),
 		trace = type(entry.trace) == "table" and entry.trace or {},
 	})
@@ -1985,7 +2050,13 @@ function api:QueueRuntimeLog(entry)
 		self.runtime_logs_dropped = (self.runtime_logs_dropped or 0) + 1
 	end
 
-	self:ScheduleRuntimeLogFlush(#self.runtime_logs >= 100 and 0.1 or 2)
+	local flushDelay = #self.runtime_logs >= 100 and 0.1 or 2
+	if normalizedLevel == "error" or normalizedLevel == "critical" then
+		flushDelay = 0.1
+	elseif normalizedLevel == "warn" then
+		flushDelay = math.min(flushDelay, 0.5)
+	end
+	self:ScheduleRuntimeLogFlush(flushDelay)
 end
 
 function api:FlushRuntimeLogs()
@@ -3033,10 +3104,19 @@ function api:CompleteGame()
 						and SpecialEvents.muradin_winners_by_player[id] == true)
 					or (heroEntity ~= nil and heroEntity.paid == true),
 				hero_images_done = completed_hero_images,
+				hero_image_done = GameMode ~= nil
+					and GameMode.IsHeroImageCompleted ~= nil
+					and GameMode:IsHeroImageCompleted(id, heroEntity),
 				all_hero_images_done = GameMode ~= nil and GameMode.AllHeroImagesDead == true,
+				all_hero_images_completed_by_player = GameMode ~= nil
+					and tonumber(GameMode.AllHeroImagesCompletedByPlayerID) == tonumber(id),
 				frost_infernal_done = GameMode ~= nil
 					and (GameMode.FrostInfernal_killed == true or GameMode.FrostInfernal_killed == 1),
+				frost_infernal_completed_by_player = GameMode ~= nil
+					and tonumber(GameMode.FrostInfernalCompletedByPlayerID) == tonumber(id),
 				spirit_beast_done = GameMode ~= nil and GameMode.SpiritBeast_killed == true,
+				spirit_beast_completed_by_player = GameMode ~= nil
+					and tonumber(GameMode.SpiritBeastCompletedByPlayerID) == tonumber(id),
 				ramero_baristol_won = SpecialEvents ~= nil
 					and SpecialEvents.ramero_baristol_winners_by_player ~= nil
 					and SpecialEvents.ramero_baristol_winners_by_player[id] == true,

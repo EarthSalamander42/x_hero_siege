@@ -10,6 +10,17 @@ local PHASE_ONE_SPAWN_NOTICE_COOLDOWN = 90
 local PHASE_ONE_SPAWN_NETTABLE = "xhs_phase_one_spawn_budget"
 local PHASE_ONE_SPAWN_NETTABLE_KEY = "state"
 
+local function BuildCreepErrorTrace(errorMessage)
+	local message = tostring(errorMessage or "Unknown creep runtime error")
+	if debug ~= nil and type(debug.traceback) == "function" then
+		local ok, trace = pcall(debug.traceback, message, 2)
+		if ok and trace ~= nil then
+			return tostring(trace)
+		end
+	end
+	return message
+end
+
 local function GetPhaseOneSpawnBudgetRegistry()
 	GameMode.phase_one_spawn_budget_units = GameMode.phase_one_spawn_budget_units or {}
 	return GameMode.phase_one_spawn_budget_units
@@ -957,7 +968,7 @@ function SpawnMagnataur(hPos)
 				nil,
 				teamNumber
 			)
-		end, debug.traceback)
+		end, BuildCreepErrorTrace)
 		local unit = ok and unitOrError or nil
 		if unit ~= nil and not unit:IsNull() then
 			RegisterPhaseOneBudgetEnemy(unit)

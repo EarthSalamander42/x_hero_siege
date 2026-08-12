@@ -11,6 +11,12 @@ SpecialEvents.farm_event_total_kills_by_player = SpecialEvents.farm_event_total_
 
 require("boss_scripts/special_arena_ai")
 
+LinkLuaModifier(
+	"modifier_xhs_muradin_event_damage_telemetry",
+	"components/muradin_event_damage_telemetry.lua",
+	LUA_MODIFIER_MOTION_NONE
+)
+
 local SPECIAL_EVENT_CINEMATIC_PAUSE_RAMP = 2.75
 local CINEMATIC_EVENT_PRE_TELEPORT_DELAY = 4.0
 local CINEMATIC_EVENT_POST_TELEPORT_HOLD = 1.5
@@ -56,17 +62,54 @@ local FARM_EVENT_STAGING_ORIGIN = Vector(-15800, -15800, -2048)
 local FARM_EVENT_WAVE_DAMAGE = { 125, 150, 175, 200, 225 }
 
 local function LogFarmEventTransition(severity, code, message, context)
-	if XHSObservability ~= nil and XHSObservability.Log ~= nil then
-		XHSObservability:Log(
-			severity or "info",
-			"farm_event_transition",
-			code or "FARM_EVENT_TRANSITION",
-			message or "Farm event transition update",
-			context or {}
-		)
-		return
+	local delivered = false
+	if XHSObservability ~= nil and type(XHSObservability.Log) == "function" then
+		delivered = pcall(function()
+			XHSObservability:Log(
+				severity or "info",
+				"farm_event_transition",
+				code or "FARM_EVENT_TRANSITION",
+				message or "Farm event transition update",
+				context or {}
+			)
+		end)
 	end
-	print("[XHS][FarmEventTransition][" .. tostring(code) .. "] " .. tostring(message))
+	if delivered then return end
+	local output = "[" .. tostring(severity or "info") .. "][XHS][FarmEventTransition]["
+		.. tostring(code) .. "] " .. tostring(message)
+	if XHSBootstrapLog ~= nil then
+		pcall(XHSBootstrapLog, severity or "error", output)
+	elseif XHSBootstrapNativePrint ~= nil then
+		pcall(XHSBootstrapNativePrint, output)
+	else
+		pcall(print, output)
+	end
+end
+
+local function BuildFarmEventErrorTrace(err)
+	local message = tostring(err == nil and "unknown farm event error" or err)
+	if debug ~= nil and type(debug.traceback) == "function" then
+		local ok, trace = pcall(debug.traceback, message, 2)
+		if ok and trace ~= nil then return tostring(trace) end
+	end
+	return message
+end
+
+local function FarmEventTransitionSnapshot(self, extra)
+	local snapshot = type(extra) == "table" and extra or {}
+	snapshot.generation = tonumber(self ~= nil and self.farm_event_generation) or 0
+	snapshot.end_started = self ~= nil and self.farm_event_end_started == true
+	snapshot.exit_completed = self ~= nil and self.farm_event_exit_completed == true
+	snapshot.exit_deadline = tonumber(self ~= nil and self.farm_event_exit_deadline) or 0
+	snapshot.farm_event_active = GameMode ~= nil and GameMode.FarmEvent_occuring == true
+	snapshot.game_phase = CustomTimers ~= nil and tonumber(CustomTimers.game_phase) or -1
+	snapshot.timers_paused = CustomTimers ~= nil and tonumber(CustomTimers.timers_paused) or -1
+	snapshot.server_game_time = 0
+	if GameRules ~= nil and GameRules.GetGameTime ~= nil then
+		local ok, value = pcall(function() return GameRules:GetGameTime() end)
+		if ok then snapshot.server_game_time = tonumber(value) or 0 end
+	end
+	return snapshot
 end
 local FARM_EVENT_ABILITY_BY_UNIT = {
 	npc_dota_creature_murloc = "xhs_creep_blood_hunger",
@@ -142,6 +185,23 @@ local function RemoveSpecialArenaDisplayDummy(globalName)
 	if dummy ~= nil and IsValidEntity(dummy) and not dummy:IsNull() then
 		UTIL_Remove(dummy)
 	end
+end
+
+local function HideCastleBarForSpecialArena()
+	local castle = Entities:FindByName(nil, "dota_goodguys_fort")
+	local modifier = castle ~= nil
+		and not castle:IsNull()
+		and castle:FindModifierByName("modifier_xhs_castle_health_bar")
+		or nil
+	if modifier ~= nil and modifier.HideBar ~= nil then
+		modifier:HideBar(true)
+		return
+	end
+
+	-- Keep the client fail-safe authoritative even if the modifier has not been
+	-- attached yet (late load/reconnect during the arena transition).
+	CustomNetTables:SetTableValue("xhs_castle_bar", "state", { visible = 0 })
+	CustomGameEventManager:Send_ServerToAllClients("hide_castle_hp", {})
 end
 
 local function GetFarmEventHero(playerID)
@@ -616,6 +676,9 @@ function SpecialEvents:MuradinEvent(time)
 	local muradin_spawn = Entities:FindByName(nil, "npc_dota_muradin_boss")
 	local muradin_spawn_position = muradin_spawn:GetAbsOrigin()
 	local Muradin = CreateUnitByName("npc_dota_creature_muradin_bronzebeard", muradin_spawn_position, true, nil, nil, DOTA_TEAM_CUSTOM_2)
+	Muradin:AddNewModifier(Muradin, nil, "modifier_xhs_muradin_event_damage_telemetry", {
+		event_duration = time,
+	})
 	Muradin:AddNewModifier(Muradin, nil, "modifier_cinematic_pause", { duration = stun_duration, ramp_duration = SPECIAL_EVENT_CINEMATIC_PAUSE_RAMP })
 	Muradin:SetAngles(0, 270, 0)
 	PlayMuradinTeleportIn(Muradin, muradin_spawn_position)
@@ -695,6 +758,11 @@ function SpecialEvents:MuradinEvent(time)
 		UpdateGlobalObjective("farm_event", "Active", "Farm Event in --:--", nil)
 		CustomGameEventManager:Send_ServerToAllClients("update_special_event_label_farm", {})
 		StopAllStormEarthFireSounds()
+		local damageTelemetry = Muradin ~= nil and not Muradin:IsNull()
+			and Muradin:FindModifierByName("modifier_xhs_muradin_event_damage_telemetry") or nil
+		if damageTelemetry ~= nil and damageTelemetry.Flush ~= nil then
+			damageTelemetry:Flush("event_end")
+		end
 		StartMuradinTeleportOut(Muradin)
 		SpecialEvents:EndMuradinEvent()
 		if CustomTimers.special_waves_disabled ~= true then
@@ -1400,7 +1468,7 @@ function SpecialEvents:ArchiveFarmEventLeaderboard()
 	self.farm_event_leaderboard_phase = "archived"
 	local ok, message = xpcall(function()
 		self:PublishFarmLeaderboard(false)
-	end, debug.traceback)
+	end, BuildFarmEventErrorTrace)
 	if not ok then
 		LogFarmEventTransition("error", "FARM_EVENT_ARCHIVE_FAILED", tostring(message), {
 			generation = tonumber(self.farm_event_generation) or 0,
@@ -1429,9 +1497,22 @@ function SpecialEvents:RecoverFarmEventExit(message, source)
 	pcall(function() self:ResumeNonFarmCreeps() end)
 	pcall(function() RestartCreeps(0.0) end)
 	pcall(function() RestartHeroes() end)
+	local recoveredHeroCount = 0
 	for _, hero in pairs(HeroList:GetAllHeroes()) do
 		if hero ~= nil and not hero:IsNull() and hero:IsRealHero() then
-			pcall(function() EnableItems(hero) end)
+			local heroOK = pcall(function()
+				EnableItems(hero)
+				local returnPosition = hero.old_pos
+				if returnPosition == nil and hero:GetTeamNumber() == DOTA_TEAM_GOODGUYS
+					and BASE_GOOD ~= nil and not BASE_GOOD:IsNull() then
+					returnPosition = BASE_GOOD:GetAbsOrigin()
+				end
+				if returnPosition ~= nil then
+					FindClearSpaceForUnit(hero, returnPosition, true)
+					hero:Stop()
+				end
+			end)
+			if heroOK then recoveredHeroCount = recoveredHeroCount + 1 end
 		end
 	end
 
@@ -1440,7 +1521,7 @@ function SpecialEvents:RecoverFarmEventExit(message, source)
 	if CustomTimers ~= nil
 		and tonumber(CustomTimers.game_phase) == 1
 		and StartPhase2 ~= nil then
-		local phaseOK, phaseError = xpcall(StartPhase2, debug.traceback)
+		local phaseOK, phaseError = xpcall(StartPhase2, BuildFarmEventErrorTrace)
 		if not phaseOK then
 			LogFarmEventTransition("critical", "FARM_EVENT_PHASE2_RECOVERY_FAILED", tostring(phaseError), {
 				source = tostring(source or "unknown"),
@@ -1448,10 +1529,42 @@ function SpecialEvents:RecoverFarmEventExit(message, source)
 		end
 	end
 	self:SetKillEventLeaderboardSuppressedForFarm(false)
+	self.farm_event_exit_completed = true
+	LogFarmEventTransition("warn", "FARM_EVENT_EXIT_RECOVERY_COMPLETED", "Farm event recovery path completed", FarmEventTransitionSnapshot(self, {
+		source = tostring(source or "unknown"),
+		heroes_recovered = recoveredHeroCount,
+	}))
+end
+
+function SpecialEvents:SafeRequestFarmEventExit(source, generation)
+	local ok, result = xpcall(function()
+		return self:RequestFarmEventExit(source, generation)
+	end, BuildFarmEventErrorTrace)
+	if ok then return result end
+
+	LogFarmEventTransition("critical", "FARM_EVENT_EXIT_UNCAUGHT", tostring(result), FarmEventTransitionSnapshot(self, {
+		source = tostring(source or "unknown"),
+		requested_generation = tonumber(generation) or -1,
+	}))
+	local recoveryOK, recoveryError = pcall(function()
+		self:RecoverFarmEventExit(result, source)
+	end)
+	if not recoveryOK then
+		self.farm_event_end_started = false
+		self.farm_event_exit_completed = false
+		LogFarmEventTransition("critical", "FARM_EVENT_EXIT_RECOVERY_UNCAUGHT", tostring(recoveryError), FarmEventTransitionSnapshot(self, {
+			source = tostring(source or "unknown"),
+		}))
+	end
+	return false
 end
 
 function SpecialEvents:RequestFarmEventExit(source, generation)
 	generation = tonumber(generation) or tonumber(self.farm_event_generation) or 0
+	LogFarmEventTransition("info", "FARM_EVENT_EXIT_REQUESTED", "Farm event exit callback reached", FarmEventTransitionSnapshot(self, {
+		source = tostring(source or "unknown"),
+		requested_generation = generation,
+	}))
 	if generation ~= (tonumber(self.farm_event_generation) or 0) then
 		LogFarmEventTransition("warn", "FARM_EVENT_EXIT_STALE", "Ignored stale farm event exit callback", {
 			source = tostring(source or "unknown"),
@@ -1460,7 +1573,12 @@ function SpecialEvents:RequestFarmEventExit(source, generation)
 		})
 		return false
 	end
-	if self.farm_event_end_started == true then return false end
+	if self.farm_event_end_started == true then
+		LogFarmEventTransition("info", "FARM_EVENT_EXIT_DUPLICATE", "Ignored duplicate farm event exit callback", FarmEventTransitionSnapshot(self, {
+			source = tostring(source or "unknown"),
+		}))
+		return false
+	end
 
 	self.farm_event_end_started = true
 	self.farm_event_exit_deadline = nil
@@ -1468,6 +1586,9 @@ function SpecialEvents:RequestFarmEventExit(source, generation)
 	-- Close the celebration UI before running gameplay cleanup. Even if a later
 	-- engine call fails, clients receive a terminal leaderboard state.
 	self:ArchiveFarmEventLeaderboard()
+	LogFarmEventTransition("info", "FARM_EVENT_EXIT_UI_ARCHIVED", "Farm event leaderboard archive requested", FarmEventTransitionSnapshot(self, {
+		source = tostring(source or "unknown"),
+	}))
 	LogFarmEventTransition("info", "FARM_EVENT_EXIT_STARTED", "Farm event exit started", {
 		source = tostring(source or "unknown"),
 		generation = generation,
@@ -1475,7 +1596,7 @@ function SpecialEvents:RequestFarmEventExit(source, generation)
 
 	local ok, message = xpcall(function()
 		self:EndFarmEvent()
-	end, debug.traceback)
+	end, BuildFarmEventErrorTrace)
 	if not ok then
 		self:RecoverFarmEventExit(message, source)
 		return false
@@ -1486,6 +1607,7 @@ function SpecialEvents:RequestFarmEventExit(source, generation)
 		generation = generation,
 		spawned_magnataurs = tonumber(self.farm_exit_magnataur_count) or 0,
 	})
+	self.farm_event_exit_completed = true
 	return true
 end
 
@@ -1513,6 +1635,7 @@ function SpecialEvents:BeginFarmEventCelebration(duration)
 	end
 
 	local generation = tonumber(self.farm_event_generation) or 0
+	self.farm_event_exit_completed = false
 	self.farm_event_exit_deadline = GameRules:GetGameTime() + duration
 	LogFarmEventTransition("info", "FARM_EVENT_CELEBRATION_STARTED", "Farm event celebration started", {
 		generation = generation,
@@ -1520,10 +1643,32 @@ function SpecialEvents:BeginFarmEventCelebration(duration)
 	})
 	-- Schedule from the moment celebration actually begins instead of relying
 	-- only on a context think registered several minutes earlier.
-	Timers:CreateTimer(duration, function()
-		self:RequestFarmEventExit("celebration_timer", generation)
-		return nil
-	end)
+	Timers:CreateTimer("xhs_farm_event_exit_" .. tostring(generation), {
+		endTime = duration,
+		callback = function()
+			self:SafeRequestFarmEventExit("celebration_timer", generation)
+			return nil
+		end,
+	})
+
+	-- Independent engine-context watchdog. It does not share the Timers heap,
+	-- so a scheduler regression cannot strand players in the farm arena.
+	GameRules:GetGameModeEntity():SetContextThink(
+		"xhs_farm_event_exit_watchdog_" .. tostring(generation),
+		function()
+			if generation ~= (tonumber(self.farm_event_generation) or 0)
+				or self.farm_event_exit_completed == true then
+				return nil
+			end
+			LogFarmEventTransition("warn", "FARM_EVENT_EXIT_WATCHDOG_FIRED", "Independent farm event exit watchdog fired", FarmEventTransitionSnapshot(self, {
+				source = "engine_context_watchdog",
+			}))
+			self:SafeRequestFarmEventExit("engine_context_watchdog", generation)
+			if self.farm_event_exit_completed == true then return nil end
+			return 2.0
+		end,
+		duration + 1.0
+	)
 end
 
 function SpecialEvents:FarmEvent(time)
@@ -1547,6 +1692,7 @@ function SpecialEvents:FarmEvent(time)
 	self:SetKillEventLeaderboardSuppressedForFarm(true)
 	self.farm_event_generation = (self.farm_event_generation or 0) + 1
 	self.farm_event_end_started = false
+	self.farm_event_exit_completed = false
 	self.farm_event_exit_deadline = nil
 	self.farm_exit_wave_scheduled = false
 	self.farm_exit_wave_spawned = false
@@ -1647,12 +1793,13 @@ function SpecialEvents:FarmEvent(time)
 
 	local farmEventGeneration = self.farm_event_generation
 	GameRules:GetGameModeEntity():SetContextThink(DoUniqueString("farm_event_celebration_end"), function()
-		SpecialEvents:RequestFarmEventExit("context_deadline", farmEventGeneration)
+		SpecialEvents:SafeRequestFarmEventExit("context_deadline", farmEventGeneration)
 		return nil
 	end, event_end_delay + FARM_EVENT_CELEBRATION_DURATION)
 end
 
 function SpecialEvents:EndFarmEvent()
+	LogFarmEventTransition("info", "FARM_EVENT_END_ENTERED", "Entered EndFarmEvent", FarmEventTransitionSnapshot(self))
 	-- RequestFarmEventExit normally archives first. Keep this idempotent call so
 	-- legacy/direct callers also terminate the celebration presentation.
 	self:ArchiveFarmEventLeaderboard()
@@ -1662,7 +1809,9 @@ function SpecialEvents:EndFarmEvent()
 		FragmentQuests:OnFarmEventEnd()
 		FragmentQuests:OnPhase2Start()
 	end
+	LogFarmEventTransition("info", "FARM_EVENT_END_QUESTS_DONE", "Farm event quest hooks completed", FarmEventTransitionSnapshot(self))
 
+	local teleportedHeroCount = 0
 	for _, hero in pairs(HeroList:GetAllHeroes()) do
 		RefreshPlayers()
 
@@ -1678,8 +1827,12 @@ function SpecialEvents:EndFarmEvent()
 			end
 
 			hero:Stop()
+			teleportedHeroCount = teleportedHeroCount + 1
 		end
 	end
+	LogFarmEventTransition("info", "FARM_EVENT_END_TELEPORTS_SCHEDULED", "Player return teleports scheduled", FarmEventTransitionSnapshot(self, {
+		heroes = teleportedHeroCount,
+	}))
 
 	-- Keep every lane creep suspended through the return TP, then give players
 	-- a short positioning window before combat and special wave 6 resume.
@@ -1712,6 +1865,9 @@ function SpecialEvents:EndFarmEvent()
 			UTIL_Remove(v)
 		end
 	end
+	LogFarmEventTransition("info", "FARM_EVENT_END_CREEPS_CLEARED", "Farm event and movable creature cleanup completed", FarmEventTransitionSnapshot(self, {
+		units_scanned = #units,
+	}))
 
 	-- Start Phase 2
 	-- Dedicated servers can have every lane marked closed after players destroy
@@ -1730,6 +1886,10 @@ function SpecialEvents:EndFarmEvent()
 		* magnataurBatchesPerLane
 		* math.max(1, tonumber(GameRules:GetCustomGameDifficulty()) or 1)
 	local spawnedMagnataurCount = 0
+	LogFarmEventTransition("info", "FARM_EVENT_END_MAGNATAUR_SPAWN_STARTED", "Starting Destroyer Magnataur creation", FarmEventTransitionSnapshot(self, {
+		active_lanes = activeLaneCount,
+		expected = expectedMagnataurCount,
+	}))
 	for lane = 1, 8 do
 		local laneState = CREEP_LANES ~= nil and CREEP_LANES[lane] or nil
 		if laneState ~= nil and laneState[1] == 1 then
@@ -1790,6 +1950,9 @@ function SpecialEvents:EndFarmEvent()
 	else
 		print("ERROR: DUMMY UNIT PHASE 2 INVALID!!!")
 	end
+	LogFarmEventTransition("info", "FARM_EVENT_END_PHASE2_GATE_DONE", "Phase two quest gate processed", FarmEventTransitionSnapshot(self, {
+		spawned_magnataurs = spawnedMagnataurCount,
+	}))
 
 	-- only set timers and update panorama, restart count down happens when magnataurs are killed
 	CustomTimers.current_time["game_time"] = (XHS_SPECIAL_EVENT_INTERVAL * 2) - 1
@@ -1799,6 +1962,9 @@ function SpecialEvents:EndFarmEvent()
 	CustomTimers:Countdown("game_time")
 	CustomTimers:Countdown("special_event")
 	CustomTimers:Countdown("special_wave")
+	LogFarmEventTransition("info", "FARM_EVENT_END_TIMERS_RESTARTED", "Main timers restarted after farm event", FarmEventTransitionSnapshot(self, {
+		spawned_magnataurs = spawnedMagnataurCount,
+	}))
 
 	GameMode.FarmEvent_occuring = false
 	self.farm_event_leaderboard_phase = "archived"
@@ -1820,6 +1986,7 @@ function SpecialEvents:StartRameroAndBaristolEvent(hero)
 	CustomTimers.timers_paused = 2
 	CustomTimers:HideSpecialWaveCountdown()
 	GameMode.SpecialArena_occuring = true
+	HideCastleBarForSpecialArena()
 	CustomTimers.current_time["special_arena"] = XHS_RAMERO_BARISTOL_TIME + intro_delay
 	BT_ENABLED = 0
 
@@ -1962,6 +2129,7 @@ function SpecialEvents:StartSogatEvent(hero)
 	CustomTimers.timers_paused = 2
 	CustomTimers:HideSpecialWaveCountdown()
 	GameMode.SpecialArena_occuring = true
+	HideCastleBarForSpecialArena()
 	CustomTimers.current_time["special_arena"] = 120.0 + intro_delay
 	BT_ENABLED = 0
 

@@ -87,6 +87,7 @@ local EARTH_FAULT_PARTICLE = "particles/units/heroes/hero_elder_titan/elder_tita
 local EARTH_GUARD_PARTICLE = "particles/units/heroes/hero_earth_spirit/espirit_bouldersmash_caster.vpcf"
 local EARTH_PILLAR_PARTICLE = "particles/units/heroes/hero_earth_spirit/espirit_stoneremnant.vpcf"
 local FIRE_CINDER_PARTICLE = "particles/units/heroes/hero_ember_spirit/ember_spirit_flameguard.vpcf"
+local FIRE_CINDER_DESTINATION_PARTICLE = "particles/units/heroes/hero_ember_spirit/ember_spirit_fire_remnant.vpcf"
 local FIRE_SOLAR_PARTICLE = "particles/units/heroes/hero_lina/lina_spell_light_strike_array.vpcf"
 local FIRE_WILDFIRE_PARTICLE = "particles/units/heroes/hero_phoenix/phoenix_fire_spirit_ground.vpcf"
 local SHORT_IMPACT_DURATION = 1.15
@@ -218,6 +219,38 @@ local function MoveSpiritWithinArena(spirit, position)
 	end
 	FindClearSpaceForUnit(spirit, position, true)
 	return true
+end
+
+local function GetCinderStepDestination(ability, caster, direction)
+	local destination = caster:GetAbsOrigin() + direction * ability:GetSpecialValueFor("dash_distance")
+	if XHSSpiritMasterEncounter ~= nil and XHSSpiritMasterEncounter.ClampArenaPosition ~= nil then
+		return XHSSpiritMasterEncounter:ClampArenaPosition(destination)
+	end
+	return GetGroundPosition(destination, caster)
+end
+
+local function DestroyCinderStepDestination(ability, immediate)
+	local particle = ability.xhs_cinder_destination_particle
+	if particle == nil then return end
+	ParticleManager:DestroyParticle(particle, immediate == true)
+	ParticleManager:ReleaseParticleIndex(particle)
+	ability.xhs_cinder_destination_particle = nil
+	ability.xhs_cinder_destination = nil
+end
+
+local function CreateCinderStepDestination(ability, caster, destination, direction)
+	DestroyCinderStepDestination(ability, true)
+	local particle = ParticleManager:CreateParticle(FIRE_CINDER_DESTINATION_PARTICLE, PATTACH_CUSTOMORIGIN, caster)
+	ParticleManager:SetParticleControl(particle, 0, destination)
+	ParticleManager:SetParticleControlForward(particle, 0, direction)
+	ability.xhs_cinder_destination_particle = particle
+	ability.xhs_cinder_destination = destination
+	Timers:CreateTimer(math.max(0.5, ability:GetCastPoint() + 1), function()
+		if ability.xhs_cinder_destination_particle == particle then
+			DestroyCinderStepDestination(ability, true)
+		end
+		return nil
+	end)
 end
 
 local function GetPalmLine(ability)
@@ -773,19 +806,26 @@ function xhs_spirit_fire_cinder_step:OnAbilityPhaseStart()
 	if not IsServer() then return true end
 	local caster = self:GetCaster()
 	local direction = NormalizeDirection((GetContext(self).position or caster:GetAbsOrigin()) - caster:GetAbsOrigin())
+	local destination = GetCinderStepDestination(self, caster, direction)
 	StartBossCastBar(self, "Cinder Step")
 	for _, lineDirection in ipairs(GetRoundLineDirections(self, direction)) do
 		XHSBossTelegraphs:Line(caster:GetAbsOrigin(), lineDirection, self:GetSpecialValueFor("spacing"), self:GetSpecialValueFor("radius"), self:GetSpecialValueFor("nodes"), self:GetCastPoint(), COLORS.fire, 100)
 	end
+	CreateCinderStepDestination(self, caster, destination, direction)
 	caster:EmitSound("Hero_EmberSpirit.FireRemnant.Activate")
 	return true
 end
 
-function xhs_spirit_fire_cinder_step:OnAbilityPhaseInterrupted() if IsServer() then HideBossCastBar(self) end end
+function xhs_spirit_fire_cinder_step:OnAbilityPhaseInterrupted()
+	if not IsServer() then return end
+	DestroyCinderStepDestination(self, true)
+	HideBossCastBar(self)
+end
 function xhs_spirit_fire_cinder_step:OnSpellStart()
 	if not IsServer() then return end
 	local caster = self:GetCaster()
 	local direction = NormalizeDirection((GetContext(self).position or caster:GetAbsOrigin()) - caster:GetAbsOrigin())
+	local destination = self.xhs_cinder_destination or GetCinderStepDestination(self, caster, direction)
 	for _, lineDirection in ipairs(GetRoundLineDirections(self, direction)) do
 		for i = 1, self:GetSpecialValueFor("nodes") do
 			local pos = caster:GetAbsOrigin() + lineDirection * (100 + self:GetSpecialValueFor("spacing") * (i - 1))
@@ -796,7 +836,8 @@ function xhs_spirit_fire_cinder_step:OnSpellStart()
 			EmitSoundOnLocationWithCaster(pos, "Hero_EmberSpirit.FireRemnant.Explode", caster)
 		end
 	end
-	MoveSpiritWithinArena(caster, caster:GetAbsOrigin() + direction * self:GetSpecialValueFor("dash_distance"))
+	MoveSpiritWithinArena(caster, destination)
+	DestroyCinderStepDestination(self, false)
 	ClearContext(self)
 end
 

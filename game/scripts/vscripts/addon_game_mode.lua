@@ -1,13 +1,14 @@
 local XHS_BOOT_NATIVE_PRINT = _G.XHSBootstrapNativePrint or print
 _G.XHSBootstrapNativePrint = XHS_BOOT_NATIVE_PRINT
 _G.XHSBootstrapLogBuffer = _G.XHSBootstrapLogBuffer or {}
-_G.XHSDiagnosticBuild = "runtime-errors-20260809"
+_G.XHSDiagnosticBuild = "farm-exit-diagnostics-20260811-1"
 _G.XHSBootstrapSequence = _G.XHSBootstrapSequence or 0
 
 local function XHSBootstrapTraceback(err)
 	local message = tostring(err or "Unknown bootstrap error")
 	if debug ~= nil and debug.traceback ~= nil then
-		return debug.traceback(message, 2)
+		local ok, trace = pcall(debug.traceback, message, 2)
+		if ok and trace ~= nil then return tostring(trace) end
 	end
 	return message
 end
@@ -275,6 +276,10 @@ local function XHSPrecacheImpl(context)
 	-- normal 30-second staging job, so its unit must already be resident.
 	XHSPrecache:PrecacheUnitSync("npc_dota_creature_chaos_knight_event_6", context)
 	XHSPrecache:PrecacheUnitSync("npc_dota_creature_clockwerk_event_8", context)
+	-- This custom creature equips the full Seismic Berserker set through
+	-- AttachWearables. Dedicated servers need its unit definition resident
+	-- synchronously or individual econ pieces can spawn missing/as ERROR models.
+	XHSPrecache:PrecacheUnitSync("npc_magnataur_destroyer_crypt", context)
 
 	XHSPrecache:PrecacheUnit("npc_dota_hero_grom_hellscream", nil, -1)
 	XHSPrecache:PrecacheUnit("npc_dota_hero_illidan", nil, -1)

@@ -235,13 +235,22 @@ local PROFILE_BY_HERO = {
 		item_affinities = ITEM_AFFINITIES.npc_dota_hero_sven,
 		skill_build = {
 			"holdout_avatar",
-			"xhs_mountain_king_bash",
+			"xhs_mountain_king_bulwark",
 			"holdout_muradin_hammer",
 			"holdout_storm_bolt",
 			"holdout_thunder_clap",
 			"holdout_thunder_spirit",
 		},
 		abilities = {
+			xhs_mountain_king_bulwark = {
+				mode = "self_buff",
+				priority = 84,
+				require_combat = true,
+				radius = 500,
+				minimum_targets = 3,
+				cast_on_boss = true,
+				active_modifier = "modifier_xhs_dwarven_bulwark",
+			},
 			holdout_storm_bolt = { mode = "enemy_unit", priority = 82, control = true, optional = true },
 			holdout_storm_bolt_20 = { mode = "enemy_unit", priority = 85, control = true, optional = true },
 			holdout_thunder_clap = { mode = "no_target_enemy", priority = 76, radius = 400, minimum_targets = 2, optional = true },
@@ -603,6 +612,14 @@ local PROFILE_BY_HERO = {
 		retreat_health = 0.25,
 		target_priority = { "caster", "boss", "nearest" },
 		item_affinities = ITEM_AFFINITIES.npc_dota_hero_phantom_assassin,
+		-- Warden already owns a permanent 40% innate cleave. The complete Fire
+		-- orb chain, including Searing Blade, duplicates that farming role.
+		item_family_limits = { fire = 0 },
+		redundant_items = {
+			item_orb_of_fire = true,
+			item_orb_of_fire2 = true,
+			item_searing_blade = true,
+		},
 		skill_build = {
 			"holdout_vengeance",
 			"holdout_gust_pool",

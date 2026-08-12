@@ -259,6 +259,11 @@ end
 
 function modifier_xhs_grom_phase3_ai:OnDestroy()
 	if not IsServer() then return end
+	local boss = self:GetParent()
+	if boss ~= nil and IsValidEntity(boss) and not boss:IsNull() then
+		boss.xhs_grom_mirror_image = nil
+		boss.xhs_grom_mirror_trial_token = nil
+	end
 	self:CleanupClones()
 end
 
@@ -536,6 +541,9 @@ function modifier_xhs_grom_phase3_ai:BeginMirrorTrial(ability)
 	local radius = ability:GetSpecialValueFor("spawn_radius")
 	local totalImages = cloneCount + 1
 	local realIndex = RandomInt(1, totalImages)
+	self.mirror_trial_token = DoUniqueString("xhs_grom_mirror")
+	boss.xhs_grom_mirror_image = true
+	boss.xhs_grom_mirror_trial_token = self.mirror_trial_token
 	local center = boss:GetAbsOrigin()
 	local positions = {}
 
@@ -558,6 +566,8 @@ function modifier_xhs_grom_phase3_ai:BeginMirrorTrial(ability)
 			if i ~= realIndex then
 				local clone = CreateUnitByName("npc_dota_hero_grom_hellscream_clone", positions[i], true, boss, boss, boss:GetTeamNumber())
 				if clone ~= nil then
+					clone.xhs_grom_mirror_image = true
+					clone.xhs_grom_mirror_trial_token = self.mirror_trial_token
 					clone.zone = boss.zone or "xhs_holdout"
 					clone:SetAngles(0, RandomFloat(0, 360), 0)
 					clone:SetRenderColor(255, 255, 255)
@@ -587,6 +597,9 @@ function modifier_xhs_grom_phase3_ai:EndMirrorTrial(foundReal)
 	self.state = "recovery"
 	self.recover_until = GameRules:GetGameTime() + XHSPhase3BossAI:ScaleDelay(foundReal == true and 0.75 or 1.5)
 	boss:RemoveModifierByName("modifier_invulnerable")
+	boss.xhs_grom_mirror_image = nil
+	boss.xhs_grom_mirror_trial_token = nil
+	self.mirror_trial_token = nil
 	boss:SetRenderColor(255, 255, 255)
 	self:CleanupClones()
 

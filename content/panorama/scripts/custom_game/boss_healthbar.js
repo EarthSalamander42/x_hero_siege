@@ -1058,9 +1058,15 @@ function UpdateBossTimer(args) {
 	var remaining = Math.max(0, Number(args.remaining) || 0);
 	var duration = Math.max(1, Number(args.duration) || 1);
 	var ratio = Math.max(0, Math.min(1, remaining / duration));
+	var timerText = FormatBossTimerSeconds(remaining);
+	var count = Number(args.count);
+	var total = Number(args.total);
+	if (isFinite(count) && isFinite(total) && total > 0) {
+		timerText += "  ·  " + Math.max(0, Math.floor(count)) + "/" + Math.max(1, Math.floor(total));
+	}
 
 	panels.timerLabel.text = args.label || "Timer";
-	panels.timerValue.text = FormatBossTimerSeconds(remaining);
+	panels.timerValue.text = timerText;
 	panels.timerFill.style.width = FormatBossRatio(ratio);
 	panels.container.AddClass("HasBossTimer");
 	panels.container.SetHasClass("BossTimerStyleMagtheridon", args.style === "magtheridon");

@@ -3,7 +3,7 @@
 @define RARE_COLOR: #4b69ff;
 @define MYTHICAL_COLOR: #8847ff;
 @define LEGENDARY_COLOR: #d32ce6;
-@define IMMORTAL_COLOR: #b28a33;
+@define IMMORTAL_COLOR: #e4ae39;
 @define ARCANA_COLOR: #ade55c;
 @define ANCIENT_COLOR: #eb4b4b;
 
@@ -86,6 +86,21 @@
 	0% { transform: translateY( -3px ) scale3d( 1, 1, 1 ); brightness: 1; }
 	50% { transform: translateY( 4px ) scale3d( 1.035, 1.035, 1 ); brightness: 1.28; }
 	100% { transform: translateY( -3px ) scale3d( 1, 1, 1 ); brightness: 1; }
+}
+
+@keyframes 'xhs_reward_fragment_fly'
+{
+	0% { opacity: 0; transform: translateY( -148px ) scale3d( 0.72, 0.72, 1 ); brightness: 1; }
+	18% { opacity: 1; transform: translateY( -122px ) scale3d( 1.16, 1.16, 1 ); brightness: 2.2; }
+	78% { opacity: 1; transform: translateY( -18px ) scale3d( 0.96, 0.96, 1 ); brightness: 1.5; }
+	100% { opacity: 0; transform: translateY( 0px ) scale3d( 0.72, 0.72, 1 ); brightness: 2.4; }
+}
+
+@keyframes 'xhs_reward_fragment_balance_pulse'
+{
+	0% { brightness: 1; transform: scale3d( 1, 1, 1 ); }
+	45% { brightness: 2.2; transform: scale3d( 1.14, 1.14, 1 ); }
+	100% { brightness: 1; transform: scale3d( 1, 1, 1 ); }
 }
 
 @keyframes 'xhs_end_result_glow'
@@ -1799,13 +1814,14 @@
 	text-shadow: 0px 0px 8px 2 #64cfff55;
 }
 
-.XHSXPRewardEndpoint.HasReward.RewardRarity-uncommon:hover .XHSXPRewardImageFrame { border-color: #62c98b; box-shadow: fill #46c87a55 0px 0px 17px 0px; }
-.XHSXPRewardEndpoint.HasReward.RewardRarity-rare:hover .XHSXPRewardImageFrame { border-color: #58bdf1; box-shadow: fill #39aee755 0px 0px 17px 0px; }
-.XHSXPRewardEndpoint.HasReward.RewardRarity-mythical:hover .XHSXPRewardImageFrame { border-color: #b276ef; box-shadow: fill #9b55e855 0px 0px 19px 0px; }
-.XHSXPRewardEndpoint.HasReward.RewardRarity-legendary:hover .XHSXPRewardImageFrame { border-color: #e5bd55; box-shadow: fill #d8a93366 0px 0px 20px 0px; }
-.XHSXPRewardEndpoint.HasReward.RewardRarity-immortal:hover .XHSXPRewardImageFrame { border-color: #f29948; box-shadow: fill #ed762f66 0px 0px 21px 0px; }
-.XHSXPRewardEndpoint.HasReward.RewardRarity-arcana:hover .XHSXPRewardImageFrame { border-color: #7de3b2; box-shadow: fill #51d8aa66 0px 0px 22px 0px; }
-.XHSXPRewardEndpoint.HasReward.RewardRarity-ancient:hover .XHSXPRewardImageFrame { border-color: #ec6969; box-shadow: fill #e0445f66 0px 0px 22px 0px; }
+.XHSXPRewardEndpoint.HasReward.RewardRarity-common:hover .XHSXPRewardImageFrame { border-color: #d6e4f2; box-shadow: fill #b0c3d955 0px 0px 17px 0px; }
+.XHSXPRewardEndpoint.HasReward.RewardRarity-uncommon:hover .XHSXPRewardImageFrame { border-color: #82b5ee; box-shadow: fill #5e98d955 0px 0px 17px 0px; }
+.XHSXPRewardEndpoint.HasReward.RewardRarity-rare:hover .XHSXPRewardImageFrame { border-color: #7189ff; box-shadow: fill #4b69ff55 0px 0px 17px 0px; }
+.XHSXPRewardEndpoint.HasReward.RewardRarity-mythical:hover .XHSXPRewardImageFrame { border-color: #ac7aff; box-shadow: fill #8847ff55 0px 0px 19px 0px; }
+.XHSXPRewardEndpoint.HasReward.RewardRarity-legendary:hover .XHSXPRewardImageFrame { border-color: #ef72f5; box-shadow: fill #d32ce666 0px 0px 20px 0px; }
+.XHSXPRewardEndpoint.HasReward.RewardRarity-immortal:hover .XHSXPRewardImageFrame { border-color: #f3c85c; box-shadow: fill #e4ae3966 0px 0px 21px 0px; }
+.XHSXPRewardEndpoint.HasReward.RewardRarity-arcana:hover .XHSXPRewardImageFrame { border-color: #ccff7d; box-shadow: fill #ade55c66 0px 0px 22px 0px; }
+.XHSXPRewardEndpoint.HasReward.RewardRarity-ancient:hover .XHSXPRewardImageFrame { border-color: #ff7272; box-shadow: fill #eb4b4b66 0px 0px 22px 0px; }
 
 .XHSXPRewardEndpoint.Previous .XHSXPRewardImageFrame {
 	saturation: 1;
@@ -2353,6 +2369,10 @@
 	transition-duration: 0.18s;
 }
 
+.XHSEndScreenRewardPanel.IsFragmentReward {
+	min-height: 680px;
+}
+
 .XHSEndScreenRewardPanel.RevealTier1 {
 	animation-name: xhs_reward_mythical_reveal;
 	animation-duration: 0.55s;
@@ -2628,6 +2648,66 @@
 .XHSRewardRarity.immortal { color: IMMORTAL_COLOR; }
 .XHSRewardRarity.arcana { color: ARCANA_COLOR; }
 .XHSRewardRarity.ancient { color: ANCIENT_COLOR; }
+
+.XHSRewardFragmentCounter {
+	width: 100%;
+	height: 60px;
+	margin-top: 10px;
+	padding: 7px 12px;
+	flow-children: right;
+	vertical-align: center;
+	overflow: noclip;
+	background-color: gradient( linear, 0% 0%, 100% 0%, from( #150f25ee ), to( #24133fee ) );
+	border: 1px solid #9e67e966;
+	box-shadow: fill #7d3bc733 0px 0px 12px 0px;
+}
+
+.XHSRewardFragmentCaption {
+	width: fill-parent-flow( 1 );
+	vertical-align: center;
+	color: #c9a8ff;
+	font-size: 13px;
+	font-weight: bold;
+	letter-spacing: 1px;
+}
+
+.XHSRewardFragmentBalance {
+	width: 108px;
+	vertical-align: center;
+	text-align: right;
+	color: #f1dcff;
+	font-size: 27px;
+	font-weight: bold;
+	text-shadow: 0px 0px 8px 2 #b56cff88;
+}
+
+.XHSRewardFragmentBalance.HasIncreased {
+	animation-name: xhs_reward_fragment_balance_pulse;
+	animation-duration: 0.62s;
+	animation-iteration-count: 1;
+}
+
+.XHSRewardFragmentGain {
+	width: 68px;
+	vertical-align: center;
+	text-align: right;
+	opacity: 0;
+	color: #f4cfff;
+	font-size: 22px;
+	font-weight: bold;
+	text-shadow: 0px 0px 10px 3 #bf70ffff;
+}
+
+.XHSRewardFragmentGain.IsFlying {
+	animation-name: xhs_reward_fragment_fly;
+	animation-duration: 0.92s;
+	animation-iteration-count: 1;
+	animation-fill-mode: forwards;
+}
+
+.IsFragmentReward .XHSRewardButton {
+	margin-top: 12px;
+}
 
 .XHSRewardButton {
 	width: 100%;

@@ -1,4 +1,6 @@
 function avatar_grown_model(keys)
+    keys.caster:EmitSound("Hero_Sven.GodsStrength")
+
     local final_model_scale = (keys.PercentageOverModelScale / 100) + 1  --This will be something like 1.3.
     local model_scale_increase_per_interval = 100 / (final_model_scale - 1)
 

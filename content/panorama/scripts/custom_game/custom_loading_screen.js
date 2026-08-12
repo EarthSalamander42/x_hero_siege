@@ -28,6 +28,7 @@ var selected_profile_player_id = -1;
 var xhs_bot_setup_initialized = false;
 var xhs_bot_setup_config = null;
 var xhs_bot_setup_roster = { count: 0, players: {} };
+var xhs_bot_setup_spectator_access = { allowed: 0 };
 var xhs_bot_setup_draft = {
 	bot_count: 0,
 	ai_difficulty: "normal",
@@ -225,7 +226,7 @@ var vote_fallbacks = {
 	loading_screen_bot_setup_controller_only: "Only the first human player can edit AI allies.",
 	loading_screen_bot_setup_locked: "AI setup is locked for this launch.",
 	loading_screen_bot_setup_pending: "Applying configuration...",
-	loading_screen_bot_setup_summary: "{count} allied bot(s) / {difficulty}",
+	loading_screen_bot_setup_summary: "{count} allied bot(s) / {difficulty} / {composition}",
 	loading_screen_bot_setup_server_status: "Server: {status}",
 	loading_screen_ai_allies_section: "AI Allies",
 	loading_screen_ai_ally_status: "AI ALLY / {difficulty}",
@@ -388,6 +389,21 @@ function L(token) {
 	return LocalizeWithFallback(token);
 }
 
+function ApplyLoadingScreenStaticLocalization() {
+	var labels = {
+		VoteCategoryTabGameModeLabel: "loading_screen_vote_tab_game_mode",
+		VoteCategoryTabAIAlliesLabel: "vote_ai_allies",
+		VoteProgressAIAlliesTitle: "vote_ai_allies",
+		VoteSelectionAIAlliesKey: "vote_ai_allies",
+	};
+	for (var panel_id in labels) {
+		var panel = $("#" + panel_id);
+		if (panel) {
+			panel.text = L(labels[panel_id]);
+		}
+	}
+}
+
 function LocalizeTemplate(token, values) {
 	var localized = L(token);
 
@@ -413,6 +429,24 @@ function XHSBotSetupHasUnanimousApproval() {
 		!!xhs_bot_setup_config &&
 		IsTruthy(xhs_bot_setup_config.vote_approved) &&
 		IsTruthy(xhs_bot_setup_config.available);
+}
+
+function XHSBotSetupHasSpectatorAccess() {
+	var tools_mode = typeof Game !== "undefined" &&
+		typeof Game.IsInToolsMode === "function" &&
+		Game.IsInToolsMode();
+	var local_player_id = GetLocalPlayerIDSafe();
+	if (!tools_mode && local_player_id >= 0 &&
+		typeof CustomNetTables !== "undefined" && CustomNetTables) {
+		var current_access = CustomNetTables.GetTableValue(
+			"xhs_bots",
+			"spectator_access_" + local_player_id
+		);
+		if (current_access) {
+			xhs_bot_setup_spectator_access = current_access;
+		}
+	}
+	return tools_mode || IsTruthy(xhs_bot_setup_spectator_access.allowed);
 }
 
 function XHSBotSetupSafeJSON(value) {
@@ -939,6 +973,9 @@ function XHSBotSetupSelectSpectatorMode(enabled) {
 		return;
 	}
 	enabled = !!enabled;
+	if (enabled && !XHSBotSetupHasSpectatorAccess()) {
+		return;
+	}
 	if (xhs_bot_setup_draft.spectator_mode === enabled) {
 		return;
 	}
@@ -1212,10 +1249,8 @@ function XHSBotSetupRender(reason) {
 	xhs_bot_setup_ui.card.SetHasClass("IsReadOnly", available && !controller);
 	xhs_bot_setup_ui.card.SetHasClass("IsLocked", locked);
 	xhs_bot_setup_ui.card.SetHasClass("IsPending", xhs_bot_setup_pending);
-	var tools_mode = typeof Game !== "undefined" &&
-		typeof Game.IsInToolsMode === "function" &&
-		Game.IsInToolsMode();
-	xhs_bot_setup_ui.spectator_row.style.visibility = tools_mode ? "visible" : "collapse";
+	var spectator_access = XHSBotSetupHasSpectatorAccess();
+	xhs_bot_setup_ui.spectator_row.style.visibility = spectator_access ? "visible" : "collapse";
 
 	xhs_bot_setup_ui.count_value.text = count + " / " + maximum;
 	var human_count = Math.max(1, Math.floor(ToNumber(
@@ -1241,16 +1276,21 @@ function XHSBotSetupRender(reason) {
 	}
 	xhs_bot_setup_ui.spectator.off.SetHasClass("Selected", !xhs_bot_setup_draft.spectator_mode);
 	xhs_bot_setup_ui.spectator.on.SetHasClass("Selected", !!xhs_bot_setup_draft.spectator_mode);
-	XHSBotSetupSetButtonEnabled(xhs_bot_setup_ui.spectator.off, can_edit);
-	XHSBotSetupSetButtonEnabled(xhs_bot_setup_ui.spectator.on, can_edit);
+	XHSBotSetupSetButtonEnabled(xhs_bot_setup_ui.spectator.off, can_edit && spectator_access);
+	XHSBotSetupSetButtonEnabled(xhs_bot_setup_ui.spectator.on, can_edit && spectator_access);
 	xhs_bot_setup_ui.spectator_note.style.visibility = xhs_bot_setup_draft.spectator_mode
 		? "visible"
 		: "collapse";
 
 	var difficulty_text = L("loading_screen_bot_setup_" + xhs_bot_setup_draft.ai_difficulty);
+	var composition = String(
+		(xhs_bot_setup_config && xhs_bot_setup_config.composition) || "random"
+	).toLowerCase();
+	var composition_text = L("loading_screen_bot_setup_" + composition);
 	xhs_bot_setup_ui.summary.text = LocalizeTemplate("loading_screen_bot_setup_summary", {
 		count: count.toString(),
 		difficulty: difficulty_text,
+		composition: composition_text,
 	});
 
 	if (xhs_bot_setup_pending) {
@@ -1340,6 +1380,11 @@ function XHSBotSetupOnNetTableChanged(table_name, key, data) {
 		XHSBotSetupSyncCard("nettable_roster");
 		return;
 	}
+	if (key === "spectator_access_" + GetLocalPlayerIDSafe()) {
+		xhs_bot_setup_spectator_access = data || { allowed: 0 };
+		XHSBotSetupSyncCard("nettable_spectator_access");
+		return;
+	}
 	XHSBotSetupLog("nettable_change_ignored", {
 		key: String(key || ""),
 		reason: "unhandled_key",
@@ -1383,6 +1428,14 @@ function MaybeInitializeXHSBotSetup() {
 		});
 		if (initial_roster) {
 			xhs_bot_setup_roster = initial_roster;
+		}
+
+		var initial_spectator_access = CustomNetTables.GetTableValue(
+			"xhs_bots",
+			"spectator_access_" + GetLocalPlayerIDSafe()
+		);
+		if (initial_spectator_access) {
+			xhs_bot_setup_spectator_access = initial_spectator_access;
 		}
 	} else {
 		XHSBotSetupLog("nettable_unavailable", {});
@@ -5896,6 +5949,7 @@ function DisableRankingVoting() {
 }
 
 (function () {
+	ApplyLoadingScreenStaticLocalization();
 	var vote_title = $.GetContextPanel().FindChildrenWithClassTraverse("vote-title");
 
 	if (vote_title && vote_title[0]) {

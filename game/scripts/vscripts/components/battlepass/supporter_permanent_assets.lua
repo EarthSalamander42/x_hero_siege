@@ -8,15 +8,102 @@
 local Manifest = {
 	SCHEMA_VERSION = 1,
 	ITEMS = {
-		-- Keep empty until a reviewed permanent catalog item is approved for a
-		-- game release. Expected shape:
-		-- ["permanent_item_id"] = {
-		-- 	approved = true,
-		-- 	published = true,
-		-- 	slot_id = "teleport",
-		-- 	asset_path = "particles/.../start.vpcf",
-		-- 	effect_paths = { ["end"] = "particles/.../end.vpcf" },
-		-- },
+		-- Rebirth audit batch 2026-08-11. These entries are deliberately staged
+		-- but disabled until their VPCFs have been reviewed in Content Studio on
+		-- x_hero_siege_demo. Once a candidate is approved and published in the
+		-- permanent catalog, flip both flags for the matching stable item ID.
+		["sp40_shop_rebirth_icewrack"] = {
+			approved = false,
+			published = false,
+			slot_id = "rebirth",
+			asset_path = "particles/econ/items/crystal_maiden/crystal_maiden_maiden_of_icewrack/cm_arcana_pup_spawn.vpcf",
+		},
+		["sp40_shop_rebirth_seismic_apotheosis"] = {
+			approved = false,
+			published = false,
+			slot_id = "rebirth",
+			asset_path = "particles/econ/items/earthshaker/earthshaker_arcana/earthshaker_arcana_spawn_v2.vpcf",
+		},
+		["sp40_shop_rebirth_phantom_legacy"] = {
+			approved = false,
+			published = false,
+			slot_id = "rebirth",
+			asset_path = "particles/econ/items/phantom_lancer/phantom_lancer_fall20_immortal/phantom_lancer_fall20_immortal_spawn.vpcf",
+		},
+		["sp40_shop_rebirth_haunting_rift_style2"] = {
+			approved = false,
+			published = false,
+			slot_id = "rebirth",
+			asset_path = "particles/econ/items/spectre/spectre_arcana/spectre_arcana_loadout_spawn_v2.vpcf",
+		},
+		["sp40_shop_rebirth_watchers_arrival"] = {
+			approved = false,
+			published = false,
+			slot_id = "rebirth",
+			asset_path = "particles/items2_fx/ward_spawn_generic.vpcf",
+		},
+		["sp40_shop_rebirth_stonefall"] = {
+			approved = false,
+			published = false,
+			slot_id = "rebirth",
+			asset_path = "particles/neutral_fx/roshan_spawn.vpcf",
+		},
+		["sp40_shop_rebirth_divine_descent"] = {
+			approved = false,
+			published = false,
+			slot_id = "rebirth",
+			asset_path = "particles/ui/ui_game_start_hero_spawn.vpcf",
+		},
+		["sp40_shop_rebirth_mistborne"] = {
+			approved = false,
+			published = false,
+			slot_id = "rebirth",
+			asset_path = "particles/units/heroes/hero_abaddon/abaddon_spawn.vpcf",
+		},
+		["sp40_shop_rebirth_exorcists_return"] = {
+			approved = false,
+			published = false,
+			slot_id = "rebirth",
+			asset_path = "particles/units/heroes/hero_death_prophet/death_prophet_spawn.vpcf",
+		},
+		["sp40_shop_rebirth_chronal_aperture"] = {
+			approved = false,
+			published = false,
+			slot_id = "rebirth",
+			asset_path = "particles/units/heroes/hero_faceless_void/faceless_void_spawn.vpcf",
+		},
+		["sp40_shop_rebirth_young_magus_debut"] = {
+			approved = false,
+			published = false,
+			slot_id = "rebirth",
+			asset_path = "particles/units/heroes/hero_invoker_kid/invoker_kid_debut_spawn.vpcf",
+		},
+		["sp40_shop_rebirth_phantom_arrival"] = {
+			approved = false,
+			published = false,
+			slot_id = "rebirth",
+			asset_path = "particles/units/heroes/hero_phantom_lancer/phantom_lancer_spawn.vpcf",
+		},
+		["sp40_shop_rebirth_winterwake"] = {
+			approved = false,
+			published = false,
+			slot_id = "rebirth",
+			asset_path = "particles/units/heroes/hero_winter_wyvern/wyvern_spawn.vpcf",
+		},
+		["sp40_shop_rebirth_faceless_void"] = {
+			approved = true,
+			published = true,
+			slot_id = "rebirth",
+			asset_path = "particles/econ/items/faceless_void/faceless_void_arcana/faceless_void_arcana_game_spawn.vpcf",
+		},
+		-- Keep the published item ID stable so existing owners retain access.
+		-- Only its unusable Drow model-dependent runtime is replaced.
+		["sp40_shop_rebirth_drow"] = {
+			approved = true,
+			published = true,
+			slot_id = "rebirth",
+			asset_path = "models/heroes/muerta/debut/particles/revenant/muerta_debut_revenant_spawn_portal.vpcf",
+		},
 	},
 }
 
@@ -43,8 +130,10 @@ local function IsPublishedEntry(entry)
 end
 
 local function IsParticlePath(value)
-	return type(value) == "string"
-		and string.match(string.lower(value), "^particles/.+%.vpcf$") ~= nil
+	if type(value) ~= "string" then return false end
+	local normalized = string.lower(value)
+	return string.match(normalized, "^particles/.+%.vpcf$") ~= nil
+		or normalized == "models/heroes/muerta/debut/particles/revenant/muerta_debut_revenant_spawn_portal.vpcf"
 end
 
 local function CopyTable(source)

@@ -354,6 +354,11 @@ function XHSBotEncounterDirector:Build(playerID, hero, record, assignment)
 	elseif IsValidCombatUnit(vanguardTarget) then
 		return {
 			id = "phase_3_vanguard",
+			-- From the vanguard onward there is no lane/base fallback left to
+			-- preserve. Bots may dodge and take short combat-spacing steps, but
+			-- they must not enter the generic safety-retreat state.
+			no_retreat = true,
+			force_combat = true,
 			shopping_locked = true,
 			anchor = self:GetPhase3VanguardAnchor(playerID, hero),
 			forced_target = vanguardTarget,
@@ -379,6 +384,11 @@ function XHSBotEncounterDirector:Build(playerID, hero, record, assignment)
 		return {
 			id = "phase_3",
 			no_combat = nonCombatObjective,
+			-- Phase 3/4 bosses are committed encounters. A living bot can kite,
+			-- heal and evade telegraphs, but fleeing to an unrelated safe point
+			-- only strands it outside the fight.
+			no_retreat = not nonCombatObjective,
+			force_combat = not nonCombatObjective,
 			shopping_locked = not nonCombatObjective,
 			anchor = assignment and CopyPosition(assignment.anchor) or hero:GetAbsOrigin(),
 			forced_target = not nonCombatObjective and not gromMirrorTrial

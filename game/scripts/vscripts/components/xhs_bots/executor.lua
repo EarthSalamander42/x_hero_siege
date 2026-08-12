@@ -145,6 +145,25 @@ function XHSBotExecutor:CanIssueUrgent(record, signature)
 	return true
 end
 
+-- IMMEDIATE consumables are an overlay on the current decision, not the
+-- hero's tactical order for this think. They deliberately stay outside the
+-- shared order window so the following attack or spell is not throttled.
+function XHSBotExecutor:CanIssueInstantOverlay(record, signature)
+	if type(record) ~= "table" then return false end
+	local now = GameTime()
+	return record.last_instant_overlay_signature ~= signature
+		or now - (record.last_instant_overlay_at or 0) >= 0.12
+end
+
+function XHSBotExecutor:RecordInstantOverlay(record, signature, label)
+	local now = GameTime()
+	record.last_instant_overlay_signature = signature
+	record.last_instant_overlay_at = now
+	record.last_instant_overlay = label
+	record.instant_overlay_orders = (record.instant_overlay_orders or 0) + 1
+	record.last_rejected_action = nil
+end
+
 function XHSBotExecutor:AttackMove(hero, position, record, label, jitter)
 	if not IsValidEntityHandle(hero) or position == nil then
 		return self:Reject(record, "invalid attack-move target")
@@ -264,6 +283,23 @@ function XHSBotExecutor:Toggle(hero, ability, desiredState, record, allowPerAtta
 	ability:ToggleAbility()
 	self:Record(record, signature, signature, 0.2)
 	record.last_ability = ability:GetAbilityName()
+	return true
+end
+
+function XHSBotExecutor:ReviveAlly(hero, tombstone, record)
+	if not IsValidEntityHandle(hero) or not IsValidEntityHandle(tombstone)
+		or XHSUnitTombstone == nil
+		or XHSUnitTombstone.BeginInteraction == nil then
+		return self:Reject(record, "invalid tombstone revive")
+	end
+	local signature = "revive_ally:" .. tostring(tombstone:entindex())
+	if not self:CanIssue(record, signature, 0.75) then return false end
+	if not XHSUnitTombstone:BeginInteraction(hero, tombstone) then
+		return self:Reject(record, "tombstone interaction rejected")
+	end
+	self:Record(record, signature, "revive allied hero", 0.75)
+	record.revive_target_entindex = tombstone:entindex()
+	record.revive_attempts = (tonumber(record.revive_attempts) or 0) + 1
 	return true
 end
 
@@ -423,8 +459,11 @@ function XHSBotExecutor:Cast(hero, abilityAction, record, jitter)
 		order.OrderType = DOTA_UNIT_ORDER_CAST_NO_TARGET
 	end
 
+	local instantOverlay = abilityAction.instant_overlay == true
 	local canIssue = nil
-	if abilityAction.urgent == true then
+	if instantOverlay then
+		canIssue = self:CanIssueInstantOverlay(record, signature)
+	elseif abilityAction.urgent == true then
 		canIssue = self:CanIssueUrgent(record, signature)
 	else
 		canIssue = self:CanIssue(record, signature, 0.75)
@@ -443,12 +482,16 @@ function XHSBotExecutor:Cast(hero, abilityAction, record, jitter)
 		if ok then channelTime = math.max(0, tonumber(value) or 0) end
 	end
 	ExecuteOrderFromTable(order)
-	self:Record(
-		record,
-		signature,
-		"cast " .. abilityName,
-		math.max(0.2, castPoint + channelTime + 0.05)
-	)
+	if instantOverlay then
+		self:RecordInstantOverlay(record, signature, "cast " .. abilityName)
+	else
+		self:Record(
+			record,
+			signature,
+			"cast " .. abilityName,
+			math.max(0.2, castPoint + channelTime + 0.05)
+		)
+	end
 	record.last_ability = abilityName
 	record.last_ability_reason = abilityAction.reason
 	record.casts_issued = (record.casts_issued or 0) + 1
@@ -519,6 +562,8 @@ function XHSBotExecutor:Execute(hero, action, record, difficulty)
 		return issued
 	elseif action.id == "pickup_loot" then
 		return self:PickupItem(hero, action.data.target, record)
+	elseif action.id == "revive_ally" then
+		return self:ReviveAlly(hero, action.data.target, record)
 	elseif action.id == "cast_ability" then
 		return self:Cast(hero, action.data, record, jitter * 0.35)
 	elseif action.id == "hold" then

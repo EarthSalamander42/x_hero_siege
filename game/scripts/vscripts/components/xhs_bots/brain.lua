@@ -83,8 +83,10 @@ local BOT_QUERY_BUCKET_PADDING = 500
 local BOT_QUERY_RADIUS_STEP = 250
 local BOT_ENEMY_QUERY_CACHE_TTL = 0.18
 local BOT_QUERY_CACHE_PRUNE_INTERVAL = 2.0
-local GROM_MIRROR_REAL_NAME = "npc_dota_hero_grom_hellscream"
-local GROM_MIRROR_CLONE_NAME = "npc_dota_hero_grom_hellscream_clone"
+local TOMBSTONE_UNIT_NAME = "npc_xhs_hero_tombstone"
+local REVIVE_SEARCH_RADIUS = 1800
+local REVIVE_RETRY_FAILURES = 2
+local REVIVE_RETRY_COOLDOWN = 10
 
 local DEFENSIVE_STRUCTURE_NAMES = {
 	npc_dota_defender_fort = true,
@@ -467,11 +469,12 @@ function XHSBotBrain:SelectGromMirrorTarget(
 )
 	local candidates = {}
 	local candidateByIndex = {}
-	local cloneVisible = false
+	local trialToken = nil
 	for _, enemy in pairs(visibleEnemies or {}) do
-		local name = IsValidEntityHandle(enemy) and enemy:GetUnitName() or ""
-		if name == GROM_MIRROR_CLONE_NAME then cloneVisible = true end
-		if (name == GROM_MIRROR_REAL_NAME or name == GROM_MIRROR_CLONE_NAME)
+		local imageToken = IsValidEntityHandle(enemy)
+			and enemy.xhs_grom_mirror_image == true
+			and tostring(enemy.xhs_grom_mirror_trial_token or "") or ""
+		if imageToken ~= ""
 			and self:IsCombatTarget(enemy)
 			and self:IsTeamVisible(hero, enemy)
 			and self:IsTargetAllowedByAssignment(
@@ -481,28 +484,23 @@ function XHSBotBrain:SelectGromMirrorTarget(
 				assignment,
 				difficulty
 			) then
-			table.insert(candidates, enemy)
-			candidateByIndex[enemy:entindex()] = enemy
+			trialToken = trialToken or imageToken
+			if imageToken == trialToken then
+				table.insert(candidates, enemy)
+				candidateByIndex[enemy:entindex()] = enemy
+			end
 		end
 	end
 
-	if not cloneVisible then
+	if trialToken == nil then
 		record.grom_mirror_signature = nil
+		record.grom_mirror_trial_token = nil
 		record.grom_mirror_target_entindex = nil
 		return nil, false
 	end
-	local assignedBoss = assignment ~= nil
-		and EntityFromIndex(assignment.target_entindex) or nil
-	if IsValidEntityHandle(assignedBoss)
-		and assignedBoss:GetUnitName() == GROM_MIRROR_REAL_NAME
-		and assignedBoss:IsAlive()
-		and assignedBoss:IsInvulnerable() then
-		-- The clones appear a fraction before the real image loses its split
-		-- invulnerability. Wait for the complete choice set instead of making the
-		-- first selection from a list that can only contain fakes.
-		return nil, true
-	end
-	if #candidates <= 0 then return nil, true end
+	-- The real image receives the opaque trial marker before the split timer
+	-- creates its peers. Never lock a choice from that one-image setup frame.
+	if #candidates <= 1 then return nil, true end
 
 	-- Entindexes identify the real unit on the server, so they may only provide
 	-- stable ordering/state here. The actual choice is uniform across every
@@ -514,17 +512,89 @@ function XHSBotBrain:SelectGromMirrorTarget(
 	for _, candidate in ipairs(candidates) do
 		table.insert(indices, candidate:entindex())
 	end
-	local signature = table.concat(indices, ",")
+	local signature = trialToken .. ":" .. table.concat(indices, ",")
 	local selected = candidateByIndex[
 		tonumber(record.grom_mirror_target_entindex) or -1
 	]
-	if record.grom_mirror_signature ~= signature or selected == nil then
+	if record.grom_mirror_trial_token ~= trialToken or selected == nil then
 		selected = candidates[RandomInt(1, #candidates)]
-		record.grom_mirror_signature = signature
 		record.grom_mirror_target_entindex = selected:entindex()
 		record.grom_mirror_choices = (record.grom_mirror_choices or 0) + 1
 	end
+	record.grom_mirror_trial_token = trialToken
+	record.grom_mirror_signature = signature
 	return selected, true
+end
+
+function XHSBotBrain:GetReviveChannelState(hero, record, now)
+	now = tonumber(now) or GameRules:GetGameTime()
+	local ability = IsValidEntityHandle(hero)
+		and hero:FindAbilityByName("xhs_tombstone_revive_channel") or nil
+	local channeling = ability ~= nil
+		and IsValidEntity(ability) and not ability:IsNull()
+		and ability:IsChanneling()
+	local tombstone = channeling and ability.xhs_tombstone
+		or EntityFromIndex(record.revive_target_entindex)
+	local interruptionSerial = tonumber(hero.xhs_bot_revive_interruption_serial) or 0
+	local previousSerial = tonumber(record.revive_interruption_serial) or 0
+	local newInterruptions = math.max(0, interruptionSerial - previousSerial)
+	record.revive_interruption_serial = interruptionSerial
+	if newInterruptions > 0 then
+		if now - (tonumber(record.last_revive_interruption_at) or -math.huge) > 8 then
+			record.revive_interruption_count = 0
+		end
+		record.last_revive_interruption_at = now
+		local unresolved = IsValidEntityHandle(tombstone)
+			and tombstone:GetUnitName() == TOMBSTONE_UNIT_NAME
+		if unresolved then
+			record.revive_interruption_count =
+				(tonumber(record.revive_interruption_count) or 0) + newInterruptions
+			if record.revive_interruption_count >= REVIVE_RETRY_FAILURES then
+				record.revive_retry_blocked_until = now + REVIVE_RETRY_COOLDOWN
+				record.revive_interruption_count = 0
+			end
+		else
+			record.revive_interruption_count = 0
+			record.revive_target_entindex = nil
+		end
+	end
+	if not channeling and record.revive_target_entindex ~= nil
+		and not IsValidEntityHandle(tombstone) then
+		record.revive_target_entindex = nil
+		record.revive_interruption_count = 0
+	end
+	if channeling and IsValidEntityHandle(tombstone) then
+		record.revive_target_entindex = tombstone:entindex()
+	end
+	return channeling, tombstone
+end
+
+function XHSBotBrain:FindReviveOpportunity(hero, record, threat, rawDanger, now)
+	now = tonumber(now) or GameRules:GetGameTime()
+	if not IsValidEntityHandle(hero)
+		or now < (tonumber(record.revive_retry_blocked_until) or 0)
+		or (tonumber(rawDanger) or 0) > 0
+		or (tonumber(threat.score) or 0) > 0.38
+		or (tonumber(threat.recent_damage_ratio) or 0) > 0.08
+		or (tonumber(threat.focused_by) or 0) > 0
+		or (tonumber(threat.close_enemies) or 0) > 0 then
+		return nil
+	end
+
+	local best, bestDistance = nil, REVIVE_SEARCH_RADIUS
+	for _, tombstone in pairs(Entities:FindAllByName(TOMBSTONE_UNIT_NAME) or {}) do
+		if IsValidEntityHandle(tombstone)
+			and tombstone:GetTeamNumber() == hero:GetTeamNumber() then
+			local deadHero = EntityFromIndex(tombstone.xhs_revive_hero_entindex)
+			local distance = Distance2D(hero:GetAbsOrigin(), tombstone:GetAbsOrigin())
+			if IsValidEntityHandle(deadHero) and not deadHero:IsAlive()
+				and deadHero ~= hero and distance < bestDistance then
+				best = tombstone
+				bestDistance = distance
+			end
+		end
+	end
+	return best, bestDistance
 end
 
 function XHSBotBrain:RememberVisibleTarget(record, target, difficulty, now)
@@ -3094,6 +3164,8 @@ end
 
 function XHSBotBrain:BuildContext(playerID, hero, profile, difficulty, record, assignment, encounter)
 	local now = GameRules:GetGameTime()
+	local phase = CustomTimers ~= nil
+		and tonumber(CustomTimers.game_phase) or 1
 	local assignmentGoal = assignment and assignment.goal or "regroup"
 	local nonCombatObjective = assignment ~= nil
 		and assignment.non_combat == true
@@ -3236,7 +3308,9 @@ function XHSBotBrain:BuildContext(playerID, hero, profile, difficulty, record, a
 		record.last_seen_position = nil
 	end
 
-	local anchor = encounter and encounter.anchor
+	local anchor = assignmentGoal == "shop" and assignment ~= nil
+		and assignment.anchor
+		or encounter and encounter.anchor
 		or assignment and assignment.anchor
 		or GetFortPosition()
 	if encounter == nil
@@ -3344,16 +3418,22 @@ function XHSBotBrain:BuildContext(playerID, hero, profile, difficulty, record, a
 		profile,
 		strategicThreatPosition
 	)
-	if encounter ~= nil
-		and (encounter.id == "phase_3"
-			or encounter.id == "phase_3_vanguard")
-		and self:IsCombatTarget(target) then
-		local away = hero:GetAbsOrigin() - target:GetAbsOrigin()
-		away.z = 0
-		if away:Length2D() > 1 then
-			retreatPosition = hero:GetAbsOrigin() + away:Normalized() * 650
-			retreatCover = "phase 3 arena spacing"
-		end
+	-- Phase 3 and everything after it have no strategic safety destination.
+	-- Keep this independent from the current assignment/target: campaign bosses
+	-- can briefly disappear, become invulnerable or lose team vision, and that
+	-- transient frame must never reopen the generic retreat state.
+	local phaseCombatCommitment = phase >= 3
+		and not nonCombatObjective
+	local forcedEncounterCombat = phaseCombatCommitment
+		and self:IsCombatTarget(target)
+	if phaseCombatCommitment then
+		-- Never feed the generic retreat scorer a destination during committed
+		-- phase 3/4 combat. The old `hero position + 650` point moved farther
+		-- away every think and could create a permanent RETREATING loop.
+		-- Preferred-range repositioning remains available separately below and
+		-- already has hysteresis, so ranged heroes can still kite intelligently.
+		retreatPosition = nil
+		retreatCover = "committed phase 3/4 combat"
 	end
 	local baseRetreatThreshold = profile.retreat_health * difficulty.self_retreat_multiplier
 	local dynamicRetreatThreshold = Clamp(
@@ -3365,6 +3445,26 @@ function XHSBotBrain:BuildContext(playerID, hero, profile, difficulty, record, a
 		baseRetreatThreshold,
 		math.min(difficulty.maximum_retreat_health or 0.68, baseRetreatThreshold + 0.14)
 	)
+	local reviveChanneling, activeReviveTombstone =
+		self:GetReviveChannelState(hero, record, now)
+	local reviveTarget, reviveDistance = nil, nil
+	if not reviveChanneling
+		and HealthRatio(hero) >= math.max(0.46, dynamicRetreatThreshold + 0.12) then
+		reviveTarget, reviveDistance = self:FindReviveOpportunity(
+			hero,
+			record,
+			threat,
+			rawDanger,
+			now
+		)
+	end
+	if reviveChanneling and IsValidEntityHandle(activeReviveTombstone) then
+		reviveTarget = activeReviveTombstone
+		reviveDistance = Distance2D(
+			hero:GetAbsOrigin(),
+			activeReviveTombstone:GetAbsOrigin()
+		)
+	end
 	local mayAttackMove = assignmentGoal == "defend_lane"
 		or assignmentGoal == "defend_phase2"
 		or assignmentGoal == "defend_base"
@@ -3416,7 +3516,8 @@ function XHSBotBrain:BuildContext(playerID, hero, profile, difficulty, record, a
 		and CustomTimers.enable_special_wave == true
 		and tonumber(CustomTimers.current_time
 			and CustomTimers.current_time["special_wave"]) or nil
-	local runeStrategicallyAllowed = encounter == nil
+	local runeStrategicallyAllowed = phase < 3
+		and encounter == nil
 		and not nonCombatObjective
 		and not baseLastStand
 		and (
@@ -3518,6 +3619,10 @@ function XHSBotBrain:BuildContext(playerID, hero, profile, difficulty, record, a
 		danger_entries = dangerEntries,
 		safe_position = safePosition,
 		channel_interrupt_danger = difficulty.channel_interrupt_danger,
+		revive_channeling = reviveChanneling,
+		revive_target = reviveTarget,
+		revive_distance = reviveDistance,
+		revive_retry_blocked_until = tonumber(record.revive_retry_blocked_until) or 0,
 		target = target,
 		target_priority = math.min(20, math.max(0, targetScore or 0) * 0.2),
 		too_close = (encounter == nil or encounter.no_reposition ~= true)
@@ -3544,7 +3649,8 @@ function XHSBotBrain:BuildContext(playerID, hero, profile, difficulty, record, a
 		engagement_survival_ratio = engagement and engagement.survival_ratio or 0,
 		engagement_feasibility = engagement and engagement.feasibility or 1,
 		engagement_urgent = engagement and engagement.urgent_objective == true or false,
-		engagement_allow_attack = engagement == nil
+		engagement_allow_attack = forcedEncounterCombat
+			or engagement == nil
 			or engagement.classification == "FARMABLE"
 			or engagement.classification == "CONTESTABLE"
 			or engagement.urgent_objective == true
@@ -3583,9 +3689,11 @@ function XHSBotBrain:BuildContext(playerID, hero, profile, difficulty, record, a
 				or record.use_attack_move == true),
 		encounter_mode = encounter and encounter.id or nil,
 		arena_combat = encounter and encounter.arena_combat == true,
+		force_combat = forcedEncounterCombat,
 		encounter_no_combat = encounter and encounter.no_combat == true,
 		encounter_reached_distance = encounter and encounter.reached_distance or 180,
-		no_retreat = encounter and encounter.no_retreat == true,
+		no_retreat = phaseCombatCommitment
+			or encounter and encounter.no_retreat == true,
 		rune_position = runeObjective and runeObjective.position or nil,
 		rune_distance = runeObjective and runeObjective.distance or nil,
 		rune_type = runeObjective and runeObjective.type or nil,
@@ -3675,6 +3783,7 @@ function XHSBotBrain:ActionState(action, assignment, target, encounter)
 		reposition = "REPOSITIONING",
 		move_to_last_seen = "SEARCHING_LAST_SEEN",
 		hold = "HOLDING",
+		revive_ally = "REVIVING ALLY",
 	}
 	if action.id == "cast_ability" and action.data ~= nil
 		and (action.data.mode == "ally_heal" or action.data.is_heal == true) then

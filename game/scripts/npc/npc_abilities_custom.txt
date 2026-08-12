@@ -6433,7 +6433,7 @@
 		"AbilityValues"
 		{
 			"radius"					"250 325 400 475"
-			"cleave_pct"				"40"
+			"cleave_pct"				"25"
 			"bonus_damage"				"125 300 500 800"
 		}
 
@@ -7352,31 +7352,44 @@
 	}
 
 	//=================================================================================================================
-	// Mountain King: Bash of the Deep
+	// Mountain King: Dwarven Bulwark
 	//=================================================================================================================
-	"xhs_mountain_king_bash"
+	"xhs_mountain_king_bulwark"
 	{
 		"BaseClass"						"ability_lua"
 		"ScriptFile"					"abilities/heroes/muradin.lua"
-		"AbilityTextureName"			"slardar_bash"
+		"AbilityTextureName"			"custom/xhs_mountain_king_bulwark_cast"
 		"MaxLevel"						"4"
-		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_PASSIVE"
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET | DOTA_ABILITY_BEHAVIOR_IMMEDIATE | DOTA_ABILITY_BEHAVIOR_IGNORE_BACKSWING"
 		"AbilityUnitDamageType"			"DAMAGE_TYPE_PHYSICAL"
 		"SpellImmunityType"				"SPELL_IMMUNITY_ENEMIES_YES"
 		"RequiredLevel"					"8"
 		"LevelsBetweenUpgrades"			"3"
 		"AbilityModifierSupportBonus"	"25"
+		"AbilityCooldown"				"18 17 16 15"
+		"AbilityManaCost"				"0"
 
 		"precache"
 		{
-			"particle"						"particles/units/heroes/hero_slardar/slardar_bash.vpcf"
+			"particle"						"particles/units/heroes/hero_sven/sven_warcry_buff.vpcf"
+			"particle"						"particles/units/heroes/hero_brewmaster/brewmaster_thunder_clap.vpcf"
+			"soundfile"					"soundevents/game_sounds_heroes/game_sounds_sven.vsndevts"
+			"soundfile"					"soundevents/game_sounds_heroes/game_sounds_brewmaster.vsndevts"
 		}
 
 		"AbilityValues"
 		{
-			"bonus_damage"				"100 250 450 700"
-			"duration"					"0.05"
-			"attack_count"				"6 5 4 3"
+			"duration"					"5.0"
+			"front_damage_reduction"	"40 50 60 70"
+			"rear_damage_reduction"		"10 15 20 25"
+			"frontal_angle"				"140"
+			"stored_damage_pct"			"60"
+			"stored_damage_cap_pct"		"8 10 12 14"
+			"release_base_damage"		"300 550 800 1050"
+			"release_radius"			"425"
+			"release_offset"			"175"
+			"armor_reduction"			"5 8 11 14"
+			"armor_duration"			"5.0"
 		}
 	}
 
@@ -7403,7 +7416,7 @@
 
 		// Damage.
 		//-------------------------------------------------------------------------------------------------------------
-		"AbilityDamage"					"400 600 800 1000"
+		"AbilityDamage"					"500 800 1150 1500"
 
 		// Cost
 		//-------------------------------------------------------------------------------------------------------------
@@ -7719,7 +7732,7 @@
 		"AbilityValues"
 		{
 			"radius"					"400"
-			"damage"					"225 400 575 750"
+			"damage"					"300 450 600 750"
 			"CalculateSpellDamageTooltip"	"1"
 			"movement_slow"				"20 30 40 50"
 			"attack_speed_slow"			"20 30 40 50"
@@ -25570,7 +25583,7 @@
 		"MaxLevel"					"5"
 		"AbilityCastPoint"			"1.75 1.60 1.45 1.30 1.18"
 		"AbilityCastRange"			"2600"
-		"AbilityCooldown"			"16.0"
+		"AbilityCooldown"			"6.0"
 		"AbilityManaCost"			"0"
 		"AbilityValues"
 		{

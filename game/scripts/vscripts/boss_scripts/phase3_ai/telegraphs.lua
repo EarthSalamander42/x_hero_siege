@@ -127,6 +127,8 @@ XHSBossTelegraphs.PARTICLE_FAMILIES = {
 }
 XHSBossTelegraphs.DEFAULT_PRIMARY = Vector(255, 110, 35)
 XHSBossTelegraphs.DEFAULT_SECONDARY = Vector(120, 255, 80)
+XHSBossTelegraphs.active_warnings = XHSBossTelegraphs.active_warnings or {}
+XHSBossTelegraphs.warning_serial = XHSBossTelegraphs.warning_serial or 0
 
 local function ValidVector(value)
 	return value ~= nil and value.x ~= nil and value.y ~= nil and value.z ~= nil
@@ -149,7 +151,22 @@ local function RegisterCircleDanger(position, radius, duration)
 	end
 end
 
-local function CreateWarning(position, radius, duration, colors, geometry, skipDangerRegistry)
+local function DestroyWarning(particle, immediate, expectedSerial)
+	if particle == nil then
+		return false
+	end
+	local activeSerial = XHSBossTelegraphs.active_warnings[particle]
+	if activeSerial == nil
+		or expectedSerial ~= nil and activeSerial ~= expectedSerial then
+		return false
+	end
+	XHSBossTelegraphs.active_warnings[particle] = nil
+	ParticleManager:DestroyParticle(particle, immediate == true)
+	ParticleManager:ReleaseParticleIndex(particle)
+	return true
+end
+
+local function CreateWarning(position, radius, duration, colors, geometry, skipDangerRegistry, visualDuration)
 	if not ValidVector(position) then return nil end
 	colors = colors or {}
 	local primary = colors.primary or XHSBossTelegraphs.DEFAULT_PRIMARY
@@ -163,23 +180,26 @@ local function CreateWarning(position, radius, duration, colors, geometry, skipD
 
 	local particlePath, contract = ResolveParticle(colors, geometry)
 	local particle = ParticleManager:CreateParticle(particlePath, PATTACH_WORLDORIGIN, nil)
+	XHSBossTelegraphs.warning_serial = XHSBossTelegraphs.warning_serial + 1
+	local warningSerial = XHSBossTelegraphs.warning_serial
+	XHSBossTelegraphs.active_warnings[particle] = warningSerial
 	ParticleManager:SetParticleControl(particle, 0, position)
+	local authoredDuration = visualDuration or duration or 1.0
 	if contract == "aghanim_radius_time" then
 		-- Aghanim telegraphs use CP1 = (world radius, lifetime, reserved),
 		-- CP15 as the authored tint and CP16.x as tint influence.
-		ParticleManager:SetParticleControl(particle, 1, Vector(radius or 180, duration or 1.0, 0))
+		ParticleManager:SetParticleControl(particle, 1, Vector(radius or 180, authoredDuration, 0))
 		ParticleManager:SetParticleControl(particle, 15, primary)
 		ParticleManager:SetParticleControl(particle, 16, Vector(1, 0, 0))
 	else
 		ParticleManager:SetParticleControl(particle, 1, Vector(radius or 180, 0, 0))
 	end
-	ParticleManager:SetParticleControl(particle, 2, Vector(duration or 1.0, 0, 0))
+	ParticleManager:SetParticleControl(particle, 2, Vector(authoredDuration, 0, 0))
 	ParticleManager:SetParticleControl(particle, 3, primary)
 	ParticleManager:SetParticleControl(particle, 4, secondary)
 	ParticleManager:SetParticleControl(particle, 5, Vector(style, 0, 0))
 	Timers:CreateTimer(math.max(0.1, duration or 1.0), function()
-		ParticleManager:DestroyParticle(particle, true)
-		ParticleManager:ReleaseParticleIndex(particle)
+		DestroyWarning(particle, true, warningSerial)
 		return nil
 	end)
 	return particle
@@ -206,12 +226,16 @@ local function CreateLineWarning(startPosition, endPosition, width, duration, co
 	return particle
 end
 
-function XHSBossTelegraphs:Circle(position, radius, duration, colors)
-	return CreateWarning(position, radius, duration, colors, "circle")
+function XHSBossTelegraphs:Circle(position, radius, duration, colors, visualDuration)
+	return CreateWarning(position, radius, duration, colors, "circle", false, visualDuration)
 end
 
 function XHSBossTelegraphs:Target(position, radius, duration, colors)
 	return CreateWarning(position, radius, duration, colors, "target")
+end
+
+function XHSBossTelegraphs:Destroy(particle, immediate)
+	return DestroyWarning(particle, immediate)
 end
 
 -- Visual payoff only: CP0 is the cast origin and CP1.x is the final radius.

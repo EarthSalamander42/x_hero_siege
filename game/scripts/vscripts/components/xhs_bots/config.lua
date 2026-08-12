@@ -2,7 +2,7 @@ if XHSBotConfig == nil then
 	XHSBotConfig = {}
 end
 
--- The lobby reserves one ninth identity slot for the Tools-only observer.
+-- The lobby reserves one ninth identity slot for the Tools/admin observer.
 -- Radiant remains capped at eight actual combat participants.
 XHSBotConfig.MAX_SESSION_SIZE = 9
 XHSBotConfig.MAX_TEAM_SIZE = 8

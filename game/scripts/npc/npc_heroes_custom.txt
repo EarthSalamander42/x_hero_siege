@@ -1741,7 +1741,7 @@
 		"Ability1"						"holdout_storm_bolt"
 		"Ability2"						"holdout_thunder_clap"
 		"Ability3"						"holdout_muradin_hammer"		
-		"Ability4"						"xhs_mountain_king_bash"
+		"Ability4"						"xhs_mountain_king_bulwark"
 		"Ability5"						"holdout_thunder_spirit"
 		"Ability6"						"holdout_avatar"
 		"Ability7"						""

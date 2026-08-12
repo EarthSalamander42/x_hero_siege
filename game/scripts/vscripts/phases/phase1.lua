@@ -198,10 +198,14 @@ end
 function SpiritBeastDead(event)
 	local hero = GetPlayerHeroFromUnit(event.attacker) or event.attacker
 	local timerStarted = GameMode.SpiritBeastTimerStarted == true
+	local playerID = hero ~= nil and hero.GetPlayerID ~= nil and hero:GetPlayerID() or nil
 
 	SetHeroOptionalEventTomeLock(hero, "spirit_beast", false)
 	DoEntFire("trigger_spirit_beast_duration", "Kill", nil, 0, nil, nil)
 	GameMode.SpiritBeast_killed = true
+	if playerID ~= nil and playerID >= 0 then
+		GameMode.SpiritBeastCompletedByPlayerID = playerID
+	end
 	GameMode.SpiritBeast_occuring = false
 	GameMode.SpiritBeastTimerStarted = false
 	if timers.SpiritBeastIntro then
@@ -265,10 +269,14 @@ end
 function FrostInfernalDead(event)
 	local hero = GetPlayerHeroFromUnit(event.attacker) or event.attacker
 	local timerStarted = GameMode.FrostInfernalTimerStarted == true
+	local playerID = hero ~= nil and hero.GetPlayerID ~= nil and hero:GetPlayerID() or nil
 
 	SetHeroOptionalEventTomeLock(hero, "frost_infernal", false)
 	DoEntFire("trigger_frost_infernal_duration", "Kill", nil, 0, nil, nil)
 	GameMode.FrostInfernal_killed = true
+	if playerID ~= nil and playerID >= 0 then
+		GameMode.FrostInfernalCompletedByPlayerID = playerID
+	end
 	GameMode.FrostInfernal_occuring = false
 	GameMode.FrostInfernalTimerStarted = false
 	if timers.FrostInfernalIntro then

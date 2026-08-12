@@ -13,9 +13,15 @@
 }
 
 .XHSDevToolsHost.LogOnly .XHSDevToolsToggle,
-.XHSDevToolsHost.LogOnly .XHSDevToolsSpectator,
 .XHSDevToolsHost.LogOnly .XHSDevToolsTimescale,
 .XHSDevToolsHost.LogOnly .XHSDevToolsPanel {
+	visibility: collapse;
+}
+
+.XHSDevToolsHost.SpectatorOnly .XHSDevToolsToggle,
+.XHSDevToolsHost.SpectatorOnly .XHSDevToolsTimescale,
+.XHSDevToolsHost.SpectatorOnly .XHSDevToolsPanel,
+.XHSDevToolsHost.SpectatorOnly .XHSDevToolsPerformance {
 	visibility: collapse;
 }
 

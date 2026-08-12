@@ -506,6 +506,11 @@ function XHSMagtheridon_OnRespawned(boss, bossCount, empowerStacks)
 	boss.deathStart = nil
 	boss.xhs_boss_bar_suppressed = nil
 	boss.xhs_boss_bar_think_active = nil
+	-- Entity-handle recycling can also preserve the compact/private selection
+	-- bookkeeping. Magtheridon is a global major boss after every rebirth.
+	boss.xhs_boss_bar_players = nil
+	boss.xhs_boss_bar_lock_to_registered = nil
+	boss.xhs_boss_bar_display_mode = "major_boss"
 	boss.zone = "xhs_holdout"
 	RegisterDevSpawn(boss)
 	XHSMagtheridon_AttachPhase3AI(boss)
