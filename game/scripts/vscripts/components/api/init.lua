@@ -3052,6 +3052,7 @@ end
 function api:CompleteGame()
 	local players = {}
 	local backend_players = {}
+	local bot_results = {}
 	local has_xhs_bot_session = self:HasXHSBotSession()
 	local is_tools_session = IsInToolsMode()
 	if has_xhs_bot_session
@@ -3373,6 +3374,19 @@ function api:CompleteGame()
 				is_xhs_bot = is_xhs_bot and 1 or 0,
 				supporter_xp = supporter_xp,
 			}
+			if is_xhs_bot then
+				table.insert(bot_results, {
+					slot = id,
+					player_name = tostring(PlayerResource:GetPlayerName(id) or "XHS Bot"),
+					hero = hero,
+					team = player.team,
+					kills = player.kills,
+					deaths = player.deaths,
+					assists = player.assists,
+					level = player.level,
+					is_bot = true,
+				})
+			end
 
 			local steamid = tostring(PlayerResource:GetSteamID(id))
 			local local_player_key = steamid
@@ -3528,6 +3542,7 @@ function api:CompleteGame()
 		map = GetMapName(),
 		fragment_quests = fragment_quests,
 		performance_summary = performance_summary,
+		bot_results = bot_results,
 		contains_xhs_bots = self:HasXHSBotParticipants(),
 		xhs_bot_count = self:GetXHSBotParticipantCount(),
 		-- XHS bots never enter backend_players. A production match containing
