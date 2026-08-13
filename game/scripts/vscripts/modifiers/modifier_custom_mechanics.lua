@@ -103,8 +103,8 @@ function modifier_custom_mechanics:OnOrder(keys)
 
 	-- OnOrder is lower-level than ExecuteOrderFilter for several inventory UI
 	-- paths. Validate the GIVE_ITEM handles here so an invalid gift reports at
-	-- click time. Returning false breaks the current order; the explicit STOP is
-	-- retained as a guard for Source inventory paths that have already started.
+	-- click time. RejectInvalidXHSBotGiftAtIssue interrupts the ordered unit and
+	-- follows with STOP because this modifier event is only observational.
 	local unit = keys.unit
 	local target = keys.target
 	local ability = keys.ability

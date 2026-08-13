@@ -5114,18 +5114,18 @@ DropDownMenu.DropDownMenuVisible {
 
 .XHSPassAchievementsGrid {
 	width: 100%;
-	flow-children: right-wrap;
+	flow-children: down;
 }
 
 .XHSPassAchievementCard {
-	width: 31.9%;
-	min-height: 264px;
-	flow-children: down;
+	width: 100%;
+	min-height: 176px;
+	flow-children: right;
 	background-color: #06131e;
 	border: 1px solid #24475b;
-	border-bottom: 3px solid #356987;
-	padding: 16px;
-	margin: 0px 12px 14px 0px;
+	border-left: 3px solid #356987;
+	padding: 14px;
+	margin-bottom: 10px;
 	transition-property: brightness, border, box-shadow;
 	transition-duration: .13s;
 }
@@ -5138,14 +5138,26 @@ DropDownMenu.DropDownMenuVisible {
 
 .XHSPassAchievementCard.IsComplete {
 	border-color: #d9b13f;
-	border-bottom-color: #f5d96f;
+	border-left-color: #f5d96f;
 	background-color: gradient( linear, 0% 0%, 100% 100%, from( #101b25 ), to( #211a13 ) );
 }
 
-.XHSPassAchievementCard.IsLocked .XHSPassAchievementCardMedal {
-	opacity: .3;
-	saturation: .2;
-	brightness: .65;
+.XHSPassAchievementCardArtwork {
+	width: 126px;
+	height: 126px;
+	vertical-align: center;
+	margin-right: 16px;
+	border: 1px solid #31576b;
+	background-color: #020a11;
+	img-shadow: 0px 4px 12px #000000aa;
+}
+
+.XHSPassAchievementCardBody {
+	width: fill-parent-flow( 1 );
+	height: fit-children;
+	min-height: 126px;
+	flow-children: down;
+	vertical-align: center;
 }
 
 .XHSPassAchievementCard.IsComing {
@@ -5156,16 +5168,8 @@ DropDownMenu.DropDownMenuVisible {
 
 .XHSPassAchievementCardTop {
 	width: 100%;
-	height: 68px;
+	height: 49px;
 	flow-children: right;
-}
-
-.XHSPassAchievementCardMedal {
-	width: 64px;
-	height: 64px;
-	margin-right: 13px;
-	border-radius: 50%;
-	box-shadow: 0px 0px 13px #59c9ff33;
 }
 
 .XHSPassAchievementCardHeading {
@@ -5193,7 +5197,7 @@ DropDownMenu.DropDownMenuVisible {
 .XHSPassAchievementCardDescription {
 	width: 100%;
 	height: fit-children;
-	min-height: 40px;
+	min-height: 18px;
 	font-size: 14px;
 	line-height: 18px;
 	color: #9bb1be;
@@ -5247,48 +5251,106 @@ DropDownMenu.DropDownMenuVisible {
 	color: #7796a6;
 }
 
+.XHSPassAchievementCardProgression {
+	width: 370px;
+	height: 134px;
+	flow-children: down;
+	vertical-align: center;
+	margin-left: 16px;
+	padding-left: 16px;
+	border-left: 1px solid #24485e;
+}
+
+.XHSPassAchievementRankPreview {
+	width: 100%;
+	height: 47px;
+	flow-children: down;
+}
+
+.XHSPassAchievementRankPreviewRank,
+.XHSPassAchievementRankPreviewTarget,
+.XHSPassAchievementRankPreviewReward,
+.XHSPassAchievementAbsoluteState {
+	width: 100%;
+	font-family: titleFont;
+	font-weight: bold;
+	text-align: center;
+}
+
+.XHSPassAchievementRankPreviewRank,
+.XHSPassAchievementAbsoluteState {
+	font-size: 11px;
+	letter-spacing: 1.2px;
+	color: #6ed8ff;
+}
+
+.XHSPassAchievementRankPreviewTarget {
+	font-size: 15px;
+	color: #ffffff;
+}
+
+.XHSPassAchievementRankPreviewReward {
+	font-size: 10px;
+	color: #e7c95e;
+}
+
 .XHSPassAchievementRankPips {
 	width: 100%;
-	height: 62px;
+	height: 52px;
 	flow-children: right;
-	margin-top: 8px;
 }
 
 .XHSPassAchievementRankPip {
 	width: fill-parent-flow( 1 );
-	height: 60px;
+	height: 49px;
 	flow-children: down;
 	horizontal-align: center;
-	border-top: 1px solid #24485e;
+	border-top: 2px solid #24485e;
 	padding-top: 4px;
-	opacity: .42;
+	opacity: .54;
+	transition-property: opacity, brightness, border;
+	transition-duration: .12s;
 }
 
 .XHSPassAchievementRankPip.IsEarned {
-	opacity: 1;
+	opacity: .72;
 	border-top-color: #e2bd50;
 }
 
+.XHSPassAchievementRankPip.IsNext,
+.XHSPassAchievementRankPip.IsHovered {
+	opacity: 1;
+	brightness: 1.45;
+	border-top-color: #67d7ff;
+}
+
 .XHSPassAchievementRankPipMedal {
-	width: 25px;
-	height: 25px;
+	width: 27px;
+	height: 27px;
 	horizontal-align: center;
 }
 
-.XHSPassAchievementRankPipTarget,
-.XHSPassAchievementRankPipReward {
+.XHSPassAchievementRankPipDot {
+	width: 10px;
+	height: 10px;
+	horizontal-align: center;
+	margin: 8px 0px 9px;
+	border-radius: 50%;
+	background-color: #e6f2f7;
+	box-shadow: 0px 0px 7px #6fd8ff66;
+}
+
+.XHSPassAchievementRankPip.IsNext .XHSPassAchievementRankPipDot {
+	background-color: #69d8ff;
+	box-shadow: 0px 0px 9px #69d8ffbb;
+}
+
+.XHSPassAchievementRankPipTarget {
 	width: 100%;
 	text-align: center;
 	font-size: 10px;
 	color: #d3e2e9;
 	text-overflow: shrink;
-}
-
-.XHSPassAchievementRankPipReward {
-	font-size: 10px;
-	font-weight: bold;
-	color: #e7c95e;
-	text-shadow: 0px 1px 2px #000000;
 }
 
 .XHSPassAchievementHeroRoster {
@@ -5352,7 +5414,7 @@ DropDownMenu.DropDownMenuVisible {
 }
 
 .XHSPassAchievementCard.IsAllHeroChallenge {
-	min-height: 420px;
+	min-height: 250px;
 }
 
 .XHSPassAchievementRecord {
@@ -5584,7 +5646,19 @@ DropDownMenu.DropDownMenuVisible {
 
 .XHSPassAchievementAbsoluteReward {
 	color: #f4ca52;
-	margin-top: 22px;
+	margin-top: 8px;
+	text-align: center;
+}
+
+.XHSPassAchievementAbsoluteMedal {
+	width: 70px;
+	height: 70px;
+	horizontal-align: center;
+	img-shadow: 0px 0px 12px #f0bd3a55;
+}
+
+.XHSPassAchievementAbsoluteState {
+	margin-top: 6px;
 }
 
 .XHSPassAchievementRevealOverlay {

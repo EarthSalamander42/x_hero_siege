@@ -1364,9 +1364,10 @@ function GameMode:RejectInvalidXHSBotGiftAtIssue(params, observer)
 		issuer,
 		tostring(errorKey or "#error_xhs_bot_item_unsupported")
 	)
-	-- OnOrder returns false through the modifier to break the current command.
-	-- Replacing the pending GIVE_ITEM with STOP in the same callback is an extra
-	-- guard for inventory paths that may already have begun pathing.
+	-- MODIFIER_EVENT_ON_ORDER is observational: its return value does not cancel
+	-- the engine order. Interrupt the donor synchronously, then issue STOP as a
+	-- second guard so no GIVE_ITEM pathing survives this callback.
+	unit:Interrupt()
 	ExecuteOrderFromTable({
 		UnitIndex = unit:entindex(),
 		OrderType = DOTA_UNIT_ORDER_STOP,

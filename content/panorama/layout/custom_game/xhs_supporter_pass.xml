@@ -446,6 +446,41 @@
 			<Image src="file://{images}/custom_game/achievements/achievement_rank_silver.png" />
 			<Image src="file://{images}/custom_game/achievements/achievement_rank_gold.png" />
 			<Image src="file://{images}/custom_game/achievements/achievement_rank_xhs_absolute.png" />
+			<Image src="file://{images}/custom_game/achievements/wins_icon_png.png" />
+			<Image src="file://{images}/custom_game/achievements/battlecup_icon_png.png" />
+			<Image src="file://{images}/custom_game/achievements/rampages_icon_png.png" />
+			<Image src="file://{images}/custom_game/achievements/wins_in_party_icon_png.png" />
+			<Image src="file://{images}/custom_game/achievements/weekly_reward_icon_png.png" />
+			<Image src="file://{images}/custom_game/achievements/hero_challenges_icon_png.png" />
+			<Image src="file://{images}/custom_game/achievements/calibrate_ranked_icon_png.png" />
+			<Image src="file://{images}/custom_game/achievements/equip_seasonal_terrain_icon_png.png" />
+			<Image src="file://{images}/custom_game/achievements/death_summary_icon_png.png" />
+			<Image src="file://{images}/custom_game/achievements/predict_victory_icon_png.png" />
+			<Image src="file://{images}/custom_game/achievements/win_core_matches_png.png" />
+			<Image src="file://{images}/custom_game/achievements/mvp_icon_png.png" />
+			<Image src="file://{images}/custom_game/achievements/win_support_matches_png.png" />
+			<Image src="file://{images}/custom_game/achievements/beat_comparative_stat_icon_png.png" />
+			<Image src="file://{images}/custom_game/achievements/first_blood_icon_png.png" />
+			<Image src="file://{images}/custom_game/achievements/relics_icon_png.png" />
+			<Image src="file://{images}/custom_game/achievements/plus_icon_png.png" />
+			<Image src="file://{images}/custom_game/achievements/ranked_roles_icon_png.png" />
+			<Image src="file://{images}/custom_game/achievements/dpc_logo_png.png" />
+			<Image src="file://{images}/custom_game/achievements/dpc_app_png.png" />
+			<Image src="file://{images}/custom_game/achievements/give_commends_icon_png.png" />
+			<Image src="file://{images}/custom_game/achievements/destroy_wards_icon_png.png" />
+			<Image src="file://{images}/custom_game/achievements/give_tips_icon_png.png" />
+			<Image src="file://{images}/custom_game/achievements/plant_observer_wards_icon_png.png" />
+			<Image src="file://{images}/custom_game/achievements/follow_lane_suggestor_icon_png.png" />
+			<Image src="file://{images}/custom_game/achievements/hero_levels_icon_png.png" />
+			<Image src="file://{images}/custom_game/achievements/view_post_game_analytics_icon_png.png" />
+			<Image src="file://{images}/custom_game/achievements/purchase_relic_icon_png.png" />
+			<Image src="file://{images}/custom_game/achievements/spectator_win_probability_icon_png.png" />
+			<Image src="file://{images}/custom_game/achievements/buy_legacy_set_icon_png.png" />
+			<Image src="file://{images}/custom_game/achievements/select_plus_guide_icon_png.png" />
+			<Image src="file://{images}/custom_game/achievements/pick_suggested_hero_icon_png.png" />
+			<Image src="file://{images}/custom_game/achievements/view_hero_trends_icon_png.png" />
+			<Image src="file://{images}/custom_game/achievements/make_relic_progress_icon_png.png" />
+			<Image src="file://{images}/custom_game/achievements/hero_chat_wheel_icon_png.png" />
 		</Panel>
 	</Panel>
 </root>

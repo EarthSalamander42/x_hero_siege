@@ -6103,6 +6103,11 @@ var XHSSupporterPass = (function () {
 		return "file://{images}/custom_game/achievements/achievement_rank_" + names[Clamp(Math.floor(ToNumber(rank, 1)), 1, 4)] + ".png";
 	}
 
+	function AchievementIconPath(entry) {
+		var icon = String(entry && entry.icon || "wins_icon_png").replace(/[^a-z0-9_\-]/gi, "");
+		return "file://{images}/custom_game/achievements/" + icon + ".png";
+	}
+
 	function AchievementValueLabel(value) {
 		var amount = ToNumber(value, 0);
 		if (Math.abs(amount) >= 1000000000) {
@@ -6254,29 +6259,75 @@ var XHSSupporterPass = (function () {
 		RenderAchievements();
 	}
 
-	function CreateAchievementRankPips(parent, entry, unlockedRank, currentValue) {
-		var thresholds = AchievementList(entry.thresholds);
-		var labels = AchievementList(entry.labels);
+	function AchievementTargetLabel(entry, rank) {
+		var thresholds = AchievementList(entry && entry.thresholds);
+		var labels = AchievementList(entry && entry.labels);
+		var index = Clamp(Math.floor(ToNumber(rank, 1)) - 1, 0, Math.max(thresholds.length - 1, 0));
+		return labels[index] || AchievementValueLabel(thresholds[index]);
+	}
+
+	function AchievementDefaultRank(entry, unlockedRank) {
+		var count = Math.max(AchievementList(entry && entry.thresholds).length, 1);
+		return unlockedRank >= count ? count : Clamp(unlockedRank + 1, 1, count);
+	}
+
+	function UpdateAchievementRankPreview(preview, entry, rank, unlockedRank, currentValue) {
+		if (!preview) {
+			return;
+		}
 		var fragments = AchievementList(entry.fragments);
 		var points = AchievementList(entry.points);
+		var index = Clamp(Math.floor(ToNumber(rank, 1)) - 1, 0, Math.max(fragments.length - 1, 0));
+		var earned = unlockedRank >= rank;
+		preview.SetHasClass("IsEarned", earned);
+		preview.SetHasClass("IsNext", !earned && rank === unlockedRank + 1);
+		preview.RemoveClass("Rank1");
+		preview.RemoveClass("Rank2");
+		preview.RemoveClass("Rank3");
+		preview.RemoveClass("Rank4");
+		preview.AddClass("Rank" + rank);
+		preview._rank.text = AchievementRankName(rank, false);
+		preview._target.text = earned
+			? AchievementTargetLabel(entry, rank) + "  " + Text("xhs_sp_achievement_complete", "COMPLETE")
+			: AchievementValueLabel(currentValue) + " / " + AchievementTargetLabel(entry, rank);
+		preview._reward.text = "+" + FormatNumber(fragments[index] || 0) + " " + Text("xhs_sp_fragments", "fragments") + "   +" + FormatNumber(points[index] || 0) + " pts";
+	}
+
+	function CreateAchievementRankPips(parent, preview, entry, unlockedRank, currentValue) {
+		var thresholds = AchievementList(entry.thresholds);
+		var defaultRank = AchievementDefaultRank(entry, unlockedRank);
 		for (var i = 0; i < thresholds.length; i++) {
 			var rank = i + 1;
 			var pip = $.CreatePanel("Panel", parent, "");
 			pip.AddClass("XHSPassAchievementRankPip");
 			pip.AddClass("Rank" + rank);
-			pip.SetHasClass("IsUnlocked", unlockedRank >= rank);
 			pip.SetHasClass("IsEarned", unlockedRank >= rank);
-			pip.SetHasClass("IsNext", unlockedRank + 1 === rank);
-			var medal = $.CreatePanel("Image", pip, "");
-			medal.AddClass("XHSPassAchievementRankPipMedal");
-			medal.SetImage(AchievementMedalPath(rank, false));
-			var target = labels[i] || AchievementValueLabel(thresholds[i]);
-			CreateAchievementLabel(pip, "XHSPassAchievementRankPipTarget", target);
-			var rewardText = "+" + AchievementValueLabel(fragments[i]) + " F  •  +" + AchievementValueLabel(points[i]) + " P";
-			var rewardLabel = CreateAchievementLabel(pip, "XHSPassAchievementRankPipReward", rewardText);
-			SetAchievementTooltip(rewardLabel, "+" + FormatNumber(fragments[i]) + " " + Text("xhs_sp_fragments", "fragments") + "\n+" + FormatNumber(points[i]) + " " + Text("xhs_sp_achievement_score", "achievement score"));
-			pip.SetDialogVariable("current", AchievementValueLabel(currentValue));
+			pip.SetHasClass("IsNext", defaultRank === rank && unlockedRank < rank);
+			if (unlockedRank >= rank) {
+				var medal = $.CreatePanel("Image", pip, "");
+				medal.AddClass("XHSPassAchievementRankPipMedal");
+				medal.SetImage(AchievementMedalPath(rank, false));
+			} else {
+				var dot = $.CreatePanel("Panel", pip, "");
+				dot.AddClass("XHSPassAchievementRankPipDot");
+			}
+			CreateAchievementLabel(pip, "XHSPassAchievementRankPipTarget", AchievementTargetLabel(entry, rank));
+			(function (stageRank, stagePanel) {
+				stagePanel.hittest = true;
+				stagePanel.SetPanelEvent("onmouseover", function () {
+					UpdateAchievementRankPreview(preview, entry, stageRank, unlockedRank, currentValue);
+					stagePanel.AddClass("IsHovered");
+				});
+				stagePanel.SetPanelEvent("onmouseout", function () {
+					stagePanel.RemoveClass("IsHovered");
+					UpdateAchievementRankPreview(preview, entry, defaultRank, unlockedRank, currentValue);
+				});
+				stagePanel.SetPanelEvent("onactivate", function () {
+					UpdateAchievementRankPreview(preview, entry, stageRank, unlockedRank, currentValue);
+				});
+			})(rank, pip);
 		}
+		UpdateAchievementRankPreview(preview, entry, defaultRank, unlockedRank, currentValue);
 	}
 
 	function UpdateArmoryRefreshButton(player) {
@@ -6513,48 +6564,63 @@ var XHSSupporterPass = (function () {
 			card.SetHasClass("IsAllHeroChallenge", entry.id === "all_hero_challenge");
 			card.AddClass("Rank" + Math.max(rank, 0));
 
-			var top = $.CreatePanel("Panel", card, "");
+			var artwork = $.CreatePanel("Image", card, "");
+			artwork.AddClass("XHSPassAchievementCardArtwork");
+			artwork.SetImage(AchievementIconPath(entry));
+			var body = $.CreatePanel("Panel", card, "");
+			body.AddClass("XHSPassAchievementCardBody");
+			var top = $.CreatePanel("Panel", body, "");
 			top.AddClass("XHSPassAchievementCardTop");
-			var medalImage = $.CreatePanel("Image", top, "");
-			medalImage.AddClass("XHSPassAchievementCardMedal");
-			medalImage.SetImage(AchievementMedalPath(Math.max(rank, 1), isAbsolute));
 			var heading = $.CreatePanel("Panel", top, "");
 			heading.AddClass("XHSPassAchievementCardHeading");
 			CreateAchievementLabel(heading, "XHSPassAchievementCardRank", isComing
 				? Text("xhs_sp_achievement_coming_in", "COMING IN {release}").replace("{release}", entry.release || Text("xhs_sp_achievement_future_update", "A FUTURE UPDATE"))
-				: AchievementRankName(rank, isAbsolute));
+				: (isAbsolute ? Text("xhs_sp_achievement_rank_absolute", "ABSOLUTE ACHIEVEMENT") : Text("xhs_sp_achievement_progressive", "PROGRESSIVE ACHIEVEMENT")));
 			CreateAchievementLabel(heading, "XHSPassAchievementCardTitle", AchievementLocalized(entry, "title"));
 			if (index.pins[entry.id]) {
 				CreateAchievementLabel(top, "XHSPassAchievementPinned", "★");
 			}
 
-			CreateAchievementLabel(card, "XHSPassAchievementCardDescription", AchievementLocalized(entry, "description"));
-			CreateAchievementRequirements(card, entry);
+			CreateAchievementLabel(body, "XHSPassAchievementCardDescription", AchievementLocalized(entry, "description"));
+			CreateAchievementRequirements(body, entry);
 			if (entry.id === "all_hero_challenge") {
-				CreateAllHeroAchievementRoster(card, entry, progressRow);
+				CreateAllHeroAchievementRoster(body, entry, progressRow);
 			}
 			var record = index.records && index.records[entry.id];
 			if (!isAbsolute && record && ToNumber(record.value, 0) > 0) {
 				var recordLabel = CreateAchievementLabel(
-					card,
+					body,
 					"XHSPassAchievementRecord",
 					"#1 " + Text("xhs_sp_achievement_record_worldwide", "WORLDWIDE") + "  •  " + AchievementValueLabel(record.value)
 				);
 				SetAchievementRecordHover(recordLabel, entry, record);
 			}
+			var progression = $.CreatePanel("Panel", card, "");
+			progression.AddClass("XHSPassAchievementCardProgression");
 			if (!isAbsolute) {
-				var rankPips = $.CreatePanel("Panel", card, "");
+				var preview = $.CreatePanel("Panel", progression, "");
+				preview.AddClass("XHSPassAchievementRankPreview");
+				preview._rank = CreateAchievementLabel(preview, "XHSPassAchievementRankPreviewRank", "");
+				preview._target = CreateAchievementLabel(preview, "XHSPassAchievementRankPreviewTarget", "");
+				preview._reward = CreateAchievementLabel(preview, "XHSPassAchievementRankPreviewReward", "");
+				var rankPips = $.CreatePanel("Panel", progression, "");
 				rankPips.AddClass("XHSPassAchievementRankPips");
-				CreateAchievementRankPips(rankPips, entry, rank, value);
-				var progressBar = $.CreatePanel("Panel", card, "");
+				CreateAchievementRankPips(rankPips, preview, entry, rank, value);
+				var progressBar = $.CreatePanel("Panel", progression, "");
 				progressBar.AddClass("XHSPassAchievementProgressBar");
 				var progressFill = $.CreatePanel("Panel", progressBar, "");
 				progressFill.AddClass("XHSPassAchievementProgressFill");
 				progressFill.style.width = (isComplete ? 100 : Clamp(Math.floor(value / Math.max(nextTarget, 1) * 100), 0, 100)) + "%";
-				CreateAchievementLabel(card, "XHSPassAchievementProgressText", isComplete ? Text("xhs_sp_achievement_complete", "COMPLETE") : AchievementValueLabel(value) + " / " + AchievementValueLabel(nextTarget));
+				CreateAchievementLabel(progression, "XHSPassAchievementProgressText", isComplete ? Text("xhs_sp_achievement_complete", "COMPLETE") : Text("xhs_sp_achievement_next_rank", "NEXT RANK"));
 			} else {
+				if (rank > 0) {
+					var absoluteMedal = $.CreatePanel("Image", progression, "");
+					absoluteMedal.AddClass("XHSPassAchievementAbsoluteMedal");
+					absoluteMedal.SetImage(AchievementMedalPath(1, true));
+				}
 				var absoluteFragments = AchievementList(entry.fragments)[0] || 0;
 				var absolutePoints = AchievementList(entry.points)[0] || 0;
+				CreateAchievementLabel(progression, "XHSPassAchievementAbsoluteState", rank > 0 ? Text("xhs_sp_achievement_complete", "COMPLETE") : Text("xhs_sp_achievement_rank_locked", "LOCKED"));
 				CreateAchievementLabel(card, "XHSPassAchievementAbsoluteReward", "+" + FormatNumber(absoluteFragments) + " " + Text("xhs_sp_fragments", "fragments") + "   •   +" + FormatNumber(absolutePoints) + " pts");
 			}
 		}
