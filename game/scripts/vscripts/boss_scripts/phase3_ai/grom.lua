@@ -220,8 +220,48 @@ function modifier_xhs_grom_phase3_ai:DeclareFunctions()
 	return {
 		MODIFIER_EVENT_ON_TAKEDAMAGE,
 		MODIFIER_EVENT_ON_ATTACK_LANDED,
+		MODIFIER_EVENT_ON_DEATH,
 		MODIFIER_PROPERTY_INCOMING_DAMAGE_PERCENTAGE,
 	}
+end
+
+-- The entity_hurt event is intentionally scoped to Grom's lifetime. Keeping
+-- this listener in events.lua made every damage event in the match pay for an
+-- achievement check even though false copies only exist during this encounter.
+function modifier_xhs_grom_phase3_ai:StartFalseCopyDamageListener()
+	if self.false_copy_damage_listener ~= nil then return end
+
+	self.false_copy_damage_listener = ListenToGameEvent("entity_hurt", function(keys)
+		if self == nil or self:IsNull() then return end
+
+		local victimIndex = tonumber(keys.entindex_killed or keys.entindex_victim)
+		local attackerIndex = tonumber(keys.entindex_attacker)
+		if victimIndex == nil or attackerIndex == nil then return end
+
+		local victim = EntIndexToHScript(victimIndex)
+		if victim == nil or victim:IsNull()
+			or victim:GetUnitName() ~= "npc_dota_hero_grom_hellscream_clone" then
+			return
+		end
+
+		local attacker = EntIndexToHScript(attackerIndex)
+		if attacker == nil or attacker:IsNull() then return end
+
+		local playerID = XHSGetPlayerIDFromUnit ~= nil and XHSGetPlayerIDFromUnit(attacker)
+			or (attacker.GetPlayerOwnerID ~= nil and attacker:GetPlayerOwnerID() or -1)
+		if playerID ~= nil and playerID >= 0 and PlayerResource:IsValidPlayerID(playerID)
+			and not (api ~= nil and api.IsXHSBotParticipant ~= nil and api:IsXHSBotParticipant(playerID)) then
+			GameMode.XHSGromFalseCopyDamaged = true
+		end
+	end, nil)
+end
+
+function modifier_xhs_grom_phase3_ai:StopFalseCopyDamageListener()
+	local listener = self.false_copy_damage_listener
+	if listener == nil then return end
+
+	self.false_copy_damage_listener = nil
+	StopListeningToGameEvent(listener)
 end
 
 function modifier_xhs_grom_phase3_ai:OnCreated()
@@ -238,6 +278,7 @@ function modifier_xhs_grom_phase3_ai:OnCreated()
 	self.recover_until = 0
 	self.last_pattern = nil
 	self.trial_active = false
+	self:StartFalseCopyDamageListener()
 
 	boss.xhs_boss_bar_colors = {
 		light_color = "#ffb13a",
@@ -259,12 +300,22 @@ end
 
 function modifier_xhs_grom_phase3_ai:OnDestroy()
 	if not IsServer() then return end
+	self:StopFalseCopyDamageListener()
 	local boss = self:GetParent()
 	if boss ~= nil and IsValidEntity(boss) and not boss:IsNull() then
 		boss.xhs_grom_mirror_image = nil
 		boss.xhs_grom_mirror_trial_token = nil
 	end
 	self:CleanupClones()
+end
+
+function modifier_xhs_grom_phase3_ai:OnDeath(event)
+	if not IsServer() then return end
+	if event.unit ~= self:GetParent() then return end
+
+	-- The modifier can survive briefly on the corpse, so do not wait for
+	-- OnDestroy before releasing the engine event listener.
+	self:StopFalseCopyDamageListener()
 end
 
 function modifier_xhs_grom_phase3_ai:IsBossActive()
