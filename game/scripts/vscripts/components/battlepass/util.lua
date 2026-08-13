@@ -45,6 +45,7 @@ CustomGameEventManager:RegisterListener("supporter_pass_catalog_preview_stop", D
 CustomGameEventManager:RegisterListener("supporter_pass_dev_equip_local", Dynamic_Wrap(Battlepass, "SupporterPassDevEquipLocal"))
 CustomGameEventManager:RegisterListener("supporter_pass_request_companion", Dynamic_Wrap(Battlepass, "SupporterPassRequestCompanion"))
 CustomGameEventManager:RegisterListener("supporter_pass_request_asset", Dynamic_Wrap(Battlepass, "SupporterPassRequestAsset"))
+CustomGameEventManager:RegisterListener("supporter_pass_refresh_armory", Dynamic_Wrap(Battlepass, "SupporterPassRefreshArmory"))
 CustomGameEventManager:RegisterListener("toggle_ingame_tag", Dynamic_Wrap(Battlepass, 'ToggleDonatorTag'))
 CustomGameEventManager:RegisterListener("change_ingame_tag", Dynamic_Wrap(Battlepass, 'SetDonatorTag'))
 CustomGameEventManager:RegisterListener("change_supporter_pass_rewards", Dynamic_Wrap(Battlepass, 'BattlepassRewards'))
@@ -1541,6 +1542,13 @@ end
 function Battlepass:PlaySupporterKillEffect(hero, victim, item)
 	if hero == nil or victim == nil or item == nil or hero:IsNull() or victim:IsNull() then return false end
 	local DROW_TARGET_ARROW_Z_OFFSET = -110
+	local itemIdentity = string.lower(table.concat({
+		tostring(item.item_name or ""),
+		tostring(item.name or ""),
+		tostring(item.display_name or ""),
+		tostring(item.title or ""),
+	}, " "))
+	local isSylvanTempest = string.find(itemIdentity, "sylvan tempest", 1, true) ~= nil
 
 	local function PlayAttachedParticle(particleName, anchor, counterpart)
 		if particleName == nil or particleName == "" or anchor == nil or anchor:IsNull() then return false end
@@ -1620,7 +1628,17 @@ function Battlepass:PlaySupporterKillEffect(hero, victim, item)
 				true
 			)
 		end
-		ParticleManager:ReleaseParticleIndex(particle)
+		if isSylvanTempest then
+			-- This effect contains a persistent flower-crown emitter. Stop it
+			-- gracefully after its one-second kill burst, then release the handle.
+			Timers:CreateTimer(1.0, function()
+				ParticleManager:DestroyParticle(particle, false)
+				ParticleManager:ReleaseParticleIndex(particle)
+				return nil
+			end)
+		else
+			ParticleManager:ReleaseParticleIndex(particle)
+		end
 
 		-- if IsInToolsMode() then
 		-- 	print("[Supporter Pass] Played kill FX:", particleName, "particle:", particle)
@@ -3105,13 +3123,6 @@ function Battlepass:SupporterPassBuyShopItem(event_source_index, event)
 		return
 	end
 
-	if self:FindSupporterPassShopItem(event.item_id) == nil then
-		self:SendSupporterPassFailure(playerID, "supporter_pass_purchase_failed", "#xhs_sp_error_shop_item_inactive", {
-			item_id = event.item_id,
-		})
-		return
-	end
-
 	CustomGameEventManager:Send_ServerToPlayer(PlayerResource:GetPlayer(playerID), "supporter_pass_purchase_pending", {
 		item_id = event.item_id,
 	})
@@ -3153,10 +3164,16 @@ function Battlepass:SupporterPassOpenPaymentPortal(event_source_index, event)
 		return
 	end
 
+	local requestedTierID = math.floor(tonumber(event.tier_id) or 0)
+	if requestedTierID < 1 or requestedTierID > 5 then
+		requestedTierID = nil
+	end
+
 	api:CreateSupporterPaymentIntent(playerID, {
 		source = event.source or "supporter_pass",
 		locale = event.locale or "en",
 		game_mode = GetMapName and GetMapName() or "xhs",
+		requested_tier_id = requestedTierID,
 	}, function(success, data)
 		if not player or player:IsNull() then return end
 		if not success or type(data) ~= "table" or type(data.url) ~= "string" or data.url == "" then
@@ -3170,6 +3187,83 @@ function Battlepass:SupporterPassOpenPaymentPortal(event_source_index, event)
 			url = data.url,
 			expires_at = data.expires_at,
 		})
+	end)
+end
+
+Battlepass.SupporterArmoryRefreshState = Battlepass.SupporterArmoryRefreshState or {}
+
+function Battlepass:GetSupporterArmoryRefreshKey(playerID)
+	if api == nil or api.GetPersistentPlayerSteamID == nil or api.GetApiGameId == nil then
+		return nil
+	end
+
+	local steamID = api:GetPersistentPlayerSteamID(playerID)
+	local gameID = api:GetApiGameId()
+	if steamID == nil or gameID == nil or tostring(gameID) == "" or tostring(gameID) == "0" then
+		return nil
+	end
+	return tostring(gameID) .. ":" .. tostring(steamID)
+end
+
+function Battlepass:GetSupporterArmoryRefreshState(playerID)
+	local key = self:GetSupporterArmoryRefreshKey(playerID)
+	return key ~= nil and self.SupporterArmoryRefreshState[key] or nil
+end
+
+function Battlepass:SupporterPassRefreshArmory(event_source_index, event)
+	local payload = self:GetSupporterPassEventPayload(event_source_index, event)
+	local playerID = payload.PlayerID
+	if playerID == nil then
+		return
+	end
+
+	local player = PlayerResource:GetPlayer(playerID)
+	local key = self:GetSupporterArmoryRefreshKey(playerID)
+	if player == nil or key == nil or api == nil or api.RefreshSupporterPassArmory == nil then
+		self:SendSupporterPassFailure(
+			playerID,
+			"supporter_pass_armory_refresh_failed",
+			"#xhs_sp_armory_refresh_failed",
+			{ code = "armory_refresh_unavailable" }
+		)
+		return
+	end
+
+	if self.SupporterArmoryRefreshState[key] ~= nil then
+		self:SendSupporterPassFailure(
+			playerID,
+			"supporter_pass_armory_refresh_failed",
+			"#xhs_sp_armory_refresh_used",
+			{ code = "armory_refresh_already_used" }
+		)
+		return
+	end
+
+	-- Consume the one allowed attempt before starting HTTP. This makes the
+	-- limit authoritative even if a client double-clicks or the request fails.
+	self.SupporterArmoryRefreshState[key] = "pending"
+	if SupporterPass ~= nil and SupporterPass.PublishPlayer ~= nil then
+		SupporterPass:PublishPlayer(playerID)
+	end
+
+	api:RefreshSupporterPassArmory(playerID, function(success, result)
+		self.SupporterArmoryRefreshState[key] = "used"
+		if SupporterPass ~= nil and SupporterPass.PublishPlayer ~= nil then
+			SupporterPass:PublishPlayer(playerID)
+		end
+
+		local livePlayer = PlayerResource:GetPlayer(playerID)
+		if livePlayer == nil then
+			return
+		end
+		if success then
+			CustomGameEventManager:Send_ServerToPlayer(livePlayer, "supporter_pass_armory_refresh_success", {})
+		else
+			CustomGameEventManager:Send_ServerToPlayer(livePlayer, "supporter_pass_armory_refresh_failed", {
+				code = type(result) == "table" and result.code or "armory_refresh_failed",
+				message = "#xhs_sp_armory_refresh_failed",
+			})
+		end
 	end)
 end
 

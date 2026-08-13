@@ -171,6 +171,7 @@ end
 function api:Init()
 	CustomGameEventManager:RegisterListener("api_change_companion", Dynamic_Wrap(self, "SetCompanion"))
 	CustomGameEventManager:RegisterListener("loading_screen_api_request", Dynamic_Wrap(self, "OnLoadingScreenApiRequest"))
+	CustomGameEventManager:RegisterListener("xhs_achievements_mark_revealed", Dynamic_Wrap(self, "OnAchievementsMarkRevealed"))
 end
 
 -- Utils
@@ -1007,6 +1008,47 @@ function api:MergeSupporterPassResponse(steamid, data)
 	end
 end
 
+function api:RefreshSupporterPassArmory(player_id, callback)
+	callback = callback or function() end
+	local steamid = self:GetPersistentPlayerSteamID(player_id)
+	local game_id = self:GetApiGameId()
+	if steamid == nil then
+		return callback(false, { code = "non_persistent_player" })
+	end
+	if game_id == nil or tostring(game_id) == "" or tostring(game_id) == "0" then
+		return callback(false, { code = "game_not_registered" })
+	end
+
+	self:Request("armory", function(data)
+		if self:GetPersistentPlayerSteamID(player_id) ~= tostring(steamid) then
+			return callback(false, { code = "player_session_changed" })
+		end
+
+		data = type(data) == "table" and data or {}
+		local armory = data.armory or data.items or data.rewards or data
+		if type(armory) ~= "table" then
+			armory = {}
+		end
+
+		self.players[steamid] = self.players[steamid] or {}
+		local player = self.players[steamid]
+		player.supporter_pass = player.supporter_pass or {}
+		player.armory = armory
+		player.supporter_pass.armory = armory
+		if data.loadout ~= nil or data.equipped ~= nil then
+			player.supporter_pass.loadout = data.loadout or data.equipped
+		end
+
+		self:PublishSupporterPassArmory(player_id, armory)
+		callback(true, { armory = armory })
+	end, function(error)
+		callback(false, error)
+	end, "POST", {
+		steamid = steamid,
+		game_id = game_id,
+	})
+end
+
 function api:RefreshSupporterPassClaims(player_id, callback)
 	callback = callback or function() end
 	if self:HasXHSBotSession() then
@@ -1336,6 +1378,146 @@ function api:UpdateSupporterPassSettings(player_id, settings, callback)
 	})
 end
 
+local function GetAchievementProfileFromResponse(data)
+	if type(data) ~= "table" then return nil end
+	if type(data.profile) == "table" then return data.profile end
+	if type(data.achievements) == "table" and type(data.achievements.profile) == "table" then
+		return data.achievements.profile
+	end
+	if type(data.catalog) == "table" and type(data.progress) == "table" then return data end
+	return nil
+end
+
+function api:MergeAchievementResponse(steamid, data)
+	steamid = steamid ~= nil and tostring(steamid) or nil
+	if steamid == nil or type(data) ~= "table" then return nil end
+	self.players = self.players or {}
+	self.players[steamid] = self.players[steamid] or {}
+	local achievementData = type(data.achievements) == "table" and data.achievements or data
+	local profile = GetAchievementProfileFromResponse(data)
+	if profile ~= nil then
+		-- A full profile contains every historical unlock. Only completion responses
+		-- carry the small `unlocks` delta that should trigger the reveal animation.
+		if type(data.achievements) == "table" and type(data.achievements.unlocks) == "table" then
+			profile.new_unlocks = data.achievements.unlocks
+		end
+		self.players[steamid].achievements = profile
+	elseif type(achievementData) == "table" then
+		self.players[steamid].achievements = self.players[steamid].achievements or {}
+		for field, value in pairs(achievementData) do
+			self.players[steamid].achievements[field] = value
+		end
+	end
+	return self.players[steamid].achievements
+end
+
+function api:PublishAchievements(player_id)
+	if not self:IsPersistentPlayerID(player_id) then return end
+	local steamid = self:GetPersistentPlayerSteamID(player_id)
+	local player = steamid ~= nil and self.players and self.players[steamid] or nil
+	local achievements = player and player.achievements or {}
+
+	-- The complete profile eventually exceeds the safe size of one CustomNetTable
+	-- value (especially after a veteran account unlocks every rank). Publish the
+	-- immutable catalogue separately in small chunks and keep the per-player value
+	-- deliberately compact. This also avoids replicating the same 10KB catalogue
+	-- once per connected player.
+	local catalog = type(achievements.catalog) == "table" and achievements.catalog or nil
+	if catalog ~= nil and #catalog > 0 and not self.achievement_catalog_published then
+		local chunk_size = 12
+		local chunk_count = math.ceil(#catalog / chunk_size)
+		for chunk_index = 1, chunk_count do
+			local chunk = {}
+			local first = ((chunk_index - 1) * chunk_size) + 1
+			local last = math.min(first + chunk_size - 1, #catalog)
+			for index = first, last do
+				table.insert(chunk, catalog[index])
+			end
+			CustomNetTables:SetTableValue("xhs_achievements_catalog", "items_" .. tostring(chunk_index), {
+				items = chunk,
+			})
+		end
+		CustomNetTables:SetTableValue("xhs_achievements_catalog", "meta", {
+			chunk_count = chunk_count,
+			item_count = #catalog,
+			schema_version = tonumber(achievements.schema_version) or 1,
+		})
+		self.achievement_catalog_published = true
+	end
+
+	local function CompactRows(rows, fields)
+		local compact = {}
+		if type(rows) ~= "table" then return compact end
+		for _, row in pairs(rows) do
+			if type(row) == "table" then
+				local output = {}
+				for _, field in ipairs(fields) do
+					if row[field] ~= nil then output[field] = row[field] end
+				end
+				table.insert(compact, output)
+			end
+		end
+		return compact
+	end
+
+	local compact_profile = {
+		schema_version = achievements.schema_version,
+		score = achievements.score,
+		progress = CompactRows(achievements.progress, { "achievement_id", "value", "state" }),
+		unlocks = CompactRows(achievements.unlocks, { "achievement_id", "rank" }),
+		pins = CompactRows(achievements.pins, { "slot", "achievement_id", "rank" }),
+		reveal_queue = CompactRows(achievements.reveal_queue, { "id", "achievement_id", "rank", "source" }),
+		new_unlocks = CompactRows(achievements.new_unlocks, { "id", "achievement_id", "rank", "fragment_balance" }),
+		records = achievements.records or {},
+	}
+	-- Historical unlocks remain visible in the collection everywhere, but the
+	-- cinematic backlog is only opened by a real eligible human match. A Tools,
+	-- cheat or XHS-bot session must never consume (or reveal) that queue.
+	if IsInToolsMode() or self:IsCheatGame() or self:HasXHSBotParticipants() then
+		compact_profile.reveal_queue = {}
+	end
+	CustomNetTables:SetTableValue("xhs_achievements_player", tostring(player_id), compact_profile)
+end
+
+function api:RefreshAchievements(player_id, callback)
+	callback = callback or function() end
+	local steamid = self:GetPersistentPlayerSteamID(player_id)
+	if steamid == nil or self:GetApiGameId() == nil then
+		callback(false, { code = "non_persistent_player" })
+		return
+	end
+	self:Request("achievements/player", function(data)
+		if self:GetPersistentPlayerSteamID(player_id) ~= steamid then return end
+		self:MergeAchievementResponse(steamid, data or {})
+		self:PublishAchievements(player_id)
+		callback(true, data or {})
+	end, function(error)
+		callback(false, error or {})
+	end, "POST", { game_id = self:GetApiGameId(), steamid = steamid }, { silent = true })
+end
+
+function api:OnAchievementsMarkRevealed(_, keys)
+	keys = keys or {}
+	local player_id = tonumber(keys.PlayerID)
+	local steamid = player_id ~= nil and self:GetPersistentPlayerSteamID(player_id) or nil
+	if steamid == nil or self:GetApiGameId() == nil then return end
+	local ids = type(keys.ids) == "table" and keys.ids or {}
+	self:Request("achievements/revealed", function()
+		if self:GetPersistentPlayerSteamID(player_id) ~= steamid then return end
+		local player = self.players and self.players[steamid] or nil
+		local queue = player and player.achievements and player.achievements.reveal_queue or nil
+		if type(queue) ~= "table" then return end
+		local revealed = {}
+		for _, id in pairs(ids) do revealed[tonumber(id)] = true end
+		local remaining = {}
+		for _, entry in pairs(queue) do
+			if not revealed[tonumber(entry.id)] then table.insert(remaining, entry) end
+		end
+		player.achievements.reveal_queue = remaining
+		self:PublishAchievements(player_id)
+	end, function() end, "POST", { game_id = self:GetApiGameId(), steamid = steamid, ids = ids }, { silent = true })
+end
+
 function api:CreateSupporterPaymentIntent(player_id, context, callback)
 	callback = callback or function() end
 	context = context or {}
@@ -1350,6 +1532,7 @@ function api:CreateSupporterPaymentIntent(player_id, context, callback)
 		source = tostring(context.source or "supporter_pass"),
 		locale = tostring(context.locale or "en"),
 		game_mode = tostring(context.game_mode or "xhs"),
+		requested_tier_id = tonumber(context.requested_tier_id),
 	}
 
 	self:Request("supporter-pass/payment-intent", function(data)
@@ -2683,6 +2866,8 @@ function api:RegisterGame(callback, register_players)
 			if api:IsPersistentPlayerID(player_id) then
 				api:PublishSupporterPassArmory(player_id)
 				api:RefreshSupporterPassClaims(player_id)
+				api:PublishAchievements(player_id)
+				api:RefreshAchievements(player_id)
 			end
 		end
 
@@ -2798,6 +2983,9 @@ function api:ProcessCompletedGame(data, payload, skipWinner)
 				if api.MergeSupporterPassResponse then
 					api:MergeSupporterPassResponse(steamid, player_data)
 				end
+				if api.MergeAchievementResponse then
+					api:MergeAchievementResponse(steamid, player_data)
+				end
 			end
 		end
 	end
@@ -2805,6 +2993,28 @@ function api:ProcessCompletedGame(data, payload, skipWinner)
 	MergeCompletedPlayers(data)
 	if SupporterPass and SupporterPass.PublishPlayers then
 		SupporterPass:PublishPlayers()
+	end
+	for player_id = 0, DOTA_MAX_TEAM_PLAYERS - 1 do
+		if api:IsPersistentPlayerID(player_id) then
+			api:PublishAchievements(player_id)
+			local steamid = api:GetPersistentPlayerSteamID(player_id)
+			local player = steamid ~= nil and api.players and api.players[steamid] or nil
+			local profile = player and player.achievements or nil
+			local has_new_unlocks = type(profile) == "table" and type(profile.new_unlocks) == "table" and #profile.new_unlocks > 0
+			local has_reveal_backlog = type(profile) == "table" and type(profile.reveal_queue) == "table" and #profile.reveal_queue > 0
+			-- A player's first eligible match also releases the reliable historical
+			-- backlog. Notify Panorama even when that match did not add a brand-new
+			-- rank, otherwise the retroactive ceremony could wait for another UI
+			-- refresh before opening.
+			if has_new_unlocks or has_reveal_backlog then
+				local owner = PlayerResource:GetPlayer(player_id)
+				if owner ~= nil then
+					CustomGameEventManager:Send_ServerToPlayer(owner, "xhs_achievements_unlocked", { unlocks = profile.new_unlocks or {} })
+				end
+				profile.new_unlocks = nil
+				api:PublishAchievements(player_id)
+			end
+		end
 	end
 
 	local full_data = {
@@ -3228,6 +3438,77 @@ function api:CompleteGame()
 		end
 	end
 
+	local human_player_count = 0
+	local human_deaths_total = 0
+	local team_consumables_used = 0
+	for _, player in pairs(backend_players) do
+		human_player_count = human_player_count + 1
+		human_deaths_total = human_deaths_total + (tonumber(player.deaths) or 0)
+		local player_consumables = (tonumber(player.potions_used) or 0)
+			+ (tonumber(player.tomes_bought_small) or 0)
+			+ (tonumber(player.tomes_bought_big) or 0)
+			+ (tonumber(player.tomes_bought_power) or 0)
+		team_consumables_used = team_consumables_used + player_consumables
+		player.achievement_evidence = {
+			consumables_used = player_consumables,
+			hellscream_defeated = GameMode ~= nil and GameMode.XHSGromRealDefeated == true,
+			pit_lord_defeated = GameMode ~= nil and GameMode.XHSPitLordDefeated == true,
+		}
+	end
+
+	local ancient_health_percent = 0
+	local ancient = Entities:FindByName(nil, "dota_goodguys_fort")
+	if ancient ~= nil and not ancient:IsNull() and ancient.GetMaxHealth ~= nil
+		and ancient:GetMaxHealth() > 0 then
+		ancient_health_percent = math.max(0, math.min(100,
+			(ancient:GetHealth() / ancient:GetMaxHealth()) * 100))
+	end
+	local victory = tonumber(winnerTeam) == DOTA_TEAM_GOODGUYS
+	local required_objective_count = 0
+	local required_objectives_complete = victory
+	local zones = GameRules.GameMode ~= nil and GameRules.GameMode.Zones
+		or (GameMode ~= nil and GameMode.Zones)
+	for _, zone in pairs(zones or {}) do
+		for _, quest in pairs(zone.Quests or {}) do
+			-- Only objectives that actually belonged to this run count. This avoids
+			-- treating inactive branch/phase definitions as missed objectives.
+			if quest ~= nil and quest.bOptional ~= true and quest.bActivated == true then
+				required_objective_count = required_objective_count + 1
+				if quest.bCompleted ~= true then
+					required_objectives_complete = false
+				end
+			end
+		end
+	end
+	required_objectives_complete = required_objectives_complete
+		and required_objective_count > 0
+	local achievement_evidence = {
+		ancient_health_percent = ancient_health_percent,
+		human_player_count = human_player_count,
+		human_deaths_total = human_deaths_total,
+		team_consumables_used = team_consumables_used,
+		campaign_complete = victory,
+		required_objective_count = required_objective_count,
+		required_objectives_complete = required_objectives_complete,
+		grom_real_defeated = GameMode ~= nil and GameMode.XHSGromRealDefeated == true,
+		grom_false_copy_damaged = GameMode ~= nil and GameMode.XHSGromFalseCopyDamaged == true,
+		hellscream_defeated = GameMode ~= nil and GameMode.XHSGromRealDefeated == true,
+		pit_lord_defeated = GameMode ~= nil and GameMode.XHSPitLordDefeated == true,
+	}
+	-- Persist the match-wide proof on each player result as well. That keeps
+	-- retrospective achievement rebuilds deterministic even years later.
+	for _, player in pairs(backend_players) do
+		player.achievement_evidence.ancient_health_percent = ancient_health_percent
+		player.achievement_evidence.human_player_count = human_player_count
+		player.achievement_evidence.human_deaths_total = human_deaths_total
+		player.achievement_evidence.team_consumables_used = team_consumables_used
+		player.achievement_evidence.campaign_complete = victory
+		player.achievement_evidence.required_objective_count = required_objective_count
+		player.achievement_evidence.required_objectives_complete = required_objectives_complete
+		player.achievement_evidence.grom_real_defeated = achievement_evidence.grom_real_defeated
+		player.achievement_evidence.grom_false_copy_damaged = achievement_evidence.grom_false_copy_damaged
+	end
+
 	local payload = {
 		winner = winnerTeam,
 		game_id = api_game_id,
@@ -3254,6 +3535,7 @@ function api:CompleteGame()
 		-- both humans and bots can therefore reward only its persistent humans.
 		-- Every Tools session remains fully non-persistent, with or without bots.
 		persistent_rewards_eligible = not is_tools_session,
+		achievement_evidence = achievement_evidence,
 	}
 	local backend_payload = {}
 	for key, value in pairs(payload) do

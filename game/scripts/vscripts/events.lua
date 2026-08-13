@@ -1577,6 +1577,7 @@ ListenToGameEvent('entity_killed', function(keys)
 	end
 
 	if killedUnit:GetUnitName() == "npc_dota_hero_grom_hellscream" and not killedUnit:IsIllusion() then
+		GameMode.XHSGromRealDefeated = true
 		if killedUnit.phantasm_illusions ~= nil then
 			for _, illusion in pairs(killedUnit.phantasm_illusions) do
 				if illusion ~= nil and IsValidEntity(illusion) and not illusion:IsNull() and illusion:IsAlive() then
@@ -1695,6 +1696,7 @@ ListenToGameEvent('entity_killed', function(keys)
 			MAGTHERIDON = MAGTHERIDON + 1
 
 			if MAGTHERIDON >= GetXHSMagtheridonKillLimit(difficulty) then
+				GameMode.XHSPitLordDefeated = true
 				if PlayMagtheridonFinalDeathSequence ~= nil then
 					PlayMagtheridonFinalDeathSequence(killedUnit)
 				end
@@ -1842,6 +1844,24 @@ ListenToGameEvent('entity_killed', function(keys)
 		end
 	end
 	--	print("EntityKilled: Not Hero or Creature or Building.")
+end, nil)
+
+-- Server-authoritative evidence for See Through the Lie. Any human-controlled
+-- damage to one of Grom's false copies invalidates the condition for the match.
+ListenToGameEvent('entity_hurt', function(keys)
+	local victimIndex = tonumber(keys.entindex_killed or keys.entindex_victim)
+	local attackerIndex = tonumber(keys.entindex_attacker)
+	if victimIndex == nil or attackerIndex == nil then return end
+	local victim = EntIndexToHScript(victimIndex)
+	local attacker = EntIndexToHScript(attackerIndex)
+	if victim == nil or victim:IsNull() or attacker == nil or attacker:IsNull() then return end
+	if victim:GetUnitName() ~= "npc_dota_hero_grom_hellscream_clone" then return end
+	local playerID = XHSGetPlayerIDFromUnit ~= nil and XHSGetPlayerIDFromUnit(attacker)
+		or (attacker.GetPlayerOwnerID ~= nil and attacker:GetPlayerOwnerID() or -1)
+	if playerID ~= nil and playerID >= 0 and PlayerResource:IsValidPlayerID(playerID)
+		and not (api ~= nil and api.IsXHSBotParticipant ~= nil and api:IsXHSBotParticipant(playerID)) then
+		GameMode.XHSGromFalseCopyDamaged = true
+	end
 end, nil)
 
 ---------------------------------------------------------

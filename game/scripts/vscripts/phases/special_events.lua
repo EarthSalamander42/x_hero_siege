@@ -48,7 +48,7 @@ local FARM_LEADERBOARD_UPDATE_INTERVAL = 0.5
 local KILL_EVENT_LEADERBOARD_NET_TABLE = "xhs_sogat_leaderboard"
 local KILL_EVENT_LEADERBOARD_NET_KEY = "state"
 local KILL_EVENT_LEADERBOARD_UPDATE_INTERVAL = 0.25
-local RAMERO_KILL_RACE_START = 250
+local KILL_EVENT_LEADERBOARD_REVEAL_REMAINING = 50
 local KILL_EVENT_OBJECTIVES_NET_TABLE = "xhs_kill_event_objectives"
 local KILL_EVENT_OBJECTIVES_NET_KEY = "state"
 local FARM_EVENT_RETURN_TELEPORT_DURATION = 3.0
@@ -935,13 +935,13 @@ function SpecialEvents:GetKillEventLeaderboardConfig()
 		return {
 			mode = "ramero_kill_race",
 			target_kills = XHS_RAMERO_BARISTOL_KILLS_REQUIRED,
-			start_kills = RAMERO_KILL_RACE_START,
+			start_kills = math.max(0, XHS_RAMERO_BARISTOL_KILLS_REQUIRED - KILL_EVENT_LEADERBOARD_REVEAL_REMAINING),
 		}
 	elseif progression == 1 then
 		return {
 			mode = "sogat_kill_race",
 			target_kills = XHS_SOGAT_KILLS_REQUIRED,
-			start_kills = XHS_RAMERO_BARISTOL_KILLS_REQUIRED,
+			start_kills = math.max(0, XHS_SOGAT_KILLS_REQUIRED - KILL_EVENT_LEADERBOARD_REVEAL_REMAINING),
 		}
 	end
 	return nil
@@ -1070,7 +1070,11 @@ function SpecialEvents:RefreshKillEventLeaderboard()
 		end
 
 		local currentPlayers, currentLeaderKills = self:GetKillEventLeaderboardPlayers(currentConfig.target_kills)
-		if currentLeaderKills >= currentConfig.target_kills then
+		-- The publisher may survive the exact frame on which Ramero & Baristol
+		-- advances the progression to Sogat. Re-apply both bounds for the new
+		-- objective so its panel stays hidden until a player is genuinely close.
+		if currentLeaderKills < currentConfig.start_kills
+		or currentLeaderKills >= currentConfig.target_kills then
 			self.kill_event_leaderboard_active = false
 			self.kill_event_leaderboard_publisher_running = false
 			self:PublishKillEventLeaderboard(false, {}, currentConfig)

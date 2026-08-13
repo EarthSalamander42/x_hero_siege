@@ -52,6 +52,9 @@
 					<Button id="XHSPassTabOverview" class="XHSPassTab IsActive">
 						<Label text="#xhs_sp_tab_overview" />
 					</Button>
+					<Button id="XHSPassTabAchievements" class="XHSPassTab">
+						<Label text="#xhs_sp_tab_achievements" />
+					</Button>
 					<Button id="XHSPassTabRewards" class="XHSPassTab">
 						<Label text="#xhs_sp_tab_rewards" />
 					</Button>
@@ -158,6 +161,37 @@
 						</Panel>
 					</Panel>
 
+					<Panel id="XHSPassAchievementsPage" class="XHSPassPage">
+						<Panel id="XHSPassAchievementsScroll" class="XHSPassAchievementsScroll">
+							<Panel class="XHSPassAchievementsHero">
+								<Panel class="XHSPassAchievementsHeroCopy">
+									<Label class="XHSPassAchievementsEyebrow" text="#xhs_sp_achievements_eyebrow" />
+									<Label class="XHSPassAchievementsTitle" text="#xhs_sp_achievements_title" />
+									<Label class="XHSPassAchievementsIntro" text="#xhs_sp_achievements_intro" />
+								</Panel>
+								<Panel class="XHSPassAchievementsSummary">
+									<Panel class="XHSPassAchievementsSummaryStat IsScore">
+										<Label class="XHSPassAchievementsSummaryLabel" text="#xhs_sp_achievement_score" />
+										<Label id="XHSPassAchievementScore" class="XHSPassAchievementsSummaryValue" text="0" />
+									</Panel>
+									<Panel class="XHSPassAchievementsSummaryStat">
+										<Label class="XHSPassAchievementsSummaryLabel" text="#xhs_sp_achievement_completion" />
+										<Label id="XHSPassAchievementCompletion" class="XHSPassAchievementsSummaryValue" text="0 / 0" />
+									</Panel>
+								</Panel>
+							</Panel>
+
+							<Panel class="XHSPassAchievementsToolbar">
+								<Button id="XHSPassAchievementFilterAll" class="XHSPassAchievementFilter IsActive"><Label text="#xhs_sp_achievement_filter_all" /></Button>
+								<Button id="XHSPassAchievementFilterProgress" class="XHSPassAchievementFilter"><Label text="#xhs_sp_achievement_filter_progress" /></Button>
+								<Button id="XHSPassAchievementFilterComplete" class="XHSPassAchievementFilter"><Label text="#xhs_sp_achievement_filter_complete" /></Button>
+								<Button id="XHSPassAchievementFilterComing" class="XHSPassAchievementFilter"><Label text="#xhs_sp_achievement_filter_coming" /></Button>
+							</Panel>
+
+							<Panel id="XHSPassAchievementsGrid" class="XHSPassAchievementsGrid" />
+						</Panel>
+					</Panel>
+
 					<Panel id="XHSPassRewardsPage" class="XHSPassPage">
 						<Panel class="XHSPassSectionHeader">
 							<Label class="XHSPassSectionTitle" text="#xhs_sp_season_rewards" />
@@ -167,33 +201,48 @@
 					</Panel>
 
 					<Panel id="XHSPassShopPage" class="XHSPassPage">
-						<Panel class="XHSPassSectionHeader HasFilters">
+						<Panel class="XHSPassSectionHeader">
 							<Label class="XHSPassSectionTitle" text="#xhs_sp_fragment_shop" />
-							<Panel id="XHSPassShopFilters" class="XHSPassSectionFilterTabs" />
 							<Label id="XHSPassShopRefresh" class="XHSPassSectionNote" text="PERMANENT CATALOG" />
 						</Panel>
-						<Panel class="XHSPassShopDiscoveryBar">
-							<TextEntry id="XHSPassShopSearch" class="XHSPassShopSearch" placeholder="Search permanent items..." />
-							<Panel class="XHSPassShopFacetGroup">
-								<Label class="XHSPassShopFacetLabel" text="EDITION" />
-								<Panel id="XHSPassShopEditionFilters" class="XHSPassShopFacetTabs" />
+						<Panel class="XHSPassShopViewTabs">
+							<Button id="XHSPassShopHighlightsTab" class="XHSPassShopViewTab IsActive"><Label text="HIGHLIGHTS" /></Button>
+							<Button id="XHSPassShopBrowseTab" class="XHSPassShopViewTab"><Label text="BROWSE ALL" /></Button>
+						</Panel>
+						<Panel id="XHSPassShopHighlightsView" class="XHSPassShopView IsVisible">
+							<Panel class="XHSPassShopViewHeader">
+								<Label class="XHSPassShopViewTitle" text="CURATED HIGHLIGHTS" />
+								<Label class="XHSPassShopViewNote" text="FEATURED PICKS FROM THE PERMANENT CATALOG" />
 							</Panel>
-							<Panel class="XHSPassShopFacetGroup IsRarity">
-								<Label class="XHSPassShopFacetLabel" text="RARITY" />
-								<Panel id="XHSPassShopRarityFilters" class="XHSPassShopFacetTabs" />
+							<Panel id="XHSPassShopHighlights" class="XHSPassShopHighlights">
+								<Panel id="XHSPassShopHero" class="XHSPassShopHero" />
+								<Panel id="XHSPassShopFeatured" class="XHSPassShopFeatured" />
 							</Panel>
-							<Label id="XHSPassShopCatalogMeta" class="XHSPassShopCatalogMeta" text="" />
 						</Panel>
-						<Panel id="XHSPassShopHighlights" class="XHSPassShopHighlights">
-							<Panel id="XHSPassShopHero" class="XHSPassShopHero" />
-							<Panel id="XHSPassShopFeatured" class="XHSPassShopFeatured" />
+						<Panel id="XHSPassShopBrowseView" class="XHSPassShopView XHSPassShopBrowseView">
+							<Panel class="XHSPassShopBrowseHeader">
+								<Label class="XHSPassShopViewTitle" text="BROWSE THE CATALOG" />
+								<Panel id="XHSPassShopFilters" class="XHSPassSectionFilterTabs" />
+							</Panel>
+							<Panel class="XHSPassShopDiscoveryBar">
+								<TextEntry id="XHSPassShopSearch" class="XHSPassShopSearch" placeholder="Search permanent items..." />
+								<Panel class="XHSPassShopFacetGroup">
+									<Label class="XHSPassShopFacetLabel" text="EDITION" />
+									<Panel id="XHSPassShopEditionFilters" class="XHSPassShopFacetTabs" />
+								</Panel>
+								<Panel class="XHSPassShopFacetGroup IsRarity">
+									<Label class="XHSPassShopFacetLabel" text="RARITY" />
+									<Panel id="XHSPassShopRarityFilters" class="XHSPassShopFacetTabs" />
+								</Panel>
+								<Label id="XHSPassShopCatalogMeta" class="XHSPassShopCatalogMeta" text="" />
+							</Panel>
+							<Panel id="XHSPassShopCatalogHeader" class="XHSPassShopCatalogHeader">
+								<Label class="XHSPassShopCatalogTitle" text="PERMANENT COLLECTION" />
+								<Label id="XHSPassShopCatalogCount" class="XHSPassShopCatalogCount" text="" />
+							</Panel>
+							<Panel id="XHSPassShopPager" class="XHSPassPaginationBar" />
+							<Panel id="XHSPassShopGrid" class="XHSPassShopGrid" />
 						</Panel>
-						<Panel id="XHSPassShopCatalogHeader" class="XHSPassShopCatalogHeader">
-							<Label class="XHSPassShopCatalogTitle" text="PERMANENT COLLECTION" />
-							<Label id="XHSPassShopCatalogCount" class="XHSPassShopCatalogCount" text="" />
-						</Panel>
-						<Panel id="XHSPassShopPager" class="XHSPassPaginationBar" />
-						<Panel id="XHSPassShopGrid" class="XHSPassShopGrid" />
 						<Panel id="XHSPassShopDetailOverlay" class="XHSPassShopDetailOverlay" hittest="false">
 							<Button id="XHSPassShopDetailBackdrop" class="XHSPassShopDetailBackdrop" />
 							<Panel class="XHSPassShopDetailWindow">
@@ -207,12 +256,34 @@
 								<Panel id="XHSPassShopDetailBody" class="XHSPassShopDetailBody" />
 							</Panel>
 						</Panel>
+						<Panel id="XHSPassPurchaseConfirmOverlay" class="XHSPassPurchaseConfirmOverlay" hittest="false">
+							<Button id="XHSPassPurchaseConfirmBackdrop" class="XHSPassPurchaseConfirmBackdrop" />
+							<Panel class="XHSPassPurchaseConfirmWindow">
+								<Label class="XHSPassPurchaseConfirmEyebrow" text="#xhs_sp_purchase_confirmation" />
+								<Panel class="XHSPassPurchaseConfirmItem">
+									<Panel id="XHSPassPurchaseConfirmPreview" class="XHSPassPurchaseConfirmPreview" />
+									<Panel class="XHSPassPurchaseConfirmCopy">
+										<Label id="XHSPassPurchaseConfirmTitle" class="XHSPassPurchaseConfirmTitle" text="" />
+										<Label id="XHSPassPurchaseConfirmPrice" class="XHSPassPurchaseConfirmPrice" text="" />
+									</Panel>
+								</Panel>
+								<Label class="XHSPassPurchaseConfirmPolicy" text="#xhs_sp_purchase_no_refund_notice" />
+								<Label id="XHSPassPurchaseConfirmOwnership" class="XHSPassPurchaseConfirmOwnership" text="" />
+								<Panel class="XHSPassPurchaseConfirmActions">
+									<Button id="XHSPassPurchaseConfirmCancel" class="XHSPassPurchaseConfirmCancel"><Label text="#xhs_sp_cancel" /></Button>
+									<Button id="XHSPassPurchaseConfirmSubmit" class="XHSPassPurchaseConfirmSubmit"><Label text="#xhs_sp_confirm_purchase" /></Button>
+								</Panel>
+							</Panel>
+						</Panel>
 					</Panel>
 
 					<Panel id="XHSPassArmoryPage" class="XHSPassPage">
 						<Panel class="XHSPassSectionHeader HasFilters XHSPassArmoryHeader">
 							<Label class="XHSPassSectionTitle" text="#xhs_sp_armory" />
 							<Panel id="XHSPassArmoryFilters" class="XHSPassSectionFilterTabs" />
+							<Button id="XHSPassArmoryRefreshButton" class="XHSPassArmoryRefreshButton">
+								<Label id="XHSPassArmoryRefreshLabel" text="#xhs_sp_armory_refresh" />
+							</Button>
 							<Label class="XHSPassSectionNote" text="#xhs_sp_armory_note" />
 						</Panel>
 						<Panel id="XHSPassArmoryPager" class="XHSPassPaginationBar" />
@@ -258,6 +329,55 @@
 								<Label text="#xhs_sp_save" />
 							</Button>
 						</Panel>
+					</Panel>
+				</Panel>
+			</Panel>
+
+		<Panel id="XHSPassAchievementRevealOverlay" class="XHSPassAchievementRevealOverlay" hittest="false" ignore-parent-flow="true">
+				<Panel class="XHSPassAchievementRevealBackdrop" hittest="false" />
+				<Panel class="XHSPassAchievementRevealBurst" hittest="false" />
+				<Panel class="XHSPassAchievementRevealWindow">
+					<Label class="XHSPassAchievementRevealEyebrow" text="#xhs_sp_achievement_unlocked" />
+					<Image id="XHSPassAchievementRevealMedal" class="XHSPassAchievementRevealMedal" />
+					<Label id="XHSPassAchievementRevealRank" class="XHSPassAchievementRevealRank" text="GOLD" />
+					<Label id="XHSPassAchievementRevealTitle" class="XHSPassAchievementRevealTitle" text="Achievement" />
+					<Label id="XHSPassAchievementRevealDescription" class="XHSPassAchievementRevealDescription" text="" />
+					<Panel class="XHSPassAchievementRevealRewards">
+						<Panel class="XHSPassAchievementRevealReward"><Label class="XHSPassAchievementRevealRewardLabel" text="#xhs_sp_fragments" /><Label id="XHSPassAchievementRevealFragments" class="XHSPassAchievementRevealRewardValue" text="+0" /></Panel>
+						<Panel class="XHSPassAchievementRevealReward"><Label class="XHSPassAchievementRevealRewardLabel" text="#xhs_sp_achievement_score" /><Label id="XHSPassAchievementRevealPoints" class="XHSPassAchievementRevealRewardValue" text="+0" /></Panel>
+					</Panel>
+					<Panel class="XHSPassAchievementRevealActions">
+						<Button id="XHSPassAchievementRevealAllButton" class="XHSPassAchievementRevealSecondary"><Label text="#xhs_sp_achievement_reveal_all" /></Button>
+						<Button id="XHSPassAchievementRevealContinueButton" class="XHSPassAchievementRevealPrimary"><Label text="#xhs_sp_continue" /></Button>
+					</Panel>
+					<Label id="XHSPassAchievementRevealRemaining" class="XHSPassAchievementRevealRemaining" text="" />
+				</Panel>
+			</Panel>
+
+			<Panel id="XHSPassAchievementRecordHover" class="XHSPassAchievementRecordHover" hittest="false" ignore-parent-flow="true">
+				<Panel class="XHSPassAchievementRecordHoverGlow" hittest="false" ignore-parent-flow="true" />
+				<Panel class="XHSPassAchievementRecordHoverHeader">
+					<DOTAAvatarImage id="XHSPassAchievementRecordHoverAvatar" class="XHSPassAchievementRecordHoverAvatar" steamid="0" />
+					<Panel class="XHSPassAchievementRecordHoverIdentity">
+						<Label class="XHSPassAchievementRecordHoverEyebrow" text="#xhs_sp_achievement_record_holder" />
+						<DOTAUserName id="XHSPassAchievementRecordHoverName" class="XHSPassAchievementRecordHoverName" steamid="0" />
+						<Label id="XHSPassAchievementRecordHoverSteamID" class="XHSPassAchievementRecordHoverSteamID" text="SteamID" />
+					</Panel>
+					<Panel class="XHSPassAchievementRecordHoverPlacement">
+						<Label class="XHSPassAchievementRecordHoverRank" text="#1" />
+						<Label class="XHSPassAchievementRecordHoverWorldwide" text="#xhs_sp_achievement_record_worldwide" />
+					</Panel>
+				</Panel>
+				<Panel class="XHSPassAchievementRecordHoverDivider" />
+				<Panel class="XHSPassAchievementRecordHoverDetails">
+					<Image id="XHSPassAchievementRecordHoverMedal" class="XHSPassAchievementRecordHoverMedal" />
+					<Panel class="XHSPassAchievementRecordHoverAchievement">
+						<Label id="XHSPassAchievementRecordHoverTitle" class="XHSPassAchievementRecordHoverTitle" text="Achievement" />
+						<Label id="XHSPassAchievementRecordHoverTier" class="XHSPassAchievementRecordHoverTier" text="Rank" />
+					</Panel>
+					<Panel class="XHSPassAchievementRecordHoverValueBlock">
+						<Label class="XHSPassAchievementRecordHoverValueLabel" text="#xhs_sp_achievement_record_value" />
+						<Label id="XHSPassAchievementRecordHoverValue" class="XHSPassAchievementRecordHoverValue" text="0" />
 					</Panel>
 				</Panel>
 			</Panel>
@@ -315,9 +435,17 @@
 				<Label id="XHSPassActionToastText" class="XHSPassActionToastText" text="" />
 			</Panel>
 
-			<Button id="XHSPassBackToTopButton" class="XHSPassBackToTopButton">
+			<Button id="XHSPassBackToTopButton" class="XHSPassBackToTopButton" ignore-parent-flow="true">
 				<Label text="▲" />
 			</Button>
+		</Panel>
+		<!-- Static references ensure the content compiler includes every medal texture;
+		     the cards themselves select the appropriate image at runtime. -->
+		<Panel class="XHSPassAchievementAssetPreload" hittest="false">
+			<Image src="file://{images}/custom_game/achievements/achievement_rank_bronze.png" />
+			<Image src="file://{images}/custom_game/achievements/achievement_rank_silver.png" />
+			<Image src="file://{images}/custom_game/achievements/achievement_rank_gold.png" />
+			<Image src="file://{images}/custom_game/achievements/achievement_rank_xhs_absolute.png" />
 		</Panel>
 	</Panel>
 </root>

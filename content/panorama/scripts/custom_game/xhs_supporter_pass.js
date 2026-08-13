@@ -15,24 +15,30 @@ var XHSSupporterPass = (function () {
 	var currentShopEditionFilter = "All";
 	var currentShopRarityFilter = "All";
 	var currentShopSearch = "";
+	var currentShopView = "highlights";
 	var shopSearchTelemetrySerial = 0;
 	var supporterUITelemetrySequence = 0;
 	var shopDetailItem = null;
 	var shopTransportCache = null;
 	var shopTransportGeneration = -1;
 	var activePageName = "overview";
+	var currentAchievementFilter = "all";
+	var achievementRevealQueue = [];
+	var achievementRevealActive = null;
+	var achievementRevealKnown = {};
 	var currentArmoryFilter = "All";
 	var armorySearchByCategory = {};
 	var armorySearchRenderSerial = 0;
+	var armoryRefreshPending = false;
 	var paginationState = {
-		shop: { page: 0, page_size: 10 },
+		shop: { page: 0, page_size: 12 },
 		armory: { page: 0, page_size: 10 },
 		asset_request: { page: 0, page_size: 10 },
 	};
 	var assetRequestSerial = 0;
 	var shopPurchaseSerial = 0;
 	var bundleOpenSerial = 0;
-	var purchaseConfirmationUntil = {};
+	var pendingPurchaseConfirmation = null;
 	var purchaseRequestByItem = {};
 	var bundleOpenRequestByInstance = {};
 	var assetRequestResultState = {};
@@ -104,6 +110,7 @@ var XHSSupporterPass = (function () {
 
 	var PAGE_IDS = {
 		overview: "XHSPassOverviewPage",
+		achievements: "XHSPassAchievementsPage",
 		rewards: "XHSPassRewardsPage",
 		shop: "XHSPassShopPage",
 		armory: "XHSPassArmoryPage",
@@ -112,6 +119,7 @@ var XHSSupporterPass = (function () {
 
 	var TAB_IDS = {
 		overview: "XHSPassTabOverview",
+		achievements: "XHSPassTabAchievements",
 		rewards: "XHSPassTabRewards",
 		shop: "XHSPassTabShop",
 		armory: "XHSPassTabArmory",
@@ -380,9 +388,9 @@ var XHSSupporterPass = (function () {
 		if (lowerImagePath.indexOf(".vpcf") !== -1 || lowerImagePath.indexOf("particles/") === 0) {
 			return "";
 		}
-		var supporterCDNMatch = rawImagePath.match(/^https?:\/\/cdn\.frostrose-studio\.com\/static\/images\/battlepass\/xhs-4\.0\/([^/?#]+)/i);
+		var supporterCDNMatch = rawImagePath.match(/^https?:\/\/cdn\.frostrose-studio\.com\/static\/images\/battlepass\/xhs-4\.0\/([^?#]+)/i);
 		if (supporterCDNMatch) {
-			var supporterImageName = supporterCDNMatch[1].replace(/\.[^.]+$/, "").replace(/-/g, "_");
+			var supporterImageName = supporterCDNMatch[1].replace(/-v2(?=\.[^.]+$)/i, "").replace(/\.[^.]+$/, "").replace(/-/g, "_");
 			return "file://{images}/custom_game/battlepass/" + supporterImageName + ".png";
 		}
 		if (rawImagePath.indexOf("s2r://panorama/images/") === 0 || rawImagePath.indexOf("file://{images}/") === 0) {
@@ -419,6 +427,120 @@ var XHSSupporterPass = (function () {
 			panel.style.backgroundPosition = "50% 50%";
 			panel.style.backgroundRepeat = "no-repeat";
 		}
+	}
+
+	// Keep reward identity and art identity coupled even when an older backend
+	// armory payload contains stale image metadata. These paths resolve directly
+	// to Valve inventory textures shipped in Dota's VPK.
+	var SUPPORTER_ITEM_IMAGE_OVERRIDES = {
+		ti10_emblem: "battlepass/ti10_emblem",
+		ti11_emblem: "battlepass/ti11_emblem",
+		sp26_companion_carty: "econ/items/courier/carty/carty",
+		sp26_companion_llama: "econ/items/courier/livery_llama_courier/livery_llama_courier",
+		sp26_companion_jumo: "econ/items/courier/jumo/jumo",
+		sp26_companion_boooofus: "econ/items/courier/boooofus_courier/boooofus_courier",
+		sp26_companion_sappling: "econ/items/courier/little_sappling_style1/little_sappling_style1",
+		sp26_companion_vaal: "econ/items/courier/vaal_the_animated_constructradiant/vaal_the_animated_constructradiant",
+		sp26_companion_raiq: "econ/items/courier/raiq/raiq",
+		sp26_companion_amphibian_kid: "econ/courier/frog/frog",
+		sp26_companion_demi_doom: "econ/items/courier/jin_yin_white_fox/jin_yin_white_fox",
+		sp26_companion_amaterasu: "econ/items/courier/amaterasu/amaterasu",
+		sp26_companion_baekho: "econ/items/courier/baekho/baekho",
+		sp26_companion_devourling: "econ/items/courier/chocobo/chocobo",
+		sp26_companion_itsy: "econ/items/courier/itsy/itsy",
+		sp26_companion_butch: "econ/items/courier/butch_pudge_dog/butch_pudge_dog",
+		sp26_companion_golden_venoling: "econ/items/courier/snail/courier_snail",
+		sp26_companion_mega_greevil: "econ/courier/mega_greevil_courier/mega_greevil_courier",
+	};
+	var SUPPORTER_TI_BUNDLE_IMAGES = {
+		4: "battlepass/ti4_bundle",
+		5: "battlepass/ti5_bundle",
+		6: "battlepass/ti6_bundle",
+		7: "battlepass/ti7_bundle",
+		8: "battlepass/ti8_bundle",
+		9: "battlepass/ti9_bundle",
+		10: "battlepass/ti10_bundle",
+		11: "battlepass/ti11_bundle",
+	};
+	var SUPPORTER_TI_EMBLEM_IMAGES = {
+		10: "battlepass/ti10_emblem",
+		11: "battlepass/ti11_emblem",
+	};
+
+	function GetSupporterTIBundleEdition(item) {
+		if (!item) {
+			return 0;
+		}
+		var candidates = [
+			item.ti_edition,
+			item.edition,
+			item.metadata && item.metadata.ti_edition,
+			item.payload && item.payload.ti_edition,
+			item.id,
+			item.item_id,
+			item.item_name,
+			item.name,
+		];
+		for (var i = 0; i < candidates.length; i++) {
+			var value = (candidates[i] || "").toString().toLowerCase();
+			var match = value.match(/(?:^|[^a-z0-9])ti[\s_-]?(10|11|[4-9])(?:[^0-9]|$)/i);
+			if (!match && /^\d+$/.test(value)) {
+				match = [value, value];
+			}
+			var edition = match ? Math.floor(ToNumber(match[1], 0)) : 0;
+			if (SUPPORTER_TI_BUNDLE_IMAGES[edition]) {
+				return edition;
+			}
+		}
+		return 0;
+	}
+
+	function ApplySupporterItemImageOverride(item) {
+		if (!item) {
+			return item;
+		}
+		var imageOverrideKeys = [item.id, item.item_id, item.item_name, item.name];
+		var override = "";
+		for (var imageOverrideIndex = 0; imageOverrideIndex < imageOverrideKeys.length; imageOverrideIndex++) {
+			var imageOverrideKey = (imageOverrideKeys[imageOverrideIndex] || "").toString().toLowerCase();
+			if (SUPPORTER_ITEM_IMAGE_OVERRIDES[imageOverrideKey]) {
+				override = SUPPORTER_ITEM_IMAGE_OVERRIDES[imageOverrideKey];
+				break;
+			}
+		}
+		var emblemIdentity = [
+			item.item_type, item.type, item.category, item.slot_id,
+			item.id, item.item_id, item.item_name, item.name,
+		].join(" ").toLowerCase();
+		if (emblemIdentity.indexOf("emblem") !== -1) {
+			var emblemEdition = GetSupporterTIBundleEdition(item);
+			if (SUPPORTER_TI_EMBLEM_IMAGES[emblemEdition]) {
+				override = SUPPORTER_TI_EMBLEM_IMAGES[emblemEdition];
+			}
+		}
+		if (override) {
+			item.image = override;
+			item.image_inventory = override;
+			item.icon = override;
+			item.image_url = override;
+			item.preview_image = override;
+		}
+		var itemType = NormalizeRewardType(item.item_type || item.type || item.category);
+		var bundleIdentity = [item.id, item.item_id, item.item_name, item.name]
+			.join(" ")
+			.toLowerCase();
+		var isTICollection = bundleIdentity.indexOf("collection") !== -1;
+		if ((item.is_bundle === true || itemType === "Bundle") && isTICollection) {
+			var tiEdition = GetSupporterTIBundleEdition(item);
+			if (tiEdition) {
+				item.image = SUPPORTER_TI_BUNDLE_IMAGES[tiEdition];
+				item.image_inventory = item.image;
+				item.icon = item.image;
+				item.image_url = item.image;
+				item.preview_image = item.image;
+			}
+		}
+		return item;
 	}
 
 	function ApplyItemVisualClasses(panel, item, track) {
@@ -686,7 +808,7 @@ var XHSSupporterPass = (function () {
 
 		var pageSizeDropdown = $.CreatePanel("DropDown", controls, "XHSPassPageSize_" + key);
 		pageSizeDropdown.AddClass("XHSPassPageSizeDropDown");
-		var pageSizes = [10, 25];
+		var pageSizes = key === "shop" ? [12, 24] : [10, 25];
 		var selectedOptionID = "";
 		for (var pageSizeIndex = 0; pageSizeIndex < pageSizes.length; pageSizeIndex++) {
 			var pageSize = pageSizes[pageSizeIndex];
@@ -696,7 +818,7 @@ var XHSSupporterPass = (function () {
 				selectedOptionID = optionID;
 			}
 		}
-		pageSizeDropdown.SetSelected(selectedOptionID || ("XHSPassPageSize_" + key + "_10"));
+		pageSizeDropdown.SetSelected(selectedOptionID || ("XHSPassPageSize_" + key + "_" + pageSizes[0]));
 		pageSizeDropdown.SetPanelEvent("oninputsubmit", function () {
 			var selected = pageSizeDropdown.GetSelected();
 			var selectedSize = selected
@@ -1644,6 +1766,7 @@ var XHSSupporterPass = (function () {
 	}
 
 	function BuildArmoryItemFromReward(reward, player, track) {
+		ApplySupporterItemImageOverride(reward);
 		var requiredLevel = ToNumber(reward.level_required || reward.level, 1);
 		var isPremium = track === "premium" || reward.track === "premium" || reward.premium === 1 || reward.premium === "1";
 		var premiumLocked = isPremium && player.tier_id < 1;
@@ -1791,7 +1914,7 @@ var XHSSupporterPass = (function () {
 	function NormalizeBackendArmoryItems(items, player) {
 		var normalizedItems = [];
 		for (var i = 0; i < items.length; i++) {
-			var item = EnrichOwnedArmoryItem(CopyObject(items[i]));
+			var item = ApplySupporterItemImageOverride(EnrichOwnedArmoryItem(CopyObject(items[i])));
 			var activatesIn41 = IsDeferredSupporterItem(item);
 			item.type = NormalizeArmoryItemType(item);
 			item.entitlement_id = item.entitlement_id || item.id;
@@ -2159,7 +2282,7 @@ var XHSSupporterPass = (function () {
 		item.lock_reason = serverLocked && serverLockReason
 			? LocalizeMaybeKey(serverLockReason)
 			: (tierLocked ? Text("xhs_sp_shop_tier_required", "Tier {tier} required", { tier: item.min_tier }) : "");
-		return item;
+		return ApplySupporterItemImageOverride(item);
 	}
 
 	function BuildShopItemIndex(items) {
@@ -2704,6 +2827,7 @@ var XHSSupporterPass = (function () {
 		} else {
 			SetCourierRequestViewerVisible(false);
 			SetShopDetailVisible(false);
+			SetPurchaseConfirmationVisible(false);
 			window.RemoveClass("IsOpening");
 			window.RemoveClass("IsVisible");
 			window.AddClass("IsClosing");
@@ -2749,6 +2873,7 @@ var XHSSupporterPass = (function () {
 		}
 		if (pageName !== "shop") {
 			SetShopDetailVisible(false);
+			SetPurchaseConfirmationVisible(false);
 		}
 
 		activePageName = pageName;
@@ -2796,6 +2921,9 @@ var XHSSupporterPass = (function () {
 
 		if (activePage === "overview") {
 			return Panel("XHSPassOverviewGrid");
+		}
+		if (activePage === "achievements") {
+			return Panel("XHSPassAchievementsScroll");
 		}
 		if (activePage === "rewards") {
 			return Panel("XHSPassRewardTracks");
@@ -3022,9 +3150,11 @@ var XHSSupporterPass = (function () {
 			row.SetHasClass("IsClickable", !isOwnedTier);
 			row.hittest = true;
 			if (!isOwnedTier) {
-				row.SetPanelEvent("onactivate", function () {
-					OpenSupporterPortal("tier_card");
-				});
+				(function (selectedTierID) {
+					row.SetPanelEvent("onactivate", function () {
+						OpenSupporterPortal("tier_card", selectedTierID);
+					});
+				})(tier.id);
 			}
 
 			var art = $.CreatePanel("Panel", row, "");
@@ -3098,7 +3228,13 @@ var XHSSupporterPass = (function () {
 	}
 
 	function CreateRewardCard(parent, reward, player, track) {
-		var card = $.CreatePanel("Panel", parent, "");
+		var requiredLevel = ToNumber(reward.level_required || reward.level, 1);
+		var isCurrentLevel = requiredLevel === Math.max(1, ToNumber(player.season_level, 1));
+		var card = $.CreatePanel(
+			"Panel",
+			parent,
+			isCurrentLevel ? "XHSPassCurrentReward_" + track : ""
+		);
 		card.AddClass("XHSPassRewardCard");
 		ApplyItemVisualClasses(card, reward, track);
 		var devAllPreview = IsDevUnlockAllUIActive(player);
@@ -3112,7 +3248,6 @@ var XHSSupporterPass = (function () {
 		var rewardClaimed = devAllPreview
 			? devLocallyClaimed
 			: (devFreePreview || (legacyReward ? legacyUnlocked : IsRewardClaimed(reward, player)));
-		var requiredLevel = ToNumber(reward.level_required || reward.level, 1);
 		var backendReady = devPreviewUnlocked || IsTruthy(player.raw && player.raw.backend_season_ready, true);
 		var premiumLocked = (track === "premium" || reward.track === "premium" ||
 			reward.premium === 1 || reward.premium === "1") && player.tier_id < 1 && !devPreviewUnlocked;
@@ -3125,11 +3260,14 @@ var XHSSupporterPass = (function () {
 		card.SetHasClass("IsUnlocked", !rewardLocked && !rewardClaimed);
 		card.SetHasClass("IsPremiumLocked", premiumLocked);
 		card.SetHasClass("IsClaimed", rewardClaimed);
+		card.SetHasClass("IsCurrentLevel", isCurrentLevel);
 
 		var preview = CreateItemPreview(card, reward, "XHSPassRewardPreview", "XHSPassRewardImage");
 		var level = $.CreatePanel("Label", preview, "");
 		level.AddClass("XHSPassRewardLevel");
-		level.text = Text("xhs_sp_level_value", "Level {level}", { level: reward.level_required || reward.level || "-" });
+		level.text = isCurrentLevel
+			? "CURRENT · " + Text("xhs_sp_level_value", "Level {level}", { level: requiredLevel })
+			: Text("xhs_sp_level_value", "Level {level}", { level: requiredLevel });
 
 		var details = $.CreatePanel("Panel", card, "");
 		details.AddClass("XHSPassRewardDetails");
@@ -3155,6 +3293,8 @@ var XHSSupporterPass = (function () {
 				: (!legacyReward && rewardClaimable && !rewardClaimed &&
 					player.season_level >= requiredLevel && !premiumLocked && backendReady && !pending);
 			button.SetHasClass("IsLocked", !canClaim);
+			button.SetHasClass("IsClaimed", rewardClaimed || legacyUnlocked);
+			button.hittest = canClaim;
 			button.SetPanelEvent("onactivate", function () {
 				if (!canClaim) {
 					Game.EmitSound("General.Cancel");
@@ -3232,7 +3372,16 @@ var XHSSupporterPass = (function () {
 		RenderRewardTrack(canvas, Text("xhs_sp_supporter_track", "Supporter Track"), premiumRewards, player, "premium");
 
 		$.Schedule(0.0, function () {
-			if (parent && parent.IsValid() && typeof parent.ScrollToLeftEdge === "function") {
+			if (!parent || !parent.IsValid()) {
+				return;
+			}
+			var currentReward = parent.FindChildTraverse("XHSPassCurrentReward_free")
+				|| parent.FindChildTraverse("XHSPassCurrentReward_premium");
+			if (currentReward && typeof currentReward.ScrollParentToMakePanelFit === "function") {
+				currentReward.ScrollParentToMakePanelFit(0, false);
+				return;
+			}
+			if (typeof parent.ScrollToLeftEdge === "function") {
 				parent.ScrollToLeftEdge();
 			}
 		});
@@ -3375,6 +3524,15 @@ var XHSSupporterPass = (function () {
 		var heroParent = Panel("XHSPassShopHero");
 		var featuredParent = Panel("XHSPassShopFeatured");
 		var highlights = Panel("XHSPassShopHighlights");
+		var highlightsView = Panel("XHSPassShopHighlightsView");
+		var browseView = Panel("XHSPassShopBrowseView");
+		var highlightsTab = Panel("XHSPassShopHighlightsTab");
+		var browseTab = Panel("XHSPassShopBrowseTab");
+		var isBrowseView = currentShopView === "browse";
+		if (highlightsView) { highlightsView.SetHasClass("IsVisible", !isBrowseView); }
+		if (browseView) { browseView.SetHasClass("IsVisible", isBrowseView); }
+		if (highlightsTab) { highlightsTab.SetHasClass("IsActive", !isBrowseView); }
+		if (browseTab) { browseTab.SetHasClass("IsActive", isBrowseView); }
 		ClearPanel(parent);
 		ClearPanel(heroParent);
 		ClearPanel(featuredParent);
@@ -3395,59 +3553,89 @@ var XHSSupporterPass = (function () {
 		SetText("XHSPassShopCatalogMeta", releaseMeta.join("  /  "));
 
 		var items = view.catalog;
-		currentShopFilter = RenderCategoryTabs("XHSPassShopFilters", items, currentShopFilter, function (filterName) {
-			currentShopFilter = filterName;
-			ResetPagination("shop");
-			EmitSupporterUIEvent("filter", {
-				tab: "shop",
-				filter_key: "category",
-				filter_value: filterName,
+		if (isBrowseView) {
+			currentShopFilter = RenderCategoryTabs("XHSPassShopFilters", items, currentShopFilter, function (filterName) {
+				currentShopFilter = filterName;
+				ResetPagination("shop");
+				EmitSupporterUIEvent("filter", {
+					tab: "shop",
+					filter_key: "category",
+					filter_value: filterName,
+				});
+				RenderShop(player);
 			});
-			RenderShop(player);
-		});
-		currentShopEditionFilter = RenderShopFacetTabs(
-			"XHSPassShopEditionFilters",
-			GetShopFacetValues(items, "edition"),
-			currentShopEditionFilter,
-			"edition",
-			function (value) {
-				currentShopEditionFilter = value;
-				ResetPagination("shop");
-				RenderShop(player);
-			}
-		);
-		currentShopRarityFilter = RenderShopFacetTabs(
-			"XHSPassShopRarityFilters",
-			GetShopFacetValues(items, "rarity"),
-			currentShopRarityFilter,
-			"rarity",
-			function (value) {
-				currentShopRarityFilter = value;
-				ResetPagination("shop");
-				RenderShop(player);
-			}
-		);
+			currentShopEditionFilter = RenderShopFacetTabs(
+				"XHSPassShopEditionFilters",
+				GetShopFacetValues(items, "edition"),
+				currentShopEditionFilter,
+				"edition",
+				function (value) {
+					currentShopEditionFilter = value;
+					ResetPagination("shop");
+					RenderShop(player);
+				}
+			);
+			currentShopRarityFilter = RenderShopFacetTabs(
+				"XHSPassShopRarityFilters",
+				GetShopFacetValues(items, "rarity"),
+				currentShopRarityFilter,
+				"rarity",
+				function (value) {
+					currentShopRarityFilter = value;
+					ResetPagination("shop");
+					RenderShop(player);
+				}
+			);
+		}
 
 		if (items.length === 0) {
 			if (highlights) { highlights.SetHasClass("IsVisible", false); }
 			SetText("XHSPassShopCatalogCount", Text("xhs_sp_zero_items", "0 items"));
 			SetShopDetailVisible(false);
-			CreateEmpty(parent, Text("xhs_sp_shop_unavailable", "Permanent catalog unavailable"), Text("xhs_sp_shop_unavailable_body", "No permanent Supporter Pass items have been published yet."));
+			CreateEmpty(isBrowseView ? parent : heroParent, Text("xhs_sp_shop_unavailable", "Permanent catalog unavailable"), Text("xhs_sp_shop_unavailable_body", "No permanent Supporter Pass items have been published yet."));
 			return;
 		}
 
-		var showHighlights = view.structured && IsDefaultShopDiscovery() && (view.hero.length > 0 || view.featured.length > 0);
+		var highlightHero = view.hero.slice(0);
+		var highlightFeatured = view.featured.slice(0);
+		if (highlightHero.length === 0 && items.length > 0) {
+			highlightHero = [items[0]];
+		}
+		var highlightedIDs = {};
+		if (highlightHero.length > 0) { highlightedIDs[highlightHero[0].id] = true; }
+		for (var highlightIndex = 0; highlightIndex < highlightFeatured.length; highlightIndex++) {
+			highlightedIDs[highlightFeatured[highlightIndex].id] = true;
+		}
+		var highlightFallbackItems = view.items && view.items.length ? view.items : items;
+		for (var fallbackIndex = 0; highlightFeatured.length < 4 && fallbackIndex < highlightFallbackItems.length; fallbackIndex++) {
+			if (!highlightedIDs[highlightFallbackItems[fallbackIndex].id]) {
+				highlightedIDs[highlightFallbackItems[fallbackIndex].id] = true;
+				highlightFeatured.push(highlightFallbackItems[fallbackIndex]);
+			}
+		}
+		var showHighlights = !isBrowseView && (highlightHero.length > 0 || highlightFeatured.length > 0);
 		if (highlights) {
 			highlights.SetHasClass("IsVisible", showHighlights);
-			highlights.SetHasClass("HasHero", showHighlights && view.hero.length > 0);
+			highlights.SetHasClass("HasHero", showHighlights && highlightHero.length > 0);
 		}
 		if (showHighlights) {
-			if (view.hero.length > 0) {
-				CreateShopHighlight(heroParent, view.hero[0], player, true, 0);
+			if (highlightHero.length > 0) {
+				CreateShopHighlight(heroParent, highlightHero[0], player, true, 0);
 			}
-			for (var featuredIndex = 0; featuredIndex < view.featured.length; featuredIndex++) {
-				CreateShopHighlight(featuredParent, view.featured[featuredIndex], player, false, featuredIndex);
+			var featuredRows = [];
+			for (var rowIndex = 0; rowIndex < Math.ceil(highlightFeatured.length / 2); rowIndex++) {
+				var featuredRow = $.CreatePanel("Panel", featuredParent, "");
+				featuredRow.AddClass("XHSPassShopFeaturedRow");
+				featuredRow.SetHasClass("IsBottomRow", rowIndex === 1);
+				featuredRows.push(featuredRow);
 			}
+			for (var featuredIndex = 0; featuredIndex < highlightFeatured.length; featuredIndex++) {
+				CreateShopHighlight(featuredRows[Math.floor(featuredIndex / 2)], highlightFeatured[featuredIndex], player, false, featuredIndex);
+			}
+		}
+		if (!isBrowseView) {
+			RefreshShopDetail(player);
+			return;
 		}
 
 		var filteredItems = FilterShopItems(items);
@@ -3475,14 +3663,17 @@ var XHSSupporterPass = (function () {
 	}
 
 	var supporterPortalRequestPending = false;
-	function OpenSupporterPortal(source) {
+	function OpenSupporterPortal(source, tierID) {
 		if (supporterPortalRequestPending) return;
 		supporterPortalRequestPending = true;
 		Game.EmitSound("General.ButtonClick");
-		GameEvents.SendCustomGameEventToServer("supporter_pass_open_payment_portal", {
+		var payload = {
 			source: source || "supporter_pass",
 			locale: $.Language ? $.Language() : "en"
-		});
+		};
+		tierID = Math.floor(ToNumber(tierID, 0));
+		if (tierID >= 1 && tierID <= 5) payload.tier_id = tierID;
+		GameEvents.SendCustomGameEventToServer("supporter_pass_open_payment_portal", payload);
 		$.Schedule(12, function () { supporterPortalRequestPending = false; });
 	}
 
@@ -4065,6 +4256,95 @@ var XHSSupporterPass = (function () {
 		return { allowed: true, label: Text(item.owned ? "xhs_sp_buy_another" : "xhs_sp_buy", item.owned ? "Buy another" : "Buy") };
 	}
 
+	function SetPurchaseConfirmationVisible(visible) {
+		var overlay = Panel("XHSPassPurchaseConfirmOverlay");
+		if (!overlay) {
+			return;
+		}
+		overlay.SetHasClass("IsVisible", visible === true);
+		overlay.hittest = visible === true;
+		if (!visible) {
+			pendingPurchaseConfirmation = null;
+		}
+	}
+
+	function OpenPurchaseConfirmation(item, player, placement) {
+		var requestID = ShopItemID(item);
+		if (!requestID) {
+			return;
+		}
+		pendingPurchaseConfirmation = {
+			item: item,
+			placement: placement || "catalog",
+		};
+		SetText("XHSPassPurchaseConfirmTitle", LocalizeMaybeKey(item.name || item.item_name || item.id || requestID));
+		SetText("XHSPassPurchaseConfirmPrice", FormatNumber(item.price || item.fragment_price || 0) + " " + Text("xhs_sp_fragments_lower", "fragments"));
+
+		var preview = Panel("XHSPassPurchaseConfirmPreview");
+		if (preview) {
+			preview.RemoveAndDeleteChildren();
+			CreateItemPreview(preview, item, "XHSPassPurchaseConfirmItemPreview", "XHSPassShopImage");
+		}
+
+		var ownership = Panel("XHSPassPurchaseConfirmOwnership");
+		if (ownership) {
+			var ownershipText = "";
+			if (item.owned || item.has_owned_components) {
+				ownershipText = item.is_bundle
+					? Text("xhs_sp_bundle_duplicate_warning", "You already own part of this bundle. Its full price will be charged and every included item will be granted again.")
+					: Text("xhs_sp_purchase_duplicate_warning", "You already own this item. Buying it again creates another giftable copy.");
+			}
+			ownership.text = ownershipText;
+			ownership.SetHasClass("IsVisible", ownershipText.length > 0);
+		}
+		SetPurchaseConfirmationVisible(true);
+		Game.EmitSound("General.ButtonClick");
+	}
+
+	function ConfirmShopPurchase() {
+		var confirmation = pendingPurchaseConfirmation;
+		if (!confirmation || !confirmation.item) {
+			SetPurchaseConfirmationVisible(false);
+			Game.EmitSound("General.Cancel");
+			return;
+		}
+		var player = GetLocalPlayerData();
+		var requestID = ShopItemID(confirmation.item);
+		var item = FindCurrentShopItem(requestID, player) || confirmation.item;
+		var placement = confirmation.placement;
+		var state = GetShopPurchaseState(item, player);
+		if (!state.allowed || state.intent_only || !requestID) {
+			SetPurchaseConfirmationVisible(false);
+			ShowActionMessage(state.label || Text("xhs_sp_purchase_failed", "Purchase failed."), false);
+			Game.EmitSound("General.Cancel");
+			RenderShop(player);
+			return;
+		}
+
+		SetPurchaseConfirmationVisible(false);
+		var confirmationKey = requestID.toString();
+		var economicRequestID = purchaseRequestByItem[confirmationKey];
+		if (!economicRequestID) {
+			shopPurchaseSerial++;
+			economicRequestID = "game_buy_" + shopPurchaseSerial + "_" + Math.floor(Safe(function () { return Game.GetGameTime(); }, 0) * 1000);
+			purchaseRequestByItem[confirmationKey] = economicRequestID;
+		}
+		SetActionPending("purchase", requestID, true);
+		EmitSupporterUIEvent("shop_purchase_intent", {
+			item_id: requestID,
+			category: ShopFacetKey(item.item_type || item.type),
+			result: "attempted",
+			price: Math.max(0, ToNumber(item.price || item.fragment_price, 0)),
+			placement: placement,
+		});
+		GameEvents.SendCustomGameEventToServer("supporter_pass_buy_shop_item", {
+			item_id: requestID,
+			request_id: economicRequestID,
+		});
+		Game.EmitSound("General.ButtonClick");
+		RenderShop(player);
+	}
+
 	function BeginShopPurchase(item, player, placement) {
 		var state = GetShopPurchaseState(item, player);
 		var requestID = ShopItemID(item);
@@ -4078,35 +4358,7 @@ var XHSSupporterPass = (function () {
 			Game.EmitSound("General.Cancel");
 			return;
 		}
-		var confirmationKey = requestID.toString();
-		if ((item.owned || item.has_owned_components) && ToNumber(purchaseConfirmationUntil[confirmationKey], 0) < Date.now()) {
-			purchaseConfirmationUntil[confirmationKey] = Date.now() + 8000;
-			ShowActionMessage(item.is_bundle
-				? Text("xhs_sp_bundle_duplicate_warning", "You already own part of this bundle. Its full price will be charged and every included item will be granted again. Click Buy again to confirm.")
-				: Text("xhs_sp_purchase_duplicate_warning", "You already own this item. Buying it again creates another giftable copy. Click Buy again to confirm."), false);
-			Game.EmitSound("General.Cancel");
-			return;
-		}
-		delete purchaseConfirmationUntil[confirmationKey];
-		var economicRequestID = purchaseRequestByItem[confirmationKey];
-		if (!economicRequestID) {
-			shopPurchaseSerial++;
-			economicRequestID = "game_buy_" + shopPurchaseSerial + "_" + Math.floor(Safe(function () { return Game.GetGameTime(); }, 0) * 1000);
-			purchaseRequestByItem[confirmationKey] = economicRequestID;
-		}
-		SetActionPending("purchase", requestID, true);
-		EmitSupporterUIEvent("shop_purchase_intent", {
-			item_id: requestID,
-			category: ShopFacetKey(item.item_type || item.type),
-			result: "attempted",
-			price: Math.max(0, ToNumber(item.price || item.fragment_price, 0)),
-		});
-		GameEvents.SendCustomGameEventToServer("supporter_pass_buy_shop_item", {
-			item_id: requestID,
-			request_id: economicRequestID,
-		});
-		Game.EmitSound("General.ButtonClick");
-		RenderShop(GetLocalPlayerData());
+		OpenPurchaseConfirmation(item, player, placement);
 	}
 
 	function CreateShopPurchaseButton(parent, item, player, placement) {
@@ -4155,7 +4407,8 @@ var XHSSupporterPass = (function () {
 
 		var meta = $.CreatePanel("Label", card, "");
 		meta.AddClass("XHSPassShopMeta");
-		meta.text = DisplayRewardRarity(item) + "  " + DisplayRewardType(item.item_type);
+		meta.AddClass("XHSPassShopQuality");
+		meta.text = DisplayRewardRarity(item);
 
 		var price = $.CreatePanel("Label", card, "");
 		price.AddClass("XHSPassShopPrice");
@@ -4171,6 +4424,7 @@ var XHSSupporterPass = (function () {
 	function CreateShopHighlight(parent, item, player, hero, position) {
 		var card = $.CreatePanel("Panel", parent, "");
 		card.AddClass(hero ? "XHSPassShopHeroCard" : "XHSPassShopFeaturedCard");
+		card.SetHasClass("IsRightColumn", !hero && position % 2 === 1);
 		card.SetHasClass("IsOwned", item.owned === true);
 		card.SetHasClass("IsBundle", item.is_bundle === true);
 		card.SetHasClass("IsLocked", item.locked === true);
@@ -4593,6 +4847,10 @@ var XHSSupporterPass = (function () {
 			websiteNotice.AddClass("IsWebsiteOnly");
 			websiteNotice.text = Text("xhs_sp_website_purchase_notice", "This item is purchased on the Supporter Pass website. No transaction is sent from the game.");
 		}
+		var purchaseNotice = $.CreatePanel("Label", content, "");
+		purchaseNotice.AddClass("XHSPassShopDetailWarning");
+		purchaseNotice.AddClass("IsPurchasePolicy");
+		purchaseNotice.text = Text("xhs_sp_purchase_no_refund_notice", "Permanent purchase. No refunds. If you are unsure, try this item free in XHS Demo Mode before purchasing.");
 
 		var footer = $.CreatePanel("Panel", content, "");
 		footer.AddClass("XHSPassShopDetailFooter");
@@ -4679,7 +4937,11 @@ var XHSSupporterPass = (function () {
 					? Text("xhs_sp_filter_all", "All")
 					: (filterName === "New"
 						? Text("xhs_sp_filter_new", "New")
-						: (filterName === "Favorites" ? Text("xhs_sp_filter_favorites", "Favorites") : DisplayRewardType(filterName)));
+						: (filterName === "Favorites"
+							? Text("xhs_sp_filter_favorites", "Favorites")
+							: (filterName === "Cosmetic"
+								? Text("xhs_sp_filter_ascension", "Ascension")
+								: DisplayRewardType(filterName))));
 			})(filters[i]);
 		}
 
@@ -5545,6 +5807,7 @@ var XHSSupporterPass = (function () {
 		var parent = Panel("XHSPassArmoryGrid");
 		ClearPanel(parent);
 		ClearPanel(Panel("XHSPassArmoryPager"));
+		UpdateArmoryRefreshButton(player);
 
 		var items = GetArmoryItems(player);
 		currentArmoryFilter = RenderCategoryTabs("XHSPassArmoryFilters", items, currentArmoryFilter, function (filterName) {
@@ -5779,6 +6042,628 @@ var XHSSupporterPass = (function () {
 		UpdateSettingsSaveBar();
 	}
 
+	function AchievementList(value) {
+		if (!value) {
+			return [];
+		}
+		if (Object.prototype.toString.call(value) === "[object Array]") {
+			return value;
+		}
+		if (typeof value !== "object") {
+			return [value];
+		}
+		var keys = [];
+		for (var key in value) {
+			if (value.hasOwnProperty(key) && /^\d+$/.test(key)) {
+				keys.push(key);
+			}
+		}
+		keys.sort(function (a, b) { return Number(a) - Number(b); });
+		var list = [];
+		for (var i = 0; i < keys.length; i++) {
+			list.push(value[keys[i]]);
+		}
+		return list;
+	}
+
+	function GetAchievementProfile() {
+		var playerID = Players.GetLocalPlayer();
+		var profile = GetTable("xhs_achievements_player", playerID.toString(), {}) || {};
+		var meta = GetTable("xhs_achievements_catalog", "meta", {}) || {};
+		var chunkCount = Math.max(0, Math.floor(ToNumber(meta.chunk_count, 0)));
+		var catalog = [];
+		for (var chunkIndex = 1; chunkIndex <= chunkCount; chunkIndex++) {
+			var chunk = GetTable("xhs_achievements_catalog", "items_" + chunkIndex, {}) || {};
+			catalog = catalog.concat(AchievementList(chunk.items));
+		}
+		profile.catalog = catalog;
+		return profile;
+	}
+
+	function AchievementRankName(rank, isAbsolute) {
+		if (isAbsolute) {
+			return ToNumber(rank, 0) > 0
+				? Text("xhs_sp_achievement_rank_absolute", "ACHIEVEMENT COMPLETE")
+				: Text("xhs_sp_achievement_rank_locked", "LOCKED");
+		}
+		return [
+			Text("xhs_sp_achievement_rank_locked", "LOCKED"),
+			Text("xhs_sp_achievement_rank_bronze", "BRONZE"),
+			Text("xhs_sp_achievement_rank_silver", "SILVER"),
+			Text("xhs_sp_achievement_rank_gold", "GOLD"),
+			Text("xhs_sp_achievement_rank_xhs", "XHS ABSOLUTE")
+		][Clamp(Math.floor(ToNumber(rank, 0)), 0, 4)];
+	}
+
+	function AchievementMedalPath(rank, isAbsolute) {
+		if (isAbsolute) {
+			return "file://{images}/custom_game/achievements/achievement_rank_gold.png";
+		}
+		var names = ["bronze", "bronze", "silver", "gold", "xhs_absolute"];
+		return "file://{images}/custom_game/achievements/achievement_rank_" + names[Clamp(Math.floor(ToNumber(rank, 1)), 1, 4)] + ".png";
+	}
+
+	function AchievementValueLabel(value) {
+		var amount = ToNumber(value, 0);
+		if (Math.abs(amount) >= 1000000000) {
+			return (amount / 1000000000).toFixed(amount >= 10000000000 ? 0 : 1) + "B";
+		}
+		if (Math.abs(amount) >= 1000000) {
+			return (amount / 1000000).toFixed(amount >= 10000000 ? 0 : 1) + "M";
+		}
+		if (Math.abs(amount) >= 1000) {
+			return (amount / 1000).toFixed(amount >= 10000 ? 0 : 1) + "K";
+		}
+		return Math.floor(amount).toString();
+	}
+
+	function AchievementLocalized(entry, field) {
+		var fallback = entry && entry[field] || "";
+		var id = entry && entry.id || "";
+		if (!id) {
+			return fallback;
+		}
+		var token = "#xhs_achievement_" + id + "_" + field;
+		var localized = $.Localize(token);
+		return localized && localized !== token ? localized : fallback;
+	}
+
+	var ACHIEVEMENT_REQUIREMENT_FALLBACKS = {
+		veteran_defender: ["Finish an X Hero Siege run."],
+		victory_march: ["Win an X Hero Siege run."],
+		endless_horde: ["Defeat hostile units during X Hero Siege runs."],
+		full_company: ["Win the run.", "Have at least four human defenders in the match."],
+		event_veteran: ["Complete Muradin, Frost Infernal, Spirit Beast, Ramero & Baristol, or Sogat events."],
+		all_hero_challenge: ["Win a run with each distinct playable XHS hero.", "A hero only counts after a victory with that hero."],
+		siege_ascendant: [
+			"Win the run; a higher difficulty also counts toward every lower difficulty.",
+			"Bronze: 10 wins on D2+ • Silver: 25 wins on D3+.",
+			"Gold: 50 wins on D4+ • XHS Absolute: 100 wins on D5."
+		],
+		the_ancient_stands: [
+			"Win the run.",
+			"Finish with at least 70% / 80% / 90% / 100% Ancient health for Bronze / Silver / Gold / XHS Absolute."
+		],
+		borrowed_time: ["Win on Difficulty 3 or higher.", "Do not die during the run."],
+		ahead_of_schedule: [
+			"Win on Difficulty 5.",
+			"Finish within 90 / 80 / 70 / 60 minutes for Bronze / Silver / Gold / XHS Absolute."
+		],
+		one_against_the_siege: [
+			"Be the only human defender and win the run.",
+			"Bronze: D2+ • Silver: D3+ • Gold: D4+ • XHS Absolute: D5."
+		],
+		boss_breaker: ["Deal damage to XHS bosses."],
+		lifebringer: ["Accumulate self-healing during X Hero Siege runs."],
+		centaurs_retaliation: ["Accumulate damage taken during X Hero Siege runs."],
+		harvest_of_war: ["Defeat enemies during the Farm Event."],
+		tome_scholar: ["Gain permanent attributes from tomes."],
+		first_victory: ["Win one eligible X Hero Siege run."],
+		muradins_trial: ["Survive Muradin's challenge."],
+		frost_infernal: ["Defeat the Frost Infernal."],
+		spirit_beast: ["Defeat the Spirit Beast."],
+		ramero_baristol: ["Win Ramero and Baristol's arena."],
+		sogats_fall: ["Defeat Sogat."],
+		hellscream_silenced: ["Defeat the true Hellscream."],
+		pit_lord_falls: ["Defeat the Pit Lord."],
+		four_stand_as_one: ["Win the run.", "Have at least four human defenders in the match."],
+		perfect_campaign: ["Complete every required campaign objective.", "Win the run."],
+		no_one_falls: ["Win the run.", "No human defender may die."],
+		power_unspent: ["Win the run.", "Do not personally use any tome or potion."],
+		see_through_the_lie: ["Defeat the true Hellscream and win the run.", "Do not damage a false clone."],
+		sealed_supplies: ["Complete and win the full campaign.", "No human defender may use a reserve consumable."],
+		old_school_defender: ["Complete the Classic campaign after it returns in 4.1."],
+		classic_perfection: ["Master the Classic campaign after it returns in 4.1."],
+		against_the_clock: ["Complete a Time Trial run after the mode arrives in 4.1."],
+		clockbreaker: ["Master the Time Trial after the mode arrives in 4.1."],
+		second_oath: ["Use the returning revive feature after it arrives in 4.3."],
+		divine_pedestal: ["Prove yourself worthy beyond the frozen veil in 4.3."]
+	};
+
+	function CreateAchievementRequirement(parent, text, eligibilityRule) {
+		var requirement = $.CreatePanel("Panel", parent, "");
+		requirement.AddClass("XHSPassAchievementRequirement");
+		if (eligibilityRule) {
+			requirement.AddClass("IsEligibilityRule");
+		}
+		CreateAchievementLabel(requirement, "XHSPassAchievementRequirementBullet", "\u2022");
+		CreateAchievementLabel(requirement, "XHSPassAchievementRequirementText", text);
+	}
+
+	function CreateAchievementRequirements(parent, entry) {
+		var requirements = $.CreatePanel("Panel", parent, "");
+		requirements.AddClass("XHSPassAchievementRequirements");
+		CreateAchievementLabel(requirements, "XHSPassAchievementRequirementsTitle", Text("xhs_sp_achievement_requirements", "Requirements"));
+
+		var fallbackRequirements = ACHIEVEMENT_REQUIREMENT_FALLBACKS[entry.id] || [AchievementLocalized(entry, "description")];
+		for (var requirementIndex = 0; requirementIndex < fallbackRequirements.length; requirementIndex++) {
+			var suffix = requirementIndex === 0 ? "requirement" : "requirement_" + (requirementIndex + 1);
+			CreateAchievementRequirement(requirements, Text(
+				"xhs_achievement_" + entry.id + "_" + suffix,
+				fallbackRequirements[requirementIndex]
+			), false);
+		}
+
+		if (entry.available !== false && entry.available !== 0) {
+			CreateAchievementRequirement(requirements, Text(
+				"xhs_sp_achievement_requirement_eligible",
+				"Eligible matches only: no XHS bots, cheats, Tools Mode, abandons, or disconnects."
+			), true);
+		}
+	}
+
+	function AchievementProfileIndex(profile) {
+		var index = { progress: {}, unlocks: {}, pins: {}, records: profile.records || {} };
+		var progress = AchievementList(profile.progress);
+		var unlocks = AchievementList(profile.unlocks);
+		var pins = AchievementList(profile.pins);
+		for (var i = 0; i < progress.length; i++) {
+			index.progress[progress[i].achievement_id] = progress[i];
+		}
+		for (var u = 0; u < unlocks.length; u++) {
+			var unlock = unlocks[u];
+			index.unlocks[unlock.achievement_id] = Math.max(ToNumber(index.unlocks[unlock.achievement_id], 0), ToNumber(unlock.rank, 0));
+		}
+		for (var p = 0; p < pins.length; p++) {
+			index.pins[pins[p].achievement_id] = true;
+		}
+		return index;
+	}
+
+	function CreateAchievementLabel(parent, className, value) {
+		var label = $.CreatePanel("Label", parent, "");
+		label.AddClass(className);
+		label.text = value || "";
+		label.hittest = false;
+		return label;
+	}
+
+	function SetAchievementFilter(filterName) {
+		currentAchievementFilter = filterName;
+		var buttons = {
+			all: "XHSPassAchievementFilterAll",
+			progress: "XHSPassAchievementFilterProgress",
+			complete: "XHSPassAchievementFilterComplete",
+			coming: "XHSPassAchievementFilterComing",
+		};
+		for (var filter in buttons) {
+			if (buttons.hasOwnProperty(filter) && Panel(buttons[filter])) {
+				Panel(buttons[filter]).SetHasClass("IsActive", filter === filterName);
+			}
+		}
+		RenderAchievements();
+	}
+
+	function CreateAchievementRankPips(parent, entry, unlockedRank, currentValue) {
+		var thresholds = AchievementList(entry.thresholds);
+		var labels = AchievementList(entry.labels);
+		var fragments = AchievementList(entry.fragments);
+		var points = AchievementList(entry.points);
+		for (var i = 0; i < thresholds.length; i++) {
+			var rank = i + 1;
+			var pip = $.CreatePanel("Panel", parent, "");
+			pip.AddClass("XHSPassAchievementRankPip");
+			pip.AddClass("Rank" + rank);
+			pip.SetHasClass("IsUnlocked", unlockedRank >= rank);
+			pip.SetHasClass("IsEarned", unlockedRank >= rank);
+			pip.SetHasClass("IsNext", unlockedRank + 1 === rank);
+			var medal = $.CreatePanel("Image", pip, "");
+			medal.AddClass("XHSPassAchievementRankPipMedal");
+			medal.SetImage(AchievementMedalPath(rank, false));
+			var target = labels[i] || AchievementValueLabel(thresholds[i]);
+			CreateAchievementLabel(pip, "XHSPassAchievementRankPipTarget", target);
+			var rewardText = "+" + AchievementValueLabel(fragments[i]) + " F  •  +" + AchievementValueLabel(points[i]) + " P";
+			var rewardLabel = CreateAchievementLabel(pip, "XHSPassAchievementRankPipReward", rewardText);
+			SetAchievementTooltip(rewardLabel, "+" + FormatNumber(fragments[i]) + " " + Text("xhs_sp_fragments", "fragments") + "\n+" + FormatNumber(points[i]) + " " + Text("xhs_sp_achievement_score", "achievement score"));
+			pip.SetDialogVariable("current", AchievementValueLabel(currentValue));
+		}
+	}
+
+	function UpdateArmoryRefreshButton(player) {
+		var button = Panel("XHSPassArmoryRefreshButton");
+		var label = Panel("XHSPassArmoryRefreshLabel");
+		if (!button) {
+			return;
+		}
+
+		var raw = player && player.raw ? player.raw : {};
+		var refreshState = (raw.armory_refresh_state || "").toString().toLowerCase();
+		var used = IsTruthy(raw.armory_refresh_used, false) || refreshState === "pending" || refreshState === "used";
+		var pending = armoryRefreshPending || refreshState === "pending";
+		button.SetHasClass("IsPending", pending);
+		button.SetHasClass("IsUsed", used && !pending);
+		button.enabled = !used && !armoryRefreshPending;
+		button.hittest = !used && !armoryRefreshPending;
+		if (label) {
+			label.text = pending
+				? Text("xhs_sp_armory_refreshing", "Refreshing...")
+				: (used
+					? Text("xhs_sp_armory_refresh_used_short", "Refresh used")
+					: Text("xhs_sp_armory_refresh", "Refresh"));
+		}
+	}
+
+	function SetAchievementTooltip(panel, value) {
+		if (!panel || !value) {
+			return;
+		}
+		panel.hittest = true;
+		panel.SetPanelEvent("onmouseover", function () {
+			$.DispatchEvent("DOTAShowTextTooltip", panel, value);
+		});
+		panel.SetPanelEvent("onmouseout", function () {
+			$.DispatchEvent("DOTAHideTextTooltip", panel);
+		});
+	}
+
+	function AchievementRecordRank(entry, value) {
+		var thresholds = AchievementList(entry && entry.thresholds);
+		var rank = 0;
+		for (var i = 0; i < thresholds.length; i++) {
+			if (ToNumber(value, 0) >= ToNumber(thresholds[i], 0)) {
+				rank = i + 1;
+			}
+		}
+		return rank;
+	}
+
+	function PositionAchievementRecordHover(source) {
+		var hover = Panel("XHSPassAchievementRecordHover");
+		var root = hover && hover.GetParent ? hover.GetParent() : null;
+		if (!hover || !root || !source || !source.IsValid()) {
+			return;
+		}
+		var sourcePosition = source.GetPositionWithinWindow();
+		var rootPosition = root.GetPositionWithinWindow();
+		var sourceWidth = ToNumber(source.actuallayoutwidth, 0);
+		var sourceHeight = ToNumber(source.actuallayoutheight, 0);
+		var rootWidth = ToNumber(root.actuallayoutwidth, 1420);
+		var rootHeight = ToNumber(root.actuallayoutheight, 820);
+		var hoverWidth = Math.max(ToNumber(hover.actuallayoutwidth || hover.desiredlayoutwidth, 0), 390);
+		var hoverHeight = Math.max(ToNumber(hover.actuallayoutheight || hover.desiredlayoutheight, 0), 166);
+		var margin = 12;
+		var sourceX = ToNumber(sourcePosition.x, 0) - ToNumber(rootPosition.x, 0);
+		var sourceY = ToNumber(sourcePosition.y, 0) - ToNumber(rootPosition.y, 0);
+		var x = sourceX + sourceWidth + margin;
+		var y = sourceY + Math.floor((sourceHeight - hoverHeight) * 0.5);
+		if (x + hoverWidth > rootWidth - margin) {
+			x = sourceX - hoverWidth - margin;
+		}
+		x = Clamp(x, margin, Math.max(margin, rootWidth - hoverWidth - margin));
+		y = Clamp(y, margin, Math.max(margin, rootHeight - hoverHeight - margin));
+		hover.style.position = Math.floor(x) + "px " + Math.floor(y) + "px 0px";
+	}
+
+	function ShowAchievementRecordHover(source, entry, record) {
+		var hover = Panel("XHSPassAchievementRecordHover");
+		if (!hover || !source || !record) {
+			return;
+		}
+		var steamID = String(record.steamid || "0");
+		var value = ToNumber(record.value, 0);
+		var rank = AchievementRecordRank(entry, value);
+		var avatar = Panel("XHSPassAchievementRecordHoverAvatar");
+		var playerName = Panel("XHSPassAchievementRecordHoverName");
+		if (avatar) {
+			avatar.steamid = steamID;
+		}
+		if (playerName) {
+			playerName.steamid = steamID;
+		}
+		SetText("XHSPassAchievementRecordHoverSteamID", "SteamID64  " + steamID);
+		SetText("XHSPassAchievementRecordHoverTitle", AchievementLocalized(entry, "title"));
+		SetText("XHSPassAchievementRecordHoverTier", AchievementRankName(rank, false));
+		SetText("XHSPassAchievementRecordHoverValue", FormatNumber(value));
+		var medal = Panel("XHSPassAchievementRecordHoverMedal");
+		if (medal) {
+			medal.SetImage(AchievementMedalPath(Math.max(rank, 1), false));
+		}
+		hover.AddClass("IsVisible");
+		PositionAchievementRecordHover(source);
+		$.Schedule(0.01, function () {
+			if (hover && (!hover.IsValid || hover.IsValid()) && hover.BHasClass("IsVisible")) {
+				PositionAchievementRecordHover(source);
+			}
+		});
+	}
+
+	function HideAchievementRecordHover() {
+		var hover = Panel("XHSPassAchievementRecordHover");
+		if (hover) {
+			hover.RemoveClass("IsVisible");
+		}
+	}
+
+	function SetAchievementRecordHover(panel, entry, record) {
+		if (!panel || !entry || !record) {
+			return;
+		}
+		panel.hittest = true;
+		panel.SetPanelEvent("onmouseover", function () {
+			ShowAchievementRecordHover(panel, entry, record);
+		});
+		panel.SetPanelEvent("onmouseout", HideAchievementRecordHover);
+	}
+
+	function AchievementState(row) {
+		var state = row && row.state || {};
+		if (typeof state === "string") {
+			try { state = JSON.parse(state); } catch (error) { state = {}; }
+		}
+		return state || {};
+	}
+
+	function CreateAllHeroAchievementRoster(parent, entry, progressRow) {
+		var pool = AchievementList(entry.hero_pool);
+		if (!parent || pool.length === 0) {
+			return;
+		}
+		var localizedPool = [];
+		for (var p = 0; p < pool.length; p++) {
+			var poolHero = pool[p] || {};
+			var localizedName = Localize("#" + poolHero.id);
+			if (!localizedName || localizedName === poolHero.id) {
+				localizedName = LocalizeMaybeKey(poolHero.name || poolHero.id || "");
+			}
+			localizedPool.push({
+				hero: poolHero,
+				name: localizedName || poolHero.id || ""
+			});
+		}
+		localizedPool.sort(function (left, right) {
+			var leftName = String(left.name || "").toLowerCase();
+			var rightName = String(right.name || "").toLowerCase();
+			if (leftName < rightName) { return -1; }
+			if (leftName > rightName) { return 1; }
+			return String(left.hero.id || "") < String(right.hero.id || "") ? -1 : 1;
+		});
+		var state = AchievementState(progressRow);
+		var completedHeroes = AchievementList(state.heroes);
+		var completed = {};
+		for (var i = 0; i < completedHeroes.length; i++) {
+			completed[String(completedHeroes[i])] = true;
+		}
+		var roster = $.CreatePanel("Panel", parent, "");
+		roster.AddClass("XHSPassAchievementHeroRoster");
+		var row = null;
+		for (var h = 0; h < localizedPool.length; h++) {
+			if (h % 10 === 0) {
+				row = $.CreatePanel("Panel", roster, "");
+				row.AddClass("XHSPassAchievementHeroRow");
+			}
+			var hero = localizedPool[h].hero;
+			var icon = $.CreatePanel("DOTAHeroImage", row, "");
+			icon.AddClass("XHSPassAchievementHeroIcon");
+			icon.SetHasClass("IsComplete", completed[String(hero.id)] === true);
+			icon.heroname = hero.id;
+			icon.heroimagestyle = "landscape";
+			SetAchievementTooltip(icon, localizedPool[h].name + (completed[String(hero.id)] ? "  [" + Text("xhs_sp_achievement_hero_complete", "COMPLETE") + "]" : ""));
+		}
+	}
+
+	function RenderAchievements() {
+		var profile = GetAchievementProfile();
+		var catalog = AchievementList(profile.catalog);
+		var index = AchievementProfileIndex(profile);
+		var grid = Panel("XHSPassAchievementsGrid");
+		if (!grid) {
+			return;
+		}
+		ClearPanel(grid);
+		SetText("XHSPassAchievementScore", FormatNumber(profile.score || 0));
+		var completed = 0;
+		var available = 0;
+		for (var c = 0; c < catalog.length; c++) {
+			if (catalog[c].available !== false && catalog[c].available !== 0) {
+				available++;
+				// Every earned rank is a completed achievement milestone. A progressive
+				// achievement does not have to reach its final/XHS rank to count here.
+				if (ToNumber(index.unlocks[catalog[c].id], 0) > 0) {
+					completed++;
+				}
+			}
+		}
+		SetText("XHSPassAchievementCompletion", completed + " / " + available);
+
+		for (var i = 0; i < catalog.length; i++) {
+			var entry = catalog[i];
+			var isAbsolute = entry.type === "absolute";
+			var maxRank = isAbsolute ? 1 : AchievementList(entry.thresholds).length;
+			var rank = ToNumber(index.unlocks[entry.id], 0);
+			var isComplete = rank >= maxRank;
+			var hasCompletedRank = rank > 0;
+			var isComing = entry.available === false || entry.available === 0;
+			if (currentAchievementFilter === "progress" && (isComplete || isComing)) { continue; }
+			if (currentAchievementFilter === "complete" && (!hasCompletedRank || isComing)) { continue; }
+			if (currentAchievementFilter === "coming" && !isComing) { continue; }
+
+			var progressRow = index.progress[entry.id] || {};
+			var value = ToNumber(progressRow.value, 0);
+			var thresholds = AchievementList(entry.thresholds);
+			var nextTarget = thresholds[Math.min(rank, thresholds.length - 1)] || (isAbsolute ? 1 : 0);
+			var card = $.CreatePanel("Panel", grid, "");
+			card.AddClass("XHSPassAchievementCard");
+			card.SetHasClass("IsComplete", isComplete);
+			card.SetHasClass("HasCompletedRank", hasCompletedRank);
+			card.SetHasClass("IsLocked", rank <= 0 && !isComing);
+			card.SetHasClass("IsComingSoon", isComing);
+			card.SetHasClass("IsComing", isComing);
+			card.SetHasClass("IsAbsolute", isAbsolute);
+			card.SetHasClass("IsPinned", index.pins[entry.id] === true);
+			card.SetHasClass("IsAllHeroChallenge", entry.id === "all_hero_challenge");
+			card.AddClass("Rank" + Math.max(rank, 0));
+
+			var top = $.CreatePanel("Panel", card, "");
+			top.AddClass("XHSPassAchievementCardTop");
+			var medalImage = $.CreatePanel("Image", top, "");
+			medalImage.AddClass("XHSPassAchievementCardMedal");
+			medalImage.SetImage(AchievementMedalPath(Math.max(rank, 1), isAbsolute));
+			var heading = $.CreatePanel("Panel", top, "");
+			heading.AddClass("XHSPassAchievementCardHeading");
+			CreateAchievementLabel(heading, "XHSPassAchievementCardRank", isComing
+				? Text("xhs_sp_achievement_coming_in", "COMING IN {release}").replace("{release}", entry.release || Text("xhs_sp_achievement_future_update", "A FUTURE UPDATE"))
+				: AchievementRankName(rank, isAbsolute));
+			CreateAchievementLabel(heading, "XHSPassAchievementCardTitle", AchievementLocalized(entry, "title"));
+			if (index.pins[entry.id]) {
+				CreateAchievementLabel(top, "XHSPassAchievementPinned", "★");
+			}
+
+			CreateAchievementLabel(card, "XHSPassAchievementCardDescription", AchievementLocalized(entry, "description"));
+			CreateAchievementRequirements(card, entry);
+			if (entry.id === "all_hero_challenge") {
+				CreateAllHeroAchievementRoster(card, entry, progressRow);
+			}
+			var record = index.records && index.records[entry.id];
+			if (!isAbsolute && record && ToNumber(record.value, 0) > 0) {
+				var recordLabel = CreateAchievementLabel(
+					card,
+					"XHSPassAchievementRecord",
+					"#1 " + Text("xhs_sp_achievement_record_worldwide", "WORLDWIDE") + "  •  " + AchievementValueLabel(record.value)
+				);
+				SetAchievementRecordHover(recordLabel, entry, record);
+			}
+			if (!isAbsolute) {
+				var rankPips = $.CreatePanel("Panel", card, "");
+				rankPips.AddClass("XHSPassAchievementRankPips");
+				CreateAchievementRankPips(rankPips, entry, rank, value);
+				var progressBar = $.CreatePanel("Panel", card, "");
+				progressBar.AddClass("XHSPassAchievementProgressBar");
+				var progressFill = $.CreatePanel("Panel", progressBar, "");
+				progressFill.AddClass("XHSPassAchievementProgressFill");
+				progressFill.style.width = (isComplete ? 100 : Clamp(Math.floor(value / Math.max(nextTarget, 1) * 100), 0, 100)) + "%";
+				CreateAchievementLabel(card, "XHSPassAchievementProgressText", isComplete ? Text("xhs_sp_achievement_complete", "COMPLETE") : AchievementValueLabel(value) + " / " + AchievementValueLabel(nextTarget));
+			} else {
+				var absoluteFragments = AchievementList(entry.fragments)[0] || 0;
+				var absolutePoints = AchievementList(entry.points)[0] || 0;
+				CreateAchievementLabel(card, "XHSPassAchievementAbsoluteReward", "+" + FormatNumber(absoluteFragments) + " " + Text("xhs_sp_fragments", "fragments") + "   •   +" + FormatNumber(absolutePoints) + " pts");
+			}
+		}
+	}
+
+	function FindAchievementCatalogEntry(profile, achievementID) {
+		var catalog = AchievementList(profile && profile.catalog);
+		for (var i = 0; i < catalog.length; i++) {
+			if (catalog[i].id === achievementID) {
+				return catalog[i];
+			}
+		}
+		return null;
+	}
+
+	function QueueAchievementReveals(profile) {
+		profile = profile || GetAchievementProfile();
+		var queue = AchievementList(profile.reveal_queue);
+		for (var i = 0; i < queue.length; i++) {
+			var reveal = queue[i];
+			var revealID = ToNumber(reveal.id, 0);
+			if (!revealID || achievementRevealKnown[revealID]) {
+				continue;
+			}
+			reveal.catalog = FindAchievementCatalogEntry(profile, reveal.achievement_id);
+			achievementRevealKnown[revealID] = true;
+			achievementRevealQueue.push(reveal);
+		}
+		if (!achievementRevealActive && achievementRevealQueue.length > 0) {
+			ShowNextAchievementReveal();
+		}
+	}
+
+	function ShowNextAchievementReveal() {
+		if (achievementRevealActive || achievementRevealQueue.length === 0) {
+			return;
+		}
+		achievementRevealActive = achievementRevealQueue.shift();
+		var reveal = achievementRevealActive;
+		var entry = reveal.catalog || {};
+		var rank = Math.max(1, ToNumber(reveal.rank, 1));
+		var isAbsolute = entry.type === "absolute";
+		var fragments = AchievementList(entry.fragments)[rank - 1] || reveal.fragments || 0;
+		var points = AchievementList(entry.points)[rank - 1] || reveal.points || 0;
+		SetText("XHSPassAchievementRevealRank", AchievementRankName(rank, isAbsolute));
+		SetText("XHSPassAchievementRevealTitle", AchievementLocalized(entry, "title") || reveal.achievement_id || "Achievement");
+		SetText("XHSPassAchievementRevealDescription", AchievementLocalized(entry, "description"));
+		SetText("XHSPassAchievementRevealFragments", "+" + FormatNumber(fragments));
+		SetText("XHSPassAchievementRevealPoints", "+" + FormatNumber(points));
+		SetText("XHSPassAchievementRevealRemaining", achievementRevealQueue.length > 0 ? Text("xhs_sp_achievement_remaining", "{count} more achievements waiting", { count: achievementRevealQueue.length }) : "");
+		var medal = Panel("XHSPassAchievementRevealMedal");
+		if (medal) {
+			medal.SetImage(AchievementMedalPath(rank, isAbsolute));
+		}
+		ToggleWindow(true);
+		SwitchPage("achievements");
+		var overlay = Panel("XHSPassAchievementRevealOverlay");
+		if (overlay) {
+			overlay.hittest = true;
+			overlay.AddClass("IsVisible");
+		}
+		Game.EmitSound("ui.trophy_levelup");
+	}
+
+	function MarkAchievementReveals(reveals) {
+		if (!GameEvents || !GameEvents.SendCustomGameEventToServer || !reveals || reveals.length === 0) {
+			return;
+		}
+		var ids = {};
+		for (var i = 0; i < reveals.length; i++) {
+			ids[i + 1] = ToNumber(reveals[i].id, 0);
+		}
+		GameEvents.SendCustomGameEventToServer("xhs_achievements_mark_revealed", { ids: ids });
+	}
+
+	function ContinueAchievementReveal() {
+		if (!achievementRevealActive) {
+			return;
+		}
+		MarkAchievementReveals([achievementRevealActive]);
+		achievementRevealActive = null;
+		var overlay = Panel("XHSPassAchievementRevealOverlay");
+		if (overlay) {
+			overlay.RemoveClass("IsVisible");
+			overlay.hittest = false;
+		}
+		Game.EmitSound("General.ButtonClick");
+		$.Schedule(0.32, ShowNextAchievementReveal);
+	}
+
+	function RevealAllAchievements() {
+		var all = [];
+		if (achievementRevealActive) {
+			all.push(achievementRevealActive);
+		}
+		for (var i = 0; i < achievementRevealQueue.length; i++) {
+			all.push(achievementRevealQueue[i]);
+		}
+		MarkAchievementReveals(all);
+		achievementRevealActive = null;
+		achievementRevealQueue = [];
+		var overlay = Panel("XHSPassAchievementRevealOverlay");
+		if (overlay) {
+			overlay.RemoveClass("IsVisible");
+			overlay.hittest = false;
+		}
+		Game.EmitSound("General.ButtonClick");
+	}
+
 	function RenderAll() {
 		var player = GetDisplayPlayerData(GetLocalPlayerData());
 		UpdateShopAvailability();
@@ -5788,6 +6673,7 @@ var XHSSupporterPass = (function () {
 		RenderShop(player);
 		RenderArmory(player);
 		RenderSettings(player);
+		RenderAchievements();
 	}
 
 	function BindButtons() {
@@ -5805,6 +6691,53 @@ var XHSSupporterPass = (function () {
 				SetCourierRequestViewerVisible(false);
 				ToggleWindow(false);
 			});
+		}
+
+		var armoryRefresh = Panel("XHSPassArmoryRefreshButton");
+		if (armoryRefresh) {
+			armoryRefresh.SetPanelEvent("onactivate", function () {
+				var player = GetLocalPlayerData();
+				var raw = player && player.raw ? player.raw : {};
+				if (armoryRefreshPending || IsTruthy(raw.armory_refresh_used, false)) {
+					Game.EmitSound("General.Cancel");
+					return;
+				}
+
+				armoryRefreshPending = true;
+				UpdateArmoryRefreshButton(player);
+				Game.EmitSound("General.ButtonClick");
+				ShowActionMessage(Text("xhs_sp_armory_refreshing", "Refreshing Armory..."), true);
+				GameEvents.SendCustomGameEventToServer("supporter_pass_refresh_armory", {});
+			});
+		}
+
+		var achievementFilters = {
+			XHSPassAchievementFilterAll: "all",
+			XHSPassAchievementFilterProgress: "progress",
+			XHSPassAchievementFilterComplete: "complete",
+			XHSPassAchievementFilterComing: "coming",
+		};
+		for (var achievementFilterButton in achievementFilters) {
+			if (achievementFilters.hasOwnProperty(achievementFilterButton)) {
+				(function (buttonID, filterName) {
+					var filterButton = Panel(buttonID);
+					if (filterButton) {
+						filterButton.SetPanelEvent("onactivate", function () {
+							SetAchievementFilter(filterName);
+							Game.EmitSound("General.ButtonClick");
+						});
+					}
+				})(achievementFilterButton, achievementFilters[achievementFilterButton]);
+			}
+		}
+
+		var achievementContinue = Panel("XHSPassAchievementRevealContinueButton");
+		if (achievementContinue) {
+			achievementContinue.SetPanelEvent("onactivate", ContinueAchievementReveal);
+		}
+		var achievementRevealAll = Panel("XHSPassAchievementRevealAllButton");
+		if (achievementRevealAll) {
+			achievementRevealAll.SetPanelEvent("onactivate", RevealAllAchievements);
 		}
 
 		var shopSearch = Panel("XHSPassShopSearch");
@@ -5830,6 +6763,30 @@ var XHSSupporterPass = (function () {
 			});
 		}
 
+		var shopHighlightsTab = Panel("XHSPassShopHighlightsTab");
+		if (shopHighlightsTab) {
+			shopHighlightsTab.SetPanelEvent("onactivate", function () {
+				if (currentShopView === "highlights") { return; }
+				currentShopView = "highlights";
+				SetShopDetailVisible(false);
+				RenderShop(GetLocalPlayerData());
+				Game.EmitSound("General.ButtonClick");
+				EmitSupporterUIEvent("shop_view", { tab: "shop", view: "highlights" });
+			});
+		}
+
+		var shopBrowseTab = Panel("XHSPassShopBrowseTab");
+		if (shopBrowseTab) {
+			shopBrowseTab.SetPanelEvent("onactivate", function () {
+				if (currentShopView === "browse") { return; }
+				currentShopView = "browse";
+				SetShopDetailVisible(false);
+				RenderShop(GetLocalPlayerData());
+				Game.EmitSound("General.ButtonClick");
+				EmitSupporterUIEvent("shop_view", { tab: "shop", view: "browse" });
+			});
+		}
+
 		var closeShopDetail = Panel("XHSPassShopDetailClose");
 		if (closeShopDetail) {
 			closeShopDetail.SetPanelEvent("onactivate", function () {
@@ -5845,6 +6802,17 @@ var XHSSupporterPass = (function () {
 				Game.EmitSound("General.Cancel");
 			});
 		}
+
+		var purchaseConfirmCancel = Panel("XHSPassPurchaseConfirmCancel");
+		var purchaseConfirmBackdrop = Panel("XHSPassPurchaseConfirmBackdrop");
+		var purchaseConfirmSubmit = Panel("XHSPassPurchaseConfirmSubmit");
+		var cancelPurchaseConfirmation = function () {
+			SetPurchaseConfirmationVisible(false);
+			Game.EmitSound("General.Cancel");
+		};
+		if (purchaseConfirmCancel) purchaseConfirmCancel.SetPanelEvent("onactivate", cancelPurchaseConfirmation);
+		if (purchaseConfirmBackdrop) purchaseConfirmBackdrop.SetPanelEvent("onactivate", cancelPurchaseConfirmation);
+		if (purchaseConfirmSubmit) purchaseConfirmSubmit.SetPanelEvent("onactivate", ConfirmShopPurchase);
 
 		var devUnlockUI = Panel("XHSPassDevUnlockUIButton");
 		if (devUnlockUI) {
@@ -6036,6 +7004,13 @@ var XHSSupporterPass = (function () {
 		}
 
 		if (GameEvents && GameEvents.Subscribe) {
+			GameEvents.Subscribe("xhs_achievements_unlocked", function () {
+				$.Schedule(0.15, function () {
+					var profile = GetAchievementProfile();
+					RenderAchievements();
+					QueueAchievementReveals(profile);
+				});
+			});
 			GameEvents.Subscribe("supporter_pass_purchase_pending", function () {
 				ShowActionMessage(Text("xhs_sp_purchase_pending", "Supporter Pass purchase pending..."), true);
 			});
@@ -6051,6 +7026,18 @@ var XHSSupporterPass = (function () {
 				EmitSupporterUIEvent("shop_purchase_failed", { item_id: payload && payload.item_id, result: "failed", error_code: payload && payload.code });
 				ShowActionMessage(LocalizeMaybeKey((payload && payload.message) || "#xhs_sp_purchase_failed"), false);
 				RenderAll();
+			});
+			GameEvents.Subscribe("supporter_pass_armory_refresh_success", function () {
+				armoryRefreshPending = false;
+				ResetPagination("armory");
+				RenderAll();
+				ShowActionMessage(Text("xhs_sp_armory_refreshed", "Armory refreshed. New website purchases are now available."), true);
+			});
+			GameEvents.Subscribe("supporter_pass_armory_refresh_failed", function (payload) {
+				armoryRefreshPending = false;
+				RenderAll();
+				payload = payload || {};
+				ShowActionMessage(LocalizeMaybeKey(payload.message || "#xhs_sp_armory_refresh_failed"), false);
 			});
 			GameEvents.Subscribe("supporter_pass_bundle_open_success", function (payload) {
 				SetActionPending("bundle_open", payload && payload.instance_id, false);
@@ -6330,7 +7317,25 @@ var XHSSupporterPass = (function () {
 		}
 
 		if (CustomNetTables.SubscribeNetTableListener) {
+			CustomNetTables.SubscribeNetTableListener("xhs_achievements_catalog", function () {
+				var profile = GetAchievementProfile();
+				RenderAchievements();
+				QueueAchievementReveals(profile);
+			});
+			CustomNetTables.SubscribeNetTableListener("xhs_achievements_player", function (tableName, key) {
+				if (key !== Players.GetLocalPlayer().toString()) {
+					return;
+				}
+				var profile = GetAchievementProfile();
+				RenderAchievements();
+				QueueAchievementReveals(profile);
+			});
 			CustomNetTables.SubscribeNetTableListener("supporter_pass_player", RenderAll);
+			CustomNetTables.SubscribeNetTableListener("supporter_pass_armory", function (tableName, key) {
+				if (key === "rewards_" + Players.GetLocalPlayer()) {
+					RenderArmory(GetLocalPlayerData());
+				}
+			});
 			CustomNetTables.SubscribeNetTableListener("supporter_pass_shop", function (tableName, key) {
 				// Catalog is the normal atomic generation switch. Listening to chunk
 				// keys too makes late/out-of-order client replication self-healing.
@@ -6349,6 +7354,7 @@ var XHSSupporterPass = (function () {
 			CustomNetTables.SubscribeNetTableListener("supporter_pass_rewards_free", renderPublishedTrack);
 			CustomNetTables.SubscribeNetTableListener("supporter_pass_rewards_premium", renderPublishedTrack);
 		}
+		QueueAchievementReveals(GetAchievementProfile());
 	}
 
 	return {

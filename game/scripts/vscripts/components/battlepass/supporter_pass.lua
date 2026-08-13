@@ -48,8 +48,8 @@ local VANILLA_TI_REWARD_IMAGES = {
 		[10] = "custom_game/battlepass/ti10_immolation",
 	},
 	teleport = {
-		[4] = "custom_game/battlepass/ti4_edition",
-		[5] = "custom_game/battlepass/ti5_edition",
+		[4] = "custom_game/battlepass/ti4_teleport",
+		[5] = "custom_game/battlepass/ti5_teleport",
 		[6] = "custom_game/battlepass/ti6_teleport",
 		[7] = "custom_game/battlepass/ti7_teleport",
 		[8] = "custom_game/battlepass/ti8_teleport",
@@ -57,8 +57,8 @@ local VANILLA_TI_REWARD_IMAGES = {
 		[10] = "custom_game/battlepass/ti10_teleport",
 	},
 	fountain = {
-		[4] = "custom_game/battlepass/ti4_edition",
-		[5] = "custom_game/battlepass/ti5_edition",
+		[4] = "custom_game/battlepass/ti4_regen_aura",
+		[5] = "custom_game/battlepass/ti5_regen_aura",
 		[6] = "custom_game/battlepass/ti6_regen_aura",
 		[7] = "custom_game/battlepass/ti7_regen_aura",
 		[8] = "custom_game/battlepass/ti8_regen_aura",
@@ -160,23 +160,40 @@ local function IsSupporterDisplayImage(value)
 end
 
 local function ResolveSupporterDisplayImage(item)
-	local tiImage = ResolveVanillaTIRewardImage(item)
-	if tiImage ~= nil then return tiImage end
 	if type(item) ~= "table" then return nil end
 
 	for _, key in ipairs({ "preview_image", "image_url", "image", "image_inventory", "icon", "icon_path" }) do
 		local value = item[key]
 		if IsSupporterDisplayImage(value) then
 			local image = tostring(value):gsub("\\", "/")
-			local cdnFilename = string.match(image, "^https?://cdn%.frostrose%-studio%.com/static/images/battlepass/xhs%-4%.0/([^/?#]+)")
-			if cdnFilename ~= nil then
-				local localName = cdnFilename:gsub("%.[^%.]+$", ""):gsub("%-", "_")
-				return "custom_game/battlepass/" .. localName
+			local cdnRelativePath = string.match(image, "^https?://cdn%.frostrose%-studio%.com/static/images/battlepass/xhs%-4%.0/([^?#]+)")
+			if cdnRelativePath ~= nil then
+				local localPath = cdnRelativePath
+					:gsub("%-v2(%.[^%.]+)$", "%1")
+					:gsub("%.[^%.]+$", "")
+					:gsub("%-", "_")
+				return "custom_game/battlepass/" .. localPath
 			end
 			if string.sub(image, 1, 11) == "battlepass/" then
 				return "custom_game/" .. image
 			end
-			return image
+			-- Explicit addon images are authoritative. In particular, modern
+			-- rewards may retain a historical TI token in their internal name
+			-- while deliberately using a different generated preview.
+			if string.sub(image, 1, 12) == "custom_game/" then
+				return image
+			end
+		end
+	end
+
+	-- Stable local exports replace Valve compendium URLs for legacy TI rewards.
+	local tiImage = ResolveVanillaTIRewardImage(item)
+	if tiImage ~= nil then return tiImage end
+
+	for _, key in ipairs({ "preview_image", "image_url", "image", "image_inventory", "icon", "icon_path" }) do
+		local value = item[key]
+		if IsSupporterDisplayImage(value) then
+			return tostring(value):gsub("\\", "/")
 		end
 	end
 	return nil
@@ -1197,6 +1214,10 @@ function SupporterPass:BuildPlayerTable(playerID)
 			)
 		end
 	end
+	local armoryRefreshState = Battlepass ~= nil
+		and Battlepass.GetSupporterArmoryRefreshState ~= nil
+		and Battlepass:GetSupporterArmoryRefreshState(playerID)
+		or nil
 
 	return {
 		steamid = steamID,
@@ -1258,6 +1279,8 @@ function SupporterPass:BuildPlayerTable(playerID)
 		entitlements = supporterPass.entitlements or current.entitlements,
 		access_timeline = supporterPass.access_timeline or current.access_timeline,
 		armory = supporterPass.armory or current.armory,
+		armory_refresh_state = armoryRefreshState,
+		armory_refresh_used = armoryRefreshState ~= nil,
 		loadout = loadout,
 		equipped_items = equippedItems,
 		claimed_rewards = seasonStateAllowed
@@ -1301,6 +1324,9 @@ function SupporterPass:PublishPlayers()
 	local legacyPremium = ItemsGame and ItemsGame.battlepass2 or {}
 	local freeRewards = MergeRewardTracks(legacyFree, backendRewards, "free")
 	local premiumRewards = MergeRewardTracks(legacyPremium, backendRewards, "premium")
+	self.PublishedFreeRewards = freeRewards
+	self.PublishedPremiumRewards = premiumRewards
+	self.PublishedRewardsGeneration = (tonumber(self.PublishedRewardsGeneration) or 0) + 1
 	if SupporterPass2026 ~= nil and SupporterPass2026.PublishRewardTrack ~= nil then
 		SupporterPass2026:PublishRewardTrack("supporter_pass_rewards_free", freeRewards)
 		SupporterPass2026:PublishRewardTrack("supporter_pass_rewards_premium", premiumRewards)

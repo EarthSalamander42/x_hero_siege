@@ -328,6 +328,8 @@
 "DOTA_Tooltip_modifier_orb_of_wind_active_Description"		"Wind Orb is enabled. Evading attacks triggers Zephyr; Tempest Aegis also adds Tempest Guard's damage reduction to the same buff."
 "DOTA_Tooltip_modifier_orb_of_wind_zephyr"		"Zephyr"
 "DOTA_Tooltip_modifier_orb_of_wind_zephyr_Description"		"Move speed: %dMODIFIER_PROPERTY_MOVESPEED_BONUS_PERCENTAGE%%%. Damage taken: %dMODIFIER_PROPERTY_INCOMING_DAMAGE_PERCENTAGE%%%."
+"DOTA_Tooltip_modifier_xhs_phase_one_wave_scaling"		"Wave Empowerment"
+"DOTA_Tooltip_modifier_xhs_phase_one_wave_scaling_Description"		"Wave progression increases maximum health and base damage by %dMODIFIER_PROPERTY_TOOLTIP%%%, and armor by %dMODIFIER_PROPERTY_TOOLTIP2%%%."
 "DOTA_Tooltip_modifier_xhs_brewmaster_drunken_haze_burn"		"Burn!"
 "DOTA_Tooltip_modifier_xhs_brewmaster_drunken_haze_burn_Description"		"Taking periodic damage."
 "DOTA_Tooltip_modifier_xhs_brewmaster_drunken_haze_debuff"		"Drunken Haze"

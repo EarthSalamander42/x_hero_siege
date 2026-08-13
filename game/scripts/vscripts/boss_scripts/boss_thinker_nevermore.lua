@@ -560,7 +560,6 @@ function boss_thinker_nevermore:RagnaBlade(altar_loc, delay)
 		-- Draw warning particle on the targets' position
 		for _, target in pairs(targets) do
 			local warning_pfx = ParticleManager:CreateParticle("particles/boss_nevermore/ragna_blade_pre_warning.vpcf", PATTACH_OVERHEAD_FOLLOW, target)
-			ParticleManager:SetParticleControl(warning_pfx, 0, target:GetAbsOrigin())
 
 			-- Play warning sound
 			target:EmitSound("Frostivus.AbilityWarning")

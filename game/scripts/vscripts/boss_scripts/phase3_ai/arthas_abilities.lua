@@ -527,7 +527,6 @@ function modifier_xhs_arthas_mark:OnCreated()
 	if not IsServer() then return end
 	local parent = self:GetParent()
 	self.pfx = ParticleManager:CreateParticle(MARK_PARTICLE, PATTACH_OVERHEAD_FOLLOW, parent)
-	ParticleManager:SetParticleControlEnt(self.pfx, 0, parent, PATTACH_OVERHEAD_FOLLOW, "attach_hitloc", parent:GetAbsOrigin(), true)
 	ParticleManager:SetParticleControl(self.pfx, 1, Vector(1, 0, 0))
 end
 function modifier_xhs_arthas_mark:OnDestroy()

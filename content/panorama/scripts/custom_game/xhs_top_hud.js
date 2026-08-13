@@ -7,7 +7,7 @@ var XHSTopHud = (function () {
 	var VITALS_REFRESH_SECONDS = 0.12;
 	var SLOW_REFRESH_SECONDS = 1.0;
 	var OVERHEAD_REFRESH_SECONDS = 0.01;
-	var OVERHEAD_WORLD_Z_OFFSET = 238;
+	var OVERHEAD_WORLD_Z_FALLBACK = 238;
 	var OVERHEAD_SCREEN_Y_OFFSET = 22;
 	var OVERHEAD_PERSPECTIVE_BIAS = 38;
 	var OVERHEAD_PLATE_WIDTH = 210;
@@ -51,6 +51,7 @@ var XHSTopHud = (function () {
 	var isSupporterPassOccluding = false;
 	var areOverheadsModalOccluded = null;
 	var isHeroSelectionTransitionActive = false;
+	var heroSelectionTransitionToken = 0;
 	var nightfallVignetteToken = 0;
 	var activeCurrentEventTimerName = null;
 	var isMuradinFrenzyActive = false;
@@ -586,16 +587,27 @@ var XHSTopHud = (function () {
 		}, -1));
 	}
 
-	function ProjectWorldToScreen(origin) {
+	function GetOverheadWorldZOffset(entIndex) {
+		return SafeValue(function () {
+			if (typeof Entities.GetHealthBarOffset === "function") {
+				var offset = Number(Entities.GetHealthBarOffset(entIndex));
+				if (isFinite(offset)) { return offset; }
+			}
+			return OVERHEAD_WORLD_Z_FALLBACK;
+		}, OVERHEAD_WORLD_Z_FALLBACK);
+	}
+
+	function ProjectWorldToScreen(origin, entIndex) {
 		if (!origin || typeof Game === "undefined" || typeof Game.WorldToScreenX !== "function" || typeof Game.WorldToScreenY !== "function") {
 			return null;
 		}
 
+		var worldZOffset = GetOverheadWorldZOffset(entIndex);
 		var x = SafeValue(function () {
-			return Game.WorldToScreenX(origin[0], origin[1], origin[2] + OVERHEAD_WORLD_Z_OFFSET);
+			return Game.WorldToScreenX(origin[0], origin[1], origin[2] + worldZOffset);
 		}, -1);
 		var y = SafeValue(function () {
-			return Game.WorldToScreenY(origin[0], origin[1], origin[2] + OVERHEAD_WORLD_Z_OFFSET);
+			return Game.WorldToScreenY(origin[0], origin[1], origin[2] + worldZOffset);
 		}, -1);
 
 		if (x < 0 || y < 0 || isNaN(x) || isNaN(y)) {
@@ -2332,7 +2344,7 @@ var XHSTopHud = (function () {
 		var origin = SafeValue(function () {
 			return Entities.GetAbsOrigin(positionEntIndex);
 		}, null);
-		var screen = ProjectWorldToScreen(origin);
+		var screen = ProjectWorldToScreen(origin, positionEntIndex);
 		var rootWidth = Number(root.actuallayoutwidth || root.desiredlayoutwidth || 0);
 		var rootHeight = Number(root.actuallayoutheight || root.desiredlayoutheight || 0);
 
@@ -3386,6 +3398,21 @@ var XHSTopHud = (function () {
 		});
 		GameEvents.Subscribe("xhs_hero_selection_transition", function (data) {
 			isHeroSelectionTransitionActive = !!(data && Number(data.active) === 1);
+			heroSelectionTransitionToken++;
+			var transitionToken = heroSelectionTransitionToken;
+			if (isHeroSelectionTransitionActive) {
+				// ReplaceHeroWith can invalidate the sender while the transition is in
+				// flight. Never let a lost completion event hide the picked hero until
+				// the next full UI refresh.
+				$.Schedule(12.0, function () {
+					if (transitionToken !== heroSelectionTransitionToken || !isHeroSelectionTransitionActive) {
+						return;
+					}
+					isHeroSelectionTransitionActive = false;
+					heroSelectionTransitionToken++;
+					RefreshAllyRoster();
+				});
+			}
 		});
 		GameEvents.Subscribe("update_special_event_label_farm", function () {});
 		GameEvents.Subscribe("update_special_event_label_final", function () {});

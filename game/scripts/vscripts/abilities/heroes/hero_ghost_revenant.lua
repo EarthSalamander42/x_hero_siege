@@ -212,6 +212,7 @@ function modifier_ghost_revenant_blackjack_debuff:IsPurgable() return false end
 function modifier_ghost_revenant_blackjack_debuff:IsStunDebuff() return true end
 function modifier_ghost_revenant_blackjack_debuff:GetEffectName() return "particles/generic_gameplay/generic_stunned.vpcf" end
 function modifier_ghost_revenant_blackjack_debuff:GetEffectAttachType() return PATTACH_OVERHEAD_FOLLOW end
+function modifier_ghost_revenant_blackjack_debuff:ShouldUseOverheadOffset() return true end
 
 -----------------------------------------------------------------------------------------------------------
 --	Miasma
@@ -268,6 +269,7 @@ function modifier_ghost_revenant_miasma:IsHidden() return false end
 function modifier_ghost_revenant_miasma:IsPurgable() return true end
 function modifier_ghost_revenant_miasma:GetEffectName() return "particles/items2_fx/true_sight_debuff.vpcf" end
 function modifier_ghost_revenant_miasma:GetEffectAttachType() return PATTACH_OVERHEAD_FOLLOW end
+function modifier_ghost_revenant_miasma:ShouldUseOverheadOffset() return true end
 function modifier_ghost_revenant_miasma:GetPriority() return MODIFIER_PRIORITY_SUPER_ULTRA end
 
 function modifier_ghost_revenant_miasma:DeclareFunctions()
@@ -589,6 +591,8 @@ end
 function modifier_ghost_revenant_exhaustion:GetEffectAttachType()
 	return PATTACH_OVERHEAD_FOLLOW
 end
+
+function modifier_ghost_revenant_exhaustion:ShouldUseOverheadOffset() return true end
 
 function modifier_ghost_revenant_exhaustion:GetPriority()
 	return MODIFIER_PRIORITY_SUPER_ULTRA

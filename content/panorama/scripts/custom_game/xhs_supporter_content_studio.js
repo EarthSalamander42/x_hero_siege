@@ -19,6 +19,7 @@
 	var activePreviewID = "";
 	var stopping = false;
 	var pendingPreviewInstruction = "";
+	var cardPreviewModes = {};
 	function updateLayoutClass() {
 		if (!root) return;
 		var width = Number(root.actuallayoutwidth || 0);
@@ -36,11 +37,94 @@
 	}
 	function text(value) { return String(value || ""); }
 	function truthy(value) { return value === true || value === 1 || value === "1" || String(value).toLowerCase() === "true"; }
+	var LOCAL_PREVIEW_IMAGE_ALIASES = {
+		diretide_2020_emblem_gold: "diretide_2020_emblem_gold",
+		diretide_2020_emblem_green: "diretide_2020_emblem_green",
+		diretide_2020_emblem_violet: "diretide_2020_emblem_violet",
+		ti4_regen: "ti4_regen_aura",
+		ti5_regen: "ti5_regen_aura",
+		ti6_regen: "ti6_regen_aura",
+		ti7_regen: "ti7_regen_aura",
+		ti8_regen: "ti8_regen_aura",
+		ti9_regen: "ti9_regen_aura",
+		ti10_regen: "ti10_regen_aura",
+		ti11_regen: "ti11_regen_aura",
+		ti10_high_five_lvl2: "ti10_high_five",
+		kill_fx_terrorblade: "kill_effect_terrorblade_arcana",
+		kill_fx_windranger: "kill_effect_windranger_arcana",
+		kill_fx_windranger_style2: "kill_effect_windranger_arcana_style2",
+		rebirth_faceless_void: "rebirth_faceless_void_arcana",
+		rebirth_muerta_revenant: "rebirth_muerta_revenant_portal",
+		rebirth_seismic_apotheosis: "rebirth_seismic_apotheosis_style2"
+	};
+	var VANILLA_PREVIEW_IMAGE_ALIASES = {
+		attack_lifesteal_blood: "s2r://panorama/images/items/lifesteal_png.vtex",
+		attack_lifesteal_feast: "s2r://panorama/images/spellicons/life_stealer_feast_png.vtex",
+		spell_lifesteal_bloodstone: "s2r://panorama/images/items/bloodstone_png.vtex",
+		rebirth_ogre: "s2r://panorama/images/econ/items/ogre_magi/ogre_magi_arcana/ogre_magi_arcana_head_png.vtex"
+	};
 	function previewImagePath(value) {
 		var raw = text(value).replace(/\\/g, "/").replace(/^\/+/, "");
 		if (!raw) return "";
 		if (raw.indexOf("file://{images}/") === 0 || raw.indexOf("s2r://panorama/images/") === 0) return raw;
-		return "file://{images}/" + raw;
+		var cdnMatch = raw.match(/^https?:\/\/cdn\.frostrose-studio\.com\/static\/images\/battlepass\/xhs-4\.0\/([^?#]+)/i);
+		if (cdnMatch) {
+			var localName = cdnMatch[1]
+				.replace(/-v2(?=\.[^.]+$)/i, "")
+				.replace(/\.[^.]+$/, "")
+				.replace(/-/g, "_");
+			return "file://{images}/custom_game/battlepass/" + localName + ".png";
+		}
+		if (/^https?:\/\//i.test(raw)) return "";
+		if (raw.indexOf("battlepass/") === 0) raw = "custom_game/" + raw;
+		if (raw.indexOf("custom_game/") === 0) {
+			if (!/\.[a-z0-9]+$/i.test(raw)) raw += ".png";
+			return "file://{images}/" + raw;
+		}
+		if (/\.(?:png|jpg|jpeg|gif)$/i.test(raw)) return "file://{images}/" + raw;
+		if (/\.vtex$/i.test(raw)) return "s2r://panorama/images/" + raw;
+		return "s2r://panorama/images/" + raw + "_png.vtex";
+	}
+	function candidateTIEmblemPreviewImagePath(item) {
+		if (!item) return "";
+		var identity = [
+			item.candidate_id,
+			item.id,
+			item.item_id,
+			item.display_name,
+			item.item_name,
+			item.name,
+			item.edition,
+			item.ti_edition,
+			item.metadata && item.metadata.ti_edition
+		].join(" ").toLowerCase();
+		var category = [item.category, item.item_type, item.type, item.slot_id]
+			.join(" ").toLowerCase();
+		if (category.indexOf("emblem") === -1 && identity.indexOf("emblem") === -1) return "";
+		var edition = identity.match(/(?:^|[^a-z0-9])ti[\s_-]?(10|11)(?:[^0-9]|$)/i);
+		if (!edition) return "";
+		return "file://{images}/custom_game/battlepass/ti" + edition[1] + "_emblem.png";
+	}
+	function candidatePreviewImagePath(item) {
+		// Candidate identity is authoritative for shipped TI emblem art. Backend
+		// image metadata can legitimately lag behind the in-game catalogue.
+		var emblemImage = candidateTIEmblemPreviewImagePath(item);
+		if (emblemImage) return emblemImage;
+		var fields = ["preview_image", "image_url", "image", "image_inventory", "icon", "icon_path"];
+		for (var index = 0; index < fields.length; index += 1) {
+			var resolved = previewImagePath(item && item[fields[index]]);
+			if (resolved) return resolved;
+		}
+		var candidateID = text(item && item.candidate_id);
+		var aliasedName = LOCAL_PREVIEW_IMAGE_ALIASES[candidateID];
+		if (aliasedName) return "file://{images}/custom_game/battlepass/" + aliasedName + ".png";
+		var vanillaImage = VANILLA_PREVIEW_IMAGE_ALIASES[candidateID];
+		if (vanillaImage) return vanillaImage;
+		var localName = candidateID;
+		if (/^(ti(?:4|5|6|7|8|9|10|11)_(?:teleport|ascension|immolation|emblem|high_five)|ti7_shadow_kill(?:_gold)?|spell_lifesteal_octarine|rebirth_(?:icewrack|phantom_legacy|haunting_rift_style2|watchers_arrival|stonefall|divine_descent|mistborne|exorcists_return|chronal_aperture|young_magus_debut|phantom_arrival|winterwake))$/.test(localName)) {
+			return "file://{images}/custom_game/battlepass/" + localName + ".png";
+		}
+		return "";
 	}
 	function normalizeSignature(value) {
 		var signature = text(value).toLowerCase();
@@ -176,17 +260,47 @@
 	function card(item) {
 		var parent = $.CreatePanel("Panel", $("#ContentStudioCandidates"), "candidate_" + item.candidate_id); parent.AddClass("CandidateCard");
 		parent.AddClass("Rarity" + label(item.rarity || "common").replace(/[^A-Za-z0-9]/g, ""));
-		var art = $.CreatePanel("Panel", parent, ""); art.AddClass("CandidateArt");
-		var imagePath = previewImagePath(item.preview_image);
+		var visual = $.CreatePanel("Panel", parent, ""); visual.AddClass("CandidateVisual");
+		var art = $.CreatePanel("Panel", visual, ""); art.AddClass("CandidateArt");
+		var previewMode = cardPreviewModes[item.candidate_id] || "image";
+		var previewSwitch = $.CreatePanel("Panel", art, ""); previewSwitch.AddClass("CandidatePreviewSwitch");
+		var imageButton = $.CreatePanel("Button", previewSwitch, ""); imageButton.AddClass("CandidatePreviewModeButton");
+		imageButton.SetHasClass("Active", previewMode === "image");
+		var imageButtonLabel = $.CreatePanel("Label", imageButton, ""); imageButtonLabel.text = "REWARD IMAGE";
+		var vpcfButton = $.CreatePanel("Button", previewSwitch, ""); vpcfButton.AddClass("CandidatePreviewModeButton");
+		vpcfButton.SetHasClass("Active", previewMode === "vpcf");
+		var vpcfButtonLabel = $.CreatePanel("Label", vpcfButton, ""); vpcfButtonLabel.text = "VPCF PREVIEW";
+
+		var imageStage = $.CreatePanel("Panel", art, ""); imageStage.AddClass("CandidatePreviewStage"); imageStage.AddClass("RewardImageStage");
+		imageStage.SetHasClass("Hidden", previewMode !== "image");
+		var imagePath = candidatePreviewImagePath(item);
 		if (imagePath) {
-			var previewImage = $.CreatePanel("Image", art, "");
+			var previewImage = $.CreatePanel("Image", imageStage, "");
 			previewImage.AddClass("CandidatePreviewImage");
-			previewImage.scaling = "stretch-to-fit-preserve-aspect";
+			previewImage.scaling = "stretch-to-fill";
 			previewImage.SetImage(imagePath);
 			previewImage.hittest = false;
 		} else {
-			var marker = $.CreatePanel("Label", art, ""); marker.AddClass("VPCFMarker"); marker.text = item.ti_edition ? text(item.ti_edition).toUpperCase() : "VPCF";
+			var marker = $.CreatePanel("Label", imageStage, ""); marker.AddClass("VPCFMarker"); marker.text = "NO REWARD IMAGE";
 		}
+		var vpcfStage = $.CreatePanel("Panel", art, ""); vpcfStage.AddClass("CandidatePreviewStage"); vpcfStage.AddClass("VPCFPreviewStage");
+		vpcfStage.SetHasClass("Hidden", previewMode !== "vpcf");
+		var vpcfStatus = $.CreatePanel("Label", vpcfStage, ""); vpcfStatus.AddClass("VPCFPreviewStatus"); vpcfStatus.text = "VPCF RENDERER COMING LATER";
+		var vpcfPath = $.CreatePanel("Label", vpcfStage, ""); vpcfPath.AddClass("VPCFPreviewPath"); vpcfPath.text = text(item.asset_path);
+		imageButton.SetPanelEvent("onactivate", function () {
+			cardPreviewModes[item.candidate_id] = "image";
+			imageButton.SetHasClass("Active", true);
+			vpcfButton.SetHasClass("Active", false);
+			imageStage.SetHasClass("Hidden", false);
+			vpcfStage.SetHasClass("Hidden", true);
+		});
+		vpcfButton.SetPanelEvent("onactivate", function () {
+			cardPreviewModes[item.candidate_id] = "vpcf";
+			imageButton.SetHasClass("Active", false);
+			vpcfButton.SetHasClass("Active", true);
+			imageStage.SetHasClass("Hidden", true);
+			vpcfStage.SetHasClass("Hidden", false);
+		});
 		var descriptionText = text(item.metadata && item.metadata.description);
 		if (descriptionText) {
 			art.SetPanelEvent("onmouseover", function () { $.DispatchEvent("DOTAShowTextTooltip", art, descriptionText); });
@@ -196,7 +310,7 @@
 		if (item.metadata && truthy(item.metadata.bundle_only)) { var bundleOnly = $.CreatePanel("Label", art, ""); bundleOnly.AddClass("BundleOnly"); bundleOnly.text = "TI BUNDLE ONLY - DORMANT UNTIL 4.1"; }
 		if (item.metadata && item.metadata.pricing_rule === "v2_above_v1") { var styleTwo = $.CreatePanel("Label", art, ""); styleTwo.AddClass("VariantBadge"); styleTwo.text = "STYLE II - PREMIUM"; }
 		if (item.metadata && (item.metadata.technical_risk || truthy(item.metadata.requires_distinctness_review))) { var review = $.CreatePanel("Label", art, ""); review.AddClass("ReviewBadge"); review.text = item.metadata.technical_risk ? "TECH REVIEW" : "COMPARE VARIANT"; }
-		var body = $.CreatePanel("Panel", parent, ""); body.AddClass("CandidateBody");
+		var body = $.CreatePanel("Panel", visual, ""); body.AddClass("CandidateBody");
 		var meta = $.CreatePanel("Label", body, ""); meta.AddClass("CandidateMeta"); meta.text = label(item.category) + "  -  " + label(item.rarity) + "  -  " + Number(item.fragment_price || 0) + " fragments";
 		var name = $.CreatePanel("Label", body, ""); name.AddClass("CandidateName"); name.text = item.display_name;
 		var path = $.CreatePanel("Label", body, ""); path.AddClass("CandidatePath");
@@ -212,15 +326,14 @@
 			pendingBadge.text = "PENDING";
 		}
 		var state = $.CreatePanel("Label", body, ""); state.AddClass("CandidateState"); state.SetHasClass("Verified", itemVerified); state.SetHasClass("Pending", previewPending); state.text = item.sent ? "SENT - persisted on reload" : (previewPending ? pendingCardText(item) : (itemVerified ? "LIVE PREVIEW RUN - confirm it was visible" : "LIVE PREVIEW REQUIRED"));
-		var actions = $.CreatePanel("Panel", body, ""); actions.AddClass("CandidateActions");
+		var actions = $.CreatePanel("Panel", parent, ""); actions.AddClass("CandidateActions");
 		action(actions, previewPending ? "TESTING..." : "TEST LIVE PLAYBACK", "Preview", function () {
 			if (activePreviewID && activePreviewID !== item.candidate_id) delete busy[activePreviewID];
 			activePreviewID = item.candidate_id;
-			pendingPreviewInstruction = "Preview pending for " + item.display_name + ": watch the in-game trigger, then reopen the Studio to review the result.";
+			pendingPreviewInstruction = "Preview pending for " + item.display_name + ": watch the in-game trigger while keeping the Studio open.";
 			var operationID = setBusy(item.candidate_id, "preview");
 			status(pendingPreviewInstruction, false);
 			openButtonState("PREVIEW RUNNING - OPEN STUDIO", "pending");
-			windowPanel.AddClass("Hidden");
 			send("supporter_content_studio_preview", { candidate_id: item.candidate_id, operation_id: operationID });
 		}, isBusy(item.candidate_id));
 		action(actions, item.sent ? "SENT" : (isBusy(item.candidate_id, "submit") ? "SENDING..." : "VISIBLE - SEND TO REVIEW"), "Submit", function () {

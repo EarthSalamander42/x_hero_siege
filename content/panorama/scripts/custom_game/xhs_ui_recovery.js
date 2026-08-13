@@ -17,7 +17,16 @@
 	];
 	var HUD_LAYER_INTERVAL = 0.25;
 	var hudLayerLoopScheduled = false;
+	var FLYOUT_SUPPORTER_HOVER_ID = "XHSSupporterHoverCard_Scoreboard";
+	var FLYOUT_SUPPORTER_HOVER_Z_INDEX = "1400";
 	var WORLD_HEALTH_FRAME_IDS = ["XHSOverheadRoot", "XHSCreepHealthBarsRoot"];
+	var FLYOUT_OCCLUDED_PANEL_IDS = [
+		"XHSWaveCountdown",
+		"XHSWaveQueue",
+		"XHSRuneIndicator",
+		"QuestLog",
+		"QuestLogCollapseButton"
+	];
 	var SHOP_PANEL_IDS = ["shop", "Shop", "DOTAShop", "ShopContainer"];
 	var TOOLTIP_PANEL_IDS = [
 		"Tooltips",
@@ -75,6 +84,7 @@
 	var COMPOSITION_LAYER_RULES = [
 		{ key: "world_health_bars", z: 70, ids: ["XHSCreepHealthBarsRoot", "XHSOverheadRoot"], classes: ["XHSCreepHealthBars"] },
 		{ key: "quest_ui", z: 90, ids: ["QuestLog", "QuestLogCollapseButton"] },
+		{ key: "supporter_pass", z: 1150, ids: ["XHSSupporterPassWindow"], classes: ["XHSSupporterPassRoot"] },
 		{ key: "flyout", z: 1300, ids: ["DungeonScoreboard"], classes: ["FlyoutScoreboardRoot"] }
 	];
 	// These layouts previously reparented and reordered themselves from their
@@ -383,7 +393,9 @@
 		} catch (error) {}
 
 		if (!isValid(hud) || !hud.FindChildTraverse) return false;
-		var openClasses = ["ShopOpen", "shop_open", "Visible", "visible"];
+		// Generic Visible classes describe the permanently mounted shop host on
+		// some HUD versions, not whether its drawer is open.
+		var openClasses = ["ShopOpen", "shop_open", "ShopVisible", "shop_visible"];
 		for (var panelIndex = 0; panelIndex < SHOP_PANEL_IDS.length; panelIndex++) {
 			var shop = hud.FindChildTraverse(SHOP_PANEL_IDS[panelIndex]);
 			if (!isValid(shop) || !shop.BHasClass) continue;
@@ -403,6 +415,19 @@
 			&& (flyoutRoot.BHasClass("flyout_scoreboard_visible") || flyoutRoot.BHasClass("ZoneComplete"));
 	}
 
+	function isSupporterPassOpen(hud) {
+		try {
+			if (GameUI.CustomUIConfig().XHSSupporterPassVisible === true) return true;
+		} catch (error) {}
+		if (!isValid(hud) || !hud.FindChildTraverse) return false;
+		var window = hud.FindChildTraverse("XHSSupporterPassWindow");
+		return isValid(window)
+			&& window.BHasClass
+			&& (window.BHasClass("IsOpening")
+				|| window.BHasClass("IsVisible")
+				|| window.BHasClass("IsClosing"));
+	}
+
 	function syncWorldHealthFrameOcclusion(hud) {
 		// World-space Panorama branches can compose above vanilla panels even with
 		// a lower local z-index. Hide only those frames while a blocking overlay is
@@ -411,8 +436,51 @@
 		for (var frameIndex = 0; frameIndex < WORLD_HEALTH_FRAME_IDS.length; frameIndex++) {
 			var frameRoot = hud.FindChildTraverse(WORLD_HEALTH_FRAME_IDS[frameIndex]);
 			if (!isValid(frameRoot)) continue;
-			frameRoot.style.visibility = occluded ? "collapse" : null;
-			frameRoot.style.opacity = occluded ? "0" : null;
+			frameRoot.SetHasClass("XHSWorldHealthFramesOccluded", occluded);
+		}
+	}
+
+	function syncFlyoutTargetedOcclusion(hud) {
+		// These notification panels live in a compositor branch which can still
+		// render above the flyout regardless of sibling order or z-index. Keep the
+		// workaround deliberately narrow: only suppress the overlapping quest,
+		// rune and special-wave panels, and use opacity so their feature state keeps
+		// running.
+		var occluded = isFlyoutScoreboardOpen(hud) || isSupporterPassOpen(hud);
+		for (var panelIndex = 0; panelIndex < FLYOUT_OCCLUDED_PANEL_IDS.length; panelIndex++) {
+			var panel = hud.FindChildTraverse(FLYOUT_OCCLUDED_PANEL_IDS[panelIndex]);
+			if (!isValid(panel)) continue;
+
+			if (occluded) {
+				if (panel._xhsFlyoutOcclusionActive !== true) {
+					panel._xhsFlyoutOcclusionPreviousOpacity = panel.style.opacity;
+					panel._xhsFlyoutOcclusionActive = true;
+				}
+				panel.style.opacity = "0";
+			} else if (panel._xhsFlyoutOcclusionActive === true) {
+				panel.style.opacity = panel._xhsFlyoutOcclusionPreviousOpacity || null;
+				panel._xhsFlyoutOcclusionPreviousOpacity = null;
+				panel._xhsFlyoutOcclusionActive = false;
+			}
+		}
+	}
+
+	function syncFlyoutSupporterHoverLayer(hud) {
+		// The dynamically created supporter card is a sibling of DungeonScoreboard,
+		// but the scoreboard's composition layer may still paint after it. Enforce
+		// both forms of local ordering without moving the hover out of its layout
+		// context (its positioning is relative to the flyout root).
+		var scoreboard = hud.FindChildTraverse("DungeonScoreboard");
+		var hover = hud.FindChildTraverse(FLYOUT_SUPPORTER_HOVER_ID);
+		if (!isValid(scoreboard) || !isValid(hover)) return;
+
+		hover.style.zIndex = FLYOUT_SUPPORTER_HOVER_Z_INDEX;
+		var parent = scoreboard.GetParent ? scoreboard.GetParent() : null;
+		if (isValid(parent)
+			&& hover.GetParent
+			&& hover.GetParent() === parent
+			&& parent.MoveChildAfter) {
+			parent.MoveChildAfter(hover, scoreboard);
 		}
 	}
 
@@ -460,6 +528,8 @@
 
 		applyCompositionLayerOrder(hud);
 		syncWorldHealthFrameOcclusion(hud);
+		syncFlyoutTargetedOcclusion(hud);
+		syncFlyoutSupporterHoverLayer(hud);
 
 		// Tooltips remain owned by vanilla. Raise their nearest direct host only
 		// when it is not HUDElements; raising HUDElements would cover all custom UI.

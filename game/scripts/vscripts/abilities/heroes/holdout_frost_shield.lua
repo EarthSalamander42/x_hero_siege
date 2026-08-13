@@ -110,6 +110,7 @@ function modifier_xhs_frost_shield:IsPurgable() return true end
 function modifier_xhs_frost_shield:GetTexture() return FROST_SHIELD_TEXTURE end
 function modifier_xhs_frost_shield:GetEffectName() return FROST_SHIELD_PARTICLE end
 function modifier_xhs_frost_shield:GetEffectAttachType() return PATTACH_OVERHEAD_FOLLOW end
+function modifier_xhs_frost_shield:ShouldUseOverheadOffset() return true end
 
 function modifier_xhs_frost_shield:OnCreated()
 	self:ReadSpecialValues()

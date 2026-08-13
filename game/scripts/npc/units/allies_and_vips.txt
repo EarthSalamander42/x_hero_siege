@@ -100,13 +100,13 @@
 		{
 			"AttachWearables"   
 			{
-				"Wearable1" { "ItemDef" "220" }		//Staff
-				"Wearable2" { "ItemDef" "221" }		//Mount
-				"Wearable3" { "ItemDef" "222" }		//Helmet
-				"Wearable4" { "ItemDef" "223" }		//Bracers
-				"Wearable5" { "ItemDef" "224" }		//Shoulder
-				"Wearable6" { "ItemDef" "225" }		//Mount Armor
-				"Wearable7" { "ItemDef" "521" }		//Miscellaneous
+				// The Desert Gale
+				"Wearable1" { "ItemDef" "5991" }		//Desert Gale Arms
+				"Wearable2" { "ItemDef" "5993" }		//Desert Gale Helmet
+				"Wearable3" { "ItemDef" "5995" }		//Desert Gale Moustache
+				"Wearable4" { "ItemDef" "5998" }		//Desert Gale Shoulder Plate
+				"Wearable5" { "ItemDef" "5999" }		//Desert Gale Fouchard
+				"Wearable6" { "ItemDef" "9161" }		//Desert Gale Mount
 			} 
 		}
 	}
@@ -208,13 +208,12 @@
 		{
 			"AttachWearables"   
 			{
-				"Wearable1" { "ItemDef" "13" }		//Bracers
-				"Wearable2" { "ItemDef" "42" }		//Shoulders
-				"Wearable3" { "ItemDef" "43" }		//Cape
-				"Wearable4" { "ItemDef" "44" }		//Weapon
-				"Wearable5" { "ItemDef" "45" }		//Head
-				"Wearable6" { "ItemDef" "46" }		//Hair
-				"Wearable7" { "ItemDef" "562" }		//Miscellaneous
+				// The Grey Gallant
+				"Wearable1" { "ItemDef" "8170" }		//Bracers of the Grey Gallant
+				"Wearable2" { "ItemDef" "8171" }		//Cape of the Grey Gallant
+				"Wearable3" { "ItemDef" "8172" }		//Hair of the Grey Gallant
+				"Wearable4" { "ItemDef" "8173" }		//Pauldrons of the Grey Gallant
+				"Wearable5" { "ItemDef" "8174" }		//Hammer of the Grey Gallant
 			} 
 		}
 	}

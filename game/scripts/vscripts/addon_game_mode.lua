@@ -280,6 +280,11 @@ local function XHSPrecacheImpl(context)
 	-- AttachWearables. Dedicated servers need its unit definition resident
 	-- synchronously or individual econ pieces can spawn missing/as ERROR models.
 	XHSPrecache:PrecacheUnitSync("npc_magnataur_destroyer_crypt", context)
+	-- Shal Lightbinder and Uther Lightbringer are map/VIP units whose complete
+	-- econ sets are declared through AttachWearables. Keep both definitions and
+	-- their wearable models resident before either campaign phase reveals them.
+	XHSPrecache:PrecacheUnitSync("npc_xhs_paladin", context)   -- The Desert Gale
+	XHSPrecache:PrecacheUnitSync("npc_xhs_paladin_2", context) -- The Grey Gallant
 
 	XHSPrecache:PrecacheUnit("npc_dota_hero_grom_hellscream", nil, -1)
 	XHSPrecache:PrecacheUnit("npc_dota_hero_illidan", nil, -1)
@@ -313,6 +318,13 @@ local function XHSPrecacheImpl(context)
 
 	-- Final Wave
 	XHSPrecache:PrecacheUnit("npc_xhs_hero_tombstone", nil, -1)
+
+	-- The demo force-picks Mountain King as soon as its zero-duration setup
+	-- finishes. Make the hero definition and all of its ability assets resident
+	-- before that replacement can run instead of relying on the async hero loop.
+	if GetMapName() == "x_hero_siege_demo" then
+		XHSPrecache:PrecacheUnitSync("npc_dota_hero_sven", context)
+	end
 
 	for _, hero in pairs(HEROLIST) do
 		-- local hero_folder_name = "models/heroes/" .. string.gsub(hero, "npc_dota_hero_", "") .. ".vmdl"

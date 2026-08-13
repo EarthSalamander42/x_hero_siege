@@ -299,6 +299,13 @@ end
 function GameMode:InitGameMode()
 	local mode = GameRules:GetGameModeEntity()
 	local isDemoMap = GetMapName() == "x_hero_siege_demo"
+	-- Workshop Tools keeps server convars alive while switching maps in the same
+	-- process. Explicitly restore normal shop delivery outside the demo so a
+	-- previous demo launch cannot leave purchases going straight to inventory.
+	GameRules:SetUseUniversalShopMode(isDemoMap)
+	if IsInToolsMode() then
+		SendToServerConsole(isDemoMap and "dota_easybuy 1" or "dota_easybuy 0")
+	end
 	-- Timer Rules
 	GameRules:SetPostGameTime(600.0)
 	GameRules:SetTreeRegrowTime(240.0)
@@ -317,7 +324,10 @@ function GameMode:InitGameMode()
 	GameRules:SetPreGameTime(PREGAMETIME)
 	-- Establish the non-vanilla selection path before optional mechanics. A
 	-- failure below must never expose Dota's stock hero picker in production.
-	mode:SetCustomGameForceHero("npc_dota_hero_wisp")
+	-- Regular maps use Wisp as the temporary XHS selection unit. The demo skips
+	-- that selection flow entirely, so it must start with an actual playable
+	-- hero; players can still replace it later through the demo hero picker.
+	mode:SetCustomGameForceHero(isDemoMap and "npc_dota_hero_sven" or "npc_dota_hero_wisp")
 
 	-- Vanilla grants 1 armor per 6 agility. XHS halves only this derived
 	-- contribution while preserving native armor and explicit armor bonuses.
@@ -380,7 +390,10 @@ function GameMode:InitGameMode()
 	SetTeamCustomHealthbarColor(DOTA_TEAM_CUSTOM_1, 128, 32, 32) --Red	
 	SetTeamCustomHealthbarColor(DOTA_TEAM_CUSTOM_2, 128, 32, 32) --Red	
 
-	GameRules:LockCustomGameSetupTeamAssignment(true)
+	-- The demo bypasses the normal lobby/setup flow, so its local player may
+	-- still be unassigned when Lua starts. Keep assignment writable there until
+	-- the demo bootstrap has explicitly moved the player to GOODGUYS.
+	GameRules:LockCustomGameSetupTeamAssignment(not isDemoMap)
 	mode:SetFixedRespawnTime(RESPAWN_TIME)
 	GameRules:SetCustomGameTeamMaxPlayers(DOTA_TEAM_GOODGUYS, 8)
 	GameRules:SetCustomGameTeamMaxPlayers(DOTA_TEAM_BADGUYS, 0)
@@ -492,6 +505,40 @@ function GameMode:InitGameMode()
 	ListenToGameEvent("dota_pause_event", Dynamic_Wrap(GameMode, "OnDotaPauseEvent"), GameMode)
 	ListenToGameEvent("dota_player_update_selected_unit", Dynamic_Wrap(GameMode, "OnPlayerSelectedUnit"), GameMode)
 	ListenToGameEvent("dota_item_picked_up", Dynamic_Wrap(GameMode, "OnDotaItemPickedUp"), GameMode)
+	-- Dragging an item onto an allied hero bypasses ExecuteOrderFilter in
+	-- Source 2. Inventory installation is therefore the authoritative runtime
+	-- hook for validating human donations to XHS bots.
+	ListenToGameEvent("dota_inventory_item_added", function(keys)
+		if IsInToolsMode() then
+			GameMode:TraceXHSBotGiftInventoryEvent("dota_inventory_item_added", keys)
+		end
+		GameMode:OnXHSBotInventoryItemAdded(keys)
+	end, nil)
+	if IsInToolsMode() then
+		for _, eventName in ipairs({
+			"dota_inventory_changed",
+			"dota_inventory_item_changed",
+			"dota_inventory_player_got_item",
+			"inventory_updated",
+		}) do
+			local capturedEventName = eventName
+			ListenToGameEvent(capturedEventName, function(keys)
+				GameMode:TraceXHSBotGiftInventoryEvent(capturedEventName, keys)
+			end, nil)
+		end
+		for _, eventName in ipairs({
+			"dota_item_drag_begin",
+			"dota_item_drag_end",
+			"dota_shop_item_drag_begin",
+			"dota_shop_item_drag_end",
+			"dota_item_gifted",
+		}) do
+			local capturedEventName = eventName
+			ListenToGameEvent(capturedEventName, function(keys)
+				GameMode:TraceXHSBotGiftLowLevelEvent(capturedEventName, keys)
+			end, nil)
+		end
+	end
 
 	--Dungeon
 	GameMode.CheckpointsActivated = {}
@@ -563,6 +610,19 @@ local PlayerZoneCache = {}
 local IsDemoMap = GetMapName() == "x_hero_siege_demo"
 
 function GameMode:OnThink()
+	if IsInToolsMode() and self.TraceXHSBotGiftInventories ~= nil then
+		local now = GameRules:GetGameTime()
+		if now >= (tonumber(self.xhsBotGiftTraceNextScan) or 0) then
+			self.xhsBotGiftTraceNextScan = now + 0.25
+			self:TraceXHSBotGiftInventories("watchdog")
+		end
+	end
+	if IsDemoMap
+		and not self.demoInitialPlayableHeroReady
+		and self.EnsureDemoPlayableHeroes ~= nil then
+		self:EnsureDemoPlayableHeroes()
+	end
+
 	if XHSPublishAllTomePurchaseStatuses ~= nil then
 		XHSPublishAllTomePurchaseStatuses()
 	end
@@ -819,6 +879,508 @@ function GameMode:DamageFilter(filterTable)
 	return true
 end
 
+function GameMode:TraceXHSBotGiftInventories(source)
+	if not IsInToolsMode() or XHSBotPlayerRegistry == nil then return 0 end
+	self.xhsBotGiftTraceSeenItems = self.xhsBotGiftTraceSeenItems or {}
+	local discovered = 0
+	for _, botPlayerID in ipairs(
+		XHSBotPlayerRegistry:GetXHSBotPlayerIDs() or {}
+	) do
+		local record = XHSBotPlayerRegistry:GetBot(botPlayerID)
+		local hero = record ~= nil and record.hero_entindex ~= nil
+			and EntIndexToHScript(record.hero_entindex) or nil
+		if hero ~= nil and not hero:IsNull() then
+			for slot = 0, 16 do
+				local item = hero:GetItemInSlot(slot)
+				if item ~= nil and not item:IsNull() then
+					local itemIndex = item:entindex()
+					local previous = self.xhsBotGiftTraceSeenItems[itemIndex]
+					if previous == nil
+						or previous.bot_player_id ~= botPlayerID
+						or previous.slot ~= slot then
+						local purchaser = item.GetPurchaser ~= nil
+							and item:GetPurchaser() or nil
+						local purchaserPlayerID = purchaser ~= nil
+							and not purchaser:IsNull()
+							and purchaser.GetPlayerID ~= nil
+							and purchaser:GetPlayerID() or -1
+						local owner = item.GetOwner ~= nil and item:GetOwner() or nil
+						local ownerPlayerID = owner ~= nil and not owner:IsNull()
+							and owner.GetPlayerID ~= nil and owner:GetPlayerID() or -1
+						print("[XHSBots][GiftTrace] inventory source="
+							.. tostring(source)
+							.. " bot_pid=" .. tostring(botPlayerID)
+							.. " hero=" .. tostring(hero:GetUnitName())
+							.. " slot=" .. tostring(slot)
+							.. " item_ent=" .. tostring(itemIndex)
+							.. " item=" .. tostring(item:GetAbilityName())
+							.. " purchaser_pid=" .. tostring(purchaserPlayerID)
+							.. " owner_pid=" .. tostring(ownerPlayerID)
+							.. " previous_bot_pid=" .. tostring(previous
+								and previous.bot_player_id or "nil")
+							.. " previous_slot=" .. tostring(previous
+								and previous.slot or "nil"))
+						discovered = discovered + 1
+					end
+					self.xhsBotGiftTraceSeenItems[itemIndex] = {
+						bot_player_id = botPlayerID,
+						slot = slot,
+					}
+				end
+			end
+		end
+	end
+	return discovered
+end
+
+function GameMode:OnXHSBotInventoryItemAdded(keys)
+	if XHSBotPlayerRegistry == nil or XHSBotEconomy == nil then return end
+	keys = keys or {}
+	local itemIndex = tonumber(keys.item_entindex)
+	local botPlayerID = tonumber(keys.inventory_player_id)
+	local parentIndex = tonumber(keys.inventory_parent_entindex)
+	local parent = parentIndex ~= nil and parentIndex > 0
+		and EntIndexToHScript(parentIndex) or nil
+	if (botPlayerID == nil
+			or not XHSBotPlayerRegistry:IsXHSBotPlayerID(botPlayerID))
+		and parent ~= nil and not parent:IsNull()
+		and parent.GetPlayerID ~= nil then
+		botPlayerID = tonumber(parent:GetPlayerID())
+	end
+	if itemIndex == nil or itemIndex <= 0 or botPlayerID == nil
+		or not XHSBotPlayerRegistry:IsXHSBotPlayerID(botPlayerID) then
+		return
+	end
+
+	-- Source emits both a transient slot-23 event and the final inventory-slot
+	-- event. Debounce by item handle and inspect on the following frame.
+	self.xhsBotPendingGiftValidation = self.xhsBotPendingGiftValidation or {}
+	local pending = self.xhsBotPendingGiftValidation[itemIndex] or {}
+	pending.bot_player_id = botPlayerID
+	pending.parent_entindex = parentIndex
+	pending.item_name = tostring(keys.itemname or pending.item_name or "unknown")
+	self.xhsBotPendingGiftValidation[itemIndex] = pending
+	if pending.scheduled == true then return end
+	pending.scheduled = true
+
+	Timers:CreateTimer(0, function()
+		local request = self.xhsBotPendingGiftValidation
+			and self.xhsBotPendingGiftValidation[itemIndex] or nil
+		if self.xhsBotPendingGiftValidation ~= nil then
+			self.xhsBotPendingGiftValidation[itemIndex] = nil
+		end
+		if request == nil then return end
+
+		local item = EntIndexToHScript(itemIndex)
+		local hero = XHSBotPlayerRegistry:GetBotHero(request.bot_player_id)
+		if item == nil or item:IsNull() or hero == nil or hero:IsNull() then return end
+		local itemIsCarried = false
+		for slot = 0, 16 do
+			if hero:GetItemInSlot(slot) == item then
+				itemIsCarried = true
+				break
+			end
+		end
+		if not itemIsCarried then return end
+
+		local purchaser = item.GetPurchaser ~= nil and item:GetPurchaser() or nil
+		local issuer = purchaser ~= nil and not purchaser:IsNull()
+			and purchaser.GetPlayerID ~= nil
+			and tonumber(purchaser:GetPlayerID()) or nil
+		local isHumanGift = issuer ~= nil and issuer >= 0
+			and not XHSBotPlayerRegistry:IsXHSBotPlayerID(issuer)
+			and (XHSBotPlayerRegistry.IsHumanPlayerID == nil
+				or XHSBotPlayerRegistry:IsHumanPlayerID(issuer))
+		if IsInToolsMode() then
+			print("[XHSBots][GiftTrace] stabilized bot_pid="
+				.. tostring(request.bot_player_id)
+				.. " hero=" .. tostring(hero:GetUnitName())
+				.. " item_ent=" .. tostring(itemIndex)
+				.. " item=" .. tostring(item:GetAbilityName())
+				.. " purchaser_pid=" .. tostring(issuer)
+				.. " human_gift=" .. tostring(isHumanGift))
+		end
+		if not isHumanGift then return end
+
+		local ok, accepted, errorKey, context = pcall(function()
+			return XHSBotEconomy:EvaluateIncomingGift(
+				request.bot_player_id,
+				hero,
+				item,
+				true
+			)
+		end)
+		if not ok then
+			accepted = false
+			errorKey = "#error_xhs_bot_item_unsupported"
+			context = nil
+		end
+		local itemName = item:GetAbilityName()
+		local rejectedAtIssue = self:GetXHSBotGiftIssueRejection(issuer, item, hero)
+		if rejectedAtIssue == nil
+			and XHSBotEconomy.RecordExternalGiftDecision ~= nil then
+			XHSBotEconomy:RecordExternalGiftDecision(
+				request.bot_player_id,
+				itemName,
+				accepted,
+				errorKey,
+				issuer
+			)
+		end
+		if accepted == true then
+			if XHSBotEconomy.PrepareAcceptedGift ~= nil then
+				XHSBotEconomy:PrepareAcceptedGift(
+					request.bot_player_id,
+					hero,
+					item,
+					context
+				)
+			end
+			return
+		end
+
+		-- Reject after installation. Never call RemoveItem before restitution:
+		-- Source destroys the handle in this transfer path instead of merely
+		-- detaching it from the bot.
+		local returned = false
+		local returnMode = "none"
+		local charges = item.GetCurrentCharges ~= nil
+			and tonumber(item:GetCurrentCharges()) or nil
+		local secondaryCharges = item.GetSecondaryCharges ~= nil
+			and tonumber(item:GetSecondaryCharges()) or nil
+		local purchaseTime = item.GetPurchaseTime ~= nil
+			and tonumber(item:GetPurchaseTime()) or nil
+		local function GetRecipientTotals(recipient)
+			local units = 0
+			local totalCharges = 0
+			if recipient == nil or recipient:IsNull() then return units, totalCharges end
+			for slot = 0, 16 do
+				local carried = recipient:GetItemInSlot(slot)
+				if carried ~= nil and not carried:IsNull()
+					and carried.GetAbilityName ~= nil
+					and carried:GetAbilityName() == itemName then
+					units = units + 1
+					if carried.GetCurrentCharges ~= nil then
+						totalCharges = totalCharges
+							+ math.max(0, tonumber(carried:GetCurrentCharges()) or 0)
+					end
+				end
+			end
+			return units, totalCharges
+		end
+		local unitsBefore, chargesBefore = GetRecipientTotals(purchaser)
+		if not item:IsNull() and purchaser ~= nil and not purchaser:IsNull()
+			and purchaser.AddItem ~= nil then
+			-- AddItem can transfer a live handle between heroes on some engine
+			-- builds. Try that lossless path first and verify both inventories.
+			local addOK = pcall(function() purchaser:AddItem(item) end)
+			if addOK then
+				for slot = 0, 16 do
+					if purchaser:GetItemInSlot(slot) == item then
+						returned = true
+						returnMode = "direct"
+						break
+					end
+				end
+				if not returned then
+					local unitsAfter, chargesAfter = GetRecipientTotals(purchaser)
+					if unitsAfter > unitsBefore or chargesAfter > chargesBefore then
+						returned = true
+						returnMode = "direct_merged"
+					end
+				end
+			end
+		end
+
+		if not returned and purchaser ~= nil and not purchaser:IsNull() then
+			-- Fallback for builds where AddItem cannot transfer an owned handle:
+			-- create and verify the replacement before destroying the original.
+			local replacement = CreateItem(itemName, purchaser, purchaser)
+			if replacement ~= nil and not replacement:IsNull() then
+				if charges ~= nil and replacement.SetCurrentCharges ~= nil then
+					replacement:SetCurrentCharges(charges)
+				end
+				if secondaryCharges ~= nil
+					and replacement.SetSecondaryCharges ~= nil then
+					replacement:SetSecondaryCharges(secondaryCharges)
+				end
+				if purchaseTime ~= nil and replacement.SetPurchaseTime ~= nil then
+					replacement:SetPurchaseTime(purchaseTime)
+				end
+				if replacement.SetPurchaser ~= nil then
+					replacement:SetPurchaser(purchaser)
+				end
+
+				local replacementAdded = pcall(function()
+					purchaser:AddItem(replacement)
+				end)
+				if replacementAdded then
+					for slot = 0, 16 do
+						if purchaser:GetItemInSlot(slot) == replacement then
+							returned = true
+							returnMode = "clone_inventory"
+							break
+						end
+					end
+					if not returned then
+						local unitsAfter, chargesAfter = GetRecipientTotals(purchaser)
+						if unitsAfter > unitsBefore or chargesAfter > chargesBefore then
+							returned = true
+							returnMode = "clone_merged"
+						end
+					end
+				end
+				if not returned and not replacement:IsNull() then
+					local dropped = pcall(function()
+						CreateItemOnPositionSync(
+							purchaser:GetAbsOrigin(),
+							replacement
+						)
+					end)
+					if dropped then
+						returned = true
+						returnMode = "clone_ground"
+					end
+				end
+			end
+		end
+
+		-- Only now is it safe to destroy the rejected copy still held by the bot.
+		if returned and not item:IsNull() then
+			local botStillOwnsOriginal = false
+			for slot = 0, 16 do
+				if hero:GetItemInSlot(slot) == item then
+					botStillOwnsOriginal = true
+					break
+				end
+			end
+			if botStillOwnsOriginal then
+				pcall(function() hero:RemoveItem(item) end)
+			end
+		end
+		if rejectedAtIssue == nil then
+			SendErrorMessage(
+				issuer,
+				tostring(errorKey or "#error_xhs_bot_item_unsupported")
+			)
+		end
+		if IsInToolsMode() then
+			print("[XHSBots][GiftTrace] post_receive_decision bot_pid="
+				.. tostring(request.bot_player_id)
+				.. " issuer=" .. tostring(issuer)
+				.. " item=" .. tostring(itemName)
+				.. " accepted=false reason=" .. tostring(errorKey)
+				.. " returned=" .. tostring(returned)
+				.. " return_mode=" .. tostring(returnMode))
+		end
+	end)
+end
+
+function GameMode:TraceXHSBotGiftInventoryEvent(eventName, keys)
+	if not IsInToolsMode() then return end
+	local discovered = self:TraceXHSBotGiftInventories(eventName)
+	local raw = {}
+	for key, value in pairs(keys or {}) do
+		table.insert(raw, tostring(key) .. "=" .. tostring(value))
+	end
+	table.sort(raw)
+	print("[XHSBots][GiftTrace] event=" .. tostring(eventName)
+		.. " discovered=" .. tostring(discovered)
+		.. " raw=" .. table.concat(raw, " "))
+end
+
+local function XHSBotGiftTraceHandle(handle)
+	if handle == nil or handle.IsNull == nil or handle:IsNull() then return "nil" end
+	local values = {}
+	local ok, entindex = pcall(function() return handle:entindex() end)
+	if ok then table.insert(values, "ent=" .. tostring(entindex)) end
+	for _, getter in ipairs({
+		{ "class", "GetClassname" },
+		{ "unit", "GetUnitName" },
+		{ "ability", "GetAbilityName" },
+		{ "pid", "GetPlayerID" },
+		{ "owner_ent", "GetOwnerEntity" },
+	}) do
+		local method = handle[getter[2]]
+		if method ~= nil then
+			local valueOk, value = pcall(function() return method(handle) end)
+			if valueOk and value ~= nil and tostring(value) ~= "" then
+				if getter[1] == "owner_ent" and type(value) ~= "number" then
+					local ownerOk, ownerIndex = pcall(function() return value:entindex() end)
+					value = ownerOk and ownerIndex or value
+				end
+				table.insert(values, getter[1] .. "=" .. tostring(value))
+			end
+		end
+	end
+	if XHSBotPlayerRegistry ~= nil and XHSBotPlayerRegistry.IsXHSBotUnit ~= nil then
+		local botOk, isBot = pcall(function() return XHSBotPlayerRegistry:IsXHSBotUnit(handle) end)
+		if botOk then table.insert(values, "xhs_bot=" .. tostring(isBot)) end
+	end
+	return table.concat(values, ",")
+end
+
+local function XHSBotGiftTraceValue(value, depth)
+	depth = tonumber(depth) or 0
+	if depth >= 3 then return tostring(value) end
+	if type(value) ~= "table" then return tostring(value) end
+	local nested = {}
+	for key, nestedValue in pairs(value) do
+		table.insert(nested, tostring(key) .. "=" .. XHSBotGiftTraceValue(nestedValue, depth + 1))
+	end
+	table.sort(nested)
+	return "{" .. table.concat(nested, ",") .. "}"
+end
+
+function GameMode:TraceXHSBotGiftLowLevelEvent(eventName, keys)
+	if not IsInToolsMode() then return end
+	local raw = {}
+	local resolved = {}
+	for key, value in pairs(keys or {}) do
+		table.insert(raw, tostring(key) .. "=" .. XHSBotGiftTraceValue(value))
+		if type(value) == "number" and (string.find(tostring(key), "entindex", 1, true)
+			or string.find(tostring(key), "item", 1, true)
+			or string.find(tostring(key), "target", 1, true)
+			or string.find(tostring(key), "parent", 1, true)) then
+			local ok, handle = pcall(EntIndexToHScript, value)
+			if ok and handle ~= nil then
+				table.insert(resolved, tostring(key) .. "={" .. XHSBotGiftTraceHandle(handle) .. "}")
+			end
+		end
+	end
+	table.sort(raw)
+	table.sort(resolved)
+	print("[XHSBots][GiftTrace][LowLevelEvent] event=" .. tostring(eventName)
+		.. " raw=" .. table.concat(raw, " "))
+	if #resolved > 0 then
+		print("[XHSBots][GiftTrace][LowLevelEvent] event=" .. tostring(eventName)
+			.. " resolved=" .. table.concat(resolved, " "))
+	end
+end
+
+function GameMode:TraceXHSBotModifierOrder(params, observer)
+	if not IsInToolsMode() then return end
+	params = params or {}
+	print("[XHSBots][GiftTrace][OnOrder] observer={" .. XHSBotGiftTraceHandle(observer) .. "}"
+		.. " unit={" .. XHSBotGiftTraceHandle(params.unit) .. "}"
+		.. " target={" .. XHSBotGiftTraceHandle(params.target) .. "}"
+		.. " ability={" .. XHSBotGiftTraceHandle(params.ability) .. "}"
+		.. " order=" .. tostring(params.order_type)
+		.. " give=" .. tostring(DOTA_UNIT_ORDER_GIVE_ITEM)
+		.. " move=" .. tostring(DOTA_UNIT_ORDER_MOVE_ITEM))
+end
+
+function GameMode:GetXHSBotGiftIssueRejection(issuer, item, target)
+	if item == nil or item:IsNull() or target == nil or target:IsNull() then return nil end
+	self.xhsBotGiftIssueRejections = self.xhsBotGiftIssueRejections or {}
+	local itemIndex = item:entindex()
+	local rejection = self.xhsBotGiftIssueRejections[itemIndex]
+	if rejection == nil then return nil end
+	local now = GameRules:GetGameTime()
+	if now > (tonumber(rejection.expires_at) or 0) then
+		self.xhsBotGiftIssueRejections[itemIndex] = nil
+		return nil
+	end
+	if tonumber(rejection.issuer) ~= tonumber(issuer)
+		or tonumber(rejection.target_entindex) ~= tonumber(target:entindex()) then
+		return nil
+	end
+	return rejection
+end
+
+-- Some inventory drag paths only surface the GIVE_ITEM command through
+-- MODIFIER_EVENT_ON_ORDER. Validate those handles synchronously, while the
+-- donor is still standing at the click position, and cancel an invalid order
+-- before Source starts pathing toward the recipient.
+function GameMode:RejectInvalidXHSBotGiftAtIssue(params, observer)
+	params = params or {}
+	if DOTA_UNIT_ORDER_GIVE_ITEM == nil
+		or tonumber(params.order_type) ~= tonumber(DOTA_UNIT_ORDER_GIVE_ITEM) then
+		return false
+	end
+	local unit = params.unit
+	local target = params.target
+	local item = params.ability
+	-- OnOrder can be relayed to several modifiers. Only the ordered unit owns
+	-- this decision, which keeps the HUD error and audit entry single-shot.
+	if unit == nil or unit:IsNull() or observer ~= unit
+		or target == nil or target:IsNull()
+		or item == nil or item:IsNull() then
+		return false
+	end
+	if XHSBotPlayerRegistry == nil or XHSBotEconomy == nil
+		or XHSBotEconomy.EvaluateIncomingGift == nil
+		or not XHSBotPlayerRegistry:IsXHSBotUnit(target) then
+		return false
+	end
+
+	local issuer = tonumber(params.issuer_player_index)
+	if issuer == nil and unit.GetPlayerID ~= nil then
+		issuer = tonumber(unit:GetPlayerID())
+	end
+	if issuer == nil or issuer < 0
+		or XHSBotPlayerRegistry:IsXHSBotPlayerID(issuer)
+		or (XHSBotPlayerRegistry.IsHumanPlayerID ~= nil
+			and not XHSBotPlayerRegistry:IsHumanPlayerID(issuer)) then
+		return false
+	end
+	local targetPlayerID = tonumber(target.xhs_bot_player_id)
+	if targetPlayerID == nil and target.GetPlayerID ~= nil then
+		targetPlayerID = tonumber(target:GetPlayerID())
+	end
+	if targetPlayerID == nil
+		or not XHSBotPlayerRegistry:IsXHSBotPlayerID(targetPlayerID) then
+		return false
+	end
+
+	local ok, accepted, errorKey = pcall(function()
+		return XHSBotEconomy:EvaluateIncomingGift(targetPlayerID, target, item)
+	end)
+	if not ok then
+		accepted = false
+		errorKey = "#error_xhs_bot_item_unsupported"
+	end
+	if accepted == true then return false end
+
+	local itemName = item.GetAbilityName ~= nil
+		and item:GetAbilityName() or "unknown"
+	self.xhsBotGiftIssueRejections = self.xhsBotGiftIssueRejections or {}
+	self.xhsBotGiftIssueRejections[item:entindex()] = {
+		issuer = issuer,
+		target_entindex = target:entindex(),
+		error_key = tostring(errorKey or "#error_xhs_bot_item_unsupported"),
+		expires_at = GameRules:GetGameTime() + 30,
+	}
+	if XHSBotEconomy.RecordExternalGiftDecision ~= nil then
+		XHSBotEconomy:RecordExternalGiftDecision(
+			targetPlayerID,
+			itemName,
+			false,
+			errorKey,
+			issuer
+		)
+	end
+	SendErrorMessage(
+		issuer,
+		tostring(errorKey or "#error_xhs_bot_item_unsupported")
+	)
+	-- OnOrder returns false through the modifier to break the current command.
+	-- Replacing the pending GIVE_ITEM with STOP in the same callback is an extra
+	-- guard for inventory paths that may already have begun pathing.
+	ExecuteOrderFromTable({
+		UnitIndex = unit:entindex(),
+		OrderType = DOTA_UNIT_ORDER_STOP,
+		Queue = false,
+	})
+	if IsInToolsMode() then
+		print("[XHSBots][GiftTrace][ImmediateReject] issuer=" .. tostring(issuer)
+			.. " bot_pid=" .. tostring(targetPlayerID)
+			.. " item=" .. tostring(itemName)
+			.. " reason=" .. tostring(errorKey))
+	end
+	return true
+end
+
 function GameMode:FilterExecuteOrder(filterTable)
 	--[[
 	print("-----------------------------------------")
@@ -837,6 +1399,25 @@ function GameMode:FilterExecuteOrder(filterTable)
 	local point = Vector(x, y, z)
 	local queue = filterTable["queue"] == 1
 	local unit
+
+	-- Log at the first possible server hook, before any lock, redirect or early
+	-- return can consume the order. This deliberately includes every order in
+	-- Tools mode so an engine-specific gift payload cannot hide behind an
+	-- unexpected order enum or field layout.
+	if IsInToolsMode() then
+		local raw = {}
+		for key, value in pairs(filterTable or {}) do
+			table.insert(raw, tostring(key) .. "=" .. XHSBotGiftTraceValue(value))
+		end
+		table.sort(raw)
+		print("[XHSBots][GiftTrace][OrderFilterEntry] order=" .. tostring(order_type)
+			.. " give=" .. tostring(DOTA_UNIT_ORDER_GIVE_ITEM)
+			.. " move=" .. tostring(DOTA_UNIT_ORDER_MOVE_ITEM)
+			.. " issuer=" .. tostring(issuer)
+			.. " ability_ent=" .. tostring(abilityIndex)
+			.. " target_ent=" .. tostring(targetIndex)
+			.. " raw=" .. table.concat(raw, " "))
+	end
 
 	-- Panorama input suppression is cosmetic; reject every player-issued order
 	-- authoritatively while that player's cinematic lock is active.
@@ -952,6 +1533,86 @@ function GameMode:FilterExecuteOrder(filterTable)
 		end
 	end
 
+	-- Temporary Tools-only diagnostics for the engine order generated by
+	-- dragging an item onto an allied bot. Source 2 has used different payload
+	-- shapes for inventory interactions over time, so log both the interpreted
+	-- handles and every raw filter field instead of assuming GIVE_ITEM's schema.
+	if IsInToolsMode() then
+		local function ResolveTraceHandle(index)
+			index = tonumber(index)
+			if index == nil or index <= 0 then return nil end
+		local ok, handle = pcall(EntIndexToHScript, index)
+			return ok and handle or nil
+		end
+		local function TraceHandle(handle)
+			if handle == nil or handle.IsNull == nil or handle:IsNull() then
+				return "nil"
+			end
+			local values = { "ent=" .. tostring(handle:entindex()) }
+			if handle.GetClassname ~= nil then
+				local ok, value = pcall(function() return handle:GetClassname() end)
+				if ok then table.insert(values, "class=" .. tostring(value)) end
+			end
+			if handle.GetUnitName ~= nil then
+				local ok, value = pcall(function() return handle:GetUnitName() end)
+				if ok and tostring(value or "") ~= "" then
+					table.insert(values, "unit=" .. tostring(value))
+				end
+			end
+			if handle.GetAbilityName ~= nil then
+				local ok, value = pcall(function() return handle:GetAbilityName() end)
+				if ok and tostring(value or "") ~= "" then
+					table.insert(values, "ability=" .. tostring(value))
+				end
+			end
+			if handle.GetPlayerID ~= nil then
+				local ok, value = pcall(function() return handle:GetPlayerID() end)
+				if ok then table.insert(values, "pid=" .. tostring(value)) end
+			end
+			if XHSBotPlayerRegistry ~= nil
+				and XHSBotPlayerRegistry.IsXHSBotUnit ~= nil then
+				local ok, value = pcall(function()
+					return XHSBotPlayerRegistry:IsXHSBotUnit(handle)
+				end)
+				if ok then table.insert(values, "xhs_bot=" .. tostring(value)) end
+			end
+			return table.concat(values, ",")
+		end
+		local traceTarget = ResolveTraceHandle(targetIndex)
+		local traceAbility = ResolveTraceHandle(abilityIndex)
+		local targetIsBot = traceTarget ~= nil
+			and XHSBotPlayerRegistry ~= nil
+			and XHSBotPlayerRegistry.IsXHSBotUnit ~= nil
+			and XHSBotPlayerRegistry:IsXHSBotUnit(traceTarget)
+		local abilityLooksLikeItem = traceAbility ~= nil
+			and traceAbility.GetAbilityName ~= nil
+			and string.sub(tostring(traceAbility:GetAbilityName() or ""), 1, 5) == "item_"
+		if IsInventoryOrder(order_type) or targetIsBot or abilityLooksLikeItem then
+			local raw = {}
+			for key, value in pairs(filterTable) do
+				if type(value) == "table" then
+					local nested = {}
+					for nestedKey, nestedValue in pairs(value) do
+						table.insert(nested, tostring(nestedKey) .. "=" .. tostring(nestedValue))
+					end
+					table.sort(nested)
+					table.insert(raw, tostring(key) .. "={" .. table.concat(nested, ",") .. "}")
+				else
+					table.insert(raw, tostring(key) .. "=" .. tostring(value))
+				end
+			end
+			table.sort(raw)
+			print("[XHSBots][GiftTrace] order=" .. tostring(order_type)
+				.. " give=" .. tostring(DOTA_UNIT_ORDER_GIVE_ITEM)
+				.. " move=" .. tostring(DOTA_UNIT_ORDER_MOVE_ITEM)
+				.. " issuer=" .. tostring(issuer)
+				.. " unit={" .. TraceHandle(unit) .. "}"
+				.. " target={" .. TraceHandle(traceTarget) .. "}"
+				.. " ability={" .. TraceHandle(traceAbility) .. "}")
+			print("[XHSBots][GiftTrace] raw " .. table.concat(raw, " "))
+		end
+	end
+
 	-- Human item donations to bots are validated before Source executes the
 	-- transfer. This keeps unsuitable items out of the inventory entirely and
 	-- gives the donor an immediate HUD explanation instead of silently letting
@@ -967,13 +1628,24 @@ function GameMode:FilterExecuteOrder(filterTable)
 			and EntIndexToHScript(numericTargetIndex) or nil
 		local giftedItem = numericItemIndex ~= nil and numericItemIndex > 0
 			and EntIndexToHScript(numericItemIndex) or nil
-		local targetPlayerID = targetHero ~= nil and not targetHero:IsNull()
-			and tonumber(targetHero.xhs_bot_player_id)
-			or nil
+		local targetPlayerID = nil
+		if targetHero ~= nil and not targetHero:IsNull()
+			and XHSBotPlayerRegistry:IsXHSBotUnit(targetHero) then
+			targetPlayerID = tonumber(targetHero.xhs_bot_player_id)
+			if targetPlayerID == nil and targetHero.GetPlayerID ~= nil then
+				targetPlayerID = tonumber(targetHero:GetPlayerID())
+			end
+		end
 		if targetPlayerID ~= nil
 			and XHSBotPlayerRegistry:IsXHSBotPlayerID(targetPlayerID)
 			and XHSBotEconomy ~= nil
 			and XHSBotEconomy.EvaluateIncomingGift ~= nil then
+			-- MODIFIER_EVENT_ON_ORDER may already have rejected this exact drag
+			-- path. The filter remains authoritative when it receives the command,
+			-- but must not duplicate the error or audit entry.
+			if self:GetXHSBotGiftIssueRejection(issuer, giftedItem, targetHero) ~= nil then
+				return false
+			end
 			local ok, accepted, errorKey, context = pcall(function()
 				return XHSBotEconomy:EvaluateIncomingGift(
 					targetPlayerID,
@@ -981,6 +1653,16 @@ function GameMode:FilterExecuteOrder(filterTable)
 					giftedItem
 				)
 			end)
+			if IsInToolsMode() then
+				print("[XHSBots][GiftTrace] evaluation bot_pid="
+					.. tostring(targetPlayerID)
+					.. " item=" .. tostring(giftedItem ~= nil
+						and giftedItem.GetAbilityName ~= nil
+						and giftedItem:GetAbilityName() or "nil")
+					.. " pcall=" .. tostring(ok)
+					.. " accepted=" .. tostring(accepted)
+					.. " reason=" .. tostring(errorKey))
+			end
 			if not ok then
 				accepted = false
 				errorKey = "#error_xhs_bot_item_unsupported"

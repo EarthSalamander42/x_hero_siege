@@ -2,6 +2,9 @@
 -- The catalog itself remains server-owned; this list only makes the vetted,
 -- locally VPK-verified preview resources resident in Tools Mode.
 local PARTICLES = {
+	"particles/econ/events/diretide_2020/emblem/fall20_emblem_effect.vpcf",
+	"particles/econ/events/diretide_2020/emblem/fall20_emblem_v1_effect.vpcf",
+	"particles/econ/events/diretide_2020/emblem/fall20_emblem_v3_effect.vpcf",
 	"particles/econ/events/fall_2022/player/fall_2022_emblem_effect_player_base.vpcf",
 	"particles/econ/events/fall_2022/regen/fountain_regen_fall2022_lvl3.vpcf",
 	"particles/econ/events/ti10/aghanim_aura_ti10/agh_aura_ti10.vpcf",
@@ -40,6 +43,7 @@ local PARTICLES = {
 	"particles/econ/events/ti8/teleport_start_ti8_lvl3.vpcf",
 	"particles/econ/events/ti9/fountain_regen_ti9_lvl3.vpcf",
 	"particles/econ/events/ti9/bottle_ti9.vpcf",
+	"particles/econ/events/ti9/shovel/shovel_baby_roshan_spawn.vpcf",
 	"particles/econ/events/ti9/hero_levelup_ti9.vpcf",
 	"particles/econ/events/ti9/high_five/high_five_impact.vpcf",
 	"particles/econ/events/ti9/high_five/high_five_overhead.vpcf",

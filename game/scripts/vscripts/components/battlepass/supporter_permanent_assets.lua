@@ -37,10 +37,10 @@ local Manifest = {
 			asset_path = "particles/econ/items/spectre/spectre_arcana/spectre_arcana_loadout_spawn_v2.vpcf",
 		},
 		["sp40_shop_rebirth_watchers_arrival"] = {
-			approved = false,
-			published = false,
+			approved = true,
+			published = true,
 			slot_id = "rebirth",
-			asset_path = "particles/items2_fx/ward_spawn_generic.vpcf",
+			asset_path = "particles/econ/events/ti9/shovel/shovel_baby_roshan_spawn.vpcf",
 		},
 		["sp40_shop_rebirth_stonefall"] = {
 			approved = false,

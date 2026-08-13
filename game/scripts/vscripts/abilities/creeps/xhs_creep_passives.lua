@@ -663,6 +663,8 @@ function modifier_xhs_creep_silencing_glaive_debuff:GetEffectAttachType()
 	return PATTACH_OVERHEAD_FOLLOW
 end
 
+function modifier_xhs_creep_silencing_glaive_debuff:ShouldUseOverheadOffset() return true end
+
 function modifier_xhs_creep_silencing_glaive_debuff:CheckState()
 	return {
 		[MODIFIER_STATE_SILENCED] = true,

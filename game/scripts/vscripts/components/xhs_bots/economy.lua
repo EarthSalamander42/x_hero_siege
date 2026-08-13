@@ -1798,7 +1798,7 @@ function XHSBotEconomy:GetAlliedItemCoverage(hero)
 	return itemCounts, familyCounts, allyCount, lowHealthCount, healthDeficit
 end
 
-function XHSBotEconomy:BuildPlannerSnapshot(playerID, hero, record)
+function XHSBotEconomy:BuildPlannerSnapshot(playerID, hero, record, ignoredItem)
 	local now = GameRules:GetGameTime()
 	local damageTypeFresh = now - (tonumber(record.damage_type_last_hit_at) or -math.huge)
 		<= 12
@@ -1807,7 +1807,7 @@ function XHSBotEconomy:BuildPlannerSnapshot(playerID, hero, record)
 	local inventorySlots = 0
 	for slot = 0, self.SCAN_LAST_SLOT do
 		local item = hero:GetItemInSlot(slot)
-		local name = ItemName(item)
+		local name = item ~= ignoredItem and ItemName(item) or nil
 		if name ~= nil then
 			owned[name] = (owned[name] or 0) + 1
 			if slot <= self.ACTIVE_LAST_SLOT then activeSlots = activeSlots + 1 end
@@ -1963,7 +1963,7 @@ function XHSBotEconomy:ResolveGiftCatalogEntry(itemName)
 	return nil, false
 end
 
-function XHSBotEconomy:GetGiftFamilyInventory(hero, familyName)
+function XHSBotEconomy:GetGiftFamilyInventory(hero, familyName, ignoredItem)
 	local state = {
 		count = 0,
 		highest_tier = 0,
@@ -1972,7 +1972,7 @@ function XHSBotEconomy:GetGiftFamilyInventory(hero, familyName)
 	if not IsValidEntityHandle(hero) or familyName == nil then return state end
 	for slot = 0, self.SCAN_LAST_SLOT do
 		local item = hero:GetItemInSlot(slot)
-		local name = ItemName(item)
+		local name = item ~= ignoredItem and ItemName(item) or nil
 		local entry, isRecipe = self:ResolveGiftCatalogEntry(name)
 		if entry ~= nil and entry.family == familyName then
 			table.insert(state.handles, item)
@@ -2015,7 +2015,14 @@ function XHSBotEconomy:IsGiftTargetLoadoutItem(entry, plan)
 	return false
 end
 
-function XHSBotEconomy:GetGiftMergeState(hero, itemName, entry, isRecipe, snapshot)
+function XHSBotEconomy:GetGiftMergeState(
+	hero,
+	itemName,
+	entry,
+	isRecipe,
+	snapshot,
+	ignoredItem
+)
 	local result = {
 		can_merge = false,
 		upgrade = false,
@@ -2028,6 +2035,7 @@ function XHSBotEconomy:GetGiftMergeState(hero, itemName, entry, isRecipe, snapsh
 	if entry.stackable == true then
 		for slot = 0, self.SCAN_LAST_SLOT do
 			local ownedItem = hero:GetItemInSlot(slot)
+			if ownedItem == ignoredItem then ownedItem = nil end
 			if ItemName(ownedItem) == itemName or ItemName(ownedItem) == entry.name then
 				result.can_merge = true
 				result.stack = true
@@ -2037,7 +2045,11 @@ function XHSBotEconomy:GetGiftMergeState(hero, itemName, entry, isRecipe, snapsh
 	end
 
 	if entry.family ~= nil then
-		local familyState = self:GetGiftFamilyInventory(hero, entry.family)
+		local familyState = self:GetGiftFamilyInventory(
+			hero,
+			entry.family,
+			ignoredItem
+		)
 		local predecessorOwned = entry.predecessor ~= nil
 			and (tonumber(snapshot.owned[entry.predecessor]) or 0) > 0
 		if (tonumber(entry.tier) or 0) > 1 then
@@ -2081,7 +2093,12 @@ function XHSBotEconomy:GetGiftMergeState(hero, itemName, entry, isRecipe, snapsh
 	return result
 end
 
-function XHSBotEconomy:EvaluateIncomingGift(botPlayerID, hero, item)
+function XHSBotEconomy:EvaluateIncomingGift(
+	botPlayerID,
+	hero,
+	item,
+	alreadyReceived
+)
 	botPlayerID = tonumber(botPlayerID)
 	local record = botPlayerID ~= nil and XHSBotPlayerRegistry:GetBot(botPlayerID) or nil
 	if record == nil or not IsValidEntityHandle(hero)
@@ -2093,11 +2110,35 @@ function XHSBotEconomy:EvaluateIncomingGift(botPlayerID, hero, item)
 	if entry == nil then
 		return false, "#error_xhs_bot_item_unsupported", nil
 	end
+	-- Tomes are deliberately unconditional gifts. They are the supported way
+	-- for a human (or a richer allied bot) to reinforce a struggling bot, and
+	-- consuming one does not alter the bot's equipment build.
+	if entry.kind == "tome" then
+		return true, nil, {
+			entry = entry,
+			item_name = itemName,
+			is_recipe = isRecipe,
+			merge = {
+				can_merge = true,
+				stack = true,
+				normalize = {},
+			},
+			tome_exception = true,
+		}
+	end
 	local profile = XHSBotHeroProfiles:Get(hero:GetUnitName())
 	if profile == nil then
 		return false, "#error_xhs_bot_item_unsupported", nil
 	end
-	local snapshot = self:BuildPlannerSnapshot(botPlayerID, hero, record)
+	-- Inventory events arrive after Source has installed the item. Ignoring that
+	-- exact handle reconstructs the pre-gift build for identical validation.
+	local ignoredItem = alreadyReceived == true and item or nil
+	local snapshot = self:BuildPlannerSnapshot(
+		botPlayerID,
+		hero,
+		record,
+		ignoredItem
+	)
 	local difficulty = XHSBotConfig:GetDifficulty(record.difficulty)
 	local plan = XHSBotItemPlanner:Plan(snapshot, profile, difficulty)
 	local merge = self:GetGiftMergeState(
@@ -2105,8 +2146,40 @@ function XHSBotEconomy:EvaluateIncomingGift(botPlayerID, hero, item)
 		itemName,
 		entry,
 		isRecipe,
-		snapshot
+		snapshot,
+		ignoredItem
 	)
+	if IsInToolsMode() then
+		local planned = {}
+		for _, plannedName in ipairs(plan and plan.target_loadout or {}) do
+			table.insert(planned, tostring(plannedName))
+		end
+		local familyCompatible, familyReason = true, nil
+		if entry.family ~= nil then
+			familyCompatible, familyReason = XHSBotItemPlanner:IsFamilyCompatible(
+				snapshot,
+				profile,
+				entry.family
+			)
+		end
+		print("[XHSBots][GiftTrace] planner bot_pid=" .. tostring(botPlayerID)
+			.. " hero=" .. tostring(hero:GetUnitName())
+			.. " item=" .. tostring(itemName)
+			.. " entry=" .. tostring(entry.name)
+			.. " kind=" .. tostring(entry.kind)
+			.. " family=" .. tostring(entry.family)
+			.. " ranged=" .. tostring(snapshot.is_ranged_attacker)
+			.. " preferred_range=" .. tostring(profile.preferred_range)
+			.. " compatible=" .. tostring(familyCompatible)
+			.. " compatibility_reason=" .. tostring(familyReason)
+			.. " next=" .. tostring(plan and plan.next_entry
+				and plan.next_entry.name or "nil")
+			.. " tactical=" .. tostring(plan and plan.tactical_entry
+				and plan.tactical_entry.name or "nil")
+			.. " target_loadout=[" .. table.concat(planned, ",") .. "]"
+			.. " merge=" .. tostring(merge.can_merge)
+			.. " upgrade=" .. tostring(merge.upgrade))
+	end
 
 	if XHSBotItemPlanner:IsItemRedundant(profile, entry.name)
 		or entry.name == self.LIFESTEAL_MASK_ITEM_NAME
@@ -2133,7 +2206,11 @@ function XHSBotEconomy:EvaluateIncomingGift(botPlayerID, hero, item)
 		if compatible ~= true then
 			return false, "#error_xhs_bot_item_build_mismatch", nil
 		end
-		local familyState = self:GetGiftFamilyInventory(hero, entry.family)
+		local familyState = self:GetGiftFamilyInventory(
+			hero,
+			entry.family,
+			ignoredItem
+		)
 		local familyLimit = XHSBotItemPlanner:GetFamilyLimit(profile, entry.family)
 		if familyLimit <= 0 then
 			return false, "#error_xhs_bot_item_build_mismatch", nil
@@ -2153,21 +2230,18 @@ function XHSBotEconomy:EvaluateIncomingGift(botPlayerID, hero, item)
 				>= XHSBotItemPlanner:GetMaximumOrbSlots(profile) then
 			return false, "#error_xhs_bot_full_build", nil
 		end
-	elseif entry.kind == "core" then
-		local isReward = entry.purchasable == false
+	else
 		local replacesOwned = entry.replaces ~= nil
 			and (tonumber(snapshot.owned[entry.replaces]) or 0) > 0
-		if not isReward and not replacesOwned
+		-- Every non-orb gift must belong to the bot's live planner output. This
+		-- includes consumables and tactical items: catalog support alone no
+		-- longer makes an arbitrary item a valid donation. A genuine superior
+		-- replacement (for example Lightning Sword over Mask of Death) remains
+		-- valid even when it is an arena reward rather than a purchase candidate.
+		if not replacesOwned and merge.upgrade ~= true
 			and not self:IsGiftTargetLoadoutItem(entry, plan) then
 			return false, "#error_xhs_bot_item_build_mismatch", nil
 		end
-	elseif entry.kind ~= "consumable"
-		and entry.kind ~= "revive"
-		and entry.kind ~= "tactical"
-		and entry.kind ~= "utility"
-		and entry.kind ~= "tome"
-		and entry.kind ~= "reward" then
-		return false, "#error_xhs_bot_item_build_mismatch", nil
 	end
 
 	if entry.name == "item_health_potion"
@@ -2503,6 +2577,8 @@ function XHSBotEconomy:GetShopAnchors(shop)
 	local castleShop = Entities:FindByName(nil, "castle_shop")
 	local secretPosition = IsValidEntityHandle(castleShop)
 		and castleShop:GetAbsOrigin() or nil
+	local normalShopEntities = {}
+	local seenShopEntities = {}
 
 	local function Add(entity, kind, radius)
 		if not IsValidEntityHandle(entity) then return end
@@ -2522,13 +2598,52 @@ function XHSBotEconomy:GetShopAnchors(shop)
 		return anchors
 	end
 
-	-- The Ancient is a defensive landmark, not necessarily the purchase
-	-- volume. Prefer the map's actual base spawn/fountain so an emergency
-	-- resupply cannot oscillate between the Ancient and the real home shop.
-	local baseAnchorCount = #anchors
-	if IsValidEntityHandle(_G.BASE_GOOD) then
-		Add(_G.BASE_GOOD, "base", self.BASE_SHOP_RADIUS)
+	-- Only map-owned shop entities are legal shopping destinations. In XHS,
+	-- base_spawn/BASE_GOOD is the Ancient and castle_shop is the secret shop;
+	-- neither may stand in for the normal base shop merely because it is a
+	-- convenient landmark.
+	for _, className in ipairs(GENERAL_SHOP_CLASSNAMES) do
+		for _, entity in pairs(Entities:FindAllByClassname(className) or {}) do
+			local entityIndex = IsValidEntityHandle(entity) and entity:entindex() or -1
+			if entityIndex >= 0
+				and not seenShopEntities[entityIndex]
+				and entity ~= castleShop then
+				local distanceFromSecret = secretPosition ~= nil
+					and (entity:GetAbsOrigin() - secretPosition):Length2D()
+					or math.huge
+				-- A trigger belonging to the named secret shop is not evidence of
+				-- a second normal shop. Explicit shop entities remain valid when a
+				-- map outpost intentionally co-locates both services.
+				if className ~= "trigger_shop" or distanceFromSecret > 128 then
+					seenShopEntities[entityIndex] = true
+					table.insert(normalShopEntities, {
+						entity = entity,
+						className = className,
+					})
+				end
+			end
+		end
 	end
+
+	-- The real base shop is the normal shop entity nearest the Ancient. The
+	-- Ancient itself remains only a reference point and is never returned as
+	-- an anchor. This distinction is essential for potions and stash pickup.
+	local baseReference = Entities:FindByName(nil, "base_spawn")
+	local baseShop = nil
+	local baseShopDistance = math.huge
+	if IsValidEntityHandle(baseReference) then
+		local referencePosition = baseReference:GetAbsOrigin()
+		for _, candidate in ipairs(normalShopEntities) do
+			local distance =
+				(candidate.entity:GetAbsOrigin() - referencePosition):Length2D()
+			if distance < baseShopDistance then
+				baseShop = candidate.entity
+				baseShopDistance = distance
+			end
+		end
+	end
+	Add(baseShop, "base", self.BASE_SHOP_RADIUS)
+
 	for _, fountain in pairs(
 		Entities:FindAllByClassname("ent_dota_fountain") or {}
 	) do
@@ -2541,35 +2656,12 @@ function XHSBotEconomy:GetShopAnchors(shop)
 		end
 		if correctTeam then Add(fountain, "base", self.BASE_SHOP_RADIUS) end
 	end
-	if #anchors == baseAnchorCount then
-		Add(GetFort(), "base", self.BASE_SHOP_RADIUS)
-	end
 	if shop == "base" then return anchors end
 
-	-- Discover the same map-owned normal-shop classes used by the lane director.
-	-- Exclude castle_shop itself, but retain a distinct normal shop beside it:
-	-- the top outpost intentionally provides both normal and secret inventories.
-	local seen = {}
-	for _, className in ipairs(GENERAL_SHOP_CLASSNAMES) do
-		for _, entity in pairs(Entities:FindAllByClassname(className) or {}) do
-			local entityIndex = IsValidEntityHandle(entity) and entity:entindex() or -1
-			if entityIndex >= 0
-				and not seen[entityIndex]
-				and entity ~= castleShop then
-				local distanceFromSecret = secretPosition ~= nil
-					and (entity:GetAbsOrigin() - secretPosition):Length2D()
-					or math.huge
-				-- A distinct map-owned normal shop is valid even inside the
-				-- secret-shop exclusion ring (the top outpost intentionally
-				-- co-locates both services). GetCurrentShopKind still requires
-				-- the engine HOME range and proximity to this exact anchor.
-				if distanceFromSecret > self.SECRET_SHOP_EXCLUSION_RADIUS
-					or entity ~= castleShop then
-					seen[entityIndex] = true
-					Add(entity, "lane", self.LANE_SHOP_RADIUS)
-				end
-			end
-		end
+	-- Add every genuine normal shop as a possible HOME destination. Add()
+	-- deduplicates the base shop while preserving its more precise kind.
+	for _, candidate in ipairs(normalShopEntities) do
+		Add(candidate.entity, "lane", self.LANE_SHOP_RADIUS)
 	end
 	return anchors
 end
@@ -2584,7 +2676,7 @@ function XHSBotEconomy:GetCurrentShopKind(hero, shop)
 	local normalShopNearby = false
 	if shop ~= "secret" then
 		for _, anchor in ipairs(self:GetShopAnchors("home")) do
-			if anchor.kind == "lane"
+			if anchor.kind ~= "secret"
 				and (origin - anchor.position):Length2D() <= anchor.radius then
 				normalShopNearby = true
 				break

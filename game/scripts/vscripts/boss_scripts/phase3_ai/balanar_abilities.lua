@@ -125,7 +125,6 @@ end
 local function CreateOverheadCast(caster, particleName)
 	if not IsValidAlive(caster) then return end
 	local particle = ParticleManager:CreateParticle(particleName, PATTACH_OVERHEAD_FOLLOW, caster)
-	ParticleManager:SetParticleControlEnt(particle, 0, caster, PATTACH_OVERHEAD_FOLLOW, "attach_hitloc", caster:GetAbsOrigin(), true)
 	ParticleManager:ReleaseParticleIndex(particle)
 end
 
@@ -428,7 +427,6 @@ function modifier_xhs_balanar_nightmare:OnCreated()
 	if not IsServer() then return end
 	local parent = self:GetParent()
 	self.nightmare_pfx = ParticleManager:CreateParticle(SLEEPING_TERROR_PARTICLE, PATTACH_OVERHEAD_FOLLOW, parent)
-	ParticleManager:SetParticleControlEnt(self.nightmare_pfx, 0, parent, PATTACH_OVERHEAD_FOLLOW, "attach_hitloc", parent:GetAbsOrigin(), true)
 	parent:EmitSound("Hero_Bane.Nightmare.Loop")
 end
 function modifier_xhs_balanar_nightmare:OnDestroy()

@@ -37,5 +37,7 @@
 		"xhs_clone_units",
 		"xhs_creep_health_bars",
 		"xhs_bootstrap_status",
+		"xhs_achievements_catalog",
+		"xhs_achievements_player",
 	]
 }

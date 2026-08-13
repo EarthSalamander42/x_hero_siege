@@ -81,6 +81,11 @@ local BATTLEPASS_DEV_FAMILY_ORDER = {
 	"spell_lifesteal",
 	"regen_aura",
 	"immolation",
+	"high_five",
+	"bundle",
+	"title",
+	"fragment",
+	"other",
 }
 
 local BATTLEPASS_DEV_FAMILY_LABELS = {
@@ -98,6 +103,11 @@ local BATTLEPASS_DEV_FAMILY_LABELS = {
 	spell_lifesteal = "Spell Lifesteal",
 	regen_aura = "Regen Aura",
 	immolation = "Immolation",
+	high_five = "High Five",
+	bundle = "Bundles",
+	title = "Titles",
+	fragment = "Fragments",
+	other = "Other / Unmapped",
 }
 
 local BATTLEPASS_DEV_FAMILY_SET = {}
@@ -112,6 +122,43 @@ local BATTLEPASS_DEV_POTION_FAMILIES = {
 }
 
 local BATTLEPASS_DEV_SEQUENCE_DELAY = 8.0
+
+local BATTLEPASS_DEV_NON_TESTABLE_FAMILIES = {
+	bundle = true,
+	title = true,
+	fragment = true,
+	other = true,
+}
+
+local BATTLEPASS_DEV_IMAGE_FIELDS = {
+	"preview_image",
+	"image_url",
+	"image",
+	"image_inventory",
+	"icon",
+	"icon_path",
+}
+
+local function BattlepassDevDisplayImage(item, itemKV)
+	-- Prefer the shipped runtime definition. Backend shop rows can retain an
+	-- older CDN image while the in-game catalog already has the corrected art.
+	local function FromSource(source)
+		if type(source) == "table" then
+			for _, field in ipairs(BATTLEPASS_DEV_IMAGE_FIELDS) do
+				local value = source[field]
+				if value ~= nil and tostring(value) ~= "" then
+					local path = tostring(value):gsub("\\", "/")
+					if string.find(string.lower(path), ".vpcf", 1, true) == nil
+						and string.sub(string.lower(path), 1, 10) ~= "particles/" then
+						return path
+					end
+				end
+			end
+		end
+		return nil
+	end
+	return FromSource(itemKV) or FromSource(item) or ""
+end
 
 local function FormatBattlepassDevRewardName(name, family)
 	local value = tostring(name or "")
@@ -480,6 +527,7 @@ function XHSDevTools:Init()
 	self.initialized = true
 	self.sandbox_active = false
 	self.spawned_units = {}
+	self.overhead_offset_overrides = {}
 	self.invulnerable_players = false
 	self.campaign_flow_active = false
 	self.host_timescale = Convars ~= nil and Convars:GetFloat("host_timescale") or 1
@@ -655,6 +703,10 @@ function XHSDevTools:RunAction(action, event)
 		return self:ToggleInvulnerable()
 	elseif action == "set_temporary_donator_status" then
 		return self:SetTemporaryDonatorStatus(event)
+	elseif action == "set_overhead_offset" then
+		return self:SetOverheadOffset(event)
+	elseif action == "reset_overhead_offset" then
+		return self:ResetOverheadOffset(event)
 	elseif action == "preview_vip_dialog" then
 		return self:PreviewVipDialog(event)
 	elseif action == "close_vip_dialog_preview" then
@@ -1556,51 +1608,105 @@ function XHSDevTools:BuildBattlepassDevCatalog()
 		grouped[family] = {}
 	end
 
-	if ItemsGame == nil then return {} end
-	for _, trackData in ipairs({
-		{ id = "free",    rewards = ItemsGame.battlepass or {} },
-		{ id = "premium", rewards = ItemsGame.battlepass2 or {} },
-	}) do
-		for _, reward in pairs(trackData.rewards) do
-			if type(reward) == "table" then
-				local family = tostring(reward.slot_id or reward.item_type or reward.type or "")
-					:lower()
-				if Battlepass ~= nil and Battlepass.NormalizeSupporterSlot ~= nil then
-					family = Battlepass:NormalizeSupporterSlot(family)
-				end
+	local function AddCatalogItem(item, track, source)
+		if type(item) ~= "table" then return end
+		local family = tostring(item.slot_id or item.item_type or item.type or item.category or ""):lower()
+		if Battlepass ~= nil and Battlepass.NormalizeSupporterSlot ~= nil then
+			family = Battlepass:NormalizeSupporterSlot(family)
+		end
+		if family == "fragments" then family = "fragment" end
 
-				local itemID = reward.entitlement_id
-					or reward.item_id
-					or reward.catalog_item_id
-					or reward.reward_item_id
-					or reward.id
-				itemID = itemID ~= nil and tostring(itemID) or ""
-				local devFamilies = { family }
-				if family == "potion" then
-					devFamilies = { "health_potion", "mana_potion", "light_potion" }
-				end
-				for _, devFamily in ipairs(devFamilies) do
-					local identity = devFamily .. ":" .. itemID
-					if BATTLEPASS_DEV_FAMILY_SET[devFamily] == true
-						and itemID ~= ""
-						and not seen[identity] then
-						seen[identity] = true
-						local name = tostring(reward.name or reward.item_name or itemID)
-						table.insert(grouped[devFamily], {
-							item_id = itemID,
-							family = devFamily,
-							slot_id = family,
-							preview_channel = BATTLEPASS_DEV_POTION_FAMILIES[devFamily],
-							name = name,
-							display_name = FormatBattlepassDevRewardName(name, family),
-							rarity = tostring(reward.rarity or reward.item_rarity or ""),
-							track = tostring(reward.track or trackData.id),
-							level = tonumber(reward.level) or 0,
-						})
-					end
-				end
+		local itemID = item.entitlement_id
+			or item.item_id
+			or item.catalog_item_id
+			or item.reward_item_id
+			or item.id
+		itemID = itemID ~= nil and tostring(itemID) or ""
+		if itemID == "" then return end
+
+		local itemKV = ItemsGame ~= nil and ItemsGame.GetItemKV ~= nil
+			and ItemsGame:GetItemKV(itemID)
+			or nil
+		if (family == "" or family == "default" or BATTLEPASS_DEV_FAMILY_SET[family] ~= true)
+			and type(itemKV) == "table" then
+			family = tostring(itemKV.slot_id or itemKV.item_type or itemKV.type or ""):lower()
+			if Battlepass ~= nil and Battlepass.NormalizeSupporterSlot ~= nil then
+				family = Battlepass:NormalizeSupporterSlot(family)
 			end
 		end
+		if BATTLEPASS_DEV_FAMILY_SET[family] ~= true then family = "other" end
+		local devFamilies = family == "potion"
+			and { "health_potion", "mana_potion", "light_potion" }
+			or { family }
+
+		for _, devFamily in ipairs(devFamilies) do
+			if BATTLEPASS_DEV_FAMILY_SET[devFamily] == true then
+				local identity = devFamily .. ":" .. itemID
+				local entry = seen[identity]
+				if entry == nil then
+					local name = tostring(item.name or item.item_name
+						or (type(itemKV) == "table" and itemKV.item_name) or itemID)
+					entry = {
+						item_id = itemID,
+						family = devFamily,
+						slot_id = family,
+						preview_channel = BATTLEPASS_DEV_POTION_FAMILIES[devFamily],
+						name = name,
+						display_name = tostring(item.display_name or item.title
+							or FormatBattlepassDevRewardName(name, family)),
+						rarity = tostring(item.rarity or item.item_rarity
+							or (type(itemKV) == "table" and itemKV.item_rarity) or ""),
+						track = tostring(item.track or track or ""),
+						level = tonumber(item.level_required or item.level) or 0,
+						image = BattlepassDevDisplayImage(item, itemKV),
+						testable = BATTLEPASS_DEV_NON_TESTABLE_FAMILIES[devFamily] ~= true,
+						from_shop = 0,
+						from_free = 0,
+						from_premium = 0,
+					}
+					seen[identity] = entry
+					table.insert(grouped[devFamily], entry)
+				elseif entry.image == "" then
+					entry.image = BattlepassDevDisplayImage(item, itemKV)
+				end
+				if source == "shop" then entry.from_shop = 1 end
+				if source == "reward" and track == "free" then entry.from_free = 1 end
+				if source == "reward" and track == "premium" then entry.from_premium = 1 end
+				if entry.track == "" and track ~= nil then entry.track = tostring(track) end
+			end
+		end
+	end
+
+	local freeTable = SupporterPass ~= nil and SupporterPass.PublishedFreeRewards or nil
+	if type(freeTable) ~= "table" then freeTable = CustomNetTables ~= nil
+		and CustomNetTables:GetTableValue("supporter_pass_rewards_free", "rewards")
+		or nil end
+	local premiumTable = SupporterPass ~= nil and SupporterPass.PublishedPremiumRewards or nil
+	if type(premiumTable) ~= "table" then premiumTable = CustomNetTables ~= nil
+		and CustomNetTables:GetTableValue("supporter_pass_rewards_premium", "rewards")
+		or nil end
+	for _, trackData in ipairs({
+		{ id = "free", rewards = type(freeTable) == "table" and freeTable
+			or (ItemsGame ~= nil and ItemsGame.battlepass or {}) },
+		{ id = "premium", rewards = type(premiumTable) == "table" and premiumTable
+			or (ItemsGame ~= nil and ItemsGame.battlepass2 or {}) },
+	}) do
+		for _, reward in pairs(trackData.rewards) do
+			AddCatalogItem(reward, trackData.id, "reward")
+		end
+	end
+
+	local function AddShopTree(item)
+		if type(item) ~= "table" then return end
+		AddCatalogItem(item, tostring(item.track or ""), "shop")
+		for _, component in pairs(type(item.components) == "table" and item.components or {}) do
+			AddShopTree(component)
+		end
+	end
+	local publishedShop = SupporterPass ~= nil and SupporterPass.PublishedShop or nil
+	for _, item in pairs(type(publishedShop) == "table" and type(publishedShop.items) == "table"
+		and publishedShop.items or {}) do
+		AddShopTree(item)
 	end
 
 	local families = {}
@@ -1614,10 +1720,16 @@ function XHSDevTools:BuildBattlepassDevCatalog()
 			return a.item_id < b.item_id
 		end)
 		if #rewards > 0 then
+			local testableCount = 0
+			for _, reward in ipairs(rewards) do
+				if reward.testable == true then testableCount = testableCount + 1 end
+			end
 			table.insert(families, {
 				id = family,
 				label = BATTLEPASS_DEV_FAMILY_LABELS[family] or family,
 				count = #rewards,
+				testable = testableCount > 0,
+				testable_count = testableCount,
 				rewards = rewards,
 			})
 		end
@@ -1626,7 +1738,12 @@ function XHSDevTools:BuildBattlepassDevCatalog()
 end
 
 function XHSDevTools:PublishBattlepassDevCatalog()
-	if self.battlepass_dev_catalog_index ~= nil then
+	local generation = table.concat({
+		tostring(SupporterPass ~= nil and SupporterPass.PublishedShopGeneration or 0),
+		tostring(SupporterPass ~= nil and SupporterPass.PublishedRewardsGeneration or 0),
+	}, ":")
+	if self.battlepass_dev_catalog_index ~= nil
+		and self.battlepass_dev_catalog_generation == generation then
 		return self.battlepass_dev_catalog_index
 	end
 	if CustomNetTables == nil then return {} end
@@ -1644,9 +1761,12 @@ function XHSDevTools:PublishBattlepassDevCatalog()
 			id = family.id,
 			label = family.label,
 			count = family.count,
+			testable = family.testable,
+			testable_count = family.testable_count,
 		})
 	end
 	self.battlepass_dev_catalog_index = index
+	self.battlepass_dev_catalog_generation = generation
 	return index
 end
 
@@ -1732,6 +1852,7 @@ function XHSDevTools:TestBattlepassReward(event)
 	if playerID == nil then error("Unable to resolve the requesting player") end
 	local reward = self:FindBattlepassDevReward(event.family, event.item_id)
 	if reward == nil then error("Unknown Battle Pass reward") end
+	if reward.testable ~= true then error("This Battle Pass catalog entry is visual-only") end
 
 	self:CancelBattlepassDevSequence(playerID, true)
 	self:RunBattlepassDevReward(
@@ -1749,6 +1870,7 @@ function XHSDevTools:TestBattlepassFamily(event)
 	if playerID == nil then error("Unable to resolve the requesting player") end
 	local family = self:FindBattlepassDevFamily(event.family)
 	if family == nil or #family.rewards == 0 then error("Unknown or empty Battle Pass family") end
+	if family.testable ~= true then error("This Battle Pass family is visual-only") end
 	if Timers == nil then error("Timers is unavailable") end
 	local player = PlayerResource:GetPlayer(playerID)
 	if player ~= nil and player.entindex ~= nil then
@@ -1933,6 +2055,91 @@ function XHSDevTools:BuildDonatorState()
 	return statuses
 end
 
+function XHSDevTools:GetHeroHealthBarOffset(hero)
+	local unit_name = hero ~= nil and not hero:IsNull() and hero:GetUnitName() or ""
+	local unit_kv = unit_name ~= "" and GetUnitKeyValuesByName(unit_name) or nil
+	local base_offset = tonumber(unit_kv and unit_kv.HealthBarOffset) or 200
+	local override = self.overhead_offset_overrides and self.overhead_offset_overrides[unit_name] or nil
+	return base_offset, override
+end
+
+function XHSDevTools:ApplyOverheadOffset(unit_name, value)
+	local applied = 0
+	for _, hero in pairs(HeroList:GetAllHeroes() or {}) do
+		if hero ~= nil and not hero:IsNull() and hero:GetUnitName() == unit_name then
+			hero:SetHealthBarOffsetOverride(value)
+			applied = applied + 1
+		end
+	end
+	return applied
+end
+
+function XHSDevTools:SetOverheadOffset(event)
+	local unit_name = tostring(event.unit_name or "")
+	if unit_name == "" then error("Missing hero unit name") end
+
+	local value = math.floor(ToNumber(event.value, -1) + 0.5)
+	if value < 0 or value > 1000 then error("Health bar offset must be between 0 and 1000") end
+
+	self.overhead_offset_overrides = self.overhead_offset_overrides or {}
+	self.overhead_offset_overrides[unit_name] = value
+	local applied = self:ApplyOverheadOffset(unit_name, value)
+	if applied == 0 then error("No active hero named " .. unit_name) end
+	return string.format("%s overhead offset = %d (%d active instance%s)", unit_name, value, applied, applied == 1 and "" or "s")
+end
+
+function XHSDevTools:ResetOverheadOffset(event)
+	local unit_name = tostring(event.unit_name or "")
+	if unit_name == "" then error("Missing hero unit name") end
+
+	self.overhead_offset_overrides = self.overhead_offset_overrides or {}
+	self.overhead_offset_overrides[unit_name] = nil
+	local base_offset = 200
+	for _, hero in pairs(HeroList:GetAllHeroes() or {}) do
+		if hero ~= nil and not hero:IsNull() and hero:GetUnitName() == unit_name then
+			base_offset = self:GetHeroHealthBarOffset(hero)
+			break
+		end
+	end
+	local applied = self:ApplyOverheadOffset(unit_name, base_offset)
+	if applied == 0 then error("No active hero named " .. unit_name) end
+	return string.format("%s overhead offset reset to KV value %d", unit_name, base_offset)
+end
+
+function XHSDevTools:BuildOverheadOffsetState()
+	local by_name = {}
+	self.overhead_offset_overrides = self.overhead_offset_overrides or {}
+
+	for _, hero in pairs(HeroList:GetAllHeroes() or {}) do
+		if hero ~= nil and not hero:IsNull() then
+			local unit_name = hero:GetUnitName()
+			local base_offset, override = self:GetHeroHealthBarOffset(hero)
+			if override ~= nil then
+				hero:SetHealthBarOffsetOverride(override)
+			end
+
+			local row = by_name[unit_name]
+			if row == nil then
+				row = {
+					unit_name = unit_name,
+					entindex = hero:entindex(),
+					base_offset = base_offset,
+					current_offset = override or base_offset,
+					has_override = override ~= nil,
+					instances = 0,
+				}
+				by_name[unit_name] = row
+			end
+			row.instances = row.instances + 1
+		end
+	end
+
+	local rows = {}
+	for _, row in pairs(by_name) do table.insert(rows, row) end
+	table.sort(rows, function(a, b) return a.unit_name < b.unit_name end)
+	return rows
+end
+
 function XHSDevTools:PushState()
 	if CustomNetTables == nil then return end
 
@@ -1954,6 +2161,7 @@ function XHSDevTools:PushState()
 		quests = self.enabled and self:BuildQuestState() or {},
 		bosses = self.enabled and self:BuildBossState() or {},
 		donator_statuses = self.enabled and self:BuildDonatorState() or {},
+		overhead_offsets = self.enabled and self:BuildOverheadOffsetState() or {},
 		battlepass = self.enabled and {
 			families = self:PublishBattlepassDevCatalog(),
 			sequences = self:BuildBattlepassDevSequenceState(),

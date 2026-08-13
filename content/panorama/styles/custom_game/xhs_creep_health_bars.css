@@ -6,6 +6,12 @@
 	overflow: clip;
 }
 
+.XHSCreepHealthBarsRoot.XHSWorldHealthFramesOccluded
+{
+	visibility: collapse;
+	opacity: 0;
+}
+
 .XHSCreepHealthBar
 {
 	width: 82px;
@@ -159,13 +165,14 @@
 
 .XHSCreepHeroHealthValue
 {
-	horizontal-align: right;
-	margin-right: 5px;
+	width: 100%;
+	horizontal-align: center;
 	margin-top: 2px;
 	color: #e7f5ed;
 	font-family: Radiance;
 	font-size: 11px;
 	font-weight: semi-bold;
+	text-align: center;
 	text-shadow: 0px 1px 3px 2 #000f;
 }
 
@@ -251,9 +258,4 @@
 .XHSCreepHealthBar.CreepHero .XHSCreepFrozenIndicator
 {
 	margin-top: 2px;
-}
-
-.XHSCreepHealthBar.CreepHero.Frozen .XHSCreepHeroHealthValue
-{
-	margin-right: 41px;
 }

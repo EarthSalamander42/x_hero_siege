@@ -60,6 +60,7 @@ var XHS_DEVTOOLS_TABS = [
 	{ id: "bots", label: "Bots" },
 	{ id: "lag_lab", label: "Lag Lab" },
 	{ id: "players", label: "Player Tools" },
+	{ id: "overhead", label: "Overhead PFX" },
 	{ id: "ui", label: "UI Preview" },
 	{ id: "battlepass", label: "Battle Pass" },
 	{ id: "cleanup", label: "Cleanup" }
@@ -2408,6 +2409,81 @@ function XHSDevToolsRenderPlayers(parent) {
 	});
 }
 
+function XHSDevToolsReadClientHealthBarOffset(entIndex, fallback) {
+	try {
+		if (typeof Entities.GetHealthBarOffset === "function" && Entities.IsValidEntity(Number(entIndex))) {
+			var value = Number(Entities.GetHealthBarOffset(Number(entIndex)));
+			if (isFinite(value)) {
+				return value;
+			}
+		}
+	} catch (error) {}
+	return Number(fallback) || 0;
+}
+
+function XHSDevToolsRenderOverheadOffsets(parent) {
+	var section = XHSDevToolsMakeSection(parent, "Hero overhead offsets");
+	XHSDevToolsMakeLabel(section, "XHSDevToolsMuted", "Values are fetched from the active hero. Apply updates the engine override for this Tools match only; Reset restores the hero KV value.");
+
+	var refresh = XHSDevToolsMakeButton(section, "Fetch current", "Accent", function() {
+		XHSDevToolsRequestState();
+	});
+	refresh.AddClass("XHSDevToolsOverheadRefresh");
+
+	var rows = XHSDevToolsBotTableValues(XHSDevToolsState.overhead_offsets || {});
+	if (rows.length === 0) {
+		XHSDevToolsMakeLabel(section, "XHSDevToolsMuted", "No active hero found.");
+		return;
+	}
+
+	var table = $.CreatePanel("Panel", section, "");
+	table.AddClass("XHSDevToolsOverheadTable");
+	for (var i = 0; i < rows.length; i++) {
+		(function(row) {
+			row = row.value || {};
+			var line = $.CreatePanel("Panel", table, "");
+			line.AddClass("XHSDevToolsOverheadRow");
+			line.SetHasClass("HasOverride", row.has_override === true);
+
+			var identity = $.CreatePanel("Panel", line, "");
+			identity.AddClass("XHSDevToolsOverheadIdentity");
+			XHSDevToolsMakeLabel(identity, "XHSDevToolsOverheadName", String(row.unit_name || "unknown"));
+			var observed = XHSDevToolsReadClientHealthBarOffset(row.entindex, row.current_offset);
+			var controlValue = row.has_override ? Number(row.current_offset) : observed;
+			XHSDevToolsMakeLabel(identity, "XHSDevToolsOverheadMeta", "KV " + row.base_offset + "  |  live " + observed + (row.has_override ? "  |  target " + controlValue : ""));
+
+			var minusTen = XHSDevToolsMakeButton(line, "-10", "Tiny", function() {
+				XHSDevToolsSend("set_overhead_offset", { unit_name: row.unit_name, value: controlValue - 10 });
+			});
+			minusTen.AddClass("XHSDevToolsOverheadStep");
+
+			var entry = $.CreatePanel("TextEntry", line, "");
+			entry.AddClass("XHSDevToolsOverheadEntry");
+			entry.text = String(controlValue);
+			entry.textmode = "numeric";
+			entry.maxchars = 4;
+
+			var plusTen = XHSDevToolsMakeButton(line, "+10", "Tiny", function() {
+				XHSDevToolsSend("set_overhead_offset", { unit_name: row.unit_name, value: controlValue + 10 });
+			});
+			plusTen.AddClass("XHSDevToolsOverheadStep");
+
+			var apply = XHSDevToolsMakeButton(line, "Apply", "Small Accent", function() {
+				XHSDevToolsSend("set_overhead_offset", { unit_name: row.unit_name, value: Number(entry.text) });
+			});
+			apply.AddClass("XHSDevToolsOverheadApply");
+			entry.SetPanelEvent("ontextentrysubmit", function() {
+				XHSDevToolsSend("set_overhead_offset", { unit_name: row.unit_name, value: Number(entry.text) });
+			});
+
+			var reset = XHSDevToolsMakeButton(line, "Reset KV", "Small", function() {
+				XHSDevToolsSend("reset_overhead_offset", { unit_name: row.unit_name });
+			});
+			reset.AddClass("XHSDevToolsOverheadReset");
+		})(rows[i]);
+	}
+}
+
 function XHSDevToolsRenderUIPreview(parent) {
 	var dialog = XHSDevToolsMakeSection(parent, "VIP Dialog Preview");
 	XHSDevToolsMakeLabel(dialog, "XHSDevToolsMuted", "Client-only layout fixtures. They do not advance quests or alter campaign state.");
@@ -2491,6 +2567,60 @@ function XHSDevToolsBattlepassValues(table) {
 	return values;
 }
 
+function XHSDevToolsResolveBattlepassImage(imagePath) {
+	if (!imagePath) {
+		return "";
+	}
+	var raw = String(imagePath).replace(/\\/g, "/");
+	var lower = raw.toLowerCase();
+	if (lower.indexOf("particles/") === 0 || lower.indexOf(".vpcf") !== -1) {
+		return "";
+	}
+	var cdnMatch = raw.match(/^https?:\/\/cdn\.frostrose-studio\.com\/static\/images\/battlepass\/xhs-4\.0\/([^?#]+)/i);
+	if (cdnMatch) {
+		var localName = cdnMatch[1]
+			.replace(/-v2(?=\.[^.]+$)/i, "")
+			.replace(/\.[^.]+$/, "")
+			.replace(/-/g, "_");
+		return "file://{images}/custom_game/battlepass/" + localName + ".png";
+	}
+	if (raw.indexOf("file://{images}/") === 0 || raw.indexOf("s2r://panorama/images/") === 0) {
+		return raw;
+	}
+	var normalized = raw
+		.replace(/^file:\/\/\{images\}\//, "")
+		.replace(/^s2r:\/\/panorama\/images\//, "")
+		.replace(/_png\.vtex$/, "")
+		.replace(/\.png$/, "");
+	if (normalized.indexOf("custom_game/") === 0) {
+		return "file://{images}/" + normalized + ".png";
+	}
+	if (normalized.indexOf("battlepass/") === 0) {
+		return "file://{images}/custom_game/" + normalized + ".png";
+	}
+	var dotaRoots = ["badges/", "compendium/", "econ/", "events/", "game_modes/", "heroes/", "items/", "spellicons/", "status_icons/"];
+	for (var i = 0; i < dotaRoots.length; i++) {
+		if (normalized.indexOf(dotaRoots[i]) === 0) {
+			return "s2r://panorama/images/" + normalized + "_png.vtex";
+		}
+	}
+	return "file://{images}/custom_game/" + normalized + ".png";
+}
+
+function XHSDevToolsBattlepassSourceText(reward) {
+	var sources = [];
+	if (Number(reward.from_shop || 0) === 1) {
+		sources.push("SHOP");
+	}
+	if (Number(reward.from_free || 0) === 1) {
+		sources.push("FREE REWARD");
+	}
+	if (Number(reward.from_premium || 0) === 1) {
+		sources.push("PREMIUM REWARD");
+	}
+	return sources.length ? sources.join(" + ") : "CATALOG";
+}
+
 function XHSDevToolsRenderBattlepass(parent) {
 	var battlepass = XHSDevToolsState.battlepass || {};
 	var families = XHSDevToolsBattlepassValues(battlepass.families);
@@ -2502,7 +2632,7 @@ function XHSDevToolsRenderBattlepass(parent) {
 	XHSDevToolsMakeLabel(
 		controls,
 		"XHSDevToolsMuted",
-		"Tests the canonical reward catalog without granting ownership. Family tests play each reward in order with a " +
+		"Merged live shop + free/premium rewards. Images use the shipped catalog art; family tests play each compatible item in order with a " +
 			delay.toFixed(1) + "s interval and restore the equipped loadout when finished."
 	);
 
@@ -2519,9 +2649,13 @@ function XHSDevToolsRenderBattlepass(parent) {
 	familyGrid.AddClass("XHSDevToolsGrid");
 	for (var familyIndex = 0; familyIndex < families.length; familyIndex++) {
 		(function(family) {
+			if (!(family.testable === true || Number(family.testable) === 1)) {
+				return;
+			}
 			var button = XHSDevToolsMakeButton(
 				familyGrid,
-				"TEST " + String(family.label || family.id).toUpperCase() + " (" + Number(family.count || 0) + ")",
+				"TEST " + String(family.label || family.id).toUpperCase() + " (" +
+					Number(family.testable_count || family.count || 0) + ")",
 				"Accent",
 				function() {
 					XHSDevToolsSend("battlepass_test_family", { family: family.id });
@@ -2551,35 +2685,76 @@ function XHSDevToolsRenderBattlepass(parent) {
 			) || family;
 			var section = XHSDevToolsMakeSection(
 				parent,
-				String(publishedFamily.label || publishedFamily.id) + " Rewards (" +
+				String(publishedFamily.label || publishedFamily.id) + " Items (" +
 					Number(publishedFamily.count || 0) + ")"
 			);
 			var grid = $.CreatePanel("Panel", section, "");
-			grid.AddClass("XHSDevToolsGrid");
+			grid.AddClass("XHSDevToolsBattlepassGrid");
 			var rewards = XHSDevToolsBattlepassValues(publishedFamily.rewards);
 			for (var rewardIndex = 0; rewardIndex < rewards.length; rewardIndex++) {
 				(function(reward) {
 					var displayName = String(reward.display_name || reward.name || reward.item_id);
+					if (displayName.charAt(0) === "#") {
+						var localizedName = $.Localize(displayName);
+						if (localizedName && localizedName !== displayName) {
+							displayName = localizedName;
+						}
+					}
+					var testable = reward.testable === true || Number(reward.testable) === 1;
+					var card = $.CreatePanel("Panel", grid, "");
+					card.AddClass("XHSDevToolsBattlepassItem");
+					card.SetHasClass("VisualOnly", !testable);
+
+					var imageFrame = $.CreatePanel("Panel", card, "");
+					imageFrame.AddClass("XHSDevToolsBattlepassImageFrame");
+					var imageURL = XHSDevToolsResolveBattlepassImage(reward.image);
+					if (imageURL) {
+						var image = $.CreatePanel("Image", imageFrame, "");
+						image.AddClass("XHSDevToolsBattlepassImage");
+						image.SetImage(imageURL);
+					} else {
+						XHSDevToolsMakeLabel(imageFrame, "XHSDevToolsBattlepassMissingImage", "NO IMAGE");
+					}
+
+					XHSDevToolsMakeLabel(card, "XHSDevToolsBattlepassItemName", displayName);
+					XHSDevToolsMakeLabel(
+						card,
+						"XHSDevToolsBattlepassItemMeta",
+						"#" + reward.item_id +
+							(reward.rarity ? "  ·  " + String(reward.rarity).toUpperCase() : "")
+					);
+					XHSDevToolsMakeLabel(
+						card,
+						"XHSDevToolsBattlepassItemSource",
+						XHSDevToolsBattlepassSourceText(reward)
+					);
 					var button = XHSDevToolsMakeButton(
-						grid,
-						"#" + reward.item_id + " " + displayName.toUpperCase(),
-						"",
+						card,
+						testable ? "TEST ITEM" : "VISUAL ONLY",
+						testable ? "Accent" : "",
 						function() {
+							if (!testable) {
+								return;
+							}
 							XHSDevToolsSend("battlepass_test_reward", {
 								family: publishedFamily.id,
 								item_id: reward.item_id
 							});
 						}
 					);
+					button.AddClass("XHSDevToolsBattlepassTestButton");
+					button.enabled = testable;
 					var tooltip = displayName + "\n" +
 						"ID: " + reward.item_id + " (" + String(reward.name || "") + ")\n" +
-						String(reward.track || "").toUpperCase() + " track, level " + Number(reward.level || 0) +
+						XHSDevToolsBattlepassSourceText(reward) +
+						(reward.track ? "\n" + String(reward.track).toUpperCase() + " track" : "") +
+						(reward.level ? ", level " + Number(reward.level || 0) : "") +
 						(reward.rarity ? "\nRarity: " + reward.rarity : "");
-					button.SetPanelEvent("onmouseover", function() {
-						$.DispatchEvent("UIShowTextTooltip", button, tooltip);
+					card.SetPanelEvent("onmouseover", function() {
+						$.DispatchEvent("UIShowTextTooltip", card, tooltip);
 					});
-					button.SetPanelEvent("onmouseout", function() {
-						$.DispatchEvent("UIHideTextTooltip", button);
+					card.SetPanelEvent("onmouseout", function() {
+						$.DispatchEvent("UIHideTextTooltip", card);
 					});
 				})(rewards[rewardIndex]);
 			}
@@ -2886,6 +3061,8 @@ function XHSDevToolsRender() {
 		XHSDevToolsRenderLagLab(content);
 	} else if (XHSDevToolsActiveTab === "players") {
 		XHSDevToolsRenderPlayers(content);
+	} else if (XHSDevToolsActiveTab === "overhead") {
+		XHSDevToolsRenderOverheadOffsets(content);
 	} else if (XHSDevToolsActiveTab === "ui") {
 		XHSDevToolsRenderUIPreview(content);
 	} else if (XHSDevToolsActiveTab === "battlepass") {
@@ -3012,6 +3189,21 @@ function XHSDevToolsOnGameOptions(tableName, key, data) {
 	CustomNetTables.SubscribeNetTableListener("xhs_devtools", XHSDevToolsOnState);
 	CustomNetTables.SubscribeNetTableListener("game_options", XHSDevToolsOnGameOptions);
 	CustomNetTables.SubscribeNetTableListener("xhs_bots", XHSDevToolsOnBots);
+	CustomNetTables.SubscribeNetTableListener("supporter_pass_shop", function(tableName, key) {
+		if (key === "catalog" && XHSDevToolsIsToolsMode()) {
+			XHSDevToolsRequestState();
+		}
+	});
+	CustomNetTables.SubscribeNetTableListener("supporter_pass_rewards_free", function(tableName, key) {
+		if ((key === "rewards" || String(key).indexOf("chunk_") === 0) && XHSDevToolsIsToolsMode()) {
+			XHSDevToolsRequestState();
+		}
+	});
+	CustomNetTables.SubscribeNetTableListener("supporter_pass_rewards_premium", function(tableName, key) {
+		if ((key === "rewards" || String(key).indexOf("chunk_") === 0) && XHSDevToolsIsToolsMode()) {
+			XHSDevToolsRequestState();
+		}
+	});
 	XHSDevToolsReadBotNetTables();
 		XHSDevToolsPerformance = CustomNetTables.GetTableValue("xhs_devtools", "performance") || {};
 		XHSDevToolsLagLab = CustomNetTables.GetTableValue("xhs_devtools", "lag_lab") || {};

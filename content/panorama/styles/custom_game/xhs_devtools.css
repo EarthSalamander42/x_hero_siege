@@ -798,7 +798,7 @@
 }
 
 .XHSDevToolsTab {
-	width: 19%;
+	width: 15.6%;
 	height: 30px;
 	margin-right: 1%;
 	margin-bottom: 5px;
@@ -868,6 +868,89 @@
 	flow-children: right-wrap;
 }
 
+.XHSDevToolsBattlepassGrid {
+	width: 100%;
+	flow-children: right-wrap;
+}
+
+.XHSDevToolsBattlepassItem {
+	width: 174px;
+	height: 238px;
+	margin-right: 8px;
+	margin-bottom: 8px;
+	padding: 7px;
+	flow-children: down;
+	background-color: #091118f4;
+	border: 1px solid #57819655;
+	box-shadow: 0px 3px 8px 0px #000000aa;
+}
+
+.XHSDevToolsBattlepassItem:hover {
+	border-color: #8edfffaa;
+	brightness: 1.12;
+}
+
+.XHSDevToolsBattlepassItem.VisualOnly {
+	border-color: #9b865344;
+}
+
+.XHSDevToolsBattlepassImageFrame {
+	width: 158px;
+	height: 124px;
+	background-color: #020609;
+	border: 1px solid #ffffff20;
+	overflow: clip;
+}
+
+.XHSDevToolsBattlepassImage {
+	width: 100%;
+	height: 100%;
+}
+
+.XHSDevToolsBattlepassMissingImage {
+	horizontal-align: center;
+	vertical-align: center;
+	color: #71838c;
+	font-size: 13px;
+	font-weight: bold;
+	letter-spacing: 1px;
+}
+
+.XHSDevToolsBattlepassItemName {
+	width: 100%;
+	height: 31px;
+	margin-top: 5px;
+	color: #f2f8fb;
+	font-size: 13px;
+	font-weight: bold;
+	text-overflow: shrink;
+	text-align: center;
+	vertical-align: center;
+}
+
+.XHSDevToolsBattlepassItemMeta,
+.XHSDevToolsBattlepassItemSource {
+	width: 100%;
+	color: #8eb8c9;
+	font-size: 10px;
+	text-align: center;
+	text-overflow: shrink;
+}
+
+.XHSDevToolsBattlepassItemSource {
+	height: 16px;
+	color: #e4ba58;
+	font-weight: bold;
+}
+
+.XHSDevToolsBattlepassTestButton.XHSDevToolsButton {
+	width: 100%;
+	height: 27px;
+	margin-top: 3px;
+	margin-right: 0px;
+	margin-bottom: 0px;
+}
+
 .XHSDevToolsButton {
 	width: 132px;
 	height: 32px;
@@ -917,6 +1000,17 @@
 	background-color: #216a80ee;
 	border-color: #9fe8ff99;
 }
+
+.XHSDevToolsOverheadRefresh { width: 118px; margin-top: 8px; }
+.XHSDevToolsOverheadTable { width: 100%; margin-top: 5px; flow-children: down; }
+.XHSDevToolsOverheadRow { width: 100%; height: 50px; margin-bottom: 4px; padding: 5px; flow-children: right; background-color: #091219cc; border: 1px solid #ffffff12; }
+.XHSDevToolsOverheadRow.HasOverride { background-color: #102c38dd; border-color: #7fdcff55; }
+.XHSDevToolsOverheadIdentity { width: fill-parent-flow(1); height: 100%; flow-children: down; }
+.XHSDevToolsOverheadName { width: 100%; color: #eaf8fc; font-size: 13px; font-weight: semi-bold; text-overflow: shrink; }
+.XHSDevToolsOverheadMeta { width: 100%; color: #83b8c9; font-size: 10px; }
+.XHSDevToolsOverheadEntry { width: 70px; height: 32px; margin-right: 6px; padding: 5px 8px; color: #f1fbff; font-size: 14px; text-align: center; background-color: #050b0fee; border: 1px solid #62ccea66; }
+.XHSDevToolsOverheadStep, .XHSDevToolsOverheadApply, .XHSDevToolsOverheadReset { margin-bottom: 0; }
+.XHSDevToolsOverheadReset { width: 82px; margin-right: 0; }
 
 .XHSDevToolsQuestGrid {
 	width: 100%;

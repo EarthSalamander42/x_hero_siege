@@ -18,6 +18,7 @@ function modifier_custom_mechanics:DeclareFunctions()
 		--	MODIFIER_PROPERTY_PHYSICAL_ARMOR_BONUS,
 		MODIFIER_PROPERTY_SPELL_AMPLIFY_PERCENTAGE,
 		MODIFIER_EVENT_ON_ABILITY_EXECUTED,
+		MODIFIER_EVENT_ON_ORDER,
 		MODIFIER_EVENT_ON_TAKEDAMAGE,
 	}
 end
@@ -93,6 +94,39 @@ function modifier_custom_mechanics:OnAbilityExecuted(keys)
 		level = level,
 		cast_time = GameRules:GetGameTime(),
 	}
+end
+
+function modifier_custom_mechanics:OnOrder(keys)
+	if not IsServer() then return end
+	local parent = self:GetParent()
+	if parent == nil or parent:IsNull() or keys == nil then return end
+
+	-- OnOrder is lower-level than ExecuteOrderFilter for several inventory UI
+	-- paths. Validate the GIVE_ITEM handles here so an invalid gift reports at
+	-- click time. Returning false breaks the current order; the explicit STOP is
+	-- retained as a guard for Source inventory paths that have already started.
+	local unit = keys.unit
+	local target = keys.target
+	local ability = keys.ability
+	local parentIsRelevant = unit == parent or target == parent
+	if not parentIsRelevant and ability ~= nil and ability.GetCaster ~= nil then
+		local ok, caster = pcall(function() return ability:GetCaster() end)
+		parentIsRelevant = ok and caster == parent
+	end
+	if not parentIsRelevant then return end
+
+	local gameMode = GameRules ~= nil and GameRules.GameMode or nil
+	local rejected = false
+	if gameMode ~= nil and gameMode.RejectInvalidXHSBotGiftAtIssue ~= nil then
+		rejected = gameMode:RejectInvalidXHSBotGiftAtIssue(keys, parent) == true
+	end
+	if IsInToolsMode() and gameMode ~= nil
+		and gameMode.TraceXHSBotModifierOrder ~= nil then
+		gameMode:TraceXHSBotModifierOrder(keys, parent)
+	end
+	if rejected then
+		return false
+	end
 end
 
 function modifier_custom_mechanics:OnTakeDamage(keys)
