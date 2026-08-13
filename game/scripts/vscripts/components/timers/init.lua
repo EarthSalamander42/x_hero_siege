@@ -377,6 +377,9 @@ function CustomTimers:PrepareFinalWaveCountdown(force)
 	CustomTimers.current_time["special_wave"] = 1
 	CustomTimers:Countdown("special_wave")
 	CustomTimers:ShowFinalWaveCountdown(CustomTimers.final_wave_delay)
+	if PrepareFinalWaveUnits ~= nil then
+		PrepareFinalWaveUnits(CustomTimers.final_wave_delay)
+	end
 end
 
 function CustomTimers:Think()

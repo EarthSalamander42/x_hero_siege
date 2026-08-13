@@ -2446,6 +2446,35 @@ function XHSBotEconomy:ShouldRestockPotion(kind, snapshot, plan)
 		0,
 		tonumber(plan[tostring(kind) .. "_potion_restock"]) or 3
 	)
+	if kind == "health" then
+		local tactical = type(plan) == "table"
+			and type(plan.tactical_entry) == "table"
+			and plan.tactical_entry or nil
+		local wantsFullPotion = tactical ~= nil
+			and tactical.name == "item_potion_full"
+		local fullPotion = XHSBotItemCatalog ~= nil
+			and XHSBotItemCatalog:Get("item_potion_full") or nil
+		local fullPotionCost = math.max(
+			0,
+			tonumber(fullPotion and fullPotion.cost) or 3500
+		)
+		local canAffordFullPotion =
+			(tonumber(snapshot.gold) or 0)
+				>= fullPotionCost + math.max(0, tonumber(plan.reserve_gold) or 0)
+		local maximumHealth = math.max(
+			0,
+			tonumber(snapshot.max_health) or 0
+		)
+		-- In late game, 3k healing stacks become a trap: they keep winning the
+		-- restock queue while the useful 30k potion is already planned. Preserve
+		-- the early-game reserve behavior, but stop buying basic potions once a
+		-- full potion is the affordable sustain answer.
+		if snapshot.basic_potions_obsolete == true
+			or wantsFullPotion and canAffordFullPotion
+				and maximumHealth >= 30000 then
+			return false
+		end
+	end
 	if target <= 0 or charges >= target then return false end
 	if snapshot.at_home_shop == true or charges <= threshold then return true end
 
@@ -2476,12 +2505,18 @@ function XHSBotEconomy:BuildPlannedPurchases(snapshot, plan)
 	)
 	local criticalHealthRestock = healthRestock
 		and healthCharges <= healthTrigger
+	local tacticalEntry = type(plan) == "table"
+		and type(plan.tactical_entry) == "table"
+		and plan.tactical_entry or nil
+	local tacticalFirst = tacticalEntry ~= nil
+		and tacticalEntry.name == "item_potion_full"
 	local function AddHealthRestock()
 		local entry = XHSBotItemCatalog:CopyEntry("item_health_potion")
 		entry.desired_charges = plan.health_potion_target
 		entry.preserve_gold = plan.reserve_gold
 		Add(entry)
 	end
+	if tacticalFirst then Add(tacticalEntry) end
 	-- Once the reserve reaches its emergency threshold, consumable sustain is
 	-- the life-insurance purchase. Route it before an Ankh: otherwise the Ankh
 	-- goal can overwrite the potion goal and feed the same death loop.
@@ -2510,7 +2545,7 @@ function XHSBotEconomy:BuildPlannedPurchases(snapshot, plan)
 		entry.maximum = plan.ankh_target
 		Add(entry)
 	end
-	Add(plan.tactical_entry)
+	if not tacticalFirst then Add(tacticalEntry) end
 	if plan.opening_tome_due ~= true then Add(plan.next_entry) end
 	return purchases
 end

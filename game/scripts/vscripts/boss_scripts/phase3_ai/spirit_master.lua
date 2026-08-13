@@ -213,7 +213,7 @@ end
 local function ConfigureBossBar(boss, def)
 	ApplyBossBarIdentity(boss, def)
 	if XHSPhase3BossAI ~= nil then
-		XHSPhase3BossAI:HideVanillaHealthBar(boss)
+		XHSPhase3BossAI:ConfigureBoss(boss)
 	end
 	ShowBossBar(boss)
 end
@@ -909,7 +909,7 @@ function XHSSpiritMaster_AttachPhase3AI(master)
 	if XHSSpiritMasterEncounter.phase == nil then XHSSpiritMasterEncounter:Reset() end
 	XHSSpiritMasterEncounter:RegisterMaster(master)
 	if XHSPhase3BossAI ~= nil then
-		XHSPhase3BossAI:HideVanillaHealthBar(master)
+		XHSPhase3BossAI:ConfigureBoss(master)
 		XHSPhase3BossAI:SetAbilityLevels(master, MASTER_ABILITIES)
 	end
 	for _, abilityName in ipairs({

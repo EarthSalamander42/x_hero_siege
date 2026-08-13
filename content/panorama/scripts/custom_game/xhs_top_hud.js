@@ -8,6 +8,7 @@ var XHSTopHud = (function () {
 	var SLOW_REFRESH_SECONDS = 1.0;
 	var OVERHEAD_REFRESH_SECONDS = 0.01;
 	var OVERHEAD_WORLD_Z_FALLBACK = 238;
+	var TOMBSTONE_WORLD_Z_OFFSET = 110;
 	var OVERHEAD_SCREEN_Y_OFFSET = 22;
 	var OVERHEAD_PERSPECTIVE_BIAS = 38;
 	var OVERHEAD_PLATE_WIDTH = 210;
@@ -589,9 +590,12 @@ var XHSTopHud = (function () {
 
 	function GetOverheadWorldZOffset(entIndex) {
 		return SafeValue(function () {
+			if (Entities.GetUnitName(entIndex) === "npc_xhs_hero_tombstone") {
+				return TOMBSTONE_WORLD_Z_OFFSET;
+			}
 			if (typeof Entities.GetHealthBarOffset === "function") {
 				var offset = Number(Entities.GetHealthBarOffset(entIndex));
-				if (isFinite(offset)) { return offset; }
+				if (isFinite(offset) && offset >= 0 && offset <= 2000) { return offset; }
 			}
 			return OVERHEAD_WORLD_Z_FALLBACK;
 		}, OVERHEAD_WORLD_Z_FALLBACK);
@@ -739,24 +743,6 @@ var XHSTopHud = (function () {
 		}
 	}
 
-	function FindVanillaShopSurface() {
-		if (typeof FindDotaHudElement !== "function") {
-			return null;
-		}
-
-		var candidateIDs = ["Main", "GridMainShopContentsV2", "shop"];
-		for (var i = 0; i < candidateIDs.length; i++) {
-			var candidate = SafeValue(function (id) {
-				return function () { return FindDotaHudElement(id); };
-			}(candidateIDs[i]), null);
-			if (IsPanelUsableOverheadBlocker(candidate)) {
-				return candidate;
-			}
-		}
-
-		return null;
-	}
-
 	function BuildOverheadUiBlockers(root, rootWidth, rootHeight) {
 		var blockers = [];
 		var rootPosition = GetPanelWindowPosition(root);
@@ -779,10 +765,9 @@ var XHSTopHud = (function () {
 		AddPanelOverheadBlocker(blockers, "XHSWavePressurePanel", rootPosition, 8);
 		AddPanelOverheadBlocker(blockers, "XHSDifficultyAltPanel", rootPosition, 8);
 		AddPanelOverheadBlocker(blockers, "XHSFragmentQuestIntro", rootPosition, 10);
-		// Both leaderboards and the vanilla shop live outside this custom UI tree.
-		// Treat their visible rectangles as occluders instead of reparenting either UI.
+		// Leaderboards live outside this custom UI tree and still need spatial
+		// occlusion. The vanilla shop already renders above world health frames.
 		AddVisibleLeaderboardOverheadBlockers(blockers, rootPosition);
-		AddExternalPanelOverheadBlocker(blockers, FindVanillaShopSurface(), rootPosition, 8);
 		if (IsSpecialEventPanelBlockingUi()) {
 			var eventWidth = Math.min(1040, rootWidth * 0.64);
 			var eventHeight = Math.min(620, rootHeight * 0.62);

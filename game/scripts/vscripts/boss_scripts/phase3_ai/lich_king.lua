@@ -73,7 +73,7 @@ function XHSLichKing_AttachPhase3AI(boss)
 	if boss:HasModifier("modifier_xhs_lich_king_phase3_ai") then return end
 	boss:SetAttackCapability(DOTA_UNIT_CAP_MELEE_ATTACK)
 	boss:SetMoveCapability(DOTA_UNIT_CAP_MOVE_GROUND)
-	XHSPhase3BossAI:HideVanillaHealthBar(boss)
+	XHSPhase3BossAI:ConfigureBoss(boss)
 	XHSPhase3BossAI:SetAbilityLevels(boss, LICH_KING_ABILITIES)
 	boss:AddNewModifier(boss, nil, "modifier_xhs_lich_king_phase3_ai", {})
 end

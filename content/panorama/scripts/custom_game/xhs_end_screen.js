@@ -777,6 +777,7 @@ var XHSEndScreen = (function () {
 			matchCheatMode: BoolValue(FirstDefined(data && data.cheat_mode, completion.cheat_mode, false)),
 			matchToolsMode: BoolValue(FirstDefined(data && data.tools_mode, completion.tools_mode, false)),
 			persistentRewardsEligible: FirstDefined(data && data.persistent_rewards_eligible, true) !== false,
+			completionError: BoolValue(data && data.completion_error),
 		};
 	}
 
@@ -830,6 +831,15 @@ var XHSEndScreen = (function () {
 			|| "-";
 	}
 
+	function GetPublicMatchURL(gameID) {
+		var normalized = gameID === undefined || gameID === null ? "" : gameID.toString().trim();
+		if (!normalized || normalized === "-" || normalized.toLowerCase() === "local") {
+			return null;
+		}
+
+		return WEBSITE_URL + "/match/" + encodeURIComponent(normalized);
+	}
+
 	function RenderHeader(data) {
 		var result = Panel("XHSEndScreenResult");
 		var isXHeroesVictory = IsPlayerVictory(data);
@@ -851,9 +861,30 @@ var XHSEndScreen = (function () {
 			difficulty.text = GetDifficultyName(data);
 		}
 
+		var gameIDValue = GetGameId(data);
 		var gameID = Panel("XHSEndScreenGameId");
+		var gameIDButton = Panel("XHSEndScreenGameIdButton");
+		var publicMatchURL = GetPublicMatchURL(gameIDValue);
 		if (gameID) {
-			gameID.text = GetGameId(data).toString();
+			gameID.text = gameIDValue.toString();
+		}
+		if (gameIDButton) {
+			gameIDButton.enabled = !!publicMatchURL;
+			gameIDButton.SetHasClass("IsAvailable", !!publicMatchURL);
+			gameIDButton.SetHasClass("IsUnavailable", !publicMatchURL);
+			gameIDButton.SetPanelEvent("onactivate", function () {
+				if (publicMatchURL) {
+					OpenExternalURL(publicMatchURL);
+				}
+			});
+			gameIDButton.SetPanelEvent("onmouseover", function () {
+				if (publicMatchURL) {
+					$.DispatchEvent("UIShowTextTooltip", gameIDButton, "Open this match on the Frostrose website");
+				}
+			});
+			gameIDButton.SetPanelEvent("onmouseout", function () {
+				$.DispatchEvent("UIHideTextTooltip", gameIDButton);
+			});
 		}
 	}
 
@@ -1303,10 +1334,11 @@ var XHSEndScreen = (function () {
 			model.matchToolsMode ? "tools_mode_telemetry_only" : undefined,
 			model.matchCheatMode ? "cheat_mode_not_whitelisted" : undefined,
 			model.persistentRewardsEligible === false ? "persistent_rewards_disabled" : undefined,
+			model.completionError ? "backend_completion_failed" : undefined,
 			""
 		) || "").toString();
 		var eligibleValue = FirstDefined(apiData.xp_eligible, season.xp_eligible, completion.xp_eligible);
-		if (eligibleValue === undefined && (model.matchToolsMode || model.matchCheatMode || model.persistentRewardsEligible === false)) {
+		if (eligibleValue === undefined && (model.matchToolsMode || model.matchCheatMode || model.persistentRewardsEligible === false || model.completionError)) {
 			eligibleValue = false;
 		}
 		if (eligibleValue === undefined) {
@@ -1412,11 +1444,36 @@ var XHSEndScreen = (function () {
 			cheat_mode: "Cheats enabled",
 			cheat_mode_not_whitelisted: "Cheats enabled",
 			persistent_rewards_disabled: "Persistence disabled",
+			backend_completion_failed: "Reward service unavailable",
 			match_too_short: "Match under 30 minutes",
 			abandoned: "Match abandoned",
 			disconnected: "Player disconnected",
 		};
-
+		var dailyFragments = apiData.daily_fragment_grant || season.daily_fragment_grant || null;
+		var dailyTier = Clamp(IntXP(FirstDefined(
+			dailyFragments && dailyFragments.tier_id,
+			apiData.tier_id,
+			season.tier_id,
+			model.supporterTier,
+			0
+		)), 0, 5);
+		var dailyCaps = [100, 125, 150, 175, 200, 200];
+		var dailyCap = IntXP(FirstDefined(dailyFragments && dailyFragments.cap, dailyCaps[dailyTier]));
+		var dailyAmount = IntXP(dailyFragments && dailyFragments.amount);
+		var dailyDetails = [];
+		if (!eligible) {
+			dailyDetails.push({ label: "Eligible match required", value: ineligibleMessages[reason] || "Match ineligible", text: true });
+			dailyDetails.push({ label: "First eligible match potential", value: "+" + FormatNumber(dailyCap) + " fragments", text: true });
+		} else if (dailyFragments && BoolValue(dailyFragments.granted) && dailyAmount > 0) {
+			dailyDetails.push({ label: "First eligible match today", value: "Granted", text: true });
+			dailyDetails.push({ label: "Fragment balance", value: FormatNumber(IntXP(dailyFragments.balance_before)) + " -> " + FormatNumber(IntXP(dailyFragments.balance_after)), text: true });
+		} else if (dailyFragments && BoolValue(dailyFragments.already_claimed)) {
+			dailyDetails.push({ label: "Daily bonus", value: "Already collected today", text: true });
+			dailyDetails.push({ label: "Tier " + dailyTier + " allowance", value: FormatNumber(dailyCap) + " fragments", text: true });
+		} else {
+			dailyDetails.push({ label: "Daily bonus", value: "No grant reported by server", text: true });
+			dailyDetails.push({ label: "Tier " + dailyTier + " allowance", value: FormatNumber(dailyCap) + " fragments", text: true });
+		}
 		return {
 			beforeXP: beforeXP,
 			finalXP: finalXP,
@@ -1446,6 +1503,7 @@ var XHSEndScreen = (function () {
 				{ key: "farm", title: "FARM EVENT", amount: farmXP, details: [{ label: FormatNumber(farmKills) + " kills x " + farmPercent + "% - " + farmDifficultyName + " - rounded down", value: "+" + farmXP }] },
 				{ key: "victory", title: model.victory ? "VICTORY" : "DEFEAT", amount: victoryXP, details: [{ label: model.victory ? "Run completed" : "No victory bonus", value: "+" + victoryXP }] },
 				{ key: "supporter", title: "SUPPORTER BOOST", amount: supporterXP, supporter: true, details: [{ label: supporterPercent + "% of " + FormatNumber(simulation ? theoretical.subtotal : IntXP(FirstDefined(breakdown.subtotal, totalXP - supporterXP))) + " XP", value: "+" + supporterXP }] },
+				{ key: "daily_fragments", title: "DAILY FRAGMENTS", amount: dailyAmount, resource: "fragments", details: dailyDetails },
 			],
 		};
 	}
@@ -1647,6 +1705,7 @@ var XHSEndScreen = (function () {
 			row.AddClass("XHSXPStep");
 			row.SetHasClass("IsZero", step.amount === 0);
 			row.SetHasClass("IsSupporter", step.supporter === true);
+			row.SetHasClass("IsFragments", step.resource === "fragments");
 			var marker = $.CreatePanel("Label", row, "");
 			marker.AddClass("XHSXPStepMarker");
 			marker.text = (i + 1).toString();
@@ -1669,7 +1728,7 @@ var XHSEndScreen = (function () {
 			}
 			var gain = $.CreatePanel("Label", row, "");
 			gain.AddClass("XHSXPStepGain");
-			gain.text = "+0 XP";
+			gain.text = "+0 " + (step.resource === "fragments" ? "FRAGMENTS" : "XP");
 			xpStepPanels.push({ panel: row, gain: gain, step: step });
 		}
 	}
@@ -1720,10 +1779,16 @@ var XHSEndScreen = (function () {
 			}
 		}
 		AnimateXPInteger(0, step.amount, 0.34, generation, function (value) {
-			item.gain.text = "+" + FormatNumber(value) + " XP";
+			item.gain.text = "+" + FormatNumber(value) + " " + (step.resource === "fragments" ? "FRAGMENTS" : "XP");
 		}, function () {
 			if (step.amount <= 0) {
 				ScheduleXP(generation, 0.34, function () { CompleteXPStep(index, generation); });
+				return;
+			}
+			// Fragment grants are already persisted by the completion endpoint. They
+			// get their own reveal without being folded into the XP progress bar.
+			if (step.resource === "fragments") {
+				ScheduleXP(generation, 0.58, function () { CompleteXPStep(index, generation); });
 				return;
 			}
 			CreateXPTransfer(step.amount, generation);
@@ -1807,6 +1872,12 @@ var XHSEndScreen = (function () {
 	}
 
 	function StartXPPresentation(data, players) {
+		// CompleteGame publishes a local snapshot before its HTTP request finishes
+		// so the end-screen has match rows ready. That snapshot has no authoritative
+		// XP yet and must not claim the presentation key before the backend receipt.
+		if (data && data.completion_pending === true) {
+			return;
+		}
 		var model = GetLocalPlayerModel(players);
 		if (!model) {
 			xpPresentationPhase = "done";

@@ -353,7 +353,7 @@ local function BeginUtherRun()
 				stalled and "warn" or "info",
 				stalled and "UTHER_RUN_STALLED" or "UTHER_RUN_PROGRESS",
 				stalled and "Uther made no meaningful movement progress during the last sample"
-					or "Uther is moving to his destination",
+				or "Uther is moving to his destination",
 				state
 			)
 			lastProgressDistance = distance
@@ -1078,7 +1078,6 @@ function FourBossesKillCount()
 		for _, v in pairs(teleporters) do
 			v:Enable()
 		end
-		Notifications:TopToAll({ text = "You have killed Grom, Proudmoore, Illidan and Balanar. Talk to Uther.", duration = 10.0 })
 	end
 end
 

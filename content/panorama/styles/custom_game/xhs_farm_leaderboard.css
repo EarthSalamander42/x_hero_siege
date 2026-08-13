@@ -1,7 +1,12 @@
 .XHSFarmLeaderboardHost
 {
-	width: 100%;
+	/* Keep the leaderboard input branch away from the left-side HUD.  The host
+	 * used to cover the whole screen and, once promoted above HUDElements,
+	 * could swallow the vanilla flyout-scoreboard button during farm events.
+	 * 730px still fits the two concurrent 326px leaderboards and their gap. */
+	width: 730px;
 	height: 100%;
+	horizontal-align: right;
 	overflow: noclip;
 	z-index: 18;
 }

@@ -54,10 +54,10 @@
 								<Label class="XHSEndScreenMetaLabel" text="Difficulty" />
 								<Label id="XHSEndScreenDifficulty" class="XHSEndScreenMetaValue" text="-" />
 							</Panel>
-							<Panel class="XHSEndScreenMetaItem">
+							<Button id="XHSEndScreenGameIdButton" class="XHSEndScreenMetaItem XHSEndScreenGameIdButton">
 								<Label class="XHSEndScreenMetaLabel" text="Game ID" />
 								<Label id="XHSEndScreenGameId" class="XHSEndScreenMetaValue" text="-" />
-							</Panel>
+							</Button>
 							<Panel class="XHSEndScreenMetaItem">
 								<Label class="XHSEndScreenMetaLabel" text="Players" />
 								<Label id="XHSEndScreenPlayersMeta" class="XHSEndScreenMetaValue" text="0" />

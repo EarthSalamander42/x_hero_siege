@@ -6294,6 +6294,7 @@
 				"Passive"			"0"
 				"IsHidden"			"0"
 				"IsBuff"			"1"
+				"IsPurgable"		"1"
 
 				"EffectName"		"particles/units/heroes/hero_magnataur/magnataur_empower.vpcf"
 				"EffectAttachType"	"attach_attack1"
@@ -25587,7 +25588,7 @@
 		"AbilityManaCost"			"0"
 		"AbilityValues"
 		{
-			"damage"					"9000 15000 22500 32000 45000"
+			"damage"					"90000 150000 225000 320000 450000"
 			"CalculateSpellDamageTooltip"	"1"
 			"radius"					"185 200 215 230 245"
 			"spacing"					"205"

@@ -384,6 +384,31 @@
 	border: 1px solid xhs_border;
 }
 
+.XHSEndScreenGameIdButton {
+	transition-property: background-color, border, brightness;
+	transition-duration: 0.12s;
+	tooltip-position: bottom;
+}
+
+.XHSEndScreenGameIdButton.IsAvailable {
+	border-color: #3b7699;
+}
+
+.XHSEndScreenGameIdButton.IsAvailable:hover {
+	background-color: #0a2639ee;
+	border-color: #69d6ff;
+	brightness: 1.25;
+}
+
+.XHSEndScreenGameIdButton.IsAvailable:active {
+	background-color: #06131fe8;
+	brightness: 0.8;
+}
+
+.XHSEndScreenGameIdButton.IsUnavailable {
+	wash-color: #76818a;
+}
+
 .XHSEndScreenMetaLabel {
 	width: 100%;
 	height: 17px;
@@ -2157,6 +2182,26 @@
 
 .XHSXPStep.IsSupporter .XHSXPStepGain {
 	color: #d99aff;
+}
+
+.XHSXPStep.IsFragments {
+	background-color: gradient( linear, 0% 0%, 100% 0%, from( #292111dd ), to( #0b1a27cc ) );
+	border-left-color: #e1b94e;
+}
+
+.XHSXPStep.IsFragments .XHSXPStepMarker,
+.XHSXPStep.IsFragments .XHSXPStepDetailBullet {
+	color: #f1cf68;
+}
+
+.XHSXPStep.IsFragments .XHSXPStepGain {
+	min-width: 190px;
+	color: #f1cf68;
+	text-shadow: 0px 0px 8px 2 #e8b83c33;
+}
+
+.XHSXPStep.IsFragments.IsZero .XHSXPStepGain {
+	color: #99875a;
 }
 
 .XHSXPSupporterCTA {

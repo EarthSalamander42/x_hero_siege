@@ -360,6 +360,50 @@
 	vertical-align: center;
 }
 
+.XHSBotGiftSuccess .XHSNotificationContent
+{
+	flow-children: right;
+	vertical-align: center;
+}
+
+.XHSBotGiftSuccess .XHSNotificationMessage
+{
+	width: fit-children;
+	max-width: 360px;
+	text-align: left;
+}
+
+.XHSBotGiftSuccess .XHSBotGiftDonor,
+.XHSBotGiftSuccess .XHSBotGiftBot
+{
+	color: #b8f7c7;
+	font-weight: bold;
+}
+
+.XHSBotGiftSuccess .XHSBotGiftItemName
+{
+	color: #ffe39a;
+	font-weight: bold;
+}
+
+.XHSBotGiftSuccess .XHSBotGiftItemIcon
+{
+	width: 34px;
+	height: 34px;
+	margin-left: 3px;
+	margin-right: 8px;
+	border: 1px solid #e4ad4799;
+}
+
+.XHSBotGiftSuccess .XHSBotGiftDonorHeroIcon
+{
+	width: 30px;
+	height: 30px;
+	margin-right: 7px;
+	border: 1px solid #7fe4a488;
+	box-shadow: fill #4bff9540 0px 0px 7px 0px;
+}
+
 .XHSNotificationProgressTrack
 {
 	width: 100%;

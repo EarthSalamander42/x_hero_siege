@@ -876,6 +876,69 @@
 		removeNotification(msg, $(BOTTOM_CONTAINER_ID));
 	}
 
+	function localizeNotificationToken(token, fallback) {
+		var localized = $.Localize(token);
+		return localized && localized !== token ? localized : fallback;
+	}
+
+	function localizeItemName(itemName) {
+		itemName = String(itemName || "");
+		if (!itemName) {
+			return localizeNotificationToken("#xhs_bot_gift_unknown_item", "an item");
+		}
+
+		var token = "#DOTA_Tooltip_ability_" + itemName;
+		var localized = $.Localize(token);
+		if (localized && localized !== token) {
+			return localized;
+		}
+
+		return itemName.replace(/^item_/, "").replace(/_/g, " ");
+	}
+
+	function showBotGiftSuccess(msg) {
+		msg = msg || {};
+		var donorPlayerID = Number(msg.donor_player_id);
+		var donorHeroName = String(msg.donor_hero_name || "");
+		if (!donorHeroName && donorPlayerID >= 0 && Players.GetPlayerSelectedHero) {
+			donorHeroName = String(Players.GetPlayerSelectedHero(donorPlayerID) || "");
+		}
+		var donorName = resolvePlayerIdentity(
+			msg.donor_player_id,
+			msg.donor_player_name,
+			donorHeroName
+		);
+		if (!donorName) {
+			donorName = localizeNotificationToken("#xhs_bot_gift_defender", "A defender");
+		}
+
+		var botName = String(msg.bot_player_name || "");
+		if (!botName && msg.bot_hero_name) {
+			botName = typeof XHSNameDisplay !== "undefined" && XHSNameDisplay.LocalizeHeroName
+				? XHSNameDisplay.LocalizeHeroName(msg.bot_hero_name)
+				: resolvePlayerIdentity(msg.bot_player_id, "", msg.bot_hero_name);
+		}
+		if (!botName) {
+			botName = localizeNotificationToken("#xhs_bot_gift_allied_bot", "the allied bot");
+		}
+
+		var itemName = String(msg.item_name || "");
+		addNotification({
+			duration: 5,
+			severity: "success",
+			class: "XHSBotGiftSuccess",
+			segments: [
+				{ hero: donorHeroName, imagestyle: "icon", class: "XHSBotGiftDonorHeroIcon" },
+				{ text: donorName, class: "XHSBotGiftDonor" },
+				{ text: " " + localizeNotificationToken("#xhs_bot_gift_gave", "gave") + " " },
+				{ item: itemName, class: "XHSBotGiftItemIcon" },
+				{ text: localizeItemName(itemName), class: "XHSBotGiftItemName" },
+				{ text: " " + localizeNotificationToken("#xhs_bot_gift_to", "to") + " " },
+				{ text: botName, class: "XHSBotGiftBot" }
+			]
+		}, $(TOP_CONTAINER_ID), "top");
+	}
+
 	function normalizeQueuedWaves(rawWaves) {
 		var waves = [];
 		rawWaves = rawWaves || {};
@@ -1945,6 +2008,7 @@
 	GameEvents.Subscribe("xhs_rune_state_update", updateRuneState);
 	GameEvents.Subscribe("xhs_main_quest_completed", showMainQuestCompleted);
 	GameEvents.Subscribe("xhs_reward_notification", showRewardNotification);
+	GameEvents.Subscribe("xhs_bot_gift_success", showBotGiftSuccess);
 	GameEvents.Subscribe("xhs_fragment_quest_star", showFragmentQuestStar);
 	GameEvents.Subscribe("xhs_channel_notification_start", showChannelNotification);
 	GameEvents.Subscribe("xhs_channel_notification_finish", finishChannelNotification);

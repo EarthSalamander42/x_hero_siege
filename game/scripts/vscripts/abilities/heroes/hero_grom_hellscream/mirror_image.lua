@@ -90,6 +90,10 @@ function Phantasm(keys)
 
 		-- handle_UnitOwner needs to be nil, else it will crash the game.
 		local illusion = CreateUnitByName(unit_name, origin, true, caster, nil, caster:GetTeamNumber())
+		-- npc_spawned can be consumed before MakeIllusion() below. Mark these
+		-- images immediately so the custom health-frame relay never publishes
+		-- them (and suppresses the Vanilla bar as well).
+		illusion.xhs_hide_health_bar = true
 		illusion:SetControllableByPlayer(player, true)
 
 		illusion:SetAngles(casterAngles.x, casterAngles.y, casterAngles.z)
@@ -126,6 +130,9 @@ function Phantasm(keys)
 
 		illusion:AddNewModifier(caster, ability, "modifier_illusion", { duration = duration, outgoing_damage = outgoingDamage, incoming_damage = incomingDamage })
 		illusion:MakeIllusion()
+		if XHSCreepHealthBars ~= nil and XHSCreepHealthBars.Apply ~= nil then
+			XHSCreepHealthBars:Apply(illusion)
+		end
 		illusion:SetHealth(caster:GetHealth())
 		table.insert(caster.phantasm_illusions, illusion)
 		illusion:RemoveAbility("boss_health")

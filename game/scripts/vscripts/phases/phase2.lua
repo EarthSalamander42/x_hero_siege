@@ -638,6 +638,7 @@ local FINAL_WAVE_CAMERA_RETURN_DURATION = 0.85
 local FINAL_WAVE_MUSIC_SOUND = "XHS.FinalWaveMusic"
 local FINAL_WAVE_PLAYER_TELEPORT_DELAY = 1.5
 local FINAL_WAVE_CINEMATIC_ID = "final_wave_intro"
+local FINAL_WAVE_STAGE_JOB = "final_wave_all_units"
 local FINAL_WAVE_LETTERBOX_PERCENT = 10
 local FINAL_WAVE_LETTERBOX_TRANSITION = 0.75
 local FINAL_WAVE_PORTAL_START_PARTICLE = "particles/items2_fx/teleport_start.vpcf"
@@ -693,6 +694,83 @@ local FINAL_WAVE_CARDINALS = {
 		creeps = { "npc_captain", "npc_marine", "npc_marine", "npc_knight" },
 	},
 }
+
+local function GetFinalWaveStagedKey(direction, slot)
+	return tostring(direction) .. ":" .. tostring(slot)
+end
+
+local function BuildFinalWaveDescriptors()
+	local descriptors = {}
+	for _, config in ipairs(FINAL_WAVE_CARDINALS) do
+		local bossSpawner = Entities:FindByName(
+			nil,
+			"final_wave_" .. config.direction .. "_13"
+		)
+		if bossSpawner ~= nil then
+			table.insert(descriptors, {
+				unit_name = config.boss .. "_final_wave",
+				team = DOTA_TEAM_CUSTOM_1,
+				spawn_position = bossSpawner:GetAbsOrigin(),
+				direction = config.direction,
+				slot = 13,
+				angle = config.angle,
+				waypoint = config.waypoint,
+			})
+		end
+
+		local slot = 1
+		for _, creepName in ipairs(config.creeps) do
+			for _ = 1, 3 do
+				local spawner = Entities:FindByName(
+					nil,
+					"final_wave_" .. config.direction .. "_" .. tostring(slot)
+				)
+				if spawner ~= nil then
+					table.insert(descriptors, {
+						unit_name = creepName .. "_final_wave",
+						team = DOTA_TEAM_CUSTOM_1,
+						spawn_position = spawner:GetAbsOrigin(),
+						direction = config.direction,
+						slot = slot,
+						angle = config.angle,
+						waypoint = config.waypoint,
+					})
+				end
+				slot = slot + 1
+			end
+		end
+	end
+	return descriptors
+end
+
+function PrepareFinalWaveUnits(duration)
+	if XHSWaveStager == nil then return false end
+	if ResetPhase2CreepWaveCounts ~= nil then
+		ResetPhase2CreepWaveCounts()
+	end
+	local descriptors = BuildFinalWaveDescriptors()
+	if #descriptors ~= FINAL_WAVE_TOTAL_UNITS then
+		print("[XHS FinalWave] staging skipped: expected="
+			.. tostring(FINAL_WAVE_TOTAL_UNITS) .. " descriptors="
+			.. tostring(#descriptors))
+		return false
+	end
+
+	XHSWaveStager:StartJob(FINAL_WAVE_STAGE_JOB, descriptors, {
+		owner = "final_wave",
+		window = math.max(0.05, tonumber(duration) or 60),
+		is_valid = function()
+			return CustomTimers ~= nil
+				and CustomTimers.proc_final_wave == true
+				and XHS_TIMERS_FINAL_WAVE == false
+				and CustomTimers.game_phase == 2
+		end,
+		configure = function(_, unit)
+			unit.xhs_final_wave_prepared = true
+		end,
+	})
+	return true
+end
 
 local function GetFinalWaveCardinalFowDuration(config)
 	if config == nil then return FINAL_WAVE_PORTAL_FOW_DURATION end
@@ -848,6 +926,7 @@ end
 local function ApplyFinalWaveCinematicLock(unit, duration)
 	if unit == nil or unit:IsNull() then return end
 	if duration <= 0 then return end
+	if unit.SetIdleAcquire ~= nil then unit:SetIdleAcquire(false) end
 
 	local pauseModifier = unit:AddNewModifier(unit, nil, "modifier_pause_creeps", { duration = duration, IsHidden = true })
 	if pauseModifier ~= nil then
@@ -871,6 +950,7 @@ local function ReleaseFinalWaveUnit(unit, waypoint)
 
 	unit:RemoveModifierByName("modifier_pause_creeps")
 	unit:RemoveModifierByName("modifier_invulnerable")
+	if unit.SetIdleAcquire ~= nil then unit:SetIdleAcquire(true) end
 
 	if waypoint ~= nil and not waypoint:IsNull() then
 		unit:SetInitialGoalEntity(waypoint)
@@ -945,6 +1025,15 @@ local function PlayFinalWaveArrivalEffects(unit)
 	unit:EmitSound("Portal.Hero_Appear")
 end
 
+local function PlayFinalWaveSpawnAnimation(unit)
+	if unit == nil or unit:IsNull() then return end
+	StartAnimation(unit, {
+		duration = 1.10,
+		activity = ACT_DOTA_SPAWN,
+		rate = 1.0,
+	})
+end
+
 local function NotifyFinalWaveArrival(config)
 	if Notifications == nil then return end
 
@@ -976,6 +1065,44 @@ local function SpawnFinalWaveUnit(unitName, spawner, angle, releaseWaypoint, loc
 	return unit
 end
 
+local function ActivatePreparedFinalWaveUnits()
+	CustomTimers.final_wave_prepared_units = {}
+	if XHSWaveStager == nil then return 0 end
+	local job = XHSWaveStager:GetJob(FINAL_WAVE_STAGE_JOB)
+	if job == nil then return 0 end
+
+	local released = XHSWaveStager:ActivateJob(FINAL_WAVE_STAGE_JOB, {
+		wake_spread = 0,
+		activate = function(_, unit, descriptor)
+			unit:AddNoDraw()
+			unit.xhs_final_wave_prepared = false
+			unit:SetAngles(0, descriptor.angle or 0, 0)
+			ApplyFinalWaveCinematicLock(
+				unit,
+				FINAL_WAVE_INTRO_DURATION + FINAL_WAVE_PREP_DURATION
+			)
+			local waypoint = Entities:FindByName(nil, descriptor.waypoint)
+			RegisterFinalWaveUnit(unit)
+			QueueFinalWaveRelease(unit, waypoint)
+			CustomTimers.final_wave_prepared_units[
+				GetFinalWaveStagedKey(descriptor.direction, descriptor.slot)
+			] = unit
+		end,
+	})
+	UpdateFinalWaveQuestLimit()
+	return tonumber(released) or 0
+end
+
+local function TakePreparedFinalWaveUnit(direction, slot)
+	local units = CustomTimers.final_wave_prepared_units
+	if units == nil then return nil end
+	local key = GetFinalWaveStagedKey(direction, slot)
+	local unit = units[key]
+	units[key] = nil
+	if unit == nil or unit:IsNull() or not unit:IsAlive() then return nil end
+	return unit
+end
+
 function FinalWave(force)
 	if force ~= true and XHSDevTools ~= nil and XHSDevTools:IsSandboxActive() then return end
 
@@ -997,7 +1124,8 @@ function FinalWave(force)
 			text = "Final Wave active",
 		})
 	end
-	KillCreeps(DOTA_TEAM_CUSTOM_1)
+	KillCreeps(DOTA_TEAM_CUSTOM_1, true)
+	ActivatePreparedFinalWaveUnits()
 	RefreshPlayers()
 	GameRules:SetHeroRespawnEnabled(false)
 
@@ -1135,7 +1263,8 @@ function FinalWaveSpawner(configOrCreep1, creep2, creep3, creep4, bossName, angl
 		end
 	end
 
-	local boss = SpawnFinalWaveUnit(config.boss, bossSpawner, config.angle, releaseWaypoint, lockDuration, true)
+	local boss = TakePreparedFinalWaveUnit(config.direction, 13)
+		or SpawnFinalWaveUnit(config.boss, bossSpawner, config.angle, releaseWaypoint, lockDuration, true)
 	if boss == nil then
 		DestroyFinalWaveParticle(teleportChannel)
 		for _, marker in pairs(spawnMarkers) do
@@ -1160,7 +1289,7 @@ function FinalWaveSpawner(configOrCreep1, creep2, creep3, creep4, bossName, angl
 
 		boss:RemoveNoDraw()
 		PlayFinalWaveArrivalEffects(boss)
-		boss:StartGesture(ACT_DOTA_CAST_ABILITY_2)
+		PlayFinalWaveSpawnAnimation(boss)
 	end)
 
 	local spawnSlot = 1
@@ -1175,8 +1304,11 @@ function FinalWaveSpawner(configOrCreep1, creep2, creep3, creep4, bossName, angl
 				if not IsFinalWaveSequenceActive(sequenceId) then return end
 				local spawner = FindFinalWaveSpawner(config.direction, currentSlot)
 				if spawner == nil then return end
-				local creep = SpawnFinalWaveUnit(currentCreepName, spawner, config.angle, releaseWaypoint, lockDuration, false)
+				local creep = TakePreparedFinalWaveUnit(config.direction, currentSlot)
+					or SpawnFinalWaveUnit(currentCreepName, spawner, config.angle, releaseWaypoint, lockDuration, true)
 				if creep ~= nil then
+					creep:RemoveNoDraw()
+					PlayFinalWaveSpawnAnimation(creep)
 					creep:EmitSound("Hero_TemplarAssassin.Trap")
 				end
 			end)

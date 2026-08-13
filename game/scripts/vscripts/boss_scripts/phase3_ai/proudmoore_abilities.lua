@@ -91,6 +91,24 @@ local function NormalizeDirection(direction)
 	return direction:Normalized()
 end
 
+local function BuildTorrentLines(caster, context, width)
+	local direction = NormalizeDirection(context.direction or caster:GetForwardVector())
+	local perpendicular = Vector(-direction.y, direction.x, 0)
+	local lineCount = math.max(1, math.min(5, tonumber(context.line_count) or 1))
+	local lineSeparation = width * 2.25
+	local lines = {}
+
+	for index = 1, lineCount do
+		local offset = (index - (lineCount + 1) * 0.5) * lineSeparation
+		lines[#lines + 1] = {
+			origin = caster:GetAbsOrigin() + perpendicular * offset,
+			direction = direction,
+		}
+	end
+
+	return lines
+end
+
 local function StartBossCastBar(ability, displayName)
 	if XHSBossCastBar ~= nil then
 		XHSBossCastBar:Start(ability:GetCaster(), ability, {
@@ -283,7 +301,6 @@ function xhs_proudmoore_torrent_line:OnAbilityPhaseStart()
 
 	local context = GetContext(self)
 	local caster = self:GetCaster()
-	local direction = NormalizeDirection(context.direction or caster:GetForwardVector())
 	local length = self:GetSpecialValueFor("length")
 	local width = self:GetSpecialValueFor("width")
 	local spacing = math.max(1, width * 1.25)
@@ -291,19 +308,21 @@ function xhs_proudmoore_torrent_line:OnAbilityPhaseStart()
 	StartBossCastBar(self, "Torrent Line")
 	-- Torrent Line lands as discrete overlapping torrents. Force the reliable
 	-- node warnings so every actual impact area remains visible during precast.
-	XHSBossTelegraphs:Line(
-		caster:GetAbsOrigin(),
-		direction,
-		spacing,
-		width,
-		math.max(1, math.floor(length / spacing)),
-		self:GetCastPoint(),
-		PROUDMOORE_COLORS,
-		120,
-		true
-	)
+	for _, line in ipairs(BuildTorrentLines(caster, context, width)) do
+		XHSBossTelegraphs:Line(
+			line.origin,
+			line.direction,
+			spacing,
+			width,
+			math.max(1, math.floor(length / spacing)),
+			self:GetCastPoint(),
+			PROUDMOORE_COLORS,
+			120,
+			true
+		)
+	end
 	StartAnimation(caster, { duration = self:GetCastPoint() + 0.15, activity = ACT_DOTA_CAST_ABILITY_1, rate = 1.0 })
-	caster:EmitSound("Ability.Torrent")
+	XHSPhase3BossAI:EmitSoundOnce(caster, "Ability.Torrent", "proudmoore_torrent_precast", self:GetCastPoint())
 	return true
 end
 
@@ -316,20 +335,21 @@ function xhs_proudmoore_torrent_line:OnSpellStart()
 
 	local caster = self:GetCaster()
 	local context = GetContext(self)
-	local direction = NormalizeDirection(context.direction or caster:GetForwardVector())
 	local width = self:GetSpecialValueFor("width")
 	local length = self:GetSpecialValueFor("length")
 	local spacing = math.max(1, width * 1.25)
 	local count = math.max(1, math.floor(length / spacing))
 	local startDistance = 120
 	local damage = ScaleDamage(self:GetSpecialValueFor("damage"))
-	for i = 1, count do
-		local position = caster:GetAbsOrigin() + direction * (startDistance + spacing * (i - 1))
-		CreateTorrentImpact(position, width)
-		EmitLocationSound(caster, position, "Ability.Torrent")
-		DamageEnemies(caster, self, position, width, damage, self:GetAbilityDamageType(), function(enemy)
-			ApplyTorrentControl(caster, self, enemy, position)
-		end)
+	XHSPhase3BossAI:EmitSoundOnce(caster, "Ability.Torrent", "proudmoore_torrent_cast", 0.5)
+	for _, line in ipairs(BuildTorrentLines(caster, context, width)) do
+		for i = 1, count do
+			local position = line.origin + line.direction * (startDistance + spacing * (i - 1))
+			CreateTorrentImpact(position, width)
+			DamageEnemies(caster, self, position, width, damage, self:GetAbilityDamageType(), function(enemy)
+				ApplyTorrentControl(caster, self, enemy, position)
+			end)
+		end
 	end
 	ClearContext(self)
 end

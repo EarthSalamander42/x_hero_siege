@@ -106,7 +106,6 @@
 						</Panel>
 
 						<Panel id="VoteSelectionSummary" class="vote-selection-summary">
-							<Label class="vote-selection-summary-title" text="#loading_screen_selected_settings" />
 							<Panel class="vote-selection-summary-row">
 								<Label class="vote-selection-summary-key" text="#loading_screen_selected_difficulty" />
 								<Label id="VoteSelectionDifficulty" class="vote-selection-summary-value" text="#loading_screen_not_selected" />

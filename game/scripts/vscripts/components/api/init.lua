@@ -1183,13 +1183,6 @@ function api:GrantSupporterFragments(player_id, amount, reason, idempotency_key,
 		callback = function() end
 	end
 
-	if self:HasXHSBotSession() then
-		return callback(false, {
-			code = "xhs_bot_session",
-			message = "Persistent rewards are disabled for XHS bot sessions.",
-		})
-	end
-
 	local steamid = self:GetPersistentPlayerSteamID(player_id)
 	if steamid == nil then
 		return callback(false, { code = "non_persistent_player", message = "Persistent human player required." })
@@ -2618,7 +2611,8 @@ function api:Request(endpoint, okCallback, failCallback, method, payload, option
 
 	local request_timeout_ms = tonumber(options.timeout_ms)
 	if request_timeout_ms == nil then
-		request_timeout_ms = endpoint == "bot-audit" and 20000 or timeout
+		request_timeout_ms = (endpoint == "bot-audit" or endpoint == "game-complete")
+			and 20000 or timeout
 	end
 	request_timeout_ms = math.max(1000, math.min(120000, math.floor(request_timeout_ms)))
 	request:SetHTTPRequestAbsoluteTimeoutMS(request_timeout_ms)
@@ -2950,7 +2944,7 @@ function api:SubmitCustomPollVote(player_id, poll_id, option_id, callback)
 	})
 end
 
-function api:ProcessCompletedGame(data, payload, skipWinner)
+function api:ProcessCompletedGame(data, payload, skipWinner, completionError)
 	local game_id = payload.game_id or api:GetApiGameId() or api:GetMatchID()
 	local match_id = payload.match_id or api:GetMatchID()
 	local gamemode = payload.gamemode or api:GetCustomGamemode()
@@ -3029,6 +3023,11 @@ function api:ProcessCompletedGame(data, payload, skipWinner)
 		cheat_mode = payload.cheat_mode == true,
 		tools_mode = payload.tools_mode == true or IsInToolsMode(),
 		persistent_rewards_eligible = payload.persistent_rewards_eligible ~= false,
+		-- The first snapshot exists only to make match data available before the
+		-- HTTP callback. Panorama must not treat it as an authoritative zero-XP
+		-- receipt or it will suppress the real completion response that follows.
+		completion_pending = skipWinner == true,
+		completion_error = completionError == true,
 		info = {
 			winner = GAME_WINNER_TEAM,
 			id = game_id,
@@ -3625,7 +3624,7 @@ function api:CompleteGame()
 			if FragmentQuests ~= nil then
 				FragmentQuests:OnBackendComplete(false, data)
 			end
-			api:ProcessCompletedGame(data, payload)
+			api:ProcessCompletedGame(data, payload, false, true)
 		end,
 		"POST", backend_payload
 	)

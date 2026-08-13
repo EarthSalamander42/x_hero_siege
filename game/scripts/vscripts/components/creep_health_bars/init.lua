@@ -55,9 +55,15 @@ local function SafeBooleanCall(unit, methodName)
 end
 
 local function ShouldHideIllusionHealthBar(unit)
-	if not IsUsableUnit(unit) or not SafeBooleanCall(unit, "IsIllusion") then
+	if not IsUsableUnit(unit) then
 		return false
 	end
+	-- Some scripted illusions are created as regular units and only become
+	-- illusions later in the same frame. Their creator can set this marker
+	-- before npc_spawned is processed so neither the Vanilla nor custom frame
+	-- flashes during that initialization window.
+	if unit.xhs_hide_health_bar == true then return true end
+	if not SafeBooleanCall(unit, "IsIllusion") then return false end
 	local unitName = unit.GetUnitName ~= nil and tostring(unit:GetUnitName() or "") or ""
 	return HEALTH_BAR_HIDDEN_ILLUSION_NAMES[unitName] == true
 end

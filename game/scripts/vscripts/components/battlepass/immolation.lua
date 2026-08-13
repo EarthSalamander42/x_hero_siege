@@ -8,6 +8,7 @@ local THINK_INTERVAL = 0.10
 local TARGET_GRACE = 0.15
 local CONTEXT_THINK = "XHSSupporterPassImmolation"
 local GOOD_TEAM = DOTA_TEAM_GOODGUYS or 2
+local TARGET_DIRECTION_CONTROL_POINT = 1
 
 local SOURCE_ALLOWLIST = {
 	item_xhs_cloak_of_flames = true,
@@ -179,6 +180,26 @@ local function CreateParticle(path, attachType, parent)
 	return particleIndex
 end
 
+-- Valve's radiance_target families use CP1 as a world-space repulsion source:
+-- particles travel away from that point. Following the burn caster therefore
+-- makes the authored flame trail point away from the caster instead of using
+-- the particle's default south-facing CP1.
+local function SetTargetDirectionSource(particleIndex, caster)
+	if particleIndex == nil or ParticleManager == nil then return end
+	if ParticleManager.SetParticleControlEnt == nil then return end
+	if not IsValidEntityHandle(caster) or caster.GetAbsOrigin == nil then return end
+
+	ParticleManager:SetParticleControlEnt(
+		particleIndex,
+		TARGET_DIRECTION_CONTROL_POINT,
+		caster,
+		PATTACH_ABSORIGIN_FOLLOW,
+		nil,
+		caster:GetAbsOrigin(),
+		false
+	)
+end
+
 local function GetSourceKey(token, caster, ability)
 	local abilityIndex = SafeEntityIndex(ability)
 	local casterIndex = SafeEntityIndex(caster)
@@ -329,11 +350,18 @@ function SupporterPassImmolation:_AcquireTargetParticle(source, targetState)
 			refs = {},
 			target = targetState.target,
 			hero = source.hero,
+			directionSourceKey = source.key,
 		}
 		self.targetParticles[groupKey] = group
 	end
 
 	group.refs[source.key] = true
+	local directionSource = self.sources[group.directionSourceKey]
+	if directionSource == nil or not IsValidEntityHandle(directionSource.caster) then
+		group.directionSourceKey = source.key
+		directionSource = source
+	end
+	SetTargetDirectionSource(group.particle, directionSource.caster)
 	targetState.groupKey = groupKey
 end
 
@@ -347,6 +375,13 @@ function SupporterPassImmolation:_ReleaseTargetParticle(source, targetState)
 		if next(group.refs) == nil then
 			DestroyParticle(group.particle)
 			self.targetParticles[groupKey] = nil
+		elseif group.directionSourceKey == source.key then
+			local nextSourceKey = next(group.refs)
+			local nextSource = self.sources[nextSourceKey]
+			group.directionSourceKey = nextSourceKey
+			if nextSource ~= nil then
+				SetTargetDirectionSource(group.particle, nextSource.caster)
+			end
 		end
 	end
 

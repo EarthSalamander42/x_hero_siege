@@ -86,7 +86,7 @@ function XHSProudmoore_AttachPhase3AI(boss)
 
 	boss:RemoveModifierByName("modifier_ai")
 	if boss:HasModifier("modifier_xhs_proudmoore_phase3_ai") then return end
-	XHSPhase3BossAI:HideVanillaHealthBar(boss)
+	XHSPhase3BossAI:ConfigureBoss(boss)
 	boss:AddNewModifier(boss, nil, "modifier_xhs_proudmoore_phase3_ai", {})
 end
 
@@ -339,6 +339,7 @@ function modifier_xhs_proudmoore_phase3_ai:CastTorrentLine()
 	local targetPosition = self:GetPredictedHeroPosition(target, 0.9)
 	local castAbility = CastPreparedAbility(boss, "xhs_proudmoore_torrent_line", {
 		direction = NormalizeDirection(targetPosition - boss:GetAbsOrigin()),
+		line_count = XHSPhase3BossAI:GetDifficulty(),
 	}, targetPosition)
 	if castAbility == nil then return nil end
 	return GetAbilityCastPoint(castAbility) + 0.25

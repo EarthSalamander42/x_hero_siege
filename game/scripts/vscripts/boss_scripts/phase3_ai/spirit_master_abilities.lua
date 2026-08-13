@@ -131,6 +131,14 @@ local function GetSpiritKey(caster)
 	return "master"
 end
 
+local function GetSpiritColors(caster, fallbackKey)
+	local spiritKey = GetSpiritKey(caster)
+	if spiritKey == "master" and fallbackKey ~= nil then
+		spiritKey = fallbackKey
+	end
+	return GetColor(spiritKey)
+end
+
 local function StartBossCastBar(ability, displayName)
 	if XHSBossCastBar == nil then return end
 	local caster = ability:GetCaster()
@@ -569,7 +577,7 @@ function xhs_spirit_storm_arc_dash:OnAbilityPhaseStart()
 	local direction = NormalizeDirection(target - caster:GetAbsOrigin())
 	StartBossCastBar(self, "Arc Dash")
 	for _, lineDirection in ipairs(GetRoundLineDirections(self, direction)) do
-		XHSBossTelegraphs:Line(caster:GetAbsOrigin(), lineDirection, self:GetSpecialValueFor("spacing"), self:GetSpecialValueFor("radius"), self:GetSpecialValueFor("nodes"), self:GetCastPoint(), COLORS.storm, 120)
+		XHSBossTelegraphs:Line(caster:GetAbsOrigin(), lineDirection, self:GetSpecialValueFor("spacing"), self:GetSpecialValueFor("radius"), self:GetSpecialValueFor("nodes"), self:GetCastPoint(), GetSpiritColors(caster, "storm"), 120)
 	end
 	StartAnimation(caster, { duration = self:GetCastPoint() + 0.1, activity = ACT_DOTA_CAST_ABILITY_1, rate = 1.0 })
 	caster:EmitSound("Hero_StormSpirit.StaticRemnantPlant")
@@ -601,10 +609,11 @@ function xhs_spirit_storm_static_orbs:OnAbilityPhaseStart()
 	local caster = self:GetCaster()
 	local center = GetContext(self).position or caster:GetAbsOrigin()
 	caster:EmitSound("Hero_StormSpirit.StaticRemnantPlant")
-	XHSBossTelegraphs:Target(center, self:GetSpecialValueFor("radius"), self:GetCastPoint(), COLORS.storm)
-	XHSBossTelegraphs:Ring(center, self:GetSpecialValueFor("ring_radius"), self:GetSpecialValueFor("radius"), self:GetSpecialValueFor("orb_count"), self:GetCastPoint(), COLORS.storm, 15)
+	local colors = GetSpiritColors(caster, "storm")
+	XHSBossTelegraphs:Target(center, self:GetSpecialValueFor("radius"), self:GetCastPoint(), colors)
+	XHSBossTelegraphs:Ring(center, self:GetSpecialValueFor("ring_radius"), self:GetSpecialValueFor("radius"), self:GetSpecialValueFor("orb_count"), self:GetCastPoint(), colors, 15)
 	if GetRoundSpecialValue(self, "ring_count") >= 2 then
-		XHSBossTelegraphs:Ring(center, self:GetSpecialValueFor("ring_radius") * self:GetSpecialValueFor("inner_radius_pct") * 0.01, self:GetSpecialValueFor("radius"), self:GetSpecialValueFor("inner_orb_count"), self:GetCastPoint(), COLORS.storm, 0)
+		XHSBossTelegraphs:Ring(center, self:GetSpecialValueFor("ring_radius") * self:GetSpecialValueFor("inner_radius_pct") * 0.01, self:GetSpecialValueFor("radius"), self:GetSpecialValueFor("inner_orb_count"), self:GetCastPoint(), colors, 0)
 	end
 	StartAnimation(caster, { duration = self:GetCastPoint() + 0.1, activity = ACT_DOTA_CAST_ABILITY_2, rate = 1.0 })
 	return true
@@ -653,7 +662,7 @@ function xhs_spirit_storm_chain_focus:OnAbilityPhaseStart()
 	local lineWidth = self:GetSpecialValueFor("radius")
 	for index = 1, lineCount do
 		local direction = RotateDirection(Vector(1, 0, 0), ((index - 1) / lineCount) * 360)
-		XHSBossTelegraphs:Line(position, direction, spacing, lineWidth, nodes, self:GetCastPoint(), COLORS.storm, 0)
+		XHSBossTelegraphs:Line(position, direction, spacing, lineWidth, nodes, self:GetCastPoint(), GetSpiritColors(self:GetCaster(), "storm"), 0)
 	end
 	self:GetCaster():EmitSound("Hero_StormSpirit.ElectricVortexCast")
 	return true
@@ -698,7 +707,7 @@ function xhs_spirit_earth_fault_line:OnAbilityPhaseStart()
 	DestroyEarthSplitterPrecasts(self, true)
 	self.xhs_earth_splitter_precasts = {}
 	for _, lineDirection in ipairs(GetRoundLineDirections(self, direction)) do
-		XHSBossTelegraphs:Line(caster:GetAbsOrigin(), lineDirection, self:GetSpecialValueFor("spacing"), self:GetSpecialValueFor("radius"), self:GetSpecialValueFor("nodes"), self:GetCastPoint(), COLORS.earth, 120)
+		XHSBossTelegraphs:Line(caster:GetAbsOrigin(), lineDirection, self:GetSpecialValueFor("spacing"), self:GetSpecialValueFor("radius"), self:GetSpecialValueFor("nodes"), self:GetCastPoint(), GetSpiritColors(caster, "earth"), 120)
 		local entry = CreateEarthSplitterPrecast(caster, caster:GetAbsOrigin() + lineDirection * 120, lineDirection, length, self:GetCastPoint())
 		table.insert(self.xhs_earth_splitter_precasts, entry)
 		Timers:CreateTimer(self:GetCastPoint() + EARTH_SPLITTER_RELEASE_BUFFER, function()
@@ -739,9 +748,10 @@ end
 function xhs_spirit_earth_stone_guard:OnAbilityPhaseStart()
 	if not IsServer() then return true end
 	StartBossCastBar(self, "Stone Guard")
-	XHSBossTelegraphs:Circle(self:GetCaster():GetAbsOrigin(), self:GetSpecialValueFor("radius"), self:GetCastPoint(), COLORS.earth)
+	local colors = GetSpiritColors(self:GetCaster(), "earth")
+	XHSBossTelegraphs:Circle(self:GetCaster():GetAbsOrigin(), self:GetSpecialValueFor("radius"), self:GetCastPoint(), colors)
 	if GetRoundSpecialValue(self, "pulse_count") >= 2 then
-		XHSBossTelegraphs:Circle(self:GetCaster():GetAbsOrigin(), self:GetSpecialValueFor("radius") * self:GetSpecialValueFor("outer_radius_pct") * 0.01, self:GetCastPoint() + self:GetSpecialValueFor("pulse_delay"), COLORS.earth)
+		XHSBossTelegraphs:Circle(self:GetCaster():GetAbsOrigin(), self:GetSpecialValueFor("radius") * self:GetSpecialValueFor("outer_radius_pct") * 0.01, self:GetCastPoint() + self:GetSpecialValueFor("pulse_delay"), colors)
 	end
 	self:GetCaster():EmitSound("Hero_EarthSpirit.StoneRemnant.Impact")
 	return true
@@ -779,9 +789,10 @@ function xhs_spirit_earth_resonant_pillar:OnAbilityPhaseStart()
 	local center = GetContext(self).position or self:GetCaster():GetAbsOrigin()
 	local count = math.max(1, GetRoundSpecialValue(self, "pillar_count"))
 	StartBossCastBar(self, "Resonant Pillar")
-	XHSBossTelegraphs:Target(center, self:GetSpecialValueFor("radius"), self:GetCastPoint(), COLORS.earth)
+	local colors = GetSpiritColors(self:GetCaster(), "earth")
+	XHSBossTelegraphs:Target(center, self:GetSpecialValueFor("radius"), self:GetCastPoint(), colors)
 	if count > 1 then
-		XHSBossTelegraphs:Ring(center, self:GetSpecialValueFor("ring_radius"), self:GetSpecialValueFor("radius"), count - 1, self:GetCastPoint(), COLORS.earth, 90)
+		XHSBossTelegraphs:Ring(center, self:GetSpecialValueFor("ring_radius"), self:GetSpecialValueFor("radius"), count - 1, self:GetCastPoint(), colors, 90)
 	end
 	self:GetCaster():EmitSound("Hero_EarthSpirit.BoulderSmash.Cast")
 	return true
@@ -809,7 +820,7 @@ function xhs_spirit_fire_cinder_step:OnAbilityPhaseStart()
 	local destination = GetCinderStepDestination(self, caster, direction)
 	StartBossCastBar(self, "Cinder Step")
 	for _, lineDirection in ipairs(GetRoundLineDirections(self, direction)) do
-		XHSBossTelegraphs:Line(caster:GetAbsOrigin(), lineDirection, self:GetSpecialValueFor("spacing"), self:GetSpecialValueFor("radius"), self:GetSpecialValueFor("nodes"), self:GetCastPoint(), COLORS.fire, 100)
+		XHSBossTelegraphs:Line(caster:GetAbsOrigin(), lineDirection, self:GetSpecialValueFor("spacing"), self:GetSpecialValueFor("radius"), self:GetSpecialValueFor("nodes"), self:GetCastPoint(), GetSpiritColors(caster, "fire"), 100)
 	end
 	CreateCinderStepDestination(self, caster, destination, direction)
 	caster:EmitSound("Hero_EmberSpirit.FireRemnant.Activate")
@@ -846,7 +857,7 @@ function xhs_spirit_fire_solar_flare:OnAbilityPhaseStart()
 	local position = GetContext(self).position or self:GetCaster():GetAbsOrigin()
 	StartBossCastBar(self, "Solar Flare")
 	for _, impactPosition in ipairs(GetSolarPositions(self, position)) do
-		XHSBossTelegraphs:Target(impactPosition, self:GetSpecialValueFor("radius"), self:GetCastPoint(), COLORS.fire)
+		XHSBossTelegraphs:Target(impactPosition, self:GetSpecialValueFor("radius"), self:GetCastPoint(), GetSpiritColors(self:GetCaster(), "fire"))
 	end
 	self:GetCaster():EmitSound("Hero_EmberSpirit.FlameGuard.Cast")
 	return true
@@ -871,10 +882,11 @@ function xhs_spirit_fire_wildfire_ring:OnAbilityPhaseStart()
 	if not IsServer() then return true end
 	local center = GetContext(self).position or self:GetCaster():GetAbsOrigin()
 	StartBossCastBar(self, "Wildfire Ring")
-	XHSBossTelegraphs:Ring(center, self:GetSpecialValueFor("outer_radius"), self:GetSpecialValueFor("node_radius"), 12, self:GetCastPoint(), COLORS.fire, 0)
-	XHSBossTelegraphs:Ring(center, self:GetSpecialValueFor("inner_radius"), self:GetSpecialValueFor("node_radius"), 8, self:GetCastPoint(), COLORS.fire, 22)
+	local colors = GetSpiritColors(self:GetCaster(), "fire")
+	XHSBossTelegraphs:Ring(center, self:GetSpecialValueFor("outer_radius"), self:GetSpecialValueFor("node_radius"), 12, self:GetCastPoint(), colors, 0)
+	XHSBossTelegraphs:Ring(center, self:GetSpecialValueFor("inner_radius"), self:GetSpecialValueFor("node_radius"), 8, self:GetCastPoint(), colors, 22)
 	if GetRoundSpecialValue(self, "ring_count") >= 3 then
-		XHSBossTelegraphs:Ring(center, (self:GetSpecialValueFor("outer_radius") + self:GetSpecialValueFor("inner_radius")) * 0.5, self:GetSpecialValueFor("node_radius"), self:GetSpecialValueFor("middle_node_count"), self:GetCastPoint(), COLORS.fire, 11)
+		XHSBossTelegraphs:Ring(center, (self:GetSpecialValueFor("outer_radius") + self:GetSpecialValueFor("inner_radius")) * 0.5, self:GetSpecialValueFor("node_radius"), self:GetSpecialValueFor("middle_node_count"), self:GetCastPoint(), colors, 11)
 	end
 	self:GetCaster():EmitSound("Hero_Phoenix.FireSpirits.Cast")
 	return true

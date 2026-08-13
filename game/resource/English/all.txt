@@ -15,6 +15,11 @@
 "error_xhs_bot_full_build"				"This bot is fully equipped and has no room for that item."
 "error_xhs_bot_item_not_upgrade"		"This bot already owns an equal or better version of that item."
 "error_xhs_bot_item_missing_base"		"This bot does not own the base item required for that upgrade."
+"xhs_bot_gift_gave"					"gave"
+"xhs_bot_gift_to"					"to"
+"xhs_bot_gift_defender"				"A defender"
+"xhs_bot_gift_allied_bot"			"the allied bot"
+"xhs_bot_gift_unknown_item"			"an item"
 
 "DOTA_GoodGuys"									"X Heroes"
 "DOTA_BadGuys"									"Dark Forces"

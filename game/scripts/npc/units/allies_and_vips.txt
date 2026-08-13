@@ -209,11 +209,15 @@
 			"AttachWearables"   
 			{
 				// The Grey Gallant
-				"Wearable1" { "ItemDef" "8170" }		//Bracers of the Grey Gallant
-				"Wearable2" { "ItemDef" "8171" }		//Cape of the Grey Gallant
-				"Wearable3" { "ItemDef" "8172" }		//Hair of the Grey Gallant
-				"Wearable4" { "ItemDef" "8173" }		//Pauldrons of the Grey Gallant
-				"Wearable5" { "ItemDef" "8174" }		//Hammer of the Grey Gallant
+				// Omniknight's face is a separate default body_head wearable. Real
+				// heroes receive it from their loadout automatically; this creature
+				// does not, while the Grey Gallant hair only replaces the head slot.
+				"Wearable1" { "ItemDef" "45" }			//Omniknight's Head (face)
+				"Wearable2" { "ItemDef" "8170" }		//Bracers of the Grey Gallant
+				"Wearable3" { "ItemDef" "8171" }		//Cape of the Grey Gallant
+				"Wearable4" { "ItemDef" "8172" }		//Hair of the Grey Gallant
+				"Wearable5" { "ItemDef" "8173" }		//Pauldrons of the Grey Gallant
+				"Wearable6" { "ItemDef" "8174" }		//Hammer of the Grey Gallant
 			} 
 		}
 	}

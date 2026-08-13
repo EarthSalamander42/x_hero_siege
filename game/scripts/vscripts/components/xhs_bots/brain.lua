@@ -2404,6 +2404,8 @@ function XHSBotBrain:BuildAbilityAction(hero, ability, rule, target, enemies, di
 			tonumber(rule.radius) or 325
 		) >= (tonumber(rule.minimum_targets) or 1)
 	end
+	local bossSpellOpportunity = XHSBotConfig:IsBossTarget(target)
+		and self:CanAbilityAffectEnemy(ability, target, rule)
 	if not emergencySelfHeal
 		and not etherealPriority
 		and not creepPackOpportunity
@@ -2411,6 +2413,7 @@ function XHSBotBrain:BuildAbilityAction(hero, ability, rule, target, enemies, di
 			creepSpellEfficiency ~= nil
 			and creepSpellEfficiency.worthwhile == true
 		)
+		and not bossSpellOpportunity
 		and not self:CanConsiderAbility(record, name, difficulty) then return nil end
 	record.casts_considered = (record.casts_considered or 0) + 1
 	local mode = rule.mode
@@ -2421,11 +2424,12 @@ function XHSBotBrain:BuildAbilityAction(hero, ability, rule, target, enemies, di
 		reason = mode,
 		control = rule.control == true,
 	}
-	local bossSpellOpportunity = XHSBotConfig:IsBossTarget(target)
-		and self:CanAbilityAffectEnemy(ability, target, rule)
 	if etherealPriority then
 		action.score = action.score + 55
 		action.reason = "spell priority: ethereal target"
+	elseif bossSpellOpportunity then
+		action.score = action.score + 35
+		action.reason = "boss spell opportunity"
 	end
 
 	if mode == "enemy_unit" then
@@ -2444,6 +2448,13 @@ function XHSBotBrain:BuildAbilityAction(hero, ability, rule, target, enemies, di
 				.. tostring(unitTargetAreaCount) .. " enemies"
 		end
 		if XHSBotConfig:IsBossTarget(target) and rule.prefer_boss then action.score = action.score + 12 end
+		if bossSpellOpportunity then
+			action.score = math.max(
+				action.score,
+				tonumber(rule.boss_opportunity_floor) or 142
+			)
+			action.reason = "single-target spell for boss"
+		end
 		if creepSpellEfficiency ~= nil
 			and creepSpellEfficiency.fallback_cast == true then
 			action.score = action.score + 18
@@ -2555,6 +2566,13 @@ function XHSBotBrain:BuildAbilityAction(hero, ability, rule, target, enemies, di
 		end
 		action.score = action.score + math.min(15, nearby * 3)
 		action.reason = tostring(nearby) .. " nearby enemies"
+		if bossSpellOpportunity then
+			action.score = math.max(
+				action.score,
+				tonumber(rule.boss_opportunity_floor) or 140
+			)
+			action.reason = "no-target spell for boss"
+		end
 	elseif mode == "no_target_mixed" then
 		local nearby = self:CountAbilityTargetsAround(
 			ability,
@@ -2635,6 +2653,13 @@ function XHSBotBrain:BuildAbilityAction(hero, ability, rule, target, enemies, di
 		action.position = target:GetAbsOrigin()
 		action.target = target
 		action.score = action.score + math.min(18, nearby * 4)
+		if bossSpellOpportunity then
+			action.score = math.max(
+				action.score,
+				tonumber(rule.boss_opportunity_floor) or 141
+			)
+			action.reason = "AoE spell for boss"
+		end
 	elseif mode == "directional_point" then
 		if not self:IsCombatTarget(target) then return nil end
 		local heroOrigin = hero:GetAbsOrigin()

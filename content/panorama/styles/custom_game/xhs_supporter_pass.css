@@ -1890,6 +1890,15 @@
 	brightness: 0.42;
 }
 
+/* Progressively reveal the pass: only future rewards are desaturated. Once a
+ * reward is unlocked or claimed, its artwork always keeps its authored color. */
+.XHSPassRewardCard.IsUnlocked .XHSPassItemPreview,
+.XHSPassRewardCard.IsClaimed .XHSPassItemPreview,
+.XHSPassRewardCard.IsUnlocked .XHSPassItemPreview.HasAnimatedModel .XHSPassPreviewImage,
+.XHSPassRewardCard.IsClaimed .XHSPassItemPreview.HasAnimatedModel .XHSPassPreviewImage {
+	saturation: 1;
+}
+
 .XHSPassRewardCard.IsLocked .XHSPassRewardName {
 	color: #83909e;
 }
@@ -2179,7 +2188,7 @@
 
 .XHSPassRewardCard.IsClaimed:hover .XHSPassItemPreview,
 .XHSPassRewardCard.IsClaimed .XHSPassItemPreview {
-	saturation: 0.72;
+	saturation: 1;
 	brightness: 0.82;
 	border-color: #668c8660;
 	box-shadow: inset #759c9418 0px 0px 10px 0px;
@@ -3379,7 +3388,7 @@ DropDownMenu.DropDownMenuVisible {
 
 .XHSPassShopHighlights {
 	width: 100%;
-	height: 320px;
+	height: 440px;
 	margin-top: 10px;
 	flow-children: right;
 	visibility: collapse;
@@ -3390,7 +3399,7 @@ DropDownMenu.DropDownMenuVisible {
 }
 
 .XHSPassShopHero {
-	width: 50%;
+	width: 42%;
 	height: 100%;
 	margin-right: 12px;
 	visibility: collapse;
@@ -3408,7 +3417,7 @@ DropDownMenu.DropDownMenuVisible {
 
 .XHSPassShopFeaturedRow {
 	width: 100%;
-	height: 154px;
+	height: 214px;
 	margin-bottom: 12px;
 	flow-children: right;
 }
@@ -3468,7 +3477,7 @@ DropDownMenu.DropDownMenuVisible {
 }
 
 .XHSPassShopFeaturedCard .XHSPassShopHighlightPreview {
-	width: 38%;
+	width: 36%;
 }
 
 .XHSPassShopHighlightCopy {
@@ -3479,7 +3488,7 @@ DropDownMenu.DropDownMenuVisible {
 }
 
 .XHSPassShopFeaturedCard .XHSPassShopHighlightCopy {
-	padding: 7px 9px;
+	padding: 10px 12px;
 }
 
 .XHSPassShopHighlightName {
@@ -3494,9 +3503,9 @@ DropDownMenu.DropDownMenuVisible {
 }
 
 .XHSPassShopFeaturedCard .XHSPassShopHighlightName {
-	height: 24px;
-	margin-top: 2px;
-	font-size: 15px;
+	height: 34px;
+	margin-top: 4px;
+	font-size: 17px;
 }
 
 .XHSPassShopHighlightMeta {
@@ -3526,8 +3535,8 @@ DropDownMenu.DropDownMenuVisible {
 }
 
 .XHSPassShopFeaturedCard .XHSPassShopHighlightPrice {
-	margin-top: 2px;
-	font-size: 13px;
+	margin-top: 5px;
+	font-size: 15px;
 }
 
 .XHSPassShopHighlightActions,
@@ -3540,8 +3549,8 @@ DropDownMenu.DropDownMenuVisible {
 }
 
 .XHSPassShopFeaturedCard .XHSPassShopHighlightActions {
-	height: 25px;
-	margin-top: 3px;
+	height: 30px;
+	margin-top: 6px;
 }
 
 .XHSPassShopCatalogHeader {
@@ -5119,7 +5128,7 @@ DropDownMenu.DropDownMenuVisible {
 
 .XHSPassAchievementCard {
 	width: 100%;
-	min-height: 176px;
+	min-height: 202px;
 	flow-children: right;
 	background-color: #06131e;
 	border: 1px solid #24475b;
@@ -5252,18 +5261,18 @@ DropDownMenu.DropDownMenuVisible {
 }
 
 .XHSPassAchievementCardProgression {
-	width: 370px;
-	height: 134px;
+	width: 440px;
+	height: 166px;
 	flow-children: down;
 	vertical-align: center;
-	margin-left: 16px;
-	padding-left: 16px;
+	margin-left: 18px;
+	padding-left: 20px;
 	border-left: 1px solid #24485e;
 }
 
 .XHSPassAchievementRankPreview {
 	width: 100%;
-	height: 47px;
+	height: 57px;
 	flow-children: down;
 }
 
@@ -5279,34 +5288,34 @@ DropDownMenu.DropDownMenuVisible {
 
 .XHSPassAchievementRankPreviewRank,
 .XHSPassAchievementAbsoluteState {
-	font-size: 11px;
+	font-size: 13px;
 	letter-spacing: 1.2px;
 	color: #6ed8ff;
 }
 
 .XHSPassAchievementRankPreviewTarget {
-	font-size: 15px;
+	font-size: 19px;
 	color: #ffffff;
 }
 
 .XHSPassAchievementRankPreviewReward {
-	font-size: 10px;
+	font-size: 12px;
 	color: #e7c95e;
 }
 
 .XHSPassAchievementRankPips {
 	width: 100%;
-	height: 52px;
+	height: 67px;
 	flow-children: right;
 }
 
 .XHSPassAchievementRankPip {
 	width: fill-parent-flow( 1 );
-	height: 49px;
+	height: 64px;
 	flow-children: down;
 	horizontal-align: center;
 	border-top: 2px solid #24485e;
-	padding-top: 4px;
+	padding-top: 6px;
 	opacity: .54;
 	transition-property: opacity, brightness, border;
 	transition-duration: .12s;
@@ -5325,16 +5334,16 @@ DropDownMenu.DropDownMenuVisible {
 }
 
 .XHSPassAchievementRankPipMedal {
-	width: 27px;
-	height: 27px;
+	width: 36px;
+	height: 36px;
 	horizontal-align: center;
 }
 
 .XHSPassAchievementRankPipDot {
-	width: 10px;
-	height: 10px;
+	width: 14px;
+	height: 14px;
 	horizontal-align: center;
-	margin: 8px 0px 9px;
+	margin: 10px 0px 11px;
 	border-radius: 50%;
 	background-color: #e6f2f7;
 	box-shadow: 0px 0px 7px #6fd8ff66;
@@ -5348,7 +5357,7 @@ DropDownMenu.DropDownMenuVisible {
 .XHSPassAchievementRankPipTarget {
 	width: 100%;
 	text-align: center;
-	font-size: 10px;
+	font-size: 12px;
 	color: #d3e2e9;
 	text-overflow: shrink;
 }
@@ -5620,10 +5629,10 @@ DropDownMenu.DropDownMenuVisible {
 
 .XHSPassAchievementProgressBar {
 	width: 100%;
-	height: 7px;
+	height: 9px;
 	background-color: #01070c;
 	border: 1px solid #1c4257;
-	margin-top: 10px;
+	margin-top: 11px;
 }
 
 .XHSPassAchievementProgressFill {
@@ -5637,7 +5646,7 @@ DropDownMenu.DropDownMenuVisible {
 .XHSPassAchievementAbsoluteReward {
 	width: 100%;
 	font-family: titleFont;
-	font-size: 13px;
+	font-size: 15px;
 	font-weight: bold;
 	letter-spacing: 1px;
 	color: #d9e6eb;
@@ -5847,7 +5856,7 @@ DropDownMenu.DropDownMenuVisible {
 }
 
 .AspectRatio16x10 .XHSPassAchievementCard {
-	width: 31.5%;
+	width: 100%;
 }
 
 .AspectRatio4x3 .XHSPassAchievementsHero {
@@ -5859,5 +5868,15 @@ DropDownMenu.DropDownMenuVisible {
 }
 
 .AspectRatio4x3 .XHSPassAchievementCard {
-	width: 47.5%;
+	width: 100%;
+}
+
+.AspectRatio4x3 .XHSPassAchievementCardArtwork {
+	width: 108px;
+	height: 108px;
+}
+
+.AspectRatio4x3 .XHSPassAchievementCardProgression {
+	width: 350px;
+	height: 158px;
 }

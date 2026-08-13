@@ -77,7 +77,7 @@ function XHSArthas_AttachPhase3AI(boss)
 	if boss:HasModifier("modifier_xhs_arthas_phase3_ai") then return end
 
 	boss:RemoveModifierByName("modifier_ai")
-	XHSPhase3BossAI:HideVanillaHealthBar(boss)
+	XHSPhase3BossAI:ConfigureBoss(boss)
 	for _, abilityName in pairs(ARTHAS_ABILITIES) do
 		AddAbilityIfMissing(boss, abilityName)
 	end

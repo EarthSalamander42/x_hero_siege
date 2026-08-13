@@ -4,11 +4,13 @@ end
 
 LinkLuaModifier("modifier_xhs_boss_cast_protection", "boss_scripts/phase3_ai/core.lua", LUA_MODIFIER_MOTION_NONE)
 LinkLuaModifier("modifier_xhs_phase3_hide_overhead_bar", "boss_scripts/phase3_ai/core.lua", LUA_MODIFIER_MOTION_NONE)
+LinkLuaModifier("modifier_xhs_boss_nearest_hero_aggro", "boss_scripts/phase3_ai/core.lua", LUA_MODIFIER_MOTION_NONE)
 
 modifier_xhs_boss_cast_protection = modifier_xhs_boss_cast_protection or class({})
 modifier_xhs_boss_cast_protection.XHS_LINK_CLIENT = true
 modifier_xhs_phase3_hide_overhead_bar = modifier_xhs_phase3_hide_overhead_bar or class({})
 modifier_xhs_phase3_hide_overhead_bar.XHS_LINK_CLIENT = true
+modifier_xhs_boss_nearest_hero_aggro = modifier_xhs_boss_nearest_hero_aggro or class({})
 
 local INTERRUPTING_CONTROL_STATES = {
 	hexed = {
@@ -89,6 +91,40 @@ function XHSPhase3BossAI:PickClosestHero(center, radius)
 	return best
 end
 
+function XHSPhase3BossAI:AttackNearestGoodguysHero(boss)
+	if boss == nil or not IsValidEntity(boss) or boss:IsNull() or not boss:IsAlive() then return nil end
+	if boss:IsInvulnerable() or boss:HasModifier("modifier_pause_creeps") then return nil end
+	if boss:HasModifier("modifier_xhs_boss_cast_protection") then return nil end
+	if boss.IsChanneling ~= nil and boss:IsChanneling() then return nil end
+	if boss.GetCurrentActiveAbility ~= nil and boss:GetCurrentActiveAbility() ~= nil then return nil end
+
+	local target = nil
+	local bestDistance = nil
+	for _, hero in pairs(self:GetLivingHeroes(boss:GetAbsOrigin(), FIND_UNITS_EVERYWHERE, false)) do
+		if hero ~= nil and IsValidEntity(hero) and not hero:IsNull() and hero:IsAlive()
+			and hero.IsRealHero ~= nil and hero:IsRealHero()
+		then
+			local distance = (hero:GetAbsOrigin() - boss:GetAbsOrigin()):Length2D()
+			if bestDistance == nil or distance < bestDistance then
+				target = hero
+				bestDistance = distance
+			end
+		end
+	end
+	if target == nil then return nil end
+
+	local current = boss.GetAggroTarget ~= nil and boss:GetAggroTarget() or nil
+	if current == target then return target end
+
+	ExecuteOrderFromTable({
+		UnitIndex = boss:entindex(),
+		OrderType = DOTA_UNIT_ORDER_ATTACK_TARGET,
+		TargetIndex = target:entindex(),
+		Queue = false,
+	})
+	return target
+end
+
 function XHSPhase3BossAI:PickFarthestHero(center, radius)
 	local heroes = self:GetLivingHeroes(center, radius, true)
 	local best = nil
@@ -122,6 +158,18 @@ function XHSPhase3BossAI:HideVanillaHealthBar(unit)
 	if not unit:HasModifier("modifier_xhs_phase3_hide_overhead_bar") then
 		unit:AddNewModifier(unit, nil, "modifier_xhs_phase3_hide_overhead_bar", {})
 	end
+end
+
+function XHSPhase3BossAI:EnableNearestHeroAggro(unit)
+	if unit == nil or not IsValidEntity(unit) or unit:IsNull() then return end
+	if not unit:HasModifier("modifier_xhs_boss_nearest_hero_aggro") then
+		unit:AddNewModifier(unit, nil, "modifier_xhs_boss_nearest_hero_aggro", {})
+	end
+end
+
+function XHSPhase3BossAI:ConfigureBoss(unit)
+	self:HideVanillaHealthBar(unit)
+	self:EnableNearestHeroAggro(unit)
 end
 
 function XHSPhase3BossAI:DestroyParticle(particle, immediate)
@@ -388,6 +436,21 @@ function modifier_xhs_boss_cast_protection:CheckState()
 		[MODIFIER_STATE_SILENCED] = false,
 		[MODIFIER_STATE_STUNNED] = false,
 	}
+end
+
+function modifier_xhs_boss_nearest_hero_aggro:IsHidden() return true end
+function modifier_xhs_boss_nearest_hero_aggro:IsPurgable() return false end
+function modifier_xhs_boss_nearest_hero_aggro:RemoveOnDeath() return true end
+
+function modifier_xhs_boss_nearest_hero_aggro:OnCreated()
+	if not IsServer() then return end
+	self:StartIntervalThink(0.25)
+	self:OnIntervalThink()
+end
+
+function modifier_xhs_boss_nearest_hero_aggro:OnIntervalThink()
+	if not IsServer() then return end
+	XHSPhase3BossAI:AttackNearestGoodguysHero(self:GetParent())
 end
 
 function modifier_xhs_phase3_hide_overhead_bar:IsHidden() return true end

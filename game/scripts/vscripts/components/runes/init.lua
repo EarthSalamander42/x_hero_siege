@@ -815,27 +815,51 @@ function Runes:GrantFragmentRune(hero)
 		return
 	end
 
-	api:GrantSupporterFragments(playerID, self.FRAGMENT_AMOUNT, "fragment_rune", idempotencyKey, function(success, data)
+	local function Notify(text, severity)
 		if player ~= nil then
-			local appliedAmount = success and tonumber(
-				data and (data.applied_amount or (data.ledger and data.ledger.amount)) or 0
-			) or 0
-			local notificationText = "Fragment Rune grant failed backend validation."
-			local notificationSeverity = "warning"
-			if success and appliedAmount > 0 then
-				notificationText = "Fragment Rune granted +" .. tostring(appliedAmount) .. " supporter fragments."
-				notificationSeverity = "success"
-			elseif success then
-				notificationText = "Daily supporter fragment cap reached."
-				notificationSeverity = "info"
-			end
 			Notifications:Bottom(player, {
-				text = notificationText,
+				text = text,
 				duration = 5.0,
-				severity = notificationSeverity,
+				severity = severity,
 			})
 		end
-	end)
+	end
+
+	local attempt = 0
+	local maxAttempts = 3
+	local function SubmitGrant()
+		attempt = attempt + 1
+		api:GrantSupporterFragments(playerID, self.FRAGMENT_AMOUNT, "fragment_rune", idempotencyKey, function(success, data)
+			if success then
+				local appliedAmount = tonumber(
+					data and (data.applied_amount or (data.ledger and data.ledger.amount)) or 0
+				) or 0
+				if appliedAmount > 0 then
+					Notify("Fragment Rune granted +" .. tostring(appliedAmount) .. " supporter fragments.", "success")
+				else
+					Notify("Daily supporter fragment cap reached.", "info")
+				end
+				return
+			end
+
+			local statusCode = tonumber(data and data.status_code) or 0
+			local transientFailure = statusCode == 0 or statusCode >= 500
+			if transientFailure and attempt < maxAttempts and Timers ~= nil then
+				Timers:CreateTimer(attempt * 2.0, SubmitGrant)
+				return
+			end
+
+			local failureText = "Fragment Rune could not be claimed."
+			if statusCode == 403 then
+				failureText = "Fragment Rune rewards are unavailable for this match."
+			elseif statusCode == 409 then
+				failureText = "Fragment Rune claim closed when the match ended."
+			end
+			Notify(failureText, "warning")
+		end)
+	end
+
+	SubmitGrant()
 end
 
 function Runes:CleanupActiveRune(state, picker, active)

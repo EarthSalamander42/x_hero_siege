@@ -92,7 +92,7 @@ function modifier_xhs_banehallow_phase3_ai:OnCreated(params)
 	self.force_pattern = nil
 	self.threshold_next_allowed_at = 0
 
-	XHSPhase3BossAI:HideVanillaHealthBar(boss)
+	XHSPhase3BossAI:ConfigureBoss(boss)
 	XHSPhase3BossAI:SetAbilityLevels(boss, BANEHALLOW_ABILITIES)
 	self:UpdateBossBarMarkers()
 	self:CreateCosmetics()

@@ -280,11 +280,21 @@ local function XHSPrecacheImpl(context)
 	-- AttachWearables. Dedicated servers need its unit definition resident
 	-- synchronously or individual econ pieces can spawn missing/as ERROR models.
 	XHSPrecache:PrecacheUnitSync("npc_magnataur_destroyer_crypt", context)
+	-- The final-wave Huntress likewise equips Luna's complete vanilla set via
+	-- AttachWearables. Precache the custom unit synchronously so every econ model
+	-- is resident before the cinematic spawns several copies at once.
+	XHSPrecache:PrecacheUnitSync("npc_luna_final_wave", context)
 	-- Shal Lightbinder and Uther Lightbringer are map/VIP units whose complete
 	-- econ sets are declared through AttachWearables. Keep both definitions and
 	-- their wearable models resident before either campaign phase reveals them.
 	XHSPrecache:PrecacheUnitSync("npc_xhs_paladin", context)   -- The Desert Gale
 	XHSPrecache:PrecacheUnitSync("npc_xhs_paladin_2", context) -- The Grey Gallant
+	-- The split Spirit Master units attach separate vanilla econ sets. Keep the
+	-- complete definitions resident before the encounter so dedicated servers do
+	-- not substitute ERROR models for individual cosmetic pieces.
+	XHSPrecache:PrecacheUnitSync("npc_dota_boss_spirit_master_fire", context)
+	XHSPrecache:PrecacheUnitSync("npc_dota_boss_spirit_master_storm", context)
+	XHSPrecache:PrecacheUnitSync("npc_dota_boss_spirit_master_earth", context)
 
 	XHSPrecache:PrecacheUnit("npc_dota_hero_grom_hellscream", nil, -1)
 	XHSPrecache:PrecacheUnit("npc_dota_hero_illidan", nil, -1)

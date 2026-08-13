@@ -987,6 +987,19 @@ function GameMode:OnXHSBotInventoryItemAdded(keys)
 		local issuer = purchaser ~= nil and not purchaser:IsNull()
 			and purchaser.GetPlayerID ~= nil
 			and tonumber(purchaser:GetPlayerID()) or nil
+		local giftIssue = item.xhs_bot_gift_issue
+		local donor = purchaser
+		if type(giftIssue) == "table"
+			and tonumber(giftIssue.target_player_id) == tonumber(request.bot_player_id)
+			and GameRules:GetGameTime() <= (tonumber(giftIssue.expires_at) or 0) then
+			issuer = tonumber(giftIssue.issuer) or issuer
+			local donorIndex = tonumber(giftIssue.donor_entindex)
+			local issuedDonor = donorIndex ~= nil and donorIndex > 0
+				and EntIndexToHScript(donorIndex) or nil
+			if issuedDonor ~= nil and not issuedDonor:IsNull() then
+				donor = issuedDonor
+			end
+		end
 		local isHumanGift = issuer ~= nil and issuer >= 0
 			and not XHSBotPlayerRegistry:IsXHSBotPlayerID(issuer)
 			and (XHSBotPlayerRegistry.IsHumanPlayerID == nil
@@ -1036,6 +1049,24 @@ function GameMode:OnXHSBotInventoryItemAdded(keys)
 					context
 				)
 			end
+			if item.xhs_bot_gift_success_notified ~= true then
+				item.xhs_bot_gift_success_notified = true
+				local donorPlayerName = issuer ~= nil and issuer >= 0
+					and PlayerResource:GetPlayerName(issuer) or ""
+				local donorHeroName = donor ~= nil and not donor:IsNull()
+					and donor.GetUnitName ~= nil and donor:GetUnitName() or ""
+				local botPlayerName = PlayerResource:GetPlayerName(request.bot_player_id) or ""
+				CustomGameEventManager:Send_ServerToAllClients("xhs_bot_gift_success", {
+					donor_player_id = issuer,
+					donor_player_name = donorPlayerName,
+					donor_hero_name = donorHeroName,
+					bot_player_id = request.bot_player_id,
+					bot_player_name = botPlayerName,
+					bot_hero_name = hero:GetUnitName(),
+					item_name = itemName,
+				})
+			end
+			item.xhs_bot_gift_issue = nil
 			return
 		end
 
@@ -1164,6 +1195,9 @@ function GameMode:OnXHSBotInventoryItemAdded(keys)
 				tostring(errorKey or "#error_xhs_bot_item_unsupported")
 			)
 		end
+		if not item:IsNull() then
+			item.xhs_bot_gift_issue = nil
+		end
 		if IsInToolsMode() then
 			print("[XHSBots][GiftTrace] post_receive_decision bot_pid="
 				.. tostring(request.bot_player_id)
@@ -1288,6 +1322,17 @@ function GameMode:GetXHSBotGiftIssueRejection(issuer, item, target)
 	return rejection
 end
 
+function GameMode:RememberXHSBotGiftIssue(issuer, donor, item, targetPlayerID)
+	if item == nil or item:IsNull() then return end
+	item.xhs_bot_gift_issue = {
+		issuer = tonumber(issuer),
+		donor_entindex = donor ~= nil and not donor:IsNull()
+			and donor:entindex() or nil,
+		target_player_id = tonumber(targetPlayerID),
+		expires_at = GameRules:GetGameTime() + 30,
+	}
+end
+
 -- Some inventory drag paths only surface the GIVE_ITEM command through
 -- MODIFIER_EVENT_ON_ORDER. Validate those handles synchronously, while the
 -- donor is still standing at the click position, and cancel an invalid order
@@ -1340,7 +1385,10 @@ function GameMode:RejectInvalidXHSBotGiftAtIssue(params, observer)
 		accepted = false
 		errorKey = "#error_xhs_bot_item_unsupported"
 	end
-	if accepted == true then return false end
+	if accepted == true then
+		self:RememberXHSBotGiftIssue(issuer, unit, item, targetPlayerID)
+		return false
+	end
 
 	local itemName = item.GetAbilityName ~= nil
 		and item:GetAbilityName() or "unknown"
@@ -1688,6 +1736,7 @@ function GameMode:FilterExecuteOrder(filterTable)
 				)
 				return false
 			end
+			self:RememberXHSBotGiftIssue(issuer, unit, giftedItem, targetPlayerID)
 			if XHSBotEconomy.PrepareAcceptedGift ~= nil then
 				XHSBotEconomy:PrepareAcceptedGift(
 					targetPlayerID,

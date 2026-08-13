@@ -1210,7 +1210,7 @@ var XHSSupporterPass = (function () {
 			name: Text("xhs_sp_tier_" + tierID + "_name", tier.name || meta.name || "Supporter"),
 			price: meta.price || tier.price || "",
 			text: LocalizeMaybeKey(meta.text || ""),
-			perks: ([FormatNumber(tier.daily_gameplay_fragments || DAILY_GAMEPLAY_FRAGMENT_CAP) + " gameplay/day", "+" + DAILY_QUEST_FRAGMENT_CAP + " quest potential"]).concat(meta.perks || [
+			perks: ([FormatNumber(tier.daily_gameplay_fragments || DAILY_GAMEPLAY_FRAGMENT_CAP) + " first match/day", "+" + DAILY_QUEST_FRAGMENT_CAP + " quest potential"]).concat(meta.perks || [
 				FormatNumber(tier.fragments || 0) + " " + Text("xhs_sp_fragments_lower", "fragments"),
 				"+" + FormatNumber(tier.xp_boost || 0) + "% " + Text("xhs_sp_xp", "XP"),
 				FormatVotePower(tier.vote_power || (tierID > 0 ? Math.min(tierID + 1, 5) : 1)),
@@ -6142,21 +6142,21 @@ var XHSSupporterPass = (function () {
 		all_hero_challenge: ["Win a run with each distinct playable XHS hero.", "A hero only counts after a victory with that hero."],
 		siege_ascendant: [
 			"Win the run; a higher difficulty also counts toward every lower difficulty.",
-			"Bronze: 10 wins on D2+ • Silver: 25 wins on D3+.",
-			"Gold: 50 wins on D4+ • XHS Absolute: 100 wins on D5."
+			"Bronze: 10 Normal wins / Silver: 25 Hard wins.",
+			"Gold: 50 Extreme wins / XHS Absolute: 100 Divine wins."
 		],
 		the_ancient_stands: [
 			"Win the run.",
 			"Finish with at least 70% / 80% / 90% / 100% Ancient health for Bronze / Silver / Gold / XHS Absolute."
 		],
-		borrowed_time: ["Win on Difficulty 3 or higher.", "Do not die during the run."],
+		borrowed_time: ["Win on Hard or higher.", "Do not die during the run."],
 		ahead_of_schedule: [
-			"Win on Difficulty 5.",
+			"Win on Divine.",
 			"Finish within 90 / 80 / 70 / 60 minutes for Bronze / Silver / Gold / XHS Absolute."
 		],
 		one_against_the_siege: [
 			"Be the only human defender and win the run.",
-			"Bronze: D2+ • Silver: D3+ • Gold: D4+ • XHS Absolute: D5."
+			"Bronze: Normal / Silver: Hard / Gold: Extreme / XHS Absolute: Divine."
 		],
 		boss_breaker: ["Deal damage to XHS bosses."],
 		lifebringer: ["Accumulate self-healing during X Hero Siege runs."],
@@ -6287,9 +6287,10 @@ var XHSSupporterPass = (function () {
 		preview.RemoveClass("Rank4");
 		preview.AddClass("Rank" + rank);
 		preview._rank.text = AchievementRankName(rank, false);
+		var hasCustomLabel = AchievementList(entry.labels).length > 0;
 		preview._target.text = earned
 			? AchievementTargetLabel(entry, rank) + "  " + Text("xhs_sp_achievement_complete", "COMPLETE")
-			: AchievementValueLabel(currentValue) + " / " + AchievementTargetLabel(entry, rank);
+			: (hasCustomLabel ? "TARGET  " + AchievementTargetLabel(entry, rank) : AchievementValueLabel(currentValue) + " / " + AchievementTargetLabel(entry, rank));
 		preview._reward.text = "+" + FormatNumber(fragments[index] || 0) + " " + Text("xhs_sp_fragments", "fragments") + "   +" + FormatNumber(points[index] || 0) + " pts";
 	}
 
@@ -6621,7 +6622,7 @@ var XHSSupporterPass = (function () {
 				var absoluteFragments = AchievementList(entry.fragments)[0] || 0;
 				var absolutePoints = AchievementList(entry.points)[0] || 0;
 				CreateAchievementLabel(progression, "XHSPassAchievementAbsoluteState", rank > 0 ? Text("xhs_sp_achievement_complete", "COMPLETE") : Text("xhs_sp_achievement_rank_locked", "LOCKED"));
-				CreateAchievementLabel(card, "XHSPassAchievementAbsoluteReward", "+" + FormatNumber(absoluteFragments) + " " + Text("xhs_sp_fragments", "fragments") + "   •   +" + FormatNumber(absolutePoints) + " pts");
+				CreateAchievementLabel(progression, "XHSPassAchievementAbsoluteReward", "+" + FormatNumber(absoluteFragments) + " " + Text("xhs_sp_fragments", "fragments") + "   •   +" + FormatNumber(absolutePoints) + " pts");
 			}
 		}
 	}

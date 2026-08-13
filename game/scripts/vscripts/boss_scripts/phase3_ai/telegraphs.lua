@@ -216,6 +216,11 @@ local function CreateLineWarning(startPosition, endPosition, width, duration, co
 	ParticleManager:SetParticleControl(particle, 0, startPosition)
 	ParticleManager:SetParticleControl(particle, 1, endPosition)
 	ParticleManager:SetParticleControl(particle, 2, Vector(duration or 1.0, width or 180, 1))
+	-- Populate the generic palette contract as well as the authored line tint
+	-- contract so every elemental Spirit keeps its own color on every renderer.
+	ParticleManager:SetParticleControl(particle, 3, primary)
+	ParticleManager:SetParticleControl(particle, 4, secondary)
+	ParticleManager:SetParticleControl(particle, 5, Vector(colors.style or 0, 0, 0))
 	ParticleManager:SetParticleControl(particle, 15, primary)
 	ParticleManager:SetParticleControl(particle, 16, secondary)
 	Timers:CreateTimer(math.max(0.1, duration or 1.0), function()

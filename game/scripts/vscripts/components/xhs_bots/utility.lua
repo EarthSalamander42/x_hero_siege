@@ -55,6 +55,15 @@ function XHSBotUtility:Build(context)
 				or abilityAction.mode == "defensive_toggle")
 				and context.health_ratio <= 0.58 then
 				score = math.max(score, 155)
+			elseif abilityAction.mode == "enemy_unit"
+				or abilityAction.mode == "point_aoe"
+				or abilityAction.mode == "directional_point"
+				or abilityAction.mode == "no_target_enemy"
+				or abilityAction.mode == "no_target_mixed"
+				or abilityAction.mode == "summon"
+				or abilityAction.mode == "self_buff"
+				or abilityAction.mode == "team_buff" then
+				score = math.max(score, 145)
 			end
 			AddAction(
 				actions,

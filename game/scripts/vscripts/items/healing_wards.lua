@@ -38,6 +38,14 @@ local function GetWardRegenDefaults(modifier)
 	return WARD_REGEN_DEFAULTS[modifier:GetName()] or WARD_REGEN_DEFAULTS.modifier_healing_ward_datadriven
 end
 
+local function GetWardRegenValues(modifier)
+	local defaults = GetWardRegenDefaults(modifier)
+	local regenFlat = tonumber(modifier.regenFlat) or 0
+	local regenPct = tonumber(modifier.regenPct) or 0
+	return regenFlat > 0 and regenFlat or defaults.flat,
+		regenPct > 0 and regenPct or defaults.pct
+end
+
 function holdout_healing_ward:GetIntrinsicModifierName()
 	return "modifier_healing_ward"
 end
@@ -100,8 +108,8 @@ function modifier_healing_ward_datadriven:IsHidden() return false end
 function modifier_healing_ward_datadriven:IsBuff() return true end
 function modifier_healing_ward_datadriven:IsPurgable() return false end
 function modifier_healing_ward_datadriven:GetAttributes() return MODIFIER_ATTRIBUTE_MULTIPLE end
-function modifier_healing_ward_datadriven:GetTexture() return "juggernaut_healing_ward" end
-function modifier_healing_ward2_datadriven:GetTexture() return "custom/healing_wards2" end
+function modifier_healing_ward_datadriven:GetTexture() return "item_healing_wards" end
+function modifier_healing_ward2_datadriven:GetTexture() return "item_healing_wards2" end
 function modifier_healing_ward_datadriven:GetEffectName() return WARD_BUFF_PARTICLE end
 function modifier_healing_ward_datadriven:GetEffectAttachType() return PATTACH_ABSORIGIN_FOLLOW end
 
@@ -167,7 +175,8 @@ end
 
 function modifier_healing_ward_datadriven:CalculateEffectiveRegeneration()
 	local parent = self:GetParent()
-	return (self.regenFlat or 0) + parent:GetMaxHealth() * (self.regenPct or 0) * 0.01
+	local regenFlat, regenPct = GetWardRegenValues(self)
+	return regenFlat + parent:GetMaxHealth() * regenPct * 0.01
 end
 
 function modifier_healing_ward_datadriven:RefreshClientRegeneration(force)
@@ -266,11 +275,13 @@ function modifier_healing_ward_datadriven:DeclareFunctions()
 end
 
 function modifier_healing_ward_datadriven:GetModifierConstantHealthRegen()
-	return self:IsStrongestSource() and (self.regenFlat or 0) or 0
+	local regenFlat = GetWardRegenValues(self)
+	return self:IsStrongestSource() and regenFlat or 0
 end
 
 function modifier_healing_ward_datadriven:GetModifierHealthRegenPercentage()
-	return self:IsStrongestSource() and (self.regenPct or 0) or 0
+	local _, regenPct = GetWardRegenValues(self)
+	return self:IsStrongestSource() and regenPct or 0
 end
 
 function modifier_healing_ward_datadriven:OnTooltip()

@@ -27,7 +27,6 @@
 		"QuestLog",
 		"QuestLogCollapseButton"
 	];
-	var SHOP_PANEL_IDS = ["shop", "Shop", "DOTAShop", "ShopContainer"];
 	var TOOLTIP_PANEL_IDS = [
 		"Tooltips",
 		"TooltipManager",
@@ -385,27 +384,6 @@
 		}
 	}
 
-	function isVanillaShopOpen(hud) {
-		try {
-			if (typeof Game.IsShopOpen === "function") {
-				return !!Game.IsShopOpen();
-			}
-		} catch (error) {}
-
-		if (!isValid(hud) || !hud.FindChildTraverse) return false;
-		// Generic Visible classes describe the permanently mounted shop host on
-		// some HUD versions, not whether its drawer is open.
-		var openClasses = ["ShopOpen", "shop_open", "ShopVisible", "shop_visible"];
-		for (var panelIndex = 0; panelIndex < SHOP_PANEL_IDS.length; panelIndex++) {
-			var shop = hud.FindChildTraverse(SHOP_PANEL_IDS[panelIndex]);
-			if (!isValid(shop) || !shop.BHasClass) continue;
-			for (var classIndex = 0; classIndex < openClasses.length; classIndex++) {
-				if (shop.BHasClass(openClasses[classIndex])) return true;
-			}
-		}
-		return false;
-	}
-
 	function isFlyoutScoreboardOpen(hud) {
 		if (!isValid(hud) || !hud.FindChildTraverse) return false;
 		var scoreboard = hud.FindChildTraverse("DungeonScoreboard");
@@ -429,10 +407,10 @@
 	}
 
 	function syncWorldHealthFrameOcclusion(hud) {
-		// World-space Panorama branches can compose above vanilla panels even with
-		// a lower local z-index. Hide only those frames while a blocking overlay is
-		// open; the rest of the custom HUD keeps its normal layer ordering.
-		var occluded = isVanillaShopOpen(hud) || isFlyoutScoreboardOpen(hud);
+		// The world health-frame branches now sit below both the vanilla shop and
+		// the flyout scoreboard. Keep them rendered and clear the former fallback
+		// class in case it was left behind by an earlier recovery pass.
+		var occluded = false;
 		for (var frameIndex = 0; frameIndex < WORLD_HEALTH_FRAME_IDS.length; frameIndex++) {
 			var frameRoot = hud.FindChildTraverse(WORLD_HEALTH_FRAME_IDS[frameIndex]);
 			if (!isValid(frameRoot)) continue;

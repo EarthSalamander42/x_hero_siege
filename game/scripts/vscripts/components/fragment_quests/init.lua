@@ -5,7 +5,7 @@ end
 local NET_TABLE = "fragment_quests"
 local NET_STATE_KEY = "state"
 local VERSION = 1
-local BALANCE_VERSION = "fragment_quests_v2_2026_08_01"
+local BALANCE_VERSION = "fragment_quests_v3_2026_08_13"
 local DEFAULT_REWARD_PER_STAR = 10
 local FRONTLINE_PACT_THRESHOLDS = { 500000, 1000000, 2000000 }
 
@@ -94,41 +94,89 @@ local function IsGoodUnit(unit)
 	return IsValidUnit(unit) and IsGoodTeam(unit:GetTeamNumber())
 end
 
+local function NormalizePlayerID(playerID)
+	playerID = tonumber(playerID)
+	if playerID == nil or playerID < 0 or PlayerResource == nil
+		or not PlayerResource:IsValidPlayerID(playerID) then
+		return nil
+	end
+	return playerID
+end
+
+local function TryPlayerIDMethod(handle, methodName)
+	if handle == nil or handle[methodName] == nil then return nil end
+	local ok, value = pcall(function()
+		return handle[methodName](handle)
+	end)
+	if not ok then return nil end
+	return NormalizePlayerID(value)
+end
+
+local function TryOwnerHandle(handle, methodName)
+	if handle == nil or handle[methodName] == nil then return nil end
+	local ok, owner = pcall(function()
+		return handle[methodName](handle)
+	end)
+	if not ok then return nil end
+	return owner
+end
+
 local function GetPlayerIDFromUnit(unit)
 	if not IsValidUnit(unit) then return nil end
 
-	if XHSGetPlayerIDFromUnit ~= nil then
-		local playerID = XHSGetPlayerIDFromUnit(unit)
-		if playerID ~= nil and PlayerResource:IsValidPlayerID(playerID) then
-			return playerID
-		end
-	end
+	-- Damage can be attributed to the hero, an illusion, a summon, a ward or a
+	-- short-lived thinker. Walk the complete ownership chain so every unit
+	-- controlled by a persistent human contributes to team damage.
+	local current = unit
+	local visited = {}
+	for _ = 1, 8 do
+		if current == nil or visited[current] == true then break end
+		visited[current] = true
 
-	if unit.GetPlayerID ~= nil then
-		local playerID = unit:GetPlayerID()
-		if playerID ~= nil and PlayerResource:IsValidPlayerID(playerID) then
-			return playerID
+		if IsValidUnit(current) and XHSGetPlayerIDFromUnit ~= nil then
+			local ok, playerID = pcall(XHSGetPlayerIDFromUnit, current)
+			playerID = ok and NormalizePlayerID(playerID) or nil
+			if playerID ~= nil then return playerID end
 		end
-	end
 
-	if unit.GetPlayerOwnerID ~= nil then
-		local playerID = unit:GetPlayerOwnerID()
-		if playerID ~= nil and PlayerResource:IsValidPlayerID(playerID) then
-			return playerID
-		end
-	end
+		local playerID = TryPlayerIDMethod(current, "GetPlayerID")
+			or TryPlayerIDMethod(current, "GetPlayerOwnerID")
+		if playerID ~= nil then return playerID end
 
-	if unit.GetOwner ~= nil then
-		local owner = unit:GetOwner()
-		if IsValidUnit(owner) and owner.GetPlayerID ~= nil then
-			local playerID = owner:GetPlayerID()
-			if playerID ~= nil and PlayerResource:IsValidPlayerID(playerID) then
-				return playerID
-			end
-		end
+		local playerOwner = TryOwnerHandle(current, "GetPlayerOwner")
+		playerID = TryPlayerIDMethod(playerOwner, "GetPlayerID")
+		if playerID ~= nil then return playerID end
+
+		local controller = TryOwnerHandle(current, "GetMainControllingPlayer")
+		playerID = NormalizePlayerID(controller) or TryPlayerIDMethod(controller, "GetPlayerID")
+		if playerID ~= nil then return playerID end
+
+		local owner = TryOwnerHandle(current, "GetOwnerEntity")
+			or TryOwnerHandle(current, "GetOwner")
+		if owner == nil then break end
+
+		playerID = TryPlayerIDMethod(owner, "GetPlayerID")
+		if playerID ~= nil then return playerID end
+		current = owner
 	end
 
 	return nil
+end
+
+local function GetDamagePlayerID(filterTable, attacker)
+	local playerID = GetPlayerIDFromUnit(attacker)
+	if playerID ~= nil then return playerID end
+
+	local inflictorIndex = filterTable ~= nil and filterTable.entindex_inflictor_const or nil
+	if inflictorIndex == nil then return nil end
+
+	local ok, inflictor = pcall(EntIndexToHScript, inflictorIndex)
+	if not ok or inflictor == nil then return nil end
+
+	-- Some custom abilities report a thinker/proxy as the attacker. The ability
+	-- caster is the authoritative player source in that case.
+	local caster = TryOwnerHandle(inflictor, "GetCaster")
+	return GetPlayerIDFromUnit(caster) or GetPlayerIDFromUnit(inflictor)
 end
 
 local function IsPersistentFragmentPlayer(playerID)
@@ -268,7 +316,7 @@ function FragmentQuests:GetTemplates()
 			template_id = "farm_event_kills",
 			category = "event",
 			score_mode = "higher_is_better",
-			thresholds = { 120, 180, 240 },
+			thresholds = { 200, 400, 600 },
 			title = "Farm Event Mastery",
 			description = "Kill creeps during the Farm Event.",
 			metric = "farm_event_kills",
@@ -346,7 +394,7 @@ function FragmentQuests:GetTemplates()
 			template_id = "phase2_assault_timer",
 			category = "boss_or_phase",
 			score_mode = "time_elapsed",
-			thresholds = { 300, 240, 180 },
+			thresholds = { 180, 120, 60 },
 			title = "Clean Assault",
 			description = "Kill all Destroyer Magnataurs quickly after phase 2 starts.",
 			metric = "phase2_elapsed",
@@ -917,16 +965,17 @@ function FragmentQuests:OnDamage(filterTable)
 	local victim = nil
 	if filterTable.entindex_attacker_const ~= nil then attacker = EntIndexToHScript(filterTable.entindex_attacker_const) end
 	if filterTable.entindex_victim_const ~= nil then victim = EntIndexToHScript(filterTable.entindex_victim_const) end
-	local attackerPlayerID = GetPlayerIDFromUnit(attacker)
+	local attackerPlayerID = GetDamagePlayerID(filterTable, attacker)
 
 	if IsValidUnit(victim) then
 		local bossID = GetBossID(victim)
-		if bossID ~= nil and IsGoodUnit(attacker) and IsPersistentFragmentPlayer(attackerPlayerID) then
+		if bossID ~= nil and IsPersistentFragmentPlayer(attackerPlayerID) then
 			self:OnBossFightStart(bossID)
 		end
 	end
 
-	if IsPersistentFragmentPlayer(attackerPlayerID) and IsGoodUnit(attacker) and IsValidUnit(victim) and not IsGoodTeam(victim:GetTeamNumber()) then
+	if IsPersistentFragmentPlayer(attackerPlayerID) and IsValidUnit(victim)
+		and not IsGoodTeam(victim:GetTeamNumber()) then
 		self.totals.team_damage = self.totals.team_damage + damage
 		self:AddPlayerContribution(attackerPlayerID, "damage", damage)
 	end
@@ -1819,7 +1868,7 @@ function FragmentQuests:DevCompleteWindow(window, value)
 	if window == "farm" then
 		self.context.farm_event_active = true
 		self:MarkQuestStarted("farm_event_kills", "team")
-		self.totals.farm_event_kills = value or 240
+		self.totals.farm_event_kills = value or 600
 		self:OnFarmEventEnd()
 	elseif window == "muradin" then
 		self:OnMuradinStart(0)
@@ -1832,7 +1881,7 @@ function FragmentQuests:DevCompleteWindow(window, value)
 		self:MarkQuestStarted("arena_remaining_time", "sogat")
 		self:SetQuestFinalValue("arena_remaining_time", "sogat", value or 45)
 	elseif window == "phase2" then
-		local elapsed = value or 180
+		local elapsed = value or 60
 		self.context.phase2_active = true
 		self.context.phase2_started_at = Now() - elapsed
 		self.totals.phase2_magnataur_kills = self:GetExpectedMagnataurKills()

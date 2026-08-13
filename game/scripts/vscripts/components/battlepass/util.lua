@@ -2183,6 +2183,15 @@ function Battlepass:ApplySupporterDevTestItem(playerID, state, hero, reapply)
 		end
 		ParticleManager:SetParticleControl(ownerParticle, 0, hero:GetAbsOrigin())
 		ParticleManager:SetParticleControl(targetParticle, 0, target:GetAbsOrigin())
+		ParticleManager:SetParticleControlEnt(
+			targetParticle,
+			1,
+			hero,
+			PATTACH_ABSORIGIN_FOLLOW,
+			nil,
+			hero:GetAbsOrigin(),
+			false
+		)
 		local ownerTracked = TrackParticle(ownerParticle)
 		local targetTracked = TrackParticle(targetParticle)
 		return ownerTracked and targetTracked

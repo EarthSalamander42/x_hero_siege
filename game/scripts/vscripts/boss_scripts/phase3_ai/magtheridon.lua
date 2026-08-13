@@ -463,7 +463,7 @@ function XHSMagtheridon_AttachPhase3AI(boss)
 
 	boss:RemoveModifierByName("modifier_ai")
 	if boss:HasModifier("modifier_xhs_magtheridon_phase3_ai") then return end
-	XHSPhase3BossAI:HideVanillaHealthBar(boss)
+	XHSPhase3BossAI:ConfigureBoss(boss)
 	boss:AddNewModifier(boss, nil, "modifier_xhs_magtheridon_phase3_ai", {})
 end
 
