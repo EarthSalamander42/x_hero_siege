@@ -360,6 +360,12 @@
 	vertical-align: center;
 }
 
+.XHSNotificationToast.XHSBotGiftSuccess
+{
+	width: 720px;
+	min-height: 62px;
+}
+
 .XHSBotGiftSuccess .XHSNotificationContent
 {
 	flow-children: right;
@@ -370,6 +376,9 @@
 {
 	width: fit-children;
 	max-width: 360px;
+	height: 38px;
+	white-space: nowrap;
+	text-overflow: shrink;
 	text-align: left;
 }
 

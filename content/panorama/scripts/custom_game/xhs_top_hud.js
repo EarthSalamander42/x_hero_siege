@@ -759,6 +759,15 @@ var XHSTopHud = (function () {
 		if (questLogBlocksWorld !== false) {
 			AddOverheadBlockerRect(blockers, 0, 120, Math.min(430, rootWidth * 0.26), rootHeight - minimapSize - 28, 0);
 		}
+		var worldHealthOcclusion = SafeValue(function () {
+			return GameUI.CustomUIConfig().xhsWorldHealthFrameOcclusion;
+		}, null) || {};
+		if (worldHealthOcclusion.flyoutLeft === true) {
+			AddOverheadBlockerRect(blockers, 0, 0, rootWidth * 0.40, rootHeight, 0);
+		}
+		if (worldHealthOcclusion.shopRight === true) {
+			AddOverheadBlockerRect(blockers, rootWidth * 0.75, 0, rootWidth, rootHeight, 0);
+		}
 
 		AddPanelOverheadBlocker(blockers, "XHSTopHudBar", rootPosition, 8);
 		AddPanelOverheadBlocker(blockers, "XHSFocusTimers", rootPosition, 8);
@@ -766,7 +775,7 @@ var XHSTopHud = (function () {
 		AddPanelOverheadBlocker(blockers, "XHSDifficultyAltPanel", rootPosition, 8);
 		AddPanelOverheadBlocker(blockers, "XHSFragmentQuestIntro", rootPosition, 10);
 		// Leaderboards live outside this custom UI tree and still need spatial
-		// occlusion. The vanilla shop already renders above world health frames.
+		// occlusion.
 		AddVisibleLeaderboardOverheadBlockers(blockers, rootPosition);
 		if (IsSpecialEventPanelBlockingUi()) {
 			var eventWidth = Math.min(1040, rootWidth * 0.64);

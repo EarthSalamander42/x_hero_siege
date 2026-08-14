@@ -243,6 +243,19 @@
 			SetBarVisible(bar, false);
 			return;
 		}
+		var worldHealthOcclusion = null;
+		try {
+			worldHealthOcclusion = GameUI.CustomUIConfig().xhsWorldHealthFrameOcclusion;
+		} catch (error) {}
+		worldHealthOcclusion = worldHealthOcclusion || {};
+		var overlapsFlyout = worldHealthOcclusion.flyoutLeft === true
+			&& x < rootWidth * 0.40;
+		var overlapsShop = worldHealthOcclusion.shopRight === true
+			&& x + metrics.width > rootWidth * 0.75;
+		if (overlapsFlyout || overlapsShop) {
+			SetBarVisible(bar, false);
+			return;
+		}
 		if (bar.lastX !== x || bar.lastY !== y) {
 			bar.lastX = x;
 			bar.lastY = y;

@@ -453,8 +453,12 @@ function XHSActivateUtherIcePrison()
 	rescue.uther:RemoveModifierByName("modifier_provides_fow_position")
 	-- Uther stays friendly, but is temporarily deny-targetable at any health.
 	-- The order filter redirects the actual attack to the prison, while Uther's
-	-- frozen state and invulnerability remain until the prison is destroyed.
+	-- frozen state and absolute damage immunity remain until the prison is
+	-- destroyed. The engine's modifier_invulnerable must be removed here: it
+	-- prevents right-click force-attack from producing an attack order against
+	-- a friendly unit, even when that unit is specially deniable.
 	rescue.uther:AddNewModifier(rescue.uther, nil, "modifier_xhs_uther_prison_target", {})
+	rescue.uther:RemoveModifierByName("modifier_invulnerable")
 	rescue.prison:RemoveModifierByName("modifier_invulnerable")
 	rescue.prison:SetHealth(rescue.prison:GetMaxHealth())
 	RefreshUtherRescueHealthBar(rescue.prison, true)
@@ -731,6 +735,7 @@ function EndMagtheridonArena()
 		grom.zone = "xhs_holdout"
 		grom.boss_count = 1
 		grom.xhs_boss_bar_suppressed = true
+		grom.xhs_boss_bar_reveal_quest = "kill_grom"
 		grom:SetAngles(0, 270, 0)
 		GameMode.GromPhase3Boss = grom
 		RegisterXHSDevSpawn(grom)
@@ -744,6 +749,7 @@ function EndMagtheridonArena()
 		illidan.zone = "xhs_holdout"
 		illidan.boss_count = 2
 		illidan.xhs_boss_bar_suppressed = true
+		illidan.xhs_boss_bar_reveal_quest = "kill_illidan"
 		illidan:SetAngles(0, 0, 0)
 		RegisterXHSDevSpawn(illidan)
 		if XHSIllidan_AttachPhase3AI ~= nil then
@@ -756,6 +762,7 @@ function EndMagtheridonArena()
 		balanar.zone = "xhs_holdout"
 		balanar.boss_count = 3
 		balanar.xhs_boss_bar_suppressed = true
+		balanar.xhs_boss_bar_reveal_quest = "kill_balanar"
 		balanar:SetAngles(0, 90, 0)
 		RegisterXHSDevSpawn(balanar)
 		if XHSBalanar_AttachPhase3AI ~= nil then
@@ -768,6 +775,7 @@ function EndMagtheridonArena()
 		proudmoore.zone = "xhs_holdout"
 		proudmoore.boss_count = 4
 		proudmoore.xhs_boss_bar_suppressed = true
+		proudmoore.xhs_boss_bar_reveal_quest = "kill_proudmoore"
 		proudmoore:SetAngles(0, 180, 0)
 		RegisterXHSDevSpawn(proudmoore)
 		if XHSProudmoore_AttachPhase3AI ~= nil then

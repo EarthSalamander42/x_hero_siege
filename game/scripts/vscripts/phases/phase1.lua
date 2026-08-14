@@ -8,6 +8,11 @@ function SpecialEventTPDisabled(event)
 end
 
 function SpecialEventTPEnabled(event)
+	if not AreXHSOptionalEventsUnlocked() then
+		SpecialEventTPDisabled(event)
+		return
+	end
+
 	local hero = event.activator
 	local point = Entities:FindByName(nil, "event_tp_fix"):GetAbsOrigin()
 	if PlayerResource:GetConnectionState(hero:GetPlayerID()) ~= 2 then return end
@@ -228,10 +233,13 @@ function SpiritBeastDead(event)
 		FragmentQuests:OnOptionalEventEnd("spirit_beast", true)
 	end
 
-	local pos = GameMode.spirit_beast:GetAbsOrigin()
-	DropNeutralItemAtPositionForHero("item_shield_of_invincibility", pos, hero, hero:GetTeam(), true)
-	if GameMode.CreateShieldOfInvincibilityDropEffect ~= nil then
-		GameMode:CreateShieldOfInvincibilityDropEffect(pos)
+	local _, shieldDropped, shieldDropPosition = GrantXHSEventRewardItem(
+		hero,
+		"item_shield_of_invincibility"
+	)
+	if shieldDropped and shieldDropPosition ~= nil
+		and GameMode.CreateShieldOfInvincibilityDropEffect ~= nil then
+		GameMode:CreateShieldOfInvincibilityDropEffect(shieldDropPosition)
 	end
 end
 
@@ -299,8 +307,7 @@ function FrostInfernalDead(event)
 		FragmentQuests:OnOptionalEventEnd("frost_infernal", true)
 	end
 
-	local pos = GameMode.frost_infernal:GetAbsOrigin()
-	DropNeutralItemAtPositionForHero("item_key_of_the_three_moons", pos, hero, hero:GetTeam(), true)
+	GrantXHSEventRewardItem(hero, "item_key_of_the_three_moons")
 end
 
 function AllHeroImageBack(event)

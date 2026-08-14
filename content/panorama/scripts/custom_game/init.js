@@ -443,6 +443,28 @@ function ApplyXHSSupporterPassButtonStyle(button) {
 	}
 }
 
+function ApplyXHSSettingsButtonStyle(button) {
+	ApplyXHSTopBarUtilityButtonStyle(button, {
+		icon: "s2r://panorama/images/control_icons/24px/settings_options.vsvg",
+		iconId: "XHSSettingsTopBarIcon"
+	});
+
+	var config = GameUI.CustomUIConfig ? GameUI.CustomUIConfig() : null;
+	if (button && config && config.XHSSettingsVisible === true) {
+		button.AddClass("XHSSettingsActive");
+		button.style.opacity = "1.0";
+		button.style.brightness = "1.32";
+		button.style.preTransformScale2d = "1.04";
+		button.style.backgroundColor = "#14364cf2";
+		button.style.border = "1px solid #70d4ff";
+		button.style.boxShadow = "fill #5ad0ff55 0px 0px 9px 0px";
+	} else if (button) {
+		button.RemoveClass("XHSSettingsActive");
+		button.style.brightness = "1.0";
+		button.style.preTransformScale2d = "1.0";
+	}
+}
+
 function ApplyXHSAdvertizeButtonStyle(button) {
 	ApplyXHSTopBarUtilityButtonStyle(button, {
 		icon: "file://{images}/custom_game/hud/xhs_advertize_icon.png",
@@ -506,7 +528,7 @@ function FindXHSFlyoutScoreboardButton(buttonBar) {
 	var firstOtherChild = null;
 	for (var i = 0; i < buttonBar.GetChildCount(); i++) {
 		var child = buttonBar.GetChild(i);
-		if (!child || child.id === "XHSReportBugButton" || child.id === "XHSAdvertizeButton" || child.id === "XHSSupporterPassTopBarButton") {
+		if (!child || child.id === "XHSReportBugButton" || child.id === "XHSAdvertizeButton" || child.id === "XHSSupporterPassTopBarButton" || child.id === "XHSSettingsTopBarButton") {
 			continue;
 		}
 
@@ -538,6 +560,14 @@ function FindXHSReportBugButton(buttonBar) {
 	}
 
 	return buttonBar.FindChildTraverse("XHSReportBugButton");
+}
+
+function FindXHSSupporterPassTopBarButton(buttonBar) {
+	if (!buttonBar) {
+		return null;
+	}
+
+	return buttonBar.FindChildTraverse("XHSSupporterPassTopBarButton");
 }
 
 function PlaceXHSAdvertizeButton(button) {
@@ -604,6 +634,24 @@ function PlaceXHSSupporterPassButton(button) {
 	return true;
 }
 
+function PlaceXHSSettingsButton(button) {
+	var buttonBar = GetXHSButtonBar();
+	if (!buttonBar || !button) {
+		return false;
+	}
+
+	if (button.SetParent && button.GetParent && button.GetParent() !== buttonBar) {
+		button.SetParent(buttonBar);
+	}
+
+	var supporterButton = FindXHSSupporterPassTopBarButton(buttonBar);
+	if (supporterButton && buttonBar.MoveChildAfter) {
+		buttonBar.MoveChildAfter(button, supporterButton);
+	}
+
+	return true;
+}
+
 function OpenXHSIngameAdvertizeFromButton(retriesLeft) {
 	var config = GameUI.CustomUIConfig ? GameUI.CustomUIConfig() : null;
 	if (config && typeof config.ToggleXHSIngameAdvertize === "function") {
@@ -646,6 +694,29 @@ function OpenXHSSupporterPassFromButton(retriesLeft) {
 	if (retriesLeft > 0) {
 		$.Schedule(0.25, function() {
 			OpenXHSSupporterPassFromButton(retriesLeft - 1);
+		});
+	}
+}
+
+function OpenXHSSettingsFromButton(retriesLeft) {
+	var config = GameUI.CustomUIConfig ? GameUI.CustomUIConfig() : null;
+	if (config && typeof config.ToggleXHSSettings === "function") {
+		config.ToggleXHSSettings();
+		return;
+	}
+
+	if (config && typeof config.OpenXHSSettings === "function") {
+		config.OpenXHSSettings();
+		return;
+	}
+
+	if (config) {
+		config.XHSOpenSettingsRequested = true;
+	}
+
+	if (retriesLeft > 0) {
+		$.Schedule(0.25, function() {
+			OpenXHSSettingsFromButton(retriesLeft - 1);
 		});
 	}
 }
@@ -906,9 +977,67 @@ function CreateXHSSupporterPassButton() {
 	});
 }
 
+function RegisterXHSSettingsButtonStateBridge() {
+	var config = GameUI.CustomUIConfig ? GameUI.CustomUIConfig() : null;
+	if (!config) {
+		return;
+	}
+	config.UpdateXHSSettingsButtonState = function(visible) {
+		config.XHSSettingsVisible = visible === true;
+		var currentRoot = GetXHSHudRoot();
+		var currentButton = currentRoot && currentRoot.FindChildTraverse("XHSSettingsTopBarButton");
+		if (currentButton) {
+			ApplyXHSSettingsButtonStyle(currentButton);
+		}
+	};
+}
+
+function CreateXHSSettingsButton() {
+	var root = GetXHSHudRoot();
+	if (!root) {
+		$.Schedule(0.5, CreateXHSSettingsButton);
+		return;
+	}
+
+	var buttonBar = GetXHSButtonBar();
+	if (!buttonBar) {
+		$.Schedule(0.5, CreateXHSSettingsButton);
+		return;
+	}
+	RegisterXHSSettingsButtonStateBridge();
+
+	var existing = root.FindChildTraverse("XHSSettingsTopBarButton");
+	if (existing) {
+		PlaceXHSSettingsButton(existing);
+		ApplyXHSSettingsButtonStyle(existing);
+		return;
+	}
+
+	var button = $.CreatePanel("Button", buttonBar, "XHSSettingsTopBarButton");
+	button.hittest = true;
+	button.SetPanelEvent("onactivate", function() {
+		OpenXHSSettingsFromButton(8);
+	});
+	button.SetPanelEvent("onmouseover", function() {
+		SetXHSTopBarUtilityButtonHover(button, ApplyXHSSettingsButtonStyle, true);
+		$.DispatchEvent("UIShowTextTooltip", button, $.Localize("#xhs_settings_topbar_tooltip"));
+	});
+	button.SetPanelEvent("onmouseout", function() {
+		SetXHSTopBarUtilityButtonHover(button, ApplyXHSSettingsButtonStyle, false);
+		$.DispatchEvent("UIHideTextTooltip", button);
+	});
+
+	var icon = $.CreatePanel("Image", button, "XHSSettingsTopBarIcon");
+	icon.hittest = false;
+
+	PlaceXHSSettingsButton(button);
+	ApplyXHSSettingsButtonStyle(button);
+}
+
 CreateXHSAdvertizeButton();
 CreateXHSReportBugButton();
 CreateXHSSupporterPassButton();
+CreateXHSSettingsButton();
 
 function ApplyXHSStyle(panel, property, value, missing, name) {
 	if (!panel) {

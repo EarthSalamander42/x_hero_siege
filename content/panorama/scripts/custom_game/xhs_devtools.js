@@ -15,6 +15,7 @@ var XHSDevToolsFPSWindowStartedAt = Date.now();
 var XHSDevToolsFPSLastSentAt = 0;
 var XHSDevToolsLocalFPS = -1;
 var XHSDevToolsCompactHidden = false;
+var XHSDevToolsOverheadFilter = "players";
 var XHSDevToolsSpectatorLoopsStarted = false;
 var XHSDevToolsSpectatorState = {
 	currentPlayerID: -1,
@@ -2422,17 +2423,50 @@ function XHSDevToolsReadClientHealthBarOffset(entIndex, fallback) {
 }
 
 function XHSDevToolsRenderOverheadOffsets(parent) {
-	var section = XHSDevToolsMakeSection(parent, "Hero overhead offsets");
-	XHSDevToolsMakeLabel(section, "XHSDevToolsMuted", "Values are fetched from the active hero. Apply updates the engine override for this Tools match only; Reset restores the hero KV value.");
+	var section = XHSDevToolsMakeSection(parent, "Live unit overhead offsets");
+	XHSDevToolsMakeLabel(section, "XHSDevToolsMuted", "Values are fetched from living entities. Apply updates every living instance of the same name and type for this Tools match; Reset restores the unit KV value.");
+
+	var allRows = XHSDevToolsBotTableValues(XHSDevToolsState.overhead_offsets || {});
+	var filters = [
+		{ id: "players", label: "Players" },
+		{ id: "considered_heroes", label: "Considered heroes" },
+		{ id: "units", label: "Units" }
+	];
+	var filterBar = $.CreatePanel("Panel", section, "");
+	filterBar.AddClass("XHSDevToolsOverheadFilters");
+	for (var filterIndex = 0; filterIndex < filters.length; filterIndex++) {
+		(function(filter) {
+			var count = 0;
+			for (var rowIndex = 0; rowIndex < allRows.length; rowIndex++) {
+				var candidate = allRows[rowIndex].value || {};
+				if (candidate.unit_type === filter.id) count += Number(candidate.instances || 0);
+			}
+			var button = XHSDevToolsMakeButton(filterBar, filter.label + " (" + count + ")", "Small", function() {
+				XHSDevToolsOverheadFilter = filter.id;
+				XHSDevToolsRender();
+			});
+			button.SetHasClass("Active", XHSDevToolsOverheadFilter === filter.id);
+		})(filters[filterIndex]);
+	}
 
 	var refresh = XHSDevToolsMakeButton(section, "Fetch current", "Accent", function() {
 		XHSDevToolsRequestState();
 	});
 	refresh.AddClass("XHSDevToolsOverheadRefresh");
+	var selectionBars = XHSDevToolsMakeButton(section, "Add custom bars to selection", "Accent", function() {
+		XHSDevToolsSend("apply_selection_health_bars", {});
+	});
+	selectionBars.AddClass("XHSDevToolsSelectionHealthBars");
+	selectionBars.SetHasClass("Active", XHSDevToolsState.selection_health_bars_enabled === true);
 
-	var rows = XHSDevToolsBotTableValues(XHSDevToolsState.overhead_offsets || {});
+	var rows = [];
+	for (var i = 0; i < allRows.length; i++) {
+		if ((allRows[i].value || {}).unit_type === XHSDevToolsOverheadFilter) {
+			rows.push(allRows[i]);
+		}
+	}
 	if (rows.length === 0) {
-		XHSDevToolsMakeLabel(section, "XHSDevToolsMuted", "No active hero found.");
+		XHSDevToolsMakeLabel(section, "XHSDevToolsMuted", "No living entity found for this type.");
 		return;
 	}
 
@@ -2450,10 +2484,10 @@ function XHSDevToolsRenderOverheadOffsets(parent) {
 			XHSDevToolsMakeLabel(identity, "XHSDevToolsOverheadName", String(row.unit_name || "unknown"));
 			var observed = XHSDevToolsReadClientHealthBarOffset(row.entindex, row.current_offset);
 			var controlValue = row.has_override ? Number(row.current_offset) : observed;
-			XHSDevToolsMakeLabel(identity, "XHSDevToolsOverheadMeta", "KV " + row.base_offset + "  |  live " + observed + (row.has_override ? "  |  target " + controlValue : ""));
+			XHSDevToolsMakeLabel(identity, "XHSDevToolsOverheadMeta", row.instances + " alive  |  KV " + row.base_offset + "  |  live " + observed + (row.has_override ? "  |  target " + controlValue : ""));
 
 			var minusTen = XHSDevToolsMakeButton(line, "-10", "Tiny", function() {
-				XHSDevToolsSend("set_overhead_offset", { unit_name: row.unit_name, value: controlValue - 10 });
+				XHSDevToolsSend("set_overhead_offset", { unit_type: row.unit_type, unit_name: row.unit_name, value: controlValue - 10 });
 			});
 			minusTen.AddClass("XHSDevToolsOverheadStep");
 
@@ -2464,20 +2498,20 @@ function XHSDevToolsRenderOverheadOffsets(parent) {
 			entry.maxchars = 4;
 
 			var plusTen = XHSDevToolsMakeButton(line, "+10", "Tiny", function() {
-				XHSDevToolsSend("set_overhead_offset", { unit_name: row.unit_name, value: controlValue + 10 });
+				XHSDevToolsSend("set_overhead_offset", { unit_type: row.unit_type, unit_name: row.unit_name, value: controlValue + 10 });
 			});
 			plusTen.AddClass("XHSDevToolsOverheadStep");
 
 			var apply = XHSDevToolsMakeButton(line, "Apply", "Small Accent", function() {
-				XHSDevToolsSend("set_overhead_offset", { unit_name: row.unit_name, value: Number(entry.text) });
+				XHSDevToolsSend("set_overhead_offset", { unit_type: row.unit_type, unit_name: row.unit_name, value: Number(entry.text) });
 			});
 			apply.AddClass("XHSDevToolsOverheadApply");
 			entry.SetPanelEvent("ontextentrysubmit", function() {
-				XHSDevToolsSend("set_overhead_offset", { unit_name: row.unit_name, value: Number(entry.text) });
+				XHSDevToolsSend("set_overhead_offset", { unit_type: row.unit_type, unit_name: row.unit_name, value: Number(entry.text) });
 			});
 
 			var reset = XHSDevToolsMakeButton(line, "Reset KV", "Small", function() {
-				XHSDevToolsSend("reset_overhead_offset", { unit_name: row.unit_name });
+				XHSDevToolsSend("reset_overhead_offset", { unit_type: row.unit_type, unit_name: row.unit_name });
 			});
 			reset.AddClass("XHSDevToolsOverheadReset");
 		})(rows[i]);

@@ -1002,6 +1002,9 @@
 }
 
 .XHSDevToolsOverheadRefresh { width: 118px; margin-top: 8px; }
+.XHSDevToolsSelectionHealthBars { width: 210px; margin-top: 5px; }
+.XHSDevToolsOverheadFilters { width: 100%; margin-top: 8px; flow-children: right; }
+.XHSDevToolsOverheadFilters .XHSDevToolsButton { width: 150px; }
 .XHSDevToolsOverheadTable { width: 100%; margin-top: 5px; flow-children: down; }
 .XHSDevToolsOverheadRow { width: 100%; height: 50px; margin-bottom: 4px; padding: 5px; flow-children: right; background-color: #091219cc; border: 1px solid #ffffff12; }
 .XHSDevToolsOverheadRow.HasOverride { background-color: #102c38dd; border-color: #7fdcff55; }

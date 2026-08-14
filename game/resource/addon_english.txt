@@ -5075,5 +5075,26 @@
 		"healing_ward2"		"Greater Healing Ward"
 		"npc_dota_techies_land_mine"		"Land Mine"
 		"npc_dota_storm_spirit_remnant"		"Static Remnant"
+
+		// XHS settings
+		"xhs_settings_title"		"Settings"
+		"xhs_settings_categories"		"Categories"
+		"xhs_settings_tab_game"		"Game"
+		"xhs_settings_tab_supporter"		"Supporter Pass"
+		"xhs_settings_footer"		"X Hero Siege preferences"
+		"xhs_settings_game_eyebrow"		"Game preferences"
+		"xhs_settings_game_title"		"Game"
+		"xhs_settings_game_description"		"Choose which X Hero Siege interfaces appear automatically during a match."
+		"xhs_settings_supporter_eyebrow"		"Supporter preferences"
+		"xhs_settings_supporter_title"		"Supporter Pass"
+		"xhs_settings_supporter_description"		"Manage your supporter identity, rewards and public profile visibility."
+		"xhs_settings_gameplay_ui"		"Interface at game start"
+		"xhs_setting_show_advertize"		"Show in-game advertize on game start"
+		"xhs_setting_show_advertize_desc"		"Display the X Hero Siege announcement when a match begins."
+		"xhs_setting_show_quest_ui"		"Show quest UI by default"
+		"xhs_setting_show_quest_ui_desc"		"Start each match with the quest log expanded."
+		"xhs_setting_controlled_creeps_auto_attack"		"Controlled creeps auto-attack after move orders"
+		"xhs_setting_controlled_creeps_auto_attack_desc"		"Ground move orders become attack-move orders for creep units you control."
+		"xhs_settings_topbar_tooltip"		"X Hero Siege settings"
 	}
 }

@@ -120,10 +120,6 @@ function modifier_custom_mechanics:OnOrder(keys)
 	if gameMode ~= nil and gameMode.RejectInvalidXHSBotGiftAtIssue ~= nil then
 		rejected = gameMode:RejectInvalidXHSBotGiftAtIssue(keys, parent) == true
 	end
-	if IsInToolsMode() and gameMode ~= nil
-		and gameMode.TraceXHSBotModifierOrder ~= nil then
-		gameMode:TraceXHSBotModifierOrder(keys, parent)
-	end
 	if rejected then
 		return false
 	end

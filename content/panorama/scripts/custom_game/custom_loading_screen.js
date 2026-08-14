@@ -2991,7 +2991,6 @@ function OpenProfileSteamPage() {
 }
 
 function OnCustomSetupReadyPressed() {
-	$.Msg("OnCustomSetupReadyPressed");
 	if (custom_setup_failed_state) {
 		$.Msg("OnCustomSetupReadyPressed: failed state, ignoring click");
 		PlayLoadingSound(LOADING_SCREEN_CONFIG.audio.failed_events);
@@ -2999,7 +2998,6 @@ function OnCustomSetupReadyPressed() {
 	}
 
 	var local_player_id = GetLocalPlayerIDSafe();
-	$.Msg("OnCustomSetupReadyPressed: local_player_id=" + local_player_id);
 
 	if (local_player_id < 0) {
 		$.Msg("OnCustomSetupReadyPressed: invalid local player id, ignoring click");
@@ -3007,9 +3005,7 @@ function OnCustomSetupReadyPressed() {
 		return;
 	}
 
-	$.Msg("OnCustomSetupReadyPressed: sending custom_setup_ready event to server");
 	if (typeof GameEvents !== "undefined" && GameEvents && typeof GameEvents.SendCustomGameEventToServer === "function") {
-		$.Msg("OnCustomSetupReadyPressed: GameEvents.SendCustomGameEventToServer is available");
 		GameEvents.SendCustomGameEventToServer("custom_setup_ready", { PlayerID: local_player_id });
 		local_ready_click_pending = true;
 		local_ready_click_token = local_ready_click_token + 1;

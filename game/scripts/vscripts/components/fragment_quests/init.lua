@@ -83,7 +83,14 @@ local function ShallowCopyTable(source)
 end
 
 local function IsValidUnit(unit)
-	return unit ~= nil and IsValidEntity(unit) and not unit:IsNull()
+	if unit == nil then return false end
+	local handleType = type(unit)
+	if handleType ~= "table" and handleType ~= "userdata" then return false end
+
+	local ok, valid = pcall(function()
+		return IsValidEntity(unit) and not unit:IsNull()
+	end)
+	return ok and valid == true
 end
 
 local function IsGoodTeam(team)
@@ -104,18 +111,28 @@ local function NormalizePlayerID(playerID)
 end
 
 local function TryPlayerIDMethod(handle, methodName)
-	if handle == nil or handle[methodName] == nil then return nil end
+	if handle == nil then return nil end
+	local methodOK, method = pcall(function()
+		return handle[methodName]
+	end)
+	if not methodOK or type(method) ~= "function" then return nil end
+
 	local ok, value = pcall(function()
-		return handle[methodName](handle)
+		return method(handle)
 	end)
 	if not ok then return nil end
 	return NormalizePlayerID(value)
 end
 
 local function TryOwnerHandle(handle, methodName)
-	if handle == nil or handle[methodName] == nil then return nil end
+	if handle == nil then return nil end
+	local methodOK, method = pcall(function()
+		return handle[methodName]
+	end)
+	if not methodOK or type(method) ~= "function" then return nil end
+
 	local ok, owner = pcall(function()
-		return handle[methodName](handle)
+		return method(handle)
 	end)
 	if not ok then return nil end
 	return owner

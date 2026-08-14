@@ -5,15 +5,6 @@ local function GetXHSLaneParticipantCount()
 	return math.max(1, math.min(8, tonumber(participantCount) or 1))
 end
 
-local function ShouldDeferXHSLaneStructureCleanup()
-	if XHSBots == nil or type(XHSBots.configuration) ~= "table" then return false end
-	local requestedBots = tonumber(XHSBots.configuration.count) or 0
-	if requestedBots <= 0 then return false end
-	return XHSBots.status ~= "provisioned"
-		and XHSBots.status ~= "locked"
-		and XHSBots.status ~= "error"
-end
-
 local function SetXHSLaneDoorState(lane, open)
 	local wasOpen = CREEP_LANES ~= nil
 		and CREEP_LANES[lane] ~= nil
@@ -34,27 +25,21 @@ local function SetXHSLaneDoorState(lane, open)
 		nil
 	)
 
-	if not open
-		and not ShouldDeferXHSLaneStructureCleanup()
-		and XHSRemoveClosedPhaseOneLaneStructures ~= nil then
-		XHSRemoveClosedPhaseOneLaneStructures(lane)
-		return
-	end
-
 	for _, tower in pairs(Entities:FindAllByName("dota_badguys_tower" .. lane)) do
-		if open then
+		if open and tower:IsAlive() then
 			tower:RemoveModifierByName("modifier_invulnerable")
-		elseif not tower:HasModifier("modifier_invulnerable") then
+		elseif tower:IsAlive() and not tower:HasModifier("modifier_invulnerable") then
 			tower:AddNewModifier(tower, nil, "modifier_invulnerable", nil)
 		end
 	end
 
 	for _, rax in pairs(Entities:FindAllByName("dota_badguys_barracks_" .. lane)) do
-		if open then
-			rax:RemoveModifierByName("modifier_invulnerable")
-		elseif not rax:HasModifier("modifier_invulnerable") then
+		if rax:IsAlive() and not rax:HasModifier("modifier_invulnerable") then
 			rax:AddNewModifier(rax, nil, "modifier_invulnerable", nil)
 		end
+	end
+	if XHSRefreshPhaseOneLaneStructureState ~= nil then
+		XHSRefreshPhaseOneLaneStructureState(lane)
 	end
 
 	if open and not wasOpen and XHSKnockbackHeroesAtOpeningDoors ~= nil then
@@ -62,9 +47,20 @@ local function SetXHSLaneDoorState(lane, open)
 	end
 end
 
-function RefreshXHSCombatLanes()
+function RefreshXHSCombatLanes(forceDefaults)
 	if GameRules:State_Get() < DOTA_GAMERULES_STATE_GAME_IN_PROGRESS then
 		return 0
+	end
+	if forceDefaults ~= true and GameMode.xhs_manual_lane_configuration == true then
+		local activeLaneCount = 0
+		for lane = 1, 8 do
+			local open = CREEP_LANES ~= nil
+				and CREEP_LANES[lane] ~= nil
+				and CREEP_LANES[lane][1] == 1
+			SetXHSLaneDoorState(lane, open)
+			if open then activeLaneCount = activeLaneCount + 1 end
+		end
+		return activeLaneCount
 	end
 
 	local participantCount = GetXHSLaneParticipantCount()
@@ -122,17 +118,7 @@ ListenToGameEvent('game_rules_state_change', function()
 			DoEntFire("door_lane" .. i, "SetAnimation", "gate_02_close", 0, nil, nil)
 		end
 
-		local special_event_tp_off = Entities:FindByName(nil, "trigger_special_event_tp_off")
-
-		if special_event_tp_off then
-			special_event_tp_off:Disable()
-		end
-
-		local trigger_special_event = Entities:FindByName(nil, "trigger_special_event")
-
-		if trigger_special_event then
-			trigger_special_event:Enable()
-		end
+		SetXHSOptionalEventsUnlocked(false)
 
 		local diff = { "Easy", "Normal", "Hard", "Extreme", "Divine" }
 		local Color = { "green", "Yellow", "orange", "red", "darkred" }
@@ -191,6 +177,7 @@ ListenToGameEvent('game_rules_state_change', function()
 		end
 
 		RefreshXHSCombatLanes()
+		SetXHSOptionalEventsUnlocked(false)
 	end
 end, nil)
 
@@ -1244,7 +1231,7 @@ ListenToGameEvent("player_chat", function(keys)
 			lane = tonumber(string.sub(lane, i, j))
 
 			if lane <= 8 then
-				print("Opening lane:", lane)
+				print("Closing lane:", lane)
 				CloseLane(hero:GetPlayerID(), lane)
 			end
 		end
@@ -1782,6 +1769,12 @@ ListenToGameEvent('entity_killed', function(keys)
 
 		return
 	elseif killedUnit:IsBuilding() then
+		local targetName = killedUnit.GetName ~= nil and killedUnit:GetName() or ""
+		local destroyedLane = tonumber(string.match(targetName, "^dota_badguys_barracks_(%d+)$"))
+		if destroyedLane ~= nil and XHSRefreshPhaseOneLaneStructureState ~= nil then
+			XHSRefreshPhaseOneLaneStructureState(destroyedLane)
+		end
+
 		if killedUnit:GetTeamNumber() == 2 then
 			if killedUnit:GetClassname() == "npc_dota_fort" then
 				GameRules:SetGameWinner(3)

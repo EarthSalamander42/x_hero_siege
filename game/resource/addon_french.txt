@@ -4857,5 +4857,26 @@
 		"healing_ward2"                                                                                "Salle de guérison supérieure"
 		"npc_dota_techies_land_mine"                                                                   "Mine terrestre"
 		"npc_dota_storm_spirit_remnant"                                                                "Reste statique"
+
+		// Paramètres XHS
+		"xhs_settings_title"                                                                           "Paramètres"
+		"xhs_settings_categories"                                                                      "Catégories"
+		"xhs_settings_tab_game"                                                                        "Partie"
+		"xhs_settings_tab_supporter"                                                                   "Supporter Pass"
+		"xhs_settings_footer"                                                                          "Préférences X Hero Siege"
+		"xhs_settings_game_eyebrow"                                                                    "Préférences de partie"
+		"xhs_settings_game_title"                                                                      "Partie"
+		"xhs_settings_game_description"                                                                "Choisissez quelles interfaces de X Hero Siege s'affichent automatiquement en partie."
+		"xhs_settings_supporter_eyebrow"                                                               "Préférences supporter"
+		"xhs_settings_supporter_title"                                                                 "Supporter Pass"
+		"xhs_settings_supporter_description"                                                           "Gérez votre identité de supporter, vos récompenses et la visibilité de votre profil."
+		"xhs_settings_gameplay_ui"                                                                     "Interface au lancement de la partie"
+		"xhs_setting_show_advertize"                                                                   "Afficher l'annonce en jeu au lancement"
+		"xhs_setting_show_advertize_desc"                                                              "Affiche l'annonce X Hero Siege au début d'une partie."
+		"xhs_setting_show_quest_ui"                                                                    "Afficher les quêtes par défaut"
+		"xhs_setting_show_quest_ui_desc"                                                               "Démarre chaque partie avec le journal de quêtes déplié."
+		"xhs_setting_controlled_creeps_auto_attack"                                                    "Les creeps contrôlés attaquent après un ordre de déplacement"
+		"xhs_setting_controlled_creeps_auto_attack_desc"                                               "Les déplacements au sol deviennent des déplacements offensifs pour les creeps que vous contrôlez."
+		"xhs_settings_topbar_tooltip"                                                                  "Paramètres X Hero Siege"
 	}
 }

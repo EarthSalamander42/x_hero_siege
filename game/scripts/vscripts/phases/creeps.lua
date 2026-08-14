@@ -431,12 +431,16 @@ function CollapsePhaseOneLane(lane, attacker)
 		DestroyPhaseOneStructure(tower, attacker)
 	end
 
-	for _, rax in pairs(Entities:FindAllByName("dota_badguys_barracks_" .. lane)) do
-		DestroyPhaseOneStructure(rax, attacker)
-	end
-
 	if CREEP_LANES[lane] ~= nil then
-		CREEP_LANES[lane][3] = 0
+		if CREEP_LANES[lane][1] == 1 and CloseCreepLane ~= nil then
+			CloseCreepLane(lane)
+		else
+			CREEP_LANES[lane][1] = 0
+		end
+		CREEP_LANES[lane][3] = 1
+	end
+	if XHSRefreshPhaseOneLaneStructureState ~= nil then
+		XHSRefreshPhaseOneLaneStructureState(lane)
 	end
 end
 
@@ -943,9 +947,24 @@ end
 function SpawnMagnataur(hPos)
 	local firstMagnataur = nil
 	local spawnedMagnataurs = {}
-	local x = hPos ~= nil and tonumber(hPos.x) or nil
-	local y = hPos ~= nil and tonumber(hPos.y) or nil
-	local z = hPos ~= nil and tonumber(hPos.z) or nil
+	local position = hPos
+	if position ~= nil and position.GetAbsOrigin ~= nil then
+		local ok, origin = pcall(function() return position:GetAbsOrigin() end)
+		if ok then position = origin end
+	end
+	if type(position) == "table" then
+		local nested = position.position or position.origin
+		if nested == nil
+			and tonumber(position.x) == nil
+			and tonumber(position[1]) == nil then
+			nested = position[1]
+		end
+		position = nested or position
+	end
+	local isVectorLike = type(position) == "table" or type(position) == "userdata"
+	local x = isVectorLike and tonumber(position.x or position[1]) or nil
+	local y = isVectorLike and tonumber(position.y or position[2]) or nil
+	local z = isVectorLike and tonumber(position.z or position[3] or 0) or nil
 	if x == nil or y == nil or z == nil then
 		print(
 			"[XHS Phase2] SpawnMagnataur rejected invalid position type="

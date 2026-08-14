@@ -413,6 +413,7 @@ function GameMode:InitGameMode()
 
 	CustomGameEventManager:RegisterListener("setting_vote", Dynamic_Wrap(GameMode, "OnSettingVote"))
 	CustomGameEventManager:RegisterListener("custom_setup_ready", Dynamic_Wrap(GameMode, "OnCustomSetupReady"))
+	CustomGameEventManager:RegisterListener("xhs_update_gameplay_settings", Dynamic_Wrap(GameMode, "OnGameplaySettingsUpdated"))
 
 	-- Initialized tables for tracking state
 	GameMode.bSeenWaitForPlayers = false
@@ -509,36 +510,8 @@ function GameMode:InitGameMode()
 	-- Source 2. Inventory installation is therefore the authoritative runtime
 	-- hook for validating human donations to XHS bots.
 	ListenToGameEvent("dota_inventory_item_added", function(keys)
-		if IsInToolsMode() then
-			GameMode:TraceXHSBotGiftInventoryEvent("dota_inventory_item_added", keys)
-		end
 		GameMode:OnXHSBotInventoryItemAdded(keys)
 	end, nil)
-	if IsInToolsMode() then
-		for _, eventName in ipairs({
-			"dota_inventory_changed",
-			"dota_inventory_item_changed",
-			"dota_inventory_player_got_item",
-			"inventory_updated",
-		}) do
-			local capturedEventName = eventName
-			ListenToGameEvent(capturedEventName, function(keys)
-				GameMode:TraceXHSBotGiftInventoryEvent(capturedEventName, keys)
-			end, nil)
-		end
-		for _, eventName in ipairs({
-			"dota_item_drag_begin",
-			"dota_item_drag_end",
-			"dota_shop_item_drag_begin",
-			"dota_shop_item_drag_end",
-			"dota_item_gifted",
-		}) do
-			local capturedEventName = eventName
-			ListenToGameEvent(capturedEventName, function(keys)
-				GameMode:TraceXHSBotGiftLowLevelEvent(capturedEventName, keys)
-			end, nil)
-		end
-	end
 
 	--Dungeon
 	GameMode.CheckpointsActivated = {}
@@ -610,13 +583,6 @@ local PlayerZoneCache = {}
 local IsDemoMap = GetMapName() == "x_hero_siege_demo"
 
 function GameMode:OnThink()
-	if IsInToolsMode() and self.TraceXHSBotGiftInventories ~= nil then
-		local now = GameRules:GetGameTime()
-		if now >= (tonumber(self.xhsBotGiftTraceNextScan) or 0) then
-			self.xhsBotGiftTraceNextScan = now + 0.25
-			self:TraceXHSBotGiftInventories("watchdog")
-		end
-	end
 	if IsDemoMap
 		and not self.demoInitialPlayableHeroReady
 		and self.EnsureDemoPlayableHeroes ~= nil then
@@ -795,18 +761,27 @@ function GameMode:DamageFilter(filterTable)
 		return true
 	end
 
+	local flDamage = tonumber(filterTable["damage"]) or 0
+	local hVictim = nil
+	if filterTable["entindex_victim_const"] ~= nil then
+		hVictim = EntIndexToHScript(filterTable["entindex_victim_const"])
+	end
+	if flDamage > 0 and hVictim ~= nil and IsValidEntity(hVictim) and not hVictim:IsNull() then
+		local victimName = hVictim.GetName ~= nil and hVictim:GetName() or ""
+		if string.match(victimName, "^dota_badguys_barracks_%d+$") ~= nil then
+			if not hVictim:HasModifier("modifier_invulnerable") then
+				hVictim:AddNewModifier(hVictim, nil, "modifier_invulnerable", nil)
+			end
+			return false
+		end
+	end
+
 	if Runes and Runes.OnDamageFilter then
 		Runes:OnDamageFilter(filterTable)
 	end
 
 	if FragmentQuests ~= nil then
 		FragmentQuests:OnDamage(filterTable)
-	end
-
-	local flDamage = tonumber(filterTable["damage"]) or 0
-	local hVictim = nil
-	if filterTable["entindex_victim_const"] ~= nil then
-		hVictim = EntIndexToHScript(filterTable["entindex_victim_const"])
 	end
 
 	-- A dead fort makes the engine enter POST_GAME immediately, before the
@@ -877,60 +852,6 @@ function GameMode:DamageFilter(filterTable)
 		end
 	end
 	return true
-end
-
-function GameMode:TraceXHSBotGiftInventories(source)
-	if not IsInToolsMode() or XHSBotPlayerRegistry == nil then return 0 end
-	self.xhsBotGiftTraceSeenItems = self.xhsBotGiftTraceSeenItems or {}
-	local discovered = 0
-	for _, botPlayerID in ipairs(
-		XHSBotPlayerRegistry:GetXHSBotPlayerIDs() or {}
-	) do
-		local record = XHSBotPlayerRegistry:GetBot(botPlayerID)
-		local hero = record ~= nil and record.hero_entindex ~= nil
-			and EntIndexToHScript(record.hero_entindex) or nil
-		if hero ~= nil and not hero:IsNull() then
-			for slot = 0, 16 do
-				local item = hero:GetItemInSlot(slot)
-				if item ~= nil and not item:IsNull() then
-					local itemIndex = item:entindex()
-					local previous = self.xhsBotGiftTraceSeenItems[itemIndex]
-					if previous == nil
-						or previous.bot_player_id ~= botPlayerID
-						or previous.slot ~= slot then
-						local purchaser = item.GetPurchaser ~= nil
-							and item:GetPurchaser() or nil
-						local purchaserPlayerID = purchaser ~= nil
-							and not purchaser:IsNull()
-							and purchaser.GetPlayerID ~= nil
-							and purchaser:GetPlayerID() or -1
-						local owner = item.GetOwner ~= nil and item:GetOwner() or nil
-						local ownerPlayerID = owner ~= nil and not owner:IsNull()
-							and owner.GetPlayerID ~= nil and owner:GetPlayerID() or -1
-						print("[XHSBots][GiftTrace] inventory source="
-							.. tostring(source)
-							.. " bot_pid=" .. tostring(botPlayerID)
-							.. " hero=" .. tostring(hero:GetUnitName())
-							.. " slot=" .. tostring(slot)
-							.. " item_ent=" .. tostring(itemIndex)
-							.. " item=" .. tostring(item:GetAbilityName())
-							.. " purchaser_pid=" .. tostring(purchaserPlayerID)
-							.. " owner_pid=" .. tostring(ownerPlayerID)
-							.. " previous_bot_pid=" .. tostring(previous
-								and previous.bot_player_id or "nil")
-							.. " previous_slot=" .. tostring(previous
-								and previous.slot or "nil"))
-						discovered = discovered + 1
-					end
-					self.xhsBotGiftTraceSeenItems[itemIndex] = {
-						bot_player_id = botPlayerID,
-						slot = slot,
-					}
-				end
-			end
-		end
-	end
-	return discovered
 end
 
 function GameMode:OnXHSBotInventoryItemAdded(keys)
@@ -1004,15 +925,6 @@ function GameMode:OnXHSBotInventoryItemAdded(keys)
 			and not XHSBotPlayerRegistry:IsXHSBotPlayerID(issuer)
 			and (XHSBotPlayerRegistry.IsHumanPlayerID == nil
 				or XHSBotPlayerRegistry:IsHumanPlayerID(issuer))
-		if IsInToolsMode() then
-			print("[XHSBots][GiftTrace] stabilized bot_pid="
-				.. tostring(request.bot_player_id)
-				.. " hero=" .. tostring(hero:GetUnitName())
-				.. " item_ent=" .. tostring(itemIndex)
-				.. " item=" .. tostring(item:GetAbilityName())
-				.. " purchaser_pid=" .. tostring(issuer)
-				.. " human_gift=" .. tostring(isHumanGift))
-		end
 		if not isHumanGift then return end
 
 		local ok, accepted, errorKey, context = pcall(function()
@@ -1074,7 +986,6 @@ function GameMode:OnXHSBotInventoryItemAdded(keys)
 		-- Source destroys the handle in this transfer path instead of merely
 		-- detaching it from the bot.
 		local returned = false
-		local returnMode = "none"
 		local charges = item.GetCurrentCharges ~= nil
 			and tonumber(item:GetCurrentCharges()) or nil
 		local secondaryCharges = item.GetSecondaryCharges ~= nil
@@ -1109,7 +1020,6 @@ function GameMode:OnXHSBotInventoryItemAdded(keys)
 				for slot = 0, 16 do
 					if purchaser:GetItemInSlot(slot) == item then
 						returned = true
-						returnMode = "direct"
 						break
 					end
 				end
@@ -1117,7 +1027,6 @@ function GameMode:OnXHSBotInventoryItemAdded(keys)
 					local unitsAfter, chargesAfter = GetRecipientTotals(purchaser)
 					if unitsAfter > unitsBefore or chargesAfter > chargesBefore then
 						returned = true
-						returnMode = "direct_merged"
 					end
 				end
 			end
@@ -1149,7 +1058,6 @@ function GameMode:OnXHSBotInventoryItemAdded(keys)
 					for slot = 0, 16 do
 						if purchaser:GetItemInSlot(slot) == replacement then
 							returned = true
-							returnMode = "clone_inventory"
 							break
 						end
 					end
@@ -1157,7 +1065,6 @@ function GameMode:OnXHSBotInventoryItemAdded(keys)
 						local unitsAfter, chargesAfter = GetRecipientTotals(purchaser)
 						if unitsAfter > unitsBefore or chargesAfter > chargesBefore then
 							returned = true
-							returnMode = "clone_merged"
 						end
 					end
 				end
@@ -1170,7 +1077,6 @@ function GameMode:OnXHSBotInventoryItemAdded(keys)
 					end)
 					if dropped then
 						returned = true
-						returnMode = "clone_ground"
 					end
 				end
 			end
@@ -1198,110 +1104,7 @@ function GameMode:OnXHSBotInventoryItemAdded(keys)
 		if not item:IsNull() then
 			item.xhs_bot_gift_issue = nil
 		end
-		if IsInToolsMode() then
-			print("[XHSBots][GiftTrace] post_receive_decision bot_pid="
-				.. tostring(request.bot_player_id)
-				.. " issuer=" .. tostring(issuer)
-				.. " item=" .. tostring(itemName)
-				.. " accepted=false reason=" .. tostring(errorKey)
-				.. " returned=" .. tostring(returned)
-				.. " return_mode=" .. tostring(returnMode))
-		end
 	end)
-end
-
-function GameMode:TraceXHSBotGiftInventoryEvent(eventName, keys)
-	if not IsInToolsMode() then return end
-	local discovered = self:TraceXHSBotGiftInventories(eventName)
-	local raw = {}
-	for key, value in pairs(keys or {}) do
-		table.insert(raw, tostring(key) .. "=" .. tostring(value))
-	end
-	table.sort(raw)
-	print("[XHSBots][GiftTrace] event=" .. tostring(eventName)
-		.. " discovered=" .. tostring(discovered)
-		.. " raw=" .. table.concat(raw, " "))
-end
-
-local function XHSBotGiftTraceHandle(handle)
-	if handle == nil or handle.IsNull == nil or handle:IsNull() then return "nil" end
-	local values = {}
-	local ok, entindex = pcall(function() return handle:entindex() end)
-	if ok then table.insert(values, "ent=" .. tostring(entindex)) end
-	for _, getter in ipairs({
-		{ "class", "GetClassname" },
-		{ "unit", "GetUnitName" },
-		{ "ability", "GetAbilityName" },
-		{ "pid", "GetPlayerID" },
-		{ "owner_ent", "GetOwnerEntity" },
-	}) do
-		local method = handle[getter[2]]
-		if method ~= nil then
-			local valueOk, value = pcall(function() return method(handle) end)
-			if valueOk and value ~= nil and tostring(value) ~= "" then
-				if getter[1] == "owner_ent" and type(value) ~= "number" then
-					local ownerOk, ownerIndex = pcall(function() return value:entindex() end)
-					value = ownerOk and ownerIndex or value
-				end
-				table.insert(values, getter[1] .. "=" .. tostring(value))
-			end
-		end
-	end
-	if XHSBotPlayerRegistry ~= nil and XHSBotPlayerRegistry.IsXHSBotUnit ~= nil then
-		local botOk, isBot = pcall(function() return XHSBotPlayerRegistry:IsXHSBotUnit(handle) end)
-		if botOk then table.insert(values, "xhs_bot=" .. tostring(isBot)) end
-	end
-	return table.concat(values, ",")
-end
-
-local function XHSBotGiftTraceValue(value, depth)
-	depth = tonumber(depth) or 0
-	if depth >= 3 then return tostring(value) end
-	if type(value) ~= "table" then return tostring(value) end
-	local nested = {}
-	for key, nestedValue in pairs(value) do
-		table.insert(nested, tostring(key) .. "=" .. XHSBotGiftTraceValue(nestedValue, depth + 1))
-	end
-	table.sort(nested)
-	return "{" .. table.concat(nested, ",") .. "}"
-end
-
-function GameMode:TraceXHSBotGiftLowLevelEvent(eventName, keys)
-	if not IsInToolsMode() then return end
-	local raw = {}
-	local resolved = {}
-	for key, value in pairs(keys or {}) do
-		table.insert(raw, tostring(key) .. "=" .. XHSBotGiftTraceValue(value))
-		if type(value) == "number" and (string.find(tostring(key), "entindex", 1, true)
-			or string.find(tostring(key), "item", 1, true)
-			or string.find(tostring(key), "target", 1, true)
-			or string.find(tostring(key), "parent", 1, true)) then
-			local ok, handle = pcall(EntIndexToHScript, value)
-			if ok and handle ~= nil then
-				table.insert(resolved, tostring(key) .. "={" .. XHSBotGiftTraceHandle(handle) .. "}")
-			end
-		end
-	end
-	table.sort(raw)
-	table.sort(resolved)
-	print("[XHSBots][GiftTrace][LowLevelEvent] event=" .. tostring(eventName)
-		.. " raw=" .. table.concat(raw, " "))
-	if #resolved > 0 then
-		print("[XHSBots][GiftTrace][LowLevelEvent] event=" .. tostring(eventName)
-			.. " resolved=" .. table.concat(resolved, " "))
-	end
-end
-
-function GameMode:TraceXHSBotModifierOrder(params, observer)
-	if not IsInToolsMode() then return end
-	params = params or {}
-	print("[XHSBots][GiftTrace][OnOrder] observer={" .. XHSBotGiftTraceHandle(observer) .. "}"
-		.. " unit={" .. XHSBotGiftTraceHandle(params.unit) .. "}"
-		.. " target={" .. XHSBotGiftTraceHandle(params.target) .. "}"
-		.. " ability={" .. XHSBotGiftTraceHandle(params.ability) .. "}"
-		.. " order=" .. tostring(params.order_type)
-		.. " give=" .. tostring(DOTA_UNIT_ORDER_GIVE_ITEM)
-		.. " move=" .. tostring(DOTA_UNIT_ORDER_MOVE_ITEM))
 end
 
 function GameMode:GetXHSBotGiftIssueRejection(issuer, item, target)
@@ -1421,13 +1224,54 @@ function GameMode:RejectInvalidXHSBotGiftAtIssue(params, observer)
 		OrderType = DOTA_UNIT_ORDER_STOP,
 		Queue = false,
 	})
-	if IsInToolsMode() then
-		print("[XHSBots][GiftTrace][ImmediateReject] issuer=" .. tostring(issuer)
-			.. " bot_pid=" .. tostring(targetPlayerID)
-			.. " item=" .. tostring(itemName)
-			.. " reason=" .. tostring(errorKey))
-	end
 	return true
+end
+
+function GameMode:OnGameplaySettingsUpdated(eventSourceIndex, event)
+	local playerID = XHSResolveEventPlayerID ~= nil
+		and XHSResolveEventPlayerID(eventSourceIndex) or nil
+	if playerID == nil then return end
+
+	event = type(event) == "table" and event or {}
+	self.xhs_gameplay_settings = self.xhs_gameplay_settings or {}
+	self.xhs_gameplay_settings[playerID] = {
+		controlled_creeps_auto_attack_after_move = event.controlled_creeps_auto_attack_after_move == true
+			or event.controlled_creeps_auto_attack_after_move == 1
+			or event.controlled_creeps_auto_attack_after_move == "1",
+	}
+end
+
+function GameMode:IsControlledCreepAutoAttackEnabled(playerID)
+	local settings = self.xhs_gameplay_settings
+		and self.xhs_gameplay_settings[tonumber(playerID)] or nil
+	return settings ~= nil and settings.controlled_creeps_auto_attack_after_move == true
+end
+
+local function IsXHSPlayerControlledCreep(unit, playerID)
+	if unit == nil or unit:IsNull() or not unit:IsAlive() then return false end
+	if unit:GetTeamNumber() ~= DOTA_TEAM_GOODGUYS then return false end
+	if (unit.IsRealHero ~= nil and unit:IsRealHero())
+		or (unit.IsHero ~= nil and unit:IsHero())
+		or (unit.IsConsideredHero ~= nil and unit:IsConsideredHero())
+		or (unit.IsIllusion ~= nil and unit:IsIllusion())
+		or (unit.IsBuilding ~= nil and unit:IsBuilding())
+		or (unit.IsWard ~= nil and unit:IsWard())
+		or (unit.IsCourier ~= nil and unit:IsCourier())
+		or (unit.IsOther ~= nil and unit:IsOther()) then
+		return false
+	end
+	if not ((unit.IsCreep ~= nil and unit:IsCreep())
+		or (unit.IsCreature ~= nil and unit:IsCreature())) then
+		return false
+	end
+
+	local ownerID = unit.GetPlayerOwnerID ~= nil and tonumber(unit:GetPlayerOwnerID()) or nil
+	if ownerID == tonumber(playerID) then return true end
+	if unit.GetMainControllingPlayer ~= nil then
+		local ok, controllerID = pcall(function() return unit:GetMainControllingPlayer() end)
+		if ok and tonumber(controllerID) == tonumber(playerID) then return true end
+	end
+	return false
 end
 
 function GameMode:FilterExecuteOrder(filterTable)
@@ -1448,25 +1292,6 @@ function GameMode:FilterExecuteOrder(filterTable)
 	local point = Vector(x, y, z)
 	local queue = filterTable["queue"] == 1
 	local unit
-
-	-- Log at the first possible server hook, before any lock, redirect or early
-	-- return can consume the order. This deliberately includes every order in
-	-- Tools mode so an engine-specific gift payload cannot hide behind an
-	-- unexpected order enum or field layout.
-	if IsInToolsMode() then
-		local raw = {}
-		for key, value in pairs(filterTable or {}) do
-			table.insert(raw, tostring(key) .. "=" .. XHSBotGiftTraceValue(value))
-		end
-		table.sort(raw)
-		print("[XHSBots][GiftTrace][OrderFilterEntry] order=" .. tostring(order_type)
-			.. " give=" .. tostring(DOTA_UNIT_ORDER_GIVE_ITEM)
-			.. " move=" .. tostring(DOTA_UNIT_ORDER_MOVE_ITEM)
-			.. " issuer=" .. tostring(issuer)
-			.. " ability_ent=" .. tostring(abilityIndex)
-			.. " target_ent=" .. tostring(targetIndex)
-			.. " raw=" .. table.concat(raw, " "))
-	end
 
 	-- Panorama input suppression is cosmetic; reject every player-issued order
 	-- authoritatively while that player's cinematic lock is active.
@@ -1511,6 +1336,8 @@ function GameMode:FilterExecuteOrder(filterTable)
 
 	local numUnits = 0
 	local numBuildings = 0
+	local orderedUnitCount = 0
+	local controlledCreepUnitIndexes = {}
 	if units then
 		-- Dedicated event tables expose string keys while Tools mode can retain
 		-- the numeric zero key. Resolve both so order-filter features receive the
@@ -1528,9 +1355,15 @@ function GameMode:FilterExecuteOrder(filterTable)
 		for n, unit_index in pairs(units) do
 			local orderedUnit = EntIndexToHScript(unit_index)
 			if orderedUnit and IsValidEntity(orderedUnit) then
+				orderedUnitCount = orderedUnitCount + 1
 				unit = unit or orderedUnit
 				orderedUnit.current_order = order_type -- Track the last executed order
 				orderedUnit.orderTable = filterTable -- Keep the whole order table, to resume it later if needed
+				if order_type == DOTA_UNIT_ORDER_MOVE_TO_POSITION
+					and self:IsControlledCreepAutoAttackEnabled(issuer)
+					and IsXHSPlayerControlledCreep(orderedUnit, issuer) then
+					table.insert(controlledCreepUnitIndexes, orderedUnit:entindex())
+				end
 				--				local bBuilding = IsCustomBuilding(unit) and not IsUprooted(unit)
 				--				if bBuilding then
 				--					numBuildings = numBuildings + 1
@@ -1538,6 +1371,39 @@ function GameMode:FilterExecuteOrder(filterTable)
 				--					numUnits = numUnits + 1
 				--				end
 			end
+		end
+	end
+
+	if #controlledCreepUnitIndexes > 0 then
+		if #controlledCreepUnitIndexes == orderedUnitCount then
+			filterTable["order_type"] = DOTA_UNIT_ORDER_ATTACK_MOVE
+			order_type = DOTA_UNIT_ORDER_ATTACK_MOVE
+			for _, unitIndex in ipairs(controlledCreepUnitIndexes) do
+				local orderedUnit = EntIndexToHScript(unitIndex)
+				if orderedUnit ~= nil and not orderedUnit:IsNull() then
+					orderedUnit.current_order = DOTA_UNIT_ORDER_ATTACK_MOVE
+				end
+			end
+		else
+			local attackMoveIndexes = controlledCreepUnitIndexes
+			local attackMovePoint = point
+			local attackMoveQueue = queue
+			local attackMoveIssuer = issuer
+			GameRules:GetGameModeEntity():SetContextThink(DoUniqueString("xhs_controlled_creep_attack_move"), function()
+				for _, unitIndex in ipairs(attackMoveIndexes) do
+					local orderedUnit = EntIndexToHScript(unitIndex)
+					if orderedUnit ~= nil and not orderedUnit:IsNull() and orderedUnit:IsAlive() then
+						ExecuteOrderFromTable({
+							UnitIndex = unitIndex,
+							OrderType = DOTA_UNIT_ORDER_ATTACK_MOVE,
+							Position = attackMovePoint,
+							PlayerID = attackMoveIssuer,
+							Queue = attackMoveQueue,
+						})
+					end
+				end
+				return nil
+			end, 0)
 		end
 	end
 
@@ -1582,86 +1448,6 @@ function GameMode:FilterExecuteOrder(filterTable)
 		end
 	end
 
-	-- Temporary Tools-only diagnostics for the engine order generated by
-	-- dragging an item onto an allied bot. Source 2 has used different payload
-	-- shapes for inventory interactions over time, so log both the interpreted
-	-- handles and every raw filter field instead of assuming GIVE_ITEM's schema.
-	if IsInToolsMode() then
-		local function ResolveTraceHandle(index)
-			index = tonumber(index)
-			if index == nil or index <= 0 then return nil end
-		local ok, handle = pcall(EntIndexToHScript, index)
-			return ok and handle or nil
-		end
-		local function TraceHandle(handle)
-			if handle == nil or handle.IsNull == nil or handle:IsNull() then
-				return "nil"
-			end
-			local values = { "ent=" .. tostring(handle:entindex()) }
-			if handle.GetClassname ~= nil then
-				local ok, value = pcall(function() return handle:GetClassname() end)
-				if ok then table.insert(values, "class=" .. tostring(value)) end
-			end
-			if handle.GetUnitName ~= nil then
-				local ok, value = pcall(function() return handle:GetUnitName() end)
-				if ok and tostring(value or "") ~= "" then
-					table.insert(values, "unit=" .. tostring(value))
-				end
-			end
-			if handle.GetAbilityName ~= nil then
-				local ok, value = pcall(function() return handle:GetAbilityName() end)
-				if ok and tostring(value or "") ~= "" then
-					table.insert(values, "ability=" .. tostring(value))
-				end
-			end
-			if handle.GetPlayerID ~= nil then
-				local ok, value = pcall(function() return handle:GetPlayerID() end)
-				if ok then table.insert(values, "pid=" .. tostring(value)) end
-			end
-			if XHSBotPlayerRegistry ~= nil
-				and XHSBotPlayerRegistry.IsXHSBotUnit ~= nil then
-				local ok, value = pcall(function()
-					return XHSBotPlayerRegistry:IsXHSBotUnit(handle)
-				end)
-				if ok then table.insert(values, "xhs_bot=" .. tostring(value)) end
-			end
-			return table.concat(values, ",")
-		end
-		local traceTarget = ResolveTraceHandle(targetIndex)
-		local traceAbility = ResolveTraceHandle(abilityIndex)
-		local targetIsBot = traceTarget ~= nil
-			and XHSBotPlayerRegistry ~= nil
-			and XHSBotPlayerRegistry.IsXHSBotUnit ~= nil
-			and XHSBotPlayerRegistry:IsXHSBotUnit(traceTarget)
-		local abilityLooksLikeItem = traceAbility ~= nil
-			and traceAbility.GetAbilityName ~= nil
-			and string.sub(tostring(traceAbility:GetAbilityName() or ""), 1, 5) == "item_"
-		if IsInventoryOrder(order_type) or targetIsBot or abilityLooksLikeItem then
-			local raw = {}
-			for key, value in pairs(filterTable) do
-				if type(value) == "table" then
-					local nested = {}
-					for nestedKey, nestedValue in pairs(value) do
-						table.insert(nested, tostring(nestedKey) .. "=" .. tostring(nestedValue))
-					end
-					table.sort(nested)
-					table.insert(raw, tostring(key) .. "={" .. table.concat(nested, ",") .. "}")
-				else
-					table.insert(raw, tostring(key) .. "=" .. tostring(value))
-				end
-			end
-			table.sort(raw)
-			print("[XHSBots][GiftTrace] order=" .. tostring(order_type)
-				.. " give=" .. tostring(DOTA_UNIT_ORDER_GIVE_ITEM)
-				.. " move=" .. tostring(DOTA_UNIT_ORDER_MOVE_ITEM)
-				.. " issuer=" .. tostring(issuer)
-				.. " unit={" .. TraceHandle(unit) .. "}"
-				.. " target={" .. TraceHandle(traceTarget) .. "}"
-				.. " ability={" .. TraceHandle(traceAbility) .. "}")
-			print("[XHSBots][GiftTrace] raw " .. table.concat(raw, " "))
-		end
-	end
-
 	-- Human item donations to bots are validated before Source executes the
 	-- transfer. This keeps unsuitable items out of the inventory entirely and
 	-- gives the donor an immediate HUD explanation instead of silently letting
@@ -1702,16 +1488,6 @@ function GameMode:FilterExecuteOrder(filterTable)
 					giftedItem
 				)
 			end)
-			if IsInToolsMode() then
-				print("[XHSBots][GiftTrace] evaluation bot_pid="
-					.. tostring(targetPlayerID)
-					.. " item=" .. tostring(giftedItem ~= nil
-						and giftedItem.GetAbilityName ~= nil
-						and giftedItem:GetAbilityName() or "nil")
-					.. " pcall=" .. tostring(ok)
-					.. " accepted=" .. tostring(accepted)
-					.. " reason=" .. tostring(errorKey))
-			end
 			if not ok then
 				accepted = false
 				errorKey = "#error_xhs_bot_item_unsupported"
@@ -2238,6 +2014,17 @@ local HERO_IMAGE_ENTRY_TELEPORT_DURATION = 3.0
 local HERO_IMAGE_ENTRY_CAMERA_DURATION = 1.25
 local OPTIONAL_EVENT_INTRO_DURATION = 5.0
 
+local function RejectLockedOptionalEvent(hero)
+	if AreXHSOptionalEventsUnlocked() then return false end
+	if hero ~= nil and IsValidEntity(hero) and not hero:IsNull() then
+		Notifications:Bottom(hero:GetPlayerOwnerID(), {
+			text = "This section will be activated after Muradin Event! (14 Minutes)",
+			duration = 6.0,
+		})
+	end
+	return true
+end
+
 function GameMode:HeroImage(event)
 	local PlayerID = event.pID
 	local player = PlayerResource:GetPlayer(PlayerID)
@@ -2245,6 +2032,7 @@ function GameMode:HeroImage(event)
 
 	local hero = player:GetAssignedHero()
 	if hero == nil or not IsValidEntity(hero) then return end
+	if RejectLockedOptionalEvent(hero) then return end
 
 	local point_hero = Entities:FindByName(nil, "hero_image_player")
 	local point_beast = Entities:FindByName(nil, "hero_image_boss"):GetAbsOrigin()
@@ -2389,7 +2177,10 @@ end
 function GameMode:SpiritBeast(event)
 	local PlayerID = event.pID
 	local player = PlayerResource:GetPlayer(PlayerID)
+	if player == nil then return end
 	local hero = player:GetAssignedHero()
+	if hero == nil or not IsValidEntity(hero) then return end
+	if RejectLockedOptionalEvent(hero) then return end
 	local point_hero = Entities:FindByName(nil, "spirit_beast_player")
 	local point_beast = Entities:FindByName(nil, "spirit_beast_boss"):GetAbsOrigin()
 
@@ -2489,7 +2280,10 @@ end
 function GameMode:FrostInfernal(event)
 	local PlayerID = event.pID
 	local player = PlayerResource:GetPlayer(PlayerID)
+	if player == nil then return end
 	local hero = player:GetAssignedHero()
+	if hero == nil or not IsValidEntity(hero) then return end
+	if RejectLockedOptionalEvent(hero) then return end
 	local point_hero = Entities:FindByName(nil, "frost_infernal_player")
 	local point_beast = Entities:FindByName(nil, "frost_infernal_boss"):GetAbsOrigin()
 
@@ -2586,7 +2380,10 @@ end
 function GameMode:AllHeroImages(event)
 	local PlayerID = event.pID
 	local player = PlayerResource:GetPlayer(PlayerID)
+	if player == nil then return end
 	local hero = player:GetAssignedHero()
+	if hero == nil or not IsValidEntity(hero) then return end
+	if RejectLockedOptionalEvent(hero) then return end
 	local point = Entities:FindByName(nil, "all_hero_image_player")
 
 	if GameMode.AllHeroImagesDead == true then

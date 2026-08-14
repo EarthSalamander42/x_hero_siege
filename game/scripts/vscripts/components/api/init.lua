@@ -819,10 +819,20 @@ local function GetSupporterClaimSyncState(steamid)
 		state = {
 			mutation_revision = 0,
 			refresh_sequence = 0,
+			claims_loaded = false,
 		}
 		api.supporter_claim_sync_state[key] = state
 	end
 	return state
+end
+
+function api:IsSupporterPassClaimsLoaded(player_id)
+	local steamid = self:GetPersistentPlayerSteamID(player_id)
+	if steamid == nil then return false end
+
+	local states = self.supporter_claim_sync_state
+	local state = type(states) == "table" and states[tostring(steamid)] or nil
+	return type(state) == "table" and state.claims_loaded == true
 end
 
 local function GetSupporterClaimPlayerState(steamid)
@@ -1073,6 +1083,10 @@ function api:RefreshSupporterPassClaims(player_id, callback)
 		data = data or {}
 		local currentState = GetSupporterClaimSyncState(steamid)
 		local _, currentPass, currentClaims = GetSupporterClaimPlayerState(steamid)
+		if type(data.rewards) ~= "table" then
+			callback(false, { code = "supporter_claims_missing" })
+			return
+		end
 
 		-- A refresh is a replace-like snapshot. Ignore it if a newer refresh
 		-- exists or if any claim POST was confirmed after this GET started.
@@ -1111,6 +1125,7 @@ function api:RefreshSupporterPassClaims(player_id, callback)
 		end
 		MergeSupporterClaimIDs(claimed, remoteClaims)
 
+		currentState.claims_loaded = true
 		api:MergeSupporterPassResponse(steamid, {
 			season = data.season,
 			claimed_rewards = claimed,
@@ -1717,6 +1732,7 @@ function api:ClaimSupporterPassReward(player_id, reward_id, callback)
 		data = data or {}
 		local currentState = GetSupporterClaimSyncState(steamid)
 		currentState.mutation_revision = currentState.mutation_revision + 1
+		currentState.claims_loaded = true
 
 		local player, currentPass, currentClaims = GetSupporterClaimPlayerState(steamid)
 		local currentSeason = GetSupporterClaimSeasonFromPass(currentPass)

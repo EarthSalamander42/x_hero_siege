@@ -15,8 +15,9 @@ end
 
 function modifier_xhs_uther_prison_target:CheckState()
 	return {
-		-- Allows A + left click on friendly Uther at full health. The server order
-		-- filter changes the target to the overlapping ice-prison unit.
+		-- Allows both A + left click and the right-click force-attack option on
+		-- friendly Uther at full health. The server order filter changes the target
+		-- to the overlapping ice-prison unit.
 		[MODIFIER_STATE_SPECIALLY_DENIABLE] = true,
 		[MODIFIER_STATE_STUNNED] = true,
 		[MODIFIER_STATE_COMMAND_RESTRICTED] = true,

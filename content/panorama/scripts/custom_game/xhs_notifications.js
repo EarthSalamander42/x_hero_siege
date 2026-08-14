@@ -468,6 +468,9 @@
 	function createToast(container, lane, msg) {
 		var toast = $.CreatePanel("Panel", container, "");
 		toast.AddClass("XHSNotificationToast");
+		if (msg.toastClass) {
+			toast.AddClass(String(msg.toastClass));
+		}
 		toast.hittest = false;
 
 		if (lane === "bottom") {
@@ -926,7 +929,7 @@
 		addNotification({
 			duration: 5,
 			severity: "success",
-			class: "XHSBotGiftSuccess",
+			toastClass: "XHSBotGiftSuccess",
 			segments: [
 				{ hero: donorHeroName, imagestyle: "icon", class: "XHSBotGiftDonorHeroIcon" },
 				{ text: donorName, class: "XHSBotGiftDonor" },

@@ -15,7 +15,6 @@
 	var renderSerial = 0;
 	var stateSerial = 0;
 
-	$.Msg("[XHS][Cinematic] Loaded. root=", root ? root.id : "<missing>");
 
 	function GetHudRoot() {
 		var panel = root;

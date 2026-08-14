@@ -2695,11 +2695,14 @@
 .XHSRewardRarity.ancient { color: ANCIENT_COLOR; }
 
 .XHSRewardFragmentCounter {
-	width: 100%;
+	/* The panel uses Panorama's content-box sizing: reserve its 24px horizontal
+	 * padding so the border stays aligned with the other 470px-wide children. */
+	width: 446px;
 	height: 60px;
 	margin-top: 10px;
 	padding: 7px 12px;
 	flow-children: right;
+	horizontal-align: center;
 	vertical-align: center;
 	overflow: noclip;
 	background-color: gradient( linear, 0% 0%, 100% 0%, from( #150f25ee ), to( #24133fee ) );

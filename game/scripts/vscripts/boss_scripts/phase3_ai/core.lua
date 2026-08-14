@@ -384,6 +384,11 @@ function XHSPhase3BossAI:RevealBossBarOnce(modifier)
 	local boss = modifier:GetParent()
 	if boss == nil or not IsValidEntity(boss) or boss:IsNull() or not boss:IsAlive() then return end
 	if boss:HasModifier("modifier_invulnerable") or boss:HasModifier("modifier_pause_creeps") then return end
+	local revealQuest = boss.xhs_boss_bar_reveal_quest
+	if revealQuest ~= nil and (GameMode == nil or GameMode.IsQuestActive == nil
+		or GameMode:IsQuestActive(revealQuest) ~= true) then
+		return
+	end
 
 	boss.xhs_boss_bar_suppressed = false
 	modifier.xhs_boss_bar_revealed = true

@@ -629,17 +629,15 @@ local function PlayStormEarthFireSound(entity, emitterKey, temporary)
 	local generation = SpecialEvents.stormEarthFireSoundGeneration
 
 	-- StopGlobalSound and replaying the same event in one frame can suppress the
-	-- new instance. Start it on the next frame after the legacy cleanup. Music is
-	-- played client-side so no temporary entity or recycled entindex can stop it.
+	-- new instance. Start it on the next frame after cleanup. The sound event is
+	-- a 2D source, so the authoritative global emit reaches every player without
+	-- depending on a Panorama panel, boss entity or recycled entindex.
 	GameRules:GetGameModeEntity():SetContextThink(DoUniqueString("storm_earth_fire_play"), function()
 		if SpecialEvents.stormEarthFireSoundGeneration ~= generation then
 			return nil
 		end
 
-		CustomGameEventManager:Send_ServerToAllClients("xhs_event_music_play", {
-			serial = NextStormEarthFireMusicSerial(),
-			sound = STORM_EARTH_FIRE_SOUND,
-		})
+		EmitGlobalSound(STORM_EARTH_FIRE_SOUND)
 		return nil
 	end, 0.03)
 end
@@ -750,9 +748,6 @@ function SpecialEvents:MuradinEvent(time)
 		BT_ENABLED = 1
 		CustomTimers.timers_paused = 0
 		RestartCreeps(MURADIN_EXIT_STUN_DURATION)
-		Notifications:TopToAll({ text = "Special Events are unlocked!", style = { color = "DodgerBlue" }, duration = 5.0 })
-		Entities:FindByName(nil, "trigger_special_event_tp_off"):Disable()
-		Entities:FindByName(nil, "trigger_special_event"):Enable()
 		HideCurrentEventTimer()
 		UpdateGlobalObjective("muradin_event", "Completed", "Muradin Event completed", nil, true)
 		UpdateGlobalObjective("farm_event", "Active", "Farm Event in --:--", nil)
@@ -792,6 +787,16 @@ function SpecialEvents:MuradinEvent(time)
 end
 
 function SpecialEvents:EndMuradinEvent()
+	local wereOptionalEventsUnlocked = AreXHSOptionalEventsUnlocked()
+	SetXHSOptionalEventsUnlocked(true)
+	if not wereOptionalEventsUnlocked then
+		Notifications:TopToAll({
+			text = "Special Events are available again!",
+			style = { color = "DodgerBlue" },
+			duration = 5.0,
+		})
+	end
+
 	if FragmentQuests ~= nil then
 		FragmentQuests:OnMuradinEnd()
 	end
@@ -1881,7 +1886,7 @@ function SpecialEvents:EndFarmEvent()
 		and GetXHSActivePhaseOneLaneCount() <= 0
 		and RefreshXHSCombatLanes ~= nil
 	then
-		RefreshXHSCombatLanes()
+		RefreshXHSCombatLanes(true)
 	end
 	local magnataurBatchesPerLane = math.max(1, tonumber(MAGNATAURS_TO_KILL) or 1)
 	local activeLaneCount = GetXHSActivePhaseOneLaneCount ~= nil
@@ -1900,12 +1905,10 @@ function SpecialEvents:EndFarmEvent()
 			local rax_spawner = Entities:FindByName(nil, "npc_dota_spawner_" .. lane)
 
 			if rax_spawner and rax_spawner.GetAbsOrigin then
-				local raw_spawner_point = rax_spawner:GetAbsOrigin()
-
 				if rax_spawner then
 					local laneAttacker = nil
 					for _ = 1, magnataurBatchesPerLane do
-						local magnataur, magnataurs = SpawnMagnataur(raw_spawner_point)
+						local magnataur, magnataurs = SpawnMagnataur(rax_spawner)
 						laneAttacker = laneAttacker or magnataur
 						for _, unit in ipairs(magnataurs or {}) do
 							spawnedMagnataurCount = spawnedMagnataurCount + 1
@@ -2098,17 +2101,7 @@ function SpecialEvents:EndRameroAndBaristolEvent(bWin)
 			local rewardHero = SpecialEvents.RameroRewardHero
 			Timers:CreateTimer(teleport_time + 0.3, function()
 				if rewardHero ~= nil and IsValidEntity(rewardHero) and not rewardHero:IsNull() then
-					if rewardHero:HasAnyAvailableInventorySpace() then
-						local item = CreateItem("item_lightning_sword", rewardHero, rewardHero)
-						if item ~= nil then
-							item:SetPurchaseTime(GameRules:GetGameTime())
-							item:SetPurchaser(rewardHero)
-							rewardHero:AddItem(item)
-						end
-					else
-						local dropTarget = rewardHero:GetAbsOrigin() + RandomVector(RandomFloat(50, 150))
-						DropNeutralItemAtPositionForHero("item_lightning_sword", dropTarget, rewardHero, rewardHero:GetTeam(), true)
-					end
+					GrantXHSEventRewardItem(rewardHero, "item_lightning_sword")
 				end
 			end)
 		end
@@ -2436,8 +2429,15 @@ function SpecialEvents:ReturnFromSpecialArena(arenaPlayerID)
 	CustomTimers.timers_paused = 0
 	CustomGameEventManager:Send_ServerToAllClients("hide_timer_special_arena", {})
 	ReturnSpecialArenaAllyCameras(arenaPlayerID)
+	-- Resume campaign time before doing any map/entity recovery. Missing arena
+	-- markers or a failed return teleport must never leave the global timer gated
+	-- forever behind SpecialArena_occuring.
+	GameMode.SpecialArena_occuring = false
+	CustomTimers:ResumeSpecialWaveCountdown()
 
-	local SpecialArenaCheck = FindUnitsInRadius(DOTA_TEAM_GOODGUYS, Entities:FindByName(nil, "npc_dota_muradin_boss"):GetAbsOrigin(), nil, 2000, DOTA_UNIT_TARGET_TEAM_FRIENDLY, DOTA_UNIT_TARGET_HERO, DOTA_UNIT_TARGET_FLAG_INVULNERABLE, FIND_ANY_ORDER, false)
+	local arenaCenter = Entities:FindByName(nil, "npc_dota_muradin_boss")
+	local arenaOrigin = arenaCenter ~= nil and arenaCenter:GetAbsOrigin() or Vector(0, 0, 0)
+	local SpecialArenaCheck = FindUnitsInRadius(DOTA_TEAM_GOODGUYS, arenaOrigin, nil, 2000, DOTA_UNIT_TARGET_TEAM_FRIENDLY, DOTA_UNIT_TARGET_HERO, DOTA_UNIT_TARGET_FLAG_INVULNERABLE, FIND_ANY_ORDER, false)
 	local returnedHero = false
 
 	for _, hero in pairs(SpecialArenaCheck) do
@@ -2462,14 +2462,12 @@ function SpecialEvents:ReturnFromSpecialArena(arenaPlayerID)
 			hero:EmitSound("Hero_TemplarAssassin.Trap")
 
 			GameRules:GetGameModeEntity():SetContextThink(DoUniqueString("delay"), function()
-				GameMode.SpecialArena_occuring = false
 				CustomTimers:ResumeSpecialWaveCountdown()
 			end, teleport_time + 1.0)
 		end
 	end
 
 	if returnedHero ~= true then
-		GameMode.SpecialArena_occuring = false
 		CustomTimers:ResumeSpecialWaveCountdown()
 	end
 end

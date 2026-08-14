@@ -64,9 +64,6 @@
 					<Button id="XHSPassTabArmory" class="XHSPassTab">
 						<Label text="#xhs_sp_tab_armory" />
 					</Button>
-					<Button id="XHSPassTabSettings" class="XHSPassTab">
-						<Label text="#xhs_sp_tab_settings" />
-					</Button>
 				</Panel>
 
 				<Button id="XHSPassDevUnlockUIButton" class="XHSPassDevUnlockUIButton">
@@ -314,22 +311,6 @@
 						</Panel>
 					</Panel>
 
-					<Panel id="XHSPassSettingsPage" class="XHSPassPage">
-						<Panel class="XHSPassSectionHeader">
-							<Label class="XHSPassSectionTitle" text="#xhs_sp_settings" />
-							<Label class="XHSPassSectionNote" text="#xhs_sp_settings_note" />
-						</Panel>
-						<Panel id="XHSPassSettingsRows" class="XHSPassSettingsRows" />
-						<Panel id="XHSPassSettingsSaveBar" class="XHSPassSettingsSaveBar">
-							<Label id="XHSPassSettingsSaveText" class="XHSPassSettingsSaveText" text="#xhs_sp_unsaved_changes" />
-							<Button id="XHSPassSettingsCancelButton" class="XHSPassSecondaryButton">
-								<Label text="#xhs_sp_cancel" />
-							</Button>
-							<Button id="XHSPassSettingsSaveButton" class="XHSPassPrimaryButton">
-								<Label text="#xhs_sp_save" />
-							</Button>
-						</Panel>
-					</Panel>
 				</Panel>
 			</Panel>
 

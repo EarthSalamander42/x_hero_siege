@@ -789,32 +789,73 @@ function GetItemByID(id)
 	end
 end
 
-function XHSRemoveClosedPhaseOneLaneStructures(lane_number)
-	lane_number = tonumber(lane_number)
-	if lane_number == nil or lane_number < 1 or lane_number > 8 then return 0 end
+function GrantXHSEventRewardItem(hero, itemName)
+	if hero == nil or not IsValidEntity(hero) or hero:IsNull() then return nil, false, nil end
+	if type(itemName) ~= "string" or itemName == "" then return nil, false, nil end
 
-	if CREEP_LANES ~= nil and CREEP_LANES[lane_number] ~= nil then
-		-- This lane no longer owns a barracks and must never participate in
-		-- phase-one wave release or the phase-two Magnataur transition.
-		CREEP_LANES[lane_number][3] = 0
-	end
-
-	local removed = 0
-	local function RemoveNamedStructures(entityName)
-		for _, structure in pairs(Entities:FindAllByName(entityName)) do
-			if structure ~= nil and IsValidEntity(structure) and not structure:IsNull() then
-				-- UTIL_Remove is intentionally silent. Keep the marker as a guard in
-				-- case an engine build still emits entity_killed while removing it.
-				structure.xhs_silent_phase_one_lane_cleanup = true
-				UTIL_Remove(structure)
-				removed = removed + 1
-			end
+	if hero:HasAnyAvailableInventorySpace() then
+		local item = CreateItem(itemName, hero, hero)
+		if item ~= nil then
+			item:SetPurchaseTime(GameRules:GetGameTime())
+			item:SetPurchaser(hero)
+			hero:AddItem(item)
+			return item, false, nil
 		end
 	end
 
-	RemoveNamedStructures("dota_badguys_tower" .. lane_number)
-	RemoveNamedStructures("dota_badguys_barracks_" .. lane_number)
-	return removed
+	local baseSpawn = Entities:FindByName(nil, "base_spawn")
+	if baseSpawn == nil or baseSpawn:IsNull() then
+		baseSpawn = BASE_GOOD
+	end
+	local dropOrigin = baseSpawn ~= nil and not baseSpawn:IsNull()
+		and baseSpawn:GetAbsOrigin() or hero:GetAbsOrigin()
+	local dropTarget = dropOrigin + RandomVector(RandomFloat(50, 150))
+	local droppedItem = DropNeutralItemAtPositionForHero(
+		itemName,
+		dropTarget,
+		hero,
+		hero:GetTeam(),
+		true
+	)
+	return droppedItem, true, dropTarget
+end
+
+function AreXHSOptionalEventsUnlocked()
+	return GameMode ~= nil and GameMode.xhs_optional_events_unlocked == true
+end
+
+function SetXHSOptionalEventsUnlocked(unlocked)
+	local isUnlocked = unlocked == true
+	GameMode.xhs_optional_events_unlocked = isUnlocked
+
+	local blocker = Entities:FindByName(nil, "trigger_special_event_tp_off")
+	if blocker ~= nil then
+		if isUnlocked then blocker:Disable() else blocker:Enable() end
+	end
+
+	local entrance = Entities:FindByName(nil, "trigger_special_event")
+	if entrance ~= nil then
+		if isUnlocked then entrance:Enable() else entrance:Disable() end
+	end
+end
+
+function XHSRefreshPhaseOneLaneStructureState(lane_number)
+	lane_number = tonumber(lane_number)
+	if lane_number == nil or lane_number < 1 or lane_number > 8 then return false end
+
+	local hasLiveBarracks = false
+	for _, rax in pairs(Entities:FindAllByName("dota_badguys_barracks_" .. lane_number)) do
+		if rax ~= nil and IsValidEntity(rax) and not rax:IsNull() and rax:IsAlive() then
+			if not rax:HasModifier("modifier_invulnerable") then
+				rax:AddNewModifier(rax, nil, "modifier_invulnerable", nil)
+			end
+			hasLiveBarracks = true
+		end
+	end
+	if CREEP_LANES ~= nil and CREEP_LANES[lane_number] ~= nil then
+		CREEP_LANES[lane_number][3] = hasLiveBarracks and 1 or 0
+	end
+	return hasLiveBarracks
 end
 
 -- Resolve a CustomGameEvent sender without trusting payload PlayerID. Depending
@@ -908,6 +949,8 @@ function OpenLane(lane_number)
 end
 
 function OpenCreepLane(lane_number)
+	if CREEP_LANES[lane_number] == nil then return end
+	GameMode.xhs_manual_lane_configuration = true
 	if CREEP_LANES[lane_number][1] == 1 then return end
 	local DoorObs = Entities:FindAllByName("obstruction_lane" .. lane_number)
 	local towers = Entities:FindAllByName("dota_badguys_tower" .. lane_number)
@@ -918,17 +961,57 @@ function OpenCreepLane(lane_number)
 	end
 
 	for _, tower in pairs(towers) do
-		tower:RemoveModifierByName("modifier_invulnerable")
+		if tower:IsAlive() then tower:RemoveModifierByName("modifier_invulnerable") end
 	end
 
 	for _, rax in pairs(raxes) do
-		rax:RemoveModifierByName("modifier_invulnerable")
+		if rax:IsAlive() and not rax:HasModifier("modifier_invulnerable") then
+			rax:AddNewModifier(rax, nil, "modifier_invulnerable", nil)
+		end
 	end
 
 	Notifications:TopToAll({ text = "Host opened lane " .. lane_number .. "!", style = { color = "lightgreen" }, duration = 5.0 })
 	CREEP_LANES[lane_number][1] = 1
+	-- Host controls only change whether the lane is enabled. Structure survival
+	-- is authoritative and cannot be resurrected by reopening the door.
+	XHSRefreshPhaseOneLaneStructureState(lane_number)
 	DoEntFire("door_lane" .. lane_number, "SetAnimation", "gate_02_open", 0, nil, nil)
 	XHSKnockbackHeroesAtOpeningDoors({ "door_lane" .. lane_number })
+end
+
+local XHS_LANE_CLOSE_CLEANUP_RADIUS = 10000
+
+local function KillCreepsAroundClosedLane(lane_number)
+	if CustomTimers == nil or tonumber(CustomTimers.game_phase) ~= 1 then return 0 end
+
+	local spawner = Entities:FindByName(nil, "npc_dota_spawner_" .. tostring(lane_number))
+	if spawner == nil or spawner:IsNull() then return 0 end
+	local cleanupOrigin = spawner:GetAbsOrigin()
+
+	local killed = 0
+	local units = FindUnitsInRadius(
+		DOTA_TEAM_CUSTOM_1,
+		cleanupOrigin,
+		nil,
+		XHS_LANE_CLOSE_CLEANUP_RADIUS,
+		DOTA_UNIT_TARGET_TEAM_FRIENDLY,
+		DOTA_UNIT_TARGET_CREEP,
+		DOTA_UNIT_TARGET_FLAG_INVULNERABLE,
+		FIND_ANY_ORDER,
+		false
+	)
+	for _, unit in pairs(units) do
+		if unit ~= nil
+			and IsValidEntity(unit)
+			and not unit:IsNull()
+			and unit:IsAlive()
+			and unit:HasMovementCapability()
+			and unit.xhs_wave_staged ~= true then
+			unit:Kill(nil, nil)
+			killed = killed + 1
+		end
+	end
+	return killed
 end
 
 function CloseLane(ID, lane_number)
@@ -981,22 +1064,36 @@ end
 
 function CloseCreepLane(lane_number)
 	if not CREEP_LANES[lane_number] then return end
-	if not CREEP_LANES[lane_number][1] then return end
-
-	if CREEP_LANES[lane_number][1] == 0 then
-		XHSRemoveClosedPhaseOneLaneStructures(lane_number)
-		return
-	end
+	GameMode.xhs_manual_lane_configuration = true
+	if CREEP_LANES[lane_number][1] == 0 then return end
 	local DoorObs = Entities:FindAllByName("obstruction_lane" .. lane_number)
+	local towers = Entities:FindAllByName("dota_badguys_tower" .. lane_number)
+	local raxes = Entities:FindAllByName("dota_badguys_barracks_" .. lane_number)
 
 	for _, obs in pairs(DoorObs) do
 		obs:SetEnabled(true, false)
 	end
+	for _, tower in pairs(towers) do
+		if tower:IsAlive() and not tower:HasModifier("modifier_invulnerable") then
+			tower:AddNewModifier(tower, nil, "modifier_invulnerable", nil)
+		end
+	end
+	for _, rax in pairs(raxes) do
+		if rax:IsAlive() and not rax:HasModifier("modifier_invulnerable") then
+			rax:AddNewModifier(rax, nil, "modifier_invulnerable", nil)
+		end
+	end
+	XHSRefreshPhaseOneLaneStructureState(lane_number)
+	CREEP_LANES[lane_number][1] = 0
+	local killedCreeps = KillCreepsAroundClosedLane(lane_number)
 
 	Notifications:TopToAll({ text = "Host closed lane " .. lane_number .. "!", style = { color = "red" }, duration = 5.0 })
-	CREEP_LANES[lane_number][1] = 0
-	XHSRemoveClosedPhaseOneLaneStructures(lane_number)
 	DoEntFire("door_lane" .. lane_number, "SetAnimation", "gate_02_close", 0, nil, nil)
+	print(
+		"[XHS Lane] closed=" .. tostring(lane_number)
+			.. " cleanup_radius=" .. tostring(XHS_LANE_CLOSE_CLEANUP_RADIUS)
+			.. " killed_creeps=" .. tostring(killedCreeps)
+	)
 end
 
 function PauseHeroes()
@@ -1532,7 +1629,7 @@ function StunBuildings(time)
 		local raxes = Entities:FindAllByName("dota_badguys_barracks_" .. Players)
 		for _, rax in pairs(raxes) do
 			if not rax:HasModifier("modifier_invulnerable") then
-				rax:AddNewModifier(rax, nil, "modifier_invulnerable", { duration = time })
+				rax:AddNewModifier(rax, nil, "modifier_invulnerable", nil)
 			end
 		end
 	end
@@ -2039,6 +2136,7 @@ function XHSRequestSelectedBossBar(eventSourceIndex, data)
 		or boss.IsAlive == nil
 		or not boss:IsAlive() then return end
 	if boss.FindAbilityByName == nil or boss:FindAbilityByName("boss_health") == nil then return end
+	if IsBossBarSuppressed(boss) then return end
 
 	local player = PlayerResource:GetPlayer(playerID)
 	if player == nil then return end

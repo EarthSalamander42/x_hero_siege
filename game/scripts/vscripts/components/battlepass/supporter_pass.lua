@@ -1104,6 +1104,10 @@ function SupporterPass:BuildPlayerTable(playerID)
 	local player = api and api.players and api.players[steamID] or {}
 	local supporterPass = player.supporter_pass or {}
 	local backendSeasonReady, backendSeasonID = IsBackendSeasonReady(supporterPass)
+	local backendClaimsReady = api ~= nil
+		and api.IsSupporterPassClaimsLoaded ~= nil
+		and api:IsSupporterPassClaimsLoaded(playerID)
+		or false
 	local seasonStateAllowed = backendSeasonReady ~= false
 	local season = seasonStateAllowed and (supporterPass.season or {}) or {}
 	local seasonSupporterPass = seasonStateAllowed and supporterPass or {}
@@ -1255,6 +1259,7 @@ function SupporterPass:BuildPlayerTable(playerID)
 		season_id = SupporterPass2026 ~= nil and SupporterPass2026.SEASON_ID or "2026",
 		backend_season_id = backendSeasonID,
 		backend_season_ready = backendSeasonReady ~= false,
+		backend_claims_ready = backendClaimsReady == true,
 		season_xp_change = seasonXPChange,
 		XP_change = seasonXPChange,
 		base_xp_change = baseXPChange,
@@ -1283,7 +1288,7 @@ function SupporterPass:BuildPlayerTable(playerID)
 		armory_refresh_used = armoryRefreshState ~= nil,
 		loadout = loadout,
 		equipped_items = equippedItems,
-		claimed_rewards = seasonStateAllowed
+		claimed_rewards = seasonStateAllowed and backendClaimsReady
 			and (supporterPass.claimed_rewards or current.claimed_rewards)
 			or {},
 		fragment_reward_grants = FirstSupporterValue(

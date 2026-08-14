@@ -2149,38 +2149,6 @@ function XHSBotEconomy:EvaluateIncomingGift(
 		snapshot,
 		ignoredItem
 	)
-	if IsInToolsMode() then
-		local planned = {}
-		for _, plannedName in ipairs(plan and plan.target_loadout or {}) do
-			table.insert(planned, tostring(plannedName))
-		end
-		local familyCompatible, familyReason = true, nil
-		if entry.family ~= nil then
-			familyCompatible, familyReason = XHSBotItemPlanner:IsFamilyCompatible(
-				snapshot,
-				profile,
-				entry.family
-			)
-		end
-		print("[XHSBots][GiftTrace] planner bot_pid=" .. tostring(botPlayerID)
-			.. " hero=" .. tostring(hero:GetUnitName())
-			.. " item=" .. tostring(itemName)
-			.. " entry=" .. tostring(entry.name)
-			.. " kind=" .. tostring(entry.kind)
-			.. " family=" .. tostring(entry.family)
-			.. " ranged=" .. tostring(snapshot.is_ranged_attacker)
-			.. " preferred_range=" .. tostring(profile.preferred_range)
-			.. " compatible=" .. tostring(familyCompatible)
-			.. " compatibility_reason=" .. tostring(familyReason)
-			.. " next=" .. tostring(plan and plan.next_entry
-				and plan.next_entry.name or "nil")
-			.. " tactical=" .. tostring(plan and plan.tactical_entry
-				and plan.tactical_entry.name or "nil")
-			.. " target_loadout=[" .. table.concat(planned, ",") .. "]"
-			.. " merge=" .. tostring(merge.can_merge)
-			.. " upgrade=" .. tostring(merge.upgrade))
-	end
-
 	if XHSBotItemPlanner:IsItemRedundant(profile, entry.name)
 		or entry.name == self.LIFESTEAL_MASK_ITEM_NAME
 			and XHSBotItemPlanner:HasIntrinsicLifesteal(profile) then

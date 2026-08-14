@@ -528,6 +528,7 @@ function XHSDevTools:Init()
 	self.sandbox_active = false
 	self.spawned_units = {}
 	self.overhead_offset_overrides = {}
+	self.selection_health_bars_enabled = false
 	self.invulnerable_players = false
 	self.campaign_flow_active = false
 	self.host_timescale = Convars ~= nil and Convars:GetFloat("host_timescale") or 1
@@ -707,6 +708,8 @@ function XHSDevTools:RunAction(action, event)
 		return self:SetOverheadOffset(event)
 	elseif action == "reset_overhead_offset" then
 		return self:ResetOverheadOffset(event)
+	elseif action == "apply_selection_health_bars" then
+		return self:ApplyHeroSelectionHealthBars()
 	elseif action == "preview_vip_dialog" then
 		return self:PreviewVipDialog(event)
 	elseif action == "close_vip_dialog_preview" then
@@ -2055,19 +2058,89 @@ function XHSDevTools:BuildDonatorState()
 	return statuses
 end
 
-function XHSDevTools:GetHeroHealthBarOffset(hero)
-	local unit_name = hero ~= nil and not hero:IsNull() and hero:GetUnitName() or ""
+function XHSDevTools:GetOverheadUnitType(unit)
+	if unit == nil or unit:IsNull() then return nil end
+
+	local player_id = unit.GetPlayerOwnerID ~= nil and unit:GetPlayerOwnerID() or -1
+	if unit.IsRealHero ~= nil and unit:IsRealHero() and player_id >= 0 then
+		return "players"
+	end
+	if (unit.IsConsideredHero ~= nil and unit:IsConsideredHero())
+		or (unit.IsHero ~= nil and unit:IsHero()) then
+		return "considered_heroes"
+	end
+	return "units"
+end
+
+function XHSDevTools:ApplyHeroSelectionHealthBars()
+	if XHSCreepHealthBars == nil or XHSCreepHealthBars.Apply == nil then
+		error("Custom health bar system is unavailable")
+	end
+	if Entities == nil or Entities.FindAllByClassname == nil then
+		error("Entity search is unavailable")
+	end
+
+	self.selection_health_bars_enabled = true
+	local found = 0
+	local added = 0
+	for _, hero in pairs(Entities:FindAllByClassname("npc_dota_hero") or {}) do
+		if hero ~= nil and not hero:IsNull() and hero:IsAlive()
+			and hero.is_fake_hero == true then
+			found = found + 1
+			local already_applied = hero.HasModifier ~= nil
+				and hero:HasModifier("modifier_xhs_custom_creep_health_bar")
+			hero.xhs_custom_health_bar_kind = "creep_hero"
+			if XHSCreepHealthBars:Apply(hero) and not already_applied then
+				added = added + 1
+			end
+		end
+	end
+
+	if found == 0 then
+		return "Selection custom health bars enabled; waiting for hero-selection displays"
+	end
+	return string.format(
+		"Custom health bars ready on %d hero-selection display%s (%d added)",
+		found,
+		found == 1 and "" or "s",
+		added
+	)
+end
+
+function XHSDevTools:GetLiveOverheadUnits()
+	return FindUnitsInRadius(
+		DOTA_TEAM_NEUTRALS,
+		Vector(0, 0, 0),
+		nil,
+		FIND_UNITS_EVERYWHERE,
+		DOTA_UNIT_TARGET_TEAM_BOTH,
+		DOTA_UNIT_TARGET_HERO + DOTA_UNIT_TARGET_BASIC,
+		DOTA_UNIT_TARGET_FLAG_INVULNERABLE + DOTA_UNIT_TARGET_FLAG_MAGIC_IMMUNE_ENEMIES,
+		FIND_ANY_ORDER,
+		false
+	) or {}
+end
+
+function XHSDevTools:GetOverheadOverrideKey(unit_type, unit_name)
+	return tostring(unit_type or "units") .. ":" .. tostring(unit_name or "")
+end
+
+function XHSDevTools:GetUnitHealthBarOffset(unit, unit_type)
+	local unit_name = unit ~= nil and not unit:IsNull() and unit:GetUnitName() or ""
 	local unit_kv = unit_name ~= "" and GetUnitKeyValuesByName(unit_name) or nil
 	local base_offset = tonumber(unit_kv and unit_kv.HealthBarOffset) or 200
-	local override = self.overhead_offset_overrides and self.overhead_offset_overrides[unit_name] or nil
+	local override_key = self:GetOverheadOverrideKey(unit_type or self:GetOverheadUnitType(unit), unit_name)
+	local override = self.overhead_offset_overrides and self.overhead_offset_overrides[override_key] or nil
 	return base_offset, override
 end
 
-function XHSDevTools:ApplyOverheadOffset(unit_name, value)
+function XHSDevTools:ApplyOverheadOffset(unit_type, unit_name, value)
 	local applied = 0
-	for _, hero in pairs(HeroList:GetAllHeroes() or {}) do
-		if hero ~= nil and not hero:IsNull() and hero:GetUnitName() == unit_name then
-			hero:SetHealthBarOffsetOverride(value)
+	for _, unit in pairs(self:GetLiveOverheadUnits()) do
+		if unit ~= nil and not unit:IsNull() and unit:IsAlive()
+			and unit:GetUnitName() == unit_name
+			and self:GetOverheadUnitType(unit) == unit_type then
+			unit:SetHealthBarOffsetOverride(value)
 			applied = applied + 1
 		end
 	end
@@ -2076,33 +2149,47 @@ end
 
 function XHSDevTools:SetOverheadOffset(event)
 	local unit_name = tostring(event.unit_name or "")
-	if unit_name == "" then error("Missing hero unit name") end
+	local unit_type = tostring(event.unit_type or "")
+	if unit_name == "" then error("Missing unit name") end
+	if unit_type ~= "players" and unit_type ~= "considered_heroes" and unit_type ~= "units" then
+		error("Invalid overhead unit type")
+	end
 
 	local value = math.floor(ToNumber(event.value, -1) + 0.5)
 	if value < 0 or value > 1000 then error("Health bar offset must be between 0 and 1000") end
 
 	self.overhead_offset_overrides = self.overhead_offset_overrides or {}
-	self.overhead_offset_overrides[unit_name] = value
-	local applied = self:ApplyOverheadOffset(unit_name, value)
-	if applied == 0 then error("No active hero named " .. unit_name) end
+	local override_key = self:GetOverheadOverrideKey(unit_type, unit_name)
+	self.overhead_offset_overrides[override_key] = value
+	local applied = self:ApplyOverheadOffset(unit_type, unit_name, value)
+	if applied == 0 then
+		self.overhead_offset_overrides[override_key] = nil
+		error("No living " .. unit_type .. " unit named " .. unit_name)
+	end
 	return string.format("%s overhead offset = %d (%d active instance%s)", unit_name, value, applied, applied == 1 and "" or "s")
 end
 
 function XHSDevTools:ResetOverheadOffset(event)
 	local unit_name = tostring(event.unit_name or "")
-	if unit_name == "" then error("Missing hero unit name") end
+	local unit_type = tostring(event.unit_type or "")
+	if unit_name == "" then error("Missing unit name") end
+	if unit_type ~= "players" and unit_type ~= "considered_heroes" and unit_type ~= "units" then
+		error("Invalid overhead unit type")
+	end
 
 	self.overhead_offset_overrides = self.overhead_offset_overrides or {}
-	self.overhead_offset_overrides[unit_name] = nil
+	self.overhead_offset_overrides[self:GetOverheadOverrideKey(unit_type, unit_name)] = nil
 	local base_offset = 200
-	for _, hero in pairs(HeroList:GetAllHeroes() or {}) do
-		if hero ~= nil and not hero:IsNull() and hero:GetUnitName() == unit_name then
-			base_offset = self:GetHeroHealthBarOffset(hero)
+	for _, unit in pairs(self:GetLiveOverheadUnits()) do
+		if unit ~= nil and not unit:IsNull() and unit:IsAlive()
+			and unit:GetUnitName() == unit_name
+			and self:GetOverheadUnitType(unit) == unit_type then
+			base_offset = self:GetUnitHealthBarOffset(unit, unit_type)
 			break
 		end
 	end
-	local applied = self:ApplyOverheadOffset(unit_name, base_offset)
-	if applied == 0 then error("No active hero named " .. unit_name) end
+	local applied = self:ApplyOverheadOffset(unit_type, unit_name, base_offset)
+	if applied == 0 then error("No living " .. unit_type .. " unit named " .. unit_name) end
 	return string.format("%s overhead offset reset to KV value %d", unit_name, base_offset)
 end
 
@@ -2110,25 +2197,28 @@ function XHSDevTools:BuildOverheadOffsetState()
 	local by_name = {}
 	self.overhead_offset_overrides = self.overhead_offset_overrides or {}
 
-	for _, hero in pairs(HeroList:GetAllHeroes() or {}) do
-		if hero ~= nil and not hero:IsNull() then
-			local unit_name = hero:GetUnitName()
-			local base_offset, override = self:GetHeroHealthBarOffset(hero)
+	for _, unit in pairs(self:GetLiveOverheadUnits()) do
+		if unit ~= nil and not unit:IsNull() and unit:IsAlive() then
+			local unit_name = unit:GetUnitName()
+			local unit_type = self:GetOverheadUnitType(unit)
+			local row_key = self:GetOverheadOverrideKey(unit_type, unit_name)
+			local base_offset, override = self:GetUnitHealthBarOffset(unit, unit_type)
 			if override ~= nil then
-				hero:SetHealthBarOffsetOverride(override)
+				unit:SetHealthBarOffsetOverride(override)
 			end
 
-			local row = by_name[unit_name]
+			local row = by_name[row_key]
 			if row == nil then
 				row = {
 					unit_name = unit_name,
-					entindex = hero:entindex(),
+					unit_type = unit_type,
+					entindex = unit:entindex(),
 					base_offset = base_offset,
 					current_offset = override or base_offset,
 					has_override = override ~= nil,
 					instances = 0,
 				}
-				by_name[unit_name] = row
+				by_name[row_key] = row
 			end
 			row.instances = row.instances + 1
 		end
@@ -2136,7 +2226,10 @@ function XHSDevTools:BuildOverheadOffsetState()
 
 	local rows = {}
 	for _, row in pairs(by_name) do table.insert(rows, row) end
-	table.sort(rows, function(a, b) return a.unit_name < b.unit_name end)
+	table.sort(rows, function(a, b)
+		if a.unit_type == b.unit_type then return a.unit_name < b.unit_name end
+		return a.unit_type < b.unit_type
+	end)
 	return rows
 end
 
@@ -2162,6 +2255,7 @@ function XHSDevTools:PushState()
 		bosses = self.enabled and self:BuildBossState() or {},
 		donator_statuses = self.enabled and self:BuildDonatorState() or {},
 		overhead_offsets = self.enabled and self:BuildOverheadOffsetState() or {},
+		selection_health_bars_enabled = self.enabled and self.selection_health_bars_enabled == true,
 		battlepass = self.enabled and {
 			families = self:PublishBattlepassDevCatalog(),
 			sequences = self:BuildBattlepassDevSequenceState(),

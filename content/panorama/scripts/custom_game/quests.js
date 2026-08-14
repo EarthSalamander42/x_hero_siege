@@ -36,6 +36,7 @@ var XHSQuestLogCollapsed = false;
 var XHSQuestLogTemporaryRevealToken = 0;
 var XHSQuestLogSuppressActivationEffects = false;
 var XHSCollapsedMainQuestPhases = {};
+var XHS_QUEST_DEFAULT_VISIBILITY_STORAGE_KEY = "xhs_show_quest_ui_by_default";
 var XHS_QUEST_STARTED_SOUND = "Dungeon.Stinger03";
 var XHS_QUEST_COMPLETED_SOUND = "Dungeon.Stinger01";
 var XHSQuestStartedSoundPlaying = false;
@@ -52,6 +53,64 @@ function IsXHSDemoMap() {
 		return mapName === "x_hero_siege_demo";
 	} catch (error) {
 		return false;
+	}
+}
+
+function GetXHSQuestLocalStorage() {
+	if (typeof $ !== "undefined" && $.LocalStorage) {
+		return $.LocalStorage;
+	}
+	if (typeof LocalStorage !== "undefined") {
+		return LocalStorage;
+	}
+	return null;
+}
+
+function GetXHSQuestLogDefaultVisibility() {
+	if (typeof GameUI !== "undefined" && GameUI.CustomUIConfig) {
+		var config = GameUI.CustomUIConfig();
+		if (typeof config[XHS_QUEST_DEFAULT_VISIBILITY_STORAGE_KEY] === "boolean") {
+			return config[XHS_QUEST_DEFAULT_VISIBILITY_STORAGE_KEY];
+		}
+	}
+
+	var storage = GetXHSQuestLocalStorage();
+	if (storage && storage.GetItem) {
+		try {
+			var stored = storage.GetItem(XHS_QUEST_DEFAULT_VISIBILITY_STORAGE_KEY);
+			if (stored !== undefined && stored !== null && stored !== "") {
+				return stored === true || stored === 1 || stored === "1" || stored === "true";
+			}
+		} catch (error) {
+		}
+	}
+	return true;
+}
+
+function SetXHSQuestLogDefaultVisibility(visible) {
+	var normalized = visible === true;
+	if (typeof GameUI !== "undefined" && GameUI.CustomUIConfig) {
+		var config = GameUI.CustomUIConfig();
+		config[XHS_QUEST_DEFAULT_VISIBILITY_STORAGE_KEY] = normalized;
+		config.xhsQuestLogCollapsed = !normalized;
+	}
+
+	var storage = GetXHSQuestLocalStorage();
+	if (storage && storage.SetItem) {
+		try {
+			storage.SetItem(XHS_QUEST_DEFAULT_VISIBILITY_STORAGE_KEY, normalized ? "1" : "0");
+		} catch (error) {
+		}
+	}
+
+	if (!IsXHSDemoMap()) {
+		XHSQuestLogCollapsed = !normalized;
+		XHSQuestLogTemporaryRevealToken++;
+		var questLog = $("#QuestLog");
+		if (questLog) {
+			questLog.SetHasClass("QuestLogTemporaryReveal", false);
+		}
+		RefreshXHSQuestLogCollapsedState();
 	}
 }
 
@@ -981,7 +1040,7 @@ function InitStaticQuestLog() {
 	}
 
 	XHSQuestState.initialized = true;
-	XHSQuestLogCollapsed = IsXHSDemoMap();
+	XHSQuestLogCollapsed = IsXHSDemoMap() || !GetXHSQuestLogDefaultVisibility();
 	if (typeof GameUI !== "undefined" && GameUI.CustomUIConfig) {
 		XHSQuestLogPinnedBackground = GameUI.CustomUIConfig().xhsQuestLogPinnedBackground === true;
 		XHSQuestLogCollapsed = XHSQuestLogCollapsed
@@ -1001,6 +1060,10 @@ function InitStaticQuestLog() {
 	RefreshStaticQuests();
 	RefreshXHSQuestCollapseState();
 	XHSQuestLogSuppressActivationEffects = false;
+}
+
+if (typeof GameUI !== "undefined" && GameUI.CustomUIConfig) {
+	GameUI.CustomUIConfig().SetXHSQuestLogDefaultVisibility = SetXHSQuestLogDefaultVisibility;
 }
 
 function OnQuestActivated( data ) {

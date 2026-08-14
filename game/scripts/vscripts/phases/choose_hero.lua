@@ -128,6 +128,11 @@ local function RegisterSelectionDisplay(group, index, unit)
 	end
 	HERO_SELECTION_DISPLAYS[group][index] = HERO_SELECTION_DISPLAYS[group][index] or {}
 	table.insert(HERO_SELECTION_DISPLAYS[group][index], unit)
+	if XHSDevTools ~= nil and XHSDevTools.selection_health_bars_enabled == true
+		and XHSCreepHealthBars ~= nil and XHSCreepHealthBars.Apply ~= nil then
+		unit.xhs_custom_health_bar_kind = "creep_hero"
+		XHSCreepHealthBars:Apply(unit)
+	end
 end
 
 local function RemoveHeroSelectionDisplay(unit, removed)

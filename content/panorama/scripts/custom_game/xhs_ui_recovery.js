@@ -73,6 +73,7 @@
 		{ key: "notifications", z: 1100, ids: ["XHSRewardFlyoutLayer", "XHSWaveCountdown", "XHSPauseRoot"], classes: ["XHSNotificationsRoot"] },
 		{ key: "supporter_pass", z: 1150, ids: ["XHSSupporterPassWindow"], classes: ["XHSSupporterPassRoot"] },
 		{ key: "devtools", z: 1200, ids: ["XHSDevToolsPanel", "XHSUIRecoveryClose"], classes: ["SupporterContentStudioRoot", "XHSUIRecoveryRoot"] },
+		{ key: "settings", z: 1250, ids: [], classes: ["XHSSettingsRoot"] },
 		{ key: "flyout", z: 1300, ids: ["DungeonScoreboard"], classes: ["FlyoutScoreboardRoot"] },
 		{ key: "end_screen", z: 1350, ids: ["XHSEndScreenMain"], classes: ["XHSEndScreenRoot"] },
 		{ key: "cinematic", z: 15000, ids: ["XHSCinematicTopBar"], classes: ["XHSCinematicRoot"] }
@@ -84,6 +85,7 @@
 		{ key: "world_health_bars", z: 70, ids: ["XHSCreepHealthBarsRoot", "XHSOverheadRoot"], classes: ["XHSCreepHealthBars"] },
 		{ key: "quest_ui", z: 90, ids: ["QuestLog", "QuestLogCollapseButton"] },
 		{ key: "supporter_pass", z: 1150, ids: ["XHSSupporterPassWindow"], classes: ["XHSSupporterPassRoot"] },
+		{ key: "settings", z: 1250, ids: [], classes: ["XHSSettingsRoot"] },
 		{ key: "flyout", z: 1300, ids: ["DungeonScoreboard"], classes: ["FlyoutScoreboardRoot"] }
 	];
 	// These layouts previously reparented and reordered themselves from their
@@ -406,10 +408,47 @@
 				|| window.BHasClass("IsClosing"));
 	}
 
+	function findVanillaShop(hud) {
+		if (!isValid(hud) || !hud.FindChildTraverse) return null;
+		var anchorIDs = ["ItemBuildContainer", "GridMainShopContentsV2", "GridBasicItems"];
+		for (var anchorIndex = 0; anchorIndex < anchorIDs.length; anchorIndex++) {
+			var panel = hud.FindChildTraverse(anchorIDs[anchorIndex]);
+			while (isValid(panel)) {
+				if (String(panel.paneltype || "") === "DOTAHUDShop") return panel;
+				panel = panel.GetParent ? panel.GetParent() : null;
+			}
+		}
+		return null;
+	}
+
+	function isVanillaShopOpen(hud) {
+		try {
+			if (typeof Game.IsShopOpen === "function") return !!Game.IsShopOpen();
+		} catch (error) {}
+
+		var shop = findVanillaShop(hud);
+		if (!isValid(shop) || shop.visible === false) return false;
+		if (shop.style && shop.style.visibility === "collapse") return false;
+		try {
+			if (shop.IsTransparent && shop.IsTransparent()) return false;
+		} catch (error) {}
+		return Number(shop.actuallayoutwidth || shop.desiredlayoutwidth || 0) > 0
+			&& Number(shop.actuallayoutheight || shop.desiredlayoutheight || 0) > 0;
+	}
+
+	function publishWorldHealthFrameOcclusion(hud) {
+		try {
+			var config = GameUI.CustomUIConfig();
+			config.xhsWorldHealthFrameOcclusion = {
+				flyoutLeft: isFlyoutScoreboardOpen(hud),
+				shopRight: isVanillaShopOpen(hud)
+			};
+		} catch (error) {}
+	}
+
 	function syncWorldHealthFrameOcclusion(hud) {
-		// The world health-frame branches now sit below both the vanilla shop and
-		// the flyout scoreboard. Keep them rendered and clear the former fallback
-		// class in case it was left behind by an earlier recovery pass.
+		// Partial flyout/shop masks are applied per health frame by their feature
+		// scripts. Keep the roots rendered so only overlapping frames disappear.
 		var occluded = false;
 		for (var frameIndex = 0; frameIndex < WORLD_HEALTH_FRAME_IDS.length; frameIndex++) {
 			var frameRoot = hud.FindChildTraverse(WORLD_HEALTH_FRAME_IDS[frameIndex]);
@@ -505,6 +544,7 @@
 		}
 
 		applyCompositionLayerOrder(hud);
+		publishWorldHealthFrameOcclusion(hud);
 		syncWorldHealthFrameOcclusion(hud);
 		syncFlyoutTargetedOcclusion(hud);
 		syncFlyoutSupporterHoverLayer(hud);

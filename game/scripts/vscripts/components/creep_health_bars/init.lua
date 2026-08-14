@@ -58,6 +58,7 @@ local function ShouldHideIllusionHealthBar(unit)
 	if not IsUsableUnit(unit) then
 		return false
 	end
+	if unit.xhs_final_wave_illusion == true then return false end
 	-- Some scripted illusions are created as regular units and only become
 	-- illusions later in the same frame. Their creator can set this marker
 	-- before npc_spawned is processed so neither the Vanilla nor custom frame

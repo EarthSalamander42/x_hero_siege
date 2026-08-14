@@ -1,0 +1,472 @@
+.XHSSettingsRoot
+{
+	width: 100%;
+	height: 100%;
+	background-color: #00000000;
+	opacity: 0;
+	visibility: collapse;
+	transition-property: opacity;
+	transition-duration: 0.18s;
+	z-index: 1250;
+}
+
+.XHSSettingsRoot.IsVisible
+{
+	opacity: 1;
+	visibility: visible;
+}
+
+.XHSSettingsBackdrop
+{
+	width: 100%;
+	height: 100%;
+	background-color: #000710d9;
+	blur: gaussian( 5 );
+}
+
+.XHSSettingsContainer
+{
+	width: 1180px;
+	height: 720px;
+	align: center center;
+	flow-children: right;
+	background-color: #1f2327;
+	box-shadow: fill #000000e8 0px 10px 38px 0px;
+	transform: translateY( 14px );
+	pre-transform-scale2d: 0.985;
+	opacity: 0;
+	transition-property: transform, opacity;
+	transition-duration: 0.22s;
+	transition-timing-function: ease-out;
+}
+
+.XHSSettingsRoot.IsVisible .XHSSettingsContainer
+{
+	transform: translateY( 0px );
+	pre-transform-scale2d: 1;
+	opacity: 1;
+}
+
+.XHSSettingsBorder
+{
+	width: 100%;
+	height: 100%;
+	ignore-parent-flow: true;
+	border: 1px solid #cceeff12;
+	box-shadow: inset #ffffff08 0px 1px 0px 0px;
+	z-index: 10;
+}
+
+.XHSSettingsNavigation
+{
+	width: 292px;
+	height: 100%;
+	flow-children: down;
+	background-color: gradient( linear, 0% 0%, 0% 100%, from( #11191f ), to( #080d11 ) );
+	border-right: 1px solid #9fdcff10;
+}
+
+.XHSSettingsNavigationTexture
+{
+	width: 100%;
+	height: 100%;
+	ignore-parent-flow: true;
+	background-image: url( "s2r://panorama/images/settings/settings_rock_texture_png.vtex" );
+	background-size: cover;
+	opacity: 0.22;
+	wash-color: #65cfff;
+	opacity-brush: gradient( linear, 0% 0%, 140% 25%, from( #ffffff ), to( #ffffff00 ) );
+}
+
+.XHSSettingsBrand
+{
+	width: 100%;
+	height: 104px;
+	padding: 24px 20px 18px 22px;
+	flow-children: right;
+	border-bottom: 1px solid #9fdcff12;
+}
+
+.XHSSettingsBrandIcon
+{
+	width: 54px;
+	height: 54px;
+	margin-right: 14px;
+	background-color: gradient( radial, 50% 50%, 0% 0%, 50% 50%, from( #1a6082 ), to( #07141d ) );
+	border: 1px solid #62d5ff99;
+	box-shadow: fill #000000a0 0px 3px 10px 0px, #47caff25 0px 0px 12px 0px;
+}
+
+.XHSSettingsBrandIcon Image
+{
+	width: 30px;
+	height: 30px;
+	align: center center;
+	wash-color: #d9f6ff;
+	img-shadow: 0px 0px 5px 2 #55ceff66;
+}
+
+.XHSSettingsBrandCopy
+{
+	width: fill-parent-flow( 1 );
+	vertical-align: center;
+	flow-children: down;
+}
+
+.XHSSettingsEyebrow,
+.XHSSettingsPageEyebrow
+{
+	color: #5ad0ff;
+	font-size: 11px;
+	font-weight: bold;
+	letter-spacing: 1.8px;
+	text-transform: uppercase;
+}
+
+.XHSSettingsBrandTitle
+{
+	color: #f2f8fb;
+	font-size: 25px;
+	font-weight: semi-bold;
+	text-shadow: 0px 2px 4px #000000;
+}
+
+.XHSSettingsNavLabel
+{
+	width: 100%;
+	height: 38px;
+	padding-left: 24px;
+	margin-top: 18px;
+}
+
+.XHSSettingsNavLabel Label
+{
+	color: #677782;
+	font-size: 11px;
+	font-weight: bold;
+	letter-spacing: 1.5px;
+	vertical-align: center;
+	text-transform: uppercase;
+}
+
+.XHSSettingsNavButton
+{
+	width: 100%;
+	height: 58px;
+	padding: 0px 20px 0px 23px;
+	flow-children: right;
+	background-color: #00000000;
+	border-left: 3px solid #00000000;
+	transition-property: background-color, border, brightness;
+	transition-duration: 0.12s;
+}
+
+.XHSSettingsNavButton:hover
+{
+	background-color: #8cdfff0c;
+	brightness: 1.3;
+}
+
+.XHSSettingsNavButton.IsActive
+{
+	background-color: gradient( linear, 0% 0%, 100% 0%, from( #17445a99 ), to( #173c4b08 ) );
+	border-left-color: #5ad0ff;
+}
+
+.XHSSettingsNavButton Image
+{
+	width: 26px;
+	height: 26px;
+	margin-right: 15px;
+	vertical-align: center;
+	wash-color: #8fa5b1;
+}
+
+.XHSSettingsNavButton.IsActive Image
+{
+	wash-color: #bdefff;
+	img-shadow: 0px 0px 5px 2 #5ad0ff55;
+}
+
+.XHSSettingsNavButton Label
+{
+	color: #a8b6be;
+	font-size: 18px;
+	font-weight: semi-bold;
+	vertical-align: center;
+}
+
+.XHSSettingsNavButton.IsActive Label
+{
+	color: #edfaff;
+}
+
+.XHSSettingsNavFooter
+{
+	width: 100%;
+	height: fill-parent-flow( 1 );
+	padding: 0px 24px 22px 24px;
+}
+
+.XHSSettingsNavFooter Label
+{
+	width: 100%;
+	color: #60717b;
+	font-size: 12px;
+	vertical-align: bottom;
+	text-align: left;
+}
+
+.XHSSettingsMain
+{
+	width: fill-parent-flow( 1 );
+	height: 100%;
+	flow-children: down;
+	background-color: gradient( linear, 0% 0%, 0% 100%, from( #24292e ), to( #171b1f ) );
+}
+
+.XHSSettingsHeader
+{
+	width: 100%;
+	height: 126px;
+	padding: 25px 28px 20px 34px;
+	flow-children: right;
+	border-bottom: 1px solid #ffffff0d;
+	background-color: gradient( linear, 0% 0%, 100% 0%, from( #273038 ), to( #1c2227 ) );
+}
+
+.XHSSettingsHeaderCopy
+{
+	width: fill-parent-flow( 1 );
+	flow-children: down;
+}
+
+.XHSSettingsPageTitle
+{
+	color: #f5f8fa;
+	font-size: 30px;
+	font-weight: semi-bold;
+	text-shadow: 0px 2px 4px #000000;
+}
+
+.XHSSettingsPageDescription
+{
+	width: 690px;
+	margin-top: 3px;
+	color: #8798a3;
+	font-size: 14px;
+}
+
+.XHSSettingsCloseButton
+{
+	width: 42px;
+	height: 42px;
+	background-color: #ffffff08;
+	border: 1px solid #ffffff0d;
+	transition-property: brightness, background-color;
+	transition-duration: 0.1s;
+}
+
+.XHSSettingsCloseButton:hover
+{
+	brightness: 1.6;
+	background-color: #b9edff14;
+}
+
+.XHSSettingsCloseButton Image
+{
+	width: 22px;
+	height: 22px;
+	align: center center;
+	wash-color: #b9c5cb;
+}
+
+.XHSSettingsContent
+{
+	width: 100%;
+	height: fill-parent-flow( 1 );
+	padding: 28px 34px 24px 34px;
+}
+
+.XHSSettingsPage
+{
+	width: 100%;
+	height: 100%;
+	flow-children: down;
+	opacity: 0;
+	visibility: collapse;
+}
+
+.XHSSettingsPage.IsVisible
+{
+	opacity: 1;
+	visibility: visible;
+}
+
+.XHSSettingsSectionTitle
+{
+	width: 100%;
+	height: 30px;
+	color: #c9d5db;
+	font-size: 17px;
+	font-weight: semi-bold;
+	letter-spacing: 0.6px;
+	text-transform: uppercase;
+}
+
+.XHSSettingsRows
+{
+	width: 100%;
+	flow-children: down;
+	background-color: #11171bd4;
+	border: 1px solid #ffffff0b;
+	box-shadow: inset #00000055 0px 1px 5px 0px;
+}
+
+.XHSSettingsRow
+{
+	width: 100%;
+	min-height: 82px;
+	padding: 15px 20px;
+	flow-children: right;
+	border-bottom: 1px solid #ffffff0a;
+	transition-property: background-color;
+	transition-duration: 0.1s;
+}
+
+.XHSSettingsRow:hover
+{
+	background-color: #7bdcff08;
+}
+
+.XHSSettingsRowCopy
+{
+	width: fill-parent-flow( 1 );
+	flow-children: down;
+	vertical-align: center;
+}
+
+.XHSSettingsRowTitle
+{
+	color: #e4eaed;
+	font-size: 17px;
+	font-weight: semi-bold;
+}
+
+.XHSSettingsRowDescription
+{
+	width: 650px;
+	margin-top: 3px;
+	color: #7f909a;
+	font-size: 13px;
+}
+
+.XHSSettingsCheckbox
+{
+	width: 36px;
+	height: 36px;
+	vertical-align: center;
+	margin-left: 18px;
+}
+
+.XHSSettingsActionButton
+{
+	min-width: 112px;
+	height: 38px;
+	padding: 0px 18px;
+	vertical-align: center;
+	background-color: gradient( linear, 0% 0%, 0% 100%, from( #26343d ), to( #182229 ) );
+	border: 1px solid #718a9988;
+	transition-property: brightness, border;
+	transition-duration: 0.1s;
+}
+
+.XHSSettingsActionButton:hover
+{
+	brightness: 1.4;
+	border-color: #8edfffaa;
+}
+
+.XHSSettingsActionButton Label
+{
+	width: 100%;
+	color: #dce8ed;
+	font-size: 14px;
+	font-weight: semi-bold;
+	text-align: center;
+	vertical-align: center;
+}
+
+.XHSSettingsFooter
+{
+	width: 100%;
+	height: 76px;
+	padding: 13px 28px;
+	flow-children: right;
+	background-color: #12171be8;
+	border-top: 1px solid #ffffff0d;
+}
+
+.XHSSettingsStatus
+{
+	width: fill-parent-flow( 1 );
+	color: #82929b;
+	font-size: 14px;
+	vertical-align: center;
+}
+
+.XHSSettingsStatus.IsSuccess { color: #70e39a; }
+.XHSSettingsStatus.IsError { color: #ff7968; }
+
+.XHSSettingsButton
+{
+	min-width: 126px;
+	height: 46px;
+	margin-left: 12px;
+	padding: 0px 22px;
+	vertical-align: center;
+	transition-property: brightness, opacity;
+	transition-duration: 0.1s;
+}
+
+.XHSSettingsButton:hover { brightness: 1.35; }
+.XHSSettingsButton:disabled { brightness: 0.55; opacity: 0.5; }
+
+.XHSSettingsButton Label
+{
+	width: 100%;
+	color: #eef8fb;
+	font-size: 16px;
+	font-weight: semi-bold;
+	text-align: center;
+	vertical-align: center;
+}
+
+.XHSSettingsButtonSecondary
+{
+	background-color: #252d32;
+	border: 1px solid #6d7d8680;
+}
+
+.XHSSettingsButtonPrimary
+{
+	background-color: gradient( linear, 0% 0%, 0% 100%, from( #2780a5 ), to( #15506c ) );
+	border: 1px solid #65d9ffb0;
+	box-shadow: fill #00000080 0px 2px 6px 0px, #4dcfff20 0px 0px 8px 0px;
+}
+
+.AspectRatio16x10 .XHSSettingsContainer
+{
+	width: 1080px;
+	height: 690px;
+}
+
+.AspectRatio4x3 .XHSSettingsContainer
+{
+	width: 940px;
+	height: 650px;
+}
+
+.AspectRatio4x3 .XHSSettingsNavigation { width: 250px; }
+.AspectRatio4x3 .XHSSettingsRowDescription { width: 500px; }
+.AspectRatio4x3 .XHSSettingsPageDescription { width: 560px; }

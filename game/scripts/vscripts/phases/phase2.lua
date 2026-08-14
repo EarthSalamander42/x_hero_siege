@@ -848,11 +848,53 @@ local function RegisterFinalWaveUnit(unit)
 
 	unit.zone = "xhs_holdout"
 	unit.xhs_final_wave_unit = true
+	CustomTimers.final_wave_units = CustomTimers.final_wave_units or {}
+	CustomTimers.final_wave_units[unit:entindex()] = unit
 	CustomTimers.final_wave_spawned_kill_limit = (CustomTimers.final_wave_spawned_kill_limit or 0) + 1
 end
 
 local function IsFinalWaveSequenceActive(sequenceId)
 	return sequenceId == nil or CustomTimers.final_wave_sequence_id == sequenceId
+end
+
+local function ReconcileFinalWaveQuest()
+	local spawnedCount = tonumber(CustomTimers.final_wave_spawned_kill_limit) or 0
+	if spawnedCount <= 0 then return false end
+
+	local liveCount = 0
+	for entIndex, unit in pairs(CustomTimers.final_wave_units or {}) do
+		if unit ~= nil and IsValidEntity(unit) and not unit:IsNull() and unit:IsAlive() then
+			liveCount = liveCount + 1
+		else
+			CustomTimers.final_wave_units[entIndex] = nil
+		end
+	end
+
+	local zone, quest = FindFinalWaveQuest()
+	if zone == nil or quest == nil or quest.bCompleted == true then
+		return quest ~= nil and quest.bCompleted == true
+	end
+
+	-- entity_killed can be missed when an engine removal/transform happens in
+	-- the cinematic. Infer only confirmed missing units and never reduce normal
+	-- kill progress.
+	local inferredDefeated = math.max(0, spawnedCount - liveCount)
+	while quest.bCompleted ~= true
+		and (tonumber(quest.nCompleted) or 0) < inferredDefeated do
+		GameRules.GameMode:OnQuestCompleted(zone, quest)
+	end
+	return quest.bCompleted == true
+end
+
+local function StartFinalWaveQuestWatchdog(sequenceId)
+	Timers:CreateTimer(2.0, function()
+		if not IsFinalWaveSequenceActive(sequenceId)
+			or CustomTimers.game_phase >= 3 then
+			return nil
+		end
+		if ReconcileFinalWaveQuest() then return nil end
+		return 2.0
+	end)
 end
 
 local function GetFinalWaveFort()
@@ -948,6 +990,7 @@ end
 local function ReleaseFinalWaveUnit(unit, waypoint)
 	if unit == nil or unit:IsNull() or not unit:IsAlive() then return end
 
+	unit:RemoveNoDraw()
 	unit:RemoveModifierByName("modifier_pause_creeps")
 	unit:RemoveModifierByName("modifier_invulnerable")
 	if unit.SetIdleAcquire ~= nil then unit:SetIdleAcquire(true) end
@@ -971,7 +1014,11 @@ local function ReleaseFinalWavePendingUnits()
 
 	CustomTimers.final_wave_pending_units = nil
 	UpdateFinalWaveQuestLimit()
-	CustomTimers.final_wave_kill_counting = (CustomTimers.final_wave_spawned_kill_limit or 0) >= FINAL_WAVE_TOTAL_UNITS
+	-- At release time the quest limit already matches successful creations. A
+	-- partial spawn must remain completable instead of disabling every kill event
+	-- because the theoretical total of 52 was not reached.
+	CustomTimers.final_wave_kill_counting = (CustomTimers.final_wave_spawned_kill_limit or 0) > 0
+	ReconcileFinalWaveQuest()
 end
 
 local function DestroyFinalWaveParticle(particle)
@@ -1109,6 +1156,7 @@ function FinalWave(force)
 	CustomTimers.proc_final_wave = true
 	CustomTimers.final_wave_kill_counting = false
 	CustomTimers.final_wave_spawned_kill_limit = 0
+	CustomTimers.final_wave_units = {}
 	CustomTimers.final_wave_pending_units = {}
 	CustomTimers.final_wave_sequence_id = (CustomTimers.final_wave_sequence_id or 0) + 1
 	local finalWaveSequenceId = CustomTimers.final_wave_sequence_id
@@ -1209,6 +1257,7 @@ function FinalWave(force)
 		Timers:CreateTimer(FINAL_WAVE_PREP_DURATION, function()
 			if not IsFinalWaveSequenceActive(finalWaveSequenceId) then return end
 			ReleaseFinalWavePendingUnits()
+			StartFinalWaveQuestWatchdog(finalWaveSequenceId)
 
 			local finalWaveFort = GetFinalWaveFort()
 			if finalWaveFort ~= nil then

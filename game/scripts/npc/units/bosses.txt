@@ -2978,10 +2978,12 @@
 		{
 			"AttachWearables"   
 			{
-				"Wearable1"	{ "ItemDef" "6996" } // Demon Eater arcana base
-				"Wearable2"	{ "ItemDef" "8259" } // Arms of Desolation
-				"Wearable3"	{ "ItemDef" "486" }  // Shoulders
-				"Wearable4"	{ "ItemDef" "7188" } // Horns of the Diabolical Fiend (head)
+				// Demon Eater (6996) is a hero_base model replacement without a
+				// wearable model. The creature already uses the Arcana base model;
+				// attaching 6996 here renders an ERROR model at the boss origin.
+				"Wearable1"	{ "ItemDef" "8259" } // Arms of Desolation
+				"Wearable2"	{ "ItemDef" "486" }  // Shoulders
+				"Wearable3"	{ "ItemDef" "7188" } // Horns of the Diabolical Fiend (head)
 			}
 
 			"DisableResistance"			"50.0"

@@ -3430,7 +3430,8 @@ function Battlepass:SupporterPassClaimReward(event_source_index, event)
 	if playerTable.backend_season_ready == false
 		or playerTable.backend_season_ready == 0
 		or playerTable.backend_season_ready == "0"
-		or playerTable.backend_season_ready == "false" then
+		or playerTable.backend_season_ready == "false"
+		or playerTable.backend_claims_ready ~= true then
 		self:SendSupporterPassFailure(playerID, "supporter_pass_claim_failed", "#xhs_sp_error_reward_backend_unavailable", {
 			reward_id = event.reward_id,
 		})

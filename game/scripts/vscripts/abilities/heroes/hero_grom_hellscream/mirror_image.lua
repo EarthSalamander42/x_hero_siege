@@ -87,13 +87,21 @@ function Phantasm(keys)
 	-- Spawn illusions
 	for i = 1, images_count do
 		local origin = casterOrigin + table.remove(vRandomSpawnPos, 1)
+		local isFinalWaveIllusion = caster.xhs_final_wave_unit == true
 
 		-- handle_UnitOwner needs to be nil, else it will crash the game.
 		local illusion = CreateUnitByName(unit_name, origin, true, caster, nil, caster:GetTeamNumber())
-		-- npc_spawned can be consumed before MakeIllusion() below. Mark these
-		-- images immediately so the custom health-frame relay never publishes
-		-- them (and suppresses the Vanilla bar as well).
-		illusion.xhs_hide_health_bar = true
+		-- Final-wave Grom images are regular combat units and need the segmented
+		-- creep-hero frame. Keep every other Grom image hidden, especially the
+		-- separate phase-three Hellscream mirror encounter. Set the marker before
+		-- npc_spawned is processed so neither path flashes the wrong presentation.
+		illusion.xhs_final_wave_illusion = isFinalWaveIllusion
+		if isFinalWaveIllusion then
+			illusion.xhs_hide_health_bar = false
+			illusion.xhs_custom_health_bar_kind = "creep_hero"
+		else
+			illusion.xhs_hide_health_bar = true
+		end
 		illusion:SetControllableByPlayer(player, true)
 
 		illusion:SetAngles(casterAngles.x, casterAngles.y, casterAngles.z)
@@ -139,8 +147,7 @@ function Phantasm(keys)
 		illusion:RemoveAbility("cant_die_generic")
 		illusion:RemoveModifierByName("modifier_cant_die_generic")
 
-		if caster.xhs_final_wave_unit == true then
-			illusion.xhs_final_wave_illusion = true
+		if isFinalWaveIllusion then
 			local ancient = Entities:FindByClassname(nil, "npc_dota_fort")
 			if ancient ~= nil and not ancient:IsNull() then
 				illusion:SetInitialGoalEntity(ancient)

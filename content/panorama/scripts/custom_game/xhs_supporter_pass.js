@@ -47,10 +47,6 @@ var XHSSupporterPass = (function () {
 		category: "courier",
 		search: "",
 	};
-	var settingsOriginal = {};
-	var settingsDraft = {};
-	var settingsInitialized = false;
-	var settingsSaving = false;
 	var backToTopPollScheduled = false;
 	var fragmentCounterInitialized = false;
 	var lastLocalFragmentBalance = 0;
@@ -114,7 +110,6 @@ var XHSSupporterPass = (function () {
 		rewards: "XHSPassRewardsPage",
 		shop: "XHSPassShopPage",
 		armory: "XHSPassArmoryPage",
-		settings: "XHSPassSettingsPage",
 	};
 
 	var TAB_IDS = {
@@ -123,7 +118,6 @@ var XHSSupporterPass = (function () {
 		rewards: "XHSPassTabRewards",
 		shop: "XHSPassTabShop",
 		armory: "XHSPassTabArmory",
-		settings: "XHSPassTabSettings",
 	};
 
 	var DISABLED_PAGES = {};
@@ -2547,32 +2541,6 @@ var XHSSupporterPass = (function () {
 		return false;
 	}
 
-	function CopySettings(settings) {
-		return {
-			toggle_tag: settings.toggle_tag === true,
-			pass_rewards: settings.pass_rewards === true,
-			player_xp: settings.player_xp === true,
-			winrate_toggle: settings.winrate_toggle === true,
-		};
-	}
-
-	function SettingsEqual(a, b) {
-		return a.toggle_tag === b.toggle_tag &&
-			a.pass_rewards === b.pass_rewards &&
-			a.player_xp === b.player_xp &&
-			a.winrate_toggle === b.winrate_toggle;
-	}
-
-	function BuildSettingsFromPlayer(player) {
-		var passRewards = player.raw.pass_rewards !== undefined ? player.raw.pass_rewards : player.raw.bp_rewards;
-		return {
-			toggle_tag: IsTruthy(player.raw.toggle_tag, true),
-			pass_rewards: passRewards === 0 ? false : IsTruthy(passRewards, true),
-			player_xp: IsTruthy(player.raw.player_xp, true),
-			winrate_toggle: IsTruthy(player.raw.winrate_toggle, true),
-		};
-	}
-
 	function SetPercent(panel, current, max) {
 		if (!panel) {
 			return;
@@ -2938,10 +2906,6 @@ var XHSSupporterPass = (function () {
 			}
 			return Panel("XHSPassArmoryGrid");
 		}
-		if (activePage === "settings") {
-			return Panel("XHSPassSettingsRows");
-		}
-
 		return null;
 	}
 
@@ -3248,7 +3212,10 @@ var XHSSupporterPass = (function () {
 		var rewardClaimed = devAllPreview
 			? devLocallyClaimed
 			: (devFreePreview || (legacyReward ? legacyUnlocked : IsRewardClaimed(reward, player)));
-		var backendReady = devPreviewUnlocked || IsTruthy(player.raw && player.raw.backend_season_ready, true);
+		var backendReady = devPreviewUnlocked || (
+			IsTruthy(player.raw && player.raw.backend_season_ready, false) &&
+			IsTruthy(player.raw && player.raw.backend_claims_ready, false)
+		);
 		var premiumLocked = (track === "premium" || reward.track === "premium" ||
 			reward.premium === 1 || reward.premium === "1") && player.tier_id < 1 && !devPreviewUnlocked;
 		var levelLocked = player.season_level < requiredLevel && !devPreviewUnlocked;
@@ -5909,139 +5876,6 @@ var XHSSupporterPass = (function () {
 		}
 	}
 
-	function CreateInfoRow(parent, title, description, value) {
-		var row = $.CreatePanel("Panel", parent, "");
-		row.AddClass("XHSPassSettingRow");
-
-		var copy = $.CreatePanel("Panel", row, "");
-		copy.AddClass("XHSPassRowMain");
-
-		var titlePanel = $.CreatePanel("Label", copy, "");
-		titlePanel.AddClass("XHSPassRowTitle");
-		titlePanel.text = title;
-
-		var descPanel = $.CreatePanel("Label", copy, "");
-		descPanel.AddClass("XHSPassRowDescription");
-		descPanel.text = description;
-
-		var valuePanel = $.CreatePanel("Label", row, "");
-		valuePanel.AddClass("XHSPassRowValue");
-		valuePanel.text = value;
-	}
-
-	function UpdateSettingsSaveBar() {
-		var bar = Panel("XHSPassSettingsSaveBar");
-		if (!bar) {
-			return;
-		}
-
-		bar.SetHasClass("IsDirty", !SettingsEqual(settingsOriginal, settingsDraft) || settingsSaving);
-		bar.SetHasClass("IsSaving", settingsSaving);
-
-		var label = bar.FindChildTraverse("XHSPassSettingsSaveText");
-		if (label) {
-			label.text = Text(settingsSaving ? "xhs_sp_saving_settings" : "xhs_sp_unsaved_changes", settingsSaving ? "Saving settings..." : "Unsaved changes");
-		}
-	}
-
-	function CreateSettingRow(parent, key, title, description) {
-		var row = $.CreatePanel("Panel", parent, "");
-		row.AddClass("XHSPassSettingRow");
-		row.SetHasClass("IsEnabled", settingsDraft[key] === true);
-		row.hittest = true;
-
-		var copy = $.CreatePanel("Panel", row, "");
-		copy.AddClass("XHSPassRowMain");
-		copy.hittest = false;
-
-		var titlePanel = $.CreatePanel("Label", copy, "");
-		titlePanel.AddClass("XHSPassRowTitle");
-		titlePanel.text = title;
-		titlePanel.hittest = false;
-
-		var descPanel = $.CreatePanel("Label", copy, "");
-		descPanel.AddClass("XHSPassRowDescription");
-		descPanel.text = description;
-		descPanel.hittest = false;
-
-		var toggle = $.CreatePanel("Panel", row, "XHSPassSetting_" + key);
-		toggle.AddClass("XHSPassSettingToggle");
-		toggle.SetHasClass("IsEnabled", settingsDraft[key] === true);
-		toggle.hittest = false;
-
-		var knob = $.CreatePanel("Panel", toggle, "");
-		knob.AddClass("XHSPassSettingToggleKnob");
-		knob.hittest = false;
-
-		row.SetPanelEvent("onactivate", function () {
-			if (settingsSaving) {
-				Game.EmitSound("General.Cancel");
-				return;
-			}
-
-			settingsDraft[key] = settingsDraft[key] !== true;
-			row.SetHasClass("IsEnabled", settingsDraft[key] === true);
-			toggle.SetHasClass("IsEnabled", settingsDraft[key] === true);
-			UpdateSettingsSaveBar();
-			Game.EmitSound("General.ButtonClick");
-		});
-	}
-
-	function CreateSettingActionRow(parent, title, description, buttonText, callback) {
-		var row = $.CreatePanel("Panel", parent, "");
-		row.AddClass("XHSPassSettingRow");
-		row.AddClass("XHSPassSettingActionRow");
-		row.hittest = true;
-
-		var copy = $.CreatePanel("Panel", row, "");
-		copy.AddClass("XHSPassRowMain");
-		copy.hittest = false;
-
-		var titlePanel = $.CreatePanel("Label", copy, "");
-		titlePanel.AddClass("XHSPassRowTitle");
-		titlePanel.text = title;
-		titlePanel.hittest = false;
-
-		var descPanel = $.CreatePanel("Label", copy, "");
-		descPanel.AddClass("XHSPassRowDescription");
-		descPanel.text = description;
-		descPanel.hittest = false;
-
-		var button = $.CreatePanel("Button", row, "");
-		button.AddClass("XHSPassSettingActionButton");
-		button.SetPanelEvent("onactivate", callback);
-
-		var label = $.CreatePanel("Label", button, "");
-		label.text = buttonText;
-	}
-
-	function RenderSettings(player) {
-		var parent = Panel("XHSPassSettingsRows");
-		ClearPanel(parent);
-
-		if (!settingsInitialized) {
-			settingsOriginal = BuildSettingsFromPlayer(player);
-			settingsDraft = CopySettings(settingsOriginal);
-			settingsInitialized = true;
-		}
-
-		CreateSettingRow(parent, "toggle_tag", Text("xhs_sp_setting_tag", "Supporter tag"), Text("xhs_sp_setting_tag_desc", "Display your supporter badge above your hero health bar."));
-		CreateSettingRow(parent, "pass_rewards", Text("xhs_sp_setting_cosmetics", "Cosmetic rewards"), Text("xhs_sp_setting_cosmetics_desc", "Enable or disable equipped pass cosmetics in-game."));
-		CreateSettingRow(parent, "player_xp", Text("xhs_sp_setting_xp", "XP visibility"), Text("xhs_sp_setting_xp_desc", "Show seasonal and account XP in social UI surfaces."));
-		CreateSettingRow(parent, "winrate_toggle", Text("xhs_sp_setting_winrate", "Winrate visibility"), Text("xhs_sp_setting_winrate_desc", "Show your seasonal winrate in public profile surfaces."));
-		CreateSettingActionRow(parent, Text("xhs_sp_type_companion", "Companion"), Text("xhs_sp_disable_companion_desc", "Remove your current supporter companion for this match."), Text("xhs_sp_disable", "Disable"), function () {
-			if (GameEvents && GameEvents.SendCustomGameEventToServer) {
-				GameEvents.SendCustomGameEventToServer("supporter_pass_change_companion", {
-					unit: "",
-					js: true,
-				});
-				ShowActionMessage(Text("xhs_sp_companion_disabled", "Companion disabled."), true);
-				Game.EmitSound("General.ButtonClick");
-			}
-		});
-		UpdateSettingsSaveBar();
-	}
-
 	function AchievementList(value) {
 		if (!value) {
 			return [];
@@ -6739,7 +6573,6 @@ var XHSSupporterPass = (function () {
 		RenderRewards(player);
 		RenderShop(player);
 		RenderArmory(player);
-		RenderSettings(player);
 		RenderAchievements();
 	}
 
@@ -7012,51 +6845,6 @@ var XHSSupporterPass = (function () {
 			backToTop.SetPanelEvent("onactivate", ScrollCurrentPageToTop);
 		}
 
-		var saveSettings = Panel("XHSPassSettingsSaveButton");
-		if (saveSettings) {
-			saveSettings.SetPanelEvent("onactivate", function () {
-				if (settingsSaving || SettingsEqual(settingsOriginal, settingsDraft)) {
-					return;
-				}
-
-				settingsSaving = true;
-				Game.EmitSound("General.ButtonClick");
-				UpdateSettingsSaveBar();
-				if (GameEvents && GameEvents.SendCustomGameEventToServer) {
-					var payload = CopySettings(settingsDraft);
-					payload.player_id = Players.GetLocalPlayer();
-					GameEvents.SendCustomGameEventToServer("supporter_pass_update_settings", payload);
-					$.Schedule(16.0, function () {
-						if (!settingsSaving) {
-							return;
-						}
-
-						settingsSaving = false;
-						settingsDraft = CopySettings(settingsOriginal);
-						RenderSettings(GetLocalPlayerData());
-						ShowActionMessage(Text("xhs_sp_settings_timeout", "Settings save timed out."), false);
-					});
-				} else {
-					settingsSaving = false;
-					UpdateSettingsSaveBar();
-				}
-			});
-		}
-
-		var cancelSettings = Panel("XHSPassSettingsCancelButton");
-		if (cancelSettings) {
-			cancelSettings.SetPanelEvent("onactivate", function () {
-				if (settingsSaving) {
-					Game.EmitSound("General.Cancel");
-					return;
-				}
-
-				settingsDraft = CopySettings(settingsOriginal);
-				RenderSettings(GetLocalPlayerData());
-				Game.EmitSound("General.Cancel");
-			});
-		}
-
 		for (var page in TAB_IDS) {
 			if (TAB_IDS.hasOwnProperty(page)) {
 				(function (pageName) {
@@ -7181,18 +6969,6 @@ var XHSSupporterPass = (function () {
 					devLocalEquippedBySlot = {};
 				}
 				RenderAll();
-			});
-			GameEvents.Subscribe("supporter_pass_settings_failed", function (payload) {
-				settingsSaving = false;
-				settingsDraft = CopySettings(settingsOriginal);
-				RenderSettings(GetLocalPlayerData());
-				ShowActionMessage(LocalizeMaybeKey((payload && payload.message) || "#xhs_sp_settings_failed"), false);
-			});
-			GameEvents.Subscribe("supporter_pass_settings_success", function () {
-				settingsSaving = false;
-				settingsOriginal = CopySettings(settingsDraft);
-				UpdateSettingsSaveBar();
-				ShowActionMessage(Text("xhs_sp_settings_saved", "Settings saved."), true);
 			});
 			GameEvents.Subscribe("supporter_pass_payment_portal_ready", function (payload) {
 				supporterPortalRequestPending = false;
