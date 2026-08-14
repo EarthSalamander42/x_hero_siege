@@ -65,8 +65,8 @@ table.insert(devour_table, "npc_dota_creature_satyrr")
 	for _,v in ipairs(devour_table) do
 		if target:GetUnitName() == v then
 			-- Get the first two abilities
-			local ability1 = target:GetAbilityByIndex(0)
-			local ability2 = target:GetAbilityByIndex(1)
+			local ability1 = GetUnitAbilityBySafeIndex(target, 0)
+			local ability2 = GetUnitAbilityBySafeIndex(target, 1)
 			if ability1 == nil then return end
 
 			-- If we already devoured a target and stole an ability from before then clear it

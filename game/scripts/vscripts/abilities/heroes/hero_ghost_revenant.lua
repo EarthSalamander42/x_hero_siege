@@ -1,6 +1,10 @@
 -- Editors:
 --     EarthSalamander #42, ??.??.2018
 
+local SupporterPassImmolation = require("components/battlepass/immolation")
+local GHOST_IMMOLATION_OWNER_PFX = "particles/hero/ghost_revenant/ambient_effects.vpcf"
+local GHOST_IMMOLATION_TARGET_PFX = "particles/econ/events/ti8/radiance_owner_ti8.vpcf"
+
 -----------------------------------------------------------------------------------------------------------
 -- Wraith
 -----------------------------------------------------------------------------------------------------------
@@ -34,6 +38,7 @@ end
 -- Wraith modifier
 -----------------------------------------------------------------------------------------------------------
 modifier_ghost_revenant_wraith = class({})
+modifier_ghost_revenant_wraith.XHS_LINK_CLIENT = true
 
 function modifier_ghost_revenant_wraith:OnRefresh()
 	if IsServer() then
@@ -184,6 +189,7 @@ end
 -----------------------------------------------------------------------------------------------------------
 
 if modifier_ghost_revenant_blackjack_debuff == nil then modifier_ghost_revenant_blackjack_debuff = class({}) end
+modifier_ghost_revenant_blackjack_debuff.XHS_LINK_CLIENT = true
 
 function modifier_ghost_revenant_blackjack_debuff:OnCreated()
 	local ability = self:GetAbility()
@@ -206,6 +212,7 @@ function modifier_ghost_revenant_blackjack_debuff:IsPurgable() return false end
 function modifier_ghost_revenant_blackjack_debuff:IsStunDebuff() return true end
 function modifier_ghost_revenant_blackjack_debuff:GetEffectName() return "particles/generic_gameplay/generic_stunned.vpcf" end
 function modifier_ghost_revenant_blackjack_debuff:GetEffectAttachType() return PATTACH_OVERHEAD_FOLLOW end
+function modifier_ghost_revenant_blackjack_debuff:ShouldUseOverheadOffset() return true end
 
 -----------------------------------------------------------------------------------------------------------
 --	Miasma
@@ -256,11 +263,13 @@ end
 -----------------------------------------------------------------------------------------------------------
 
 if modifier_ghost_revenant_miasma == nil then modifier_ghost_revenant_miasma = class({}) end
+modifier_ghost_revenant_miasma.XHS_LINK_CLIENT = true
 function modifier_ghost_revenant_miasma:IsDebuff() return true end
 function modifier_ghost_revenant_miasma:IsHidden() return false end
 function modifier_ghost_revenant_miasma:IsPurgable() return true end
 function modifier_ghost_revenant_miasma:GetEffectName() return "particles/items2_fx/true_sight_debuff.vpcf" end
 function modifier_ghost_revenant_miasma:GetEffectAttachType() return PATTACH_OVERHEAD_FOLLOW end
+function modifier_ghost_revenant_miasma:ShouldUseOverheadOffset() return true end
 function modifier_ghost_revenant_miasma:GetPriority() return MODIFIER_PRIORITY_SUPER_ULTRA end
 
 function modifier_ghost_revenant_miasma:DeclareFunctions()
@@ -366,10 +375,7 @@ LinkLuaModifier("modifier_ghost_revenant_ghost_immolation", "abilities/heroes/he
 LinkLuaModifier("modifier_ghost_revenant_ghost_immolation_debuff", "abilities/heroes/hero_ghost_revenant", LUA_MODIFIER_MOTION_NONE)
 
 modifier_ghost_revenant_ghost_immolation = class({})
-
-function modifier_ghost_revenant_ghost_immolation:GetEffectName()
-	return "particles/hero/ghost_revenant/ambient_effects.vpcf"
-end
+modifier_ghost_revenant_ghost_immolation.XHS_LINK_CLIENT = true
 
 function modifier_ghost_revenant_ghost_immolation:GetStatusEffectName()
 	return "particles/status_fx/status_effect_ghost_revenant.vpcf"
@@ -382,6 +388,15 @@ end
 function modifier_ghost_revenant_ghost_immolation:OnCreated()
 	if IsServer() then
 		self:GetParent():SetRenderColor(128, 255, 0)
+		self.immolation_source = self:GetAbility()
+		self.immolation_caster = self:GetCaster()
+		SupporterPassImmolation:Acquire(
+			self.immolation_source,
+			self.immolation_caster,
+			self.immolation_source,
+			GHOST_IMMOLATION_OWNER_PFX,
+			GHOST_IMMOLATION_TARGET_PFX
+		)
 	end
 end
 
@@ -391,8 +406,17 @@ function modifier_ghost_revenant_ghost_immolation:OnRefresh()
 	end
 end
 
+function modifier_ghost_revenant_ghost_immolation:OnDestroy()
+	if not IsServer() then return end
+	SupporterPassImmolation:Release(
+		self.immolation_source,
+		self.immolation_caster,
+		self.immolation_source
+	)
+end
+
 function modifier_ghost_revenant_ghost_immolation:GetAuraEntityReject(target)
-	return false
+	return IsXHSRuneUnit and IsXHSRuneUnit(target)
 end
 
 function modifier_ghost_revenant_ghost_immolation:GetAuraRadius()
@@ -439,6 +463,7 @@ function modifier_ghost_revenant_ghost_immolation:GetModifierAura()
 end
 
 modifier_ghost_revenant_ghost_immolation_debuff = modifier_ghost_revenant_ghost_immolation_debuff or class({})
+modifier_ghost_revenant_ghost_immolation_debuff.XHS_LINK_CLIENT = true
 
 function modifier_ghost_revenant_ghost_immolation_debuff:IsHidden()
 	return false
@@ -452,10 +477,6 @@ function modifier_ghost_revenant_ghost_immolation_debuff:IsPurgable()
 	return false
 end
 
-function modifier_ghost_revenant_ghost_immolation_debuff:GetEffectName()
-	return "particles/econ/events/ti8/radiance_owner_ti8.vpcf"
-end
-
 function modifier_ghost_revenant_ghost_immolation_debuff:GetEffectAttachType()
 	return PATTACH_ABSORIGIN_FOLLOW
 end
@@ -464,12 +485,56 @@ end
 function modifier_ghost_revenant_ghost_immolation_debuff:OnCreated()
 	if not IsServer() then return end
 
+	self.immolation_source = self:GetAbility()
+	self.immolation_caster = self:GetCaster()
+	SupporterPassImmolation:AcquireTarget(
+		self.immolation_source,
+		self.immolation_caster,
+		self:GetParent(),
+		self.immolation_source,
+		GHOST_IMMOLATION_OWNER_PFX,
+		GHOST_IMMOLATION_TARGET_PFX
+	)
+
 --	print("Tick time:", self:GetAbility():GetSpecialValueFor("tick_time"))
 	self:StartIntervalThink(self:GetAbility():GetSpecialValueFor("tick_time"))
 end
 
+function modifier_ghost_revenant_ghost_immolation_debuff:OnRefresh()
+	if not IsServer() then return end
+
+	self.immolation_source = self:GetAbility()
+	self.immolation_caster = self:GetCaster()
+	SupporterPassImmolation:AcquireTarget(
+		self.immolation_source,
+		self.immolation_caster,
+		self:GetParent(),
+		self.immolation_source,
+		GHOST_IMMOLATION_OWNER_PFX,
+		GHOST_IMMOLATION_TARGET_PFX
+	)
+end
+
+function modifier_ghost_revenant_ghost_immolation_debuff:OnDestroy()
+	if not IsServer() then return end
+	SupporterPassImmolation:ReleaseTarget(
+		self.immolation_source,
+		self.immolation_caster,
+		self:GetParent(),
+		self.immolation_source
+	)
+end
+
 function modifier_ghost_revenant_ghost_immolation_debuff:OnIntervalThink()
 --	print("Damage:", self:GetParent():GetMaxHealth() / 100 * self:GetAbility():GetSpecialValueFor("health_as_damage_pct"))
+	SupporterPassImmolation:AcquireTarget(
+		self.immolation_source,
+		self.immolation_caster,
+		self:GetParent(),
+		self.immolation_source,
+		GHOST_IMMOLATION_OWNER_PFX,
+		GHOST_IMMOLATION_TARGET_PFX
+	)
 	ApplyDamage({victim = self:GetParent(), attacker = self:GetCaster(), damage = self:GetParent():GetMaxHealth() / 100 * self:GetAbility():GetSpecialValueFor("health_as_damage_pct"), damage_type = DAMAGE_TYPE_MAGICAL})
 end
 
@@ -500,6 +565,7 @@ function ghost_revenant_exhaustion:OnSpellStart()
 end
 
 if modifier_ghost_revenant_exhaustion == nil then modifier_ghost_revenant_exhaustion = class({}) end
+modifier_ghost_revenant_exhaustion.XHS_LINK_CLIENT = true
 function modifier_ghost_revenant_exhaustion:IsDebuff() return true end
 function modifier_ghost_revenant_exhaustion:IsHidden() return false end
 function modifier_ghost_revenant_exhaustion:IsPurgable() return true end
@@ -525,6 +591,8 @@ end
 function modifier_ghost_revenant_exhaustion:GetEffectAttachType()
 	return PATTACH_OVERHEAD_FOLLOW
 end
+
+function modifier_ghost_revenant_exhaustion:ShouldUseOverheadOffset() return true end
 
 function modifier_ghost_revenant_exhaustion:GetPriority()
 	return MODIFIER_PRIORITY_SUPER_ULTRA

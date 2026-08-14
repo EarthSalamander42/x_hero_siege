@@ -1,0 +1,263 @@
+<root>
+	<styles>
+		<include src="file://{resources}/styles/custom_game/xhs_theme.css" />
+		<include src="file://{resources}/styles/custom_game/xhs_supporter_hover.css" />
+		<include src="file://{resources}/styles/custom_game/xhs_end_screen.css" />
+	</styles>
+
+	<scripts>
+		<include src="file://{resources}/scripts/custom_game/util.js" />
+		<include src="file://{resources}/scripts/custom_game/xhs_name_display.js" />
+		<include src="file://{resources}/scripts/custom_game/xhs_supporter_hover.js" />
+		<include src="file://{resources}/scripts/custom_game/xhs_end_screen.js" />
+	</scripts>
+
+	<Panel class="XHSEndScreenRoot IsLoading">
+		<Panel class="XHSEndScreenBackdrop" hittest="false" />
+		<Panel id="XHSEndScreenLoading" class="XHSEndScreenLoading">
+			<Panel class="XHSEndScreenLoadingSpinner">
+				<Panel class="XHSEndScreenSpinnerBlade Blade1" />
+				<Panel class="XHSEndScreenSpinnerBlade Blade2" />
+				<Panel class="XHSEndScreenSpinnerBlade Blade3" />
+				<Panel class="XHSEndScreenSpinnerBlade Blade4" />
+				<Panel class="XHSEndScreenSpinnerBlade Blade5" />
+				<Panel class="XHSEndScreenSpinnerBlade Blade6" />
+				<Panel class="XHSEndScreenSpinnerBlade Blade7" />
+				<Panel class="XHSEndScreenSpinnerBlade Blade8" />
+				<Panel class="XHSEndScreenSpinnerCore" />
+			</Panel>
+			<Label class="XHSEndScreenLoadingTitle" text="Loading run summary" />
+			<Label class="XHSEndScreenLoadingText" text="Waiting for final game data..." />
+		</Panel>
+		<Panel id="XHSEndScreenFallback" class="XHSEndScreenFallback">
+			<Panel class="XHSEndScreenFallbackCard">
+				<Label class="XHSEndScreenFallbackIcon" text="!" />
+				<Label class="XHSEndScreenFallbackTitle" text="Unable to load run summary" />
+				<Label class="XHSEndScreenFallbackText" text="A problem occurred while preparing the end screen. You can safely leave the game." />
+				<Button id="XHSEndScreenFallbackClose" class="XHSEndScreenButton XHSEndScreenFallbackButton">
+					<Label text="Leave game" />
+				</Button>
+			</Panel>
+		</Panel>
+
+		<Panel id="XHSEndScreenMain" class="XHSEndScreenMain">
+			<Panel class="XHSEndScreenHeader">
+				<Panel class="XHSEndScreenHeaderCopy">
+					<Label id="XHSEndScreenResult" class="XHSEndScreenResult" text="Victory" />
+					<Panel class="XHSEndScreenMetaSlot">
+						<Panel class="XHSEndScreenMeta">
+							<Panel class="XHSEndScreenMetaItem">
+								<Label class="XHSEndScreenMetaLabel" text="Time" />
+								<Label id="XHSEndScreenTime" class="XHSEndScreenMetaValue" text="00:00" />
+							</Panel>
+							<Panel class="XHSEndScreenMetaItem">
+								<Label class="XHSEndScreenMetaLabel" text="Difficulty" />
+								<Label id="XHSEndScreenDifficulty" class="XHSEndScreenMetaValue" text="-" />
+							</Panel>
+							<Button id="XHSEndScreenGameIdButton" class="XHSEndScreenMetaItem XHSEndScreenGameIdButton">
+								<Label class="XHSEndScreenMetaLabel" text="Game ID" />
+								<Label id="XHSEndScreenGameId" class="XHSEndScreenMetaValue" text="-" />
+							</Button>
+							<Panel class="XHSEndScreenMetaItem">
+								<Label class="XHSEndScreenMetaLabel" text="Players" />
+								<Label id="XHSEndScreenPlayersMeta" class="XHSEndScreenMetaValue" text="0" />
+							</Panel>
+						</Panel>
+					</Panel>
+				</Panel>
+
+				<Panel class="XHSEndScreenHeaderActions">
+					<Button id="XHSEndScreenXPButton" class="XHSEndScreenButton XHSEndScreenButtonSecondary" enabled="false">
+						<Label text="XP Summary" />
+					</Button>
+					<Button id="XHSEndScreenFarmButton" class="XHSEndScreenButton XHSEndScreenButtonSecondary">
+						<Label id="XHSEndScreenFarmButtonLabel" text="Farm Event" />
+					</Button>
+					<Button id="XHSEndScreenHallButton" class="XHSEndScreenButton XHSEndScreenButtonSecondary XHSEndScreenButtonDisabled" enabled="false">
+						<Label text="Hall of Fame" />
+					</Button>
+				</Panel>
+			</Panel>
+
+			<Panel class="XHSEndScreenBody">
+				<Panel class="XHSEndScreenLeft">
+					<Panel id="XHSEndScreenMvpCards" class="XHSEndScreenMvpGrid" />
+					<Panel id="XHSEndScreenFragmentQuests" class="XHSEndScreenFragmentQuests" />
+				</Panel>
+
+				<Panel class="XHSEndScreenPlayersPanel XHSPanel">
+					<Panel class="XHSEndScreenSectionHeader">
+						<Label class="XHSEndScreenSectionTitle" text="Run Scoreboard" />
+						<Label id="XHSEndScreenPlayerCount" class="XHSEndScreenSectionNote" text="0 players" />
+					</Panel>
+
+					<Panel class="XHSEndScreenPlayerHeader">
+						<Label class="PlayerColIdentity" text="Player" />
+						<Label class="PlayerColSmall" text="LVL" />
+						<Label class="PlayerColKda" text="Kills" />
+						<Label class="PlayerColNumber" text="Deaths" />
+						<Label class="PlayerColNumber" text="Gold Earned" />
+						<Label class="PlayerColNumber" text="Tome Stats" />
+						<Label class="PlayerColNumber" text="Potions" />
+						<Label class="PlayerColBattlepass" text="Supporter Pass" />
+					</Panel>
+
+					<Panel id="XHSEndScreenPlayerRows" class="XHSEndScreenPlayerRows" />
+				</Panel>
+			</Panel>
+
+			<Panel class="XHSEndScreenSupportCta">
+				<Panel class="XHSEndScreenSupportMark">
+					<Image class="XHSEndScreenSupportLogo" src="file://{images}/custom_game/logo/logo-xhs-transparent.png" />
+				</Panel>
+				<Panel class="XHSEndScreenSupportCopy">
+					<Panel class="XHSEndScreenSupportHeader">
+						<Label class="XHSEndScreenSupportTitle" text="Support X Hero Siege" />
+						<Label class="XHSEndScreenSupportTag" text="Up to +40% XP every game" />
+					</Panel>
+					<Label class="XHSEndScreenSupportText" text="Help keep XHS running and progress faster with monthly fragments, cosmetics, setup votes, and a permanent XP boost." />
+					<Panel class="XHSEndScreenSupportBoosts">
+						<Label class="XHSEndScreenSupportBoostLabel" text="XP BOOSTS" />
+						<Label class="XHSEndScreenSupportBoost Tier1" text="+10%" />
+						<Label class="XHSEndScreenSupportBoost Tier2" text="+20%" />
+						<Label class="XHSEndScreenSupportBoost Tier3" text="+30%" />
+						<Label class="XHSEndScreenSupportBoost Tier4" text="+40%" />
+					</Panel>
+				</Panel>
+				<Button id="XHSEndScreenSupportButton" class="XHSEndScreenSupportButton">
+					<Label text="Support &amp; Rewards" />
+				</Button>
+			</Panel>
+
+			<Panel class="XHSEndScreenFooter">
+				<Button id="XHSEndScreenWebsiteButton" class="XHSEndScreenFooterButton XHSEndScreenButtonSecondary">
+					<Label text="Website" />
+				</Button>
+				<Button id="XHSEndScreenDiscordButton" class="XHSEndScreenFooterButton XHSEndScreenDiscordButton">
+					<Label text="Discord" />
+				</Button>
+				<Button id="XHSEndScreenCloseButton" class="XHSEndScreenFooterButton XHSEndScreenButton">
+					<Label text="#CustomEndScreenClose" />
+				</Button>
+			</Panel>
+		</Panel>
+
+		<Panel id="XHSEndScreenHallPanel" class="XHSEndScreenHallPanel">
+			<Panel class="XHSEndScreenHallBackdrop" onactivate="XHSEndScreen.CloseHallOfFame()" />
+			<Panel class="XHSEndScreenHallWindow XHSPanel">
+				<Panel class="XHSEndScreenHallHeader">
+					<Panel>
+						<Label class="XHSEndScreenSectionTitle" text="Hall of Fame" />
+						<Label class="XHSEndScreenSectionNote" text="Diretide leaderboard" />
+					</Panel>
+					<Button id="XHSEndScreenHallCloseButton" class="XHSEndScreenIconButton" onactivate="XHSEndScreen.CloseHallOfFame()">
+						<Label text="X" />
+					</Button>
+				</Panel>
+
+				<Panel class="XHSEndScreenHallLegend">
+					<Label class="HallColRank" text="#" />
+					<Label class="HallColPlayer" text="Player" />
+					<Label class="HallColScore" text="Score" />
+				</Panel>
+
+				<Panel id="XHSEndScreenHallRows" class="XHSEndScreenHallRows" />
+				<Label id="XHSEndScreenHallEmpty" class="XHSEndScreenEmptyText" text="No Hall of Fame data available for this run." />
+			</Panel>
+		</Panel>
+
+		<Panel id="XHSEndScreenXPContainer" class="XHSEndScreenXPContainer" hittest="true">
+			<Panel class="XHSXPBackdrop" hittest="true" />
+
+			<Panel id="XHSXPModal" class="XHSXPModal" hittest="true">
+				<Panel class="XHSXPTopAccent" hittest="false" />
+
+				<Panel class="XHSXPHeader">
+					<Panel class="XHSXPHeaderCopy">
+						<Label class="XHSXPEyebrow" text="SUPPORTER PASS PROGRESS" />
+						<Label id="XHSXPPlayerName" class="XHSXPPlayerName" text="Player" />
+					</Panel>
+					<Panel class="XHSXPTotalBlock">
+						<Label id="XHSXPTotalCaption" class="XHSXPTotalCaption" text="TOTAL EARNED" />
+						<Label id="XHSXPTotalGain" class="XHSXPTotalGain" text="+0 XP" />
+					</Panel>
+				</Panel>
+
+				<Panel id="XHSXPSimulationNotice" class="XHSXPSimulationNotice">
+					<Label class="XHSXPSimulationIcon" text="!" />
+					<Panel class="XHSXPSimulationCopy">
+						<Label id="XHSXPSimulationTitle" class="XHSXPSimulationTitle" text="SIMULATION ONLY - MATCH NOT ELIGIBLE" />
+						<Label id="XHSXPSimulationText" class="XHSXPSimulationText" text="Theoretical XP is shown for preview. Nothing is saved." />
+					</Panel>
+				</Panel>
+
+				<Panel class="XHSXPProgressSection">
+					<Panel class="XHSXPRewardEndpoints">
+						<Panel class="XHSXPRewardEndpoint Previous">
+							<Panel class="XHSXPRewardImageFrame">
+								<Panel id="XHSXPPreviousRewardImage" class="XHSXPRewardImage" />
+								<Panel class="XHSXPRewardImageShade" hittest="false" />
+							</Panel>
+							<Panel class="XHSXPRewardCopy">
+								<Label class="XHSXPRewardCaption" text="LAST REWARD" />
+								<Label id="XHSXPPreviousRewardName" class="XHSXPRewardName" text="Previous reward" />
+							</Panel>
+						</Panel>
+
+						<Panel class="XHSXPLevelTrack">
+							<Panel class="XHSXPLevelLabels">
+								<Label id="XHSXPCurrentLevel" class="XHSXPLevelLabel Current" text="LEVEL 1" />
+								<Label id="XHSXPNextLevel" class="XHSXPLevelLabel Next" text="LEVEL 2" />
+							</Panel>
+							<Panel class="XHSXPProgressBar">
+								<Panel class="XHSXPProgressBackGlow" hittest="false" />
+								<Panel id="XHSXPProgressFill" class="XHSXPProgressFill">
+									<Panel class="XHSXPProgressShine" hittest="false" />
+								</Panel>
+								<Panel class="XHSXPProgressTicks" hittest="false" />
+							</Panel>
+							<Label id="XHSXPProgressText" class="XHSXPProgressText" text="0 / 1000 XP" />
+						</Panel>
+
+						<Panel class="XHSXPRewardEndpoint Next">
+							<Panel class="XHSXPRewardCopy">
+								<Label class="XHSXPRewardCaption" text="NEXT REWARD" />
+								<Label id="XHSXPNextRewardName" class="XHSXPRewardName" text="Upcoming reward" />
+							</Panel>
+							<Panel class="XHSXPRewardImageFrame">
+								<Panel id="XHSXPNextRewardImage" class="XHSXPRewardImage" />
+								<Panel class="XHSXPRewardImageGlow" hittest="false" />
+							</Panel>
+						</Panel>
+					</Panel>
+				</Panel>
+
+				<Panel class="XHSXPStepsSection">
+					<Panel class="XHSXPStepsHeader">
+						<Label class="XHSXPStepsTitle" text="MATCH XP BREAKDOWN" />
+						<Label class="XHSXPStepsHint" text="Rewards are added to your progress one by one" />
+					</Panel>
+					<Panel id="XHSXPSteps" class="XHSXPSteps" />
+				</Panel>
+
+				<Panel class="XHSXPFooter">
+					<Label id="XHSXPFooterHint" class="XHSXPFooterHint" text="Your unlocked rewards will follow" />
+					<Button id="XHSXPContinueButton" class="XHSXPContinueButton" enabled="false">
+						<Label id="XHSXPContinueButtonLabel" text="CONTINUE TO REWARDS" />
+						<Panel class="XHSXPContinueArrow" hittest="false" />
+					</Button>
+				</Panel>
+			</Panel>
+
+			<Panel id="XHSXPTransferLayer" class="XHSXPTransferLayer" hittest="false" />
+			<Panel id="XHSXPLevelUpBurst" class="XHSXPLevelUpBurst" hittest="false">
+				<Panel class="XHSXPLevelUpRing Outer" />
+				<Panel class="XHSXPLevelUpRing Inner" />
+				<Panel class="XHSXPLevelUpFlash" />
+				<Label id="XHSXPLevelUpText" class="XHSXPLevelUpText" text="+1 LEVEL" />
+			</Panel>
+		</Panel>
+
+		<Panel id="XHSEndScreenRewardContainer" class="XHSEndScreenRewardContainer" />
+	</Panel>
+</root>

@@ -247,9 +247,7 @@ function IllusionManager:ResetIllusion(tEntity,tIllusion)  -- Wipe AND re-add sk
 	if not IsServer() then return end	
 	IllusionManager:WipeIllusion(tIllusion)
 	--start at baseline, we have no ability points... add and skill up requisite skills.
-	for ability_slot = 0, 15 do
-		local ability = tEntity:GetAbilityByIndex(ability_slot)
-		if ability then
+	ForEachUnitAbility(tEntity, function(ability)
 			local abilityLevel = ability:GetLevel()
 			local abilityName = ability:GetAbilityName()
 			local illusionAbility = tIllusion:FindAbilityByName(abilityName)
@@ -264,8 +262,7 @@ function IllusionManager:ResetIllusion(tEntity,tIllusion)  -- Wipe AND re-add sk
 					newability:SetLevel(abilityLevel)
 				end
 			end
-		end
-	end
+	end)
 	if tIllusion:IsCreep() then return end	
 	local illusion_level = tIllusion:GetLevel()
 	local entity_level 	 = tEntity:GetLevel()
@@ -295,12 +292,13 @@ end
 
 function IllusionManager:WipeIllusion(tIllusion)  -- Wipe illusion of any notable characteristics (skills, items, etc)
 	if not IsServer() then return end
-	for ability_slot = 0, 15 do
-		local wipe_ability_index = tIllusion:GetAbilityByIndex(ability_slot)
-		if wipe_ability_index then
-			local abilityName = wipe_ability_index:GetAbilityName()
+	local abilityNames = {}
+	ForEachUnitAbility(tIllusion, function(ability)
+		table.insert(abilityNames, ability:GetAbilityName())
+	end)
+
+	for _, abilityName in pairs(abilityNames) do
 			tIllusion:RemoveAbility(abilityName)
-		end
 	end
 	if tIllusion:IsCreep() then return end	
 	for item_slot = 0, 8 do	

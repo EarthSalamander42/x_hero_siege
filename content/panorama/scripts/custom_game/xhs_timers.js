@@ -15,7 +15,7 @@ function CountdownTimer(data)
 }
 
 function EnsureTimerShellVisible() {
-	if ($("#TimerShell").style.visibility !== "visible") {
+	if ($("#TimerShell") && $("#TimerShell").style.visibility !== "visible") {
 		$("#TimerShell").style.visibility = "visible";
 		$("#TimerPanels").style.visibility = "visible";
 	}

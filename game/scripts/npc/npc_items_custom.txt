@@ -14,6 +14,7 @@
 		"AbilityUnitTargetTeam"			"DOTA_UNIT_TARGET_TEAM_FRIENDLY"
 		"AbilityUnitTargetType"			"DOTA_UNIT_TARGET_HERO"
 		"Model"							"models/props_gameplay/gold_bag.vmdl"
+		"AbilityTextureName"			"hand_of_midas"
 		"ItemKillable"					"0"
 
 		// Stats
@@ -42,7 +43,7 @@
 		// General
 		//-------------------------------------------------------------------------------------------------------------
 		"BaseClass"						"item_branches"
-		"AbilityTextureName"			"orb_of_passage"
+		"AbilityTextureName"			"blink"
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_PASSIVE"
 		"Model"							"models/gameplay/orb_passage.vmdl"
 
@@ -80,6 +81,7 @@
 		// General
 		//-------------------------------------------------------------------------------------------------------------
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET | DOTA_ABILITY_BEHAVIOR_DONT_RESUME_ATTACK"
+		"AbilityTextureName"			"custom/tome_small"
 																																																																												 
 		// Stats		
 		//-------------------------------------------------------------------------------------------------------------
@@ -114,6 +116,7 @@
 		// General
 		//-------------------------------------------------------------------------------------------------------------
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET | DOTA_ABILITY_BEHAVIOR_DONT_RESUME_ATTACK"
+		"AbilityTextureName"			"custom/tome_small"
 																																																																												 
 		// Stats		
 		//-------------------------------------------------------------------------------------------------------------
@@ -148,6 +151,7 @@
 		// General
 		//-------------------------------------------------------------------------------------------------------------
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET | DOTA_ABILITY_BEHAVIOR_DONT_RESUME_ATTACK"
+		"AbilityTextureName"			"custom/tome_small"
 																																																																												 
 		// Stats		
 		//-------------------------------------------------------------------------------------------------------------
@@ -768,7 +772,7 @@
 		// General
 		//-------------------------------------------------------------------------------------------------------------
 		"BaseClass"						"item_lua"
-		"AbilityTextureName"			"rhyziks_eye"
+		"AbilityTextureName"			"seer_stone"
 		"ScriptFile"					"items/item_rhyziks_eye"
 
 		"Model"							"models/props_gameplay/treasure_chest001.vmdl"
@@ -963,7 +967,7 @@
 		// General
 		//-------------------------------------------------------------------------------------------------------------
 		"BaseClass"						"item_lua"
-		"AbilityTextureName"			"the_caustic_finale"
+		"AbilityTextureName"			"orb_of_corrosion"
 		"ScriptFile"					"items/item_the_caustic_finale"
 
 		"Model"							"models/props_gameplay/treasure_chest001.vmdl"
@@ -1019,6 +1023,7 @@
 		// Item Info
 		//-------------------------------------------------------------------------------------------------------------
 		"ItemCost" 						"15000"
+		"ItemPurchasable"				"1"
 		"ItemShopTags"					"unique"
 		"ItemQuality"					"rare"
 		"ItemAliases"					"mask of death"
@@ -1169,6 +1174,7 @@
 		// Item Info
 		//-------------------------------------------------------------------------------------------------------------
 		"ItemCost"						"150"
+		"ItemPurchasable"				"1"
 		"ItemShopTags"					"consumable"
 		"ItemQuality"					"consumable"
 		"ItemStackable"					"1"
@@ -1208,6 +1214,7 @@
 		// Item Info
 		//-------------------------------------------------------------------------------------------------------------
 		"ItemCost"						"100"
+		"ItemPurchasable"				"1"
 		"ItemShopTags"					"consumable"
 		"ItemQuality"					"consumable"
 		"ItemStackable"					"1"
@@ -1220,134 +1227,6 @@
 		"AbilityValues"
 		{
 			"mana_restore"			"3000"
-		}
-	}
-
-	//=================================================================================================================
-	// Staff of Mastery
-	//=================================================================================================================
-	"item_staff_of_mastery"
-	{
-		// General
-		//-------------------------------------------------------------------------------------------------------------
-		"BaseClass"                     "item_datadriven"
-		"ID"                            "2509"
-		"AbilityBehavior"               "DOTA_ABILITY_BEHAVIOR_UNIT_TARGET"
-		"AbilityUnitTargetTeam"			"DOTA_UNIT_TARGET_TEAM_ENEMY"
-		"AbilityUnitTargetType"			"DOTA_UNIT_TARGET_HERO | DOTA_UNIT_TARGET_BASIC"
-		"Model"                         "models/props_gameplay/red_box.vmdl" 
-		"Effect"                        "particles/generic_gameplay/dropped_item.vpcf"
-		"AbilityTextureName"			"custom/scepter_of_mastery"
-
-		// Stats        
-		//-------------------------------------------------------------------------------------------------------------
-		"AbilityCastPoint"              "0"
-		"AbilityCastRange"				"700"
-		"AbilityCooldown"               "30"
-		"AbilityManaCost"               "0"
-		"AbilitySharedCooldown"         "ethereal"
-
-		// Item Info
-		//-------------------------------------------------------------------------------------------------------------
-		"ItemCost"                      "30000"
-		"ItemShopTags"                  "int;agi;str;hard_to_tag"
-		"ItemQuality"                   "epic"
-		"ItemAliases"                   "staff of mastery"
-		"SecretShop"					"1"
-
-		"AbilityValues"
-		{
-			"bonus_armor"					"50"
-			"duration"                      "5.0"
-			"extra_spell_damage_percent"	"-100"
-			"projectile_speed"				"800"
-			"bonus_movement"				"-60"
-			"spell_amplification_tooltip"	"50"
-			"slow_tooltip"					"60"
-			"mana_regen"					"10"
-		}
-
-		"OnSpellStart"
-		{
-			"TrackingProjectile"
-			{
-				"Target"			"TARGET"
-				"EffectName"		"particles/items_fx/ethereal_blade.vpcf"
-				"Dodgeable"			"1"
-				"ProvidesVision"	"0"
-				"MoveSpeed"			"%projectile_speed"
-				"SourceAttachment"	"DOTA_PROJECTILE_ATTACHMENT_ATTACK_1"
-			}
-
-			"FireSound"
-			{
-				"EffectName"	"Hero_Viper.viperStrike"
-				"Target"		"CASTER"
-			}
-		}
-
-		"OnProjectileHitUnit"
-		{
-			"ApplyModifier"
-			{
-				"Target"			"TARGET"
-				"ModifierName"		"modifier_item_ghost_datadriven_active"
-			}
-			
-			"FireSound"
-			{
-				"EffectName"		"DOTA_Item.GhostScepter.Activate"
-				"Target"			"TARGET"
-			}
-
-			"FireEffect"
-			{
-				"EffectName"		"particles/items_fx/ethereal_blade_explosion.vpcf"
-				"EffectAttachType"	"follow_origin"
-				"Target"			"TARGET"
-			}
-		}
-
-		"Modifiers"
-		{
-			"modifier_item_ghost_datadriven"
-			{
-				"Passive"           "1"
-				"IsHidden"          "1"
-				"Attributes"        "MODIFIER_ATTRIBUTE_MULTIPLE"
-
-				"Properties"
-				{
-					"MODIFIER_PROPERTY_PHYSICAL_ARMOR_BONUS"		"%bonus_armor"
-					"MODIFIER_PROPERTY_MANA_REGEN_CONSTANT"			"%mana_regen"
-				}
-			}
-			"modifier_item_ghost_datadriven_active"
-			{
-				"Duration"                  "%duration"
-				"Passive"                   "0"
-				"IsHidden"                  "0"
-				"IsBuff"                    "1"
-				"IsDebuff"                  "0"
-				"IsPurgable"                "1"
-				"StatusEffectName"          "particles/status_fx/status_effect_ghost.vpcf"
-				"StatusEffectPriority"      "15"
-				"EffectName"                "particles/items_fx/ghost.vpcf"
-				"EffectAttachType"          "PATTACH_ABSORIGIN"
-				
-				"Properties"
-				{
-					"MODIFIER_PROPERTY_ABSOLUTE_NO_DAMAGE_PHYSICAL"     "1"
-					"MODIFIER_PROPERTY_MAGICAL_RESISTANCE_BONUS"        "%extra_spell_damage_percent"
-					"MODIFIER_PROPERTY_MOVESPEED_BONUS_PERCENTAGE"		"%bonus_movement"
-				}
-				
-				"States"
-				{
-					"MODIFIER_STATE_ATTACK_IMMUNE"          "MODIFIER_STATE_VALUE_ENABLED"
-					"MODIFIER_STATE_DISARMED"               "MODIFIER_STATE_VALUE_ENABLED"
-				}
-			}
 		}
 	}
 
@@ -1451,7 +1330,7 @@
 		"ID"							"2513"
 		"BaseClass"						"item_lua"
 		"ScriptFile"					"items/item_key_of_the_three_moons.lua"
-		"AbilityTextureName" 			"custom/key_of_the_three_moons"
+		"AbilityTextureName" 			"key_of_the_three_moons"
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_PASSIVE"
 		"AbilityCastRange"				"0"
 		"Model"							"models/props_items/bloodstone.vmdl"
@@ -1482,38 +1361,6 @@
 	}
 
 	//=================================================================================================================
-	// Recipe: Bracer of the Void
-	//=================================================================================================================
-	"item_recipe_bracer_of_the_void"
-	{
-		// General
-		//-------------------------------------------------------------------------------------------------------------
-		"ID"							"2520"
-		"BaseClass"             		"item_datadriven"
-		"Model"							"models/props_gameplay/recipe.vmdl"
-		"AbilityTextureName"			"custom/recipe"
-		
-		// Item Info
-		//-------------------------------------------------------------------------------------------------------------
-		"ItemCost"						"30000"	
-		"ItemShopTags"					""
-//		"ItemInitialStockTime"			"1470.0"
-//		"ItemStockMax"					"2" 
-//		"ItemStockTime"					"30.0"
-//		"ItemStockInitial"				"0"
-		
-		// Recipe
-		//-------------------------------------------------------------------------------------------------------------
-		"ItemRecipe"					"1"
-		"SecretShop"					"1"
-		"ItemResult"					"item_bracer_of_the_void"
-		"ItemRequirements"
-		{
-			"01"						"item_orb_of_darkness2"
-		}
-	}
-
-	//=================================================================================================================
 	// Shield of Invincibility (Spirit Beast Event)
 	//=================================================================================================================
 	"item_shield_of_invincibility"
@@ -1523,7 +1370,7 @@
 		"ID"							"2521"
 		"BaseClass"						"item_lua"
 		"ScriptFile"					"items/shield_of_invincibility.lua"
-		"AbilityTextureName" 			"custom/shield_of_invincibility"
+		"AbilityTextureName" 			"shield_of_invincibility"
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_PASSIVE"
 		"AbilityCastRange"				"0"
 		"AbilityCooldown"				"0.0"
@@ -1556,81 +1403,161 @@
 		}
 	}
 
-	//=================================================================================================================
-	// Bag of Gold
-	//=================================================================================================================
-	"item_bag_of_gold"
+	//========================================================================================================
+	// Orb of Wind
+	//========================================================================================================
+	"item_orb_of_wind"
 	{
 		// General
 		//-------------------------------------------------------------------------------------------------------------
-		"ID"							"2522"
-		"AbilityName"					"item_bag_of_gold"
-		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_UNIT_TARGET | DOTA_ABILITY_BEHAVIOR_IMMEDIATE | DOTA_ABILITY_BEHAVIOR_DONT_RESUME_ATTACK"
-		"AbilityUnitTargetTeam"			"DOTA_UNIT_TARGET_TEAM_FRIENDLY"
-		"AbilityUnitTargetType"			"DOTA_UNIT_TARGET_HERO"
-		"Model"							"models/props_gameplay/gold_coin001.vmdl"
-
-		// Stats
-		//-------------------------------------------------------------------------------------------------------------
-		"AbilityCastRange"				"100"
-		"AbilityCastPoint"				"0.0"
-
-		// Item Info
-		//-------------------------------------------------------------------------------------------------------------
-		"ItemCost"						"99999"
-		"ItemPurchasable"				"0"
-		"ItemShopTags"					"consumable"
-		"ItemQuality"					"consumable"
-		"ItemStackable"					"1"
-		"ItemShareability"				"ITEM_FULLY_SHAREABLE"
-		"ItemPermanent"					"0"
-		"ItemInitialCharges"			"0"
-		"ItemKillable"					"0"
-		"ItemCastOnPickup"				"1"
-	}
-
-	//========================================================================================================
-	// Talisman of Evasion
-	//========================================================================================================
-	"item_talisman_of_evasion_datadriven"
-	{
-		// General
-		//-------------------------------------------------------------------------------------------------------------
-		"BaseClass"						"item_datadriven"
+		"BaseClass"						"item_lua"
+		"AllowedInBackpack"				"0"
+		"ScriptFile"					"items/item_orb_of_wind.lua"
 		"ID"							"2523"
-		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_PASSIVE"
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET"
+		"AbilityCooldown"				"1.0"
+		"AbilitySharedCooldown"         "orb_of_wind"
 		"Model"							"models/props_gameplay/red_box.vmdl" 
 		"Effect"						"particles/generic_gameplay/dropped_item.vpcf"
 		"AbilityTextureName"			"custom/talisman_of_evasion_datadriven"
 
 		// Item Info
 		//-------------------------------------------------------------------------------------------------------------
-		"ItemCost"						"5000"
+		"ItemCost"						"10000"
+		"ItemPurchasable"				"1"
 		"ItemShopTags"					"evasion"
-		"ItemQuality"					"rare"
-		"ItemAliases"					"talisman of evasion"
+		"ItemQuality"					"artifact"
+		"ItemAliases"					"orb of wind"
+		"ItemShareability"				"ITEM_FULLY_SHAREABLE"
 		"ItemDeclarations"				"DECLARE_PURCHASES_TO_TEAMMATES | DECLARE_PURCHASES_IN_SPEECH | DECLARE_PURCHASES_TO_SPECTATORS"
-		"SecretShop"					"1"
+		"ItemBaseLevel"					"1"
+		"MaxUpgradeLevel"				"3"
 
 		// Special	
 		//-------------------------------------------------------------------------------------------------------------
 		"AbilityValues"
 		{
-			"bonus_evasion"				"17"
+			"bonus_damage"						"100"
+			"bonus_evasion"						"17"
+			"bonus_movement_speed"				"40"
+			"evasion_proc_duration"				"0"
+			"evasion_proc_cooldown"				"0"
+			"evasion_proc_movespeed_pct"		"0"
+			"evasion_proc_damage_reduction_pct"	"0"
 		}
+	}
 
-		"Modifiers"
+	//========================================================================================================
+	// Zephyr Gem
+	//========================================================================================================
+	"item_zephyr_gem"
+	{
+		"BaseClass"						"item_lua"
+		"AllowedInBackpack"				"0"
+		"ScriptFile"					"items/item_orb_of_wind.lua"
+		"ID"							"2552"
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET"
+		"AbilityCooldown"				"1.0"
+		"AbilitySharedCooldown"         "orb_of_wind"
+		"Model"							"models/props_gameplay/red_box.vmdl" 
+		"Effect"						"particles/generic_gameplay/dropped_item.vpcf"
+		"AbilityTextureName"			"custom/zephyr_gem"
+
+		"ItemCost"						"20000"
+		"ItemPurchasable"				"1"
+		"ItemShopTags"					"evasion"
+		"ItemQuality"					"artifact"
+		"ItemAliases"					"zephyr gem"
+		"ItemShareability"				"ITEM_FULLY_SHAREABLE"
+		"ItemBaseLevel"					"2"
+		"MaxUpgradeLevel"				"3"
+
+		"AbilityValues"
 		{
-			"modifier_talisman_of_evasion_datadriven"
-			{
-				"Passive"			"1"
-				"IsHidden"			"1"
+			"bonus_damage"						"300"
+			"bonus_evasion"						"25"
+			"bonus_movement_speed"				"70"
+			"evasion_proc_duration"				"2.0"
+			"evasion_proc_cooldown"				"8.0"
+			"evasion_proc_movespeed_pct"		"20"
+			"evasion_proc_damage_reduction_pct"	"0"
+		}
+	}
 
-				"Properties"
-				{
-					"MODIFIER_PROPERTY_EVASION_CONSTANT"	"%bonus_evasion" 
-				}
-			}
+	//========================================================================================================
+	// Recipe: Zephyr Gem
+	//========================================================================================================
+	"item_recipe_zephyr_gem"
+	{
+		"ID"							"2553"
+		"BaseClass"             		"item_datadriven"
+		"Model"							"models/props_gameplay/recipe.vmdl"
+		"AbilityTextureName"			"recipe"
+		"ItemCost"						"10000"
+		"ItemShopTags"					""
+		"ItemRecipe"					"1"
+		"ItemResult"					"item_zephyr_gem"
+		"ItemRequirements"
+		{
+			"01"						"item_orb_of_wind"
+		}
+	}
+
+	//========================================================================================================
+	// Tempest Aegis
+	//========================================================================================================
+	"item_tempest_aegis"
+	{
+		"BaseClass"						"item_lua"
+		"AllowedInBackpack"				"0"
+		"ScriptFile"					"items/item_orb_of_wind.lua"
+		"ID"							"2554"
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET"
+		"AbilityCooldown"				"1.0"
+		"AbilitySharedCooldown"         "orb_of_wind"
+		"Model"							"models/props_gameplay/red_box.vmdl" 
+		"Effect"						"particles/generic_gameplay/dropped_item.vpcf"
+		"AbilityTextureName"			"custom/tempest_aegis"
+
+		"ItemCost"						"50000"
+		"ItemPurchasable"				"1"
+		"ItemShopTags"					"evasion"
+		"ItemQuality"					"epic"
+		"ItemAliases"					"tempest aegis"
+		"ItemShareability"				"ITEM_FULLY_SHAREABLE"
+		"SecretShop"					"1"
+		"ItemBaseLevel"					"3"
+		"MaxUpgradeLevel"				"3"
+
+		"AbilityValues"
+		{
+			"bonus_damage"						"900"
+			"bonus_evasion"						"35"
+			"bonus_movement_speed"				"100"
+			"evasion_proc_duration"				"2.0"
+			"evasion_proc_cooldown"				"8.0"
+			"evasion_proc_movespeed_pct"		"20"
+			"evasion_proc_damage_reduction_pct"	"20"
+		}
+	}
+
+	//========================================================================================================
+	// Recipe: Tempest Aegis
+	//========================================================================================================
+	"item_recipe_tempest_aegis"
+	{
+		"ID"							"2555"
+		"BaseClass"             		"item_datadriven"
+		"Model"							"models/props_gameplay/recipe.vmdl"
+		"AbilityTextureName"			"recipe"
+		"ItemCost"						"30000"
+		"ItemShopTags"					""
+		"ItemRecipe"					"1"
+		"SecretShop"					"1"
+		"ItemResult"					"item_tempest_aegis"
+		"ItemRequirements"
+		{
+			"01"						"item_zephyr_gem"
 		}
 	}
 
@@ -1650,6 +1577,7 @@
 		// Item Info
 		//-------------------------------------------------------------------------------------------------------------
 		"ItemCost"						"6250"
+		"ItemPurchasable"				"1"
 		"ItemShopTags"					"boots"
 		"ItemQuality"					"rare"
 		"ItemAliases"					"boots"
@@ -1689,7 +1617,7 @@
 		"ID"							"2526"
 		"BaseClass"             		"item_datadriven"
 		"Model"							"models/props_gameplay/recipe.vmdl"
-		"AbilityTextureName"			"custom/recipe"
+		"AbilityTextureName"			"recipe"
 
 		// Item Info
 		//-------------------------------------------------------------------------------------------------------------
@@ -1721,7 +1649,7 @@
 		"BaseClass"             		"item_lua"
 		"ScriptFile"					"items/item_lightning_sword.lua"
 		"ID"							"2527"
-		"AbilityTextureName"			"custom/lightning_sword"		
+		"AbilityTextureName"			"lightning_sword"		
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_PASSIVE"
 		"Model"							"models/props_items/blinkdagger.vmdl"
 		"Effect"						"particles/units/heroes/hero_morphling/morphling_ambient_new.vpcf"
@@ -1753,18 +1681,21 @@
 	//========================================================================================================
 	"item_healing_wards"
 	{
-		"BaseClass"						"item_datadriven"
+		"BaseClass"						"item_lua"
+		"ScriptFile"					"items/wards"
 		"ID"							"2528"
 		"AbilityTextureName"			"custom/healing_wards"
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_POINT | DOTA_ABILITY_BEHAVIOR_IMMEDIATE | DOTA_ABILITY_BEHAVIOR_AOE"
 
 		"AbilityCooldown"				"20.0"	
 		"AbilityCastRange"				"500"
-		"ItemCost"						"1000"
+		"ItemCost"						"3000"
+		"ItemPurchasable"				"1"
 		"ItemQuality"					"rare"
 		"ItemStackable"					"1"
 		"ItemPermanent"					"0"
 		"ItemInitialCharges"			"3"
+		"ItemDisplayCharges"			"1"
 		"AOERadius"						"500"
 		"ItemShareability"				"ITEM_FULLY_SHAREABLE"
 
@@ -1772,18 +1703,40 @@
 		{
 			"duration"				"30"
 			"radius"				"500"
-			"regeneration"			"5"
+			"regeneration"			"0.5"
+			"flat_regeneration"		"75"
 		}
+	}
 
-		"OnSpellStart"
+	//========================================================================================================
+	// Healing Wards 2
+	//========================================================================================================
+	"item_healing_wards2"
+	{
+		"BaseClass"						"item_lua"
+		"ScriptFile"					"items/wards"
+		"ID"							"2545"
+		"AbilityTextureName"			"custom/healing_wards2"
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_POINT | DOTA_ABILITY_BEHAVIOR_IMMEDIATE | DOTA_ABILITY_BEHAVIOR_AOE"
+
+		"AbilityCooldown"				"20.0"	
+		"AbilityCastRange"				"600"
+		"ItemCost"						"30000"
+		"ItemPurchasable"				"1"
+		"ItemQuality"					"rare"
+		"ItemStackable"					"1"
+		"ItemPermanent"					"0"
+		"ItemInitialCharges"			"3"
+		"ItemDisplayCharges"			"1"
+		"AOERadius"						"600"
+		"ItemShareability"				"ITEM_FULLY_SHAREABLE"
+
+		"AbilityValues"
 		{
-			"SpendCharge"	{}
-			"RunScript"
-			{
-				"ScriptFile"			"items/wards.lua"
-				"Function"				"SummonHealingWard"
-				"Target"				"POINT"
-			}
+			"duration"				"35"
+			"radius"				"600"
+			"regeneration"			"1.0"
+			"flat_regeneration"		"300"
 		}
 	}
 
@@ -1799,6 +1752,7 @@
 		"AbilityCooldown"				"5.0"
 		"AbilityCastRange"				"0"
 		"ItemCost"						"3500"
+		"ItemPurchasable"				"1"
 		"ItemQuality"					"rare"
 		"ItemStackable"					"1"
 		"ItemPermanent"					"0"
@@ -1807,7 +1761,7 @@
 
 		"precache"
 		{
-			"particle"		"particles/units/heroes/hero_abaddon/abaddon_borrowed_time_heal.vpcf"
+			"particle"		"particles/items2_fx/mekanism.vpcf"
 		}
 
 		"AbilityValues"
@@ -1822,13 +1776,6 @@
 			{
 				"ScriptFile"			"items/potion.lua"
 				"Function"				"FullRestauration"
-			}
-
-			"FireEffect"
-			{
-				"EffectName"			"particles/units/heroes/hero_abaddon/abaddon_borrowed_time_heal.vpcf"
-				"EffectAttachType"		"follow_origin"
-				"Target"				"CASTER"
 			}
 
 			"FireSound"
@@ -1851,6 +1798,7 @@
 		"AbilityCooldown"				"40.0"	
 		"AbilityCastRange"				"0"
 		"ItemCost"						"7500"
+		"ItemPurchasable"				"1"
 		"ItemQuality"					"rare"
 		"ItemStackable"					"1"
 		"ItemPermanent"					"0"
@@ -1895,9 +1843,10 @@
 		"ID"							"2531"
 		"AbilityTextureName"			"custom/potion_of_antimagic"
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET | DOTA_ABILITY_BEHAVIOR_IMMEDIATE"
-		"AbilityCooldown"				"30.0"	
+		"AbilityCooldown"				"75.0"
 		"AbilityCastRange"				"0"
-		"ItemCost"						"2500"
+		"ItemCost"						"6000"
+		"ItemPurchasable"				"1"
 		"ItemQuality"					"rare"
 		"ItemStackable"					"1"
 		"ItemPermanent"					"0"
@@ -1906,7 +1855,7 @@
 
 		"AbilityValues"
 		{
-			"duration"				"15"
+			"duration"				"6"
 		}
 
 		"OnSpellStart"
@@ -1921,7 +1870,7 @@
 
 			"FireSound"
 			{
-				"EffectName"	"DOTA_Item.ClarityPotion.Activate"
+				"EffectName"	"DOTA_Item.BlackKingBar.Activate"
 				"Target"		"CASTER"
 			}
 
@@ -1939,6 +1888,7 @@
 			{
 				"Passive"					"0"
 				"IsHidden"					"0"
+				"TextureName"				"custom/potion_of_antimagic"
 				"EffectName"				"particles/items_fx/black_king_bar_avatar.vpcf"
 				"EffectAttachType"			"PATTACH_ABSORIGIN"
 
@@ -1966,7 +1916,7 @@
 		"BaseClass"             		"item_lua"
 		"ScriptFile"					"items/ring_of_superiority.lua"
 		"ID"							"2532"
-		"AbilityTextureName"			"custom/ring_of_superiority"		
+		"AbilityTextureName"			"ring_of_superiority"		
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_PASSIVE"
 		"Model"							"models/props_items/ring_health.vmdl"
 		"Effect"						"particles/units/heroes/hero_morphling/morphling_morph_agi.vpcf"
@@ -2054,37 +2004,6 @@
 		}
 	}
 
-	//=================================================================================================================
-	// Armor Rune
-	//=================================================================================================================
-	"item_rune_armor"
-	{
-		// General
-		//-------------------------------------------------------------------------------------------------------------
-		"ID"									"2536"
-		"BaseClass"								"item_lua"
-		"ScriptFile"							"items/item_rune_armor.lua"
-		"Model"									"models/props_items/assault_cuirass.vmdl"
-		"Effect"								"particles/units/heroes/hero_dazzle/dazzle_armor_enemy_ring_sink.vpcf"
-
-		// Item Info
-		//-------------------------------------------------------------------------------------------------------------
-		"ItemCost"								"0"
-		"ItemQuality"							"component"
-		"ItemPurchasable"						"0"
-		"ItemSellable"							"0"
-		"ItemKillable"							"1"
-		"ItemCastOnPickup"						"1"
-
-		// Special
-		//-------------------------------------------------------------------------------------------------------------
-		"AbilityValues"
-		{
-			"bonus_armor"				"30"
-			"duration"					"45"
-		}
-	}
-
 	//========================================================================================================
 	// Necklace of Spell Immunity
 	//========================================================================================================
@@ -2094,10 +2013,16 @@
 		//----------------------------------------------------------------------------------------------------
 		"BaseClass"             		"item_datadriven"
 		"ID"							"2546"
-		"AbilityTextureName"			"custom/necklace_of_spell_immunity"		
+		"AbilityTextureName"			"custom/necklace_of_spell_immunity"
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_PASSIVE"
 		"Model"							"models/props_items/staff_wizardry01.vmdl"
 		"Effect"						"particles/units/heroes/hero_doom_bringer/doom_bringer_doom_ring.vpcf"
+
+		"precache"
+		{
+			"particle"	"particles/items_fx/black_king_bar_avatar.vpcf"
+			"particle"	"particles/status_fx/status_effect_avatar.vpcf"
+		}
 
 		// Item Info
 		//----------------------------------------------------------------------------------------------------
@@ -2116,6 +2041,10 @@
 				"Passive"						"1"
 				"IsHidden"						"0"
 				"TextureName"					"modifiers/necklace_of_spell_immunity"
+				"EffectName"						"particles/items_fx/black_king_bar_avatar.vpcf"
+				"EffectAttachType"				"PATTACH_ABSORIGIN_FOLLOW"
+				"StatusEffectName"				"particles/status_fx/status_effect_avatar.vpcf"
+				"StatusEffectPriority"			"10"
 
 				"Properties"
 				{
@@ -2139,16 +2068,18 @@
 		// General
 		//-------------------------------------------------------------------------------------------------------------
 		"ID"							"2547"														// unique ID number for this item.  Do not change this once established or it will invalidate collected stats.
-		"AbilityName"					"item_tombstone"
+		"BaseClass"						"item_lua"
+		"ScriptFile"					"items/item_tombstone.lua"
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET | DOTA_ABILITY_BEHAVIOR_CHANNELLED | DOTA_ABILITY_BEHAVIOR_DONT_RESUME_ATTACK"
-		"Model"							"models/props_gameplay/tombstoneb01.vmdl"
+		"Model"							"models/props_gameplay/tombstonea01.vmdl"
+		"AbilityTextureName"			"tombstone"
 		"PingOverrideText"				"DOTA_Chat_Tombstone_Pinged"
 
 		// Stats
 		//-------------------------------------------------------------------------------------------------------------
 		"AbilityCastRange"				"100"
 		"AbilityCastPoint"				"0.0"
-		"AbilityChannelTime"			"6.0"
+		"AbilityChannelTime"			"5.0"
 		
 		// Item Info
 		//-------------------------------------------------------------------------------------------------------------
@@ -2160,40 +2091,9 @@
 		"ItemShareability"				"ITEM_FULLY_SHAREABLE"
 		"ItemPermanent"					"0"
 		"ItemInitialCharges"			"1"
+		// Picking the Tombstone is the revive interaction: cast immediately instead of storing it.
 		"ItemCastOnPickup"				"1"
 		"ItemKillable"					"0"
 	}
 
-	//=================================================================================================================
-	// Immolation Rune
-	//=================================================================================================================
-	"item_rune_immolation"
-	{
-		// General
-		//-------------------------------------------------------------------------------------------------------------
-		"ID"							"2548"
-		"BaseClass"						"item_lua"
-		"ScriptFile"					"items/item_rune_immolation.lua"
-		"Model"							"models/items/juggernaut/arcana/juggernaut_arcana_mask.vmdl"
-		"Effect"						"particles/econ/items/dazzle/dazzle_dark_light_weapon/dazzle_dark_shallow_grave_ground.vpcf"
-
-		// Item Info
-		//-------------------------------------------------------------------------------------------------------------
-		"ItemCost"						"0"
-		"ItemQuality"					"component"
-		"ItemPurchasable"				"0"
-		"ItemSellable"					"0"
-		"ItemKillable"					"1"
-		"ItemCastOnPickup"				"1"
-
-		// Special
-		//-------------------------------------------------------------------------------------------------------------
-		"AbilityValues"
-		{
-			"radius"			"375"
-			"damage_per_tick"	"75"
-			"tick_time"			"1.0"
-			"duration"			"45.0"
-		}
-	}
 }

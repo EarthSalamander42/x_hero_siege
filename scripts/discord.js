@@ -1,9 +1,10 @@
 const fs = require("fs");
 
 const webhookUrl = process.env.DISCORD_WEBHOOK;
-const githubToken = process.env.GITHUB_TOKEN;
 const eventName = process.env.GITHUB_EVENT_NAME;
 const eventPath = process.env.GITHUB_EVENT_PATH;
+const githubToken = process.env.GITHUB_TOKEN;
+const discordMessageId = process.env.DISCORD_MESSAGE_ID;
 
 if (!webhookUrl) {
 	console.error("Missing DISCORD_WEBHOOK secret.");
@@ -51,62 +52,6 @@ function field(name, value, inline = true) {
 	};
 }
 
-function diffBlock(additions = [], deletions = []) {
-	const maxItemsPerType = 6;
-	const added = additions.filter(Boolean);
-	const removed = deletions.filter(Boolean);
-	const lines = [
-		...added.slice(0, maxItemsPerType).map(value => `+ ${truncate(value, 72)}`),
-		...(added.length > maxItemsPerType ? [`+ … ${added.length - maxItemsPerType} more addition(s)`] : []),
-		...removed.slice(0, maxItemsPerType).map(value => `- ${truncate(value, 72)}`),
-		...(removed.length > maxItemsPerType ? [`- … ${removed.length - maxItemsPerType} more deletion(s)`] : [])
-	];
-
-	return lines.length ? `\`\`\`diff\n${lines.join("\n")}\n\`\`\`` : "";
-}
-
-function uniqueCommitFiles(commits, key) {
-	return [
-		...new Set(
-			commits.flatMap(commit => (Array.isArray(commit[key]) ? commit[key] : []))
-		)
-	];
-}
-
-async function fetchPushLineChanges() {
-	if (!repoName || !event.before || !event.after) return null;
-
-	const headers = {
-		Accept: "application/vnd.github+json",
-		"X-GitHub-Api-Version": "2022-11-28"
-	};
-	if (githubToken) headers.Authorization = `Bearer ${githubToken}`;
-
-	try {
-		const response = await fetch(
-			`https://api.github.com/repos/${repoName}/compare/${event.before}...${event.after}`,
-			{ headers }
-		);
-		if (!response.ok) {
-			console.warn(`GitHub compare request failed: ${response.status}`);
-			return null;
-		}
-
-		const comparison = await response.json();
-		const files = Array.isArray(comparison.files) ? comparison.files : [];
-		return files.reduce(
-			(totals, file) => ({
-				additions: totals.additions + Number(file.additions || 0),
-				deletions: totals.deletions + Number(file.deletions || 0)
-			}),
-			{ additions: 0, deletions: 0 }
-		);
-	} catch (error) {
-		console.warn(`GitHub compare request failed: ${error.message}`);
-		return null;
-	}
-}
-
 function baseEmbed({ title, description, url, color = COLORS.discord, fields = [] }) {
 	return {
 		title,
@@ -129,17 +74,180 @@ function baseEmbed({ title, description, url, color = COLORS.discord, fields = [
 	};
 }
 
+async function getCommitStats(commit) {
+	if (!commit?.id || !repo.full_name) return null;
+
+	const headers = {
+		Accept: "application/vnd.github+json",
+		"X-GitHub-Api-Version": "2022-11-28"
+	};
+
+	if (githubToken) headers.Authorization = `Bearer ${githubToken}`;
+
+	try {
+		const response = await fetch(`https://api.github.com/repos/${repo.full_name}/commits/${commit.id}`, {
+			headers
+		});
+
+		if (!response.ok) {
+			console.warn(`Could not load stats for ${shortSha(commit.id)}: GitHub API returned ${response.status}.`);
+			return null;
+		}
+
+		const details = await response.json();
+		if (!details.stats) return null;
+		const files = Array.isArray(details.files) ? details.files : [];
+
+		return {
+			additions: Number(details.stats.additions) || 0,
+			deletions: Number(details.stats.deletions) || 0,
+			filesChanged: files.length,
+			created: files.filter(file => file.status === "added").length,
+			deleted: files.filter(file => file.status === "removed").length
+		};
+	} catch (error) {
+		console.warn(`Could not load stats for ${shortSha(commit.id)}: ${error.message}`);
+		return null;
+	}
+}
+
+function formatCommitStats(stats) {
+	const created = stats.created ? ` · ${stats.created} created` : "";
+	const deleted = stats.deleted ? ` · ${stats.deleted} deleted` : "";
+	const fileLabel = stats.filesChanged === 1 ? "file" : "files";
+
+	return `\`\`\`diff\n+${stats.additions} additions${created}\n-${stats.deletions} deletions${deleted}\n ${stats.filesChanged} ${fileLabel} changed\n\`\`\``;
+}
+
+async function addStatsToExistingDescription(description) {
+	const withoutStats = String(description || "").replace(
+		/\n```diff\n\+\d+ additions(?: · \d+ created)?\n-\d+ deletions(?: · \d+ deleted)?(?:\n \d+ files? changed)?\n```/g,
+		""
+	);
+	const commitUrlPattern = /https:\/\/github\.com\/[^/\s)]+\/[^/\s)]+\/commit\/([0-9a-f]{7,40})/i;
+	const lines = withoutStats.split("\n");
+	const updatedLines = [];
+
+	for (const line of lines) {
+		updatedLines.push(line);
+		const match = line.match(commitUrlPattern);
+		if (!match) continue;
+
+		const stats = await getCommitStats({ id: match[1] });
+		if (stats) {
+			updatedLines.push(formatCommitStats(stats));
+		}
+	}
+
+	return truncate(updatedLines.join("\n"), 4096);
+}
+
+function editableEmbed(embed, description) {
+	const editable = {
+		title: embed.title,
+		description,
+		url: embed.url,
+		timestamp: embed.timestamp,
+		color: embed.color,
+		fields: embed.fields?.map(({ name, value, inline }) => ({ name, value, inline }))
+	};
+
+	if (embed.footer) editable.footer = { text: embed.footer.text, icon_url: embed.footer.icon_url };
+	if (embed.image?.url) editable.image = { url: embed.image.url };
+	if (embed.thumbnail?.url) editable.thumbnail = { url: embed.thumbnail.url };
+	if (embed.author) {
+		editable.author = {
+			name: embed.author.name,
+			url: embed.author.url,
+			icon_url: embed.author.icon_url
+		};
+	}
+
+	return editable;
+}
+
+function wait(milliseconds) {
+	return new Promise(resolve => setTimeout(resolve, milliseconds));
+}
+
+async function discordFetch(url, options = {}, operation = "Discord request") {
+	const maxAttempts = 6;
+
+	for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+		const response = await fetch(url, options);
+		if (response.status !== 429) return response;
+
+		const rateLimit = await response.json().catch(() => ({}));
+		const retryAfterMs = Math.max(250, Math.ceil((Number(rateLimit.retry_after) || 1) * 1000));
+		if (attempt === maxAttempts) {
+			throw new Error(`${operation} is still rate limited after ${maxAttempts} attempts.`);
+		}
+
+		console.warn(`${operation} rate limited; retrying in ${retryAfterMs}ms (attempt ${attempt}/${maxAttempts}).`);
+		await wait(retryAfterMs);
+	}
+}
+
+async function updateDiscordMessage(messageId) {
+	const messageUrl = `${webhookUrl}/messages/${messageId}`;
+	const currentResponse = await discordFetch(messageUrl, {}, `Loading Discord message ${messageId}`);
+	if (!currentResponse.ok) {
+		throw new Error(`Could not load Discord message ${messageId}: ${currentResponse.status} ${await currentResponse.text()}`);
+	}
+
+	const message = await currentResponse.json();
+	if (!Array.isArray(message.embeds) || message.embeds.length === 0) {
+		throw new Error(`Discord message ${messageId} has no embed to update.`);
+	}
+
+	const embeds = await Promise.all(message.embeds.map(async embed =>
+		editableEmbed(embed, await addStatsToExistingDescription(embed.description))
+	));
+	const updateResponse = await discordFetch(messageUrl, {
+		method: "PATCH",
+		headers: { "Content-Type": "application/json" },
+		body: JSON.stringify({ embeds })
+	}, `Updating Discord message ${messageId}`);
+
+	if (!updateResponse.ok) {
+		throw new Error(`Discord message update failed: ${updateResponse.status} ${await updateResponse.text()}`);
+	}
+
+	console.log(`Updated Discord message ${messageId} in place.`);
+}
+
+async function updateDiscordMessages() {
+	const messageIds = String(discordMessageId || "")
+		.split(",")
+		.map(messageId => messageId.trim())
+		.filter(Boolean);
+
+	if (messageIds.length === 0 || messageIds.some(messageId => !/^\d+$/.test(messageId))) {
+		throw new Error("DISCORD_MESSAGE_ID must contain numeric Discord message IDs separated by commas.");
+	}
+
+	const uniqueMessageIds = [...new Set(messageIds)];
+	for (const [index, messageId] of uniqueMessageIds.entries()) {
+		await updateDiscordMessage(messageId);
+		if (index < uniqueMessageIds.length - 1) await wait(350);
+	}
+}
+
 async function pushEmbed() {
 	const branch = (event.ref || "").replace("refs/heads/", "");
 	const commits = event.commits || [];
-	const addedFiles = uniqueCommitFiles(commits, "added");
-	const removedFiles = uniqueCommitFiles(commits, "removed");
-	const fileChanges = diffBlock(addedFiles, removedFiles);
-	const lineChanges = await fetchPushLineChanges();
+	const displayedCommits = commits.slice(0, 10);
+	const commitStats = await Promise.all(displayedCommits.map(getCommitStats));
 
-	const commitLines = commits
-		.slice(0, 10)
-		.map(commit => `• [${shortSha(commit.id)}](${commit.url}) ${truncate(commit.message.split("\n")[0], 130)}`)
+	const commitLines = displayedCommits
+		.map((commit, index) => {
+			const summary = `• [${shortSha(commit.id)}](${commit.url}) ${truncate(commit.message.split("\n")[0], 130)}`;
+			const stats = commitStats[index];
+
+			if (!stats) return summary;
+
+			return `${summary}\n${formatCommitStats(stats)}`;
+		})
 		.join("\n");
 
 	const extra = commits.length > 10 ? `\n…and ${commits.length - 10} more commit(s).` : "";
@@ -152,17 +260,7 @@ async function pushEmbed() {
 		fields: [
 			field("Branch", `\`${branch}\``),
 			field("Pusher", event.pusher?.name || sender.login),
-			field("Commit count", String(commits.length)),
-			...(lineChanges
-				? [
-						field(
-							"Line additions / deletions",
-							diffBlock([`${lineChanges.additions} additions`], [`${lineChanges.deletions} deletions`]),
-							false
-						)
-					]
-				: []),
-			...(fileChanges ? [field("File additions / deletions", fileChanges, false)] : [])
+			field("Commit count", String(commits.length))
 		]
 	});
 }
@@ -205,11 +303,8 @@ function pullRequestEmbed() {
 			field("Author", pr.user.login),
 			field("Branch", `\`${pr.head.ref}\` → \`${pr.base.ref}\``),
 			field("Changed files", String(pr.changed_files ?? "N/A")),
-			field(
-				"Line additions / deletions",
-				diffBlock([`${pr.additions ?? 0} additions`], [`${pr.deletions ?? 0} deletions`]),
-				false
-			)
+			field("Additions", `+${pr.additions ?? 0}`),
+			field("Deletions", `-${pr.deletions ?? 0}`)
 		]
 	});
 }
@@ -328,10 +423,10 @@ function simpleEmbed(icon, title, description, url = repoUrl, color = COLORS.gra
 	});
 }
 
-function buildEmbed() {
+async function buildEmbed() {
 	switch (eventName) {
 		case "push":
-			return pushEmbed();
+			return await pushEmbed();
 
 		case "pull_request":
 			return pullRequestEmbed();
@@ -409,7 +504,7 @@ async function sendToDiscord() {
 	}
 }
 
-sendToDiscord().catch(error => {
+(discordMessageId ? updateDiscordMessages() : sendToDiscord()).catch(error => {
 	console.error(error);
 	process.exit(1);
 });

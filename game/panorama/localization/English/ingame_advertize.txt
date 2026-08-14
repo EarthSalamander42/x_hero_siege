@@ -1,5 +1,5 @@
 "ingame_advertize_header"				"DID YOU KNOW?"
-"ingame_advertize_description"			"X Hero Siege is played by more than <font color='#FF7800'>{s:player_count_monthly}</font> unique players monthly, and yet, many players on Discord struggle to find teammates to play with.<br><br>By joining our Discord server, you can:<br>- Find teammates instantly and form parties for a better co-op experience.<br>- Get real-time updates on the latest patches, balance changes, and upcoming features.<br>- Participate in exclusive events, tournaments, and community challenges.<br>- Share your feedback directly with the developers and help shape the future of the mod.<br>- Discuss strategies, builds, and gameplay mechanics with experienced players.<br><br>Don't play alone! Join our growing community now and experience X Hero Siege like never before!"
+"ingame_advertize_description"			"X Hero Siege is played by more than <font color='#FF7800'>{s:player_count_monthly}</font> unique players every month.<br><br>Join the Discord to find teammates, follow patch news, share feedback, and discuss builds with experienced players.<br><br>Don't play alone. Join the community and make your next run easier to organize."
 "ingame_advertize_more"					"Website"
 "ingame_advertize_more2"				"Discord"
 "ingame_advertize_dismiss"				"Dismiss"

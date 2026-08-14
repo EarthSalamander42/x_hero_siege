@@ -1,6 +1,64 @@
 LinkLuaModifier("modifier_cant_die_generic", "npc_abilities/cant_die.lua", LUA_MODIFIER_MOTION_NONE)
 LinkLuaModifier("modifier_dying_generic", "npc_abilities/cant_die.lua", LUA_MODIFIER_MOTION_NONE)
 
+local XHS_DEFERRED_PHASE3_BOSS_BARS = {
+	["npc_dota_hero_grom_hellscream"] = true,
+	["npc_dota_hero_illidan"] = true,
+	["npc_dota_hero_balanar"] = true,
+	["npc_dota_hero_proudmoore"] = true,
+	["npc_dota_boss_spirit_master"] = true,
+}
+
+local function IsDeferredPhase3BossBar(boss)
+	return boss ~= nil
+		and IsValidEntity(boss)
+		and not boss:IsNull()
+		and XHS_DEFERRED_PHASE3_BOSS_BARS[boss:GetUnitName()] == true
+end
+
+local function GetBossFromDataDrivenKeys(keys)
+	if keys == nil then return nil end
+
+	local boss = keys.caster or keys.unit or keys.target
+	if boss ~= nil and IsValidEntity(boss) and not boss:IsNull() then
+		return boss
+	end
+
+	return nil
+end
+
+function OnCreated(keys)
+	local boss = GetBossFromDataDrivenKeys(keys)
+	-- Spirit boss_health modifiers can be created synchronously inside
+	-- CreateUnitByName, before BeginSplit has assigned boss_count/key fields.
+	-- Configure from the unit name first so Earth/Fire never emit a transient
+	-- slot-1 show event that can replace Storm's bar.
+	if boss ~= nil
+		and XHSSpiritMaster_ConfigureSpiritBossBar ~= nil
+		and string.find(boss:GetUnitName(), "npc_dota_boss_spirit_master_") then
+		XHSSpiritMaster_ConfigureSpiritBossBar(boss)
+	end
+
+	if boss ~= nil and ((IsPrivateBossBarBoss and IsPrivateBossBarBoss(boss)) or IsDeferredPhase3BossBar(boss)) then
+		return
+	end
+
+	if boss ~= nil and ShowBossBar then
+		ShowBossBar(boss)
+	end
+end
+
+function BossTakeDamage(keys)
+	local boss = GetBossFromDataDrivenKeys(keys)
+	if boss ~= nil and UpdateBossBar then
+		if XHSSpiritMaster_ConfigureSpiritBossBar ~= nil
+			and string.find(boss:GetUnitName(), "npc_dota_boss_spirit_master_") then
+			XHSSpiritMaster_ConfigureSpiritBossBar(boss)
+		end
+		UpdateBossBar(boss, keys and keys.attacker)
+	end
+end
+
 cant_die_generic = cant_die_generic or class({})
 
 function cant_die_generic:GetIntrinsicModifierName()
@@ -8,6 +66,30 @@ function cant_die_generic:GetIntrinsicModifierName()
 end
 
 modifier_cant_die_generic = modifier_cant_die_generic or class({})
+modifier_cant_die_generic.XHS_LINK_CLIENT = true
+
+local function CleanupBanehallowRevenants()
+	local units = FindUnitsInRadius(
+		DOTA_TEAM_CUSTOM_2,
+		Vector(0, 0, 0),
+		nil,
+		FIND_UNITS_EVERYWHERE,
+		DOTA_UNIT_TARGET_TEAM_FRIENDLY,
+		DOTA_UNIT_TARGET_ALL,
+		DOTA_UNIT_TARGET_FLAG_MAGIC_IMMUNE_ENEMIES + DOTA_UNIT_TARGET_FLAG_INVULNERABLE,
+		FIND_ANY_ORDER,
+		false
+	)
+
+	for _, unit in pairs(units) do
+		if unit ~= nil
+			and IsValidEntity(unit)
+			and not unit:IsNull()
+			and unit:GetUnitName() == "npc_death_revenant_banehallow" then
+			UTIL_Remove(unit)
+		end
+	end
+end
 
 function modifier_cant_die_generic:IsHidden() return true end
 
@@ -26,17 +108,13 @@ function modifier_cant_die_generic:OnCreated()
 	self.parent = self:GetParent()
 	self.disable_on_takedamage = false
 
-	local blacklist = {
-		["npc_dota_hero_grom_hellscream"] = true,
-		["npc_dota_hero_illidan"] = true,
-		["npc_dota_hero_balanar"] = true,
-		["npc_dota_hero_proudmoore"] = true,
-		["npc_dota_boss_spirit_master_storm"] = true,
-		["npc_dota_boss_spirit_master_earth"] = true,
-		["npc_dota_boss_spirit_master_fire"] = true,
-	}
+	local is_private_boss_bar_boss = IsPrivateBossBarBoss and IsPrivateBossBarBoss(self.parent)
 
-	if not blacklist[self.parent:GetUnitName()] then
+	if not is_private_boss_bar_boss
+		and not IsDeferredPhase3BossBar(self.parent)
+		and self.parent:GetUnitName() ~= "npc_dota_boss_spirit_master_storm"
+		and self.parent:GetUnitName() ~= "npc_dota_boss_spirit_master_earth"
+		and self.parent:GetUnitName() ~= "npc_dota_boss_spirit_master_fire" then
 		if ShowBossBar then
 			ShowBossBar(self.parent)
 		end
@@ -57,19 +135,59 @@ function modifier_cant_die_generic:OnTakeDamage(event)
 	local attacker = event.attacker
 
 	if parent == self.parent then
+		if XHSSpiritMaster_ConfigureSpiritBossBar ~= nil
+			and string.find(parent:GetUnitName(), "npc_dota_boss_spirit_master_") then
+			XHSSpiritMaster_ConfigureSpiritBossBar(parent)
+		end
 		UpdateBossBar(parent, attacker)
 
 		if parent:GetHealth() <= 100 and not parent:IsIllusion() and parent.deathStart ~= true then
+			if XHSSpiritMasterEncounter ~= nil
+				and XHSSpiritMasterEncounter.GetNextThreshold ~= nil
+				and parent:GetUnitName() == "npc_dota_boss_spirit_master"
+				and XHSSpiritMasterEncounter.phase ~= nil then
+				if XHSSpiritMasterEncounter.phase ~= "master" then
+					-- The real Spirit Master is only an encounter anchor during a
+					-- split/finale. It must never enter the generic boss death path.
+					parent:SetHealth(math.max(1, parent:GetHealth()))
+					return
+				else
+					local threshold = XHSSpiritMasterEncounter:GetNextThreshold(parent)
+					if threshold ~= nil and XHSSpiritMasterEncounter:TriggerSplit(parent, threshold) == true then
+						return
+					end
+				end
+			end
+
+			if XHSSpiritMasterEncounter ~= nil
+				and XHSSpiritMasterEncounter.HandleSpiritLethal ~= nil
+				and string.find(parent:GetUnitName(), "npc_dota_boss_spirit_master_")
+				and XHSSpiritMasterEncounter:HandleSpiritLethal(parent, attacker) == true then
+				return
+			end
+
 			self.disable_on_takedamage = true
 
 			parent:SetBaseHealthRegen(0.0)
 			parent:AddNewModifier(parent, nil, "modifier_dying_generic", { duration = 15.0 })
-			CustomGameEventManager:Send_ServerToAllClients("hide_boss_hp", { boss_count = parent.boss_count })
+			if HideBossBar then
+				HideBossBar(parent)
+			end
+			if parent:GetUnitName() == "npc_dota_hero_banehallow" then
+				CustomGameEventManager:Send_ServerToAllClients("xhs_boss_counter_hide", {
+					boss_count = parent.boss_count,
+					boss_bar_id = GetBossBarId and GetBossBarId(parent) or nil,
+				})
+				CleanupBanehallowRevenants()
+				GameMode.BanehallowRevenantsRemaining = nil
+				GameMode.BanehallowRevenantsTotal = nil
+			end
 
 			parent.deathStart = true
+			local bDevSandbox = XHSDevTools ~= nil and XHSDevTools:IsSandboxActive()
 
 			-- specific interaction for first 4 bosses
-			if XHS_BOSSES_TABLE[parent:GetUnitName()] and XHS_BOSSES_TABLE[parent:GetUnitName()].four_bosses_kill_count then
+			if bDevSandbox ~= true and XHS_BOSSES_TABLE[parent:GetUnitName()] and XHS_BOSSES_TABLE[parent:GetUnitName()].four_bosses_kill_count then
 				FourBossesKillCount()
 			end
 
@@ -105,7 +223,14 @@ function modifier_cant_die_generic:OnTakeDamage(event)
 						EmitGlobalSound("Loot_Drop_Stinger_Arcana")
 					end)
 
-					EndGame()
+					if bDevSandbox == true then
+						Notifications:TopToAll({ text = "Dev sandbox: Spirit Master cleared. EndGame blocked.", duration = 6.0 })
+						if XHSDevTools ~= nil then
+							XHSDevTools:PushState()
+						end
+					else
+						EndGame()
+					end
 				else -- normal spirit master boss death
 					Timers:CreateTimer(1.0, function()
 						EmitGlobalSound("Loot_Drop_Stinger_Mythical")
@@ -114,37 +239,57 @@ function modifier_cant_die_generic:OnTakeDamage(event)
 					return
 				end
 			else -- normal boss death
-				GiveTomeToAllHeroes(250)
+				if bDevSandbox ~= true then
+					GiveTomeToAllHeroes(250)
+				end
 				EmitGlobalSound("Loot_Drop_Stinger_Arcana")
 			end
 
-			-- open doors if any
-			Timers:CreateTimer(6.0, function()
-				if XHS_BOSSES_TABLE[parent:GetUnitName()] and XHS_BOSSES_TABLE[parent:GetUnitName()].doors_to_open then
-					for _, door_name in pairs(XHS_BOSSES_TABLE[parent:GetUnitName()].doors_to_open) do
-						DoEntFire(door_name, "SetAnimation", "gate_02_open", 0, nil, nil)
-					end
+			local bossConfig = XHS_BOSSES_TABLE[parent:GetUnitName()]
+			local cameraPosition = nil
+			if bossConfig.camera_focus_door ~= nil then
+				local cameraDoor = Entities:FindByName(nil, bossConfig.camera_focus_door)
+				if cameraDoor ~= nil and IsValidEntity(cameraDoor) then
+					cameraPosition = cameraDoor:GetAbsOrigin()
 				end
-
-				if XHS_BOSSES_TABLE[parent:GetUnitName()] and XHS_BOSSES_TABLE[parent:GetUnitName()].obstructions_to_disable then
-					for _, obs_name in pairs(XHS_BOSSES_TABLE[parent:GetUnitName()].obstructions_to_disable) do
-						for _, obs in pairs(Entities:FindAllByName(obs_name)) do
-							obs:SetEnabled(false, true)
-						end
-					end
-				end
-
+			end
+			local function FinishBossDoorTransition()
 				StartAnimation(parent, XHS_BOSSES_TABLE[parent:GetUnitName()].death_animation)
 				EmitSoundOn("skeleton_king_wraith_death_long_09", parent)
-			end)
+			end
+
+			-- Start moving the camera before the six-second death beat, then open
+			-- the next arena exactly when the camera reaches its doors.
+			if bDevSandbox ~= true and bossConfig.doors_to_open ~= nil and XHSOpenDoorsWithCinematic ~= nil then
+				Timers:CreateTimer(4.65, function()
+					XHSOpenDoorsWithCinematic(
+						bossConfig.doors_to_open,
+						bossConfig.obstructions_to_disable,
+						"gate_02_open",
+						FinishBossDoorTransition,
+						{
+							camera_position = cameraPosition,
+							move_duration = 1.35,
+							hold_duration = 1.25,
+							return_duration = 1.0,
+						}
+					)
+				end)
+			else
+				Timers:CreateTimer(6.0, FinishBossDoorTransition)
+			end
 
 			-- next boss
 			local delay = XHS_BOSSES_TABLE[parent:GetUnitName()].func_next_delay or 0.0
 			local func = XHS_BOSSES_TABLE[parent:GetUnitName()].func_next
 
-			if delay and func then
+			if bDevSandbox ~= true and delay and func then
 				Timers:CreateTimer(delay, function()
 					func()
+				end)
+			elseif bDevSandbox == true and XHSDevTools ~= nil then
+				Timers:CreateTimer(delay or 0.0, function()
+					XHSDevTools:PushState()
 				end)
 			end
 		end
@@ -152,6 +297,7 @@ function modifier_cant_die_generic:OnTakeDamage(event)
 end
 
 modifier_dying_generic = modifier_dying_generic or class({})
+modifier_dying_generic.XHS_LINK_CLIENT = true
 
 function modifier_dying_generic:IsHidden() return true end
 

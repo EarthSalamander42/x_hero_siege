@@ -3,6 +3,7 @@
 
 if modifier_donator_statue == nil then
 	modifier_donator_statue = class({})
+	modifier_donator_statue.XHS_LINK_CLIENT = true
 end
 
 function modifier_donator_statue:CheckState()

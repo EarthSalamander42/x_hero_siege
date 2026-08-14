@@ -5,12 +5,173 @@ api = api or class({})
 
 local baseUrl = "https://api.frostrose-studio.com/"
 local endUrlWebsite = "website/"
-local endUrlFrostrose = "imba/"
+local endUrlFrostrose = string.lower(CUSTOM_GAME_TYPE or "xhs") .. "/"
 local timeout = 5000
 local native_print = print
+local BOT_AUDIT_CHECKPOINT_INITIAL_DELAY = 5
+local BOT_AUDIT_CHECKPOINT_INTERVAL = 30
+local RUNTIME_LOG_LEVEL_BY_NUMBER = {
+	[1] = "debug",
+	[2] = "info",
+	[3] = "warn",
+	[4] = "error",
+	[5] = "critical",
+}
+local VALID_RUNTIME_LOG_LEVELS = {
+	debug = true,
+	info = true,
+	warn = true,
+	error = true,
+	critical = true,
+}
+
+local function NormalizeRuntimeLogLevel(value)
+	local numeric = tonumber(value)
+	if numeric ~= nil and RUNTIME_LOG_LEVEL_BY_NUMBER[numeric] ~= nil then
+		return RUNTIME_LOG_LEVEL_BY_NUMBER[numeric]
+	end
+	local level = string.lower(tostring(value or "info"))
+	if level == "warning" then level = "warn" end
+	if level == "err" then level = "error" end
+	if level == "fatal" then level = "critical" end
+	return VALID_RUNTIME_LOG_LEVELS[level] and level or "info"
+end
+
+local function IsValidApiPlayerID(player_id)
+	player_id = tonumber(player_id)
+	return player_id ~= nil
+		and player_id >= 0
+		and PlayerResource ~= nil
+		and PlayerResource.IsValidPlayerID ~= nil
+		and PlayerResource:IsValidPlayerID(player_id)
+end
+
+local function GetApiSteamID(player_id)
+	if not IsValidApiPlayerID(player_id) then return nil end
+
+	local ok, steam_id = pcall(function()
+		return PlayerResource:GetSteamID(tonumber(player_id))
+	end)
+	if not ok or steam_id == nil then return nil end
+
+	steam_id = tostring(steam_id)
+	if steam_id == "" or steam_id == "0" then return nil end
+	return steam_id
+end
+
+local function IsApiBotPlayerID(player_id)
+	if not IsValidApiPlayerID(player_id) then return false end
+
+	if IsXHSBotPlayerID ~= nil then
+		local ok, is_xhs_bot = pcall(IsXHSBotPlayerID, tonumber(player_id))
+		if ok and is_xhs_bot == true then return true end
+	end
+
+	-- The explicit XHS registry is authoritative. Tools can expose unrelated
+	-- Valve fake-client slots even when the XHS bot count is locked to zero, so
+	-- only use IsFakeClient during an actual configured provisioning window.
+	local configured_bot_count = XHSBots ~= nil
+		and type(XHSBots.configuration) == "table"
+		and (tonumber(XHSBots.configuration.count) or 0)
+		or 0
+	if configured_bot_count > 0 and PlayerResource.IsFakeClient ~= nil then
+		local ok, is_fake_client = pcall(function()
+			return PlayerResource:IsFakeClient(tonumber(player_id))
+		end)
+		if ok and is_fake_client == true then return true end
+	end
+
+	return false
+end
+
+local function IsApiSpectatorPlayerID(player_id)
+	if not IsValidApiPlayerID(player_id)
+		or PlayerResource.GetTeam == nil then
+		return false
+	end
+
+	local ok, team = pcall(function()
+		return PlayerResource:GetTeam(tonumber(player_id))
+	end)
+	return ok and tonumber(team) == 1
+end
+
+local function IsApiPersistentPlayerID(player_id)
+	if not IsValidApiPlayerID(player_id) then return false end
+	if IsApiSpectatorPlayerID(player_id) then return false end
+
+	if IsXHSPersistentPlayerID ~= nil then
+		local ok, is_persistent = pcall(IsXHSPersistentPlayerID, tonumber(player_id))
+		if ok then
+			return is_persistent == true and GetApiSteamID(player_id) ~= nil
+		end
+	end
+
+	if IsApiBotPlayerID(player_id) then return false end
+	return GetApiSteamID(player_id) ~= nil
+end
+
+function api:IsPersistentPlayerID(player_id)
+	return IsApiPersistentPlayerID(player_id)
+end
+
+function api:GetPersistentPlayerSteamID(player_id)
+	if not self:IsPersistentPlayerID(player_id) then return nil end
+	return GetApiSteamID(player_id)
+end
+
+function api:IsXHSBotParticipant(player_id)
+	return IsApiBotPlayerID(player_id)
+end
+
+function api:HasXHSBotParticipants()
+	if GetXHSBotPlayerIDs ~= nil then
+		local ok, bot_ids = pcall(GetXHSBotPlayerIDs)
+		if ok and type(bot_ids) == "table" and next(bot_ids) ~= nil then
+			return true
+		end
+	end
+
+	for player_id = 0, 23 do
+		if IsApiBotPlayerID(player_id) then return true end
+	end
+
+	return false
+end
+
+function api:HasXHSBotSession()
+	-- Configuration is checked in addition to the live registry so persistence
+	-- is disabled immediately after the controller requests bots, including
+	-- the asynchronous provisioning window and explicit provisioning failures.
+	if XHSBots ~= nil and type(XHSBots.configuration) == "table"
+		and (tonumber(XHSBots.configuration.count) or 0) > 0 then
+		return true
+	end
+
+	return self:HasXHSBotParticipants()
+end
+
+function api:GetXHSBotParticipantCount()
+	local count = 0
+	for player_id = 0, 23 do
+		if IsApiBotPlayerID(player_id) then count = count + 1 end
+	end
+	return count
+end
+
+function api:GetXHSBotSessionCount()
+	local participant_count = self:GetXHSBotParticipantCount()
+	local configured_count = 0
+	if XHSBots ~= nil and type(XHSBots.configuration) == "table" then
+		configured_count = math.max(0, math.floor(tonumber(XHSBots.configuration.count) or 0))
+	end
+	return math.max(participant_count, configured_count)
+end
 
 function api:Init()
 	CustomGameEventManager:RegisterListener("api_change_companion", Dynamic_Wrap(self, "SetCompanion"))
+	CustomGameEventManager:RegisterListener("loading_screen_api_request", Dynamic_Wrap(self, "OnLoadingScreenApiRequest"))
+	CustomGameEventManager:RegisterListener("xhs_achievements_mark_revealed", Dynamic_Wrap(self, "OnAchievementsMarkRevealed"))
 end
 
 -- Utils
@@ -23,9 +184,18 @@ function api:GetUrl(endpoint)
 		url = url .. endUrlFrostrose
 	end
 
-	print("URL: " .. url .. endpoint)
+	local full_url = url .. endpoint
+	local uses_combined_log = endpoint == "game-register"
+		or endpoint == "tools-session-register"
+		or endpoint == "game-complete"
+		or endpoint == "performance"
+		or endpoint == "runtime-logs"
+		or endpoint == "bot-audit"
+	if not uses_combined_log then
+		print("URL: " .. full_url)
+	end
 
-	return url .. endpoint
+	return full_url
 end
 
 function api:IsDonator(player_id)
@@ -45,10 +215,61 @@ function api:IsDeveloper(player_id)
 	end
 end
 
+function api:GetBotDonatorStatus(player_id)
+	local bot_supporter_tier = self:GetBotSupporterTier(player_id)
+	if bot_supporter_tier <= 0 then
+		return 0
+	end
+
+	if DONATOR_TIER_TO_STATUS ~= nil and DONATOR_TIER_TO_STATUS[bot_supporter_tier] ~= nil then
+		return DONATOR_TIER_TO_STATUS[bot_supporter_tier]
+	end
+
+	local tier_to_status = {
+		[1] = 6,
+		[2] = 5,
+		[3] = 4,
+		[4] = 7,
+		[5] = 8,
+	}
+
+	return tier_to_status[bot_supporter_tier] or 0
+end
+
+function api:GetDevPreviewSupporterTier(player_id)
+	-- Legacy PID-based tiers are a local supporter UI preview, not bot
+	-- detection. Keep the preview available to real Tools users only.
+	if not IsInToolsMode() or not self:IsPersistentPlayerID(player_id) then
+		return 0
+	end
+
+	local connection_state = PlayerResource:GetConnectionState(player_id)
+	if player_id >= 1 and player_id <= 5 and (connection_state == 1 or connection_state == 2) then
+		return player_id
+	end
+
+	return 0
+end
+
+-- Backwards-compatible name for existing visual code. This deliberately
+-- returns zero for XHS/engine bots and outside Tools mode.
+function api:GetBotSupporterTier(player_id)
+	return self:GetDevPreviewSupporterTier(player_id)
+end
+
 function api:GetDonatorStatus(player_id)
-	if not PlayerResource:IsValidPlayerID(player_id) then
+	if not self:IsPersistentPlayerID(player_id) then
 		--		native_print("api:GetDonatorStatus: Player ID not valid!")
 		return 0
+	end
+
+	if self.temporary_donator_status ~= nil and self.temporary_donator_status[player_id] ~= nil then
+		return self.temporary_donator_status[player_id]
+	end
+
+	local bot_donator_status = self:GetBotDonatorStatus(player_id)
+	if bot_donator_status ~= 0 then
+		return bot_donator_status
 	end
 
 	local steamid = tostring(PlayerResource:GetSteamID(player_id))
@@ -64,6 +285,36 @@ function api:GetDonatorStatus(player_id)
 		--		native_print("api:GetDonatorStatus: api players steamid not valid!")
 		return 0
 	end
+end
+
+function api:GetTemporaryDonatorStatus(player_id)
+	if not self:IsPersistentPlayerID(player_id) then
+		return nil
+	end
+
+	if self.temporary_donator_status == nil then
+		return nil
+	end
+
+	return self.temporary_donator_status[player_id]
+end
+
+function api:SetTemporaryDonatorStatus(player_id, status)
+	if not self:IsPersistentPlayerID(player_id) then
+		return false
+	end
+
+	self.temporary_donator_status = self.temporary_donator_status or {}
+
+	if status == nil then
+		self.temporary_donator_status[player_id] = nil
+		return true
+	end
+
+	status = tonumber(status) or 0
+	status = math.max(0, math.min(10, math.floor(status)))
+	self.temporary_donator_status[player_id] = status
+	return true
 end
 
 function api:GetPlayerIngameTag(player_id)
@@ -112,7 +363,7 @@ end
 function api:InitDonatorTableJS()
 	local donators = {}
 
-	for i = 0, PlayerResource:GetPlayerCount() - 1 do
+	for i = 0, DOTA_MAX_TEAM_PLAYERS - 1 do
 		local donator_status = self:GetDonatorStatus(i)
 		if donator_status ~= 0 and donator_status ~= 10 then
 			donators[PlayerResource:GetSteamID(i)] = donator_status
@@ -334,6 +585,35 @@ function api:GetPlayerWinrateShown(player_id)
 	end
 end
 
+function api:GetPlayerIngameAdvertizeHidden(player_id)
+	if not PlayerResource:IsValidPlayerID(player_id) then
+		return nil
+	end
+
+	local steamid = tostring(PlayerResource:GetSteamID(player_id))
+	if self.players == nil or self.players[steamid] == nil then
+		return nil
+	end
+
+	local player = self.players[steamid]
+	local supporter_pass = player.supporter_pass or {}
+	local settings = supporter_pass.settings or player.settings or {}
+	local values = {
+		settings.xhs_ingame_advertize_hidden,
+		settings.ingame_advertize_hidden,
+		player.xhs_ingame_advertize_hidden,
+		player.ingame_advertize_hidden,
+	}
+
+	for _, value in pairs(values) do
+		if value ~= nil then
+			return value
+		end
+	end
+
+	return nil
+end
+
 function api:GetPlayerWinrate(player_id)
 	if not PlayerResource:IsValidPlayerID(player_id) then
 		native_print("api:GetPlayerWinrate: Player ID not valid!")
@@ -376,6 +656,1216 @@ function api:GetPlayerSeasonalWinrate(player_id)
 		native_print("api:GetPlayerWinrate: api players steamid not valid!")
 		return false
 	end
+end
+
+function api:GetPlayerSupporterPass(player_id)
+	if not self:IsPersistentPlayerID(player_id) then
+		return {}
+	end
+
+	local steamid = tostring(PlayerResource:GetSteamID(player_id))
+	if self.players == nil or self.players[steamid] == nil then
+		return {}
+	end
+
+	return self.players[steamid].supporter_pass or {}
+end
+
+function api:GetPlayerSupporterTier(player_id)
+	local supporter_pass = self:GetPlayerSupporterPass(player_id)
+	local tier_id = tonumber(supporter_pass.tier_id)
+	local status_tier = 0
+
+	if SupporterPass and SupporterPass.GetTierForStatus then
+		status_tier = SupporterPass:GetTierForStatus(self:GetDonatorStatus(player_id))
+	end
+
+	if tier_id ~= nil then
+		return math.max(tier_id, status_tier)
+	end
+
+	return status_tier
+end
+
+function api:GetPlayerSupporterFragments(player_id)
+	local supporter_pass = self:GetPlayerSupporterPass(player_id)
+	return tonumber(supporter_pass.fragments or supporter_pass.fragment_balance) or 0
+end
+
+local function IsSupporterClaimedValue(value)
+	if value == true or value == 1 or value == "1" then return true end
+	return string.lower(tostring(value or "")) == "true"
+end
+
+local function CollectSupporterClaimIDs(value, result, depth)
+	result = result or {}
+	depth = depth or 0
+	if type(value) ~= "table" or depth > 5 then return result end
+
+	local rewardID = value.reward_id or value.reward_key
+	if rewardID == nil and value.claimed ~= nil then
+		rewardID = value.id
+	end
+	local isRewardRecord = rewardID ~= nil or value.claimed ~= nil
+	if rewardID ~= nil and IsSupporterClaimedValue(value.claimed) then
+		result[tostring(rewardID)] = true
+	end
+
+	for key, nested in pairs(value) do
+		if type(nested) == "table" then
+			CollectSupporterClaimIDs(nested, result, depth + 1)
+		elseif not isRewardRecord
+			and IsSupporterClaimedValue(nested)
+			and type(key) == "string"
+		then
+			result[tostring(key)] = true
+		elseif tonumber(key) ~= nil and type(nested) == "string" and nested ~= "" then
+			result[nested] = true
+		end
+	end
+	return result
+end
+
+local function MergeSupporterClaimIDs(target, source)
+	target = target or {}
+	for rewardID in pairs(CollectSupporterClaimIDs(source or {})) do
+		target[tostring(rewardID)] = true
+	end
+	return target
+end
+
+local function NormalizeSupporterClaimSeasonKey(value)
+	if type(value) == "table" then
+		value = value.season_id
+			or value.season_key
+			or value.key
+			or value.id
+			or value.name
+			or value.title
+	end
+	if value == nil then return nil end
+
+	local key = string.lower(tostring(value))
+	key = string.gsub(key, "^%s+", "")
+	key = string.gsub(key, "%s+$", "")
+	if key == "" then return nil end
+
+	-- The live backend and the local manifest use different identifiers for
+	-- the same 2026 season. Claims may only be merged after canonicalization.
+	if string.find(key, "2026", 1, true) ~= nil then
+		return "supporter_pass_2026"
+	end
+	return key
+end
+
+local function InferSupporterClaimSeasonKey(claimed)
+	local inferred = nil
+	local found = false
+
+	for rewardID in pairs(CollectSupporterClaimIDs(claimed or {})) do
+		found = true
+		local id = string.lower(tostring(rewardID))
+		local rewardSeason = nil
+		if string.match(id, "^sp26_") ~= nil
+			or string.find(id, "supporter_pass_2026:", 1, true) == 1
+		then
+			rewardSeason = "supporter_pass_2026"
+		end
+
+		-- Unknown or mixed identifiers are deliberately not treated as being
+		-- in the current season. This prevents cross-season monotone unions.
+		if rewardSeason == nil then return nil end
+		if inferred ~= nil and inferred ~= rewardSeason then return nil end
+		inferred = rewardSeason
+	end
+
+	return found and inferred or nil
+end
+
+local function GetSupporterClaimSeasonFromPass(supporter_pass)
+	if type(supporter_pass) ~= "table" then return nil end
+	return NormalizeSupporterClaimSeasonKey(supporter_pass.season)
+		or NormalizeSupporterClaimSeasonKey(supporter_pass.season_id)
+		or NormalizeSupporterClaimSeasonKey(supporter_pass.season_key)
+end
+
+local function GetSupporterClaimSeasonFromResponse(data)
+	if type(data) ~= "table" then return nil end
+	local profile = type(data.profile) == "table" and data.profile
+		or (type(data.supporter_pass) == "table" and data.supporter_pass or {})
+	return NormalizeSupporterClaimSeasonKey(data.season)
+		or NormalizeSupporterClaimSeasonKey(data.season_id)
+		or NormalizeSupporterClaimSeasonKey(data.season_key)
+		or NormalizeSupporterClaimSeasonKey(profile.season)
+		or NormalizeSupporterClaimSeasonKey(profile.season_id)
+		or NormalizeSupporterClaimSeasonKey(profile.season_key)
+end
+
+local function GetSupporterClaimPayload(data, fallback)
+	if type(data) ~= "table" then return fallback or {} end
+	local profile = type(data.profile) == "table" and data.profile
+		or (type(data.supporter_pass) == "table" and data.supporter_pass or {})
+	return data.claimed_rewards
+		or profile.claimed_rewards
+		or fallback
+		or {}
+end
+
+local function GetSupporterClaimSyncState(steamid)
+	api.supporter_claim_sync_state = api.supporter_claim_sync_state or {}
+	local key = tostring(steamid)
+	local state = api.supporter_claim_sync_state[key]
+	if type(state) ~= "table" then
+		state = {
+			mutation_revision = 0,
+			refresh_sequence = 0,
+			claims_loaded = false,
+		}
+		api.supporter_claim_sync_state[key] = state
+	end
+	return state
+end
+
+function api:IsSupporterPassClaimsLoaded(player_id)
+	local steamid = self:GetPersistentPlayerSteamID(player_id)
+	if steamid == nil then return false end
+
+	local states = self.supporter_claim_sync_state
+	local state = type(states) == "table" and states[tostring(steamid)] or nil
+	return type(state) == "table" and state.claims_loaded == true
+end
+
+local function GetSupporterClaimPlayerState(steamid)
+	local player = api.players and api.players[tostring(steamid)] or nil
+	local supporter_pass = player and player.supporter_pass or nil
+	local claimed = CollectSupporterClaimIDs(
+		supporter_pass and supporter_pass.claimed_rewards or {}
+	)
+	return player, supporter_pass, claimed
+end
+
+local function IsSupporterClaimPlayerStillBound(player_id, steamid)
+	return api:GetPersistentPlayerSteamID(player_id) == tostring(steamid)
+end
+
+function api:MergeSupporterPassResponse(steamid, data)
+	if not steamid or not data or not api.players or not api.players[steamid] then
+		return
+	end
+
+	local player = api.players[steamid]
+	player.supporter_pass = player.supporter_pass or {}
+	local supporter_pass = player.supporter_pass
+	local profile = data.profile or data.supporter_pass or {}
+	local season = data.season or profile.season or supporter_pass.season or {}
+	local function FirstNonNil(...)
+		for index = 1, select("#", ...) do
+			local value = select(index, ...)
+			if value ~= nil then
+				return value
+			end
+		end
+		return nil
+	end
+	local season_id = season.season_id or season.id or season.key
+	if season_id ~= nil and tostring(season_id) ~= "" then
+		supporter_pass.season = supporter_pass.season or {}
+		supporter_pass.season.id = season_id
+		supporter_pass.season.season_id = season_id
+	end
+
+	if profile.fragments ~= nil then
+		supporter_pass.fragments = profile.fragments
+		supporter_pass.fragment_balance = profile.fragments
+	end
+	local daily_fragments = profile.daily_fragments or profile.daily_earned or profile.weekly_fragments
+	if daily_fragments ~= nil then
+		supporter_pass.daily_fragments = daily_fragments
+		supporter_pass.daily_earned = daily_fragments
+		supporter_pass.weekly_fragments = daily_fragments
+		supporter_pass.weekly_earned = daily_fragments
+	end
+	local daily_cap = profile.daily_cap or profile.weekly_cap
+	if daily_cap ~= nil then
+		supporter_pass.daily_cap = daily_cap
+		supporter_pass.weekly_cap = daily_cap
+	end
+	for _, field in ipairs({ "daily_gameplay_fragments", "daily_gameplay_cap", "daily_quest_fragments", "daily_quest_cap", "daily_potential_fragments" }) do
+		if profile[field] ~= nil then
+			supporter_pass[field] = profile[field]
+		end
+	end
+
+	if season.xp ~= nil or season.level ~= nil or season.xp_per_level ~= nil then
+		supporter_pass.season = supporter_pass.season or {}
+		supporter_pass.season.xp = season.xp or supporter_pass.season.xp
+		supporter_pass.season.level = season.level or supporter_pass.season.level
+		supporter_pass.season.xp_per_level = season.xp_per_level or supporter_pass.season.xp_per_level
+	end
+
+	local season_xp = season.xp or profile.season_xp
+	local season_level = season.level or profile.season_level
+	local season_xp_change = season.xp_change or season.gained_xp or profile.season_xp_change or profile.xp_change or data.season_xp_change or data.supporter_pass_xp_change or data.xp_change
+	local base_xp_change = season.base_xp_change or profile.base_xp_change or data.base_xp_change
+	local xp_boost = season.xp_boost or profile.xp_boost or data.xp_boost
+	local xp_bonus = season.xp_bonus or profile.xp_bonus or data.xp_bonus
+	local duration_xp = FirstNonNil(season.duration_xp, profile.duration_xp, data.duration_xp)
+	local victory_xp_bonus = FirstNonNil(season.victory_xp_bonus, profile.victory_xp_bonus, data.victory_xp_bonus)
+	local xp_eligible = FirstNonNil(season.xp_eligible, profile.xp_eligible, data.xp_eligible)
+	local xp_ineligible_reason = FirstNonNil(season.xp_ineligible_reason, profile.xp_ineligible_reason, data.xp_ineligible_reason)
+	local xp_eligibility_reason = FirstNonNil(season.xp_eligibility_reason, profile.xp_eligibility_reason, data.xp_eligibility_reason)
+	if season_xp ~= nil then
+		supporter_pass.season_xp = season_xp
+		supporter_pass.current_exp = season_xp
+	end
+	if season_level ~= nil then
+		supporter_pass.season_level = season_level
+		supporter_pass.level = season_level
+	end
+	if season_xp_change ~= nil then
+		supporter_pass.season_xp_change = season_xp_change
+		supporter_pass.xp_change = season_xp_change
+		supporter_pass.season = supporter_pass.season or {}
+		supporter_pass.season.xp_change = season_xp_change
+	end
+	if base_xp_change ~= nil then
+		supporter_pass.base_xp_change = base_xp_change
+		supporter_pass.season = supporter_pass.season or {}
+		supporter_pass.season.base_xp_change = base_xp_change
+	end
+	if xp_boost ~= nil then
+		supporter_pass.xp_boost = xp_boost
+		supporter_pass.season = supporter_pass.season or {}
+		supporter_pass.season.xp_boost = xp_boost
+	end
+	if xp_bonus ~= nil then
+		supporter_pass.xp_bonus = xp_bonus
+		supporter_pass.season = supporter_pass.season or {}
+		supporter_pass.season.xp_bonus = xp_bonus
+	end
+	if duration_xp ~= nil then
+		supporter_pass.duration_xp = duration_xp
+		supporter_pass.season = supporter_pass.season or {}
+		supporter_pass.season.duration_xp = duration_xp
+	end
+	if victory_xp_bonus ~= nil then
+		supporter_pass.victory_xp_bonus = victory_xp_bonus
+		supporter_pass.season = supporter_pass.season or {}
+		supporter_pass.season.victory_xp_bonus = victory_xp_bonus
+	end
+	if xp_eligible ~= nil then
+		supporter_pass.xp_eligible = xp_eligible
+		supporter_pass.season = supporter_pass.season or {}
+		supporter_pass.season.xp_eligible = xp_eligible
+	end
+	if xp_ineligible_reason ~= nil then
+		supporter_pass.xp_ineligible_reason = xp_ineligible_reason
+		supporter_pass.season = supporter_pass.season or {}
+		supporter_pass.season.xp_ineligible_reason = xp_ineligible_reason
+	end
+	if xp_eligibility_reason ~= nil then
+		supporter_pass.xp_eligibility_reason = xp_eligibility_reason
+		supporter_pass.season = supporter_pass.season or {}
+		supporter_pass.season.xp_eligibility_reason = xp_eligibility_reason
+	end
+
+	if data.entitlements ~= nil then
+		supporter_pass.entitlements = data.entitlements
+	end
+	if data.purchases ~= nil then
+		supporter_pass.purchases = data.purchases
+	end
+	if data.loadout ~= nil then
+		supporter_pass.loadout = data.loadout
+	end
+	if data.armory ~= nil then
+		supporter_pass.armory = data.armory
+	end
+	if data.equipped ~= nil then
+		supporter_pass.loadout = data.equipped
+	end
+	if data.claimed_rewards ~= nil then
+		supporter_pass.claimed_rewards = data.claimed_rewards
+	end
+	local fragment_reward_grants = data.fragment_reward_grants or season.fragment_reward_grants
+	if fragment_reward_grants ~= nil then
+		supporter_pass.fragment_reward_grants = fragment_reward_grants
+		player.fragment_reward_grants = fragment_reward_grants
+
+		-- Fragment rewards are claimed atomically by game-complete. Reflect those
+		-- claims immediately so the reward track cannot briefly offer them again
+		-- while the next full claim refresh is still pending.
+		local claimed_rewards = CollectSupporterClaimIDs(supporter_pass.claimed_rewards or {})
+		for _, grant in pairs(fragment_reward_grants) do
+			if type(grant) == "table" and grant.reward_id ~= nil then
+				claimed_rewards[tostring(grant.reward_id)] = true
+			end
+		end
+		supporter_pass.claimed_rewards = claimed_rewards
+	end
+	local fragment_reward_total = FirstNonNil(data.fragment_reward_total, season.fragment_reward_total)
+	if fragment_reward_total ~= nil then
+		supporter_pass.fragment_reward_total = fragment_reward_total
+		player.fragment_reward_total = fragment_reward_total
+	end
+	local fragment_reward_claim_event_id = FirstNonNil(
+		data.fragment_reward_claim_event_id,
+		season.fragment_reward_claim_event_id
+	)
+	if fragment_reward_claim_event_id ~= nil then
+		supporter_pass.fragment_reward_claim_event_id = fragment_reward_claim_event_id
+		player.fragment_reward_claim_event_id = fragment_reward_claim_event_id
+	end
+end
+
+function api:RefreshSupporterPassArmory(player_id, callback)
+	callback = callback or function() end
+	local steamid = self:GetPersistentPlayerSteamID(player_id)
+	local game_id = self:GetApiGameId()
+	if steamid == nil then
+		return callback(false, { code = "non_persistent_player" })
+	end
+	if game_id == nil or tostring(game_id) == "" or tostring(game_id) == "0" then
+		return callback(false, { code = "game_not_registered" })
+	end
+
+	self:Request("armory", function(data)
+		if self:GetPersistentPlayerSteamID(player_id) ~= tostring(steamid) then
+			return callback(false, { code = "player_session_changed" })
+		end
+
+		data = type(data) == "table" and data or {}
+		local armory = data.armory or data.items or data.rewards or data
+		if type(armory) ~= "table" then
+			armory = {}
+		end
+
+		self.players[steamid] = self.players[steamid] or {}
+		local player = self.players[steamid]
+		player.supporter_pass = player.supporter_pass or {}
+		player.armory = armory
+		player.supporter_pass.armory = armory
+		if data.loadout ~= nil or data.equipped ~= nil then
+			player.supporter_pass.loadout = data.loadout or data.equipped
+		end
+
+		self:PublishSupporterPassArmory(player_id, armory)
+		callback(true, { armory = armory })
+	end, function(error)
+		callback(false, error)
+	end, "POST", {
+		steamid = steamid,
+		game_id = game_id,
+	})
+end
+
+function api:RefreshSupporterPassClaims(player_id, callback)
+	callback = callback or function() end
+	if self:HasXHSBotSession() then
+		return callback(false, { code = "xhs_bot_session" })
+	end
+
+	local steamid = self:GetPersistentPlayerSteamID(player_id)
+	if steamid == nil then
+		return callback(false, { code = "non_persistent_player" })
+	end
+
+	local syncState = GetSupporterClaimSyncState(steamid)
+	syncState.refresh_sequence = syncState.refresh_sequence + 1
+	local refreshSequence = syncState.refresh_sequence
+	local mutationRevision = syncState.mutation_revision
+	local _, requestPass, requestClaims = GetSupporterClaimPlayerState(steamid)
+	local requestSeason = GetSupporterClaimSeasonFromPass(requestPass)
+		or syncState.season_key
+		or InferSupporterClaimSeasonKey(requestClaims)
+
+	self:Request("supporter-pass/catalog", function(data)
+		data = data or {}
+		local currentState = GetSupporterClaimSyncState(steamid)
+		local _, currentPass, currentClaims = GetSupporterClaimPlayerState(steamid)
+		if type(data.rewards) ~= "table" then
+			callback(false, { code = "supporter_claims_missing" })
+			return
+		end
+
+		-- A refresh is a replace-like snapshot. Ignore it if a newer refresh
+		-- exists or if any claim POST was confirmed after this GET started.
+		if currentState.refresh_sequence ~= refreshSequence
+			or currentState.mutation_revision ~= mutationRevision
+		then
+			if IsSupporterClaimPlayerStillBound(player_id, steamid)
+				and SupporterPass and SupporterPass.PublishPlayer
+			then
+				SupporterPass:PublishPlayer(player_id)
+			end
+			callback(true, {
+				claimed_rewards = currentClaims,
+				season = currentPass and currentPass.season or nil,
+				stale_ignored = true,
+			})
+			return
+		end
+
+		local remoteClaims = CollectSupporterClaimIDs(data.rewards or {})
+		local currentSeason = GetSupporterClaimSeasonFromPass(currentPass)
+			or currentState.season_key
+			or InferSupporterClaimSeasonKey(currentClaims)
+		local remoteSeason = GetSupporterClaimSeasonFromResponse(data)
+			or InferSupporterClaimSeasonKey(remoteClaims)
+			or requestSeason
+		local claimed = {}
+
+		-- Claims are monotone only inside one positively identified season.
+		-- A real season transition intentionally starts from the remote set.
+		if currentSeason ~= nil
+			and remoteSeason ~= nil
+			and currentSeason == remoteSeason
+		then
+			MergeSupporterClaimIDs(claimed, currentClaims)
+		end
+		MergeSupporterClaimIDs(claimed, remoteClaims)
+
+		currentState.claims_loaded = true
+		api:MergeSupporterPassResponse(steamid, {
+			season = data.season,
+			claimed_rewards = claimed,
+		})
+		currentState.season_key = remoteSeason
+		if IsSupporterClaimPlayerStillBound(player_id, steamid)
+			and SupporterPass and SupporterPass.PublishPlayer
+		then
+			SupporterPass:PublishPlayer(player_id)
+		end
+		callback(true, {
+			claimed_rewards = claimed,
+			season = data.season,
+		})
+	end, function(error)
+		callback(false, error)
+	end, "GET", {
+		steamid = steamid,
+		game_id = self:GetApiGameId(),
+	})
+end
+
+function api:PublishSupporterPassArmory(player_id, armory)
+	if not PlayerResource:IsValidPlayerID(player_id) then
+		return
+	end
+
+	if armory == nil then
+		local steamid = tostring(PlayerResource:GetSteamID(player_id))
+		local player = api.players and api.players[steamid] or nil
+		local supporter_pass = player and player.supporter_pass or nil
+		armory = supporter_pass and supporter_pass.armory or nil
+	end
+
+	CustomNetTables:SetTableValue("supporter_pass_armory", "rewards_" .. player_id, armory or {})
+
+	if Battlepass and Battlepass.ApplySupporterLoadout then
+		Battlepass:ApplySupporterLoadout(player_id)
+	end
+end
+
+function api:GetSupporterPassArmory(player_id)
+	if not PlayerResource:IsValidPlayerID(player_id) then
+		return {}
+	end
+
+	local steamid = tostring(PlayerResource:GetSteamID(player_id))
+	local player = self.players and self.players[steamid] or nil
+	local supporter_pass = player and player.supporter_pass or nil
+	return supporter_pass and supporter_pass.armory or {}
+end
+
+function api:GetSupporterPassLoadout(player_id)
+	if not PlayerResource:IsValidPlayerID(player_id) then
+		return {}
+	end
+
+	local steamid = tostring(PlayerResource:GetSteamID(player_id))
+	local player = self.players and self.players[steamid] or nil
+	local supporter_pass = player and player.supporter_pass or nil
+	if supporter_pass and supporter_pass.loadout then
+		return supporter_pass.loadout
+	end
+
+	return player and player.armory or {}
+end
+
+function api:GrantSupporterFragments(player_id, amount, reason, idempotency_key, callback)
+	if callback == nil then
+		callback = function() end
+	end
+
+	local steamid = self:GetPersistentPlayerSteamID(player_id)
+	if steamid == nil then
+		return callback(false, { code = "non_persistent_player", message = "Persistent human player required." })
+	end
+
+	local payload = {
+		game_id = api:GetApiGameId(),
+		match_id = api:GetMatchID(),
+		steam_id = steamid,
+		player_id = player_id,
+		amount = amount,
+		reason = reason,
+		idempotency_key = idempotency_key,
+		gamemode = api:GetCustomGamemode(),
+	}
+
+	api:Request("supporter-fragments/grant", function(data)
+		api:MergeSupporterPassResponse(steamid, data)
+
+		if SupporterPass and SupporterPass.PublishPlayer then
+			SupporterPass:PublishPlayer(player_id)
+		end
+
+		callback(true, data)
+	end, function(error)
+		callback(false, error)
+	end, "POST", payload)
+end
+
+function api:UpdateSupporterPassSettings(player_id, settings, callback)
+	if callback == nil then
+		callback = function() end
+	end
+	settings = settings or {}
+
+	local steamid = self:GetPersistentPlayerSteamID(player_id)
+	if steamid == nil then
+		return callback(false, { code = "non_persistent_player", message = "Persistent human player required." })
+	end
+
+	local completed = false
+	local function Finish(success, data)
+		if completed then
+			return
+		end
+		completed = true
+		callback(success, data)
+	end
+
+	local function SubmitSettingsUpdate(game_id)
+		if completed then
+			return
+		end
+
+		local payload = {
+			steamid = steamid,
+			game_id = game_id,
+		}
+
+		if settings.toggle_tag ~= nil then payload.toggle_tag = settings.toggle_tag == true or settings.toggle_tag == 1 end
+		if settings.pass_rewards ~= nil then payload.pass_rewards = settings.pass_rewards == true or settings.pass_rewards == 1 end
+		if settings.player_xp ~= nil then payload.player_xp = settings.player_xp == true or settings.player_xp == 1 end
+		if settings.winrate_toggle ~= nil then payload.winrate_toggle = settings.winrate_toggle == true or settings.winrate_toggle == 1 end
+		if settings.xhs_ingame_advertize_hidden ~= nil then payload.xhs_ingame_advertize_hidden = settings.xhs_ingame_advertize_hidden == true or settings.xhs_ingame_advertize_hidden == 1 end
+
+		api:Request("supporter-pass/settings", function(data)
+			if api.players and api.players[steamid] then
+				if data.toggle_tag ~= nil then api.players[steamid].toggle_tag = data.toggle_tag elseif settings.toggle_tag ~= nil then api.players[steamid].toggle_tag = settings.toggle_tag end
+				if data.bp_rewards ~= nil then api.players[steamid].bp_rewards = data.bp_rewards end
+				if data.pass_rewards ~= nil then
+					api.players[steamid].pass_rewards = data.pass_rewards
+					api.players[steamid].bp_rewards = data.pass_rewards
+				elseif settings.pass_rewards ~= nil then
+					api.players[steamid].pass_rewards = settings.pass_rewards
+					api.players[steamid].bp_rewards = settings.pass_rewards
+				end
+				if data.player_xp ~= nil then api.players[steamid].player_xp = data.player_xp elseif settings.player_xp ~= nil then api.players[steamid].player_xp = settings.player_xp end
+				if data.winrate_toggle ~= nil then
+					api.players[steamid].winrate = data.winrate_toggle and 1 or 0
+					api.players[steamid].winrate_toggle = data.winrate_toggle
+				elseif settings.winrate_toggle ~= nil then
+					api.players[steamid].winrate = settings.winrate_toggle and 1 or 0
+					api.players[steamid].winrate_toggle = settings.winrate_toggle
+				end
+				if data.xhs_ingame_advertize_hidden ~= nil then
+					api.players[steamid].xhs_ingame_advertize_hidden = data.xhs_ingame_advertize_hidden
+				elseif settings.xhs_ingame_advertize_hidden ~= nil then
+					api.players[steamid].xhs_ingame_advertize_hidden = settings.xhs_ingame_advertize_hidden
+				end
+				api.players[steamid].supporter_pass = api.players[steamid].supporter_pass or {}
+				api.players[steamid].supporter_pass.settings = api.players[steamid].supporter_pass.settings or {}
+				local persisted_settings = api.players[steamid].supporter_pass.settings
+				if api.players[steamid].toggle_tag ~= nil then persisted_settings.toggle_tag = api.players[steamid].toggle_tag end
+				if api.players[steamid].pass_rewards ~= nil then persisted_settings.pass_rewards = api.players[steamid].pass_rewards end
+				if api.players[steamid].player_xp ~= nil then persisted_settings.player_xp = api.players[steamid].player_xp end
+				if api.players[steamid].winrate_toggle ~= nil then persisted_settings.winrate_toggle = api.players[steamid].winrate_toggle end
+				if api.players[steamid].xhs_ingame_advertize_hidden ~= nil then persisted_settings.xhs_ingame_advertize_hidden = api.players[steamid].xhs_ingame_advertize_hidden end
+			end
+
+			Finish(true, data)
+		end, function(error)
+			Finish(false, error)
+		end, "POST", payload)
+	end
+
+	local game_id = tonumber(self:GetApiGameId())
+	if game_id ~= nil and game_id > 0 then
+		SubmitSettingsUpdate(game_id)
+		return
+	end
+
+	local locked_bot_session = IsInToolsMode()
+		and XHSBots ~= nil
+		and XHSBots.enabled == true
+		and XHSBots.locked == true
+		and self.HasXHSBotSession ~= nil
+		and self:HasXHSBotSession()
+	if self.xhs_bot_session_backend_disabled == true or locked_bot_session then
+		return Finish(false, {
+			code = "game_not_registered",
+			message = "Supporter settings cannot be saved in a local-only bot session.",
+		})
+	end
+
+	local register_state = tostring(self.game_register_state or "not_started")
+	print("supporter-pass/settings: waiting for game-register (state=" .. register_state .. ")")
+
+	local registration_retry_started = false
+	if self.game_register_state == nil or self.game_register_state == "failed" then
+		registration_retry_started = true
+		local started, reason = self:RegisterGame()
+		if started == false then
+			return Finish(false, {
+				code = "game_not_registered",
+				message = "Unable to register the match before saving supporter settings: " .. tostring(reason),
+			})
+		end
+	end
+
+	local wait_attempts = 0
+	local function WaitForRegisteredGame()
+		if completed then
+			return nil
+		end
+
+		local registered_game_id = tonumber(api:GetApiGameId())
+		if registered_game_id ~= nil and registered_game_id > 0 then
+			print("supporter-pass/settings: game-register ready; submitting settings")
+			SubmitSettingsUpdate(registered_game_id)
+			return nil
+		end
+
+		wait_attempts = wait_attempts + 1
+		if api.game_register_state == "failed" and not registration_retry_started then
+			registration_retry_started = true
+			print("supporter-pass/settings: game-register failed; retrying once before save")
+			local started, reason = api:RegisterGame()
+			if started == false then
+				Finish(false, {
+					code = "game_not_registered",
+					message = "Unable to retry match registration before saving supporter settings: " .. tostring(reason),
+				})
+				return nil
+			end
+		end
+
+		if wait_attempts >= 40 or (api.game_register_state == "failed" and registration_retry_started) then
+			Finish(false, {
+				code = "game_not_registered",
+				message = "The match could not be registered. Supporter settings were not saved.",
+			})
+			return nil
+		end
+
+		return 0.25
+	end
+
+	if Timers ~= nil and Timers.CreateTimer ~= nil then
+		Timers:CreateTimer(0.25, WaitForRegisteredGame)
+		return
+	end
+
+	Finish(false, {
+		code = "game_registration_wait_unavailable",
+		message = "Unable to wait for match registration before saving supporter settings.",
+	})
+end
+
+local function GetAchievementProfileFromResponse(data)
+	if type(data) ~= "table" then return nil end
+	if type(data.profile) == "table" then return data.profile end
+	if type(data.achievements) == "table" and type(data.achievements.profile) == "table" then
+		return data.achievements.profile
+	end
+	if type(data.catalog) == "table" and type(data.progress) == "table" then return data end
+	return nil
+end
+
+function api:MergeAchievementResponse(steamid, data)
+	steamid = steamid ~= nil and tostring(steamid) or nil
+	if steamid == nil or type(data) ~= "table" then return nil end
+	self.players = self.players or {}
+	self.players[steamid] = self.players[steamid] or {}
+	local achievementData = type(data.achievements) == "table" and data.achievements or data
+	local profile = GetAchievementProfileFromResponse(data)
+	if profile ~= nil then
+		-- A full profile contains every historical unlock. Only completion responses
+		-- carry the small `unlocks` delta that should trigger the reveal animation.
+		if type(data.achievements) == "table" and type(data.achievements.unlocks) == "table" then
+			profile.new_unlocks = data.achievements.unlocks
+		end
+		self.players[steamid].achievements = profile
+	elseif type(achievementData) == "table" then
+		self.players[steamid].achievements = self.players[steamid].achievements or {}
+		for field, value in pairs(achievementData) do
+			self.players[steamid].achievements[field] = value
+		end
+	end
+	return self.players[steamid].achievements
+end
+
+function api:PublishAchievements(player_id)
+	if not self:IsPersistentPlayerID(player_id) then return end
+	local steamid = self:GetPersistentPlayerSteamID(player_id)
+	local player = steamid ~= nil and self.players and self.players[steamid] or nil
+	local achievements = player and player.achievements or {}
+
+	-- The complete profile eventually exceeds the safe size of one CustomNetTable
+	-- value (especially after a veteran account unlocks every rank). Publish the
+	-- immutable catalogue separately in small chunks and keep the per-player value
+	-- deliberately compact. This also avoids replicating the same 10KB catalogue
+	-- once per connected player.
+	local catalog = type(achievements.catalog) == "table" and achievements.catalog or nil
+	if catalog ~= nil and #catalog > 0 and not self.achievement_catalog_published then
+		local chunk_size = 12
+		local chunk_count = math.ceil(#catalog / chunk_size)
+		for chunk_index = 1, chunk_count do
+			local chunk = {}
+			local first = ((chunk_index - 1) * chunk_size) + 1
+			local last = math.min(first + chunk_size - 1, #catalog)
+			for index = first, last do
+				table.insert(chunk, catalog[index])
+			end
+			CustomNetTables:SetTableValue("xhs_achievements_catalog", "items_" .. tostring(chunk_index), {
+				items = chunk,
+			})
+		end
+		CustomNetTables:SetTableValue("xhs_achievements_catalog", "meta", {
+			chunk_count = chunk_count,
+			item_count = #catalog,
+			schema_version = tonumber(achievements.schema_version) or 1,
+		})
+		self.achievement_catalog_published = true
+	end
+
+	local function CompactRows(rows, fields)
+		local compact = {}
+		if type(rows) ~= "table" then return compact end
+		for _, row in pairs(rows) do
+			if type(row) == "table" then
+				local output = {}
+				for _, field in ipairs(fields) do
+					if row[field] ~= nil then output[field] = row[field] end
+				end
+				table.insert(compact, output)
+			end
+		end
+		return compact
+	end
+
+	local compact_profile = {
+		schema_version = achievements.schema_version,
+		score = achievements.score,
+		progress = CompactRows(achievements.progress, { "achievement_id", "value", "state" }),
+		unlocks = CompactRows(achievements.unlocks, { "achievement_id", "rank" }),
+		pins = CompactRows(achievements.pins, { "slot", "achievement_id", "rank" }),
+		reveal_queue = CompactRows(achievements.reveal_queue, { "id", "achievement_id", "rank", "source" }),
+		new_unlocks = CompactRows(achievements.new_unlocks, { "id", "achievement_id", "rank", "fragment_balance" }),
+		records = achievements.records or {},
+	}
+	-- Historical unlocks remain visible in the collection everywhere, but the
+	-- cinematic backlog is only opened by a real eligible human match. A Tools,
+	-- cheat or XHS-bot session must never consume (or reveal) that queue.
+	if IsInToolsMode() or self:IsCheatGame() or self:HasXHSBotParticipants() then
+		compact_profile.reveal_queue = {}
+	end
+	CustomNetTables:SetTableValue("xhs_achievements_player", tostring(player_id), compact_profile)
+end
+
+function api:RefreshAchievements(player_id, callback)
+	callback = callback or function() end
+	local steamid = self:GetPersistentPlayerSteamID(player_id)
+	if steamid == nil or self:GetApiGameId() == nil then
+		callback(false, { code = "non_persistent_player" })
+		return
+	end
+	self:Request("achievements/player", function(data)
+		if self:GetPersistentPlayerSteamID(player_id) ~= steamid then return end
+		self:MergeAchievementResponse(steamid, data or {})
+		self:PublishAchievements(player_id)
+		callback(true, data or {})
+	end, function(error)
+		callback(false, error or {})
+	end, "POST", { game_id = self:GetApiGameId(), steamid = steamid }, { silent = true })
+end
+
+function api:OnAchievementsMarkRevealed(_, keys)
+	keys = keys or {}
+	local player_id = tonumber(keys.PlayerID)
+	local steamid = player_id ~= nil and self:GetPersistentPlayerSteamID(player_id) or nil
+	if steamid == nil or self:GetApiGameId() == nil then return end
+	local ids = type(keys.ids) == "table" and keys.ids or {}
+	self:Request("achievements/revealed", function()
+		if self:GetPersistentPlayerSteamID(player_id) ~= steamid then return end
+		local player = self.players and self.players[steamid] or nil
+		local queue = player and player.achievements and player.achievements.reveal_queue or nil
+		if type(queue) ~= "table" then return end
+		local revealed = {}
+		for _, id in pairs(ids) do revealed[tonumber(id)] = true end
+		local remaining = {}
+		for _, entry in pairs(queue) do
+			if not revealed[tonumber(entry.id)] then table.insert(remaining, entry) end
+		end
+		player.achievements.reveal_queue = remaining
+		self:PublishAchievements(player_id)
+	end, function() end, "POST", { game_id = self:GetApiGameId(), steamid = steamid, ids = ids }, { silent = true })
+end
+
+function api:CreateSupporterPaymentIntent(player_id, context, callback)
+	callback = callback or function() end
+	context = context or {}
+	local steamid = self:GetPersistentPlayerSteamID(player_id)
+	if steamid == nil then
+		return callback(false, { code = "non_persistent_player", message = "Persistent human player required." })
+	end
+
+	local payload = {
+		steamid = steamid,
+		game_id = self:GetApiGameId(),
+		source = tostring(context.source or "supporter_pass"),
+		locale = tostring(context.locale or "en"),
+		game_mode = tostring(context.game_mode or "xhs"),
+		requested_tier_id = tonumber(context.requested_tier_id),
+	}
+
+	self:Request("supporter-pass/payment-intent", function(data)
+		callback(true, data or {})
+	end, function(error)
+		callback(false, error or { code = "supporter_payment_intent_failed" })
+	end, "POST", payload)
+end
+
+function api:GetSupporterPaymentOptions(player_id, callback)
+	callback = callback or function() end
+	local steamid = self:GetPersistentPlayerSteamID(player_id)
+	if steamid == nil then
+		return callback(false, { code = "non_persistent_player", message = "Persistent human player required." })
+	end
+
+	self:Request("supporter-pass/payment-options", function(data)
+		callback(true, data or {})
+	end, function(error)
+		callback(false, error or { code = "supporter_payment_options_failed", message = "Payment options are unavailable." })
+	end, "POST", {
+		steamid = steamid,
+		game_id = self:GetApiGameId(),
+	})
+end
+
+function api:CreateSupporterDirectCheckout(player_id, selection, callback)
+	callback = callback or function() end
+	selection = type(selection) == "table" and selection or {}
+	local steamid = self:GetPersistentPlayerSteamID(player_id)
+	if steamid == nil then
+		return callback(false, { code = "non_persistent_player", message = "Persistent human player required." })
+	end
+
+	self:Request("supporter-pass/direct-checkout", function(data)
+		callback(true, data or {})
+	end, function(error)
+		callback(false, error or { code = "supporter_payment_checkout_failed", message = "Unable to create checkout." })
+	end, "POST", {
+		steamid = steamid,
+		game_id = self:GetApiGameId(),
+		provider = tostring(selection.provider or ""),
+		tier_id = tonumber(selection.tier_id),
+		billing_id = tostring(selection.billing_id or ""),
+		request_id = tostring(selection.request_id or ""),
+		locale = tostring(selection.locale or "en"),
+		game_mode = GetMapName and GetMapName() or "xhs",
+	})
+end
+
+function api:GetSupporterDirectCheckoutStatus(player_id, order_key, callback)
+	callback = callback or function() end
+	local steamid = self:GetPersistentPlayerSteamID(player_id)
+	if steamid == nil then
+		return callback(false, { code = "non_persistent_player", message = "Persistent human player required." })
+	end
+
+	self:Request("supporter-pass/checkout-status", function(data)
+		if type(data) == "table" and data.confirmed == true and type(data.supporter_pass) == "table" then
+			api.players = api.players or {}
+			api.players[steamid] = api.players[steamid] or { status = 0 }
+			api.players[steamid].status = tonumber(data.user_status) or api.players[steamid].status or 0
+			api.players[steamid].supporter_pass = data.supporter_pass
+			if SupporterPass and SupporterPass.PublishPlayer then
+				SupporterPass:PublishPlayer(player_id)
+			end
+		end
+		callback(true, data or {})
+	end, function(error)
+		callback(false, error or { code = "supporter_payment_status_failed", message = "Unable to verify checkout." })
+	end, "POST", {
+		steamid = steamid,
+		game_id = self:GetApiGameId(),
+		order_key = tostring(order_key or ""),
+	})
+end
+
+function api:RequestSupporterPassAsset(player_id, asset, callback)
+	callback = callback or function() end
+	local steamid = self:GetPersistentPlayerSteamID(player_id)
+	if steamid == nil then
+		return callback(false, { code = "non_persistent_player", message = "Persistent human player required." })
+	end
+
+	asset = type(asset) == "table" and asset or {}
+	self:Request("supporter-pass/asset-request", function(data)
+		callback(true, data or {})
+	end, function(error)
+		callback(false, error or { message = "Feature request failed." })
+	end, "POST", {
+		steamid = steamid,
+		game_id = self:GetApiGameId(),
+		match_id = self:GetMatchID(),
+		request_id = tostring(asset.request_id or ""),
+		request_type = tostring(asset.request_type or ""),
+		category = tostring(asset.category or ""),
+		asset_id = tostring(asset.asset_id or ""),
+		item_def = asset.item_def,
+		unit_name = asset.unit_name,
+		model = asset.model,
+		display_name = asset.display_name,
+	})
+end
+
+function api:BuySupporterPassShopItem(player_id, item_id, request_id, callback)
+	if callback == nil then
+		callback = request_id
+		request_id = nil
+	end
+	if callback == nil then callback = function() end end
+
+	local steamid = self:GetPersistentPlayerSteamID(player_id)
+	if steamid == nil then
+		return callback(false, { code = "non_persistent_player", message = "Persistent human player required." })
+	end
+
+	local payload = {
+		steamid = steamid,
+		game_id = self:GetApiGameId(),
+		item_id = item_id,
+		request_id = tostring(request_id or ""),
+	}
+
+	api:Request("supporter-pass/buy-shop-item", function(data)
+		api:MergeSupporterPassResponse(steamid, data)
+		api:PublishSupporterPassArmory(player_id, data.armory)
+
+		if SupporterPass and SupporterPass.PublishPlayer then
+			SupporterPass:PublishPlayer(player_id)
+		end
+
+		callback(true, data)
+	end, function(error)
+		callback(false, error)
+	end, "POST", payload)
+end
+
+function api:OpenSupporterPassBundle(player_id, instance_id, request_id, callback)
+	if callback == nil then callback = function() end end
+	local steamid = self:GetPersistentPlayerSteamID(player_id)
+	if steamid == nil then
+		return callback(false, { code = "non_persistent_player", message = "Persistent human player required." })
+	end
+	self:Request("supporter-pass/open-bundle", function(data)
+		self:MergeSupporterPassResponse(steamid, data)
+		self:PublishSupporterPassArmory(player_id, data.armory)
+		callback(true, data)
+	end, function(error)
+		callback(false, error)
+	end, "POST", {
+		steamid = steamid,
+		game_id = self:GetApiGameId(),
+		instance_id = tostring(instance_id or ""),
+		request_id = tostring(request_id or ""),
+	})
+end
+
+function api:ClaimSupporterPassReward(player_id, reward_id, callback)
+	if callback == nil then
+		callback = function() end
+	end
+
+	if self:HasXHSBotSession() then
+		return callback(false, {
+			code = "xhs_bot_session",
+			message = "Persistent rewards are disabled for XHS bot sessions.",
+		})
+	end
+
+	local steamid = self:GetPersistentPlayerSteamID(player_id)
+	if steamid == nil then
+		return callback(false, { code = "non_persistent_player", message = "Persistent human player required." })
+	end
+
+	local payload = {
+		steamid = steamid,
+		game_id = self:GetApiGameId(),
+		reward_id = reward_id,
+	}
+
+	local syncState = GetSupporterClaimSyncState(steamid)
+	local _, requestPass, requestClaims = GetSupporterClaimPlayerState(steamid)
+	local requestSeason = GetSupporterClaimSeasonFromPass(requestPass)
+		or syncState.season_key
+		or InferSupporterClaimSeasonKey(requestClaims)
+		or InferSupporterClaimSeasonKey({ [tostring(reward_id)] = true })
+
+	api:Request("supporter-pass/claim-reward", function(data)
+		data = data or {}
+		local currentState = GetSupporterClaimSyncState(steamid)
+		currentState.mutation_revision = currentState.mutation_revision + 1
+		currentState.claims_loaded = true
+
+		local player, currentPass, currentClaims = GetSupporterClaimPlayerState(steamid)
+		local currentSeason = GetSupporterClaimSeasonFromPass(currentPass)
+			or currentState.season_key
+			or InferSupporterClaimSeasonKey(currentClaims)
+		local responseClaims = CollectSupporterClaimIDs(
+			GetSupporterClaimPayload(data, {})
+		)
+		local responseSeason = GetSupporterClaimSeasonFromResponse(data)
+			or InferSupporterClaimSeasonKey(responseClaims)
+			or requestSeason
+			or InferSupporterClaimSeasonKey({ [tostring(reward_id)] = true })
+
+		api:MergeSupporterPassResponse(steamid, data)
+		player = api.players and api.players[steamid] or player
+		if player ~= nil then
+			player.supporter_pass = player.supporter_pass or {}
+			local claimed = {}
+			if currentSeason ~= nil
+				and responseSeason ~= nil
+				and currentSeason == responseSeason
+			then
+				MergeSupporterClaimIDs(claimed, currentClaims)
+			end
+			MergeSupporterClaimIDs(claimed, responseClaims)
+			claimed[tostring(reward_id)] = true
+			player.supporter_pass.claimed_rewards = claimed
+		end
+		currentState.season_key = responseSeason
+
+		local playerStillBound = IsSupporterClaimPlayerStillBound(player_id, steamid)
+		if playerStillBound and data.armory then
+			api:PublishSupporterPassArmory(player_id, data.armory)
+		end
+
+		if playerStillBound and SupporterPass and SupporterPass.PublishPlayer then
+			SupporterPass:PublishPlayer(player_id)
+		end
+
+		callback(true, data)
+	end, function(error)
+		callback(false, error)
+	end, "POST", payload)
+end
+
+local function NormalizeSupporterPassMutationRequestID(request_id)
+	request_id = tostring(request_id or "")
+	if request_id == ""
+		or string.len(request_id) > 160
+		or string.match(request_id, "^[%w_-]+$") == nil then
+		return nil
+	end
+	return request_id
+end
+
+function api:EquipSupporterPassItem(player_id, item_id, hero, slot_id, request_id, callback)
+	if callback == nil then
+		callback = function() end
+	end
+
+	local steamid = self:GetPersistentPlayerSteamID(player_id)
+	if steamid == nil then
+		return callback(false, { code = "non_persistent_player", message = "Persistent human player required." })
+	end
+	request_id = NormalizeSupporterPassMutationRequestID(request_id)
+	if request_id == nil then
+		return callback(false, { code = "supporter_request_id_invalid", message = "A valid server request ID is required." })
+	end
+
+	local payload = {
+		steamid = steamid,
+		game_id = self:GetApiGameId(),
+		item_id = item_id,
+		hero = hero,
+		slot_id = slot_id,
+		request_id = request_id,
+	}
+
+	api:Request("supporter-pass/equip", function(data)
+		data = type(data) == "table" and data or {}
+		data.request_id = data.request_id or request_id
+		api:MergeSupporterPassResponse(steamid, data)
+
+		if data.armory then
+			api:PublishSupporterPassArmory(player_id, data.armory)
+		end
+
+		callback(true, data)
+	end, function(error)
+		error = type(error) == "table" and error or {}
+		error.request_id = error.request_id or request_id
+		callback(false, error)
+	end, "POST", payload)
+end
+
+function api:UnequipSupporterPassItem(player_id, hero, slot_id, scope, request_id, callback)
+	if callback == nil then
+		callback = function() end
+	end
+
+	local steamid = self:GetPersistentPlayerSteamID(player_id)
+	if steamid == nil then
+		return callback(false, { code = "non_persistent_player", message = "Persistent human player required." })
+	end
+	request_id = NormalizeSupporterPassMutationRequestID(request_id)
+	if request_id == nil then
+		return callback(false, { code = "supporter_request_id_invalid", message = "A valid server request ID is required." })
+	end
+
+	local payload = {
+		steamid = steamid,
+		game_id = self:GetApiGameId(),
+		hero = hero,
+		slot_id = slot_id,
+		request_id = request_id,
+	}
+	if scope ~= nil and tostring(scope) ~= "" then payload.scope = tostring(scope) end
+
+	api:Request("supporter-pass/unequip", function(data)
+		data = type(data) == "table" and data or {}
+		data.request_id = data.request_id or request_id
+		api:MergeSupporterPassResponse(steamid, data)
+
+		if data.armory then
+			api:PublishSupporterPassArmory(player_id, data.armory)
+		end
+
+		callback(true, data)
+	end, function(error)
+		error = type(error) == "table" and error or {}
+		error.request_id = error.request_id or request_id
+		callback(false, error)
+	end, "POST", payload)
 end
 
 function api:GetPlayerMMR(player_id)
@@ -525,6 +2015,50 @@ function api:IsCheatGame()
 	return false
 end
 
+function api:HasLocalBackendKey()
+	if not IsInToolsMode() or IsDedicatedServer() then
+		return false
+	end
+
+	local key_values = LoadKeyValues("scripts/vscripts/components/api/backend_key.kv")
+	local server_key = type(key_values) == "table" and key_values.server_key or nil
+	return type(server_key) == "string" and string.len(server_key) > 0
+end
+
+function api:SetBackendTestGameTime(value)
+	if not self:HasLocalBackendKey() then
+		self.backend_test_game_time = nil
+		return false, "local backend key missing; simulation disabled"
+	end
+
+	local seconds = tonumber(value)
+	if seconds == nil then
+		return false, "usage: xhs_backend_test_game_time <seconds>; use 0 to disable"
+	end
+
+	seconds = math.floor(seconds)
+	if seconds <= 0 then
+		self.backend_test_game_time = nil
+		return true, "production XP simulation disabled"
+	end
+
+	self.backend_test_game_time = math.min(seconds, 28800)
+	return true, "production XP simulation enabled with game_time="
+		.. tostring(self.backend_test_game_time)
+end
+
+function api:GetBackendTestGameTime()
+	if not self:HasLocalBackendKey() then
+		return nil
+	end
+
+	local seconds = tonumber(self.backend_test_game_time)
+	if seconds == nil or seconds <= 0 then
+		return nil
+	end
+	return math.floor(seconds)
+end
+
 function api:GetWinnerTeam()
 	return GAME_WINNER_TEAM
 end
@@ -533,14 +2067,34 @@ function api:GetKillsForTeam(team)
 	return GetTeamHeroKills(team)
 end
 
-function api:GetAllPlayerSteamIds()
+local function CollectGameRegisterPlayerSteamIds()
 	local players = {}
-	for id = 0, PlayerResource:GetPlayerCount() - 1 do
-		if PlayerResource:IsValidPlayerID(id) then
-			table.insert(players, tostring(PlayerResource:GetSteamID(id)))
+	local seen = {}
+	local valid_player_count = 0
+
+	for id = 0, DOTA_MAX_TEAM_PLAYERS - 1 do
+		-- game-register is the bootstrap request: do not depend on the XHS
+		-- persistent-player registry here because it may be initialized after
+		-- PlayerResource on dedicated servers.
+		if IsValidApiPlayerID(id)
+			and not IsApiSpectatorPlayerID(id)
+			and not IsApiBotPlayerID(id) then
+			valid_player_count = valid_player_count + 1
+
+			local steamid = GetApiSteamID(id)
+			if steamid ~= nil and seen[steamid] ~= true then
+				seen[steamid] = true
+				table.insert(players, steamid)
+			end
 		end
 	end
 
+	table.sort(players)
+	return players, valid_player_count
+end
+
+function api:GetAllPlayerSteamIds()
+	local players = CollectGameRegisterPlayerSteamIds()
 	return players
 end
 
@@ -565,25 +2119,489 @@ function api:Message(message, _type)
 		data = tostring(message)
 	end
 
-	local status, err = xpcall(function()
-		--[[
-		api:Request("game-event", nil, nil, "POST", {
-			type = _type,
-			game_id = api.game_id or 0,
-			message = data
-		})
---]]
-	end, function(err)
-		if err == nil then
-			err = "Unknown Error"
+	if _type == 2 and type(data) == "table" then
+		self:QueueRuntimeLog(data)
+	end
+end
+
+function api:ScheduleRuntimeLogFlush(delay)
+	local flushDelay = tonumber(delay) or 2
+	local now = 0
+	if Time ~= nil then
+		local ok, value = pcall(Time)
+		if ok then now = tonumber(value) or 0 end
+	end
+	local requestedAt = now + flushDelay
+	if self.runtime_log_flush_scheduled == true
+		and tonumber(self.runtime_log_flush_deadline) ~= nil
+		and requestedAt >= tonumber(self.runtime_log_flush_deadline) then
+		return
+	end
+	self.runtime_log_flush_scheduled = true
+	self.runtime_log_flush_deadline = requestedAt
+	self.runtime_log_flush_generation = (self.runtime_log_flush_generation or 0) + 1
+	local flushGeneration = self.runtime_log_flush_generation
+	local function FlushQueuedRuntimeLogs()
+		if flushGeneration ~= self.runtime_log_flush_generation then return nil end
+		self.runtime_log_flush_scheduled = false
+		self.runtime_log_flush_deadline = nil
+		local ok, failure = pcall(function() self:FlushRuntimeLogs() end)
+		if not ok and XHSBootstrapNativePrint ~= nil then
+			pcall(XHSBootstrapNativePrint, "[error][XHS_RUNTIME_LOG] flush threw: " .. tostring(failure))
+		end
+		return nil
+	end
+
+	if Timers ~= nil and Timers.CreateTimer ~= nil then
+		Timers:CreateTimer(flushDelay, FlushQueuedRuntimeLogs)
+		return
+	end
+
+	-- Bootstrap failures may happen after this API file is parsed but before
+	-- libraries/timers exists. The engine context think keeps those logs
+	-- deliverable instead of leaving a permanently dormant in-memory queue.
+	local mode = nil
+	if GameRules ~= nil and GameRules.GetGameModeEntity ~= nil then
+		pcall(function() mode = GameRules:GetGameModeEntity() end)
+	end
+	if mode ~= nil and mode.SetContextThink ~= nil then
+		local scheduled, scheduleError = pcall(function()
+			mode:SetContextThink("XHSRuntimeLogBootstrapFlush", function()
+				if flushGeneration ~= self.runtime_log_flush_generation then return nil end
+				self.runtime_log_flush_scheduled = false
+				self.runtime_log_flush_deadline = nil
+				self.runtime_log_bootstrap_think_active = true
+				local ok, failure = pcall(function() self:FlushRuntimeLogs() end)
+				if not ok and XHSBootstrapNativePrint ~= nil then
+					pcall(XHSBootstrapNativePrint, "[error][XHS_RUNTIME_LOG] bootstrap flush threw: "
+						.. tostring(failure))
+				end
+
+				local gameID = tonumber(self:GetApiGameId())
+				if ok and type(self.runtime_logs) == "table" and #self.runtime_logs > 0
+					and (gameID == nil or gameID <= 0)
+					and (Timers == nil or Timers.CreateTimer == nil) then
+					self.runtime_log_flush_scheduled = true
+					return 2
+				end
+				self.runtime_log_bootstrap_think_active = false
+				return nil
+			end, flushDelay)
+		end)
+		if scheduled then return end
+		if XHSBootstrapNativePrint ~= nil then
+			pcall(XHSBootstrapNativePrint, "[error][XHS_RUNTIME_LOG] context think registration failed: "
+				.. tostring(scheduleError))
+		end
+	end
+
+	self.runtime_log_flush_scheduled = false
+end
+
+function api:QueueRuntimeLog(entry)
+	if type(entry) ~= "table" then return end
+	self.runtime_logs = self.runtime_logs or {}
+	self.runtime_log_next_sequence = (self.runtime_log_next_sequence or 0) + 1
+
+	local gameTime = 0
+	if GameRules ~= nil and GameRules.GetGameTime ~= nil then
+		local ok, value = pcall(function() return GameRules:GetGameTime() end)
+		if ok then gameTime = tonumber(value) or 0 end
+	end
+
+	local dotaTime = tonumber(entry.dota_time) or 0
+	if dotaTime == 0 and GameRules ~= nil and GameRules.GetDOTATime ~= nil then
+		local ok, value = pcall(function() return GameRules:GetDOTATime(false, false) end)
+		if ok then dotaTime = tonumber(value) or 0 end
+	end
+	local realTime = tonumber(entry.real_time)
+	if (realTime == nil or realTime <= 0) and RealTime ~= nil then
+		local ok, value = pcall(RealTime)
+		if ok then realTime = tonumber(value) end
+	end
+	if (realTime == nil or realTime <= 0) and Time ~= nil then
+		local ok, value = pcall(Time)
+		if ok then realTime = tonumber(value) end
+	end
+
+	local normalizedLevel = NormalizeRuntimeLogLevel(entry.level)
+	table.insert(self.runtime_logs, {
+		sequence = self.runtime_log_next_sequence,
+		game_time = tonumber(entry.game_time) or gameTime,
+		dota_time = dotaTime,
+		real_time = realTime or 0,
+		logged_at_unix = tonumber(entry.logged_at_unix) or 0,
+		logged_at_utc = tostring(entry.logged_at_utc or ""),
+		level = normalizedLevel,
+		content = string.sub(tostring(entry.content or ""), 1, 4000),
+		trace = type(entry.trace) == "table" and entry.trace or {},
+	})
+
+	while #self.runtime_logs > 1000 do
+		table.remove(self.runtime_logs, 1)
+		self.runtime_logs_dropped = (self.runtime_logs_dropped or 0) + 1
+	end
+
+	local flushDelay = #self.runtime_logs >= 100 and 0.1 or 2
+	if normalizedLevel == "error" or normalizedLevel == "critical" then
+		flushDelay = 0.1
+	elseif normalizedLevel == "warn" then
+		flushDelay = math.min(flushDelay, 0.5)
+	end
+	self:ScheduleRuntimeLogFlush(flushDelay)
+end
+
+function api:FlushRuntimeLogs()
+	if self.runtime_log_flush_in_flight == true then return end
+	if type(self.runtime_logs) ~= "table" or #self.runtime_logs == 0 then return end
+
+	local gameID = tonumber(self:GetApiGameId())
+	if gameID == nil or gameID <= 0 then
+		if self.runtime_log_bootstrap_think_active ~= true then
+			self:ScheduleRuntimeLogFlush(2)
+		end
+		return
+	end
+
+	local batch = {}
+	for _ = 1, math.min(100, #self.runtime_logs) do
+		table.insert(batch, table.remove(self.runtime_logs, 1))
+	end
+	local droppedInBatch = self.runtime_logs_dropped or 0
+	self.runtime_log_flush_in_flight = true
+
+	self:Request("runtime-logs", function()
+		self.runtime_log_flush_in_flight = false
+		self.runtime_logs_dropped = math.max(0, (self.runtime_logs_dropped or 0) - droppedInBatch)
+		if #self.runtime_logs > 0 then self:ScheduleRuntimeLogFlush(0.1) end
+	end, function(errorData)
+		self.runtime_log_flush_in_flight = false
+		for index = #batch, 1, -1 do
+			table.insert(self.runtime_logs, 1, batch[index])
+		end
+		while #self.runtime_logs > 1000 do
+			table.remove(self.runtime_logs)
+			self.runtime_logs_dropped = (self.runtime_logs_dropped or 0) + 1
+		end
+		self:ScheduleRuntimeLogFlush(5)
+	end, "POST", {
+		game_id = gameID,
+		match_id = self:GetMatchID(),
+		logs = batch,
+		dropped = droppedInBatch,
+	}, { silent = true })
+end
+
+function api:BuildBotAuditUploadPayload(reason)
+	local isToolsMode = IsInToolsMode()
+	-- Tools matches are deliberately reward-ineligible, but their bot decisions
+	-- are valuable QA data and use the same registered backend game session.
+	if (not isToolsMode and self:IsCheatGame()) or not self:HasXHSBotSession() then
+		return nil
+	end
+	local game_id = tonumber(self:GetApiGameId())
+	if game_id == nil or game_id <= 0 then return nil end
+	if XHSBotDecisionAudit == nil
+		or type(XHSBotDecisionAudit.BuildBackendPayload) ~= "function" then
+		return nil
+	end
+
+	local auditBuildOK, auditPayload = pcall(function()
+		return XHSBotDecisionAudit:BuildBackendPayload(reason or "live_checkpoint")
+	end)
+	if not auditBuildOK or type(auditPayload) ~= "table" then return nil end
+
+	return {
+		game_id = game_id,
+		match_id = self:GetMatchID(),
+		game_time = GameRules:GetDOTATime(false, false),
+		winner = self:GetWinnerTeam(),
+		gamemode = self:GetCustomGamemode(),
+		difficulty = self:GetCustomDifficulty(),
+		mod_version = tostring(GAME_VERSION or ""),
+		map = GetMapName(),
+		-- Keep the configured count as a fallback after end-game cleanup removes
+		-- bot player entities before the terminal HTTP request completes.
+		bot_count = self:GetXHSBotSessionCount(),
+		human_count = #self:GetAllPlayerSteamIds(),
+		tools_mode = isToolsMode,
+		cheat_mode = self:IsCheatGame(),
+		audit = auditPayload,
+	}
+end
+
+function api:SubmitBotAuditCheckpoint(reason)
+	if self.bot_audit_checkpoint_in_flight == true then return false end
+	local payload = self:BuildBotAuditUploadPayload(reason or "live_checkpoint")
+	if payload == nil or tonumber(payload.bot_count or 0) <= 0 then return false end
+
+	self.bot_audit_checkpoint_in_flight = true
+	self:Request("bot-audit", function(data)
+		self.bot_audit_checkpoint_in_flight = false
+		self.bot_audit_last_checkpoint_at = GameRules:GetGameTime()
+		self.bot_audit_last_checkpoint_id = tonumber(data and data.id) or 0
+		self.bot_audit_last_checkpoint_error = nil
+	end, function(error)
+		self.bot_audit_checkpoint_in_flight = false
+		self.bot_audit_last_checkpoint_error = tostring(
+			error and error.message or "unknown"
+		)
+	end, "POST", payload, { silent = true })
+	return true
+end
+
+function api:ScheduleBotAuditCheckpoints(delay)
+	if self.bot_audit_checkpoint_scheduled == true then return end
+	self.bot_audit_checkpoint_scheduled = true
+
+	local function UploadCheckpoint()
+		local state = GameRules ~= nil and GameRules:State_Get() or -1
+		if state >= DOTA_GAMERULES_STATE_POST_GAME then
+			self.bot_audit_checkpoint_scheduled = false
+			return nil
+		end
+		if XHSBotDecisionAudit ~= nil and XHSBotDecisionAudit:IsActive() then
+			self:SubmitBotAuditCheckpoint("live_checkpoint")
+		end
+		return BOT_AUDIT_CHECKPOINT_INTERVAL
+	end
+
+	if Timers ~= nil and Timers.CreateTimer ~= nil then
+		Timers:CreateTimer(tonumber(delay) or BOT_AUDIT_CHECKPOINT_INITIAL_DELAY, UploadCheckpoint)
+		return
+	end
+	local game_mode = GameRules ~= nil and GameRules:GetGameModeEntity() or nil
+	if game_mode ~= nil and game_mode.SetContextThink ~= nil then
+		game_mode:SetContextThink(
+			"XHSBotAuditCheckpoint",
+			UploadCheckpoint,
+			tonumber(delay) or BOT_AUDIT_CHECKPOINT_INITIAL_DELAY
+		)
+		return
+	end
+	self.bot_audit_checkpoint_scheduled = false
+end
+
+function api:RegisterToolsTelemetrySession()
+	if not IsInToolsMode() then return false, "tools_mode_required" end
+	if self.tools_session_register_state == "pending" then return true, "pending" end
+	if self.tools_session_register_state == "ready" and tonumber(self.game_id) ~= nil then return true, "ready" end
+
+	local botCount = self.GetXHSBotParticipantCount ~= nil and self:GetXHSBotParticipantCount() or 0
+	self.tools_session_register_state = "pending"
+	self:Request("tools-session-register", function(data)
+		local gameID = tonumber(data and data.game_id)
+		if gameID == nil or gameID <= 0 then
+			self.tools_session_register_state = "failed"
+			print("tools-session-register: backend returned an invalid game_id")
+			return
 		end
 
-		native_print(err)
+		self.game_id = gameID
+		self.tools_telemetry_session = true
+		self.tools_session_register_state = "ready"
+		self:ScheduleRuntimeLogFlush(0.1)
+		self:ScheduleBotAuditCheckpoints(BOT_AUDIT_CHECKPOINT_INITIAL_DELAY)
+	end, function(errorData)
+		self.tools_session_register_state = "failed"
+		print("tools-session-register: failed; Lua logs remain local ("
+			.. tostring(errorData and errorData.message or "unknown error") .. ")")
+	end, "POST", {
+		map = GetMapName(),
+		match_id = self:GetMatchID(),
+		tools_mode = true,
+		cheat_mode = true,
+		bot_count = botCount,
+	})
+	return true, "pending"
+end
+
+function api:GetEventPlayerID(event_source_index, payload)
+	if XHSResolveEventPlayerID ~= nil then
+		return XHSResolveEventPlayerID(event_source_index)
+	end
+
+	local player_id = nil
+	local source_index = nil
+
+	if type(event_source_index) == "number" or type(event_source_index) == "string" then
+		source_index = tonumber(event_source_index)
+	end
+
+	if source_index ~= nil and source_index >= 0
+		and CustomGameEventManager ~= nil
+		and CustomGameEventManager.GetPlayerIDFromEventSourceIndex ~= nil then
+		local ok, sender_player_id = pcall(function()
+			return CustomGameEventManager:GetPlayerIDFromEventSourceIndex(source_index)
+		end)
+
+		if ok then
+			local resolved_player_id = tonumber(sender_player_id)
+			if resolved_player_id ~= nil and resolved_player_id >= 0 then
+				player_id = resolved_player_id
+			end
+		end
+	end
+
+	if player_id == nil and source_index ~= nil and source_index > 0 then
+		-- Compatibility fallback for engine builds without
+		-- GetPlayerIDFromEventSourceIndex. Never trust payload.PlayerID.
+		local ok, sender_player_id = pcall(function()
+			local sender = EntIndexToHScript(source_index)
+			if sender ~= nil and sender.GetPlayerID then
+				return sender:GetPlayerID()
+			end
+			return nil
+		end)
+
+		if ok then
+			local resolved_player_id = tonumber(sender_player_id)
+			if resolved_player_id ~= nil and resolved_player_id >= 0 then
+				player_id = resolved_player_id
+			end
+		end
+	end
+
+	if player_id == nil then
+		return nil
+	end
+
+	local valid_ok, valid_player_id = pcall(function()
+		return PlayerResource:IsValidPlayerID(player_id)
+	end)
+
+	if not valid_ok or not valid_player_id then
+		return nil
+	end
+
+	return player_id
+end
+
+function api:SendLoadingScreenApiResponse(player_id, request_id, ok, data, message)
+	local player_ok, player = pcall(function()
+		return PlayerResource:GetPlayer(player_id)
+	end)
+	if not player_ok or player == nil then
+		return
+	end
+
+	local send_ok, send_err = pcall(function()
+		CustomGameEventManager:Send_ServerToPlayer(player, "loading_screen_api_response", {
+			request_id = request_id or "",
+			ok = ok and 1 or 0,
+			data = data or {},
+			message = message or "",
+		})
 	end)
 end
 
+function api:IsLoadingScreenApiRateLimited(player_id, request_type)
+	self.loading_screen_api_last_request = self.loading_screen_api_last_request or {}
+
+	local key = tostring(player_id) .. ":" .. tostring(request_type)
+	local now = 0
+	local ok, game_time = pcall(function()
+		return GameRules:GetGameTime()
+	end)
+	if ok and tonumber(game_time) ~= nil then
+		now = tonumber(game_time)
+	elseif Time ~= nil then
+		now = Time()
+	end
+	local last_request = self.loading_screen_api_last_request[key]
+
+	if last_request ~= nil and now - last_request < 0.5 then
+		return true
+	end
+
+	self.loading_screen_api_last_request[key] = now
+	return false
+end
+
+function api:OnLoadingScreenApiRequest(event_source_index, keys)
+	local ok = xpcall(function()
+		api.OnLoadingScreenApiRequestSafe(api, event_source_index, keys)
+	end, function(error_message)
+		return tostring(error_message)
+	end)
+end
+
+function api:OnLoadingScreenApiRequestSafe(event_source_index, keys)
+	local payload = keys
+
+	if type(event_source_index) == "table" and type(payload) ~= "table" then
+		payload = event_source_index
+		event_source_index = nil
+	end
+
+	if type(payload) ~= "table" then
+		return
+	end
+
+	local player_id = nil
+	local ok, resolved_player_id = pcall(function()
+		return self:GetEventPlayerID(event_source_index, payload)
+	end)
+
+	if ok then
+		player_id = resolved_player_id
+	end
+
+	if player_id == nil then
+		return
+	end
+
+	local valid_ok, valid_player_id = pcall(function()
+		return PlayerResource:IsValidPlayerID(player_id)
+	end)
+	if not valid_ok or not valid_player_id then
+		return
+	end
+
+	local request_id = tostring(payload.request_id or "")
+	if request_id == "" then
+		return
+	end
+
+	local request_type = tostring(payload.request_type or "")
+	local rate_limit_ok, is_rate_limited = pcall(function()
+		return self:IsLoadingScreenApiRateLimited(player_id, request_type)
+	end)
+	if rate_limit_ok and is_rate_limited then
+		self:SendLoadingScreenApiResponse(player_id, request_id, false, {}, "rate limited")
+		return
+	end
+
+	if request_type == "loading-screen-info" then
+		if self.loading_screen_info_cache ~= nil then
+			self:SendLoadingScreenApiResponse(player_id, request_id, true, { data = self.loading_screen_info_cache })
+			return
+		end
+
+		local request_ok = pcall(function()
+			self:Request("loading-screen-info", function(data)
+				self.loading_screen_info_cache = data
+				self:SendLoadingScreenApiResponse(player_id, request_id, true, { data = data })
+			end, function()
+				self:SendLoadingScreenApiResponse(player_id, request_id, false, {}, "loading-screen-info failed")
+			end)
+		end)
+
+		if not request_ok then
+			self:SendLoadingScreenApiResponse(player_id, request_id, false, {}, "loading-screen-info failed")
+		end
+		return
+	end
+
+	self:SendLoadingScreenApiResponse(player_id, request_id, false, {}, "unknown request")
+end
+
 -- Core
-function api:Request(endpoint, okCallback, failCallback, method, payload)
+function api:Request(endpoint, okCallback, failCallback, method, payload, options)
+	options = type(options) == "table" and options or {}
+	local silent = options.silent == true
+	local request_started_at = Time()
+	local encoded_payload_size = 0
 	if okCallback == nil then
 		okCallback = function()
 		end
@@ -597,15 +2615,23 @@ function api:Request(endpoint, okCallback, failCallback, method, payload)
 	if method == nil then
 		method = "GET"
 	end
+	method = string.upper(method)
 
-	local request = CreateHTTPRequestScriptVM(method, self:GetUrl(endpoint))
+	local request_url = self:GetUrl(endpoint)
+	local request = CreateHTTPRequestScriptVM(method, request_url)
 
 	if request == nil then
-		print("Failed to create http request. skipping")
+		if not silent then print("Failed to create http request. skipping") end
 		return failCallback()
 	end
 
-	request:SetHTTPRequestAbsoluteTimeoutMS(timeout)
+	local request_timeout_ms = tonumber(options.timeout_ms)
+	if request_timeout_ms == nil then
+		request_timeout_ms = (endpoint == "bot-audit" or endpoint == "game-complete")
+			and 20000 or timeout
+	end
+	request_timeout_ms = math.max(1000, math.min(120000, math.floor(request_timeout_ms)))
+	request:SetHTTPRequestAbsoluteTimeoutMS(request_timeout_ms)
 
 	local header_key = nil
 
@@ -619,41 +2645,86 @@ function api:Request(endpoint, okCallback, failCallback, method, payload)
 		end
 	end
 
-	CustomNetTables:SetTableValue("game_options", "server_key", { header_key })
-
 	request:SetHTTPRequestHeaderValue("X-Dota-Server-Key", header_key)
 	request:SetHTTPRequestHeaderValue("X-Dota-Game-Type", CUSTOM_GAME_TYPE)
 
 	-- encode payload
 	if payload ~= nil then
-		local encoded = json.encode(payload)
-		request:SetHTTPRequestRawPostBody("application/json", encoded)
+		if method == "GET" then
+			for key, value in pairs(payload) do
+				if value ~= nil and value ~= json.null then
+					request:SetHTTPRequestGetOrPostParameter(tostring(key), tostring(value))
+				end
+			end
+		else
+			local encoded = json.encode(payload)
+			encoded_payload_size = string.len(encoded or "")
+			request:SetHTTPRequestRawPostBody("application/json", encoded)
+		end
 	end
 
 	request:Send(function(result)
 		-- print(result)
 		local code = result.StatusCode;
+		local response_body = tostring(result.Body or "")
+		if endpoint == "game-register" or endpoint == "tools-session-register" or endpoint == "game-complete"
+			or endpoint == "performance" or endpoint == "bot-audit" then
+			local elapsed_ms = math.floor(math.max(Time() - request_started_at, 0) * 1000)
+			local http_log_message = "[XHS HTTP] destination=" .. tostring(request_url)
+				.. " | method=" .. tostring(method)
+				.. " | status=" .. tostring(code or 0)
+				.. " | elapsed=" .. tostring(elapsed_ms) .. "ms"
+				.. " | request=" .. tostring(encoded_payload_size) .. "B"
+				.. " | response=" .. tostring(string.len(response_body)) .. "B"
+			if not silent then
+				if log ~= nil and type(log.debug) == "function" then
+					log.debug(http_log_message)
+				else
+					print(http_log_message)
+				end
+			end
+		end
 
 		local fail = function(message)
 			if (code == nil) then
 				code = 0
 			end
 
-			print("Request to " .. endpoint .. " failed with message " .. message .. " (" .. tostring(code) .. ")")
-			failCallback()
+			if not silent then print("Request to " .. endpoint .. " failed with message " .. message .. " (" .. tostring(code) .. ")") end
+			if not silent and endpoint ~= "observability/logs" and endpoint ~= "runtime-logs" and XHSObservability ~= nil then
+				XHSObservability:Log("error", "backend_http", "HTTP_REQUEST_FAILED", "Request to " .. tostring(endpoint) .. " failed: " .. tostring(message), {
+					endpoint = tostring(endpoint), status_code = tonumber(code) or 0,
+				})
+			end
+			failCallback({
+				message = message,
+				status_code = code,
+				endpoint = endpoint,
+			})
 		end
 
 		if code == 0 then
 			return fail("Request timeout")
-		elseif code >= 500 then
-			return fail("Server Error")
 		elseif code == 204 then
-			print("Request to " .. endpoint .. " succeeded with no content")
-			return okCallback(obj.data or {})
+			if not silent then print("Request to " .. endpoint .. " succeeded with no content") end
+			return okCallback({})
 		else
-			local obj, pos, err = json.decode(result.Body)
+			-- Express' default 403/404 responses can be empty or HTML when a
+			-- deployment is missing a route. Do not report those transport errors
+			-- as malformed JSON: that hides the actionable HTTP status from Tools.
+			if response_body == "" then
+				return fail("HTTP " .. tostring(code) .. " returned an empty response")
+			end
+
+			local obj, pos, err = json.decode(response_body)
 
 			if err then
+				if code >= 500 then
+					return fail("Server Error")
+				end
+				if code >= 400 then
+					return fail("HTTP " .. tostring(code) .. " returned a non-JSON response")
+				end
 				return fail("Json error: " .. tostring(err))
 			end
 
@@ -677,96 +2748,517 @@ function api:Request(endpoint, okCallback, failCallback, method, payload)
 	end)
 end
 
-function api:RegisterGame(callback)
-	self:Request("game-register", function(data)
-		-- if IsInToolsMode() then
-		-- for k, v in pairs(data.players) do
-		-- print("Player SteamID: " .. k)
-		-- print("Whalepass:")
-		-- print(v.whalepass)
+function api:RegisterGame(callback, register_players)
+	-- This flag is reserved for an explicitly telemetry-only caller. A normal
+	-- Tools bot match must register its human players so read-only Supporter Pass
+	-- state and vote power are available; Tools Mode remains XP-ineligible.
+	if self.xhs_bot_session_backend_disabled == true then
+		print("game-register: rejected for an explicitly telemetry-only session.")
+		return false, "xhs_bot_session"
+	end
 
-		-- if v.whalepass then
-		-- 	for i, j in pairs(v.whalepass) do
-		-- 		print(i)
-		-- 		-- print(i, j)
-		-- 	end
-		-- end
-		-- end
-
-		-- print(data.players)
-		-- print(data.whalepass)
-		-- end
-
-		api.game_id = tonumber(data.game_id)
-		api.players = data.players
-		api.companions = data.companions or nil
-		api.emblems = data.emblems or nil
-		api.disabled_heroes = data.disabled_heroes or nil
-
-		-- Whalepass
-		if data.whalepass and data.whalepass[1] then
-			api.whalepass = data.whalepass[1]
-		else
-			api.whalepass = nil
+	-- Tools mode generally exposes PlayerResource before this call, while a
+	-- dedicated server can invoke the same flow before any human SteamID is
+	-- readable. Poll without blocking the server thread, then submit the full
+	-- snapshot as soon as at least one valid human SteamID is available.
+	if type(register_players) ~= "table" or #register_players == 0 then
+		if self.game_register_state == "waiting_for_players" then
+			return true, "waiting_for_players"
+		elseif self.game_register_state == "pending" then
+			return true, "pending"
+		elseif self.game_register_state == "ready" then
+			return true, "ready"
 		end
 
-		CustomNetTables:SetTableValue("battlepass_player", "companions", api.companions)
-		CustomNetTables:SetTableValue("battlepass_player", "emblems", api.emblems)
-		CustomNetTables:SetTableValue("battlepass_player", "whalepass", api.whalepass)
+		register_players = self:GetAllPlayerSteamIds()
+
+		if #register_players == 0 then
+			self.game_register_state = "waiting_for_players"
+			self.game_register_wait_attempts = 0
+
+			local function WaitForGameRegisterPlayers()
+				if self.game_register_state ~= "waiting_for_players" then
+					return nil
+				end
+
+				local players, valid_player_count = CollectGameRegisterPlayerSteamIds()
+				if #players == 0 then
+					self.game_register_wait_attempts = (self.game_register_wait_attempts or 0) + 1
+
+					if self.game_register_wait_attempts == 1
+						or self.game_register_wait_attempts % 20 == 0 then
+						print("game-register: waiting for a valid human SteamID"
+							.. " (valid_player_ids=" .. tostring(valid_player_count)
+							.. ", attempt=" .. tostring(self.game_register_wait_attempts) .. ")")
+					end
+
+					return 0.25
+				end
+
+				print("game-register: player data ready; registering "
+					.. tostring(#players) .. " human player(s).")
+
+				self.game_register_state = nil
+				self.game_register_wait_attempts = nil
+				self:RegisterGame(callback, players)
+				return nil
+			end
+
+			if Timers ~= nil and Timers.CreateTimer ~= nil then
+				Timers:CreateTimer(0.25, WaitForGameRegisterPlayers)
+				return true, "waiting_for_players"
+			end
+
+			local game_mode = nil
+			if GameRules ~= nil and GameRules.GetGameModeEntity ~= nil then
+				local ok, entity = pcall(function()
+					return GameRules:GetGameModeEntity()
+				end)
+
+				if ok then
+					game_mode = entity
+				end
+			end
+
+			if game_mode ~= nil and game_mode.SetContextThink ~= nil then
+				game_mode:SetContextThink(
+					"api_game_register_wait_for_players",
+					WaitForGameRegisterPlayers,
+					0.25
+				)
+				return true, "waiting_for_players"
+			end
+
+			self.game_register_state = "failed"
+			self.game_register_wait_attempts = nil
+			print("game-register: unable to schedule the player readiness loop.")
+			return false, "player_wait_unavailable"
+		end
+	end
+
+	self.game_register_state = "pending"
+	self:Request("game-register", function(data)
+		api.game_id = tonumber(data.game_id)
+		if api.game_id == nil or api.game_id <= 0 then
+			api.game_id = nil
+			api.game_register_state = "failed"
+			print("game-register: backend returned an invalid game_id")
+			return
+		end
+		api.game_register_state = "ready"
+		print("game-register: ready with game_id=" .. tostring(api.game_id))
+		if XHSFlushBootstrapLogs ~= nil then
+			XHSFlushBootstrapLogs()
+		end
+		api:ScheduleRuntimeLogFlush(0.1)
+		api:ScheduleBotAuditCheckpoints(BOT_AUDIT_CHECKPOINT_INITIAL_DELAY)
+		api.players = data.players or {}
+		api.companions = data.companions or nil
+		api.emblems = data.emblems or nil
+		api.effigies = data.effigies or data.statues or nil
+		api.disabled_heroes = data.disabled_heroes or nil
+		api.supporter_pass = data.supporter_pass or nil
+		api.custom_polls = data.custom_polls or nil
+
+		CustomNetTables:SetTableValue("supporter_pass_player", "companions", api.companions)
+		CustomNetTables:SetTableValue("supporter_pass_player", "emblems", api.emblems)
+		CustomNetTables:SetTableValue("supporter_pass_player", "effigies", api.effigies)
+
+		if SupporterPass and SupporterPass.PublishPlayers then
+			SupporterPass:PublishPlayers()
+		end
+
+		if CustomPolls and CustomPolls.SetBackendPayload then
+			CustomPolls:SetBackendPayload(api.custom_polls)
+		end
+
+		for player_id = 0, DOTA_MAX_TEAM_PLAYERS - 1 do
+			if api:IsPersistentPlayerID(player_id) then
+				api:PublishSupporterPassArmory(player_id)
+				api:RefreshSupporterPassClaims(player_id)
+				api:PublishAchievements(player_id)
+				api:RefreshAchievements(player_id)
+			end
+		end
+
+		if IsInToolsMode() then
+			for player_id = 0, DOTA_MAX_TEAM_PLAYERS - 1 do
+				local steamid = api:GetPersistentPlayerSteamID(player_id)
+				if steamid ~= nil then
+					local player = api.players and api.players[steamid] or nil
+					local supporter_pass = player and player.supporter_pass or {}
+					local season = supporter_pass.season or {}
+					local published = CustomNetTables:GetTableValue("supporter_pass_player", tostring(player_id)) or {}
+					print("XHS Supporter Pass register: player=" .. tostring(player_id)
+						.. " steamid=" .. steamid
+						.. " status=" .. tostring(player and player.status)
+						.. " tier=" .. tostring(supporter_pass.tier_id)
+						.. " fragments=" .. tostring(supporter_pass.fragments or supporter_pass.fragment_balance)
+						.. " season_xp=" .. tostring(season.xp or supporter_pass.season_xp or supporter_pass.current_exp)
+						.. " season_level=" .. tostring(season.level or supporter_pass.season_level or supporter_pass.level)
+						.. " published_xp=" .. tostring(published.season_xp or published.XP)
+						.. " published_level=" .. tostring(published.season_level or published.Lvl)
+						.. " vote_power=" .. tostring(published.vote_power))
+					if not player then
+						print("XHS Supporter Pass register: missing backend player row for steamid=" .. steamid)
+					end
+				end
+			end
+		end
 
 		if callback ~= nil then
 			callback(data)
 		end
-	end, function()
+	end, function(error_data)
+		api.game_id = nil
+		api.game_register_state = "failed"
+		print("game-register: failed; persistent completion disabled for this match ("
+			.. tostring(error_data and error_data.message or "unknown error") .. ")")
 		-- fail-safe if http request can't reach backend
 		--		GameRules:SetCustomGameSetupRemainingTime(20.0)
 	end, "POST", {
 		map = GetMapName(),
 		match_id = self:GetMatchID(),
-		players = self:GetAllPlayerSteamIds(),
+		players = register_players,
 		cheat_mode = self:IsCheatGame(),
+		tools_mode = IsInToolsMode(),
+		contains_xhs_bots = self:HasXHSBotSession(),
+		xhs_bot_count = self:GetXHSBotSessionCount(),
+	}, {
+		-- The first request after a backend restart can legitimately spend several
+		-- seconds verifying the Supporter Pass schema. Keep ordinary API calls on
+		-- the short timeout while allowing the match bootstrap to finish.
+		timeout_ms = 60000,
 	})
 
-	-- call in BP scripts after battlepass_player is set to show mmr medal in loading screen
+	-- call in supporter pass scripts after supporter_pass_player is set to show mmr medal in loading screen
 	--	print("ALL PLAYERS LOADED IN!")
 	--	CustomGameEventManager:Send_ServerToAllClients("all_players_loaded", {})
 end
 
-function api:ProcessCompletedGame(data, payload)
+function api:SubmitCustomPollVote(player_id, poll_id, option_id, callback)
+	if callback == nil then
+		callback = function() end
+	end
+
+	local steamid = self:GetPersistentPlayerSteamID(player_id)
+	if steamid == nil then
+		callback(false, { code = "non_persistent_player", message = "Persistent human player required." })
+		return
+	end
+
+	self:Request("custom-polls/vote", function(data)
+		callback(true, data or {})
+	end, function(err)
+		callback(false, err or { message = "Vote backend unavailable." })
+	end, "POST", {
+		game_id = api:GetApiGameId(),
+		match_id = api:GetMatchID(),
+		steamid = steamid,
+		poll_id = tostring(poll_id or ""),
+		option_id = tostring(option_id or ""),
+	})
+end
+
+function api:ProcessCompletedGame(data, payload, skipWinner, completionError)
+	local game_id = payload.game_id or api:GetApiGameId() or api:GetMatchID()
+	local match_id = payload.match_id or api:GetMatchID()
+	local gamemode = payload.gamemode or api:GetCustomGamemode()
+	local game_type = payload.game_type or CUSTOM_GAME_TYPE
+
+	local function MergeCompletedPlayers(response)
+		if type(response) ~= "table" then
+			return
+		end
+
+		local response_players = response.players
+		if response_players == nil and type(response.data) == "table" then
+			response_players = response.data.players
+		end
+		if type(response_players) ~= "table" then
+			return
+		end
+
+		api.players = api.players or {}
+
+		for key, player_data in pairs(response_players) do
+			if type(player_data) == "table" then
+				local steamid = tostring(player_data.steamid or player_data.steam_id or player_data.steamID or key)
+				api.players[steamid] = api.players[steamid] or {}
+
+				for field, value in pairs(player_data) do
+					api.players[steamid][field] = value
+				end
+
+				if api.MergeSupporterPassResponse then
+					api:MergeSupporterPassResponse(steamid, player_data)
+				end
+				if api.MergeAchievementResponse then
+					api:MergeAchievementResponse(steamid, player_data)
+				end
+			end
+		end
+	end
+
+	MergeCompletedPlayers(data)
+	if SupporterPass and SupporterPass.PublishPlayers then
+		SupporterPass:PublishPlayers()
+	end
+	for player_id = 0, DOTA_MAX_TEAM_PLAYERS - 1 do
+		if api:IsPersistentPlayerID(player_id) then
+			api:PublishAchievements(player_id)
+			local steamid = api:GetPersistentPlayerSteamID(player_id)
+			local player = steamid ~= nil and api.players and api.players[steamid] or nil
+			local profile = player and player.achievements or nil
+			local has_new_unlocks = type(profile) == "table" and type(profile.new_unlocks) == "table" and #profile.new_unlocks > 0
+			local has_reveal_backlog = type(profile) == "table" and type(profile.reveal_queue) == "table" and #profile.reveal_queue > 0
+			-- A player's first eligible match also releases the reliable historical
+			-- backlog. Notify Panorama even when that match did not add a brand-new
+			-- rank, otherwise the retroactive ceremony could wait for another UI
+			-- refresh before opening.
+			if has_new_unlocks or has_reveal_backlog then
+				local owner = PlayerResource:GetPlayer(player_id)
+				if owner ~= nil then
+					CustomGameEventManager:Send_ServerToPlayer(owner, "xhs_achievements_unlocked", { unlocks = profile.new_unlocks or {} })
+				end
+				profile.new_unlocks = nil
+				api:PublishAchievements(player_id)
+			end
+		end
+	end
+
 	local full_data = {
 		players = payload.players,
 		data = data,
+		game_id = game_id,
+		match_id = match_id,
+		game_type = game_type,
+		gamemode = gamemode,
+		game_time = payload.game_time,
+		map = payload.map or GetMapName(),
+		cheat_mode = payload.cheat_mode == true,
+		tools_mode = payload.tools_mode == true or IsInToolsMode(),
+		persistent_rewards_eligible = payload.persistent_rewards_eligible ~= false,
+		-- The first snapshot exists only to make match data available before the
+		-- HTTP callback. Panorama must not treat it as an authoritative zero-XP
+		-- receipt or it will suppress the real completion response that follows.
+		completion_pending = skipWinner == true,
+		completion_error = completionError == true,
 		info = {
 			winner = GAME_WINNER_TEAM,
-			id = api:GetApiGameId(),
-			gamemode = api:GetCustomGamemode(),
+			id = game_id,
+			match_id = match_id,
+			game_type = game_type,
+			gamemode = gamemode,
 		}
 	}
 	CustomNetTables:SetTableValue("game_options", "end_game", full_data)
 	-- CustomGameEventManager:Send_ServerToAllClients("end_game", full_data)
 
-	GameRules:SetGameWinner(GAME_WINNER_TEAM, true)
+	if not skipWinner then
+		local winner_team = GAME_WINNER_TEAM
+		-- Give the final net-table snapshot enough time to reach every client
+		-- before POST_GAME freezes normal custom-game replication.
+		Timers:CreateTimer(2.0, function()
+			GameRules:SetGameWinner(winner_team, true)
+		end)
+	end
 end
 
 function api:CompleteGame()
-	print("CompleteGame")
 	local players = {}
+	local backend_players = {}
+	local bot_results = {}
+	local has_xhs_bot_session = self:HasXHSBotSession()
+	local is_tools_session = IsInToolsMode()
+	if has_xhs_bot_session
+		and XHSBotDecisionAudit ~= nil
+		and type(XHSBotDecisionAudit.Finalize) == "function" then
+		local auditCallOK, auditOK, auditMessage = pcall(function()
+			return XHSBotDecisionAudit:Finalize("complete_game")
+		end)
+		if not auditCallOK then
+			self.bot_audit_finalize_error = tostring(auditOK)
+		elseif auditOK == false and auditMessage ~= "audit_already_finalized" then
+			self.bot_audit_finalize_error = tostring(auditMessage)
+		else
+			self.bot_audit_finalize_error = nil
+		end
+	end
 
-	for id = 0, PlayerResource:GetPlayerCount() - 1 do
-		if PlayerResource:IsValidPlayerID(id) then
+	local function CountItemsBought(itemsBought, itemName)
+		local count = 0
+
+		if itemsBought == nil then
+			return count
+		end
+
+		for _, itemInfo in pairs(itemsBought) do
+			if itemInfo and itemInfo.item_name == itemName then
+				count = count + 1
+			end
+		end
+
+		return count
+	end
+
+	local function CountPlayerZoneStat(playerID, statName)
+		local total = 0
+		local zones = nil
+
+		if GameRules.GameMode ~= nil and GameRules.GameMode.Zones ~= nil then
+			zones = GameRules.GameMode.Zones
+		elseif GameMode ~= nil and GameMode.Zones ~= nil then
+			zones = GameMode.Zones
+		end
+
+		if zones == nil then
+			return total
+		end
+
+		for _, zone in pairs(zones) do
+			if zone.PlayerStats ~= nil and zone.PlayerStats[playerID] ~= nil then
+				total = total + (tonumber(zone.PlayerStats[playerID][statName]) or 0)
+			end
+		end
+
+		return total
+	end
+
+	local function GetEndScreenHeroPlayerID(hero)
+		if hero == nil or hero:IsNull() or not hero:IsRealHero() then
+			return nil
+		end
+
+		if XHSGetPlayerIDFromUnit ~= nil then
+			local playerID = XHSGetPlayerIDFromUnit(hero)
+			if playerID ~= nil then
+				return playerID
+			end
+		end
+
+		if hero.GetPlayerID ~= nil then
+			local playerID = hero:GetPlayerID()
+			if playerID ~= nil and playerID >= 0 and PlayerResource:IsValidPlayerID(playerID) then
+				return playerID
+			end
+		end
+
+		return nil
+	end
+
+	local function IsEndScreenHero(hero, playerID)
+		return GetEndScreenHeroPlayerID(hero) == playerID
+	end
+
+	local function ResolveEndScreenHero(playerID)
+		local candidates = {}
+		local selectedHero = PlayerResource:GetSelectedHeroEntity(playerID)
+		local player = PlayerResource:GetPlayer(playerID)
+		local assignedHero = nil
+
+		if player ~= nil then
+			assignedHero = player:GetAssignedHero()
+		end
+
+		if IsEndScreenHero(selectedHero, playerID) then
+			table.insert(candidates, selectedHero)
+		end
+
+		if IsEndScreenHero(assignedHero, playerID) and assignedHero ~= selectedHero then
+			table.insert(candidates, assignedHero)
+		end
+
+		for _, hero in pairs(HeroList:GetAllHeroes()) do
+			if IsEndScreenHero(hero, playerID) and hero ~= selectedHero and hero ~= assignedHero then
+				table.insert(candidates, hero)
+			end
+		end
+
+		local fallbackHero = nil
+		for _, hero in pairs(candidates) do
+			fallbackHero = fallbackHero or hero
+
+			if hero:FindModifierByName("modifier_tome_of_stats") ~= nil then
+				return hero
+			end
+		end
+
+		return fallbackHero
+	end
+
+	local completed_hero_images = 0
+	for candidateID = 0, DOTA_MAX_TEAM_PLAYERS - 1 do
+		if PlayerResource:IsValidPlayerID(candidateID)
+			and not IsApiSpectatorPlayerID(candidateID)
+			and self:IsPersistentPlayerID(candidateID) then
+			local candidateHero = ResolveEndScreenHero(candidateID)
+			local completed = GameMode ~= nil
+				and GameMode.IsHeroImageCompleted ~= nil
+				and GameMode:IsHeroImageCompleted(candidateID, candidateHero)
+			if completed then
+				completed_hero_images = completed_hero_images + 1
+			end
+		end
+	end
+
+	local function GetFarmEventKills(playerID)
+		if SpecialEvents == nil then return 0 end
+
+		local totalKills = SpecialEvents.farm_event_total_kills_by_player ~= nil
+			and SpecialEvents.farm_event_total_kills_by_player[playerID]
+			or nil
+		if totalKills ~= nil then
+			return math.max(0, math.floor(tonumber(totalKills) or 0))
+		end
+
+		local progress = SpecialEvents.hero_farm_event ~= nil
+			and SpecialEvents.hero_farm_event[playerID]
+			or nil
+		if progress ~= nil then
+			return math.max(0, math.floor(tonumber(progress.kills) or 0))
+		end
+
+		for _, result in pairs(SpecialEvents.farm_event_final_players or {}) do
+			if tonumber(result.player_id) == tonumber(playerID) then
+				return math.max(0, math.floor(tonumber(result.kills) or 0))
+			end
+		end
+
+		return 0
+	end
+
+	local farm_event_difficulty = math.max(1, math.min(5,
+		tonumber(GameRules:GetCustomGameDifficulty()) or tonumber(api:GetCustomDifficulty()) or 1))
+
+	for id = 0, DOTA_MAX_TEAM_PLAYERS - 1 do
+		if PlayerResource:IsValidPlayerID(id)
+			and not IsApiSpectatorPlayerID(id) then
 			local items = {}
-			local heroEntity = PlayerResource:GetSelectedHeroEntity(id)
+			local heroEntity = ResolveEndScreenHero(id)
 			local hero = json.null
 			local networth = 0
+			local gold_earned = XHSGetEndScreenStat ~= nil and XHSGetEndScreenStat(id, "gold_earned") or 0
 			local healing = PlayerResource:GetHealing(id)
+			local boss_damage = XHSGetEndScreenStat ~= nil and XHSGetEndScreenStat(id, "boss_damage") or 0
+			local damage_taken = XHSGetEndScreenStat ~= nil and XHSGetEndScreenStat(id, "damage_taken") or 0
+			local self_healing = XHSGetEndScreenStat ~= nil and XHSGetEndScreenStat(id, "self_healing") or 0
+			local tracked_potions_used = XHSGetPotionUses ~= nil and XHSGetPotionUses(id) or 0
+			local end_screen_potions_used = XHSGetEndScreenStat ~= nil and XHSGetEndScreenStat(id, "potions_used") or 0
+			local potions_used = math.max(tracked_potions_used, end_screen_potions_used, CountPlayerZoneStat(id, "Potions"))
 			local damage_done_to_heroes = 0
 			local damage_done_to_buildings = 0
 			local kills_done_to_hero = {}
-			local items_bought = nil
+			local items_bought = {}
 			local abandon = false
+			local connection_state = tonumber(PlayerResource:GetConnectionState(id)) or 0
+			local disconnected = connection_state ~= 2
 			local leaderboard = {}
 			local support_items = {}
 			local abilities_level_up_order = {}
+			local tracked_tome_stats_bonus = XHSGetTomeStats ~= nil and XHSGetTomeStats(id) or 0
+			local end_screen_tome_stats_bonus = XHSGetEndScreenStat ~= nil and XHSGetEndScreenStat(id, "tome_stats_bonus") or 0
+			local tome_stats_bonus = math.max(tracked_tome_stats_bonus, end_screen_tome_stats_bonus)
 
 			if PlayerResource.GetHasAbandonedDueToLongDisconnect then
 				abandon = PlayerResource:GetHasAbandonedDueToLongDisconnect(id)
@@ -795,6 +3287,11 @@ function api:CompleteGame()
 				end
 
 				networth = PlayerResource:GetNetWorth(id)
+
+				local tomeModifier = heroEntity:FindModifierByName("modifier_tome_of_stats")
+				if tomeModifier ~= nil then
+					tome_stats_bonus = math.max(tome_stats_bonus, tomeModifier:GetStackCount())
+				end
 			end
 
 			if CUSTOM_GAME_TYPE == "PLS" then
@@ -804,7 +3301,7 @@ function api:CompleteGame()
 				end
 			end
 
-			for i = 0, PlayerResource:GetPlayerCount() - 1 do
+			for i = 0, DOTA_MAX_TEAM_PLAYERS - 1 do
 				damage_done_to_heroes = damage_done_to_heroes + PlayerResource:GetDamageDoneToHero(id, i)
 				kills_done_to_hero[i] = PlayerResource:GetKillsDoneToHero(id, i)
 			end
@@ -824,6 +3321,38 @@ function api:CompleteGame()
 
 			--			print("Player Leaderboard:", leaderboard)
 
+			local is_persistent_player = self:IsPersistentPlayerID(id)
+			local is_xhs_bot = self:IsXHSBotParticipant(id)
+			local supporter_xp = {
+				version = 1,
+				muradin_event_won = (SpecialEvents ~= nil
+						and SpecialEvents.muradin_winners_by_player ~= nil
+						and SpecialEvents.muradin_winners_by_player[id] == true)
+					or (heroEntity ~= nil and heroEntity.paid == true),
+				hero_images_done = completed_hero_images,
+				hero_image_done = GameMode ~= nil
+					and GameMode.IsHeroImageCompleted ~= nil
+					and GameMode:IsHeroImageCompleted(id, heroEntity),
+				all_hero_images_done = GameMode ~= nil and GameMode.AllHeroImagesDead == true,
+				all_hero_images_completed_by_player = GameMode ~= nil
+					and tonumber(GameMode.AllHeroImagesCompletedByPlayerID) == tonumber(id),
+				frost_infernal_done = GameMode ~= nil
+					and (GameMode.FrostInfernal_killed == true or GameMode.FrostInfernal_killed == 1),
+				frost_infernal_completed_by_player = GameMode ~= nil
+					and tonumber(GameMode.FrostInfernalCompletedByPlayerID) == tonumber(id),
+				spirit_beast_done = GameMode ~= nil and GameMode.SpiritBeast_killed == true,
+				spirit_beast_completed_by_player = GameMode ~= nil
+					and tonumber(GameMode.SpiritBeastCompletedByPlayerID) == tonumber(id),
+				ramero_baristol_won = SpecialEvents ~= nil
+					and SpecialEvents.ramero_baristol_winners_by_player ~= nil
+					and SpecialEvents.ramero_baristol_winners_by_player[id] == true,
+				sogat_won = SpecialEvents ~= nil
+					and SpecialEvents.sogat_winners_by_player ~= nil
+					and SpecialEvents.sogat_winners_by_player[id] == true,
+				farm_event_kills = GetFarmEventKills(id),
+				farm_event_difficulty = farm_event_difficulty,
+				farm_event_percent = farm_event_difficulty,
+			}
 			local player = {
 				id = id,
 				kills = tonumber(PlayerResource:GetKills(id)),
@@ -834,27 +3363,61 @@ function api:CompleteGame()
 				team = tonumber(PlayerResource:GetTeam(id)),
 				items = items,
 				networth = networth,
+				gold_earned = gold_earned,
 				healing = healing,
+				boss_damage = boss_damage,
+				damage_taken = damage_taken,
+				self_healing = self_healing,
+				potions_used = potions_used,
 				damage_done_to_heroes = damage_done_to_heroes,
 				damage_done_to_buildings = damage_done_to_buildings,
 				kills_done_to_hero = kills_done_to_hero,
 				items_bought = items_bought,
+				tome_stats_bonus = tome_stats_bonus,
+				tomes_bought_small = CountItemsBought(items_bought, "item_tome_small"),
+				tomes_bought_big = CountItemsBought(items_bought, "item_tome_big"),
+				tomes_bought_power = CountItemsBought(items_bought, "item_tome_of_power"),
 				support_items = support_items,
 				gold_spent_on_support = PlayerResource:GetGoldSpentOnSupport(id),
 				abilities_level_up_order = abilities_level_up_order,
 				increment_pa_arcana_kills = increment_pa_arcana_kills,
 				pa_arcana_kills = api:GetPhantomAssassinArcanaKills(id),
 				abandon = abandon,
+				connection_state = connection_state,
+				disconnected = disconnected,
 				leaderboard = leaderboard,
+				participant_kind = is_xhs_bot and "xhs_bot" or (is_persistent_player and "human" or "non_persistent"),
+				is_xhs_bot = is_xhs_bot and 1 or 0,
+				supporter_xp = supporter_xp,
 			}
-
-			local steamid = tostring(PlayerResource:GetSteamID(id))
-
-			if steamid == 0 then
-				steamid = tostring(id)
+			if is_xhs_bot then
+				table.insert(bot_results, {
+					slot = id,
+					player_name = tostring(PlayerResource:GetPlayerName(id) or "XHS Bot"),
+					hero = hero,
+					team = player.team,
+					kills = player.kills,
+					deaths = player.deaths,
+					assists = player.assists,
+					level = player.level,
+					is_bot = true,
+				})
 			end
 
-			players[steamid] = player
+			local steamid = tostring(PlayerResource:GetSteamID(id))
+			local local_player_key = steamid
+
+			if local_player_key == "0" then
+				local_player_key = tostring(id)
+			end
+
+			players[local_player_key] = player
+			if is_persistent_player then
+				local persistent_steamid = self:GetPersistentPlayerSteamID(id)
+				if persistent_steamid ~= nil then
+					backend_players[persistent_steamid] = player
+				end
+			end
 		end
 	end
 
@@ -867,49 +3430,248 @@ function api:CompleteGame()
 	local rosh_hp
 	local rosh_max_hp
 
-	if CUSTOM_GAME_TYPE == "IMBA" then
-		-- print("Cheat game?", api:IsCheatGame(), api:GetCustomGamemode() == 4)
+	--	print(rosh_lvl, rosh_hp, rosh_max_hp)
 
-		if api:IsCheatGame() == false and api:GetCustomGamemode() == 4 then
-			rosh_lvl = ROSHAN_ENT:GetLevel()
-			rosh_hp = ROSHAN_ENT:GetHealth()
-			rosh_max_hp = ROSHAN_ENT:GetMaxHealth()
+	local api_game_id = tonumber(self:GetApiGameId())
+	if api_game_id ~= nil and api_game_id <= 0 then
+		api_game_id = nil
+	end
+
+	local fragment_quests = FragmentQuests ~= nil and FragmentQuests:BuildAnalyticsPayload() or nil
+	local performance_summary = XHSPerformanceTelemetry ~= nil
+		and XHSPerformanceTelemetry:Finalize()
+		or nil
+	local backend_fragment_quests = fragment_quests
+	if type(fragment_quests) == "table" then
+		backend_fragment_quests = {}
+		for key, value in pairs(fragment_quests) do
+			backend_fragment_quests[key] = value
+		end
+
+		backend_fragment_quests.players = {}
+		for _, contribution in pairs(fragment_quests.players or {}) do
+			if type(contribution) == "table" and self:IsPersistentPlayerID(contribution.player_id) then
+				table.insert(backend_fragment_quests.players, contribution)
+			end
+		end
+
+		backend_fragment_quests.events = {}
+		for _, event in ipairs(fragment_quests.events or {}) do
+			local event_player_id = type(event) == "table"
+				and type(event.data) == "table"
+				and event.data.player_id
+				or nil
+			if event_player_id == nil or self:IsPersistentPlayerID(event_player_id) then
+				table.insert(backend_fragment_quests.events, event)
+			end
 		end
 	end
 
-	--	print(rosh_lvl, rosh_hp, rosh_max_hp)
+	local human_player_count = 0
+	local human_deaths_total = 0
+	local team_consumables_used = 0
+	for _, player in pairs(backend_players) do
+		human_player_count = human_player_count + 1
+		human_deaths_total = human_deaths_total + (tonumber(player.deaths) or 0)
+		local player_consumables = (tonumber(player.potions_used) or 0)
+			+ (tonumber(player.tomes_bought_small) or 0)
+			+ (tonumber(player.tomes_bought_big) or 0)
+			+ (tonumber(player.tomes_bought_power) or 0)
+		team_consumables_used = team_consumables_used + player_consumables
+		player.achievement_evidence = {
+			consumables_used = player_consumables,
+			hellscream_defeated = GameMode ~= nil and GameMode.XHSGromRealDefeated == true,
+			pit_lord_defeated = GameMode ~= nil and GameMode.XHSPitLordDefeated == true,
+		}
+	end
+
+	local ancient_health_percent = 0
+	local ancient = Entities:FindByName(nil, "dota_goodguys_fort")
+	if ancient ~= nil and not ancient:IsNull() and ancient.GetMaxHealth ~= nil
+		and ancient:GetMaxHealth() > 0 then
+		ancient_health_percent = math.max(0, math.min(100,
+			(ancient:GetHealth() / ancient:GetMaxHealth()) * 100))
+	end
+	local victory = tonumber(winnerTeam) == DOTA_TEAM_GOODGUYS
+	local required_objective_count = 0
+	local required_objectives_complete = victory
+	local zones = GameRules.GameMode ~= nil and GameRules.GameMode.Zones
+		or (GameMode ~= nil and GameMode.Zones)
+	for _, zone in pairs(zones or {}) do
+		for _, quest in pairs(zone.Quests or {}) do
+			-- Only objectives that actually belonged to this run count. This avoids
+			-- treating inactive branch/phase definitions as missed objectives.
+			if quest ~= nil and quest.bOptional ~= true and quest.bActivated == true then
+				required_objective_count = required_objective_count + 1
+				if quest.bCompleted ~= true then
+					required_objectives_complete = false
+				end
+			end
+		end
+	end
+	required_objectives_complete = required_objectives_complete
+		and required_objective_count > 0
+	local achievement_evidence = {
+		ancient_health_percent = ancient_health_percent,
+		human_player_count = human_player_count,
+		human_deaths_total = human_deaths_total,
+		team_consumables_used = team_consumables_used,
+		campaign_complete = victory,
+		required_objective_count = required_objective_count,
+		required_objectives_complete = required_objectives_complete,
+		grom_real_defeated = GameMode ~= nil and GameMode.XHSGromRealDefeated == true,
+		grom_false_copy_damaged = GameMode ~= nil and GameMode.XHSGromFalseCopyDamaged == true,
+		hellscream_defeated = GameMode ~= nil and GameMode.XHSGromRealDefeated == true,
+		pit_lord_defeated = GameMode ~= nil and GameMode.XHSPitLordDefeated == true,
+	}
+	-- Persist the match-wide proof on each player result as well. That keeps
+	-- retrospective achievement rebuilds deterministic even years later.
+	for _, player in pairs(backend_players) do
+		player.achievement_evidence.ancient_health_percent = ancient_health_percent
+		player.achievement_evidence.human_player_count = human_player_count
+		player.achievement_evidence.human_deaths_total = human_deaths_total
+		player.achievement_evidence.team_consumables_used = team_consumables_used
+		player.achievement_evidence.campaign_complete = victory
+		player.achievement_evidence.required_objective_count = required_objective_count
+		player.achievement_evidence.required_objectives_complete = required_objectives_complete
+		player.achievement_evidence.grom_real_defeated = achievement_evidence.grom_real_defeated
+		player.achievement_evidence.grom_false_copy_damaged = achievement_evidence.grom_false_copy_damaged
+	end
 
 	local payload = {
 		winner = winnerTeam,
-		game_id = self:GetApiGameId(),
+		game_id = api_game_id,
+		match_id = self:GetMatchID(),
 		players = players,
 		-- radiant_score = self:GetKillsForTeam(2),
 		-- dire_score = self:GetKillsForTeam(3),
 		game_time = GameRules:GetDOTATime(false, false),
 		game_type = CUSTOM_GAME_TYPE,
 		gamemode = api:GetCustomGamemode(),
+		difficulty = api:GetCustomDifficulty(),
+		mod_version = tostring(GAME_VERSION or ""),
 		rosh_lvl = rosh_lvl,
 		rosh_hp = rosh_hp,
 		rosh_max_hp = rosh_max_hp,
 		cheat_mode = self:IsCheatGame(),
+		tools_mode = is_tools_session,
 		map = GetMapName(),
+		fragment_quests = fragment_quests,
+		performance_summary = performance_summary,
+		bot_results = bot_results,
+		contains_xhs_bots = self:HasXHSBotParticipants(),
+		xhs_bot_count = self:GetXHSBotParticipantCount(),
+		-- XHS bots never enter backend_players. A production match containing
+		-- both humans and bots can therefore reward only its persistent humans.
+		-- Every Tools session remains fully non-persistent, with or without bots.
+		persistent_rewards_eligible = not is_tools_session,
+		achievement_evidence = achievement_evidence,
 	}
+	local backend_payload = {}
+	for key, value in pairs(payload) do
+		backend_payload[key] = value
+	end
+	backend_payload.players = backend_players
+	backend_payload.fragment_quests = backend_fragment_quests
+	local backend_test_game_time = self:GetBackendTestGameTime()
+	if backend_test_game_time ~= nil then
+		backend_payload.game_time = backend_test_game_time
+		print("game-complete: authenticated game time override enabled with game_time="
+			.. tostring(backend_test_game_time))
+	end
+	local completed_display_payload = {}
+	for key, value in pairs(payload) do
+		completed_display_payload[key] = value
+	end
+	completed_display_payload.game_time = backend_payload.game_time
+
+	-- Production and Tools bot matches both retain the complete audit. Tools
+	-- sessions stay explicitly tagged and reward-ineligible on game-complete.
+	if has_xhs_bot_session then
+		local finalAuditPayload = self:BuildBotAuditUploadPayload("complete_game")
+		if finalAuditPayload ~= nil then
+			finalAuditPayload.game_time = backend_payload.game_time
+			finalAuditPayload.winner = winnerTeam
+			self:Request("bot-audit", function(data)
+				self.bot_audit_final_store_id = tonumber(data and data.id) or 0
+				self.bot_audit_final_store_error = nil
+			end, function(error)
+				self.bot_audit_final_store_error = tostring(
+					error and error.message or "unknown"
+				)
+			end, "POST", finalAuditPayload, { silent = true })
+		end
+	end
+
+	-- Tools Mode still submits game-complete so telemetry sessions close
+	-- cleanly. Never send player reward inputs from Tools: the backend also
+	-- recognizes tools_mode and bypasses every persistent reward operation.
+	if is_tools_session then
+		backend_players = {}
+		backend_payload.players = {}
+		backend_payload.fragment_quests = {}
+		backend_payload.persistent_rewards_eligible = false
+	end
+
+	if next(backend_players) == nil and not is_tools_session then
+		print("game-complete: skipped backend request because no persistent human player is present.")
+		if FragmentQuests ~= nil then
+			FragmentQuests:OnBackendComplete(false, { code = "no_persistent_players" })
+		end
+		self:ProcessCompletedGame({}, payload)
+		return
+	end
+
+	if api_game_id == nil then
+		local registrationState = self.tools_telemetry_session == true
+			and self.tools_session_register_state
+			or self.game_register_state
+		print("game-complete: skipped backend request because session registration has no valid game_id (state="
+			.. tostring(registrationState or "unknown") .. ").")
+		if FragmentQuests ~= nil then
+			FragmentQuests:OnBackendComplete(false, { code = "game_not_registered" })
+		end
+		self:ProcessCompletedGame({}, payload)
+		return
+	end
+
+	-- Publish the local match snapshot before starting the asynchronous request.
+	-- Some engine defeat paths can enter POST_GAME before an HTTP callback runs;
+	-- the EndScreen therefore always has replicated data when its context mounts.
+	-- A successful backend response replaces this snapshot with authoritative XP
+	-- before the deliberately delayed SetGameWinner transition.
+	self:ProcessCompletedGame({}, completed_display_payload, true)
 
 	self:Request("game-complete", function(data)
-			print("game-complete: Game complete successful!")
-			api:ProcessCompletedGame(data, payload)
+			if FragmentQuests ~= nil then
+				FragmentQuests:OnBackendComplete(true, data)
+			end
+			api:ProcessCompletedGame(data, completed_display_payload)
 		end,
 
 		function(data)
 			print("game-complete: Error on game complete!")
 			print(data)
-			api:ProcessCompletedGame(data, payload)
+			if FragmentQuests ~= nil then
+				FragmentQuests:OnBackendComplete(false, data)
+			end
+			api:ProcessCompletedGame(data, payload, false, true)
 		end,
-		"POST", payload
+		"POST", backend_payload
 	)
 end
 
 function api:DiretideHallOfFame(successCallback, failCallback)
+	if self:HasXHSBotSession() then
+		if failCallback ~= nil then
+			failCallback({
+				code = "xhs_bot_session",
+				message = "Leaderboard persistence is disabled for XHS bot sessions.",
+			})
+		end
+		return false
+	end
+
 	self:Request("diretide-score", function(data)
 		if successCallback ~= nil then
 			successCallback(data)
@@ -1011,21 +3773,41 @@ function api:FindPlayerParty(iPlayerID)
 	end
 end
 
-function api:SetCompanion(data)
-	local player_id = data.PlayerID
+function api:SetCompanion(event_source_index, data)
+	if type(event_source_index) == "table" and type(data) ~= "table" then
+		data = event_source_index
+		event_source_index = nil
+	end
+	data = data or {}
+
+	local player_id = self:GetEventPlayerID(event_source_index, data)
+	local player = player_id ~= nil and PlayerResource:GetPlayer(player_id) or nil
+	local steamid = self:GetPersistentPlayerSteamID(player_id)
+	if steamid == nil then
+		if player ~= nil then
+			CustomGameEventManager:Send_ServerToPlayer(player, "change_companion_failure", {
+				code = "non_persistent_player",
+			})
+		end
+		return false
+	end
+
 	local unit_name = data.sUnitName
 
 	local payload = {
 		companion_id = data.companion_id,
-		steamid = tostring(PlayerResource:GetSteamID(player_id))
+		steamid = steamid,
 	}
 
 	api:Request("modify-companion", function(data)
 			Battlepass:DonatorCompanion(player_id, unit_name, true)
 		end,
 		function(data)
-			CustomGameEventManager:Send_ServerToPlayer(player, "change_companion_failure", {})
+			if player ~= nil then
+				CustomGameEventManager:Send_ServerToPlayer(player, "change_companion_failure", {})
+			end
 		end, "POST", payload)
+	return true
 end
 
 function api:GetParties(iPlayerID)
@@ -1037,9 +3819,9 @@ function api:GetParties(iPlayerID)
 	return self.parties
 end
 
-function api:GetPlayerWhalepassURL(player_id)
+function api:GetPlayerSupporterURL(player_id)
 	if not PlayerResource:IsValidPlayerID(player_id) then
-		native_print("api:GetPlayerWhalepassURL: Player ID not valid!")
+		native_print("api:GetPlayerSupporterURL: Player ID not valid!")
 		return false
 	end
 
@@ -1051,9 +3833,10 @@ function api:GetPlayerWhalepassURL(player_id)
 	end
 
 	if self.players[steamid] ~= nil then
-		return self.players[steamid].whalepass_url
+		local supporter_pass = self.players[steamid].supporter_pass or {}
+		return supporter_pass.url or self.players[steamid].supporter_url
 	else
-		native_print("api:GetPlayerWhalepassURL: api players steamid not valid!")
+		native_print("api:GetPlayerSupporterURL: api players steamid not valid!")
 		return false
 	end
 end
@@ -1071,17 +3854,18 @@ function api:GetPlayerAchievements(player_id)
 		return false
 	end
 
-	if self.players[steamid] ~= nil and self.players[steamid].whalepass then
-		return self.players[steamid].whalepass.challenges
+	if self.players[steamid] ~= nil then
+		local supporter_pass = self.players[steamid].supporter_pass or {}
+		return supporter_pass.challenges or supporter_pass.achievements or {}
 	else
 		native_print("api:GetPlayerAchievements: api players steamid not valid!")
 		return false
 	end
 end
 
-function api:GetPlayerWhalepassXP(player_id)
+function api:GetPlayerSupporterPassXP(player_id)
 	if not PlayerResource:IsValidPlayerID(player_id) then
-		native_print("api:GetPlayerWhalepassXP: Player ID not valid!")
+		native_print("api:GetPlayerSupporterPassXP: Player ID not valid!")
 		return 0
 	end
 
@@ -1092,21 +3876,17 @@ function api:GetPlayerWhalepassXP(player_id)
 	end
 
 	if self.players[steamid] ~= nil then
-		if self.players[steamid] ~= nil and self.players[steamid].whalepass then
-			return self.players[steamid].whalepass.currentExp
-		end
-
-		native_print("api:GetPlayerWhalepassXP: api players whalepass not valid!")
-		return 0
+		local supporter_pass = self.players[steamid].supporter_pass or {}
+		return tonumber(supporter_pass.season_xp or supporter_pass.current_exp) or 0
 	else
-		native_print("api:GetPlayerWhalepassXP: api players steamid not valid!")
+		native_print("api:GetPlayerSupporterPassXP: api players steamid not valid!")
 		return 0
 	end
 end
 
-function api:GetPlayerWhalepassLevel(player_id)
+function api:GetPlayerSupporterPassLevel(player_id)
 	if not PlayerResource:IsValidPlayerID(player_id) then
-		native_print("api:GetPlayerWhalepassLevel: Player ID not valid!")
+		native_print("api:GetPlayerSupporterPassLevel: Player ID not valid!")
 		return false
 	end
 
@@ -1117,17 +3897,11 @@ function api:GetPlayerWhalepassLevel(player_id)
 	end
 
 	if self.players[steamid] ~= nil then
-		if self.players[steamid].whalepass then
-			return self.players[steamid].whalepass.currentExp
-		else
-			native_print("api:GetPlayerWhalepassLevel: api players whalepass not valid!")
-			return false
-		end
-
-		return self.players[steamid].whalepass.lastCompletedLevel or 0
+		local supporter_pass = self.players[steamid].supporter_pass or {}
+		return math.max(tonumber(supporter_pass.season_level or supporter_pass.level) or 1, 1)
 	else
-		native_print("api:GetPlayerWhalepassLevel: api players steamid not valid!")
-		return false
+		native_print("api:GetPlayerSupporterPassLevel: api players steamid not valid!")
+		return 1
 	end
 end
 

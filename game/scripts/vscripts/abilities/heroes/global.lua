@@ -73,8 +73,15 @@ function CastleMuradin(event)
 	local Health = ability:GetSpecialValueFor("hp_tooltip")
 	local InvTime = ability:GetSpecialValueFor("invulnerability_time")
 	local PauseTime = 10.0
+	local defendDuration = InvTime + PauseTime
+	local timerName = "castle_muradin"
 
 	if caster:GetHealthPercent() <= Health then
+		local castleBar = caster:FindModifierByName("modifier_xhs_castle_health_bar")
+		if castleBar ~= nil and castleBar.MarkMuradinTriggered ~= nil then
+			castleBar:MarkMuradinTriggered(Health)
+		end
+
 		PauseCreeps(PauseTime)
 
 		local Muradin = CreateUnitByName("npc_dota_creature_muradin_bronzebeard", waypoint_pos, false, nil, nil, DOTA_TEAM_GOODGUYS)
@@ -87,22 +94,70 @@ function CastleMuradin(event)
 		Muradin:EmitSound("MountainKing.Avatar")
 
 		for _, hero in pairs(heroes) do
-			CustomGameEventManager:Send_ServerToPlayer(hero:GetPlayerOwner(), "set_player_camera", { hPosition = Muradin:GetAbsOrigin() })
+			if hero:GetPlayerOwnerID() >= 0 then
+				CameraMotion:Move(hero:GetPlayerOwnerID(), Muradin, {
+					from = hero,
+					duration = 0.55,
+					easing = "smootherstep",
+					owner = "castle_muradin",
+					priority = 70,
+					policy = "replace",
+					release = "free",
+				})
+			end
 
 			hero:AddNewModifier(hero, nil, "modifier_pause_creeps", { Duration = 10, IsHidden = true })
 			hero:AddNewModifier(hero, nil, "modifier_invulnerable", { Duration = 10, IsHidden = true })
 		end
 
 		print("Castle will be invulnerable for " .. tostring(InvTime + PauseTime) .. " seconds.")
-		caster:AddNewModifier(caster, nil, "modifier_invulnerable", { duration = InvTime + PauseTime })
-		Notifications:TopToAll({ text = "Muradin is requested to defend your castle!", duration = PauseTime, continue = true })
+		caster:AddNewModifier(caster, nil, "modifier_invulnerable", { duration = defendDuration })
+		Notifications:TopToAll({ text = "Muradin is requested to defend your castle!", duration = PauseTime })
 
-		Timers:CreateTimer(InvTime + PauseTime, function()
+		CustomTimers.current_time[timerName] = math.ceil(defendDuration)
+		CustomGameEventManager:Send_ServerToAllClients("show_current_event_timer", {
+			timer_name = timerName,
+			title = "MURADIN DEFENDS",
+			duration = defendDuration,
+		})
+		CustomTimers:BroadcastTimer(timerName)
+
+		Timers:CreateTimer(1.0, function()
+			if CustomTimers.current_time[timerName] == nil then return nil end
+			if CustomTimers.current_time[timerName] <= 0 then return nil end
+
+			CustomTimers:Countdown(timerName)
+			return CustomTimers.current_time[timerName] > 0 and 1.0 or nil
+		end)
+
+		Timers:CreateTimer(defendDuration, function()
+			CustomGameEventManager:Send_ServerToAllClients("hide_current_event_timer", { timer_name = timerName })
+			CustomTimers.current_time[timerName] = nil
 			UTIL_Remove(Muradin)
 		end)
 
 		caster:RemoveAbility("castle_muradin_defend")
 	end
+end
+
+local XHS_PHYSICAL_IMMUNITY_MODIFIERS = {
+	modifier_holdout_wukong_army_buff = true,
+	modifier_holdout_guardian_angel_buff = true,
+	modifier_holdout_guardian_angel_summoned_buff = true,
+	modifier_omniknight_guardian_angel = true,
+}
+
+local function XHSHasPhysicalDamageImmunity(unit)
+	if unit == nil or unit:IsNull() then return true end
+	if unit:IsAttackImmune() then return true end
+
+	for modifierName in pairs(XHS_PHYSICAL_IMMUNITY_MODIFIERS) do
+		if unit:HasModifier(modifierName) then
+			return true
+		end
+	end
+
+	return false
 end
 
 -- Global Splash
@@ -117,7 +172,7 @@ function Splash(event)
 
 	for _, unit in pairs(splash_targets) do
 		if target:IsBuilding() then return end
-		if unit ~= target and not unit:IsBuilding() then
+		if unit ~= target and not unit:IsBuilding() and not XHSHasPhysicalDamageImmunity(unit) then
 			if ability:IsItem() and attacker:GetAttackCapability() == DOTA_UNIT_CAP_RANGED_ATTACK then return end
 			local full_damage = attacker:GetRealDamageDone(unit)
 			local cleave_damage = cleave * full_damage / 100

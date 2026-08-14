@@ -8,6 +8,7 @@ function frostivus_altar_aura_fire:GetIntrinsicModifierName() return "modifier_f
 -- Aura emitter
 LinkLuaModifier("modifier_frostivus_altar_aura_fire", "boss_scripts/aura_abilities/frostivus_altar_aura_fire.lua", LUA_MODIFIER_MOTION_NONE )
 modifier_frostivus_altar_aura_fire = modifier_frostivus_altar_aura_fire or class({})
+modifier_frostivus_altar_aura_fire.XHS_LINK_CLIENT = true
 
 function modifier_frostivus_altar_aura_fire:IsHidden() return true end
 function modifier_frostivus_altar_aura_fire:IsPurgable() return false end
@@ -42,6 +43,7 @@ end
 -- Aura buff
 LinkLuaModifier("modifier_frostivus_altar_aura_fire_buff", "boss_scripts/aura_abilities/frostivus_altar_aura_fire.lua", LUA_MODIFIER_MOTION_NONE )
 modifier_frostivus_altar_aura_fire_buff = modifier_frostivus_altar_aura_fire_buff or class({})
+modifier_frostivus_altar_aura_fire_buff.XHS_LINK_CLIENT = true
 
 function modifier_frostivus_altar_aura_fire_buff:IsHidden() return false end
 function modifier_frostivus_altar_aura_fire_buff:IsPurgable() return false end

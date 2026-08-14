@@ -137,6 +137,7 @@
 	{
 		"BaseClass"					"npc_donator_companion"
 		"Model"						"models/items/courier/baekho/baekho.vmdl"        
+		"AmbientParticle"			"particles/econ/courier/courier_baekho/courier_baekho_ambient.vpcf"
 		"ModelScale"				"0.9"
 	}
 
@@ -144,6 +145,7 @@
 	{
 		"BaseClass"					"npc_donator_companion"
 		"Model"						"models/items/courier/devourling/devourling.vmdl"        
+		"AmbientParticle"			"particles/econ/courier/courier_devourling/courier_devourling_ambient.vpcf"
 		"ModelScale"				"0.9"
 	}
 
@@ -165,6 +167,7 @@
 	{
 		"BaseClass"					"npc_donator_companion"
 		"Model"						"models/items/warlock/golem/ti_8_warlock_darkness_apostate_golem/ti_8_warlock_darkness_apostate_golem.vmdl"        
+		"AmbientParticle"			"particles/econ/courier/courier_greevil_orange/courier_greevil_orange_ambient_3.vpcf"
 		"ModelScale"				"0.35"
 	}
 
@@ -230,6 +233,7 @@
 	{
 		"BaseClass"					"npc_donator_companion"
 		"Model"						"models/items/courier/shagbark/shagbark.vmdl"
+		"AmbientParticle"			"particles/econ/courier/courier_shagbark/courier_shagbark_ambient.vpcf"
 		"ModelScale"				"0.9"
 	}
 
@@ -244,6 +248,7 @@
 	{
 		"BaseClass"					"npc_donator_companion"
 		"Model"						"models/items/io/io_ti7/io_ti7.vmdl"        
+		"AmbientParticle"			"particles/econ/items/wisp/wisp_ambient_ti7.vpcf"
 		"ModelScale"				"0.5"
 	}
 
@@ -265,6 +270,7 @@
 	{
 		"BaseClass"					"npc_donator_companion"
 		"Model"						"models/courier/donkey_unicorn/donkey_unicorn_flying.vmdl"
+		"AmbientParticle"			"particles/econ/courier/courier_donkey_unicorn/courier_donkey_unicorn_ambient.vpcf"
 		"ModelScale"				"0.65"
 	}
 
@@ -272,6 +278,8 @@
 	{
 		"BaseClass"					"npc_donator_companion"
 		"Model"						"models/heroes/phoenix/phoenix_bird.vmdl"
+		"AmbientParticle"			"particles/units/heroes/hero_phoenix/phoenix_ambient.vpcf"
+		"IsFlying"					"1"
 		"ModelScale"				"0.4"
 	}
 
@@ -293,6 +301,7 @@
 	{
 		"BaseClass"					"npc_donator_companion"
 		"Model"						"models/courier/donkey_crummy_wizard_2014/donkey_crummy_wizard_2014_flying.vmdl"
+		"AmbientParticle"			"particles/econ/courier/courier_hwytty/courier_hwytty_ambient.vpcf"
 		"ModelScale"				"0.55"
 	}
 
@@ -300,6 +309,7 @@
 	{
 		"BaseClass"					"npc_donator_companion"
 		"Model"						"models/courier/sw_donkey/sw_donkey_flying.vmdl"
+		"AmbientParticle"			"particles/econ/courier/courier_dolfrat_and_roshinante/courier_dolfrat_and_roshinante_a.vpcf"
 		"ModelScale"				"0.6"
 	}
 
@@ -314,6 +324,7 @@
 	{
 		"BaseClass"					"npc_donator_companion"
 		"Model"						"models/items/courier/nian_courier/nian_courier.vmdl"
+		"AmbientParticle"			"particles/econ/courier/courier_nian/courier_nian_ambient.vpcf"
 		"ModelScale"				"0.75"
 	}
 	
@@ -321,6 +332,7 @@
 	{
 		"BaseClass"					"npc_donator_companion"
 		"Model"						"models/items/phoenix/ultimate/golden_nirvana_golden_nirvana_nova/golden_nirvana_golden_nirvana_nova.vmdl"
+		"IsFlying"					"1"
 		"ModelScale"				"0.6"
 	}
 	
@@ -328,6 +340,8 @@
 	{
 		"BaseClass"					"npc_donator_companion"
 		"Model"						"models/courier/donkey_ti7/donkey_ti7_flying.vmdl"
+		"AmbientParticle"			"particles/econ/courier/courier_donkey_ti7/courier_donkey_ti7_ambient.vpcf"
+		"IsFlying"					"1"
 		"ModelScale"				"0.65"
 	}
 
@@ -356,6 +370,8 @@
 	{
 		"BaseClass"					"npc_donator_companion"
 		"Model"						"models/items/courier/deathripper/deathripper.vmdl"
+		"AmbientParticle"			"particles/econ/courier/courier_wmachine/courier_warmachine_ambient.vpcf"
+		"AmbientAttachment"			"attach_smoke_1"
 		"ModelScale"				"0.75"
 	}
 
@@ -363,6 +379,8 @@
 	{
 		"BaseClass"					"npc_donator_companion"
 		"Model"						"models/items/courier/butch_pudge_dog/butch_pudge_dog.vmdl"
+		"AmbientParticle"			"particles/econ/courier/courier_butch/courier_butch_ambient.vpcf"
+		"AmbientAttachment"			"attach_tongue"
 		"ModelScale"				"0.75"
 	}
 
@@ -398,6 +416,7 @@
 	{
 		"BaseClass"					"npc_donator_companion"
 		"Model"						"models/courier/venoling/venoling.vmdl"
+		"AmbientParticle"			"particles/econ/courier/courier_venoling_gold/courier_venoling_ambient_gold.vpcf"
 		"ModelScale"				"0.75"
 	}
 
@@ -412,6 +431,7 @@
 	{
 		"BaseClass"					"npc_donator_companion"
 		"Model"						"models/items/courier/chocobo/chocobo.vmdl"
+		"AmbientParticle"			"particles/econ/courier/courier_master_chocobo/courier_master_chocobo_ambient.vpcf"
 		"ModelScale"				"0.85"
 	}
 
@@ -419,6 +439,8 @@
 	{
 		"BaseClass"					"npc_donator_companion"
 		"Model"						"models/courier/mega_greevil_courier/mega_greevil_courier.vmdl"
+		"AmbientParticle"			"particles/econ/courier/courier_mega_greevil/courier_mega_greevil_ambient.vpcf"
+		"AmbientAttachment"			"attach_mouth"
 		"ModelScale"				"0.75"
 	}
 
@@ -426,6 +448,7 @@
 	{
 		"BaseClass"					"npc_donator_companion"
 		"Model"						"models/items/courier/snail/courier_snail.vmdl"
+		"AmbientParticle"			"particles/econ/courier/courier_snail/courier_snail_trail.vpcf"
 		"ModelScale"				"0.8"
 	}
 
@@ -433,6 +456,7 @@
 	{
 		"BaseClass"					"npc_donator_companion"
 		"Model"						"models/items/courier/mighty_chicken/mighty_chicken.vmdl"
+		"AmbientParticle"			"particles/econ/courier/courier_cluckles/courier_cluckles_ambient.vpcf"
 		"ModelScale"				"0.75"
 	}
 
@@ -441,5 +465,75 @@
 		"BaseClass"					"npc_donator_companion"
 		"Model"						"models/courier/frog/frog.vmdl"
 		"ModelScale"				"0.75"
+	}
+
+	// Fragment Shop variants. Ground and flying forms are separate products;
+	// golden styles remain separate premium products where Valve ships one.
+	"npc_donator_companion_amphibian_kid_flying"
+	{
+		"BaseClass"					"npc_donator_companion"
+		"Model"						"models/items/courier/amphibian_kid/amphibian_kid_flying.vmdl"
+		"ModelScale"				"0.85"
+		"IsFlying"					"1"
+	}
+
+	"npc_donator_companion_demi_doom_flying"
+	{
+		"BaseClass"					"npc_donator_companion"
+		"Model"						"models/courier/doom_demihero_courier/doom_demihero_courier_flying.vmdl"
+		"ModelScale"				"0.7"
+		"IsFlying"					"1"
+	}
+
+	"npc_donator_companion_devourling_flying"
+	{
+		"BaseClass"					"npc_donator_companion"
+		"Model"						"models/items/courier/devourling/devourling_flying.vmdl"
+		"AmbientParticle"			"particles/econ/courier/courier_devourling/courier_devourling_ambient.vpcf"
+		"ModelScale"				"0.85"
+		"IsFlying"					"1"
+	}
+
+	"npc_donator_companion_golden_devourling"
+	{
+		"BaseClass"					"npc_donator_companion"
+		"Model"						"models/items/courier/golden_devourling/golden_devourling.vmdl"
+		"AmbientParticle"			"particles/econ/courier/courier_devourling_gold/courier_devourling_gold_ambient.vpcf"
+		"ModelScale"				"0.85"
+	}
+
+	"npc_donator_companion_golden_devourling_flying"
+	{
+		"BaseClass"					"npc_donator_companion"
+		"Model"						"models/items/courier/golden_devourling/golden_devourling_flying.vmdl"
+		"AmbientParticle"			"particles/econ/courier/courier_devourling_gold/courier_devourling_gold_ambient.vpcf"
+		"ModelScale"				"0.85"
+		"IsFlying"					"1"
+	}
+
+	"npc_donator_companion_venoling"
+	{
+		"BaseClass"					"npc_donator_companion"
+		"Model"						"models/courier/venoling/venoling.vmdl"
+		"AmbientParticle"			"particles/econ/courier/courier_venoling/courier_venoling_ambient.vpcf"
+		"ModelScale"				"0.75"
+	}
+
+	"npc_donator_companion_venoling_flying"
+	{
+		"BaseClass"					"npc_donator_companion"
+		"Model"						"models/courier/venoling/venoling_flying.vmdl"
+		"AmbientParticle"			"particles/econ/courier/courier_venoling/courier_venoling_ambient.vpcf"
+		"ModelScale"				"0.75"
+		"IsFlying"					"1"
+	}
+
+	"npc_donator_companion_golden_venoling_flying"
+	{
+		"BaseClass"					"npc_donator_companion"
+		"Model"						"models/courier/venoling/venoling_flying.vmdl"
+		"AmbientParticle"			"particles/econ/courier/courier_venoling_gold/courier_venoling_ambient_gold.vpcf"
+		"ModelScale"				"0.75"
+		"IsFlying"					"1"
 	}
 }

@@ -1,3 +1,5 @@
+LinkLuaModifier("modifier_holdout_taunt_debuff", "abilities/heroes/hero_paladin.lua", LUA_MODIFIER_MOTION_NONE)
+
 --[[Author: Pizzalol
 	Date: 09.02.2015.
 	Chains from target to target, healing them and dealing damage to enemies in a small
@@ -21,8 +23,12 @@ function ShadowWave( keys )
 	local damage_radius = ability:GetLevelSpecialValueFor("damage_radius", ability_level)
 	local max_targets = ability:GetLevelSpecialValueFor("max_targets", ability_level)
 	local damage = ability:GetLevelSpecialValueFor("damage", ability_level)
-	local heal = damage
+	local heal_pct = ability:GetLevelSpecialValueFor("heal_pct", ability_level)
 	local unit_healed = false
+
+	local function GetHealAmount(unit)
+		return damage + unit:GetMaxHealth() * heal_pct / 100
+	end
 
 	-- Particles
 	local shadow_wave_particle = keys.shadow_wave_particle
@@ -41,7 +47,7 @@ function ShadowWave( keys )
 		-- Insert the caster into the hit table
 		table.insert(hit_table, caster)
 		-- Heal the caster and do damage to the units around it
-		caster:Heal(heal, caster)
+		caster:Heal(GetHealAmount(caster), caster)
 
 		local units_to_damage = FindUnitsInRadius(caster:GetTeam(), caster_location, nil, damage_radius, DOTA_UNIT_TARGET_TEAM_ENEMY, ability:GetAbilityTargetType(), 0, 0, false)
 
@@ -58,7 +64,7 @@ function ShadowWave( keys )
 	-- Mark the target as already hit
 	table.insert(hit_table, target)
 	-- Heal the initial target and do the damage to the units around it
-	target:Heal(heal, caster)
+	target:Heal(GetHealAmount(target), caster)
 	local units_to_damage = FindUnitsInRadius(caster:GetTeam(), target_location, nil, damage_radius, DOTA_UNIT_TARGET_TEAM_ENEMY, ability:GetAbilityTargetType(), 0, 0, false)
 
 	for _,v in pairs(units_to_damage) do
@@ -111,7 +117,7 @@ function ShadowWave( keys )
 					target_location = unit_location
 
 					-- Heal it and deal damage to enemy units around it
-					target:Heal(heal, caster)
+					target:Heal(GetHealAmount(target), caster)
 					local units_to_damage = FindUnitsInRadius(caster:GetTeam(), target_location, nil, damage_radius, DOTA_UNIT_TARGET_TEAM_ENEMY, ability:GetAbilityTargetType(), 0, 0, false)
 
 					for _,v in pairs(units_to_damage) do
@@ -167,7 +173,7 @@ function ShadowWave( keys )
 						target_location = unit_location
 
 						-- Heal it and deal damage to enemy units around it
-						target:Heal(heal, caster)
+						target:Heal(GetHealAmount(target), caster)
 						local units_to_damage = FindUnitsInRadius(caster:GetTeam(), target_location, nil, damage_radius, DOTA_UNIT_TARGET_TEAM_ENEMY, ability:GetAbilityTargetType(), 0, 0, false)
 
 						for _,v in pairs(units_to_damage) do
@@ -221,7 +227,7 @@ function ShadowWave( keys )
 					target_location = unit_location
 
 					-- Heal it and deal damage to enemy units around it
-					target:Heal(heal, caster)
+					target:Heal(GetHealAmount(target), caster)
 					local units_to_damage = FindUnitsInRadius(caster:GetTeam(), target_location, nil, damage_radius, DOTA_UNIT_TARGET_TEAM_ENEMY, ability:GetAbilityTargetType(), 0, 0, false)
 
 					for _,v in pairs(units_to_damage) do
@@ -274,7 +280,7 @@ function ShadowWave( keys )
 					target_location = unit_location
 
 					-- Heal it and deal damage to enemy units around it
-					target:Heal(heal, caster)
+					target:Heal(GetHealAmount(target), caster)
 					local units_to_damage = FindUnitsInRadius(caster:GetTeam(), target_location, nil, damage_radius, DOTA_UNIT_TARGET_TEAM_ENEMY, ability:GetAbilityTargetType(), 0, 0, false)
 
 					for _,v in pairs(units_to_damage) do
@@ -360,8 +366,14 @@ function Taunt( event )
 	local ability = event.ability
 	local radius = ability:GetSpecialValueFor("radius")
 	local max_units = ability:GetSpecialValueFor("max_units")
+	local duration = ability:GetSpecialValueFor("duration")
 
 	caster:StartGesture(ACT_TINY_GROWL)
+	caster:EmitSound("Hero_Axe.Berserkers_Call")
+
+	local pfx = ParticleManager:CreateParticle("particles/units/heroes/hero_axe/axe_beserkers_call_owner.vpcf", PATTACH_ABSORIGIN_FOLLOW, caster)
+	ParticleManager:SetParticleControl(pfx, 1, Vector(radius, 0, 0))
+	ParticleManager:ReleaseParticleIndex(pfx)
 	
 	local count = 0
 	local targets = FindUnitsInRadius(caster:GetTeamNumber(), caster:GetAbsOrigin(), nil, radius, DOTA_UNIT_TARGET_TEAM_ENEMY, DOTA_UNIT_TARGET_HERO + DOTA_UNIT_TARGET_BASIC, DOTA_UNIT_TARGET_FLAG_MAGIC_IMMUNE_ENEMIES, FIND_CLOSEST, false)
@@ -369,23 +381,79 @@ function Taunt( event )
 	for _,unit in pairs(targets) do
 		if unit:HasAttackCapability() then
 			count = count + 1
-			unit:MoveToTargetToAttack(caster)
+			unit:AddNewModifier(caster, ability, "modifier_holdout_taunt_debuff", { duration = duration })
 		end
 
 		if count == max_units then return end
 	end
 end
 
+modifier_holdout_taunt_debuff = modifier_holdout_taunt_debuff or class({})
+modifier_holdout_taunt_debuff.XHS_LINK_CLIENT = true
+
+function modifier_holdout_taunt_debuff:IsHidden() return false end
+function modifier_holdout_taunt_debuff:IsDebuff() return true end
+function modifier_holdout_taunt_debuff:IsPurgable() return true end
+
+function modifier_holdout_taunt_debuff:CheckState()
+	return {
+		[MODIFIER_STATE_TAUNTED] = true,
+		[MODIFIER_STATE_COMMAND_RESTRICTED] = true,
+	}
+end
+
+function modifier_holdout_taunt_debuff:GetStatusEffectName()
+	return "particles/status_fx/status_effect_beserkers_call.vpcf"
+end
+
+function modifier_holdout_taunt_debuff:StatusEffectPriority()
+	return MODIFIER_PRIORITY_HIGH
+end
+
+function modifier_holdout_taunt_debuff:GetEffectName()
+	return "particles/units/heroes/hero_axe/axe_beserkers_call.vpcf"
+end
+
+function modifier_holdout_taunt_debuff:GetEffectAttachType()
+	return PATTACH_ABSORIGIN_FOLLOW
+end
+
+function modifier_holdout_taunt_debuff:OnCreated()
+	if not IsServer() then return end
+
+	self:StartIntervalThink(0.2)
+	self:OnIntervalThink()
+end
+
+function modifier_holdout_taunt_debuff:OnIntervalThink()
+	local parent = self:GetParent()
+	local caster = self:GetCaster()
+
+	if not caster or caster:IsNull() or not caster:IsAlive() then
+		self:Destroy()
+		return
+	end
+
+	parent:SetForceAttackTarget(caster)
+	parent:MoveToTargetToAttack(caster)
+end
+
+function modifier_holdout_taunt_debuff:OnDestroy()
+	if not IsServer() then return end
+
+	local parent = self:GetParent()
+	if parent and not parent:IsNull() then
+		parent:SetForceAttackTarget(nil)
+	end
+end
+
 function LightFrenzy(keys)
 	--Refresh all abilities on the target.
-	for i = 0, 16, 1 do --The maximum number of abilities a unit can have is currently 17.
-		local current_ability = keys.target:GetAbilityByIndex(i)
-		if current_ability ~= nil then
+	ForEachUnitAbility(keys.target, function(current_ability)
 			if current_ability:GetName() ~= "holdout_light_frenzy" then
 				current_ability:EndCooldown()
 			end
-		end
-	end
+	end)
 	
 	--Refresh all items the target has.
 	for i=0, 5, 1 do

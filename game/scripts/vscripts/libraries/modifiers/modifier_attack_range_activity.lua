@@ -1,4 +1,5 @@
 modifier_attack_range_activity = class({})
+modifier_attack_range_activity.XHS_LINK_CLIENT = true
 
 require('libraries/modifiers/animation_code')
 

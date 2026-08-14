@@ -9,18 +9,7 @@ _G.ZonesDefinition =
 		Type = ZONE_TYPE_EXPLORE,
 		--		szTeleportEntityName = "forest_holdout_zone_darkforest_death_maze",
 		--		bNoLeaderboard = true,
-		StarCriteria =
-		{
-			{
-				Type = ZONE_STAR_CRITERIA_DEATHS,
-				Values =
-				{
-					7,
-					4,
-					0,
-				},
-			},
-		},
+		StarCriteria = {},
 		Quests =
 		{
 			{
@@ -71,7 +60,7 @@ _G.ZonesDefinition =
 					Type = QUEST_EVENT_ON_ENEMY_KILLED,
 					szNPCName = "npc_magnataur_destroyer_crypt",
 				},
-				nCompleteLimit = MAGNATAURS_TO_KILL * PlayerResource:GetPlayerCount() * CREEP_LANES_TYPE,
+				nCompleteLimit = GetXHSDestroyerMagnataurKillLimit(),
 			},
 			{
 				szQuestName = "kill_ice_towers",
@@ -93,13 +82,7 @@ _G.ZonesDefinition =
 			{
 				szQuestName = "kill_final_wave",
 				szQuestType = "Kill",
-				Activators =
-				{
-					{
-						Type = QUEST_EVENT_ON_QUEST_COMPLETE,
-						szQuestName = "kill_ice_towers",
-					},
-				},
+				Activators = {},
 				Completion =
 				{
 					Type = QUEST_EVENT_ON_TEAM_ENEMY_KILLED,
@@ -121,7 +104,7 @@ _G.ZonesDefinition =
 				{
 					Type = QUEST_EVENT_ON_DIALOG_ALL_CONFIRMED,
 					szNPCName = "npc_xhs_paladin",
-					nDialogLine = 1,
+					nDialogLine = 4,
 				},
 			},
 			{
@@ -139,7 +122,24 @@ _G.ZonesDefinition =
 					Type = QUEST_EVENT_ON_ENEMY_KILLED,
 					szNPCName = "npc_dota_hero_magtheridon",
 				},
-				nCompleteLimit = GameRules:GetCustomGameDifficulty(),
+				nCompleteLimit = GetXHSMagtheridonKillLimit(),
+			},
+			{
+				szQuestName = "clear_grom_vanguard",
+				szQuestType = "Kill",
+				Activators =
+				{
+					{
+						Type = QUEST_EVENT_ON_QUEST_COMPLETE,
+						szQuestName = "kill_mag",
+					},
+				},
+				Completion =
+				{
+					Type = QUEST_EVENT_ON_TEAM_ENEMY_KILLED,
+					szTeamName = DOTA_TEAM_CUSTOM_2,
+				},
+				nCompleteLimit = GetXHSGromVanguardKillLimit(),
 			},
 			{
 				szQuestName = "kill_grom",
@@ -148,7 +148,7 @@ _G.ZonesDefinition =
 				{
 					{
 						Type = QUEST_EVENT_ON_QUEST_COMPLETE,
-						szQuestName = "kill_mag",
+						szQuestName = "clear_grom_vanguard",
 					},
 				},
 				Completion =
@@ -210,8 +210,8 @@ _G.ZonesDefinition =
 				nCompleteLimit = 1,
 			},
 			{
-				szQuestName = "teleport_arthas",
-				szQuestType = "Speak",
+				szQuestName = "free_uther",
+				szQuestType = "Kill",
 				Activators =
 				{
 					{
@@ -221,9 +221,21 @@ _G.ZonesDefinition =
 				},
 				Completion =
 				{
+					Type = QUEST_EVENT_ON_ENEMY_KILLED,
+					szNPCName = "npc_xhs_uther_ice_prison",
+				},
+				nCompleteLimit = 1,
+			},
+			{
+				szQuestName = "teleport_arthas",
+				szQuestType = "Speak",
+				-- Started explicitly after Uther reaches his original position.
+				Activators = {},
+				Completion =
+				{
 					Type = QUEST_EVENT_ON_DIALOG_ALL_CONFIRMED,
 					szNPCName = "npc_xhs_paladin_2",
-					nDialogLine = 1,
+					nDialogLine = 4,
 				},
 			},
 			{
@@ -233,7 +245,7 @@ _G.ZonesDefinition =
 				{
 					{
 						Type = QUEST_EVENT_ON_QUEST_COMPLETE,
-						szQuestName = "kill_proudmoore",
+						szQuestName = "teleport_arthas",
 					},
 				},
 				Completion =
@@ -289,10 +301,9 @@ _G.ZonesDefinition =
 				},
 				Completion =
 				{
-					Type = QUEST_EVENT_ON_TEAM_ENEMY_KILLED,
-					szTeamName = DOTA_TEAM_CUSTOM_1,
+					Type = QUEST_EVENT_ON_ENEMY_KILLED,
+					szNPCName = "npc_dota_boss_spirit_master",
 				},
-				nCompleteLimit = 4,
 			},
 		},
 		VIPs =
@@ -302,6 +313,7 @@ _G.ZonesDefinition =
 				szSpawnerName = "xhs_spawner_paladin_vip",
 				nCount = 1,
 				Activity = ACT_DOTA_IDLE,
+				bDeferredSpawn = true,
 			},
 			{
 				szVIPName = "npc_xhs_paladin_2",
@@ -371,7 +383,6 @@ _G.ZonesDefinition =
 					"item_potion_of_antimagic",
 					"item_xhs_cloak_of_flames",
 					"item_amulet_of_the_wild",
-					"item_talisman_of_evasion_datadriven",
 				},
 				fCommonItemChance = 0.15,
 				RareItems =
@@ -379,6 +390,13 @@ _G.ZonesDefinition =
 					"item_tome_small",
 					"item_tome_big",
 					"item_tome_of_power",
+					"item_orb_of_lightning",
+					"item_orb_of_fire",
+					"item_orb_of_darkness",
+					"item_orb_of_earth",
+					"item_orb_of_wind",
+					"item_orb_of_arcane",
+					"item_xhs_orb_of_venom",
 				},
 				fRareItemChance = 0.001,
 			},

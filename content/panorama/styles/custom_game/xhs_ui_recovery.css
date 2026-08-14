@@ -1,0 +1,45 @@
+.XHSUIRecoveryRoot {
+	width: 100%;
+	height: 100%;
+	z-index: 950;
+}
+
+.XHSUIRecoveryClose {
+	width: 30px;
+	height: 30px;
+	visibility: collapse;
+	opacity: 0;
+	background-color: #130b0be8;
+	border: 1px solid #ff746fdd;
+	border-radius: 3px;
+	box-shadow: fill #000000cc 0px 1px 7px 1px;
+	transition-property: opacity, brightness, transform;
+	transition-duration: 0.08s;
+	z-index: 950;
+}
+
+.XHSUIRecoveryClose.Visible {
+	visibility: visible;
+	opacity: 0.82;
+}
+
+.XHSUIRecoveryClose:hover {
+	opacity: 1;
+	brightness: 1.45;
+	transform: scale3d(1.08, 1.08, 1);
+}
+
+.XHSUIRecoveryClose:active {
+	brightness: 0.75;
+	transform: scale3d(0.94, 0.94, 1);
+}
+
+.XHSUIRecoveryClose Label {
+	horizontal-align: center;
+	vertical-align: center;
+	margin-top: -2px;
+	color: #fff4f2;
+	font-size: 25px;
+	font-weight: bold;
+	text-shadow: 0px 1px 3px 2 #000000;
+}

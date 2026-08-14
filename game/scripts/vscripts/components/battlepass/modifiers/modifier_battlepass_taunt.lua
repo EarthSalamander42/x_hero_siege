@@ -1,4 +1,5 @@
 modifier_battlepass_taunt = class({})
+modifier_battlepass_taunt.XHS_LINK_CLIENT = true
 
 function modifier_battlepass_taunt:IsPurgable()
 	return false

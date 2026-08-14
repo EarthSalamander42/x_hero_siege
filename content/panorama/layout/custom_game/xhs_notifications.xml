@@ -1,0 +1,157 @@
+<root>
+	<styles>
+		<include src="s2r://panorama/styles/dotastyles.vcss_c" />
+		<include src="file://{resources}/styles/custom_game/xhs_theme.css" />
+		<include src="file://{resources}/styles/custom_game/xhs_notifications.css" />
+		<include src="file://{resources}/styles/custom_game/xhs_pause.css" />
+	</styles>
+
+	<scripts>
+		<include src="file://{resources}/scripts/custom_game/xhs_name_display.js" />
+		<include src="file://{resources}/scripts/custom_game/xhs_notifications.js" />
+		<include src="file://{resources}/scripts/custom_game/xhs_pause.js" />
+	</scripts>
+
+	<Panel class="XHSNotificationsRoot" hittest="false">
+		<Panel id="XHSRewardFlyoutLayer" class="XHSRewardFlyoutLayer" hittest="false" />
+
+		<Panel id="XHSPauseRoot" class="XHSPauseRoot XHSPauseHidden" hittest="false" hittestchildren="false">
+			<Panel class="XHSPauseBackdrop" />
+
+			<Panel id="XHSPauseFrame" class="XHSPauseFrame" hittest="false">
+				<Panel class="XHSPauseChrome">
+					<Panel class="XHSPauseTopGlow" />
+					<Panel class="XHSPauseCorner XHSPauseCornerLeft" />
+					<Panel class="XHSPauseCorner XHSPauseCornerRight" />
+				</Panel>
+
+				<Panel class="XHSPauseHeader">
+					<Panel class="XHSPauseMark">
+						<Panel class="XHSPauseMarkCore">
+							<Panel class="XHSPauseMarkBar XHSPauseMarkBarLeft" />
+							<Panel class="XHSPauseMarkBar XHSPauseMarkBarRight" />
+						</Panel>
+					</Panel>
+
+					<Panel class="XHSPauseHeading">
+						<Label class="XHSPauseEyebrow" text="X HERO SIEGE" />
+						<Label class="XHSPauseTitle" text="SIEGE PAUSED" />
+						<Label id="XHSPauseSubtitle" class="XHSPauseSubtitle" text="Tactical overview" />
+					</Panel>
+
+					<Panel class="XHSPauseState">
+						<Label class="XHSPauseStateLabel" text="BATTLE STATE" />
+						<Label class="XHSPauseStateValue" text="FROZEN" />
+					</Panel>
+				</Panel>
+
+				<Panel class="XHSPauseIntelRow">
+					<Panel class="XHSPauseIntelCell">
+						<Label class="XHSPauseIntelLabel" text="CAMPAIGN" />
+						<Label id="XHSPausePhaseValue" class="XHSPauseIntelValue" text="PHASE 1" />
+						<Label id="XHSPausePhaseDetail" class="XHSPauseIntelDetail" text="Defend the Castle" />
+					</Panel>
+					<Panel class="XHSPauseIntelDivider" />
+
+					<Panel class="XHSPauseIntelCell">
+						<Label class="XHSPauseIntelLabel" text="CREEP THREAT" />
+						<Label id="XHSPauseCreepValue" class="XHSPauseIntelValue" text="LEVEL 1 / 4" />
+						<Label id="XHSPauseCreepDetail" class="XHSPauseIntelDetail" text="Wave strength" />
+					</Panel>
+					<Panel class="XHSPauseIntelDivider" />
+
+					<Panel class="XHSPauseIntelCell">
+						<Label class="XHSPauseIntelLabel" text="DIFFICULTY" />
+						<Label id="XHSPauseDifficultyValue" class="XHSPauseIntelValue" text="NORMAL" />
+						<Label class="XHSPauseIntelDetail" text="Siege intensity" />
+					</Panel>
+					<Panel class="XHSPauseIntelDivider" />
+
+					<Panel class="XHSPauseIntelCell">
+						<Label class="XHSPauseIntelLabel" text="SQUAD" />
+						<Label id="XHSPauseSquadValue" class="XHSPauseIntelValue" text="1 / 1 ALIVE" />
+						<Label id="XHSPauseSquadDetail" class="XHSPauseIntelDetail" text="All heroes ready" />
+					</Panel>
+				</Panel>
+
+				<Panel class="XHSPauseFocus">
+					<Panel class="XHSPauseFocusAccent" />
+					<Panel class="XHSPauseFocusCopy">
+						<Label id="XHSPauseFocusEyebrow" class="XHSPauseFocusEyebrow" text="TACTICAL FOCUS" />
+						<Label id="XHSPauseFocusTitle" class="XHSPauseFocusTitle" text="Defend the Castle" />
+						<Label id="XHSPauseFocusBody" class="XHSPauseFocusBody" text="Assign lanes and clear every wave before the next minute." />
+					</Panel>
+				</Panel>
+
+				<Panel class="XHSPauseFooter">
+					<Panel class="XHSPauseFooterLine" />
+					<Label class="XHSPauseFooterText" text="Plan purchases, assign lanes, and call the next focus before resuming." />
+					<Panel class="XHSPauseFooterLine" />
+				</Panel>
+			</Panel>
+		</Panel>
+
+		<Panel id="XHSWaveCountdown" hittest="false" class="XHSWaveCountdown XHSNotificationHidden">
+			<Panel class="XHSWaveRingWrap">
+				<Panel class="XHSWaveRingBackdrop" />
+				<Panel id="XHSWaveRingProgressClip" class="XHSWaveRingProgressClip">
+					<Panel id="XHSWaveRing" class="XHSWaveRing" />
+					<Panel id="XHSWaveRingFill" class="XHSWaveRingFill" />
+					<Panel id="XHSWaveRingSweep" class="XHSWaveRingSweep" />
+				</Panel>
+				<Label id="XHSWaveCountdownValue" class="XHSWaveCountdownValue" text="30" />
+			</Panel>
+			<Panel class="XHSWaveCopy">
+				<Label id="XHSWaveEyebrow" class="XHSWaveEyebrow" text="WAVE INCOMING" />
+				<Label id="XHSWaveTitle" class="XHSWaveTitle" text="Wave of Darkness" />
+				<Label id="XHSWaveSubtitle" class="XHSWaveSubtitle" text="Prepare your lane" />
+			</Panel>
+		</Panel>
+		<Panel id="XHSWaveQueue" hittest="false" class="XHSWaveQueue XHSWaveQueueHidden" />
+
+		<Panel id="XHSRuneIndicator" hittest="false" class="XHSRuneIndicator XHSRuneHidden">
+			<Panel id="XHSRuneAccent" class="XHSRuneAccent" />
+			<Panel class="XHSRuneBody">
+				<Panel class="XHSRuneHeader">
+					<Panel class="XHSRuneCopy">
+						<Label id="XHSRuneEyebrow" class="XHSRuneEyebrow" text="RUNE ACTIVE" />
+						<Label id="XHSRuneName" class="XHSRuneName" text="" />
+						<Label id="XHSRuneDetail" class="XHSRuneDetail" text="" />
+					</Panel>
+					<Label id="XHSRuneCount" class="XHSRuneCount" text="1/1" />
+				</Panel>
+				<Panel id="XHSRunePips" class="XHSRunePips">
+					<Panel id="XHSRunePip0" class="XHSRunePip" />
+					<Panel id="XHSRunePip1" class="XHSRunePip" />
+					<Panel id="XHSRunePip2" class="XHSRunePip" />
+					<Panel id="XHSRunePip3" class="XHSRunePip" />
+					<Panel id="XHSRunePip4" class="XHSRunePip" />
+					<Panel id="XHSRunePip5" class="XHSRunePip" />
+					<Panel id="XHSRunePip6" class="XHSRunePip" />
+					<Panel id="XHSRunePip7" class="XHSRunePip" />
+				</Panel>
+			</Panel>
+		</Panel>
+
+		<Panel id="XHSChannelNotification" hittest="false" class="XHSChannelNotification XHSChannelNotificationHidden">
+			<Panel class="XHSChannelGlow" />
+			<Panel class="XHSChannelBody">
+				<DOTAItemImage id="XHSChannelItemIcon" class="XHSChannelItemIcon" itemname="item_tombstone" scaling="stretch-to-fit-x-preserve-aspect" />
+				<Panel class="XHSChannelCopy">
+					<Panel class="XHSChannelHeader">
+						<Label id="XHSChannelEyebrow" class="XHSChannelEyebrow" text="CHANNELING" />
+						<Label id="XHSChannelTime" class="XHSChannelTime" text="5.0s" />
+					</Panel>
+					<Label id="XHSChannelTitle" class="XHSChannelTitle" text="Reviving ally" />
+					<Panel class="XHSChannelProgressTrack">
+						<Panel id="XHSChannelProgress" class="XHSChannelProgress" />
+						<Panel class="XHSChannelProgressShine" />
+					</Panel>
+				</Panel>
+			</Panel>
+		</Panel>
+
+		<Panel id="XHSTopNotifications" hittest="false" class="XHSNotificationStack XHSTopNotifications" />
+		<Panel id="XHSBottomNotifications" hittest="false" class="XHSNotificationStack XHSBottomNotifications" />
+	</Panel>
+</root>

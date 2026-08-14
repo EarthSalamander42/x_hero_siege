@@ -26,6 +26,7 @@ end
 
 -- Fountain aura
 modifier_xhs_vampiric_aura = modifier_xhs_vampiric_aura or class({})
+modifier_xhs_vampiric_aura.XHS_LINK_CLIENT = true
 
 function modifier_xhs_vampiric_aura:IsHidden() return true end
 
@@ -57,6 +58,10 @@ function modifier_xhs_vampiric_aura:GetModifierAura()
 	return "modifier_xhs_vampiric"
 end
 
+function modifier_xhs_vampiric_aura:GetAuraEntityReject(target)
+	return IsXHSRuneUnit and IsXHSRuneUnit(target)
+end
+
 function modifier_xhs_vampiric_aura:OnCreated()
 	self.caster = self:GetCaster()
 	self.ability = self:GetAbility()
@@ -68,6 +73,11 @@ function modifier_xhs_vampiric_aura:OnCreated()
 
 	-- Ability specials
 	self.aura_radius = self.ability:GetSpecialValueFor("aura_radius")
+	if self.aura_radius <= 0 then
+		-- Muradin's Hammer historically exposes this special under a
+		-- different name than the shared vampiric-aura implementation.
+		self.aura_radius = self.ability:GetSpecialValueFor("lifesteal_radius")
+	end
 	self.aura_stickyness = self.ability:GetSpecialValueFor("aura_stickyness")
 end
 

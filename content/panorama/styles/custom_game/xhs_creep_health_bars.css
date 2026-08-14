@@ -1,0 +1,261 @@
+.XHSCreepHealthBars,
+.XHSCreepHealthBarsRoot
+{
+	width: 100%;
+	height: 100%;
+	overflow: clip;
+}
+
+.XHSCreepHealthBarsRoot.XHSWorldHealthFramesOccluded
+{
+	visibility: collapse;
+	opacity: 0;
+}
+
+.XHSCreepHealthBar
+{
+	width: 82px;
+	height: 31px;
+	z-index: 100;
+	opacity: 0;
+	transition-property: opacity;
+	transition-duration: 0.06s;
+}
+
+.XHSCreepHealthBar.Visible
+{
+	opacity: 1;
+}
+
+.XHSCreepHealthTrack
+{
+	width: 82px;
+	height: 5px;
+	position: 0px 24px 0px;
+	background-color: #02070bec;
+	border: 1px solid #477486aa;
+	box-shadow: #000e 0px 1px 3px 0px;
+	overflow: clip;
+}
+
+.XHSCreepHealthDividers
+{
+	width: 100%;
+	height: 100%;
+}
+
+.XHSCreepHealthLag,
+.XHSCreepHealthFill
+{
+	height: 100%;
+}
+
+.XHSCreepHealthLag
+{
+	width: 100%;
+	background-color: #c8eef0aa;
+	transition-property: width;
+	transition-duration: 0.24s;
+	transition-timing-function: ease-out;
+}
+
+.XHSCreepHealthFill
+{
+	width: 100%;
+	background-color: gradient(linear, 0% 0%, 100% 0%, from(#7d2732), color-stop(0.72, #c64a4e), to(#e27466));
+	box-shadow: inset #ffd7cf38 0px 1px 1px 0px;
+	transition-property: width;
+	transition-duration: 0.07s;
+}
+
+.XHSCreepHealthBar.Critical .XHSCreepHealthFill
+{
+	background-color: gradient(linear, 0% 0%, 100% 0%, from(#671822), to(#f04744));
+	brightness: 1.2;
+}
+
+.XHSCreepHealthBar.ControlledCreep.Ally .XHSCreepHealthLag
+{
+	background-color: #b9efc0aa;
+}
+
+.XHSCreepHealthBar.ControlledCreep.Ally .XHSCreepHealthFill
+{
+	background-color: gradient(linear, 0% 0%, 100% 0%, from(#227b43), color-stop(0.72, #47b95f), to(#82db79));
+	box-shadow: inset #d9ffd944 0px 1px 1px 0px;
+}
+
+.XHSCreepLevelLabel
+{
+	margin-left: 1px;
+	margin-top: 8px;
+	padding: 0px 3px 0px 3px;
+	color: #bdebc8;
+	background-color: #07120dcc;
+	border: 1px solid #366d4c99;
+	font-family: Radiance;
+	font-size: 10px;
+	font-weight: semi-bold;
+	letter-spacing: 0.2px;
+	text-shadow: 0px 1px 2px 1 #000f;
+	opacity: 0;
+}
+
+.XHSCreepHealthBar.ControlledCreep.Ally .XHSCreepLevelLabel
+{
+	opacity: 1;
+}
+
+.XHSCreepHealthBar.CreepHero
+{
+	width: 132px;
+	height: 42px;
+	background-color: #00000000;
+	border: 0px;
+	box-shadow: none;
+}
+
+.XHSCreepHeroFrame
+{
+	width: 132px;
+	height: 29px;
+	position: 0px 13px 0px;
+	background-color: gradient(linear, 0% 0%, 0% 100%, from(#102331e8), to(#03090dd9));
+	border: 1px solid #4e7585cc;
+	box-shadow: #000e 0px 2px 5px 0px;
+}
+
+.XHSCreepHealthBar.CreepHero .XHSCreepHealthTrack
+{
+	width: 124px;
+	height: 8px;
+	position: 3px 17px 0px;
+	border: 1px solid #203946ee;
+	box-shadow: #000f 0px 2px 4px 0px;
+}
+
+.XHSCreepHealthBar.CreepHero.Ally .XHSCreepHeroFrame
+{
+	border-color: #4c9b72dd;
+}
+
+.XHSCreepHealthBar.CreepHero.Enemy .XHSCreepHeroFrame
+{
+	border-color: #a54b50dd;
+}
+
+.XHSCreepHealthBar.CreepHero.Ally .XHSCreepHealthFill
+{
+	background-color: gradient(linear, 0% 0%, 100% 0%, from(#27984e), to(#78db74));
+	box-shadow: inset #d9ffd955 0px 1px 1px 0px;
+}
+
+.XHSCreepHealthBar.CreepHero.Enemy .XHSCreepHealthFill
+{
+	background-color: gradient(linear, 0% 0%, 100% 0%, from(#8b2730), to(#e95a50));
+}
+
+.XHSCreepHeroHealthDivider
+{
+	width: 1px;
+	height: 100%;
+	background-color: #061016dd;
+	box-shadow: #d8f7ff22 1px 0px 0px 0px;
+}
+
+.XHSCreepHeroHealthValue
+{
+	width: 100%;
+	horizontal-align: center;
+	margin-top: 2px;
+	color: #e7f5ed;
+	font-family: Radiance;
+	font-size: 11px;
+	font-weight: semi-bold;
+	text-align: center;
+	text-shadow: 0px 1px 3px 2 #000f;
+}
+
+.XHSCreepHeroName
+{
+	width: 132px;
+	height: 14px;
+	color: #d9e7eb;
+	font-family: Radiance;
+	font-size: 11px;
+	font-weight: bold;
+	letter-spacing: 0.4px;
+	text-align: center;
+	text-overflow: shrink;
+	text-shadow: 0px 1px 3px 2 #000f, 0px 0px 3px 1 #000b;
+}
+
+.XHSCreepHealthBar.CreepHero.Enemy .XHSCreepHeroName
+{
+	color: #ffd0ca;
+}
+
+@keyframes 'XHSCreepFrozenPulse'
+{
+	0% { opacity: 0.68; }
+	50% { opacity: 1; }
+	100% { opacity: 0.68; }
+}
+
+.XHSCreepHealthBar.Frozen
+{
+	saturation: 0.3;
+	wash-color: #b7eaff33;
+}
+
+.XHSCreepHealthBar.Frozen .XHSCreepHealthTrack
+{
+	border-color: #9cecffdd;
+	box-shadow: #54cfffaa 0px 0px 5px 0px;
+}
+
+.XHSCreepHealthBar.Frozen .XHSCreepHealthLag
+{
+	background-color: #e1f8ffbb;
+}
+
+.XHSCreepHealthBar.Frozen .XHSCreepHealthFill
+{
+	background-color: gradient(linear, 0% 0%, 100% 0%, from(#507689), color-stop(0.7, #80adbd), to(#d7f4fa));
+	box-shadow: inset #ffffff99 0px 1px 1px 0px;
+	brightness: 1.08;
+}
+
+.XHSCreepFrozenIndicator
+{
+	width: 35px;
+	height: 12px;
+	horizontal-align: right;
+	margin-right: 1px;
+	margin-top: 9px;
+	color: #effdff;
+	background-color: gradient(linear, 0% 0%, 100% 0%, from(#173b4bee), to(#2a6d82ee));
+	border: 1px solid #99edffff;
+	border-radius: 2px;
+	font-family: Radiance;
+	font-size: 8px;
+	font-weight: bold;
+	letter-spacing: 0.5px;
+	text-align: center;
+	text-shadow: 0px 0px 3px 1 #72ddffff;
+	opacity: 0;
+}
+
+.XHSCreepHealthBar.Frozen .XHSCreepFrozenIndicator
+{
+	opacity: 1;
+	animation-name: XHSCreepFrozenPulse;
+	animation-duration: 1.1s;
+	animation-timing-function: ease-in-out;
+	animation-iteration-count: infinite;
+}
+
+.XHSCreepHealthBar.CreepHero .XHSCreepFrozenIndicator
+{
+	margin-top: 2px;
+}

@@ -27,10 +27,12 @@
 "teleport_top"									"Talk to Shal Lightbinder"
 "teleport_arthas"								"Talk to Uther Lightbringer"
 "kill_mag"										"Phase 3: Defeat Magtheridon"
+"clear_grom_vanguard"							"Break Grom's Vanguard"
 "kill_grom"										"Defeat Grom Hellscream"
 "kill_illidan"									"Defeat Illidan Stormrage"
 "kill_balanar"									"Defeat Balanar"
 "kill_proudmoore"								"Defeat Admiral Proudmoore"
+"free_uther"									"Shatter Uther's Ice Prison"
 "kill_arthas"									"Defeat Arthas"
 "kill_banehallow"								"Defeat Banehallow"
 "kill_lich_king"								"Defeat Lich King (Undead Arthas)"
@@ -40,6 +42,7 @@
 //INTRO
 "DOTA_Siltbreaker_Quests"								"QUESTS"
 "DOTA_Siltbreaker_ContinueSpeechText"					"Ready"
+"DOTA_Siltbreaker_NextSpeechText"						"Next"
 "DOTA_Siltbreaker_PreviousZone"							"Previous Zone"
 "DOTA_Siltbreaker_NextZone"								"Next Zone"
 "DOTA_Siltbreaker_Disconnect"							"Leave"
@@ -51,7 +54,7 @@
 
 // Items
 "npc_dota_crate"								"Wooden Crate"
-"DOTA_Tooltip_ability_item_tombstone"			"Revive Ally Hero!"
+"DOTA_Tooltip_ability_item_tombstone"			"Tombstone"
 "DOTA_Chat_Tombstone_Pinged"					"Fallen teammate here."
 
 "DOTA_Tooltip_ability_item_bag_of_gold"								"Bag of Gold"
@@ -64,7 +67,7 @@
 "DOTA_Tooltip_ability_item_book_of_intelligence_Description"		"Consume to gain 3 Intelligence permanently."
 
 "DOTA_Tooltip_modifier_campfire_effect"								"Campfire Warmth"
-"DOTA_Tooltip_modifier_campfire_effect_Description"					"The campfire warms you, warding off the Bonefrost as well as regenerating 30 health and 20 mana per second."
+"DOTA_Tooltip_modifier_campfire_effect_Description"					"Health regen: %dMODIFIER_PROPERTY_HEALTH_REGEN_PERCENTAGE%%%. mana regen total percentage: %dMODIFIER_PROPERTY_MANA_REGEN_TOTAL_PERCENTAGE%."
 
 "DOTA_Tooltip_modifier_book_of_strength"							"Book of Strength"
 "DOTA_Tooltip_modifier_book_of_strength_Description"				"Strength gained from consumed Books."
@@ -87,5 +90,12 @@
 //VIPS
 "npc_xhs_paladin"						"Shal Lightbinder"
 "npc_xhs_paladin_2"						"Uther Lightbringer"
-"Dialog_ForestChief_DefendTheCamp"		"Good job on defending the Castle! The teleport spell is ready, tell me when you're ready."
-"Dialog_ForestChief_DefendTheCamp2"		"You have defeated the servants of Arthas! You are ready to face him. The teleport spell is ready, tell me when you're ready."
+"npc_xhs_uther_ice_prison"				"Uther's Ice Prison"
+"Dialog_ForestChief_DefendTheCamp"		"At last... the prison's hold is broken. You have my gratitude, heroes."
+"Dialog_Shal_Lightbinder_2"				"While I was bound, I felt the enemy gathering beyond the gates. The siege was only their first test."
+"Dialog_Shal_Lightbinder_3"				"I can open a path into their realm, but the spell will carry us only once. Gather your strength."
+"Dialog_Shal_Lightbinder_4"				"The way is open. Give the word, and the Light will carry us into their realm - straight to the source of this invasion."
+"Dialog_ForestChief_DefendTheCamp2"		"The road to the Frozen Throne lies open. Beyond this passage, Arthas awaits - and the reckoning I have dreaded since Lordaeron fell."
+"Dialog_Uther_Lightbringer_2"			"I once called him prince. Now only the Lich King remains, and Frostmourne feeds on every soul it claims."
+"Dialog_Uther_Lightbringer_3"			"Steel your hearts. Beyond this passage, mercy cannot reach him, and hesitation will only make him stronger."
+"Dialog_Uther_Lightbringer_4"			"Stand together. When every hero is ready, we face Arthas - and end this."

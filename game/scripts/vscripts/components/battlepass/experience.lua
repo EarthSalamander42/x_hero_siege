@@ -1,6 +1,20 @@
 -- Experience System
 CustomNetTables:SetTableValue("game_options", "game_count", { value = 1 })
 
+local function IsPersistentBattlepassPlayer(playerID)
+	playerID = tonumber(playerID)
+	if playerID == nil or playerID < 0 or not PlayerResource:IsValidPlayerID(playerID) then
+		return false
+	end
+	if IsXHSPersistentPlayerID ~= nil then
+		return IsXHSPersistentPlayerID(playerID)
+	end
+	if PlayerResource.IsFakeClient ~= nil then
+		return not PlayerResource:IsFakeClient(playerID)
+	end
+	return true
+end
+
 function Battlepass:GetTitleColorXP(title)
 	if title == "Rookie" then
 		return { 255, 255, 255 }
@@ -43,60 +57,100 @@ function Battlepass:GetPlayerInfoXP() -- yet it has too much useless loops, form
 
 	print("API ready!")
 
-	for player_id = 0, PlayerResource:GetPlayerCount() - 1 do
+	local persistentPlayerIDs = {}
+	for playerID = 0, 23 do
+		if IsPersistentBattlepassPlayer(playerID) then
+			table.insert(persistentPlayerIDs, playerID)
+		end
+	end
+	for _, player_id in ipairs(persistentPlayerIDs) do
 		local steamid = tostring(PlayerResource:GetSteamID(player_id))
+		local has_backend_player = api.players[steamid] ~= nil
+		local is_bot_donator = api.GetBotDonatorStatus ~= nil and api:GetBotDonatorStatus(player_id) ~= 0
 
-		if api.players[steamid] then
+		if has_backend_player or is_bot_donator then
 			--			print("Player XP:", api.players[steamid].xp_in_level, api.players[steamid].xp_next_level, api.players[steamid].xp_level)
 
 			local color = PLAYER_COLORS[player_id]
 
-			if api:IsDonator(player_id) ~= 10 then
-				donator_color = DONATOR_COLOR[api:GetDonatorStatus(player_id)]
-			end
+			local raw_donator_status = api:GetDonatorStatus(player_id)
+			local donator_status = GetDonatorVisualStatus ~= nil and GetDonatorVisualStatus(raw_donator_status) or raw_donator_status
+			local donator_color = DONATOR_COLOR[donator_status]
 
 			if donator_color == nil then
 				donator_color = DONATOR_COLOR[0]
 			end
 
-			local current_xp = api:GetPlayerWhalepassXP(player_id)
-			local xp_in_level = current_xp
-			local level = api:GetPlayerWhalepassLevel(player_id)
-
-			while xp_in_level > 2000 do
-				xp_in_level = xp_in_level - 2000
+			local supporter_table = SupporterPass and SupporterPass:BuildPlayerTable(player_id) or nil
+			if type(supporter_table) ~= "table" then
+				supporter_table = CustomNetTables:GetTableValue("supporter_pass_player", tostring(player_id)) or {}
 			end
 
-			CustomNetTables:SetTableValue("battlepass_player", tostring(player_id), {
-				XP = xp_in_level,
-				MaxXP = 2000,
-				Lvl = level,
-				ply_color = rgbToHex(color),
-				title = api.players[steamid].rank_title,
-				title_color = rgbToHex(Battlepass:GetTitleColorXP(api.players[steamid].rank_title)),
-				donator_level = api:GetDonatorStatus(player_id),
-				donator_color = rgbToHex(donator_color),
-				toggle_tag = api:GetPlayerTagEnabled(player_id),
-				bp_rewards = api:GetPlayerBPRewardsEnabled(player_id),
-				player_xp = api:GetPlayerXPEnabled(player_id),
-				winrate = api:GetPlayerSeasonalWinrate(player_id),
-				winrate_toggle = api:GetPlayerWinrateShown(player_id),
-				XP_change = 0,
-				ingame_tag = api:GetPlayerIngameTag(player_id),
-				whalepass_url = api:GetPlayerWhalepassURL(player_id),
-				achievements = api:GetPlayerAchievements(player_id),
-				whalepass_xp = current_xp,
-				-- mmr = api:GetPlayerMMR(player_id),
-				-- mmr_title = api:GetPlayerRankMMR(player_id),
-			})
+			local season_xp = tonumber(supporter_table.season_xp or supporter_table.XP) or 0
+			local season_xp_max = tonumber(supporter_table.season_xp_max or supporter_table.MaxXP) or 1000
+			local season_level = tonumber(supporter_table.season_level or supporter_table.Lvl) or 1
+
+			if season_xp_max <= 0 then
+				season_xp_max = 1000
+			end
+			if season_level <= 0 then
+				season_level = 1
+			end
+
+			supporter_table.XP = season_xp
+			supporter_table.MaxXP = season_xp_max
+			supporter_table.Lvl = season_level
+			supporter_table.ply_color = rgbToHex(color)
+			supporter_table.title = supporter_table.title or "Supporter Pass"
+			supporter_table.title_color = supporter_table.title_color or "#9eb0c9"
+			supporter_table.donator_level = donator_status
+			supporter_table.raw_donator_level = raw_donator_status
+			supporter_table.donator_color = rgbToHex(donator_color)
+			supporter_table.tier_id = supporter_table.tier_id or 0
+			supporter_table.tier_name = supporter_table.tier_name or "Free Player"
+			supporter_table.tier_color = supporter_table.tier_color or "#7DB9D8"
+			supporter_table.fragments = supporter_table.fragments or 0
+			supporter_table.daily_fragments = supporter_table.daily_fragments or supporter_table.weekly_fragments or 0
+			supporter_table.daily_gameplay_fragments = supporter_table.daily_gameplay_fragments or 0
+			supporter_table.daily_gameplay_cap = supporter_table.daily_gameplay_cap or 100
+			supporter_table.daily_quest_fragments = supporter_table.daily_quest_fragments or 0
+			supporter_table.daily_quest_cap = supporter_table.daily_quest_cap or 90
+			supporter_table.daily_cap = supporter_table.daily_cap or supporter_table.weekly_cap or (supporter_table.daily_gameplay_cap + supporter_table.daily_quest_cap)
+			supporter_table.weekly_fragments = supporter_table.daily_fragments
+			supporter_table.weekly_cap = supporter_table.daily_cap
+			supporter_table.monthly_fragments = supporter_table.monthly_fragments or 0
+			supporter_table.xp_boost = supporter_table.xp_boost or 0
+			supporter_table.season_level = season_level
+			supporter_table.season_xp = season_xp
+			supporter_table.season_xp_max = season_xp_max
+			supporter_table.account_level = supporter_table.account_level or 0
+			supporter_table.account_title = supporter_table.account_title or "Supporter Pass"
+			if has_backend_player and supporter_table.toggle_tag == nil then supporter_table.toggle_tag = api:GetPlayerTagEnabled(player_id) end
+			if has_backend_player and supporter_table.bp_rewards == nil then supporter_table.bp_rewards = api:GetPlayerBPRewardsEnabled(player_id) end
+			if has_backend_player and supporter_table.pass_rewards == nil then supporter_table.pass_rewards = api:GetPlayerBPRewardsEnabled(player_id) end
+			if has_backend_player and supporter_table.player_xp == nil then supporter_table.player_xp = api:GetPlayerXPEnabled(player_id) end
+			if has_backend_player then supporter_table.winrate = supporter_table.winrate or api:GetPlayerSeasonalWinrate(player_id) end
+			if has_backend_player and supporter_table.winrate_toggle == nil then supporter_table.winrate_toggle = api:GetPlayerWinrateShown(player_id) end
+			if has_backend_player and supporter_table.xhs_ingame_advertize_hidden == nil and api.GetPlayerIngameAdvertizeHidden ~= nil then supporter_table.xhs_ingame_advertize_hidden = api:GetPlayerIngameAdvertizeHidden(player_id) end
+			supporter_table.XP_change = supporter_table.XP_change or 0
+			if has_backend_player then supporter_table.ingame_tag = supporter_table.ingame_tag or api:GetPlayerIngameTag(player_id) end
+			if has_backend_player then supporter_table.achievements = supporter_table.achievements or api:GetPlayerAchievements(player_id) end
+			supporter_table.supporter_url = supporter_table.supporter_url or "https://mods.frostrose-studio.com/supporter-pass"
+
+			CustomNetTables:SetTableValue("supporter_pass_player", tostring(player_id), supporter_table)
 		end
 	end
 end
 
 function Battlepass:UpdatePlayerTable(player_id, key, value)
-	local ply_table = CustomNetTables:GetTableValue("battlepass_player", tostring(player_id))
+	if not IsPersistentBattlepassPlayer(player_id) then return false end
+	local ply_table = CustomNetTables:GetTableValue("supporter_pass_player", tostring(player_id))
+	if ply_table == nil then
+		ply_table = {}
+	end
 
 	ply_table[key] = value
 
-	CustomNetTables:SetTableValue("battlepass_player", tostring(player_id), ply_table)
+	CustomNetTables:SetTableValue("supporter_pass_player", tostring(player_id), ply_table)
+	return true
 end

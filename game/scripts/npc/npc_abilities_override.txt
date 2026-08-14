@@ -15,8 +15,11 @@
 		"AbilityCooldown"				"40.0"
 		"AbilityChannelTime"			"3.0"
 		"AbilityManaCost"				"75"
+		"AbilityTextureName"			"custom/tp_scroll"
 		"ItemCost"						"50"
-		"ItemInitialCharges"			"1"
+		"ItemInitialCharges"			"1000"
+		"ItemDisplayCharges"			"0"
+		"ItemPurchasable"				"0"
 		
 		// Special	
 		//-------------------------------------------------------------------------------------------------------------
@@ -52,245 +55,6 @@
 	{		
 		"ItemPurchasable"				"0"
 	}
-
-	//=================================================================================================================
-	// Battle Fury
-	//=================================================================================================================
-	"item_bfury"
-	{		
-		"ItemPurchasable"				"0"
-
-		// Special
-		//-------------------------------------------------------------------------------------------------------------
-		"AbilitySpecial"
-		{
-			"01"
-			{
-				"var_type"				"FIELD_INTEGER"
-				"bonus_damage"			"1000"
-			}
-			"02"
-			{
-				"var_type"				"FIELD_INTEGER"
-				"bonus_health_regen"	"10"
-			}
-			"03"
-			{
-				"var_type"				"FIELD_INTEGER"
-				"bonus_mana_regen"		"150"
-			}
-			"04"
-			{
-				"var_type"				"FIELD_INTEGER"
-				"cleave_damage_percent"	"50"
-			}
-			"05"
-			{
-				"var_type"						"FIELD_INTEGER"
-				"cleave_damage_percent_creep"	"50"
-			}
-			"06"
-			{
-				"var_type"				"FIELD_INTEGER"
-				"quelling_bonus"		"160"
-			}
-			"07"
-			{
-				"var_type"				"FIELD_INTEGER"
-				"quelling_bonus_ranged"	"125"
-			}			
-			"08"
-			{
-				"var_type"				"FIELD_INTEGER"
-				"cleave_starting_width"	"150"
-			}			
-			"09"
-			{
-				"var_type"				"FIELD_INTEGER"
-				"cleave_ending_width"			"500"
-			}			
-			"10"
-			{
-				"var_type"				"FIELD_INTEGER"
-				"cleave_distance"			"770"
-			}		
-		}
-	}
-
-	//=================================================================================================================
-	// Removed Items
-	//=================================================================================================================
-	"item_ward_observer"			
-	{
-		"ItemPurchasable"				"0"
-	}
-	"item_ward_sentry"				
-	{
-		"ItemPurchasable"				"0"
-	}
-	"item_clarity"					
-	{
-		"ItemPurchasable"				"0"
-	}
-	"item_flask"					
-	{
-		"ItemPurchasable"				"0"
-	}
-	"item_dust"						
-	{
-		"ItemPurchasable"				"0"
-	}
-	"item_bottle"					"REMOVE"
-	"item_recipe_dagon"				"REMOVE"
-	"item_recipe_dagon_2"			"REMOVE"
-	"item_recipe_dagon_3"			"REMOVE"
-	"item_recipe_dagon_4"			"REMOVE"
-	"item_recipe_dagon_5"			"REMOVE"
-	"item_dagon"					"REMOVE"
-	"item_dagon_2"					"REMOVE"
-	"item_dagon_3"					"REMOVE"
-	"item_dagon_4"					"REMOVE"
-	"item_dagon_5"					"REMOVE"
-	"item_recipe_necronomicon"		"REMOVE"
-	"item_recipe_necronomicon_2"	"REMOVE"
-	"item_recipe_necronomicon_3"	"REMOVE"
-	"item_necronomicon"				"REMOVE"
-	"item_necronomicon_2"			"REMOVE"
-	"item_necronomicon_3"			"REMOVE"
-	"item_smoke_of_deceit"			"REMOVE"
-	"item_rapier"					"REMOVE"
-	"item_lesser_crit"				"REMOVE"
-	"item_greater_crit"				"REMOVE"
-	"item_vladmir"					"REMOVE"
-	"item_tango"					"REMOVE"
-	"item_moon_shard"				"REMOVE"
-	"item_mask_of_madness"			"REMOVE"
-	"item_basher"					"REMOVE"
-	"item_guardian_greaves"			"REMOVE"
-	"item_assault"					"REMOVE"
-	"item_blink"					"REMOVE"
-	"item_force_staff"				"REMOVE"
-	"item_arcane_boots"				"REMOVE"
-	"item_tranquil_boots"			"REMOVE"
-	"item_power_treads"				"REMOVE"
-	"item_phase_boots"				"REMOVE"
-	"item_invis_sword"				"REMOVE"
-	"item_silver_edge"				"REMOVE"
-	"item_rod_of_atos"				"REMOVE"
-	"item_armlet"					"REMOVE"
-	"item_bloodstone"				"REMOVE"
-	"item_helm_of_the_dominator"	"REMOVE"
-	"item_satanic"					"REMOVE"
-	"item_branches"					"REMOVE"
-	"item_diffusal_blade"			"REMOVE"
-	"item_diffusal_blade_2"			"REMOVE"
-	"item_magic_stick"				"REMOVE"
-	"item_magic_wand"				"REMOVE"
-	"item_sphere"					"REMOVE"
-	"item_demon_edge"				"REMOVE"
-	"item_butterfly"				"REMOVE"
-	"item_solar_crest"				"REMOVE"
-	"item_heavens_halberd"			"REMOVE"
-	"item_buckler"					"REMOVE"
-	"item_crimson_guard"			"REMOVE"
-	"item_ethereal_blade"			"REMOVE"
-	"item_ghost"					"REMOVE"
-	"item_orchid"					"REMOVE"
-	"item_vanguard"					"REMOVE"
-	"item_urn_of_shadows"			"REMOVE"
-	"item_travel_boots"				"REMOVE"
-	"item_travel_boots_2"			"REMOVE"
-	"item_boots"					"REMOVE"
-	"item_veil_of_discord"			"REMOVE"
-	"item_shadow_amulet"			"REMOVE"
-	"item_glimmer_cape"				"REMOVE"
-	"item_sange"					"REMOVE"
-	"item_sange_and_yasha"			"REMOVE"
-	"item_null_talisman"			"REMOVE"
-	"item_skadi"					"REMOVE"
-	"item_ancient_janggo"			"REMOVE"
-	"item_cyclone"					"REMOVE"
-	"item_dragon_lance"				"REMOVE"
-	"item_yasha"					"REMOVE"
-	"item_manta"					"REMOVE"
-	"item_aether_lens"				"REMOVE"
-	"item_bracer"					"REMOVE"
-	"item_ultimate_scepter"			"REMOVE"
-	"item_wraith_band"				"REMOVE"
-	"item_circlet"					"REMOVE"
-	"item_gauntlets"				"REMOVE"
-	"item_boots_of_elves"			"REMOVE"
-	"item_oblivion_staff"			"REMOVE"
-	"item_quarterstaff"				"REMOVE"
-	"item_mantle"					"REMOVE"
-	"item_hand_of_midas"			"REMOVE"
-	"item_octarine_core"			"REMOVE"
-	"item_ring_of_basilius"			"REMOVE"
-	"item_ring_of_protection"		"REMOVE"
-	"item_sobi_mask"				"REMOVE"
-	"item_medallion_of_courage"		"REMOVE"
-	"item_headdress"				"REMOVE"
-	"item_pipe"						"REMOVE"
-	"item_soul_ring"				"REMOVE"
-	"item_shivas_guard"				"REMOVE"
-	"item_hurricane_pike"			"REMOVE"
-	"item_bloodthorn"				"REMOVE"
-	"item_echo_sabre"				"REMOVE"
-	"item_wind_lace"				"REMOVE"
-	"item_blades_of_attack"			"REMOVE"
-	"item_belt_of_strength"			"REMOVE"
-	"item_quelling_blade"			"REMOVE"
-	"item_staff_of_wizardry"		"REMOVE"
-	"item_orb_of_venom"				"REMOVE"
-	"item_point_booster"			"REMOVE"
-	"item_blade_of_alacrity"		"REMOVE"
-	"item_soul_booster"				"REMOVE"
-	"item_lifesteal"				"REMOVE"
-	"item_refresher"				"REMOVE"
-	"item_radiance"					"REMOVE"
-	"item_blade_mail"				"REMOVE"
-	"item_maelstrom"				"REMOVE"
-	"item_mjollnir"					"REMOVE"
-	"item_hyperstone"				"REMOVE"
-	"item_abyssal_blade"			"REMOVE"
-	"item_infused_raindrop"			"REMOVE"
-	"item_robe"						"REMOVE"
-	"item_chainmail"				"REMOVE"
-	"item_cloak"					"REMOVE"
-	"item_ring_of_regen"			"REMOVE"
-	"item_gem"						"REMOVE"
-	"item_claymore"					"REMOVE"
-	"item_mystic_staff"				"REMOVE"
-	"item_ultimate_orb"				"REMOVE"
-	"item_sheepstick"				"REMOVE"
-	"item_ogre_axe"					"REMOVE"
-	"item_lotus_orb"				"REMOVE"
-	"item_platemail"				"REMOVE"
-	"item_energy_booster"			"REMOVE"
-	"item_pers"						"REMOVE"
-	"item_ring_of_health"			"REMOVE"
-	"item_void_stone"				"REMOVE"
-	"item_broadsword"				"REMOVE"
-	"item_relic"					"REMOVE"
-	"item_helm_of_iron_will"		"REMOVE"
-	"item_eagle"					"REMOVE"
-	"item_black_king_bar"			"REMOVE"
-	"item_hood_of_defiance"			"REMOVE"
-	"item_javelin"					"REMOVE"
-	"item_gloves"					"REMOVE"
-	"item_heart"					"REMOVE"
-	"item_desolator"				"REMOVE"
-	"item_vitality_booster"			"REMOVE"
-	"item_reaver"					"REMOVE"
-	"item_mithril_hammer"			"REMOVE"
-	"item_blight_stone"				"REMOVE"
-	"item_mekansm"					"REMOVE"
-	"item_talisman_of_evasion"		"REMOVE"
-	"item_faerie_fire"				"REMOVE"
-	"item_enchanted_mango"			"REMOVE"
-	"item_tome_of_knowledge"		"REMOVE"
-	"item_stout_shield"				"REMOVE"
-	"item_slippers"					"REMOVE"
 
 	//============================================================================================================
 	//============================================================================================================
@@ -407,6 +171,7 @@
 			{
 				"var_type"					"FIELD_INTEGER"
 				"damage"					"8 16 24 32 40"
+				"CalculateSpellDamageTooltip"	"1"
 				"LinkedSpecialBonus"		"special_bonus_unique_viper_1"
 			}
 			"05"
@@ -452,6 +217,7 @@
 	//=================================================================================================================
 	"juggernaut_blade_fury"
 	{
+		"MaxLevel"					"4"
 		// General
 		//-------------------------------------------------------------------------------------------------------------
 		"RequiredLevel"					"10"
@@ -466,12 +232,12 @@
 
 		// Time		
 		//-------------------------------------------------------------------------------------------------------------
-		"AbilityCooldown"				"100.0 90.0 80.0"
+		"AbilityCooldown"				"100.0 90.0 80.0 70.0"
 		"AbilityDuration"				"8.0"
 
 		// Cost
 		//-------------------------------------------------------------------------------------------------------------
-		"AbilityManaCost"				"180 420 0"		
+		"AbilityManaCost"				"180 420 0 0"
 
 		// Special
 		//-------------------------------------------------------------------------------------------------------------
@@ -491,7 +257,8 @@
 			"03"
 			{
 				"var_type"						"FIELD_INTEGER"
-				"blade_fury_damage"				"800 1600 2400"
+				"blade_fury_damage"				"800 1600 2400 3200"
+				"CalculateSpellDamageTooltip"	"1"
 				"LinkedSpecialBonus"			"special_bonus_unique_juggernaut_3"
 			}
 		}
@@ -538,7 +305,8 @@
 			"03"
 			{
 				"var_type"					"FIELD_INTEGER"
-				"damage"					"200 450 950 1850"
+				"damage"					"300 550 1050 1850"
+				"CalculateSpellDamageTooltip"	"1"
 			}
 			"04"
 			{
@@ -563,6 +331,7 @@
 	//=================================================================================================================
 	"slardar_bash"
 	{
+		"MaxLevel"					"4"
 		// General
 		//-------------------------------------------------------------------------------------------------------------
 		"RequiredLevel"						"8"
@@ -579,7 +348,7 @@
 			"01"
 			{
 				"var_type"				"FIELD_INTEGER"
-				"bonus_damage"			"100 250 450 700 1000"
+				"bonus_damage"			"100 250 450 700"
 				"LinkedSpecialBonus"	"special_bonus_unique_slardar_2"
 			}
 			"02"
@@ -590,7 +359,7 @@
 			"03"
 			{
 				"var_type"				"FIELD_INTEGER"
-				"attack_count"			"6 5 4 3 2"
+				"attack_count"			"6 5 4 3"
 			}
 		}
 	}
@@ -644,6 +413,7 @@
 			{
 				"var_type"				"FIELD_INTEGER"
 				"damage"				"200 250 300 350 400"
+				"CalculateSpellDamageTooltip"	"1"
 			}
 			"03"
 			{
@@ -721,6 +491,18 @@
 	//=================================================================================================================
 	"zuus_arc_lightning"
 	{
+		"XHSBotOpeningPriority"		"1"
+		// General
+		//-------------------------------------------------------------------------------------------------------------
+		"BaseClass"						"ability_lua"
+		"MaxLevel"					"4"
+		"ScriptFile"					"abilities/heroes/hero_huntress.lua"
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_UNIT_TARGET | DOTA_ABILITY_BEHAVIOR_AOE"
+		"AbilityUnitTargetTeam"			"DOTA_UNIT_TARGET_TEAM_ENEMY"
+		"AbilityUnitTargetType"			"DOTA_UNIT_TARGET_HERO | DOTA_UNIT_TARGET_BASIC"
+		"AbilityUnitDamageType"			"DAMAGE_TYPE_MAGICAL"
+		"SpellImmunityType"				"SPELL_IMMUNITY_ENEMIES_NO"
+
 		// Casting
 		//-------------------------------------------------------------------------------------------------------------
 		"AbilityCastRange"				"800"
@@ -742,7 +524,8 @@
 			"01"
 			{
 				"var_type"				"FIELD_INTEGER"
-				"arc_damage"			"110 220 440 880"
+				"arc_damage"			"175 275 475 880"
+				"CalculateSpellDamageTooltip"	"1"
 				"LinkedSpecialBonus"	"special_bonus_unique_zeus_2"
 			}
 			"02"
@@ -768,6 +551,7 @@
 	//=================================================================================================================
 	"pugna_life_drain"
 	{
+		"MaxLevel"					"4"
 		// General
 		//-------------------------------------------------------------------------------------------------------------
 		"SpellImmunityType"				"SPELL_IMMUNITY_ENEMIES_YES"
@@ -778,7 +562,7 @@
 
 		// Casting
 		//-------------------------------------------------------------------------------------------------------------
-		"AbilityCastRange"				"800 1000 1200"
+		"AbilityCastRange"				"800 1000 1200 1400"
 		"AbilityCastPoint"				"0.2"
 		"AbilityChannelTime"			"6.0"
 
@@ -788,7 +572,7 @@
 
 		// Cost
 		//-------------------------------------------------------------------------------------------------------------
-		"AbilityManaCost"				"225 550 0"
+		"AbilityManaCost"				"225 550 0 0"
 		
 		// Stats
 		//-------------------------------------------------------------------------------------------------------------
@@ -801,19 +585,19 @@
 			"01"
 			{
 				"var_type"						"FIELD_INTEGER"
-				"health_drain"					"300 600 900"
+				"health_drain"					"300 600 900 1200"
 				"CalculateSpellDamageTooltip"	"1"
 			}
 			"02"
 			{
 				"var_type"					"FIELD_FLOAT"
-				"scepter_cooldown"			"0.0 0.0 0.0"
+				"scepter_cooldown"			"0.0 0.0 0.0 0.0"
 				"RequiresScepter"			"1"
 			}
 			"03"
 			{
 				"var_type"					"FIELD_FLOAT"
-				"tick_rate"					"0.25 0.25 0.25"
+				"tick_rate"					"0.25 0.25 0.25 0.25"
 			}
 		}
 	}
@@ -852,6 +636,7 @@
 			{
 				"var_type"				"FIELD_FLOAT"
 				"total_damage"			"500"
+				"CalculateSpellDamageTooltip"	"1"
 			}
 			"03"
 			{
@@ -955,6 +740,15 @@
 	//=================================================================================================================
 	"nyx_assassin_impale"
 	{
+		"BaseClass"					"ability_lua"
+		"ScriptFile"					"abilities/heroes/hero_crypt_lord.lua"
+		"MaxLevel"					"4"
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_POINT | DOTA_ABILITY_BEHAVIOR_AOE | DOTA_ABILITY_BEHAVIOR_AUTOCAST"
+		"AbilityUnitTargetTeam"			"DOTA_UNIT_TARGET_TEAM_ENEMY"
+		"AbilityUnitTargetType"			"DOTA_UNIT_TARGET_HERO | DOTA_UNIT_TARGET_BASIC"
+		"AbilityUnitDamageType"			"DAMAGE_TYPE_MAGICAL"
+		"SpellImmunityType"				"SPELL_IMMUNITY_ENEMIES_NO"
+		"AbilityCastAnimation"			"ACT_DOTA_CAST_ABILITY_1"
 		// Casting
 		//-------------------------------------------------------------------------------------------------------------
 		"AbilityCastRange"				"1200"
@@ -1002,63 +796,14 @@
 			"06"
 			{
 				"var_type"				"FIELD_INTEGER"
-				"impale_damage"			"160 410 660 910"
+				"impale_damage"			"300 475 700 1000"
+				"CalculateSpellDamageTooltip"	"1"
 				"LinkedSpecialBonus"	"special_bonus_unique_nyx_2"
 			}
-		}
-	}
-
-	//=================================================================================================================
-	// Ogre Magi: Bloodlust
-	//=================================================================================================================
-	"ogre_magi_bloodlust"
-	{
-		// Casting
-		//-------------------------------------------------------------------------------------------------------------
-		"AbilityCastRange"				"600"
-		"AbilityCastPoint"				"0.45"
-		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_UNIT_TARGET"
-		"MaxLevel"						"1"
-		"AbilityTextureName"			"custom/ogre_magi_bloodlust"
-		
-		// Time		
-		//-------------------------------------------------------------------------------------------------------------
-		"AbilityCooldown"				"25"
-
-		// Cost
-		//-------------------------------------------------------------------------------------------------------------
-		"AbilityManaCost"				"50"
-
-		// Special
-		//-------------------------------------------------------------------------------------------------------------
-		"AbilitySpecial"
-		{
-			"01"
-			{
-				"var_type"			"FIELD_FLOAT"
-				"modelscale"		"30"
-			}	
-			"02"
-			{
-				"var_type"				"FIELD_INTEGER"
-				"bonus_movement_speed"		"20"
-			}
-			"03"
-			{
-				"var_type"				"FIELD_INTEGER"
-				"bonus_attack_speed"	"60"
-				"LinkedSpecialBonus"	"special_bonus_unique_ogre_magi"
-			}
-			"04"
-			{
-				"var_type"				"FIELD_INTEGER"
-				"self_bonus"			"60"
-				"LinkedSpecialBonus"	"special_bonus_unique_ogre_magi"
-			}
-			"05"
+			"07"
 			{
 				"var_type"				"FIELD_FLOAT"
-				"duration"				"20"
+				"infested_duration"		"5.0"
 			}
 		}
 	}
@@ -1187,6 +932,7 @@
 			{
 				"var_type"			"FIELD_INTEGER"
 				"damage"			"40"
+				"CalculateSpellDamageTooltip"	"1"
 			}
 			"03"
 			{
@@ -1247,7 +993,11 @@
 		"DisplayAdditionalHeroes"	"1"
 		"HasScepterUpgrade"			"0"
 		"AbilityTextureName"		"custom/lone_druid_spirit_bear"
-		"MaxLevel"					"7"
+		"AbilityType"				"DOTA_ABILITY_TYPE_BASIC"
+		"AbilityBehavior"			"DOTA_ABILITY_BEHAVIOR_NO_TARGET"
+		"MaxLevel"					"4"
+		"RequiredLevel"				"1"
+		"LevelsBetweenUpgrades"		"2"
 
 		// Casting
 		//-------------------------------------------------------------------------------------------------------------
@@ -1259,7 +1009,7 @@
 
 		// Cost
 		//-------------------------------------------------------------------------------------------------------------
-		"AbilityManaCost"				"75 150 225 300 375 450 525"
+		"AbilityManaCost"				"75 225 375 525"
 
 		// Special
 		//-------------------------------------------------------------------------------------------------------------
@@ -1268,23 +1018,23 @@
 			"01"
 			{
 				"var_type"					"FIELD_INTEGER"
-				"bear_hp"					"900 1800 3600 7200 14400 28800 57600"
+				"bear_hp"					"900 3600 14400 57600"
 			}
 			"02"
 			{
 				"var_type"					"FIELD_INTEGER"
-				"bear_regen_tooltip"		"5 10 20 40 80 160 320"
+				"bear_regen_tooltip"		"5 20 80 320"
 			}
 			"03"
 			{
 				"var_type"					"FIELD_FLOAT"
-				"bear_bat"					"1.4 1.3 1.2 1.1 1.0 0.9 0.8"
+				"bear_bat"					"1.4 1.2 1.0 0.8"
 				"LinkedSpecialBonus"		"special_bonus_unique_lone_druid_10"
 			}
 			"04"
 			{
 				"var_type"					"FIELD_INTEGER"
-				"bear_armor"				"4 8 16 32 64 128 256"
+				"bear_armor"				"4 16 64 256"
 				"LinkedSpecialBonus"		"special_bonus_unique_lone_druid_2"
 			}
 			"05"
@@ -1384,6 +1134,7 @@
 			{
 				"var_type"					"FIELD_INTEGER"
 				"poof_damage"				"160 250 340 430"
+				"CalculateSpellDamageTooltip"	"1"
 				"LinkedSpecialBonus"		"special_bonus_unique_meepo_2"
 			}
 		}
@@ -1426,6 +1177,7 @@
 			{
 				"var_type"					"FIELD_INTEGER"
 				"damage"					"2500"
+				"CalculateSpellDamageTooltip"	"1"
 				"LinkedSpecialBonus"		"special_bonus_unique_lion_3"
 			}
 		}
@@ -1436,6 +1188,7 @@
 	//=================================================================================================================
 	"enraged_wildkin_tornado"
 	{
+		"MaxLevel"					"1"
 		// Stats
 		//-------------------------------------------------------------------------------------------------------------
 		"AbilityCastRange"				"600"
@@ -1495,11 +1248,13 @@
 			{
 				"var_type"				"FIELD_INTEGER"
 				"near_damage"			"1000"
+				"CalculateSpellDamageTooltip"	"1"
 			}
 			"06"
 			{
 				"var_type"				"FIELD_INTEGER"
 				"far_damage"			"1000"
+				"CalculateSpellDamageTooltip"	"1"
 			}
 			"07"
 			{
@@ -1514,6 +1269,7 @@
 	//=================================================================================================================
 	"monkey_king_boundless_strike"
 	{
+		"MaxLevel"					"4"
 		// Casting
 		//-------------------------------------------------------------------------------------------------------------
 		"AbilityCastPoint"				"0.4"
@@ -1539,7 +1295,7 @@
 			"02"
 			{
 				"var_type"					"FIELD_INTEGER"
-				"strike_crit_mult"			"250 300 350 400"
+				"strike_crit_mult"			"380 390 400 410"
 				"LinkedSpecialBonus"		"special_bonus_unique_monkey_king"
 			}
 			"03"
@@ -1719,6 +1475,7 @@
 			{
 				"var_type"					"FIELD_FLOAT"
 				"damage_pct"				"15"
+				"CalculateSpellDamageTooltip"	"1"
 			}
 			"08"
 			{
@@ -1938,7 +1695,7 @@
 			"12"
 			{
 				"var_type"					"FIELD_INTEGER"
-				"impact_damage_tooltip"		"225 550 775 1050"
+				"impact_damage_tooltip"		"350 625 825 1050"
 				"LinkedSpecialBonus"		"special_bonus_unique_monkey_king_3"
 			}
 			"13"
@@ -1982,7 +1739,8 @@
 			"01"
 			{
 				"var_type"				"FIELD_INTEGER"
-				"impact_damage"			"225 550 775 1050"
+				"impact_damage"			"350 625 825 1050"
+				"CalculateSpellDamageTooltip"	"1"
 				"LinkedSpecialBonus"	"special_bonus_unique_monkey_king_3"
 			}
 			"02"
@@ -2068,7 +1826,8 @@
 			"01"
 			{
 				"var_type"				"FIELD_INTEGER"
-				"damage"				"60 100 140 180"
+				"damage"				"90 120 150 180"
+				"CalculateSpellDamageTooltip"	"1"
 				"LinkedSpecialBonus"	"special_bonus_unique_axe_4"
 			}
 			"02"
@@ -2129,7 +1888,8 @@
 			"04"
 			{
 				"var_type"					"FIELD_INTEGER"
-				"axe_damage"				"150 300 450 600"
+				"axe_damage"				"225 350 475 600"
+				"CalculateSpellDamageTooltip"	"1"
 				"LinkedSpecialBonus"		"special_bonus_unique_troll_warlord_3"
 			}
 			"05"
@@ -2180,6 +1940,7 @@
 			{
 				"var_type"					"FIELD_INTEGER"
 				"damage"					"200 400 600 800"
+				"CalculateSpellDamageTooltip"	"1"
 				"LinkedSpecialBonus"		"special_bonus_unique_troll_warlord_3"
 			}
 			"02"
@@ -2261,7 +2022,8 @@
 			"01"
 			{
 				"var_type"				"FIELD_INTEGER"
-				"damage_per_second"		"40 70 100 130"
+				"damage_per_second"		"60 90 110 130"
+				"CalculateSpellDamageTooltip"	"1"
 				"LinkedSpecialBonus"	"special_bonus_unique_doom_4"				
 			}
 			"02"
@@ -2305,6 +2067,7 @@
 			{
 				"var_type"				"FIELD_INTEGER"
 				"burn_damage"			"100 200 300 400"
+				"CalculateSpellDamageTooltip"	"1"
 			}
 			"02"
 			{
@@ -2358,6 +2121,7 @@
 			{
 				"var_type"				"FIELD_INTEGER"
 				"damage"				"100 200 300"
+				"CalculateSpellDamageTooltip"	"1"
 				"LinkedSpecialBonus"	"special_bonus_unique_doom_5"				
 			}
 		}
@@ -2393,7 +2157,7 @@
 
 		// Damage
 		//-------------------------------------------------------------------------------------------------------------
-		"AbilityDamage"					"220 440 660 880"
+		"AbilityDamage"					"350 525 700 900"
 		"AbilityDuration"				"2.0"
 
 		// Special
@@ -2449,7 +2213,7 @@
 
 		// Damage.
 		//-------------------------------------------------------------------------------------------------------------
-		"AbilityDamage"					"45 90 135 180"
+		"AbilityDamage"					"70 110 150 190"
 		"AbilityDuration"				"10.0"
 
 		// Special
@@ -2595,6 +2359,7 @@
 			{
 				"var_type"				"FIELD_INTEGER"
 				"damage"				"100 130 160"
+				"CalculateSpellDamageTooltip"	"1"
 				"LinkedSpecialBonus"	"special_bonus_unique_leshrac_3"
 			}
 			"04"
@@ -2682,12 +2447,14 @@
 			"02"
 			{
 				"var_type"				"FIELD_INTEGER"
-				"quill_base_damage"		"50 100 150 200"
+				"quill_base_damage"		"75 120 160 200"
+				"CalculateSpellDamageTooltip"	"1"
 			}
 			"03"
 			{
 				"var_type"				"FIELD_INTEGER"
-				"quill_stack_damage"	"30 50 70 90"
+				"quill_stack_damage"	"45 60 75 90"
+				"CalculateSpellDamageTooltip"	"1"
 				"LinkedSpecialBonus"	"special_bonus_unique_bristleback_2"
 			}
 			"04"
@@ -2699,6 +2466,7 @@
 			{
 				"var_type"				"FIELD_INTEGER"
 				"max_damage"			"1100.0"
+				"CalculateSpellDamageTooltip"	"1"
 			}
 			"06"
 			{
@@ -2823,9 +2591,10 @@
 	//=================================================================================================================
 	"ember_spirit_searing_chains"
 	{
+		"MaxLevel"					"4"
 		// General
 		//-------------------------------------------------------------------------------------------------------------
-		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET"
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET | DOTA_ABILITY_BEHAVIOR_AOE"
 		"AbilityUnitDamageType"			"DAMAGE_TYPE_MAGICAL"
 		"SpellImmunityType"				"SPELL_IMMUNITY_ENEMIES_NO"
 		"SpellDispellableType"			"SPELL_DISPELLABLE_YES"
@@ -2862,7 +2631,8 @@
 			"03"
 			{
 				"var_type"						"FIELD_INTEGER"
-				"damage_per_second"				"150 200 250 300"
+				"damage_per_second"				"225 250 275 300"
+				"CalculateSpellDamageTooltip"	"1"
 			}
 			"04"
 			{
@@ -2883,6 +2653,7 @@
 	//=================================================================================================================
 	"ember_spirit_sleight_of_fist"
 	{
+		"MaxLevel"					"4"
 		// General
 		//-------------------------------------------------------------------------------------------------------------
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_POINT | DOTA_ABILITY_BEHAVIOR_AOE"
@@ -2912,7 +2683,7 @@
 			"02"
 			{
 				"var_type"						"FIELD_INTEGER"
-				"bonus_hero_damage"				"500 100 1500 2000"
+				"bonus_hero_damage"				"750 1200 1600 2000"
 				"LinkedSpecialBonus"			"special_bonus_unique_ember_spirit_6"
 				"CalculateSpellDamageTooltip"	"0"
 			}		
@@ -3015,9 +2786,10 @@
 	//=================================================================================================================
 	"ember_spirit_flame_guard"
 	{
+		"MaxLevel"					"4"
 		// General
 		//-------------------------------------------------------------------------------------------------------------
-		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET"
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET | DOTA_ABILITY_BEHAVIOR_AOE"
 		"AbilityUnitDamageType"			"DAMAGE_TYPE_MAGICAL"
 		"SpellImmunityType"				"SPELL_IMMUNITY_ENEMIES_NO"
 		"SpellDispellableType"			"SPELL_DISPELLABLE_YES"
@@ -3068,6 +2840,7 @@
 			{
 				"var_type"						"FIELD_INTEGER"
 				"damage_per_second"				"25 50 75 100"
+				"CalculateSpellDamageTooltip"	"1"
 				"LinkedSpecialBonus"			"special_bonus_unique_ember_spirit_3"
 			}
 		}
@@ -3109,6 +2882,7 @@
 			{
 				"var_type"				"FIELD_INTEGER"
 				"far_damage"			"77777"
+				"CalculateSpellDamageTooltip"	"1"
 			}
 			"02"
 			{
@@ -3134,6 +2908,7 @@
 			{
 				"var_type"				"FIELD_INTEGER"
 				"near_damage"			"20000"
+				"CalculateSpellDamageTooltip"	"1"
 			}
 			"07"
 			{
@@ -3222,12 +2997,12 @@
 			"01"
 			{
 				"var_type"					"FIELD_INTEGER"
-				"damage_modifier"			"-70 -55 -40 -25"
+				"damage_modifier"			"-55 -45 -35 -25"
 			}
 			"02"
 			{
 				"var_type"					"FIELD_INTEGER"
-				"damage_modifier_tooltip"	"30 45 60 75"
+				"damage_modifier_tooltip"	"45 55 65 75"
 			}
 			"03"
 			{	
@@ -3263,7 +3038,8 @@
 			"04"
 			{
 				"var_type"				"FIELD_INTEGER"
-				"snake_damage"			"160 320 480 720"
+				"snake_damage"			"250 400 525 720"
+				"CalculateSpellDamageTooltip"	"1"
 			}
 			"05"
 			{
@@ -3355,6 +3131,7 @@
 		"AbilityUnitDamageType"			"DAMAGE_TYPE_PHYSICAL"
 		"SpellImmunityType"				"SPELL_IMMUNITY_ENEMIES_YES"
 		"SpellDispellableType"			"SPELL_DISPELLABLE_NO"
+		"AbilityTextureName"				"ursa_fury_swipes"
 		"MaxLevel"						"5"
 
 		// Special
@@ -3403,7 +3180,8 @@
 			"03"
 			{
 				"var_type"					"FIELD_INTEGER"
-				"damage"					"80 160 240 320"
+				"damage"					"120 200 280 360"
+				"CalculateSpellDamageTooltip"	"1"
 			}
 			"04"
 			{
@@ -3485,7 +3263,8 @@
 			"03"
 			{
 				"var_type"					"FIELD_INTEGER"
-				"shock_damage"				"275 550 825 1100"
+				"shock_damage"				"425 650 875 1100"
+				"CalculateSpellDamageTooltip"	"1"
 				"LinkedSpecialBonus"		"special_bonus_unique_magnus_4"
 			}
 			"04"
@@ -3594,6 +3373,7 @@
 			{
 				"var_type"				"FIELD_INTEGER"
 				"skewer_damage"			"100 300 600 1200"
+				"CalculateSpellDamageTooltip"	"1"
 			}			
 			"07"
 			{
@@ -3659,6 +3439,7 @@
 			{
 				"var_type"				"FIELD_INTEGER"
 				"polarity_damage"		"600 1200 2400"
+				"CalculateSpellDamageTooltip"	"1"
 			}
 			"03"
 			{
@@ -3712,7 +3493,8 @@
 			"01"
 			{
 				"var_type"			"FIELD_INTEGER"
-				"gush_damage"		"100 250 550 900"
+				"gush_damage"		"150 300 575 900"
+				"CalculateSpellDamageTooltip"	"1"
 				"LinkedSpecialBonus"	"special_bonus_unique_tidehunter_2"
 			}
 			"02"
@@ -3793,7 +3575,7 @@
 			"01"
 			{
 				"var_type"				"FIELD_INTEGER"
-				"attack_damage"			"90 180 360 720"
+				"attack_damage"			"140 225 400 720"
 			}
 			"02"
 			{
@@ -4006,7 +3788,8 @@
 			"04"
 			{
 				"var_type"					"FIELD_INTEGER"
-				"axe_damage"				"150 300 450 600"
+				"axe_damage"				"225 350 475 600"
+				"CalculateSpellDamageTooltip"	"1"
 				"LinkedSpecialBonus"		"special_bonus_unique_troll_warlord_3"
 			}
 			"05"
@@ -4057,6 +3840,7 @@
 			{
 				"var_type"					"FIELD_INTEGER"
 				"damage"					"200 400 600 800"
+				"CalculateSpellDamageTooltip"	"1"
 				"LinkedSpecialBonus"		"special_bonus_unique_troll_warlord_3"
 			}
 			"02"
@@ -4158,7 +3942,8 @@
 			"09"
 			{
 				"var_type"				"FIELD_INTEGER"
-				"impact_damage"			"110 250 510 970"
+				"impact_damage"			"175 300 550 970"
+				"CalculateSpellDamageTooltip"	"1"
 			}
 			"10"
 			{
@@ -4201,7 +3986,7 @@
 
 		// Damage
 		//-------------------------------------------------------------------------------------------------------------
-		"AbilityDamage"					"220 560 890 1280"
+		"AbilityDamage"					"350 650 950 1300"
 
 		// Cost
 		//-------------------------------------------------------------------------------------------------------------
@@ -4290,6 +4075,7 @@
 			{
 				"var_type"				"FIELD_INTEGER"
 				"damage"				"230 490 800 1090"
+				"CalculateSpellDamageTooltip"	"1"
 				"LinkedSpecialBonus"	"special_bonus_unique_void_spirit_4"
 			}
 			"04"
@@ -4379,6 +4165,7 @@
 			{
 				"var_type"				"FIELD_INTEGER"
 				"pop_damage"			"500 800 1200"
+				"CalculateSpellDamageTooltip"	"1"
 			}
 			"08"
 			{
@@ -4415,7 +4202,8 @@
 			"01"
 			{
 				"var_type"					"FIELD_INTEGER"
-				"damage"					"80 150 220 290"
+				"damage"					"120 180 240 300"
+				"CalculateSpellDamageTooltip"	"1"
 				"LinkedSpecialBonus"		"special_bonus_unique_snapfire_7"
 			}
 			"02"
@@ -4508,7 +4296,8 @@
 			"09"
 			{
 				"var_type"				"FIELD_INTEGER"
-				"impact_damage"			"110 220 440 880"
+				"impact_damage"			"175 275 475 880"
+				"CalculateSpellDamageTooltip"	"1"
 			}
 			"10"
 			{
@@ -4549,6 +4338,7 @@
 			{
 				"var_type"					"FIELD_INTEGER"
 				"damage"					"120 240 480 960"
+				"CalculateSpellDamageTooltip"	"1"
 			}
 			"02"
 			{
@@ -4651,6 +4441,7 @@
 			{
 				"var_type"				"FIELD_INTEGER"
 				"damage_per_impact"		"500 1000 2000"
+				"CalculateSpellDamageTooltip"	"1"
 			}
 			"06"
 			{
@@ -4676,6 +4467,7 @@
 			{
 				"var_type"				"FIELD_INTEGER"
 				"burn_damage"			"150 500 1000"
+				"CalculateSpellDamageTooltip"	"1"
 			}
 			"11"
 			{

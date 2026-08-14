@@ -1,4 +1,4 @@
--- Copyright (C) 2018  The Dota IMBA Development Team
+-- Copyright (C) 2018  Frostrose Studio
 --
 -- Licensed under the Apache License, Version 2.0 (the "License");
 -- you may not use this file except in compliance with the License.
@@ -26,8 +26,8 @@ if Log == nil then
 			DEBUG = 1,
 			INFO = 2,
 			WARN = 3,
-			CRITICAL = 4,
-			ERROR = 5
+			ERROR = 4,
+			CRITICAL = 5
 		},
 		targets = {}
 	}
@@ -35,9 +35,15 @@ if Log == nil then
 	Log.config = {
 		{
 			matcher = ".*",
+			level = Log.Levels.DEBUG,
+			targets = {
+				"api"
+			}
+		},
+		{
+			matcher = ".*",
 			level = Log.Levels.INFO,
 			targets = {
-				"api",
 				"console"
 			}
 		}
@@ -48,16 +54,16 @@ if Log == nil then
 	-- Utility
 	---------------------------------------------
 	function Log:_LevelToString(lvl)
-		if lvl == 1 then
+		if lvl == self.Levels.DEBUG then
 			return "debug"
-		elseif lvl == 2 then
+		elseif lvl == self.Levels.INFO then
 			return "info"
-		elseif lvl == 3 then
+		elseif lvl == self.Levels.WARN then
 			return "warn"
-		elseif lvl == 4 then
-			return "critical"
-		elseif lvl == 5 then
+		elseif lvl == self.Levels.ERROR then
 			return "error"
+		elseif lvl == self.Levels.CRITICAL then
+			return "critical"
 		else
 			return "invalid"
 		end
@@ -205,15 +211,35 @@ if Log == nil then
 
 	function Log:_GetStackTrace(ptr)
 		local trace = {}
+		if debug == nil or debug.getinfo == nil then return trace end
 
 		-- gather info
 		while true do
-			local i = debug.getinfo(ptr, "nSl")
+			local ok, i = pcall(debug.getinfo, ptr, "nSl")
+			if not ok then break end
 			if i == nil or ptr > 20 then
 				break
 			end
 			table.insert(trace, i)
 			ptr = ptr + 1
+		end
+
+		-- Stack offsets are not stable when debug.getinfo is invoked through
+		-- pcall or another wrapper. Drop our own frames explicitly so trace[1]
+		-- always identifies the code that called print/log.*.
+		while #trace > 0 do
+			local frame = trace[1] or {}
+			local source = tostring(frame.short_src or frame.source or "")
+				:gsub("\\", "/")
+				:lower()
+			local isInternal = string.match(source, "libraries/adv_log%.lua$") ~= nil
+			local isCFrame = source == "[c]"
+				or source == "=[c]"
+				or tostring(frame.what or ""):upper() == "C"
+			if not isInternal and not isCFrame then
+				break
+			end
+			table.remove(trace, 1)
 		end
 
 		return trace
@@ -241,19 +267,34 @@ if Log == nil then
 
 		local content = ""
 
-		if type(obj) == "table" then
-			content = self:_PrintTable(obj)
+		local contentOK, preparedContent = pcall(function()
+			if type(obj) == "table" then return self:_PrintTable(obj) end
+			return tostring(obj)
+		end)
+		if contentOK then
+			content = preparedContent
 		else
-			content = tostring(obj)
+			content = "<adv_log serialization failed: " .. tostring(preparedContent) .. ">"
 		end
 
 		local trace = self:_GetStackTrace(traceLevel);
 		local file = self:_GetFileFromTrace(trace)
 
+		local delivered = false
 		for i = 1, #self.targets do
 			if not self:_IsFiltered(self.targets[i].name, level, file) then
-				self.targets[i]:print(levelString, content, trace)
+				local targetOK, targetError = pcall(function()
+					self.targets[i]:print(levelString, content, trace)
+				end)
+				delivered = delivered or targetOK
+				if not targetOK and NativePrint ~= nil then
+					pcall(NativePrint, "[error][adv_log] target=" .. tostring(self.targets[i].name)
+						.. " failed: " .. tostring(targetError))
+				end
 			end
+		end
+		if not delivered and NativePrint ~= nil then
+			pcall(NativePrint, "[" .. levelString .. "][adv_log fallback] " .. tostring(content))
 		end
 	end
 
@@ -261,23 +302,48 @@ if Log == nil then
 	-- Runs code in safe context: Catches exceptions
 	-- and logs errors
 	---------------------------------------------
-	function Log:ExecuteInSafeContext(fun, args)
+	function Log:ExecuteInSafeContext(fun, args, options)
 		if args == nil then args = {} end
+		options = type(options) == "table" and options or {}
 
 		local status, err = xpcall(fun, function(err)
 			if err == nil then
 				err = "Unknown Error"
 			end
+			local errorText = tostring(err)
+			local prefix = tostring(options.prefix or "")
+			if prefix ~= "" then errorText = prefix .. " " .. errorText end
 
-			-- dont filter errors
-			local levelString = self:_LevelToString(Log.Levels.ERROR)
+			if options.silent ~= true then
+				-- Do not filter safe-context errors, but never let a broken log
+				-- target replace the original exception.
+				local levelString = self:_LevelToString(Log.Levels.ERROR)
+				local trace = self:_GetStackTrace(4)
+				local delivered = false
 
-			for i = 1, #self.targets do
-				self.targets[i]:print(levelString, "Error occured while executing in safe context: " .. err, self:_GetStackTrace(4))
+				for i = 1, #self.targets do
+					local targetStatus = pcall(function()
+						self.targets[i]:print(
+							levelString,
+							"Error occurred while executing in safe context: " .. errorText,
+							trace
+						)
+					end)
+					delivered = delivered or targetStatus
+				end
+				if not delivered and NativePrint ~= nil then
+					NativePrint("[error][adv_log] " .. errorText)
+				end
 			end
 
-			-- ultimate debugging
-			GameRules:SendCustomMessage("Error: " .. err, 0, 0)
+			if options.notify ~= false
+				and GameRules ~= nil
+				and GameRules.SendCustomMessage ~= nil then
+				pcall(function()
+					GameRules:SendCustomMessage("Error: " .. errorText, 0, 0)
+				end)
+			end
+			return errorText
 		end, unpack(args))
 
 		return status, err
@@ -354,16 +420,20 @@ if Log == nil then
 	}
 
 	function ApiLogTarget:print(level, content, trace)
-		local trace = ""
-		for i = 1, #trace do
-			trace = trace .. ", " .. json.encode(trace[i])
+		local encodedTrace = {}
+		for i = 1, math.min(#trace, 12) do
+			local frame = trace[i] or {}
+			table.insert(encodedTrace, {
+				source = tostring(frame.short_src or frame.source or ""),
+				line = tonumber(frame.currentline or frame.line) or 0,
+				name = tostring(frame.name or ""),
+			})
 		end
 		if api then
-			-- prepare api request
 			api:Message({
 				level = level,
 				content = tostring(content),
-				trace = trace
+				trace = encodedTrace
 			}, 2)
 		end
 	end
@@ -373,12 +443,18 @@ if Log == nil then
 	}
 
 	function ConsoleLogTarget:print(level, content, trace)
+		local frame = type(trace) == "table" and trace[1] or nil
+		if type(frame) ~= "table" then
+			NativePrint("[" .. tostring(level) .. "][adv_log:no_trace] " .. tostring(content))
+			return
+		end
 		local name = ""
-		if trace[1]["name"] ~= nil then
-			name = "|" .. trace[1]["name"]
+		if frame["name"] ~= nil then
+			name = "|" .. frame["name"]
 		end
 		NativePrint("[" ..
-			level .. "][" .. trace[1]["short_src"] .. ":" .. trace[1]["currentline"] .. name .. "] " .. content)
+			level .. "][" .. tostring(frame["short_src"] or frame["source"] or "unknown")
+			.. ":" .. tostring(frame["currentline"] or 0) .. name .. "] " .. tostring(content))
 	end
 
 	-----------------------------------------------------------------
@@ -409,21 +485,23 @@ if Log == nil then
 	end
 
 	function Dynamic_Wrap(mt, name)
-		-- testing nil value fix on line "return mt[name](unpack(args))" [NOT WORKING]
-		--		if mt == nil or name == nil then return end
-
 		local function wrapper(...)
 			local args = { ... }
 
-			-- Very rare issue! if this line appears:
-			-- [error][[C]:-1|xpcall] Error occured while executing in safe context: scripts\vscripts\libraries\adv_log.lua:423: attempt to call a nil value
-			-- uncomment prints and check what's wrong
-			--			print(mt, name, args)
-			--			print(mt[name])
-			--			print(mt[name](unpack(args)))
+			if mt == nil or name == nil then
+				print("[adv_log] Dynamic_Wrap received invalid mt/name")
+				return nil
+			end
+
+			local method = mt[name]
+			if type(method) ~= "function" then
+				print("[adv_log] Dynamic_Wrap target is not a function:", tostring(name), type(method))
+				return nil
+			end
 
 			local status, v = safe(function()
-				return mt[name](unpack(args))
+				-- Keep native Dynamic_Wrap behavior: pass wrapped table as self.
+				return method(mt, unpack(args))
 			end)
 
 			if status then

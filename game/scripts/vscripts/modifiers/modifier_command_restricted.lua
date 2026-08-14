@@ -1,4 +1,5 @@
 modifier_command_restricted = class({})
+modifier_command_restricted.XHS_LINK_CLIENT = true
 
 function modifier_command_restricted:IsHidden()
 	return true

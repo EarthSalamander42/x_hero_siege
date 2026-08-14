@@ -1,0 +1,297 @@
+"DOTAUnits"
+{
+	"Version"	"1"
+
+
+	//=================================================================================
+	// VIP: Uther
+	//=================================================================================
+	"npc_xhs_paladin"
+	{
+		// General
+		//----------------------------------------------------------------
+		"BaseClass"					"npc_dota_creature"
+		"Model"						"models/heroes/chen/chen.vmdl"
+		"SoundSet"					"Hero_Tusk"
+		"ModelScale" 				"0.9"
+		"Level"						"1"
+		"ConsideredHero"			"1"
+//		"MinimapIcon"				"minimap_ancient"
+//		"MinimapIconSize"			"200"
+		
+		// Abilities
+		//----------------------------------------------------------------
+		
+		"Ability1"					""
+		"Ability2"					""
+		"Ability3"					""
+		"Ability4"					""
+
+		// Armor
+		//----------------------------------------------------------------
+		"ArmorPhysical"				"20"
+		"MagicalResistance"			"33"
+
+		// Attack
+		//----------------------------------------------------------------
+		"AttackCapabilities"		"DOTA_UNIT_CAP_NO_ATTACK"
+		"AttackDamageMin"			"35"
+		"AttackDamageMax"			"50"
+		"AttackDamageType"			"DAMAGE_TYPE_ArmorPhysical"
+		"AttackRate"				"1.6"
+		"AttackAnimationPoint"		"0.3"
+		"AttackAcquisitionRange"	"350"
+		"AttackRange"				"150"
+		"ProjectileModel"			""
+		"ProjectileSpeed"			""
+
+		// Attributes
+		//----------------------------------------------------------------
+		"AttributePrimary"			"DOTA_ATTRIBUTE_STRENGTH"
+		"AttributeBaseStrength"		"0"
+		"AttributeStrengthGain"		"0"
+		"AttributeBaseIntelligence"	"0"
+		"AttributeIntelligenceGain"	"0"
+		"AttributeBaseAgility"		"0"
+		"AttributeAgilityGain"		"0"
+
+		// Bounty
+		//----------------------------------------------------------------
+		"BountyXP"					"45"
+		"BountyGoldMin"				"36"
+		"BountyGoldMax"				"40"
+
+		// Bounds
+		//----------------------------------------------------------------
+		"BoundsHullName"			"DOTA_HULL_SIZE_REGULAR"
+		"RingRadius"				"45"
+		"HealthBarOffset"			"190"
+
+		// Movement
+		//----------------------------------------------------------------
+		"MovementCapabilities"		"DOTA_UNIT_CAP_MOVE_NONE"
+		"MovementSpeed"				"325"
+		"MovementTurnRate"			"0.5"
+
+		// Status
+		//----------------------------------------------------------------
+		"StatusHealth"				"6000"
+		"StatusHealthRegen"			"20.0"
+		"StatusMana"				"600"
+		"StatusManaRegen"			"10"
+
+		// Team
+		//----------------------------------------------------------------
+		"TeamName"					"DOTA_TEAM_GOODGUYS"
+		"CombatClassAttack"			"DOTA_COMBAT_CLASS_ATTACK_BASIC"
+		"CombatClassDefend"			"DOTA_COMBAT_CLASS_DEFEND_BASIC"
+		"UnitRelationshipClass"		"DOTA_NPC_UNIT_RELATIONSHIP_TYPE_WARD"
+		
+		// Vision
+		//----------------------------------------------------------------
+		"VisionDaytimeRange"		"850"
+		"VisionNighttimeRange"		"800"
+
+		"HasInventory"				"0"
+		
+		// Creature Data
+		//----------------------------------------------------------------
+		 "Creature"
+		{
+			"AttachWearables"   
+			{
+				// The Desert Gale
+				"Wearable1" { "ItemDef" "5991" }		//Desert Gale Arms
+				"Wearable2" { "ItemDef" "5993" }		//Desert Gale Helmet
+				"Wearable3" { "ItemDef" "5995" }		//Desert Gale Moustache
+				"Wearable4" { "ItemDef" "5998" }		//Desert Gale Shoulder Plate
+				"Wearable5" { "ItemDef" "5999" }		//Desert Gale Fouchard
+				"Wearable6" { "ItemDef" "9161" }		//Desert Gale Mount
+			} 
+		}
+	}
+
+	//=================================================================================
+	// VIP: Uther
+	//=================================================================================
+	"npc_xhs_paladin_2"
+	{
+		// General
+		//----------------------------------------------------------------
+		"BaseClass"					"npc_dota_creature"
+		"Model"						"models/heroes/omniknight/omniknight.vmdl"
+		"SoundSet"					"Hero_Tusk"
+		"ModelScale" 				"0.9"
+		"Level"						"1"
+		"ConsideredHero"			"1"
+//		"MinimapIcon"				"minimap_ancient"
+//		"MinimapIconSize"			"200"
+		
+		// Abilities
+		//----------------------------------------------------------------
+		
+		"Ability1"					""
+		"Ability2"					""
+		"Ability3"					""
+		"Ability4"					""
+
+		// Armor
+		//----------------------------------------------------------------
+		"ArmorPhysical"				"20"
+		"MagicalResistance"			"33"
+
+		// Attack
+		//----------------------------------------------------------------
+		"AttackCapabilities"		"DOTA_UNIT_CAP_NO_ATTACK"
+		"AttackDamageMin"			"35"
+		"AttackDamageMax"			"50"
+		"AttackDamageType"			"DAMAGE_TYPE_ArmorPhysical"
+		"AttackRate"				"1.6"
+		"AttackAnimationPoint"		"0.3"
+		"AttackAcquisitionRange"	"350"
+		"AttackRange"				"150"
+		"ProjectileModel"			""
+		"ProjectileSpeed"			""
+
+		// Attributes
+		//----------------------------------------------------------------
+		"AttributePrimary"			"DOTA_ATTRIBUTE_STRENGTH"
+		"AttributeBaseStrength"		"0"
+		"AttributeStrengthGain"		"0"
+		"AttributeBaseIntelligence"	"0"
+		"AttributeIntelligenceGain"	"0"
+		"AttributeBaseAgility"		"0"
+		"AttributeAgilityGain"		"0"
+
+		// Bounty
+		//----------------------------------------------------------------
+		"BountyXP"					"45"
+		"BountyGoldMin"				"36"
+		"BountyGoldMax"				"40"
+
+		// Bounds
+		//----------------------------------------------------------------
+		"BoundsHullName"			"DOTA_HULL_SIZE_REGULAR"
+		"RingRadius"				"45"
+		"HealthBarOffset"			"190"
+
+		// Movement
+		//----------------------------------------------------------------
+		"MovementCapabilities"		"DOTA_UNIT_CAP_MOVE_GROUND"
+		"MovementSpeed"				"325"
+		"MovementTurnRate"			"0.5"
+
+		// Status
+		//----------------------------------------------------------------
+		"StatusHealth"				"6000"
+		"StatusHealthRegen"			"20.0"
+		"StatusMana"				"600"
+		"StatusManaRegen"			"10"
+
+		// Team
+		//----------------------------------------------------------------
+		"TeamName"					"DOTA_TEAM_GOODGUYS"
+		"CombatClassAttack"			"DOTA_COMBAT_CLASS_ATTACK_BASIC"
+		"CombatClassDefend"			"DOTA_COMBAT_CLASS_DEFEND_BASIC"
+		"UnitRelationshipClass"		"DOTA_NPC_UNIT_RELATIONSHIP_TYPE_WARD"
+		
+		// Vision
+		//----------------------------------------------------------------
+		"VisionDaytimeRange"		"850"
+		"VisionNighttimeRange"		"800"
+
+		"HasInventory"				"0"
+		
+		// Creature Data
+		//----------------------------------------------------------------
+		"Creature"
+		{
+			"AttachWearables"   
+			{
+				// The Grey Gallant
+				// Omniknight's face is a separate default body_head wearable. Real
+				// heroes receive it from their loadout automatically; this creature
+				// does not, while the Grey Gallant hair only replaces the head slot.
+				"Wearable1" { "ItemDef" "45" }			//Omniknight's Head (face)
+				"Wearable2" { "ItemDef" "8170" }		//Bracers of the Grey Gallant
+				"Wearable3" { "ItemDef" "8171" }		//Cape of the Grey Gallant
+				"Wearable4" { "ItemDef" "8172" }		//Hair of the Grey Gallant
+				"Wearable5" { "ItemDef" "8173" }		//Pauldrons of the Grey Gallant
+				"Wearable6" { "ItemDef" "8174" }		//Hammer of the Grey Gallant
+			} 
+		}
+	}
+
+	//=================================================================================
+	// Living Tower (Radiant)
+	//=================================================================================
+	"npc_imba_malfurion_living_tower_radiant"
+	{
+		// General
+		//----------------------------------------------------------------
+		"BaseClass"                 "npc_dota_creature"
+		"Model"                     "models/props_structures/rock_golem/tower_radiant_rock_golem.vmdl" // models/props_structures/rock_golem/tower_dire_rock_golem.vmdl
+		"SoundSet"					"Tower.Water"					// Name of sound set.
+		"Level"                     "1"
+		"ModelScale"                "1.0"
+		"ConsideredHero"			"1"
+		"IsAncient"					"1"
+		"CanBeDominated"            "0"     
+		"UnitLabel"                 "living_tower"
+
+		// Abilities
+		//----------------------------------------------------------------
+		"Ability1"                  "neutral_spell_immunity"
+
+		// Armor
+		//----------------------------------------------------------------
+		"ArmorPhysical"             "0"
+		"MagicalResistance"         "100"
+
+		// Attack
+		//----------------------------------------------------------------
+		"AttackCapabilities"        "DOTA_UNIT_CAP_RANGED_ATTACK"
+		"AttackDamageMin"           "0"
+		"AttackDamageMax"           "0"
+		"AttackRate"				"2.0"		// Speed of attack.
+		"AttackAnimationPoint"		"0.1"		// Normalized time in animation cycle to attack.
+		"AttackAcquisitionRange"    "0"
+		"AttackRange"               "0"
+		"ProjectileModel"           "particles/econ/events/ti9/rock_golem_tower/radiant_tower_attack.vpcf" // particles/econ/events/ti9/rock_golem_tower/dire_tower_attack.vpcf
+		"ProjectileSpeed"           "900"
+
+		// Bounds
+		//----------------------------------------------------------------
+		"HealthBarOffset"           "240"
+		"BoundsHullName"            "DOTA_HULL_SIZE_HERO"
+
+		// Bounty
+		//----------------------------------------------------------------
+		"BountyXP"                  "0"
+		"BountyGoldMin"             "0"
+		"BountyGoldMax"             "0"
+
+		// Movement
+		//----------------------------------------------------------------
+		"MovementCapabilities"      "DOTA_UNIT_CAP_MOVE_NONE"
+		"MovementSpeed"             "0"
+		"MovementTurnRate"          "0.5"
+
+		// Status
+		//----------------------------------------------------------------
+		"StatusHealth"              "10000"
+		"StatusHealthRegen"         "0.0"        
+
+		// Team
+		//----------------------------------------------------------------
+		"TeamName"                  "DOTA_TEAM_NEUTRALS"
+		"CombatClassAttack"         "DOTA_COMBAT_CLASS_ATTACK_HERO"
+		"CombatClassDefend"         "DOTA_COMBAT_CLASS_DEFEND_HERO"
+		"UnitRelationshipClass"     "DOTA_NPC_UNIT_RELATIONSHIP_TYPE_DEFAULT"
+		
+		// Vision
+		//----------------------------------------------------------------
+		"VisionDaytimeRange"        "1900"
+		"VisionNighttimeRange"      "800"
+	}
+}

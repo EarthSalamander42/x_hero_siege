@@ -43,98 +43,106 @@ local ultimate = caster:FindAbilityByName("holdout_desert_dragon_form")
 end
 
 function TornadoTempest(keys)
-local caster = keys.caster
-local caster_origin = keys.caster:GetAbsOrigin()
-local ability = keys.ability
-local ability_level = ability:GetLevel() -1
-local AreaOfEffect = keys.AreaOfEffect
-local TravelSpeed = keys.TravelSpeed
-local VisionDistance = keys.VisionDistance
-tornado_travel_distance = ability:GetLevelSpecialValueFor("travel_distance", ability_level)
-tornado_lift_duration = ability:GetLevelSpecialValueFor("lift_duration", ability_level)
+	local caster = keys.caster
+	local casterOrigin = caster:GetAbsOrigin()
+	local ability = keys.ability
+	local abilityLevel = ability:GetLevel() - 1
+	local areaOfEffect = keys.AreaOfEffect
+	local travelSpeed = math.max(1, keys.TravelSpeed)
+	local visionDistance = keys.VisionDistance
+	local travelDistance = ability:GetLevelSpecialValueFor("travel_distance", abilityLevel)
+	local liftDuration = ability:GetLevelSpecialValueFor("lift_duration", abilityLevel)
 
-	--Create a dummy unit that will follow the path of the tornado, providing flying vision and sound.
-	--Its holdout_tornado_tempest ability also applies the cyclone modifier to hit enemy units, since if Invoker uninvokes Tornado,
-	--existing modifiers linked to that ability can cause errors.
-	local tornado_dummy_unit = CreateUnitByName("npc_dummy_unit", caster_origin, false, nil, nil, caster:GetTeam())
-	tornado_dummy_unit:SetOwner(caster)
-	tornado_dummy_unit:AddAbility("holdout_tornado_tempest")
---	tornado_dummy_unit:SetBaseIntellect(caster:GetBaseIntellect()) -- Spell Amp
-	local emp_unit_ability = tornado_dummy_unit:FindAbilityByName("holdout_tornado_tempest")
-	if emp_unit_ability ~= nil then
-		emp_unit_ability:SetLevel(ability:GetLevel())
-		emp_unit_ability:ApplyDataDrivenModifier(tornado_dummy_unit, tornado_dummy_unit, "modifier_invoker_tornado_datadriven_unit_ability", {duration = -1})
+	local tornadoDummy = CreateUnitByName("npc_dummy_unit", casterOrigin, false, nil, nil, caster:GetTeam())
+	if tornadoDummy == nil then return end
+
+	tornadoDummy:SetOwner(caster)
+	tornadoDummy:AddAbility("holdout_tornado_tempest")
+	local dummyAbility = tornadoDummy:FindAbilityByName("holdout_tornado_tempest")
+	if dummyAbility ~= nil then
+		dummyAbility:SetLevel(ability:GetLevel())
+		dummyAbility:ApplyDataDrivenModifier(tornadoDummy, tornadoDummy, "modifier_invoker_tornado_datadriven_unit_ability", { duration = -1 })
 	end
-	
-	tornado_dummy_unit:EmitSound("Hero_Invoker.Tornado")  --Emit a sound that will follow the tornado.
-	tornado_dummy_unit:SetDayTimeVisionRange(keys.VisionDistance)
-	tornado_dummy_unit:SetNightTimeVisionRange(keys.VisionDistance)
 
-	local projectile_information =  
-	{
+	tornadoDummy:EmitSound("Hero_Invoker.Tornado")
+	tornadoDummy:SetDayTimeVisionRange(visionDistance)
+	tornadoDummy:SetNightTimeVisionRange(visionDistance)
+	tornadoDummy.invoker_tornado_lift_duration = liftDuration
+
+	local targetPoint = Vector(keys.target_points[1].x, keys.target_points[1].y, 0)
+	local casterPoint = Vector(casterOrigin.x, casterOrigin.y, 0)
+	local direction = targetPoint - casterPoint
+	if direction:Length2D() <= 0 then
+		direction = caster:GetForwardVector()
+	end
+	direction = direction:Normalized()
+
+	local projectileInfo = {
 		EffectName = "particles/units/heroes/hero_invoker/invoker_tornado.vpcf",
-		Ability = emp_unit_ability,
-		vSpawnOrigin = caster_origin,
-		fDistance = tornado_travel_distance,
-		fStartRadius = AreaOfEffect,
-		fEndRadius = AreaOfEffect,
-		Source = tornado_dummy_unit,
+		Ability = dummyAbility,
+		vSpawnOrigin = casterOrigin,
+		fDistance = travelDistance,
+		fStartRadius = areaOfEffect,
+		fEndRadius = areaOfEffect,
+		Source = tornadoDummy,
 		bHasFrontalCone = false,
-		iMoveSpeed = TravelSpeed,
+		iMoveSpeed = travelSpeed,
 		bReplaceExisting = false,
 		bProvidesVision = true,
 		iVisionTeamNumber = caster:GetTeam(),
-		iVisionRadius = kVisionDistance,
+		iVisionRadius = visionDistance,
 		bDrawsOnMinimap = false,
-		bVisibleToEnemies = true, 
+		bVisibleToEnemies = true,
 		iUnitTargetTeam = DOTA_UNIT_TARGET_TEAM_ENEMY,
 		iUnitTargetFlags = DOTA_UNIT_TARGET_FLAG_NONE,
 		iUnitTargetType = DOTA_UNIT_TARGET_HERO + DOTA_UNIT_TARGET_CREEP,
 		fExpireTime = GameRules:GetGameTime() + 20.0,
+		vVelocity = direction * travelSpeed,
 	}
 
-	local target_point = keys.target_points[1]
-	target_point.z = 0
-	local caster_point = caster:GetAbsOrigin()
-	caster_point.z = 0
-	local point_difference_normalized = (target_point - caster_point):Normalized()
-	projectile_information.vVelocity = point_difference_normalized * TravelSpeed
-	
-	local tornado_projectile = ProjectileManager:CreateLinearProjectile(projectile_information)
+	local projectile = ProjectileManager:CreateLinearProjectile(projectileInfo)
+	local travelDuration = travelDistance / travelSpeed
+	local endVisionDuration = math.max(0, tonumber(keys.EndVisionDuration) or 0)
+	local velocityPerFrame = projectileInfo.vVelocity * 0.03
+	local endTime = GameRules:GetGameTime() + travelDuration
+	local cleaned = false
 
-	tornado_dummy_unit.invoker_tornado_lift_duration = tornado_lift_duration
-	tornado_dummy_unit.invoker_tornado_landing_damage_bonus = tornado_landing_damage_bonus
-	
-	--Calculate where and when the Tornado projectile will end up.
-	local tornado_duration = tornado_travel_distance / TravelSpeed
-	local tornado_final_position = caster_origin + (projectile_information.vVelocity * tornado_duration)
-	local tornado_velocity_per_frame = projectile_information.vVelocity * .03
-	
-	--Adjust the dummy unit's position every frame to match that of the tornado particle effect.
-	local endTime = GameRules:GetGameTime() + tornado_duration
-	Timers:CreateTimer({
-		endTime = .03,
-		callback = function()
-			tornado_dummy_unit:SetAbsOrigin(tornado_dummy_unit:GetAbsOrigin() + tornado_velocity_per_frame)
-			if GameRules:GetGameTime() > endTime then
-				tornado_dummy_unit:StopSound("Hero_Invoker.Tornado")
-				
-				--Have the dummy unit linger in the position the tornado ended up in, in order to provide vision.
-				Timers:CreateTimer({
-					endTime = keys.EndVisionDuration,
-					callback = function()
-						tornado_dummy_unit:RemoveSelf()
-					end
-				})
-				
-				return 
-			else 
-				return .03
-			end
+	local function CleanupTornado()
+		if cleaned then return end
+		cleaned = true
+		if projectile ~= nil then
+			ProjectileManager:DestroyLinearProjectile(projectile)
 		end
-	})
-end
+		if tornadoDummy ~= nil and IsValidEntity(tornadoDummy) and not tornadoDummy:IsNull() then
+			tornadoDummy:StopSound("Hero_Invoker.Tornado")
+			UTIL_Remove(tornadoDummy)
+		end
+	end
 
+	tornadoDummy:AddNewModifier(tornadoDummy, nil, "modifier_kill", {
+		duration = travelDuration + endVisionDuration + 0.5,
+	})
+
+	Timers:CreateTimer(0.03, function()
+		if cleaned then return nil end
+		if tornadoDummy == nil or not IsValidEntity(tornadoDummy) or tornadoDummy:IsNull() then
+			CleanupTornado()
+			return nil
+		end
+
+		tornadoDummy:SetAbsOrigin(tornadoDummy:GetAbsOrigin() + velocityPerFrame)
+		if GameRules:GetGameTime() >= endTime then
+			tornadoDummy:StopSound("Hero_Invoker.Tornado")
+			Timers:CreateTimer(endVisionDuration, function()
+				CleanupTornado()
+				return nil
+			end)
+			return nil
+		end
+
+		return 0.03
+	end)
+end
 function TornadoTempestHit(keys)
 local caster = keys.caster
 local target = keys.target
@@ -311,14 +319,18 @@ function SkinChangerDragon(keys)
 	caster:SetAttackCapability(DOTA_UNIT_CAP_RANGED_ATTACK)
 	caster:SetOriginalModel(model)
 
-	local main_1 = caster:GetAbilityByIndex(0):GetName()
+	local ability_1 = GetUnitAbilityBySafeIndex(caster, 0)
+	local ability_2 = GetUnitAbilityBySafeIndex(caster, 1)
+	local ability_3 = GetUnitAbilityBySafeIndex(caster, 2)
+	if ability_1 == nil or ability_2 == nil or ability_3 == nil then return end
+
+	local main_1 = ability_1:GetName()
 	local sub_1 = keys.sub_ability_1
-	local main_2 = caster:GetAbilityByIndex(1):GetName()
+	local main_2 = ability_2:GetName()
 	local sub_2 = keys.sub_ability_2
-	local main_3 = caster:GetAbilityByIndex(2):GetName()
+	local main_3 = ability_3:GetName()
 	local main_3_alt = keys.main_ability_3
 	local sub_3 = keys.sub_ability_3
---	local main_4 = caster:GetAbilityByIndex(3):GetName()
 --	local sub_4 = keys.sub_ability_4
 	caster:FindAbilityByName(main_3):SetActivated(false)
 	caster:FindAbilityByName(sub_3):SetActivated(true)

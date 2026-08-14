@@ -1,33 +1,104 @@
 -- Author: Cookies
 -- Date: 05.12.2019
 
+require("boss_scripts/phase3_ai/magtheridon")
+
+local SupporterRecoveryEffects = require("components/battlepass/recovery_effects"):Init()
+
 local function RespawnMagtheridon(iBossCount, vPosition, iAnkhCharges)
 	if iAnkhCharges == 0 then return end
 
+	local empowerStacks = 0
+	if XHSMagtheridon_GetRuptureEmpowerStacks ~= nil then
+		empowerStacks = XHSMagtheridon_GetRuptureEmpowerStacks(iBossCount)
+	end
+
 	local magtheridon = CreateUnitByName("npc_dota_hero_magtheridon", vPosition, true, nil, nil, DOTA_TEAM_CUSTOM_2)
 	magtheridon.boss_count = iBossCount
+	magtheridon.xhs_boss_bar_id = "magtheridon_" .. tostring(iBossCount or 1)
 
-	print(iAnkhCharges)
 	magtheridon:AddNewModifier(magtheridon, nil, "modifier_ankh_passives", {}):SetStackCount(iAnkhCharges - 1)
 
 	magtheridon:EmitSound("Ability.Reincarnation")
 	magtheridon.zone = "xhs_holdout"
+
+	if XHSMagtheridon_OnRespawned ~= nil then
+		XHSMagtheridon_OnRespawned(magtheridon, iBossCount, empowerStacks)
+	end
 end
 
 LinkLuaModifier("modifier_ankh_passives", "items/ankh_of_reincarnation.lua", LUA_MODIFIER_MOTION_NONE)
 
 item_ankh_of_reincarnation = item_ankh_of_reincarnation or class({})
 
+local ANKH_RESPAWN_PARTICLE = "particles/items_fx/aegis_respawn.vpcf"
+
+local function GetMagtheridonRuptureReincarnateTime(unit, fallback)
+	if unit == nil or unit:IsNull() then return fallback end
+
+	local rupture = unit:FindAbilityByName("xhs_magtheridon_rupture")
+	if rupture ~= nil then
+		local value = rupture:GetSpecialValueFor("reincarnate_time")
+		if value ~= nil and value > 0 then return value end
+	end
+
+	return fallback
+end
+
+local function PlayAnkhRespawnParticle(unit)
+	if unit == nil or unit:IsNull() then return end
+	SupporterRecoveryEffects:PlayRebirth(unit, ANKH_RESPAWN_PARTICLE)
+end
+
+local function SetXHSReincarnationNetTable(unit, active, duration)
+	if unit == nil or unit:IsNull() then return end
+	if not unit:IsRealHero() or not unit:IsOwnedByAnyPlayer() then return end
+
+	duration = tonumber(duration) or 0
+	CustomNetTables:SetTableValue("player_table", tostring(unit:entindex()).."_reincarnation", {
+		active = active == true and 1 or 0,
+		duration = duration,
+		end_time = active == true and (GameRules:GetGameTime() + duration) or 0,
+	})
+end
+
 function item_ankh_of_reincarnation:GetIntrinsicModifierName()
 	return "modifier_ankh"
 end
 
 modifier_ankh = modifier_ankh or class({})
+modifier_ankh.XHS_LINK_CLIENT = true
 
 function modifier_ankh:IsHidden() return true end
 
 function modifier_ankh:OnCreated(keys)
 	if not IsServer() then return end
+
+	-- Remote bot purchases must first live in stash slots 9-14. AddItem briefly
+	-- creates this intrinsic before economy.lua can swap the item there; suppress
+	-- conversion until the verified base pickup moves it into an active slot.
+	local pendingAbility = self:GetAbility()
+	if pendingAbility ~= nil and not pendingAbility:IsNull()
+		and pendingAbility.xhs_pending_stash_delivery == true then
+		return
+	end
+
+	if self:GetParent():IsRealHero() and self:GetParent():IsOwnedByAnyPlayer() and IsPlayerXHSReincarnating ~= nil and IsPlayerXHSReincarnating(self:GetParent():GetPlayerID()) then
+		SendErrorMessage(self:GetParent():GetPlayerID(), "#error_reincarnation_inventory_locked")
+		if WasItemInXHSReincarnationInventorySnapshot ~= nil and WasItemInXHSReincarnationInventorySnapshot(self:GetParent(), self:GetAbility()) then
+			if RestoreXHSReincarnationInventory ~= nil then
+				RestoreXHSReincarnationInventory(self:GetParent())
+			end
+			self:Destroy()
+			return
+		end
+
+		if self:GetAbility() ~= nil and not self:GetAbility():IsNull() then
+			UTIL_Remove(self:GetAbility())
+		end
+		self:Destroy()
+		return
+	end
 
 	local mod = self:GetParent():FindModifierByName("modifier_ankh_passives")
 
@@ -39,6 +110,7 @@ function modifier_ankh:OnCreated(keys)
 
 		if self:GetParent():IsRealHero() and self:GetParent():IsOwnedByAnyPlayer() then
 			CustomNetTables:SetTableValue("player_table", tostring(self:GetParent():entindex()).."_respawns", {mod:GetStackCount()})
+			SetXHSReincarnationNetTable(self:GetParent(), false, 0)
 		end
 	else
 		local charges = 0
@@ -53,16 +125,20 @@ function modifier_ankh:OnCreated(keys)
 
 		if self:GetParent():IsRealHero() and self:GetParent():IsOwnedByAnyPlayer() then
 			CustomNetTables:SetTableValue("player_table", tostring(self:GetParent():entindex()).."_respawns", {charges})
+			SetXHSReincarnationNetTable(self:GetParent(), false, 0)
 		end
 	end
 
-	UTIL_Remove(self:GetAbility())
+	if self:GetAbility() ~= nil and not self:GetAbility():IsNull() then
+		UTIL_Remove(self:GetAbility())
+	end
 	self:Destroy()
 end
 
 modifier_ankh_passives = modifier_ankh_passives or class({})
+modifier_ankh_passives.XHS_LINK_CLIENT = true
 
-function modifier_ankh_passives:IsHidden() return not IsInToolsMode() end
+function modifier_ankh_passives:IsHidden() return true end
 function modifier_ankh_passives:RemoveOnDeath() return false end
 function modifier_ankh_passives:IsPurgable() return false end
 function modifier_ankh_passives:IsPurgeException() return false end
@@ -82,6 +158,12 @@ function modifier_ankh_passives:OnIntervalThink()
 		self:GetParent():SetRespawnPosition(self.position)
 		self:GetParent():RespawnHero(false, false)
 		self:GetParent():SetRespawnsDisabled(false)
+		if XHSSetPlayerBaseRespawnPosition ~= nil then
+			-- The current reincarnation stays at its death position; only future
+			-- ordinary deaths return to this player's dedicated base slot.
+			XHSSetPlayerBaseRespawnPosition(self:GetParent())
+		end
+		PlayAnkhRespawnParticle(self:GetParent())
 	else
 --		print("Unit name:", self:GetParent():GetUnitName())
 		-- useless fail-safe, just in case (shouldn't proc as the unit is removed before the interval think occurs)
@@ -89,10 +171,19 @@ function modifier_ankh_passives:OnIntervalThink()
 			print("MAGTHERIDON RESPAWN!")
 		else
 			self:GetParent():RespawnUnit()
+			PlayAnkhRespawnParticle(self:GetParent())
 		end
 	end
 
 	self:GetParent().ankh_respawn = false
+	if self:GetParent():IsRealHero() and self:GetParent():IsOwnedByAnyPlayer() then
+		SetXHSReincarnationNetTable(self:GetParent(), false, 0)
+		_G.XHS_REINCARNATING_PLAYERS = _G.XHS_REINCARNATING_PLAYERS or {}
+		_G.XHS_REINCARNATING_PLAYERS[self:GetParent():GetPlayerID()] = nil
+		if StopXHSReincarnationInventoryLock ~= nil then
+			StopXHSReincarnationInventoryLock(self:GetParent())
+		end
+	end
 end
 
 function modifier_ankh_passives:OnDeath(params)
@@ -124,17 +215,32 @@ function modifier_ankh_passives:OnDeath(params)
 			self:SetStackCount(new_stacks)
 
 			if charges == 0 then
+				SetXHSReincarnationNetTable(self:GetParent(), false, 0)
 				return
 			end
 		end
+	end
+
+	if FragmentQuests ~= nil and self:GetParent():IsRealHero() then
+		FragmentQuests:OnHeroDeath(self:GetParent(), { source = "ankh" })
 	end
 
 	local reincarnate_time = XHS_GLOBAL_RESPAWN_TIME
 
 	AddFOWViewer(self:GetParent():GetTeamNumber(), self.position, 200, reincarnate_time, false)
 	self:GetParent().ankh_respawn = true
+	if self:GetParent():IsRealHero() and self:GetParent():IsOwnedByAnyPlayer() then
+		_G.XHS_REINCARNATING_PLAYERS = _G.XHS_REINCARNATING_PLAYERS or {}
+		_G.XHS_REINCARNATING_PLAYERS[self:GetParent():GetPlayerID()] = true
+		if StartXHSReincarnationInventoryLock ~= nil then
+			StartXHSReincarnationInventoryLock(self:GetParent())
+		end
+	end
 
 	if self:GetParent():IsRealHero() then
+		if self:GetParent().SetTimeUntilRespawn ~= nil then
+			self:GetParent():SetTimeUntilRespawn(reincarnate_time)
+		end
 		self:GetParent():SetRespawnsDisabled(true)
 	else
 		-- Prevent Beastmaster's bear ability to be cast while reincarnating
@@ -143,10 +249,10 @@ function modifier_ankh_passives:OnDeath(params)
 		end
 
 		if string.find(self:GetParent():GetUnitName(), "magtheridon") then
-			reincarnate_time = 10.0
+			reincarnate_time = GetMagtheridonRuptureReincarnateTime(self:GetParent(), 20.0)
 
-			for i = 1, 8 do
-				CreateUnitByName("npc_dota_hero_magtheridon_medium", self.position + RandomVector(200), true, nil, nil, DOTA_TEAM_CUSTOM_2)
+			if XHSMagtheridon_StartRupture ~= nil then
+				XHSMagtheridon_StartRupture(self:GetParent(), boss_count, self.position, charges, reincarnate_time)
 			end
 
 			Timers:CreateTimer(reincarnate_time, function()
@@ -160,5 +266,6 @@ function modifier_ankh_passives:OnDeath(params)
 	ParticleManager:SetParticleControl(particle, 3, self.position)
 	ParticleManager:ReleaseParticleIndex(particle)
 
+	SetXHSReincarnationNetTable(self:GetParent(), true, reincarnate_time)
 	self:StartIntervalThink(reincarnate_time)
 end

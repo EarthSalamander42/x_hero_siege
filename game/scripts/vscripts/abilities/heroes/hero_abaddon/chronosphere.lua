@@ -37,6 +37,7 @@ end
 ---------------------------------
 
 if modifier_creature_chronosphere_aura == nil then modifier_creature_chronosphere_aura = class({}) end
+modifier_creature_chronosphere_aura.XHS_LINK_CLIENT = true
 
 function modifier_creature_chronosphere_aura:IsPurgable() return false end
 
@@ -72,6 +73,10 @@ end
 
 -- "Faceless Void and illusions of him (be it his own, enemy or allied illusions) are never disabled by any Chronosphere."
 function modifier_creature_chronosphere_aura:GetAuraEntityReject(target)
+	if IsXHSRuneUnit and IsXHSRuneUnit(target) then
+		return true
+	end
+
 	if target == self:GetCaster() then
 		return true
 	end
@@ -84,9 +89,15 @@ function modifier_creature_chronosphere_aura:OnCreated()
 		self.parent = self:GetParent()
 		self.base_radius = self.ability:GetSpecialValueFor("base_radius")
 
+		local baseParticle = "particles/units/heroes/hero_faceless_void/faceless_void_chronosphere_red.vpcf"
+		local particlePath = Battlepass ~= nil and Battlepass.GetPlayerParticleOverride ~= nil
+			and Battlepass:GetPlayerParticleOverride(self.caster, baseParticle)
+			or baseParticle
 		local particle = ParticleManager:CreateParticle(
-		"particles/units/heroes/hero_faceless_void/faceless_void_chronosphere_red.vpcf", PATTACH_WORLDORIGIN, self
-		.parent, self.caster)
+			particlePath,
+			PATTACH_WORLDORIGIN,
+			self.parent
+		)
 		ParticleManager:SetParticleControl(particle, 0, self.parent:GetAbsOrigin())
 		ParticleManager:SetParticleControl(particle, 1, Vector(self.base_radius, self.base_radius, self.base_radius))
 		self:AddParticle(particle, false, false, -1, false, false)
@@ -97,6 +108,7 @@ end
 -----	Chronosphere Handler	-----
 -------------------------------------
 if modifier_creature_chronosphere_handler == nil then modifier_creature_chronosphere_handler = class({}) end
+modifier_creature_chronosphere_handler.XHS_LINK_CLIENT = true
 
 function modifier_creature_chronosphere_handler:IsHidden() return true end
 
@@ -143,7 +155,7 @@ function modifier_creature_chronosphere_handler:OnIntervalThink()
 			-- Make certain people are stunned
 			self.parent:AddNewModifier(self.caster, self:GetAbility(), "modifier_stunned", { duration = FrameTime() })
 
-			-- Non-IMBA handling
+			-- Alternate handling
 			self.parent:InterruptMotionControllers(true)
 		end
 	end

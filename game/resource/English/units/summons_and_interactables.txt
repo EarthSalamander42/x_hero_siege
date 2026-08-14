@@ -1,0 +1,21 @@
+// XHS generated unit names: summons and interactables
+// Generated from the tooltip audit pass. Keep keys stable; split by topic for maintainability.
+
+"npc_dota_lycan_wolf1"		"Lycan Wolf 1"
+"npc_dota_lycan_wolf2"		"Lycan Wolf 2"
+"npc_dota_lycan_wolf3"		"Lycan Wolf 3"
+"npc_dota_lycan_wolf4"		"Lycan Wolf 4"
+"npc_dota_campfire"		"Campfire"
+"npc_treasure_chest"		"Treasure Chest"
+"npc_dota_creature_techies_land_mine"		"Techies Land Mine"
+"npc_xhs_lone_druid_bear_stun"		"Furbolg"
+"npc_dota_summoned_guardian_angel"		"Summoned Guardian Angel"
+"npc_dota_hero_monkey_king_army"		"Monkey King Army"
+"npc_dota_brewmaster_earth_1"		"Brewmaster Earth 1"
+"npc_dota_brewmaster_storm_1"		"Brewmaster Storm 1"
+"npc_dota_brewmaster_fire_1"		"Brewmaster Fire 1"
+"npc_dota_hero_skywrath_guardian1"		"Skywrath Mage Guardian"
+"npc_dota_juggernaut_healing_ward"		"Healing Ward"
+"healing_ward2"							"Greater Healing Ward"
+"npc_dota_techies_land_mine"		"Land Mine"
+"npc_dota_storm_spirit_remnant"		"Static Remnant"

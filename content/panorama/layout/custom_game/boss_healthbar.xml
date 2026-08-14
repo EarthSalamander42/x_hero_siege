@@ -8,35 +8,218 @@
 		<include src="file://{resources}/scripts/custom_game/boss_healthbar.js" />
 	</scripts>
 
-	<Panel class="Diretide" hittest="false">
-		<Panel id="DiretidePanel">
-			<Panel id="BossHP1" class="HealthBarContainer" hittest="false">
-				<Label id="BossLabel1" class="HoldoutLabelSmall" hittest="false" text=""/>
-				<Label id="BossLevel1" class="HoldoutLabelSmall_alt" hittest="false" text=""/>
+	<Panel class="Diretide" hittest="false" hittestchildren="true">
+		<Panel id="DiretidePanel" hittest="false" hittestchildren="true">
+			<Panel id="CastleHP" class="HealthBarContainer CastleHealthBar" hittest="false">
+				<Panel class="BossHeader" hittest="false">
+					<Label id="CastleLabel" class="HoldoutLabelSmall" hittest="false" text=""/>
+					<Label id="CastleMuradinState" class="HoldoutLabelSmall_alt CastleMuradinState" hittest="false" text=""/>
+				</Panel>
+				<Panel class="BossProgressBarContainer" hittest="false">
+					<Panel id="CastleIcon" class="BossIcon CastleIcon" hittest="false">
+						<Image id="CastleIconImage" class="BossIconImage" hittest="false" scaling="stretch-to-cover-preserve-aspect"/>
+					</Panel>
+					<Panel class="BossBarMain" hittest="false">
+						<Panel id="CastleProgressBar" class="BossProgressBar" hittest="false">
+							<Panel id="CastleDamageLag" class="BossDamageLag" hittest="false"/>
+							<Panel id="CastleProgressFill" class="BossProgressFill" hittest="false"/>
+							<Panel id="CastleHealPulse" class="BossHealPulse" hittest="false"/>
+							<Panel id="CastleMarkers" class="BossMarkers" hittest="false"/>
+							<Label id="CastleHealth" class="HoldoutLabelSmall BossHealthLabel" hittest="false" text=""/>
+						</Panel>
+					</Panel>
+				</Panel>
+			</Panel>
+
+			<Panel id="BossHP1" class="HealthBarContainer" hittest="false" hittestchildren="true">
+				<Panel class="BossHeader" hittest="false" hittestchildren="true">
+					<Label id="BossLabel1" class="HoldoutLabelSmall" hittest="false" text=""/>
+					<Label id="BossLevel1" class="HoldoutLabelSmall_alt" hittest="false" text=""/>
+					<Button id="BossClose1" class="BossSelectionClose" hittest="true"><Label text="×" hittest="false"/></Button>
+				</Panel>
 				<Panel id="BossProgressBarContainer1" class="BossProgressBarContainer" hittest="false">
-					<Panel id="BossIcon1" class="BossIcon" hittest="false"/>
-					<ProgressBar id="BossProgressBar1" class="BossProgressBar" hittest="false" value="1.0"/>
-					<Label id="BossHealth1" class="HoldoutLabelSmall" hittest="false" text=""/>
+					<Panel id="BossIcon1" class="BossIcon" hittest="false">
+						<Image id="BossIconImage1" class="BossIconImage" hittest="false" scaling="stretch-to-cover-preserve-aspect"/>
+					</Panel>
+					<Panel class="BossBarMain" hittest="false">
+						<Panel id="BossProgressBar1" class="BossProgressBar" hittest="false">
+							<Panel id="BossDamageLag1" class="BossDamageLag" hittest="false"/>
+							<Panel id="BossProgressFill1" class="BossProgressFill" hittest="false"/>
+							<Panel id="BossHealPulse1" class="BossHealPulse" hittest="false"/>
+							<Panel id="BossMarkers1" class="BossMarkers" hittest="false"/>
+							<Label id="BossHealth1" class="HoldoutLabelSmall BossHealthLabel" hittest="false" text=""/>
+						</Panel>
+					</Panel>
+				</Panel>
+				<Panel id="BossCastBar1" class="BossCastBar" hittest="false">
+					<Panel id="BossCastIcon1" class="BossCastIcon" hittest="false">
+						<Image id="BossCastIconImage1" class="BossCastIconImage" hittest="false" scaling="stretch-to-cover-preserve-aspect"/>
+					</Panel>
+					<Panel class="BossCastBody" hittest="false">
+						<Panel class="BossCastHeader" hittest="false">
+							<Label id="BossCastLabel1" class="BossCastLabel" hittest="false" text=""/>
+							<Label id="BossCastTime1" class="BossCastTime" hittest="false" text=""/>
+						</Panel>
+						<Panel id="BossCastTrack1" class="BossCastTrack" hittest="false">
+							<Panel id="BossCastFill1" class="BossCastFill" hittest="false"/>
+							<Panel id="BossCastGlow1" class="BossCastGlow" hittest="false"/>
+						</Panel>
+					</Panel>
+				</Panel>
+				<Panel id="BossCounter1" class="BossCounter" hittest="false">
+					<Label id="BossCounterLabel1" class="BossCounterLabel" hittest="false" text=""/>
+					<Label id="BossCounterValue1" class="BossCounterValue" hittest="false" text=""/>
+				</Panel>
+				<Panel id="BossTimer1" class="BossTimer" hittest="false">
+					<Label id="BossTimerLabel1" class="BossTimerLabel" hittest="false" text=""/>
+					<Label id="BossTimerValue1" class="BossTimerValue" hittest="false" text=""/>
+					<Panel id="BossTimerTrack1" class="BossTimerTrack" hittest="false">
+						<Panel id="BossTimerFill1" class="BossTimerFill" hittest="false"/>
+					</Panel>
 				</Panel>
 			</Panel>
 
-			<Panel id="BossHP2" class="HealthBarContainer" hittest="false">
-				<Label id="BossLabel2" class="HoldoutLabelSmall" hittest="false" text=""/>
-				<Label id="BossLevel2" class="HoldoutLabelSmall_alt" hittest="false" text=""/>
+			<Panel id="BossHP2" class="HealthBarContainer" hittest="false" hittestchildren="true">
+				<Panel class="BossHeader" hittest="false" hittestchildren="true">
+					<Label id="BossLabel2" class="HoldoutLabelSmall" hittest="false" text=""/>
+					<Label id="BossLevel2" class="HoldoutLabelSmall_alt" hittest="false" text=""/>
+					<Button id="BossClose2" class="BossSelectionClose" hittest="true"><Label text="×" hittest="false"/></Button>
+				</Panel>
 				<Panel id="BossProgressBarContainer2" class="BossProgressBarContainer" hittest="false">
-					<Panel id="BossIcon2" class="BossIcon" hittest="false"/>
-					<ProgressBar id="BossProgressBar2" class="BossProgressBar" hittest="false" value="1.0"/>
-					<Label id="BossHealth2" class="HoldoutLabelSmall" hittest="false" text=""/>
+					<Panel id="BossIcon2" class="BossIcon" hittest="false">
+						<Image id="BossIconImage2" class="BossIconImage" hittest="false" scaling="stretch-to-cover-preserve-aspect"/>
+					</Panel>
+					<Panel class="BossBarMain" hittest="false">
+						<Panel id="BossProgressBar2" class="BossProgressBar" hittest="false">
+							<Panel id="BossDamageLag2" class="BossDamageLag" hittest="false"/>
+							<Panel id="BossProgressFill2" class="BossProgressFill" hittest="false"/>
+							<Panel id="BossHealPulse2" class="BossHealPulse" hittest="false"/>
+							<Panel id="BossMarkers2" class="BossMarkers" hittest="false"/>
+							<Label id="BossHealth2" class="HoldoutLabelSmall BossHealthLabel" hittest="false" text=""/>
+						</Panel>
+					</Panel>
+				</Panel>
+				<Panel id="BossCastBar2" class="BossCastBar" hittest="false">
+					<Panel id="BossCastIcon2" class="BossCastIcon" hittest="false">
+						<Image id="BossCastIconImage2" class="BossCastIconImage" hittest="false" scaling="stretch-to-cover-preserve-aspect"/>
+					</Panel>
+					<Panel class="BossCastBody" hittest="false">
+						<Panel class="BossCastHeader" hittest="false">
+							<Label id="BossCastLabel2" class="BossCastLabel" hittest="false" text=""/>
+							<Label id="BossCastTime2" class="BossCastTime" hittest="false" text=""/>
+						</Panel>
+						<Panel id="BossCastTrack2" class="BossCastTrack" hittest="false">
+							<Panel id="BossCastFill2" class="BossCastFill" hittest="false"/>
+							<Panel id="BossCastGlow2" class="BossCastGlow" hittest="false"/>
+						</Panel>
+					</Panel>
+				</Panel>
+				<Panel id="BossCounter2" class="BossCounter" hittest="false">
+					<Label id="BossCounterLabel2" class="BossCounterLabel" hittest="false" text=""/>
+					<Label id="BossCounterValue2" class="BossCounterValue" hittest="false" text=""/>
+				</Panel>
+				<Panel id="BossTimer2" class="BossTimer" hittest="false">
+					<Label id="BossTimerLabel2" class="BossTimerLabel" hittest="false" text=""/>
+					<Label id="BossTimerValue2" class="BossTimerValue" hittest="false" text=""/>
+					<Panel id="BossTimerTrack2" class="BossTimerTrack" hittest="false">
+						<Panel id="BossTimerFill2" class="BossTimerFill" hittest="false"/>
+					</Panel>
 				</Panel>
 			</Panel>
 
-			<Panel id="BossHP3" class="HealthBarContainer" hittest="false">
-				<Label id="BossLabel3" class="HoldoutLabelSmall" hittest="false" text=""/>
-				<Label id="BossLevel3" class="HoldoutLabelSmall_alt" hittest="false" text=""/>
+			<Panel id="BossHP3" class="HealthBarContainer" hittest="false" hittestchildren="true">
+				<Panel class="BossHeader" hittest="false" hittestchildren="true">
+					<Label id="BossLabel3" class="HoldoutLabelSmall" hittest="false" text=""/>
+					<Label id="BossLevel3" class="HoldoutLabelSmall_alt" hittest="false" text=""/>
+					<Button id="BossClose3" class="BossSelectionClose" hittest="true"><Label text="×" hittest="false"/></Button>
+				</Panel>
 				<Panel id="BossProgressBarContainer3" class="BossProgressBarContainer" hittest="false">
-					<Panel id="BossIcon3" class="BossIcon" hittest="false"/>
-					<ProgressBar id="BossProgressBar3" class="BossProgressBar" hittest="false" value="1.0"/>
-					<Label id="BossHealth3" class="HoldoutLabelSmall" hittest="false" text=""/>
+					<Panel id="BossIcon3" class="BossIcon" hittest="false">
+						<Image id="BossIconImage3" class="BossIconImage" hittest="false" scaling="stretch-to-cover-preserve-aspect"/>
+					</Panel>
+					<Panel class="BossBarMain" hittest="false">
+						<Panel id="BossProgressBar3" class="BossProgressBar" hittest="false">
+							<Panel id="BossDamageLag3" class="BossDamageLag" hittest="false"/>
+							<Panel id="BossProgressFill3" class="BossProgressFill" hittest="false"/>
+							<Panel id="BossHealPulse3" class="BossHealPulse" hittest="false"/>
+							<Panel id="BossMarkers3" class="BossMarkers" hittest="false"/>
+							<Label id="BossHealth3" class="HoldoutLabelSmall BossHealthLabel" hittest="false" text=""/>
+						</Panel>
+					</Panel>
+				</Panel>
+				<Panel id="BossCastBar3" class="BossCastBar" hittest="false">
+					<Panel id="BossCastIcon3" class="BossCastIcon" hittest="false">
+						<Image id="BossCastIconImage3" class="BossCastIconImage" hittest="false" scaling="stretch-to-cover-preserve-aspect"/>
+					</Panel>
+					<Panel class="BossCastBody" hittest="false">
+						<Panel class="BossCastHeader" hittest="false">
+							<Label id="BossCastLabel3" class="BossCastLabel" hittest="false" text=""/>
+							<Label id="BossCastTime3" class="BossCastTime" hittest="false" text=""/>
+						</Panel>
+						<Panel id="BossCastTrack3" class="BossCastTrack" hittest="false">
+							<Panel id="BossCastFill3" class="BossCastFill" hittest="false"/>
+							<Panel id="BossCastGlow3" class="BossCastGlow" hittest="false"/>
+						</Panel>
+					</Panel>
+				</Panel>
+				<Panel id="BossCounter3" class="BossCounter" hittest="false">
+					<Label id="BossCounterLabel3" class="BossCounterLabel" hittest="false" text=""/>
+					<Label id="BossCounterValue3" class="BossCounterValue" hittest="false" text=""/>
+				</Panel>
+				<Panel id="BossTimer3" class="BossTimer" hittest="false">
+					<Label id="BossTimerLabel3" class="BossTimerLabel" hittest="false" text=""/>
+					<Label id="BossTimerValue3" class="BossTimerValue" hittest="false" text=""/>
+					<Panel id="BossTimerTrack3" class="BossTimerTrack" hittest="false">
+						<Panel id="BossTimerFill3" class="BossTimerFill" hittest="false"/>
+					</Panel>
+				</Panel>
+			</Panel>
+
+			<Panel id="BossHP4" class="HealthBarContainer" hittest="false" hittestchildren="true">
+				<Panel class="BossHeader" hittest="false" hittestchildren="true">
+					<Label id="BossLabel4" class="HoldoutLabelSmall" hittest="false" text=""/>
+					<Label id="BossLevel4" class="HoldoutLabelSmall_alt" hittest="false" text=""/>
+					<Button id="BossClose4" class="BossSelectionClose" hittest="true"><Label text="×" hittest="false"/></Button>
+				</Panel>
+				<Panel id="BossProgressBarContainer4" class="BossProgressBarContainer" hittest="false">
+					<Panel id="BossIcon4" class="BossIcon" hittest="false">
+						<Image id="BossIconImage4" class="BossIconImage" hittest="false" scaling="stretch-to-cover-preserve-aspect"/>
+					</Panel>
+					<Panel class="BossBarMain" hittest="false">
+						<Panel id="BossProgressBar4" class="BossProgressBar" hittest="false">
+							<Panel id="BossDamageLag4" class="BossDamageLag" hittest="false"/>
+							<Panel id="BossProgressFill4" class="BossProgressFill" hittest="false"/>
+							<Panel id="BossHealPulse4" class="BossHealPulse" hittest="false"/>
+							<Panel id="BossMarkers4" class="BossMarkers" hittest="false"/>
+							<Label id="BossHealth4" class="HoldoutLabelSmall BossHealthLabel" hittest="false" text=""/>
+						</Panel>
+					</Panel>
+				</Panel>
+				<Panel id="BossCastBar4" class="BossCastBar" hittest="false">
+					<Panel id="BossCastIcon4" class="BossCastIcon" hittest="false">
+						<Image id="BossCastIconImage4" class="BossCastIconImage" hittest="false" scaling="stretch-to-cover-preserve-aspect"/>
+					</Panel>
+					<Panel class="BossCastBody" hittest="false">
+						<Panel class="BossCastHeader" hittest="false">
+							<Label id="BossCastLabel4" class="BossCastLabel" hittest="false" text=""/>
+							<Label id="BossCastTime4" class="BossCastTime" hittest="false" text=""/>
+						</Panel>
+						<Panel id="BossCastTrack4" class="BossCastTrack" hittest="false">
+							<Panel id="BossCastFill4" class="BossCastFill" hittest="false"/>
+							<Panel id="BossCastGlow4" class="BossCastGlow" hittest="false"/>
+						</Panel>
+					</Panel>
+				</Panel>
+				<Panel id="BossCounter4" class="BossCounter" hittest="false">
+					<Label id="BossCounterLabel4" class="BossCounterLabel" hittest="false" text=""/>
+					<Label id="BossCounterValue4" class="BossCounterValue" hittest="false" text=""/>
+				</Panel>
+				<Panel id="BossTimer4" class="BossTimer" hittest="false">
+					<Label id="BossTimerLabel4" class="BossTimerLabel" hittest="false" text=""/>
+					<Label id="BossTimerValue4" class="BossTimerValue" hittest="false" text=""/>
+					<Panel id="BossTimerTrack4" class="BossTimerTrack" hittest="false">
+						<Panel id="BossTimerFill4" class="BossTimerFill" hittest="false"/>
+					</Panel>
 				</Panel>
 			</Panel>
 		</Panel>

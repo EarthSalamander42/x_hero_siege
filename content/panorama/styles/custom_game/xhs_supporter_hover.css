@@ -1,0 +1,384 @@
+.XHSSupporterHoverCard {
+	width: 388px;
+	padding: 10px;
+	flow-children: down;
+	ignore-parent-flow: true;
+	position: 0px 0px 0px;
+	z-index: 650;
+	visibility: collapse;
+	opacity: 0;
+	background-color: gradient( linear, 0% 0%, 100% 100%, from( #101a27f8 ), color-stop( 0.58, #07111cf8 ), to( #0b0d16f8 ) );
+	border: 1px solid #77c8ff4a;
+	box-shadow: #000000de 0px 4px 16px 0px;
+	transition-property: opacity, pre-transform-scale2d;
+	transition-duration: 0.1s;
+}
+
+.XHSSupporterHoverRight {
+	align: left top;
+}
+
+.XHSSupporterHoverCard.XHSHoverVisible {
+	visibility: visible;
+	opacity: 1;
+	pre-transform-scale2d: 1;
+}
+
+.XHSSupporterHoverCard.XHSSupporterTier1 {
+	border-color: #70e39a8a;
+	background-color: gradient( linear, 0% 0%, 100% 100%, from( #102f20f4 ), color-stop( 0.48, #071421f4 ), to( #03080cf4 ) );
+	box-shadow: #000000de 0px 4px 16px 0px, #70e39a34 0px 0px 14px 0px;
+}
+
+.XHSSupporterHoverCard.XHSSupporterTier2 {
+	border-color: #ffcf6694;
+	background-color: gradient( linear, 0% 0%, 100% 100%, from( #332812f4 ), color-stop( 0.48, #071421f4 ), to( #04070bf4 ) );
+	box-shadow: #000000de 0px 4px 16px 0px, #ffcf6638 0px 0px 14px 0px;
+}
+
+.XHSSupporterHoverCard.XHSSupporterTier3 {
+	border-color: #ff5a4394;
+	background-color: gradient( linear, 0% 0%, 100% 100%, from( #361712f4 ), color-stop( 0.48, #071421f4 ), to( #05080cf4 ) );
+	box-shadow: #000000de 0px 4px 16px 0px, #ff5a4338 0px 0px 14px 0px;
+}
+
+.XHSSupporterHoverCard.XHSSupporterTier4 {
+	border-color: #5ad0ffaa;
+	background-color: gradient( linear, 0% 0%, 100% 100%, from( #08283bf4 ), color-stop( 0.48, #071421f4 ), to( #03080cf4 ) );
+	box-shadow: #000000de 0px 4px 16px 0px, #5ad0ff48 0px 0px 15px 0px;
+}
+
+.XHSSupporterHoverCard.XHSSupporterTier5 {
+	border-color: #c99cffba;
+	background-color: gradient( linear, 0% 0%, 100% 100%, from( #211134f6 ), color-stop( 0.48, #0d1024f6 ), to( #05050bf6 ) );
+	box-shadow: #000000de 0px 4px 16px 0px, #c99cff62 0px 0px 18px 0px, inset #ffffff10 0px 1px 0px 0px;
+}
+
+.XHSSupporterHoverHeader {
+	width: 100%;
+	height: 64px;
+	flow-children: right;
+	margin-bottom: 8px;
+	padding-bottom: 8px;
+	border-bottom: 1px solid #77c8ff22;
+}
+
+.XHSSupporterHoverCard.XHSSupporterTier1 .XHSSupporterHoverHeader { border-bottom-color: #70e39a38; }
+.XHSSupporterHoverCard.XHSSupporterTier2 .XHSSupporterHoverHeader { border-bottom-color: #ffcf6640; }
+.XHSSupporterHoverCard.XHSSupporterTier3 .XHSSupporterHoverHeader { border-bottom-color: #ff5a4340; }
+.XHSSupporterHoverCard.XHSSupporterTier4 .XHSSupporterHoverHeader { border-bottom-color: #5ad0ff48; }
+.XHSSupporterHoverCard.XHSSupporterTier5 .XHSSupporterHoverHeader { border-bottom-color: #c99cff60; }
+
+.XHSSupporterHoverHeroFrame {
+	width: 76px;
+	height: 46px;
+	margin-right: 10px;
+	vertical-align: center;
+	border: 1px solid #77c8ff44;
+	background-color: #02060b;
+	overflow: clip;
+}
+
+.XHSSupporterHoverCard.XHSSupporterTier1 .XHSSupporterHoverHeroFrame { border-color: #70e39aaa; box-shadow: fill #70e39a38 0px 0px 8px 0px; }
+.XHSSupporterHoverCard.XHSSupporterTier2 .XHSSupporterHoverHeroFrame { border-color: #ffcf66bb; box-shadow: fill #ffcf6640 0px 0px 9px 0px; }
+.XHSSupporterHoverCard.XHSSupporterTier3 .XHSSupporterHoverHeroFrame { border-color: #ff5a43b8; box-shadow: fill #ff5a433e 0px 0px 9px 0px; }
+.XHSSupporterHoverCard.XHSSupporterTier4 .XHSSupporterHoverHeroFrame { border-color: #5ad0ffd0; box-shadow: fill #5ad0ff50 0px 0px 10px 0px; }
+.XHSSupporterHoverCard.XHSSupporterTier5 .XHSSupporterHoverHeroFrame { border-color: #c99cffed; box-shadow: fill #c99cff70 0px 0px 12px 0px, #ffffff32 0px 0px 3px 0px; }
+
+.XHSSupporterHoverHeroImage {
+	width: 100%;
+	height: 100%;
+}
+
+.XHSSupporterHoverHeaderCopy {
+	width: fill-parent-flow( 1.0 );
+	height: 100%;
+	flow-children: down;
+}
+
+.XHSSupporterHoverEyebrow,
+.XHSSupporterHoverStatLabel,
+.XHSSupporterHoverMeterLabel {
+	font-size: 10px;
+	letter-spacing: 1px;
+	text-transform: uppercase;
+	color: #86dfff;
+	font-family: Reaver;
+	text-shadow: 0px 1px 3px #000000;
+}
+
+.XHSSupporterHoverCard.XHSSupporterTier1 .XHSSupporterHoverEyebrow,
+.XHSSupporterHoverCard.XHSSupporterTier1 .XHSSupporterHoverStatLabel,
+.XHSSupporterHoverCard.XHSSupporterTier1 .XHSSupporterHoverMeterLabel,
+.XHSSupporterHoverCard.XHSSupporterTier2 .XHSSupporterHoverEyebrow,
+.XHSSupporterHoverCard.XHSSupporterTier2 .XHSSupporterHoverStatLabel,
+.XHSSupporterHoverCard.XHSSupporterTier2 .XHSSupporterHoverMeterLabel,
+.XHSSupporterHoverCard.XHSSupporterTier3 .XHSSupporterHoverEyebrow,
+.XHSSupporterHoverCard.XHSSupporterTier3 .XHSSupporterHoverStatLabel,
+.XHSSupporterHoverCard.XHSSupporterTier3 .XHSSupporterHoverMeterLabel,
+.XHSSupporterHoverCard.XHSSupporterTier4 .XHSSupporterHoverEyebrow,
+.XHSSupporterHoverCard.XHSSupporterTier4 .XHSSupporterHoverStatLabel,
+.XHSSupporterHoverCard.XHSSupporterTier4 .XHSSupporterHoverMeterLabel,
+.XHSSupporterHoverCard.XHSSupporterTier5 .XHSSupporterHoverEyebrow,
+.XHSSupporterHoverCard.XHSSupporterTier5 .XHSSupporterHoverStatLabel,
+.XHSSupporterHoverCard.XHSSupporterTier5 .XHSSupporterHoverMeterLabel {
+	color: #9fd7ff;
+}
+
+.XHSSupporterHoverPlayerName {
+	width: 100%;
+	height: 25px;
+	font-size: 18px;
+	font-weight: bold;
+	color: #f2dfb8;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	font-family: Reaver;
+	text-shadow: 0px 1px 4px #000000;
+}
+
+.XHSSupporterHoverHeroName {
+	width: 100%;
+	height: 21px;
+	font-size: 13px;
+	color: #b9d9ff;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	font-family: Reaver;
+	text-shadow: 0px 1px 3px #000000;
+}
+
+.XHSSupporterHoverTierValue {
+	width: 100%;
+	height: 28px;
+	margin-bottom: 7px;
+	padding: 5px 8px;
+	font-size: 15px;
+	font-weight: bold;
+	text-transform: uppercase;
+	letter-spacing: 0.6px;
+	text-align: center center;
+	color: #f2dfb8;
+	background-color: #050a10b8;
+	border: 1px solid #77c8ff2d;
+	text-overflow: shrink;
+	font-family: Reaver;
+	text-shadow: 0px 1px 4px #000000;
+}
+
+.XHSSupporterHoverCard.XHSSupporterTier1 .XHSSupporterHoverTierValue,
+.XHSSupporterHoverCard.XHSSupporterTier2 .XHSSupporterHoverTierValue,
+.XHSSupporterHoverCard.XHSSupporterTier3 .XHSSupporterHoverTierValue,
+.XHSSupporterHoverCard.XHSSupporterTier4 .XHSSupporterHoverTierValue,
+.XHSSupporterHoverCard.XHSSupporterTier5 .XHSSupporterHoverTierValue {
+	color: #eef9ff;
+}
+
+.XHSSupporterHoverCard.XHSSupporterTier1 .XHSSupporterHoverTierValue { background-color: gradient( linear, 0% 0%, 100% 0%, from( #123b25cc ), to( #07111dcc ) ); border-color: #70e39a55; box-shadow: fill #70e39a18 0px 0px 8px 0px; }
+.XHSSupporterHoverCard.XHSSupporterTier2 .XHSSupporterHoverTierValue { background-color: gradient( linear, 0% 0%, 100% 0%, from( #3b2c12cc ), to( #07111dcc ) ); border-color: #ffcf665c; box-shadow: fill #ffcf661b 0px 0px 8px 0px; }
+.XHSSupporterHoverCard.XHSSupporterTier3 .XHSSupporterHoverTierValue { background-color: gradient( linear, 0% 0%, 100% 0%, from( #401916cc ), to( #07111dcc ) ); border-color: #ff5a435a; box-shadow: fill #ff5a431b 0px 0px 8px 0px; }
+.XHSSupporterHoverCard.XHSSupporterTier4 .XHSSupporterHoverTierValue { background-color: gradient( linear, 0% 0%, 100% 0%, from( #0a2f45d0 ), to( #07111dcc ) ); border-color: #5ad0ff68; box-shadow: fill #5ad0ff24 0px 0px 9px 0px; }
+.XHSSupporterHoverCard.XHSSupporterTier5 .XHSSupporterHoverTierValue { background-color: gradient( linear, 0% 0%, 100% 0%, from( #2c1743d8 ), to( #0a0d1bcc ) ); border-color: #c99cff82; box-shadow: fill #c99cff35 0px 0px 11px 0px, inset #ffffff12 0px 1px 0px 0px; }
+
+.XHSSupporterHoverStats {
+	width: 100%;
+	flow-children: right-wrap;
+	margin-bottom: 2px;
+}
+
+.XHSSupporterHoverStat {
+	width: 150px;
+	height: 42px;
+	margin-right: 6px;
+	margin-bottom: 6px;
+	padding: 5px 7px;
+	flow-children: down;
+	background-color: #07111dc8;
+	border: 1px solid #77c8ff24;
+}
+
+.XHSSupporterHoverCard.XHSSupporterTier1 .XHSSupporterHoverStat { background-color: #071a12d8; border-color: #70e39a38; box-shadow: fill #70e39a10 0px 0px 5px 0px; }
+.XHSSupporterHoverCard.XHSSupporterTier2 .XHSSupporterHoverStat { background-color: #1d1709d8; border-color: #ffcf663d; box-shadow: fill #ffcf6610 0px 0px 5px 0px; }
+.XHSSupporterHoverCard.XHSSupporterTier3 .XHSSupporterHoverStat { background-color: #1d0c09d8; border-color: #ff5a433a; box-shadow: fill #ff5a4310 0px 0px 5px 0px; }
+.XHSSupporterHoverCard.XHSSupporterTier4 .XHSSupporterHoverStat { background-color: #061a26d8; border-color: #5ad0ff44; box-shadow: fill #5ad0ff15 0px 0px 6px 0px; }
+.XHSSupporterHoverCard.XHSSupporterTier5 .XHSSupporterHoverStat { background-color: #130b20e0; border-color: #c99cff56; box-shadow: fill #c99cff20 0px 0px 7px 0px; }
+
+.XHSSupporterHoverStatValue {
+	width: 100%;
+	height: 20px;
+	font-size: 14px;
+	color: #f4fbff;
+	text-overflow: shrink;
+	font-family: Reaver;
+	text-shadow: 0px 1px 3px #000000;
+}
+
+.XHSSupporterHoverMeter {
+	width: 100%;
+	height: 38px;
+	margin-bottom: 6px;
+	flow-children: down;
+}
+
+.XHSSupporterHoverMeterRow {
+	width: 100%;
+	height: 16px;
+	flow-children: right;
+}
+
+.XHSSupporterHoverMeterLabel {
+	width: fill-parent-flow( 1.0 );
+}
+
+.XHSSupporterHoverMeterValue {
+	width: 118px;
+	text-align: right center;
+	font-size: 12px;
+	color: #d8e9ff;
+	text-overflow: shrink;
+	font-family: Reaver;
+	text-shadow: 0px 1px 3px #000000;
+}
+
+.XHSSupporterHoverMeterTrack {
+	width: 100%;
+	height: 8px;
+	background-color: #02060bcc;
+	border: 1px solid #77c8ff24;
+}
+
+.XHSSupporterHoverCard.XHSSupporterTier1 .XHSSupporterHoverMeterTrack { border-color: #70e39a38; }
+.XHSSupporterHoverCard.XHSSupporterTier2 .XHSSupporterHoverMeterTrack { border-color: #ffcf663d; }
+.XHSSupporterHoverCard.XHSSupporterTier3 .XHSSupporterHoverMeterTrack { border-color: #ff5a433a; }
+.XHSSupporterHoverCard.XHSSupporterTier4 .XHSSupporterHoverMeterTrack { border-color: #5ad0ff44; }
+.XHSSupporterHoverCard.XHSSupporterTier5 .XHSSupporterHoverMeterTrack { border-color: #c99cff56; }
+
+.XHSSupporterHoverMeterFill {
+	width: 0%;
+	height: 100%;
+	background-color: gradient( linear, 0% 0%, 100% 0%, from( #0b6e97 ), color-stop( 0.55, #25b7ff ), to( #8fdcff ) );
+}
+
+.XHSSupporterHoverEquipped {
+	width: 100%;
+	flow-children: down;
+	margin-top: 2px;
+	margin-bottom: 6px;
+	padding-top: 7px;
+	border-top: 1px solid #77c8ff22;
+}
+
+.XHSSupporterHoverEquippedTitle,
+.XHSSupporterHoverEquippedSlot {
+	font-size: 10px;
+	letter-spacing: 1px;
+	text-transform: uppercase;
+	color: #86dfff;
+	font-family: Reaver;
+	text-shadow: 0px 1px 3px #000000;
+}
+
+.XHSSupporterHoverEquippedTitle {
+	width: 100%;
+	height: 18px;
+	margin-bottom: 4px;
+}
+
+.XHSSupporterHoverEquippedGrid {
+	width: 100%;
+	flow-children: right-wrap;
+}
+
+.XHSSupporterHoverEquippedItem {
+	width: 174px;
+	height: 54px;
+	margin-right: 6px;
+	margin-bottom: 6px;
+	padding: 4px 6px;
+	flow-children: right;
+	background-color: #07111dc8;
+	border: 1px solid #77c8ff24;
+}
+
+.XHSSupporterHoverEquippedImage {
+	width: 42px;
+	height: 42px;
+	margin-right: 7px;
+	vertical-align: center;
+	background-color: #02060bcc;
+	border: 1px solid #77c8ff28;
+	opacity: 0.35;
+}
+
+.XHSSupporterHoverEquippedImage.HasImage {
+	opacity: 1;
+}
+
+.XHSSupporterHoverEquippedCopy {
+	width: fill-parent-flow( 1.0 );
+	height: 100%;
+	flow-children: down;
+	vertical-align: center;
+}
+
+.XHSSupporterHoverEquippedSlot {
+	width: 100%;
+	height: 14px;
+	font-size: 9px;
+	text-overflow: shrink;
+}
+
+.XHSSupporterHoverEquippedName {
+	width: 100%;
+	height: 25px;
+	font-size: 12px;
+	color: #f4fbff;
+	text-overflow: shrink;
+	font-family: Reaver;
+	text-shadow: 0px 1px 3px #000000;
+}
+
+.XHSSupporterHoverCard.XHSSupporterTier1 .XHSSupporterHoverEquippedItem { background-color: #071a12d8; border-color: #70e39a38; }
+.XHSSupporterHoverCard.XHSSupporterTier2 .XHSSupporterHoverEquippedItem { background-color: #1d1709d8; border-color: #ffcf663d; }
+.XHSSupporterHoverCard.XHSSupporterTier3 .XHSSupporterHoverEquippedItem { background-color: #1d0c09d8; border-color: #ff5a433a; }
+.XHSSupporterHoverCard.XHSSupporterTier4 .XHSSupporterHoverEquippedItem { background-color: #061a26d8; border-color: #5ad0ff44; }
+.XHSSupporterHoverCard.XHSSupporterTier5 .XHSSupporterHoverEquippedItem { background-color: #130b20e0; border-color: #c99cff56; }
+
+.XHSSupporterHoverCard.XHSSupporterTier1 .XHSSupporterHoverMeterFill { background-color: gradient( linear, 0% 0%, 100% 0%, from( #2d8a4d ), to( #70e39a ) ); }
+.XHSSupporterHoverCard.XHSSupporterTier2 .XHSSupporterHoverMeterFill { background-color: gradient( linear, 0% 0%, 100% 0%, from( #9c7924 ), to( #ffcf66 ) ); }
+.XHSSupporterHoverCard.XHSSupporterTier3 .XHSSupporterHoverMeterFill { background-color: gradient( linear, 0% 0%, 100% 0%, from( #8d2f21 ), to( #ff5a43 ) ); }
+.XHSSupporterHoverCard.XHSSupporterTier4 .XHSSupporterHoverMeterFill { background-color: gradient( linear, 0% 0%, 100% 0%, from( #0a7ca8 ), to( #5ad0ff ) ); }
+.XHSSupporterHoverCard.XHSSupporterTier5 .XHSSupporterHoverMeterFill { background-color: gradient( linear, 0% 0%, 100% 0%, from( #7d4bb5 ), to( #c99cff ) ); }
+
+.XHSSupporterHoverFooter {
+	width: 100%;
+	min-height: 24px;
+	padding: 5px 7px;
+	font-size: 12px;
+	text-align: center center;
+	color: #c7d5eb;
+	background-color: #050a10b8;
+	border: 1px solid #77c8ff24;
+	text-overflow: shrink;
+	font-family: Reaver;
+	text-shadow: 0px 1px 3px #000000;
+}
+
+.XHSSupporterHoverCard.XHSSupporterTier1 .XHSSupporterHoverFooter { color: #c7d5eb; background-color: #071a12d8; border-color: #70e39a42; }
+.XHSSupporterHoverCard.XHSSupporterTier2 .XHSSupporterHoverFooter { color: #c7d5eb; background-color: #1d1709d8; border-color: #ffcf6648; }
+.XHSSupporterHoverCard.XHSSupporterTier3 .XHSSupporterHoverFooter { color: #c7d5eb; background-color: #1d0c09d8; border-color: #ff5a4344; }
+.XHSSupporterHoverCard.XHSSupporterTier4 .XHSSupporterHoverFooter { color: #c7d5eb; background-color: #061a26d8; border-color: #5ad0ff50; }
+.XHSSupporterHoverCard.XHSSupporterTier5 .XHSSupporterHoverFooter { color: #c7d5eb; background-color: #130b20e0; border-color: #c99cff68; box-shadow: fill #c99cff1b 0px 0px 7px 0px; }
+
+.AspectRatio4x3 .XHSSupporterHoverCard {
+	width: 300px;
+	padding: 9px;
+}
+
+.AspectRatio4x3 .XHSSupporterHoverStat {
+	width: 135px;
+}
+
+.AspectRatio4x3 .XHSSupporterHoverEquippedItem {
+	width: 135px;
+}

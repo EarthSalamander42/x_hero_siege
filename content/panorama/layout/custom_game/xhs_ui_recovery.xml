@@ -1,0 +1,14 @@
+<root>
+	<styles>
+		<include src="s2r://panorama/styles/custom_game/xhs_ui_recovery.css" />
+	</styles>
+	<scripts>
+		<include src="s2r://panorama/scripts/custom_game/xhs_ui_recovery.js" />
+	</scripts>
+
+	<Panel class="XHSUIRecoveryRoot" hittest="false" hittestchildren="true">
+		<Button id="XHSUIRecoveryClose" class="XHSUIRecoveryClose" hittest="true">
+			<Label text="×" />
+		</Button>
+	</Panel>
+</root>

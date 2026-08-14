@@ -7,7 +7,7 @@
             "reference_operator"
             {
                 "operator"              "sos_reference_stack"
-                "reference_stack"       "dota_update_default"
+                "reference_stack"       "src1_2d"
                 "operator_variables"
                 {
                     "vsnd_files"
@@ -17,13 +17,12 @@
                             "value0"        "sounds/storm_earth_fire.vsnd"
                         }
                     }
-                    "volume"            {   "value"     "2.00000"  }
-                    "pitch_rand_min"    {   "value"     "0.00000"  }
-                    "pitch_rand_max"    {   "value"     "0.000000"  }
-                    "pitch"             {   "value"     "1.000000"  }
-                    "soundlevel"        {   "value"     "100.00000" }
-                    "distance_max"      {   "value"     "5000.000"  }
-                    "event_type"        {   "value"     "1.000000"  }
+                    "volume_min"        {   "value"     "2.000000"  }
+                    "volume_max"        {   "value"     "2.000000"  }
+                    "pitch_min"         {   "value"     "1.000000"  }
+                    "pitch_max"         {   "value"     "1.000000"  }
+                    "chan_type"         {   "value"     "0"         }
+                    "memory_type"       {   "value"     "0"         }
                 }
             }
         }
@@ -632,6 +631,37 @@
                     "soundlevel"        {   "value"     "100.00000" }
                     "distance_max"      {   "value"     "5000.000"  }
                     "event_type"        {   "value"     "1.000000"  }
+                }
+            }
+        }
+    }
+}
+
+"XHS.FinalWaveMusic"
+{
+    "operator_stacks"
+    {
+        "update_stack"
+        {
+            "reference_operator"
+            {
+                "operator"              "sos_reference_stack"
+                "reference_stack"       "src1_2d"
+                "operator_variables"
+                {
+                    "vsnd_files"
+                    {
+                        "value"
+                        {
+                            "value0"        "sounds/music/yaskar_01/music/ui_hero_select.vsnd"
+                        }
+                    }
+                    "volume_min"        {   "value"     "2.000000"  }
+                    "volume_max"        {   "value"     "2.000000"  }
+                    "pitch_min"         {   "value"     "1.000000"  }
+                    "pitch_max"         {   "value"     "1.000000"  }
+                    "chan_type"         {   "value"     "0"         }
+                    "memory_type"       {   "value"     "0"         }
                 }
             }
         }

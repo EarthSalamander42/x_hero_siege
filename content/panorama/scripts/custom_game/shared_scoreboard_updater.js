@@ -23,6 +23,77 @@ function _ScoreboardUpdater_SetValueSafe(panel, childName, Value) {
 	childPanel.value = Value;
 }
 
+var XHS_SCOREBOARD_PLAYER_COLOR_FALLBACKS = [
+	"#0032c8ff",
+	"#00ffffff",
+	"#640064ff",
+	"#ffff00ff",
+	"#ff9600ff",
+	"#ff64ffff",
+	"#a3b000ff",
+	"#65d9f7ff",
+	"#007d00ff",
+	"#a46900ff",
+];
+
+function _ScoreboardUpdater_IntToColorString(value) {
+	return "#" +
+		("00" + (value & 0xFF).toString(16)).substr(-2) +
+		("00" + ((value >> 8) & 0xFF).toString(16)).substr(-2) +
+		("00" + ((value >> 16) & 0xFF).toString(16)).substr(-2) +
+		"ff";
+}
+
+function _ScoreboardUpdater_NormalizeColorString(color) {
+	if (color === undefined || color === null) {
+		return "";
+	}
+
+	var colorString = color.toString();
+	if (colorString.charAt(0) !== "#") {
+		colorString = "#" + colorString;
+	}
+
+	if (colorString.length === 7) {
+		colorString += "ff";
+	}
+
+	return colorString.toLowerCase();
+}
+
+function _ScoreboardUpdater_IsInvalidPlayerColorString(colorString) {
+	return !colorString || colorString === "#ffffffff" || colorString === "#ffffff";
+}
+
+function _ScoreboardUpdater_GetFallbackPlayerColorString(playerId) {
+	var fallbackIndex = ((playerId % XHS_SCOREBOARD_PLAYER_COLOR_FALLBACKS.length) + XHS_SCOREBOARD_PLAYER_COLOR_FALLBACKS.length) % XHS_SCOREBOARD_PLAYER_COLOR_FALLBACKS.length;
+	return XHS_SCOREBOARD_PLAYER_COLOR_FALLBACKS[fallbackIndex];
+}
+
+function _ScoreboardUpdater_GetPlayerColorString(playerId) {
+	var playerColors = CustomNetTables.GetTableValue("game_options", "player_colors");
+	var tableColor = playerColors ? playerColors[playerId] : null;
+	var normalizedTableColor = _ScoreboardUpdater_NormalizeColorString(tableColor);
+
+	if (!_ScoreboardUpdater_IsInvalidPlayerColorString(normalizedTableColor)) {
+		return normalizedTableColor;
+	}
+
+	var engineColor = null;
+	try {
+		engineColor = Players.GetPlayerColor(playerId);
+	} catch (error) {
+		engineColor = null;
+	}
+
+	var engineColorString = engineColor === null ? "" : _ScoreboardUpdater_IntToColorString(engineColor);
+	if (!_ScoreboardUpdater_IsInvalidPlayerColorString(engineColorString)) {
+		return engineColorString;
+	}
+
+	return _ScoreboardUpdater_GetFallbackPlayerColorString(playerId);
+}
+
 function _ScoreboardUpdater_UpdatePlayerPanelImr(playerId, playerPanel) {
 	var ids = {
 		_5v5: {
@@ -128,11 +199,12 @@ function _ScoreboardUpdater_UpdatePlayerPanel(scoreboardConfig, playersContainer
 
 //	playerPanel.SetHasClass("is_local_player", (playerId == Game.GetLocalPlayerID()));
 
-	var player_table = CustomNetTables.GetTableValue("player_table", playerId.toString());
-	if (player_table && player_table.donator_level && player_table.donator_color) {
-		if (player_table.donator_level < 10) {
-			playerPanel.style.backgroundColor = player_table.donator_color;
-//			playerPanel.backgroundColor = 'gradient( linear, 100% 0, 0 0, from( ' + player_table.donator_color + ' ), color-stop( 0.4, #FFFFFF ), to( #FFFFFF ) )';
+	var player_table = CustomNetTables.GetTableValue("supporter_pass_player", playerId.toString());
+	if (player_table && (player_table.tier_id || player_table.donator_level)) {
+		var supporter_color = player_table.tier_color || player_table.donator_color;
+		if (supporter_color && (player_table.tier_id > 0 || player_table.donator_level < 10)) {
+			playerPanel.style.backgroundColor = supporter_color;
+//			playerPanel.backgroundColor = 'gradient( linear, 100% 0, 0 0, from( ' + supporter_color + ' ), color-stop( 0.4, #FFFFFF ), to( #FFFFFF ) )';
 		}
 	}
 
@@ -224,12 +296,7 @@ function _ScoreboardUpdater_UpdatePlayerPanel(scoreboardConfig, playersContainer
 
 		var playerColorBar = playerPanel.FindChildInLayoutFile("PlayerColorBar");
 		if (playerColorBar !== null) {
-			var PlyColors = CustomNetTables.GetTableValue("game_options", "player_colors");
-			if (PlyColors != undefined)
-			{
-				if (PlyColors[playerId] != undefined)
-					playerColorBar.style.backgroundColor = PlyColors[playerId];
-			}
+			playerColorBar.style.backgroundColor = _ScoreboardUpdater_GetPlayerColorString(playerId);
 		}
 	}
 

@@ -1,0 +1,107 @@
+<root>
+	<styles>
+		<include src="s2r://panorama/styles/dotastyles.vcss_c" />
+		<include src="s2r://panorama/styles/custom_game/xhs_theme.vcss_c" />
+		<include src="s2r://panorama/styles/custom_game/xhs_supporter_hover.vcss_c" />
+		<include src="s2r://panorama/styles/custom_game/xhs_top_hud.vcss_c" />
+	</styles>
+
+	<scripts>
+		<include src="file://{resources}/scripts/custom_game/xhs_name_display.js" />
+		<include src="s2r://panorama/scripts/custom_game/xhs_supporter_hover.vjs_c" />
+		<include src="s2r://panorama/scripts/custom_game/xhs_top_hud.vjs_c" />
+		<include src="file://{resources}/scripts/custom_game/util.js" />
+	</scripts>
+
+	<Panel class="XHSTopHudHost" hittest="false" hittestchildren="true">
+		<Panel id="XHSTopHudRoot" hittest="false" hittestchildren="true">
+			<Panel id="XHSTopHudBar" hittest="false" hittestchildren="true">
+				<Panel id="XHSTopHudLeftSlot" hittest="true" hittestchildren="true">
+					<Panel id="XHSTopHudAllies" hittest="true" hittestchildren="true">
+						<Panel id="XHSAllyRosterLeft" class="XHSAllyRoster" hittest="true" hittestchildren="true" />
+						<Panel id="XHSVipRoster" hittest="true" hittestchildren="true" />
+					</Panel>
+				</Panel>
+
+				<Panel id="XHSTopHudClock" hittest="false">
+					<Label id="XHSClockTitle" text="TIME" />
+					<Label id="XHSClockValue" text="--:--" />
+				</Panel>
+				<Panel id="XHSOverheadTopStatusMockupRoot" hittest="false" />
+
+				<Panel id="XHSTopHudRightSlot" hittest="true" hittestchildren="true">
+					<Panel id="XHSTopHudRightAllies" hittest="true" hittestchildren="true">
+						<Panel id="XHSAllyRosterRight" class="XHSAllyRoster" hittest="true" hittestchildren="true" />
+					</Panel>
+				</Panel>
+			</Panel>
+
+			<Panel id="XHSFocusTimers" hittest="false">
+				<Panel id="XHSArenaTimer" class="XHSFocusTimer XHSArenaFocusTimer XHSOptionalTimer" hittest="false">
+					<Label id="XHSCurrentEventTimerTitle" class="XHSFocusTimerTitle" text="EVENT" />
+					<Label id="XHSArenaTimerValue" class="XHSFocusTimerValue" text="--:--" />
+					<Panel id="XHSCurrentEventProgressTrack" class="XHSFocusTimerProgressTrack" hittest="false">
+						<Panel id="XHSCurrentEventProgressFill" class="XHSFocusTimerProgressFill" hittest="false" />
+					</Panel>
+					<Panel id="XHSMuradinFrenzyBanner" class="XHSMuradinFrenzyBanner" hittest="false">
+						<Panel class="XHSMuradinFrenzyLine XHSMuradinFrenzyLineLeft" hittest="false" />
+						<Label class="XHSMuradinFrenzyLabel" text="FRENZY RAGE" />
+						<Panel class="XHSMuradinFrenzyLine XHSMuradinFrenzyLineRight" hittest="false" />
+					</Panel>
+				</Panel>
+
+				<Panel id="XHSPersonalEventTimer" class="XHSFocusTimer XHSPersonalFocusTimer XHSOptionalTimer" hittest="false">
+					<Label id="XHSPersonalEventTimerTitle" class="XHSFocusTimerTitle" text="EVENT" />
+					<Label id="XHSPersonalEventTimerValue" class="XHSFocusTimerValue" text="--:--" />
+					<Panel id="XHSPersonalEventProgressTrack" class="XHSFocusTimerProgressTrack XHSPersonalTimerProgressTrack" hittest="false">
+						<Panel id="XHSPersonalEventProgressFill" class="XHSFocusTimerProgressFill XHSPersonalTimerProgressFill" hittest="false" />
+					</Panel>
+				</Panel>
+			</Panel>
+
+			<Panel id="XHSWavePressurePanel" class="XHSWavePressurePanel" hittest="false">
+				<Panel class="XHSWavePressureMark" hittest="false">
+					<Label text="!" />
+				</Panel>
+				<Panel class="XHSWavePressureCopy" hittest="false">
+					<Panel class="XHSWavePressureHeader" hittest="false">
+						<Label class="XHSWavePressureEyebrow" text="#xhs_phase_one_spawn_budget_eyebrow" />
+						<Label id="XHSWavePressureCount" class="XHSWavePressureCount" text="0 / 150" />
+					</Panel>
+					<Label id="XHSWavePressureTitle" class="XHSWavePressureTitle" text="#xhs_phase_one_spawn_budget_rising" />
+					<Label id="XHSWavePressureDetail" class="XHSWavePressureDetail" text="#xhs_phase_one_spawn_budget_detail_normal" />
+					<Panel class="XHSWavePressureTrack" hittest="false">
+						<Panel id="XHSWavePressureFill" class="XHSWavePressureFill" hittest="false" />
+					</Panel>
+				</Panel>
+			</Panel>
+
+			<Panel id="XHSFragmentQuestIntro" class="XHSFragmentQuestIntro" hittest="false">
+				<Panel class="XHSFragmentQuestIntroHeader">
+					<Panel class="XHSFragmentQuestIntroMark">
+						<Label text="FQ" />
+					</Panel>
+					<Panel class="XHSFragmentQuestIntroCopy">
+						<Label class="XHSFragmentQuestIntroEyebrow" text="TEAM OBJECTIVES" />
+						<Label class="XHSFragmentQuestIntroTitle" text="Fragment Quests Active" />
+						<Label class="XHSFragmentQuestIntroSub" text="Earn stars together. Backend-confirmed stars grant shop fragments at the end of the run." />
+					</Panel>
+				</Panel>
+				<Panel id="XHSFragmentQuestIntroList" class="XHSFragmentQuestIntroList" hittest="false" />
+			</Panel>
+
+			<Panel id="XHSDifficultyAltPanel" hittest="false">
+				<Label id="XHSDifficultyAltValue" text="DIFFICULTY: -----" />
+			</Panel>
+
+			<Panel id="XHSOverheadMockupRoot" hittest="false" />
+		</Panel>
+		<Panel id="XHSOverheadRoot" hittest="false" />
+		<Panel id="XHSNightfallVignette" hittest="false">
+			<Panel class="XHSNightfallEdge XHSNightfallTop" hittest="false" />
+			<Panel class="XHSNightfallEdge XHSNightfallBottom" hittest="false" />
+			<Panel class="XHSNightfallEdge XHSNightfallLeft" hittest="false" />
+			<Panel class="XHSNightfallEdge XHSNightfallRight" hittest="false" />
+		</Panel>
+	</Panel>
+</root>

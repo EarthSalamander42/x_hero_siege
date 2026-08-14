@@ -478,6 +478,7 @@ end
 -- Immolation buff
 LinkLuaModifier("modifier_frostivus_immolation", "boss_scripts/boss_thinker_nevermore.lua", LUA_MODIFIER_MOTION_NONE )
 modifier_frostivus_immolation = modifier_frostivus_immolation or class({})
+modifier_frostivus_immolation.XHS_LINK_CLIENT = true
 
 function modifier_frostivus_immolation:IsHidden() return true end
 function modifier_frostivus_immolation:IsPurgable() return false end
@@ -559,7 +560,6 @@ function boss_thinker_nevermore:RagnaBlade(altar_loc, delay)
 		-- Draw warning particle on the targets' position
 		for _, target in pairs(targets) do
 			local warning_pfx = ParticleManager:CreateParticle("particles/boss_nevermore/ragna_blade_pre_warning.vpcf", PATTACH_OVERHEAD_FOLLOW, target)
-			ParticleManager:SetParticleControl(warning_pfx, 0, target:GetAbsOrigin())
 
 			-- Play warning sound
 			target:EmitSound("Frostivus.AbilityWarning")

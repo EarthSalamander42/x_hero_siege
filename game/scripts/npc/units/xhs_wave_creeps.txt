@@ -1,0 +1,2474 @@
+"DOTAUnits"
+{
+	"Version"	"1"
+
+
+	// X HERO SIEGE CREEPS
+	//=================================================================================
+	// Creature: Mini Lifestealers
+	//=================================================================================
+	"npc_xhs_undead_creep_melee_1"
+	{
+		// General
+		"BaseClass"					"npc_dota_creature"	// Class of entity of link to.
+		"Model"						"models/creeps/neutral_creeps/n_creep_troll_skeleton/n_creep_skeleton_melee.vmdl"	// Model.
+		"ModelScale"				"0.78"
+		"Level"						"1"
+		"SoundSet"					"Creep_Bad_Melee"
+		"UseAI"						"1"
+
+		// Abilities
+		//----------------------------------------------------------------
+		"Ability1"					""		// Ability 1.
+		"Ability2"					""		// Ability 2.
+		"Ability3"					""		// Ability 3.
+		"Ability4"					""		// Ability 4.
+
+		// Armor
+		//----------------------------------------------------------------
+		"ArmorPhysical"				"4"	// Physical protection.
+		"MagicalResistance"			"20"	// Magical protection.
+
+		// Attack
+		//----------------------------------------------------------------
+		"AttackCapabilities"		"DOTA_UNIT_CAP_MELEE_ATTACK"
+		"AttackDamageMin"			"20"							// Damage range min. Level 1 current damage reduced by 30%.
+		"AttackDamageMax"			"28"						// Damage range max. Level 1 current damage reduced by 30%.
+		"AttackRate"				"1.45"						// Speed of attack.
+		"AttackAnimationPoint"		"0.39"						// Normalized time in animation cycle to attack.
+		"AttackAcquisitionRange"	"1000"						// Range within a target can be acquired.
+		"AttackRange"				"128"						// Range within a target can be attacked.
+		"ProjectileModel"			""							// Particle system model for projectile.
+		"ProjectileSpeed"			""							// Speed of projectile.
+
+		// Bounty
+		//----------------------------------------------------------------
+		"BountyXP"					"38"		// Experience earn.
+		"BountyGoldMin"				"418"		// Gold earned min.
+		"BountyGoldMax"				"462"		// Gold earned max.
+
+		// Bounds
+		//----------------------------------------------------------------
+		"RingRadius"				"70"
+		"HealthBarOffset"			"160"
+		"BoundsHullName"			"DOTA_HULL_SIZE_REGULAR"
+
+		// Movement
+		//----------------------------------------------------------------
+		"MovementCapabilities"		"DOTA_UNIT_CAP_MOVE_GROUND"			// Type of locomotion - ground, air
+		"MovementSpeed"				"370"		// Speed
+		"MovementTurnRate"			"0.5"		// Turning rate.
+
+		// Status
+		//----------------------------------------------------------------
+		"StatusHealth"				"1044"		// Base health. Level 1 balance: -15%.
+		"StatusHealthRegen"			"8"		// Health regeneration rate.
+		"StatusMana"				"0"			// Base mana.
+		"StatusManaRegen"			"0"			// Mana regeneration rate.
+
+		// Team
+		//----------------------------------------------------------------
+		"TeamName"					"DOTA_TEAM_BADGUYS"			// Team name.
+		"CombatClassAttack"			"DOTA_COMBAT_CLASS_ATTACK_BASIC"
+		"CombatClassDefend"			"DOTA_COMBAT_CLASS_DEFEND_HERO"
+		"UnitRelationshipClass"		"DOTA_NPC_UNIT_RELATIONSHIP_TYPE_DEFAULT"
+		
+		// Vision
+		//----------------------------------------------------------------
+		"VisionDaytimeRange"		"800"		// Range of vision during day light.
+		"VisionNighttimeRange"		"800"		// Range of vision at night time.
+	}
+
+	//=================================================================================
+	// Creature: Mini Huntress
+	//=================================================================================
+	"npc_xhs_elf_creep_melee_1"
+	{
+		// General
+		"BaseClass"					"npc_dota_creature"	// Class of entity of link to.
+		"Model"						"models/creeps/neutral_creeps/n_creep_satyr_spawn_a/n_creep_satyr_spawn_a.vmdl"	// Model.
+		"ModelScale"				"0.702"
+		"Level"						"1"
+		"SoundSet"					"Creep_Good_Melee"
+		"UseAI"						"1"
+
+		// Abilities
+		//----------------------------------------------------------------
+		"Ability1"					""		// Ability 1.
+		"Ability2"					""		// Ability 2.
+		"Ability3"					""		// Ability 3.
+		"Ability4"					""		// Ability 4.
+
+		// Armor
+		//----------------------------------------------------------------
+		"ArmorPhysical"				"4"	// Physical protection.
+		"MagicalResistance"			"20"	// Magical protection.
+
+		// Attack
+		//----------------------------------------------------------------
+		"AttackCapabilities"		"DOTA_UNIT_CAP_RANGED_ATTACK"
+		"AttackDamageMin"			"20"							// Damage range min. Level 1 current damage reduced by 30%.
+		"AttackDamageMax"			"28"						// Damage range max. Level 1 current damage reduced by 30%.
+		"AttackRate"				"1.45"						// Speed of attack.
+		"AttackAnimationPoint"		"0.39"						// Normalized time in animation cycle to attack.
+		"AttackAcquisitionRange"	"1000"						// Range within a target can be acquired.
+		"AttackRange"				"300"						// Range within a target can be attacked.
+		"ProjectileModel"			""							// Particle system model for projectile.
+		"ProjectileSpeed"			"925"							// Speed of projectile.
+
+		// Bounty
+		//----------------------------------------------------------------
+		"BountyXP"					"38"		// Experience earn.
+		"BountyGoldMin"				"418"		// Gold earned min.
+		"BountyGoldMax"				"462"		// Gold earned max.
+
+		// Bounds
+		//----------------------------------------------------------------
+		"RingRadius"				"70"
+		"HealthBarOffset"			"160"
+		"BoundsHullName"			"DOTA_HULL_SIZE_REGULAR"
+
+		// Movement
+		//----------------------------------------------------------------
+		"MovementCapabilities"		"DOTA_UNIT_CAP_MOVE_GROUND"			// Type of locomotion - ground, air
+		"MovementSpeed"				"370"		// Speed
+		"MovementTurnRate"			"0.5"		// Turning rate.
+
+		// Status
+		//----------------------------------------------------------------
+		"StatusHealth"				"1044"		// Base health. Level 1 balance: -15%.
+		"StatusHealthRegen"			"4"		// Health regeneration rate.
+		"StatusMana"				"0"			// Base mana.
+		"StatusManaRegen"			"0"			// Mana regeneration rate.
+
+		// Team
+		//----------------------------------------------------------------
+		"TeamName"					"DOTA_TEAM_BADGUYS"			// Team name.
+		"CombatClassAttack"			"DOTA_COMBAT_CLASS_ATTACK_BASIC"
+		"CombatClassDefend"			"DOTA_COMBAT_CLASS_DEFEND_HERO"
+		"UnitRelationshipClass"		"DOTA_NPC_UNIT_RELATIONSHIP_TYPE_DEFAULT"
+		
+		// Vision
+		//----------------------------------------------------------------
+		"VisionDaytimeRange"		"800"		// Range of vision during day light.
+		"VisionNighttimeRange"		"800"		// Range of vision at night time.
+
+		// Creature Data
+		//----------------------------------------------------------------
+	}
+
+	//=================================================================================
+	// Creature: Mini Grunts
+	//=================================================================================
+	"npc_xhs_orc_creep_melee_1"
+	{
+		// General
+		"BaseClass"					"npc_dota_creature"	// Class of entity of link to.
+		"Model"						"models/creeps/neutral_creeps/n_creep_ogre_med/n_creep_ogre_med.vmdl"	// Model.
+		"ModelScale"				"0.624"
+		"Level"						"1"
+		"SoundSet"					"Creep_Bad_Melee"
+		"UseAI"						"1"
+
+		// Abilities
+		//----------------------------------------------------------------
+		"Ability1"					""		// Ability 1.
+		"Ability2"					""		// Ability 2.
+		"Ability3"					""		// Ability 3.
+		"Ability4"					""		// Ability 4.
+
+		// Armor
+		//----------------------------------------------------------------
+		"ArmorPhysical"				"4"	// Physical protection.
+		"MagicalResistance"			"20"	// Magical protection.
+
+		// Attack
+		//----------------------------------------------------------------
+		"AttackCapabilities"		"DOTA_UNIT_CAP_MELEE_ATTACK"
+		"AttackDamageMin"			"20"							// Damage range min. Level 1 current damage reduced by 30%.
+		"AttackDamageMax"			"28"						// Damage range max. Level 1 current damage reduced by 30%.
+		"AttackRate"				"1.45"						// Speed of attack.
+		"AttackAnimationPoint"		"0.39"						// Normalized time in animation cycle to attack.
+		"AttackAcquisitionRange"	"1000"						// Range within a target can be acquired.
+		"AttackRange"				"128"						// Range within a target can be attacked.
+		"ProjectileModel"			""							// Particle system model for projectile.
+		"ProjectileSpeed"			""							// Speed of projectile.
+
+		// Bounty
+		//----------------------------------------------------------------
+		"BountyXP"					"38"		// Experience earn.
+		"BountyGoldMin"				"418"		// Gold earned min.
+		"BountyGoldMax"				"462"		// Gold earned max.
+
+		// Bounds
+		//----------------------------------------------------------------
+		"RingRadius"				"70"
+		"HealthBarOffset"			"160"
+		"BoundsHullName"			"DOTA_HULL_SIZE_REGULAR"
+
+		// Movement
+		//----------------------------------------------------------------
+		"MovementCapabilities"		"DOTA_UNIT_CAP_MOVE_GROUND"			// Type of locomotion - ground, air
+		"MovementSpeed"				"370"		// Speed
+		"MovementTurnRate"			"0.5"		// Turning rate.
+
+		// Status
+		//----------------------------------------------------------------
+		"StatusHealth"				"1044"		// Base health. Level 1 balance: -15%.
+		"StatusHealthRegen"			"4"		// Health regeneration rate.
+		"StatusMana"				"0"			// Base mana.
+		"StatusManaRegen"			"0"			// Mana regeneration rate.
+
+		// Team
+		//----------------------------------------------------------------
+		"TeamName"					"DOTA_TEAM_BADGUYS"			// Team name.
+		"CombatClassAttack"			"DOTA_COMBAT_CLASS_ATTACK_BASIC"
+		"CombatClassDefend"			"DOTA_COMBAT_CLASS_DEFEND_HERO"
+		"UnitRelationshipClass"		"DOTA_NPC_UNIT_RELATIONSHIP_TYPE_DEFAULT"
+		
+		// Vision
+		//----------------------------------------------------------------
+		"VisionDaytimeRange"		"800"		// Range of vision during day light.
+		"VisionNighttimeRange"		"800"		// Range of vision at night time.
+	}
+
+	//=================================================================================
+	// Creature: Mini Knights
+	//=================================================================================
+	"npc_xhs_human_creep_melee_1"
+	{
+		// General
+		"BaseClass"					"npc_dota_creature"	// Class of entity of link to.
+		"Model"						"models/creeps/lane_creeps/creep_radiant_melee/radiant_melee.vmdl"	// Model.
+		"ModelScale"				"0.78"
+		"Level"						"1"
+		"SoundSet"					"Creep_Good_Melee"
+		"UseAI"						"1"
+
+		// Abilities
+		//----------------------------------------------------------------
+		"Ability1"					""		// Ability 1.
+		"Ability2"					""		// Ability 2.
+		"Ability3"					""		// Ability 3.
+		"Ability4"					""		// Ability 4.
+
+		// Armor
+		//----------------------------------------------------------------
+		"ArmorPhysical"				"4"	// Physical protection.
+		"MagicalResistance"			"20"	// Magical protection.
+
+		// Attack
+		//----------------------------------------------------------------
+		"AttackCapabilities"		"DOTA_UNIT_CAP_MELEE_ATTACK"
+		"AttackDamageMin"			"20"							// Damage range min. Level 1 current damage reduced by 30%.
+		"AttackDamageMax"			"28"						// Damage range max. Level 1 current damage reduced by 30%.
+		"AttackRate"				"1.45"						// Speed of attack.
+		"AttackAnimationPoint"		"0.39"						// Normalized time in animation cycle to attack.
+		"AttackAcquisitionRange"	"1000"						// Range within a target can be acquired.
+		"AttackRange"				"128"						// Range within a target can be attacked.
+		"ProjectileModel"			""							// Particle system model for projectile.
+		"ProjectileSpeed"			""							// Speed of projectile.
+
+		// Bounty
+		//----------------------------------------------------------------
+		"BountyXP"					"38"		// Experience earn.
+		"BountyGoldMin"				"418"		// Gold earned min.
+		"BountyGoldMax"				"462"		// Gold earned max.
+
+		// Bounds
+		//----------------------------------------------------------------
+		"RingRadius"				"70"
+		"HealthBarOffset"			"160"
+		"BoundsHullName"			"DOTA_HULL_SIZE_REGULAR"
+
+		// Movement
+		//----------------------------------------------------------------
+		"MovementCapabilities"		"DOTA_UNIT_CAP_MOVE_GROUND"			// Type of locomotion - ground, air
+		"MovementSpeed"				"370"		// Speed
+		"MovementTurnRate"			"0.5"		// Turning rate.
+
+		// Status
+		//----------------------------------------------------------------
+		"StatusHealth"				"1044"		// Base health. Level 1 balance: -15%.
+		"StatusHealthRegen"			"4"		// Health regeneration rate.
+		"StatusMana"				"0"			// Base mana.
+		"StatusManaRegen"			"0"			// Mana regeneration rate.
+
+		// Team
+		//----------------------------------------------------------------
+		"TeamName"					"DOTA_TEAM_BADGUYS"			// Team name.
+		"CombatClassAttack"			"DOTA_COMBAT_CLASS_ATTACK_BASIC"
+		"CombatClassDefend"			"DOTA_COMBAT_CLASS_DEFEND_HERO"
+		"UnitRelationshipClass"		"DOTA_NPC_UNIT_RELATIONSHIP_TYPE_DEFAULT"
+		
+		// Vision
+		//----------------------------------------------------------------
+		"VisionDaytimeRange"		"800"		// Range of vision during day light.
+		"VisionNighttimeRange"		"800"		// Range of vision at night time.
+
+	}
+
+	//=================================================================================
+	// Creature: Mini Weavers
+	//=================================================================================
+	"npc_xhs_undead_creep_ranged_1"
+	{
+		// General
+		"BaseClass"					"npc_dota_creature"	// Class of entity of link to.
+		"Model"						"models/creeps/neutral_creeps/n_creep_ghost_a/n_creep_ghost_a.vmdl"	// Model.
+		"ModelScale"				"0.78"
+		"Level"						"1"
+		"SoundSet"					"Creep_Bad_Range"
+		"UseAI"						"1"
+
+		// Abilities
+		//----------------------------------------------------------------
+		"Ability1"					""		// Ability 1.
+		"Ability2"					""		// Ability 2.
+		"Ability3"					""		// Ability 3.
+		"Ability4"					""		// Ability 4.
+
+		// Armor
+		//----------------------------------------------------------------
+		"ArmorPhysical"				"4"	// Physical protection.
+		"MagicalResistance"			"20"	// Magical protection.
+
+		// Attack
+		//----------------------------------------------------------------
+		"AttackCapabilities"		"DOTA_UNIT_CAP_RANGED_ATTACK"
+		"AttackDamageMin"			"28"						// Damage range min. Level 1 current damage reduced by 30%.
+		"AttackDamageMax"			"38"						// Damage range max. Level 1 current damage reduced by 30%.
+		"AttackRate"				"1.45"						// Speed of attack.
+		"AttackAnimationPoint"		"0.64"						// Normalized time in animation cycle to attack.
+		"AttackAcquisitionRange"	"1000"						// Range within a target can be acquired.
+		"AttackRange"				"525"						// Range within a target can be attacked.
+		"ProjectileModel"			"particles/base_attacks/ranged_badguy.vpcf"							// Particle system model for projectile.
+		"ProjectileSpeed"			"900"							// Speed of projectile.
+
+		// Bounty
+		//----------------------------------------------------------------
+		"BountyXP"					"14"		// Experience earn.
+		"BountyGoldMin"				"220"		// Gold earned min.
+		"BountyGoldMax"				"264"		// Gold earned max.
+
+		// Bounds
+		//----------------------------------------------------------------
+		"RingRadius"				"70"
+		"HealthBarOffset"			"160"
+		"BoundsHullName"			"DOTA_HULL_SIZE_REGULAR"
+
+		// Movement
+		//----------------------------------------------------------------
+		"MovementCapabilities"		"DOTA_UNIT_CAP_MOVE_GROUND"			// Type of locomotion - ground, air
+		"MovementSpeed"				"370"		// Speed
+		"MovementTurnRate"			"0.5"		// Turning rate.
+
+		// Status
+		//----------------------------------------------------------------
+		"StatusHealth"				"808"		// Base health. Level 1 balance: -15%.
+		"StatusHealthRegen"			"4"		// Health regeneration rate.
+		"StatusMana"				"170"			// Base mana.
+		"StatusManaRegen"			"1.0"			// Mana regeneration rate.
+
+		// Team
+		//----------------------------------------------------------------
+		"TeamName"					"DOTA_TEAM_BADGUYS"			// Team name.
+		"CombatClassAttack"			"DOTA_COMBAT_CLASS_ATTACK_BASIC"
+		"CombatClassDefend"			"DOTA_COMBAT_CLASS_DEFEND_HERO"
+		"UnitRelationshipClass"		"DOTA_NPC_UNIT_RELATIONSHIP_TYPE_DEFAULT"
+		
+		// Vision
+		//----------------------------------------------------------------
+		"VisionDaytimeRange"		"800"		// Range of vision during day light.
+		"VisionNighttimeRange"		"800"		// Range of vision at night time.
+
+		// Creature Data
+		//----------------------------------------------------------------------------------------------------------------------
+	}
+
+	//=================================================================================
+	// Creature: Mini Huskars
+	//=================================================================================
+	"npc_xhs_orc_creep_ranged_1"
+	{
+		// General
+		"BaseClass"					"npc_dota_creature"	// Class of entity of link to.
+		"Model"						"models/creeps/neutral_creeps/n_creep_forest_trolls/n_creep_forest_troll_berserker.vmdl"	// Model.
+		"ModelScale"				"0.738"
+		"Level"						"1"
+		"SoundSet"					"Creep_Bad_Range"
+		"UseAI"						"1"
+
+		// Abilities
+		//----------------------------------------------------------------
+		"Ability1"					""		// Ability 1.
+		"Ability2"					""		// Ability 2.
+		"Ability3"					""		// Ability 3.
+		"Ability4"					""		// Ability 4.
+
+		// Armor
+		//----------------------------------------------------------------
+		"ArmorPhysical"				"4"	// Physical protection.
+		"MagicalResistance"			"20"	// Magical protection.
+
+		// Attack
+		//----------------------------------------------------------------
+		"AttackCapabilities"		"DOTA_UNIT_CAP_RANGED_ATTACK"
+		"AttackDamageMin"			"28"						// Damage range min. Level 1 current damage reduced by 30%.
+		"AttackDamageMax"			"38"						// Damage range max. Level 1 current damage reduced by 30%.
+		"AttackRate"				"1.45"						// Speed of attack.
+		"AttackAnimationPoint"		"0.64"						// Normalized time in animation cycle to attack.
+		"AttackAcquisitionRange"	"1000"						// Range within a target can be acquired.
+		"AttackRange"				"525"						// Range within a target can be attacked.
+		"ProjectileModel"			"particles/base_attacks/ranged_badguy.vpcf"							// Particle system model for projectile.
+		"ProjectileSpeed"			"900"							// Speed of projectile.
+
+		// Bounty
+		//----------------------------------------------------------------
+		"BountyXP"					"14"		// Experience earn.
+		"BountyGoldMin"				"220"		// Gold earned min.
+		"BountyGoldMax"				"264"		// Gold earned max.
+
+		// Bounds
+		//----------------------------------------------------------------
+		"RingRadius"				"70"
+		"HealthBarOffset"			"160"
+		"BoundsHullName"			"DOTA_HULL_SIZE_REGULAR"
+
+		// Movement
+		//----------------------------------------------------------------
+		"MovementCapabilities"		"DOTA_UNIT_CAP_MOVE_GROUND"			// Type of locomotion - ground, air
+		"MovementSpeed"				"370"		// Speed
+		"MovementTurnRate"			"0.5"		// Turning rate.
+
+		// Status
+		//----------------------------------------------------------------
+		"StatusHealth"				"808"		// Base health. Level 1 balance: -15%.
+		"StatusHealthRegen"			"4"		// Health regeneration rate.
+		"StatusMana"				"170"			// Base mana.
+		"StatusManaRegen"			"1.0"			// Mana regeneration rate.
+
+		// Team
+		//----------------------------------------------------------------
+		"TeamName"					"DOTA_TEAM_BADGUYS"			// Team name.
+		"CombatClassAttack"			"DOTA_COMBAT_CLASS_ATTACK_BASIC"
+		"CombatClassDefend"			"DOTA_COMBAT_CLASS_DEFEND_HERO"
+		"UnitRelationshipClass"		"DOTA_NPC_UNIT_RELATIONSHIP_TYPE_DEFAULT"
+		
+		// Vision
+		//----------------------------------------------------------------
+		"VisionDaytimeRange"		"800"		// Range of vision during day light.
+		"VisionNighttimeRange"		"800"		// Range of vision at night time.
+
+		// Creature Data
+		//----------------------------------------------------------------------------------------------------------------------
+	}
+
+	//=================================================================================
+	// Creature: Mini Drows
+	//=================================================================================
+	"npc_xhs_elf_creep_ranged_1"
+	{
+		// General
+		"BaseClass"					"npc_dota_creature"	// Class of entity of link to.
+		"Model"						"models/creeps/neutral_creeps/n_creep_harpy_a/n_creep_harpy_a.vmdl"	// Model.
+		"ModelScale"				"0.78"
+		"Level"						"1"
+		"SoundSet"					"Creep_Good_Range"
+		"UseAI"						"1"
+
+		// Abilities
+		//----------------------------------------------------------------
+		"Ability1"					""		// Ability 1.
+		"Ability2"					""		// Ability 2.
+		"Ability3"					""		// Ability 3.
+		"Ability4"					""		// Ability 4.
+
+		// Armor
+		//----------------------------------------------------------------
+		"ArmorPhysical"				"4"	// Physical protection.
+		"MagicalResistance"			"20"	// Magical protection.
+
+		// Attack
+		//----------------------------------------------------------------
+		"AttackCapabilities"		"DOTA_UNIT_CAP_RANGED_ATTACK"
+		"AttackDamageMin"			"28"						// Damage range min. Level 1 current damage reduced by 30%.
+		"AttackDamageMax"			"38"						// Damage range max. Level 1 current damage reduced by 30%.
+		"AttackRate"				"1.45"						// Speed of attack.
+		"AttackAnimationPoint"		"0.64"						// Normalized time in animation cycle to attack.
+		"AttackAcquisitionRange"	"1000"						// Range within a target can be acquired.
+		"AttackRange"				"525"						// Range within a target can be attacked.
+		"ProjectileModel"			"particles/base_attacks/ranged_goodguy.vpcf"							// Particle system model for projectile.
+		"ProjectileSpeed"			"900"							// Speed of projectile.
+
+		// Bounty
+		//----------------------------------------------------------------
+		"BountyXP"					"14"		// Experience earn.
+		"BountyGoldMin"				"220"		// Gold earned min.
+		"BountyGoldMax"				"264"		// Gold earned max.
+
+		// Bounds
+		//----------------------------------------------------------------
+		"RingRadius"				"70"
+		"HealthBarOffset"			"160"
+		"BoundsHullName"			"DOTA_HULL_SIZE_REGULAR"
+
+		// Movement
+		//----------------------------------------------------------------
+		"MovementCapabilities"		"DOTA_UNIT_CAP_MOVE_GROUND"			// Type of locomotion - ground, air
+		"MovementSpeed"				"370"		// Speed
+		"MovementTurnRate"			"0.5"		// Turning rate.
+
+		// Status
+		//----------------------------------------------------------------
+		"StatusHealth"				"808"		// Base health. Level 1 balance: -15%.
+		"StatusHealthRegen"			"4"		// Health regeneration rate.
+		"StatusMana"				"170"			// Base mana.
+		"StatusManaRegen"			"1.0"			// Mana regeneration rate.
+
+		// Team
+		//----------------------------------------------------------------
+		"TeamName"					"DOTA_TEAM_BADGUYS"			// Team name.
+		"CombatClassAttack"			"DOTA_COMBAT_CLASS_ATTACK_BASIC"
+		"CombatClassDefend"			"DOTA_COMBAT_CLASS_DEFEND_HERO"
+		"UnitRelationshipClass"		"DOTA_NPC_UNIT_RELATIONSHIP_TYPE_DEFAULT"
+		
+		// Vision
+		//----------------------------------------------------------------
+		"VisionDaytimeRange"		"800"		// Range of vision during day light.
+		"VisionNighttimeRange"		"800"		// Range of vision at night time.
+
+		// Creature Data
+		//----------------------------------------------------------------
+	}
+
+	//=================================================================================
+	// Creature: Mini Snipers
+	//=================================================================================
+	"npc_xhs_human_creep_ranged_1"
+	{
+		// General
+		"BaseClass"					"npc_dota_creature"	// Class of entity of link to.
+		"Model"						"models/creeps/lane_creeps/creep_radiant_ranged/radiant_ranged.vmdl"	// Model.
+		"ModelScale"				"0.78"
+		"Level"						"1"
+		"SoundSet"					"Creep_Good_Range"
+		"UseAI"						"1"
+
+		// Abilities
+		//----------------------------------------------------------------
+		"Ability1"					""		// Ability 1.
+		"Ability2"					""		// Ability 2.
+		"Ability3"					""		// Ability 3.
+		"Ability4"					""		// Ability 4.
+
+		// Armor
+		//----------------------------------------------------------------
+		"ArmorPhysical"				"4"	// Physical protection.
+		"MagicalResistance"			"20"	// Magical protection.
+
+		// Attack
+		//----------------------------------------------------------------
+		"AttackCapabilities"		"DOTA_UNIT_CAP_RANGED_ATTACK"
+		"AttackDamageMin"			"28"						// Damage range min. Level 1 current damage reduced by 30%.
+		"AttackDamageMax"			"38"						// Damage range max. Level 1 current damage reduced by 30%.
+		"AttackRate"				"1.45"						// Speed of attack.
+		"AttackAnimationPoint"		"0.64"						// Normalized time in animation cycle to attack.
+		"AttackAcquisitionRange"	"1000"						// Range within a target can be acquired.
+		"AttackRange"				"625"						// Range within a target can be attacked.
+		"ProjectileModel"			"particles/base_attacks/ranged_goodguy.vpcf"							// Particle system model for projectile.
+		"ProjectileSpeed"			"1800"							// Speed of projectile.
+
+		// Bounty
+		//----------------------------------------------------------------
+		"BountyXP"					"14"		// Experience earn.
+		"BountyGoldMin"				"220"		// Gold earned min.
+		"BountyGoldMax"				"264"		// Gold earned max.
+
+		// Bounds
+		//----------------------------------------------------------------
+		"RingRadius"				"70"
+		"HealthBarOffset"			"160"
+		"BoundsHullName"			"DOTA_HULL_SIZE_REGULAR"
+
+		// Movement
+		//----------------------------------------------------------------
+		"MovementCapabilities"		"DOTA_UNIT_CAP_MOVE_GROUND"			// Type of locomotion - ground, air
+		"MovementSpeed"				"370"		// Speed
+		"MovementTurnRate"			"0.5"		// Turning rate.
+
+		// Status
+		//----------------------------------------------------------------
+		"StatusHealth"				"808"		// Base health. Level 1 balance: -15%.
+		"StatusHealthRegen"			"4"		// Health regeneration rate.
+		"StatusMana"				"170"			// Base mana.
+		"StatusManaRegen"			"1.0"			// Mana regeneration rate.
+
+		// Team
+		//----------------------------------------------------------------
+		"TeamName"					"DOTA_TEAM_BADGUYS"			// Team name.
+		"CombatClassAttack"			"DOTA_COMBAT_CLASS_ATTACK_BASIC"
+		"CombatClassDefend"			"DOTA_COMBAT_CLASS_DEFEND_HERO"
+		"UnitRelationshipClass"		"DOTA_NPC_UNIT_RELATIONSHIP_TYPE_DEFAULT"
+		
+		// Vision
+		//----------------------------------------------------------------
+		"VisionDaytimeRange"		"800"		// Range of vision during day light.
+		"VisionNighttimeRange"		"800"		// Range of vision at night time.
+
+		// Creature Data
+		//----------------------------------------------------------------
+	}
+
+	//=================================================================================
+	// Creature: Mini Pudge
+	//=================================================================================
+	"npc_xhs_undead_creep_melee_2"
+	{
+		// General
+		"BaseClass"					"npc_dota_creature"	// Class of entity of link to.
+		"Model"						"models/creeps/lane_creeps/creep_bad_melee_diretide/creep_bad_melee_diretide.vmdl"	// Model.
+		"ModelScale"				"0.88"
+		"Level"						"1"
+		"SoundSet"					"Creep_Bad_Melee"
+		"UseAI"						"1"
+
+		// Abilities
+		//----------------------------------------------------------------
+//		"Ability1"					"undead_disease_cloud"		// Ability 1.
+		"Ability2"					""		// Ability 2.
+		"Ability3"					""		// Ability 3.
+		"Ability4"					""		// Ability 4.
+
+		// Armor
+		//----------------------------------------------------------------
+		"ArmorPhysical"				"8"	// Physical protection.
+		"MagicalResistance"			"25"	// Magical protection.
+
+		// Attack
+		//----------------------------------------------------------------
+		"AttackCapabilities"		"DOTA_UNIT_CAP_MELEE_ATTACK"
+		"AttackDamageMin"			"214"						// Base damage range min. Tier balance: 64.8% of original.
+		"AttackDamageMax"			"232"						// Base damage range max. Tier balance: 64.8% of original.
+		"AttackRate"				"1.25"						// Speed of attack.
+		"AttackAnimationPoint"		"0.3"						// Normalized time in animation cycle to attack.
+		"AttackAcquisitionRange"	"1000"						// Range within a target can be acquired.
+		"AttackRange"				"128"						// Range within a target can be attacked.
+		"ProjectileModel"			""							// Particle system model for projectile.
+		"ProjectileSpeed"			""							// Speed of projectile.
+
+		// Bounty
+		//----------------------------------------------------------------
+		"BountyXP"					"110"		// Experience earn.
+		"BountyGoldMin"				"656"		// Gold earned min.
+		"BountyGoldMax"				"712"		// Gold earned max.
+
+		// Bounds
+		//----------------------------------------------------------------
+		"RingRadius"				"70"
+		"HealthBarOffset"			"160"
+		"BoundsHullName"			"DOTA_HULL_SIZE_REGULAR"
+
+		// Movement
+		//----------------------------------------------------------------
+		"MovementCapabilities"		"DOTA_UNIT_CAP_MOVE_GROUND"			// Type of locomotion - ground, air
+		"MovementSpeed"				"370"		// Speed
+		"MovementTurnRate"			"0.5"		// Turning rate.
+
+		// Status
+		//----------------------------------------------------------------
+		"StatusHealth"				"2397"		// Base health. Tier balance: 72% of original.
+		"StatusHealthRegen"			"8"		// Health regeneration rate.
+		"StatusMana"				"0"			// Base mana.
+		"StatusManaRegen"			"0"			// Mana regeneration rate.
+
+		// Team
+		//----------------------------------------------------------------
+		"TeamName"					"DOTA_TEAM_BADGUYS"			// Team name.
+		"CombatClassAttack"			"DOTA_COMBAT_CLASS_ATTACK_BASIC"
+		"CombatClassDefend"			"DOTA_COMBAT_CLASS_DEFEND_HERO"
+		"UnitRelationshipClass"		"DOTA_NPC_UNIT_RELATIONSHIP_TYPE_DEFAULT"
+		
+		// Vision
+		//----------------------------------------------------------------
+		"VisionDaytimeRange"		"800"		// Range of vision during day light.
+		"VisionNighttimeRange"		"800"		// Range of vision at night time.
+
+		// Creature Data
+		//----------------------------------------------------------------------------------------------------------------------
+	}
+
+	//=================================================================================
+	// Creature: Mini Tauren
+	//=================================================================================
+	"npc_xhs_orc_creep_melee_2"
+	{
+		// General
+		"BaseClass"					"npc_dota_creature"	// Class of entity of link to.
+		"Model"						"models/creeps/neutral_creeps/n_creep_ogre_lrg/n_creep_ogre_lrg.vmdl"	// Model.
+		"ModelScale"				"0.88"
+		"Level"						"1"
+		"SoundSet"					"Creep_Bad_Melee"
+		"UseAI"						"1"
+
+		// Abilities
+		//----------------------------------------------------------------
+		"Ability1"					""		// Ability 1.
+		"Ability2"					""		// Ability 2.
+		"Ability3"					""		// Ability 3.
+		"Ability4"					""		// Ability 4.
+
+		// Armor
+		//----------------------------------------------------------------
+		"ArmorPhysical"				"8"	// Physical protection.
+		"MagicalResistance"			"25"	// Magical protection.
+
+		// Attack
+		//----------------------------------------------------------------
+		"AttackCapabilities"		"DOTA_UNIT_CAP_MELEE_ATTACK"
+		"AttackDamageMin"			"214"						// Base damage range min. Tier balance: 64.8% of original.
+		"AttackDamageMax"			"232"						// Base damage range max. Tier balance: 64.8% of original.
+		"AttackRate"				"1.25"						// Speed of attack.
+		"AttackAnimationPoint"		"0.3"						// Normalized time in animation cycle to attack.
+		"AttackAcquisitionRange"	"1000"						// Range within a target can be acquired.
+		"AttackRange"				"128"						// Range within a target can be attacked.
+		"ProjectileModel"			""							// Particle system model for projectile.
+		"ProjectileSpeed"			""							// Speed of projectile.
+
+		// Bounty
+		//----------------------------------------------------------------
+		"BountyXP"					"110"		// Experience earn.
+		"BountyGoldMin"				"656"		// Gold earned min.
+		"BountyGoldMax"				"712"		// Gold earned max.
+
+		// Bounds
+		//----------------------------------------------------------------
+		"RingRadius"				"70"
+		"HealthBarOffset"			"160"
+		"BoundsHullName"			"DOTA_HULL_SIZE_REGULAR"
+
+		// Movement
+		//----------------------------------------------------------------
+		"MovementCapabilities"		"DOTA_UNIT_CAP_MOVE_GROUND"			// Type of locomotion - ground, air
+		"MovementSpeed"				"370"		// Speed
+		"MovementTurnRate"			"0.5"		// Turning rate.
+
+		// Status
+		//----------------------------------------------------------------
+		"StatusHealth"				"2397"		// Base health. Tier balance: 72% of original.
+		"StatusHealthRegen"			"8"		// Health regeneration rate.
+		"StatusMana"				"0"			// Base mana.
+		"StatusManaRegen"			"0"			// Mana regeneration rate.
+
+		// Team
+		//----------------------------------------------------------------
+		"TeamName"					"DOTA_TEAM_BADGUYS"			// Team name.
+		"CombatClassAttack"			"DOTA_COMBAT_CLASS_ATTACK_BASIC"
+		"CombatClassDefend"			"DOTA_COMBAT_CLASS_DEFEND_HERO"
+		"UnitRelationshipClass"		"DOTA_NPC_UNIT_RELATIONSHIP_TYPE_DEFAULT"
+		
+		// Vision
+		//----------------------------------------------------------------
+		"VisionDaytimeRange"		"800"		// Range of vision during day light.
+		"VisionNighttimeRange"		"800"		// Range of vision at night time.
+
+		// Creature Data
+		//----------------------------------------------------------------------------------------------------------------------
+	}
+
+	//=================================================================================
+	// Creature: Mini Malfurions
+	//=================================================================================
+	"npc_xhs_elf_creep_melee_2"
+	{
+		// General
+		"BaseClass"					"npc_dota_creature"	// Class of entity of link to.
+		"Model"						"models/items/lone_druid/true_form/form_of_the_atniw/form_of_the_atniw.vmdl"	// Model.
+		"ModelScale"				"0.7"
+		"Level"						"1"
+		"SoundSet"					"Hero_Ursa"
+		"UseAI"						"1"
+
+		// Abilities
+		//----------------------------------------------------------------
+		"Ability1"					"xhs_creep_fury_swipes"		// Ability 1.
+		"Ability2"					""		// Ability 2.
+		"Ability3"					""		// Ability 3.
+		"Ability4"					""		// Ability 4.
+
+		// Armor
+		//----------------------------------------------------------------
+		"ArmorPhysical"				"8"	// Physical protection.
+		"MagicalResistance"			"25"	// Magical protection.
+
+		// Attack
+		//----------------------------------------------------------------
+		"AttackCapabilities"		"DOTA_UNIT_CAP_MELEE_ATTACK"
+		"AttackDamageMin"			"214"						// Base damage range min. Tier balance: 64.8% of original.
+		"AttackDamageMax"			"232"						// Base damage range max. Tier balance: 64.8% of original.
+		"AttackRate"				"1.25"						// Speed of attack.
+		"AttackAnimationPoint"		"0.3"						// Normalized time in animation cycle to attack.
+		"AttackAcquisitionRange"	"1000"						// Range within a target can be acquired.
+		"AttackRange"				"128"						// Range within a target can be attacked.
+		"ProjectileModel"			""							// Particle system model for projectile.
+		"ProjectileSpeed"			""							// Speed of projectile.
+
+		// Bounty
+		//----------------------------------------------------------------
+		"BountyXP"					"110"		// Experience earn.
+		"BountyGoldMin"				"656"		// Gold earned min.
+		"BountyGoldMax"				"712"		// Gold earned max.
+
+		// Bounds
+		//----------------------------------------------------------------
+		"RingRadius"				"70"
+		"HealthBarOffset"			"160"
+		"BoundsHullName"			"DOTA_HULL_SIZE_REGULAR"
+
+		// Movement
+		//----------------------------------------------------------------
+		"MovementCapabilities"		"DOTA_UNIT_CAP_MOVE_GROUND"			// Type of locomotion - ground, air
+		"MovementSpeed"				"370"		// Speed
+		"MovementTurnRate"			"0.5"		// Turning rate.
+
+		// Status
+		//----------------------------------------------------------------
+		"StatusHealth"				"2397"		// Base health. Tier balance: 72% of original.
+		"StatusHealthRegen"			"8"		// Health regeneration rate.
+		"StatusMana"				"0"			// Base mana.
+		"StatusManaRegen"			"0"			// Mana regeneration rate.
+
+		// Team
+		//----------------------------------------------------------------
+		"TeamName"					"DOTA_TEAM_BADGUYS"			// Team name.
+		"CombatClassAttack"			"DOTA_COMBAT_CLASS_ATTACK_BASIC"
+		"CombatClassDefend"			"DOTA_COMBAT_CLASS_DEFEND_HERO"
+		"UnitRelationshipClass"		"DOTA_NPC_UNIT_RELATIONSHIP_TYPE_DEFAULT"
+		
+		// Vision
+		//----------------------------------------------------------------
+		"VisionDaytimeRange"		"800"		// Range of vision during day light.
+		"VisionNighttimeRange"		"800"		// Range of vision at night time.
+	}
+
+	//=================================================================================
+	// Creature: Mini Knights
+	//=================================================================================
+	"npc_xhs_human_creep_melee_2"
+	{
+		// General
+		"BaseClass"					"npc_dota_creature"	// Class of entity of link to.
+		"Model"						"models/creeps/lane_creeps/creep_radiant_melee/radiant_flagbearer.vmdl"	// Model.
+		"ModelScale"				"0.88"
+		"Level"						"1"
+		"SoundSet"					"Creep_Good_Melee"
+		"UseAI"						"1"
+
+		// Abilities
+		//----------------------------------------------------------------
+		"Ability1"					""		// Ability 1.
+		"Ability2"					""		// Ability 2.
+		"Ability3"					""		// Ability 3.
+		"Ability4"					""		// Ability 4.
+
+		// Armor
+		//----------------------------------------------------------------
+		"ArmorPhysical"				"8"	// Physical protection.
+		"MagicalResistance"			"25"	// Magical protection.
+
+		// Attack
+		//----------------------------------------------------------------
+		"AttackCapabilities"		"DOTA_UNIT_CAP_MELEE_ATTACK"
+		"AttackDamageMin"			"214"						// Base damage range min. Tier balance: 64.8% of original.
+		"AttackDamageMax"			"232"						// Base damage range max. Tier balance: 64.8% of original.
+		"AttackRate"				"1.25"						// Speed of attack.
+		"AttackAnimationPoint"		"0.3"						// Normalized time in animation cycle to attack.
+		"AttackAcquisitionRange"	"1000"						// Range within a target can be acquired.
+		"AttackRange"				"128"						// Range within a target can be attacked.
+		"ProjectileModel"			""							// Particle system model for projectile.
+		"ProjectileSpeed"			""							// Speed of projectile.
+
+		// Bounty
+		//----------------------------------------------------------------
+		"BountyXP"					"110"		// Experience earn.
+		"BountyGoldMin"				"656"		// Gold earned min.
+		"BountyGoldMax"				"712"		// Gold earned max.
+
+		// Bounds
+		//----------------------------------------------------------------
+		"RingRadius"				"70"
+		"HealthBarOffset"			"160"
+		"BoundsHullName"			"DOTA_HULL_SIZE_REGULAR"
+
+		// Movement
+		//----------------------------------------------------------------
+		"MovementCapabilities"		"DOTA_UNIT_CAP_MOVE_GROUND"			// Type of locomotion - ground, air
+		"MovementSpeed"				"370"		// Speed
+		"MovementTurnRate"			"0.5"		// Turning rate.
+
+		// Status
+		//----------------------------------------------------------------
+		"StatusHealth"				"2397"		// Base health. Tier balance: 72% of original.
+		"StatusHealthRegen"			"8"		// Health regeneration rate.
+		"StatusMana"				"0"			// Base mana.
+		"StatusManaRegen"			"0"			// Mana regeneration rate.
+
+		// Team
+		//----------------------------------------------------------------
+		"TeamName"					"DOTA_TEAM_BADGUYS"			// Team name.
+		"CombatClassAttack"			"DOTA_COMBAT_CLASS_ATTACK_BASIC"
+		"CombatClassDefend"			"DOTA_COMBAT_CLASS_DEFEND_HERO"
+		"UnitRelationshipClass"		"DOTA_NPC_UNIT_RELATIONSHIP_TYPE_DEFAULT"
+		
+		// Vision
+		//----------------------------------------------------------------
+		"VisionDaytimeRange"		"800"		// Range of vision during day light.
+		"VisionNighttimeRange"		"800"		// Range of vision at night time.
+
+	}
+
+	//=================================================================================
+	// Creature: Mini Necrolytes
+	//=================================================================================
+	"npc_xhs_undead_creep_ranged_2"
+	{
+		// General
+		"BaseClass"					"npc_dota_creature"	// Class of entity of link to.
+		"Model"						"models/creeps/neutral_creeps/n_creep_ghost_b/n_creep_ghost_red.vmdl"	// Model.
+		"ModelScale"				"0.88"
+		"Level"						"1"
+		"SoundSet"					"Creep_Bad_Range"
+		"UseAI"						"1"
+
+		// Abilities
+		//----------------------------------------------------------------
+		"Ability1"					""		// Ability 1.
+		"Ability2"					""		// Ability 2.
+		"Ability3"					""		// Ability 3.
+		"Ability4"					""		// Ability 4.
+
+		// Armor
+		//----------------------------------------------------------------
+		"ArmorPhysical"				"8"	// Physical protection.
+		"MagicalResistance"			"25"	// Magical protection.
+
+		// Attack
+		//----------------------------------------------------------------
+		"AttackCapabilities"		"DOTA_UNIT_CAP_RANGED_ATTACK"
+		"AttackDamageMin"			"145"						// Base damage range min. Tier balance: 64.8% of original.
+		"AttackDamageMax"			"166"						// Base damage range max. Tier balance: 64.8% of original.
+		"AttackRate"				"1.3"						// Speed of attack.
+		"AttackAnimationPoint"		"0.53"						// Normalized time in animation cycle to attack.
+		"AttackAcquisitionRange"	"1000"						// Range within a target can be acquired.
+		"AttackRange"				"525"						// Range within a target can be attacked.
+		"ProjectileModel"			"particles/base_attacks/ranged_badguy.vpcf"							// Particle system model for projectile.
+		"ProjectileSpeed"			"900"						// Speed of projectile.
+
+		// Bounty
+		//----------------------------------------------------------------
+		"BountyXP"					"70"		// Experience earn.
+		"BountyGoldMin"				"414"		// Gold earned min.
+		"BountyGoldMax"				"442"		// Gold earned max.
+
+		// Bounds
+		//----------------------------------------------------------------
+		"RingRadius"				"70"
+		"HealthBarOffset"			"160"
+		"BoundsHullName"			"DOTA_HULL_SIZE_REGULAR"
+
+		// Movement
+		//----------------------------------------------------------------
+		"MovementCapabilities"		"DOTA_UNIT_CAP_MOVE_GROUND"			// Type of locomotion - ground, air
+		"MovementSpeed"				"370"		// Speed
+		"MovementTurnRate"			"0.5"		// Turning rate.
+
+		// Status
+		//----------------------------------------------------------------
+		"StatusHealth"				"1859"		// Base health. Tier balance: 72% of original.
+		"StatusHealthRegen"			"8"		// Health regeneration rate.
+		"StatusMana"				"170"			// Base mana.
+		"StatusManaRegen"			"1.0"			// Mana regeneration rate.
+
+		// Team
+		//----------------------------------------------------------------
+		"TeamName"					"DOTA_TEAM_BADGUYS"			// Team name.
+		"CombatClassAttack"			"DOTA_COMBAT_CLASS_ATTACK_BASIC"
+		"CombatClassDefend"			"DOTA_COMBAT_CLASS_DEFEND_HERO"
+		"UnitRelationshipClass"		"DOTA_NPC_UNIT_RELATIONSHIP_TYPE_DEFAULT"
+		
+		// Vision
+		//----------------------------------------------------------------
+		"VisionDaytimeRange"		"800"		// Range of vision during day light.
+		"VisionNighttimeRange"		"800"		// Range of vision at night time.
+
+		// Creature Data
+		//----------------------------------------------------------------------------------------------------------------------
+	}
+
+	//=================================================================================
+	// Creature: Mini Shamans
+	//=================================================================================
+	"npc_xhs_orc_creep_ranged_2"
+	{
+		// General
+		"BaseClass"					"npc_dota_creature"	// Class of entity of link to.
+		"Model"						"models/creeps/neutral_creeps/n_creep_forest_trolls/n_creep_forest_troll_high_priest.vmdl"	// Model.
+		"ModelScale"				"0.92"
+		"Level"						"1"
+		"SoundSet"					"n_creep_ForestTrollHighPriest"
+		"UseAI"						"1"
+
+		// Abilities
+		//----------------------------------------------------------------
+		"Ability1"					""		// Ability 1.
+		"Ability2"					""		// Ability 2.
+		"Ability3"					""		// Ability 3.
+		"Ability4"					""		// Ability 4.
+
+		// Armor
+		//----------------------------------------------------------------
+		"ArmorPhysical"				"8"	// Physical protection.
+		"MagicalResistance"			"25"	// Magical protection.
+
+		// Attack
+		//----------------------------------------------------------------
+		"AttackCapabilities"		"DOTA_UNIT_CAP_RANGED_ATTACK"
+		"AttackDamageMin"			"145"						// Base damage range min. Tier balance: 64.8% of original.
+		"AttackDamageMax"			"166"						// Base damage range max. Tier balance: 64.8% of original.
+		"AttackRate"				"1.3"						// Speed of attack.
+		"AttackAnimationPoint"		"0.53"						// Normalized time in animation cycle to attack.
+		"AttackAcquisitionRange"	"1000"						// Range within a target can be acquired.
+		"AttackRange"				"525"						// Range within a target can be attacked.
+		"ProjectileModel"			"particles/base_attacks/ranged_badguy.vpcf"							// Particle system model for projectile.
+		"ProjectileSpeed"			"900"						// Speed of projectile.
+
+		// Bounty
+		//----------------------------------------------------------------
+		"BountyXP"					"70"		// Experience earn.
+		"BountyGoldMin"				"414"		// Gold earned min.
+		"BountyGoldMax"				"442"		// Gold earned max.
+
+		// Bounds
+		//----------------------------------------------------------------
+		"RingRadius"				"70"
+		"HealthBarOffset"			"160"
+		"BoundsHullName"			"DOTA_HULL_SIZE_REGULAR"
+
+		// Movement
+		//----------------------------------------------------------------
+		"MovementCapabilities"		"DOTA_UNIT_CAP_MOVE_GROUND"			// Type of locomotion - ground, air
+		"MovementSpeed"				"370"		// Speed
+		"MovementTurnRate"			"0.5"		// Turning rate.
+
+		// Status
+		//----------------------------------------------------------------
+		"StatusHealth"				"1859"		// Base health. Tier balance: 72% of original.
+		"StatusHealthRegen"			"8"		// Health regeneration rate.
+		"StatusMana"				"170"			// Base mana.
+		"StatusManaRegen"			"1.0"			// Mana regeneration rate.
+
+		// Team
+		//----------------------------------------------------------------
+		"TeamName"					"DOTA_TEAM_BADGUYS"			// Team name.
+		"CombatClassAttack"			"DOTA_COMBAT_CLASS_ATTACK_BASIC"
+		"CombatClassDefend"			"DOTA_COMBAT_CLASS_DEFEND_HERO"
+		"UnitRelationshipClass"		"DOTA_NPC_UNIT_RELATIONSHIP_TYPE_DEFAULT"
+		
+		// Vision
+		//----------------------------------------------------------------
+		"VisionDaytimeRange"		"800"		// Range of vision during day light.
+		"VisionNighttimeRange"		"800"		// Range of vision at night time.
+
+		// Creature Data
+		//----------------------------------------------------------------
+	}
+
+	//=================================================================================
+	// Creature: Mini Chimaeras
+	//=================================================================================
+	"npc_xhs_elf_creep_ranged_2"
+	{
+		// General
+		"BaseClass"					"npc_dota_creature"	// Class of entity of link to.
+		"Model"						"models/creeps/neutral_creeps/n_creep_harpy_b/n_creep_harpy_b.vmdl"	// Model.
+		"ModelScale"				"0.88"
+		"Level"						"1"
+		"SoundSet"					"Creep_Good_Range"
+		"UseAI"						"1"
+
+		// Abilities
+		//----------------------------------------------------------------
+		"Ability1"					""		// Ability 1.
+		"Ability2"					""		// Ability 2.
+		"Ability3"					""		// Ability 3.
+		"Ability4"					""		// Ability 4.
+
+		// Armor
+		//----------------------------------------------------------------
+		"ArmorPhysical"				"8"	// Physical protection.
+		"MagicalResistance"			"25"	// Magical protection.
+
+		// Attack
+		//----------------------------------------------------------------
+		"AttackCapabilities"		"DOTA_UNIT_CAP_RANGED_ATTACK"
+		"AttackDamageMin"			"145"						// Base damage range min. Tier balance: 64.8% of original.
+		"AttackDamageMax"			"166"						// Base damage range max. Tier balance: 64.8% of original.
+		"AttackRate"				"1.3"						// Speed of attack.
+		"AttackAnimationPoint"		"0.4"						// Normalized time in animation cycle to attack.
+		"AttackAcquisitionRange"	"1000"						// Range within a target can be acquired.
+		"AttackRange"				"525"						// Range within a target can be attacked.
+		"ProjectileModel"			"particles/base_attacks/ranged_goodguy.vpcf"							// Particle system model for projectile.
+		"ProjectileSpeed"			"900"						// Speed of projectile.
+
+		// Bounty
+		//----------------------------------------------------------------
+		"BountyXP"					"70"		// Experience earn.
+		"BountyGoldMin"				"414"		// Gold earned min.
+		"BountyGoldMax"				"442"		// Gold earned max.
+
+		// Bounds
+		//----------------------------------------------------------------
+		"RingRadius"				"70"
+		"HealthBarOffset"			"160"
+		"BoundsHullName"			"DOTA_HULL_SIZE_REGULAR"
+
+		// Movement
+		//----------------------------------------------------------------
+		"MovementCapabilities"		"DOTA_UNIT_CAP_MOVE_GROUND"			// Type of locomotion - ground, air
+		"MovementSpeed"				"370"		// Speed
+		"MovementTurnRate"			"0.5"		// Turning rate.
+
+		// Status
+		//----------------------------------------------------------------
+		"StatusHealth"				"1859"		// Base health. Tier balance: 72% of original.
+		"StatusHealthRegen"			"8"		// Health regeneration rate.
+		"StatusMana"				"170"			// Base mana.
+		"StatusManaRegen"			"1.0"			// Mana regeneration rate.
+
+		// Team
+		//----------------------------------------------------------------
+		"TeamName"					"DOTA_TEAM_BADGUYS"			// Team name.
+		"CombatClassAttack"			"DOTA_COMBAT_CLASS_ATTACK_BASIC"
+		"CombatClassDefend"			"DOTA_COMBAT_CLASS_DEFEND_HERO"
+		"UnitRelationshipClass"		"DOTA_NPC_UNIT_RELATIONSHIP_TYPE_DEFAULT"
+		
+		// Vision
+		//----------------------------------------------------------------
+		"VisionDaytimeRange"		"800"		// Range of vision during day light.
+		"VisionNighttimeRange"		"800"		// Range of vision at night time.
+	}
+
+	//=================================================================================
+	// Creature: Mini Priests
+	//=================================================================================
+	"npc_xhs_human_creep_ranged_2"
+	{
+		// General
+		"BaseClass"					"npc_dota_creature"	// Class of entity of link to.
+		"Model"						"models/creeps/lane_creeps/creep_radiant_ranged/radiant_ranged_mega.vmdl"	// Model.
+		"ModelScale"				"0.88"
+		"Level"						"1"
+		"SoundSet"					"Creep_Good_Range"
+		"UseAI"						"1"
+
+		// Abilities
+		//----------------------------------------------------------------
+		"Ability1"					""		// Ability 1.
+		"Ability2"					""		// Ability 2.
+		"Ability3"					""		// Ability 3.
+		"Ability4"					""		// Ability 4.
+
+		// Armor
+		//----------------------------------------------------------------
+		"ArmorPhysical"				"8"	// Physical protection.
+		"MagicalResistance"			"25"	// Magical protection.
+
+		// Attack
+		//----------------------------------------------------------------
+		"AttackCapabilities"		"DOTA_UNIT_CAP_RANGED_ATTACK"
+		"AttackDamageMin"			"145"						// Base damage range min. Tier balance: 64.8% of original.
+		"AttackDamageMax"			"166"						// Base damage range max. Tier balance: 64.8% of original.
+		"AttackRate"				"1.3"						// Speed of attack.
+		"AttackAnimationPoint"		"0.53"						// Normalized time in animation cycle to attack.
+		"AttackAcquisitionRange"	"1000"						// Range within a target can be acquired.
+		"AttackRange"				"525"						// Range within a target can be attacked.
+		"ProjectileModel"			"particles/base_attacks/ranged_goodguy.vpcf"							// Particle system model for projectile.
+		"ProjectileSpeed"			"900"						// Speed of projectile.
+
+		// Bounty
+		//----------------------------------------------------------------
+		"BountyXP"					"70"		// Experience earn.
+		"BountyGoldMin"				"414"		// Gold earned min.
+		"BountyGoldMax"				"442"		// Gold earned max.
+
+		// Bounds
+		//----------------------------------------------------------------
+		"RingRadius"				"70"
+		"HealthBarOffset"			"160"
+		"BoundsHullName"			"DOTA_HULL_SIZE_REGULAR"
+
+		// Movement
+		//----------------------------------------------------------------
+		"MovementCapabilities"		"DOTA_UNIT_CAP_MOVE_GROUND"			// Type of locomotion - ground, air
+		"MovementSpeed"				"370"		// Speed
+		"MovementTurnRate"			"0.5"		// Turning rate.
+
+		// Status
+		//----------------------------------------------------------------
+		"StatusHealth"				"1859"		// Base health. Tier balance: 72% of original.
+		"StatusHealthRegen"			"8"		// Health regeneration rate.
+		"StatusMana"				"170"			// Base mana.
+		"StatusManaRegen"			"1.0"			// Mana regeneration rate.
+
+		// Team
+		//----------------------------------------------------------------
+		"TeamName"					"DOTA_TEAM_BADGUYS"			// Team name.
+		"CombatClassAttack"			"DOTA_COMBAT_CLASS_ATTACK_BASIC"
+		"CombatClassDefend"			"DOTA_COMBAT_CLASS_DEFEND_HERO"
+		"UnitRelationshipClass"		"DOTA_NPC_UNIT_RELATIONSHIP_TYPE_DEFAULT"
+		
+		// Vision
+		//----------------------------------------------------------------
+		"VisionDaytimeRange"		"800"		// Range of vision during day light.
+		"VisionNighttimeRange"		"800"		// Range of vision at night time.
+	}
+
+	//=================================================================================
+	// Creature: Mini Nyxes
+	//=================================================================================
+	"npc_xhs_undead_creep_melee_3"
+	{
+		// General
+		"BaseClass"					"npc_dota_creature"	// Class of entity of link to.
+		"Model"						"models/creeps/lane_creeps/creep_bad_melee/creep_bad_melee.vmdl"	// Model.
+		"ModelScale"				"0.98"
+		"Level"						"1"
+		"SoundSet"					"Creep_Bad_Melee"
+		"UseAI"						"1"
+
+		// Abilities
+		//----------------------------------------------------------------
+		"Ability1"					""		// Ability 1.
+		"Ability2"					""		// Ability 2.
+		"Ability3"					""		// Ability 3.
+		"Ability4"					""		// Ability 4.
+
+		// Armor
+		//----------------------------------------------------------------
+		"ArmorPhysical"				"20"	// Physical protection.
+		"MagicalResistance"			"25"	// Magical protection.
+
+		// Attack
+		//----------------------------------------------------------------
+		"AttackCapabilities"		"DOTA_UNIT_CAP_MELEE_ATTACK"
+		"AttackDamageMin"			"493"						// Base damage range min. Tier balance: -20%.
+		"AttackDamageMax"			"510"						// Base damage range max. Tier balance: -20%.
+		"AttackRate"				"1.3"						// Speed of attack.
+		"AttackAnimationPoint"		"0.46"						// Normalized time in animation cycle to attack.
+		"AttackAcquisitionRange"	"1000"						// Range within a target can be acquired.
+		"AttackRange"				"128"						// Range within a target can be attacked.
+		"ProjectileModel"			""							// Particle system model for projectile.
+		"ProjectileSpeed"			""							// Speed of projectile.
+
+		// Bounty
+		//----------------------------------------------------------------
+		"BountyXP"					"206"		// Experience earn.
+		"BountyGoldMin"				"1254"		// Gold earned min.
+		"BountyGoldMax"				"1298"		// Gold earned max.
+
+		// Bounds
+		//----------------------------------------------------------------
+		"RingRadius"				"80"
+		"HealthBarOffset"			"160"
+		"BoundsHullName"			"DOTA_HULL_SIZE_REGULAR"
+
+		// Movement
+		//----------------------------------------------------------------
+		"MovementCapabilities"		"DOTA_UNIT_CAP_MOVE_GROUND"			// Type of locomotion - ground, air
+		"MovementSpeed"				"370"		// Speed
+		"MovementTurnRate"			"0.5"		// Turning rate.
+
+		// Status
+		//----------------------------------------------------------------
+		"StatusHealth"				"4858"		// Base health. Tier balance: -20%.
+		"StatusHealthRegen"			"8"		// Health regeneration rate.
+		"StatusMana"				"0"			// Base mana.
+		"StatusManaRegen"			"0"			// Mana regeneration rate.
+
+		// Team
+		//----------------------------------------------------------------
+		"TeamName"					"DOTA_TEAM_BADGUYS"			// Team name.
+		"CombatClassAttack"			"DOTA_COMBAT_CLASS_ATTACK_BASIC"
+		"CombatClassDefend"			"DOTA_COMBAT_CLASS_DEFEND_HERO"
+		"UnitRelationshipClass"		"DOTA_NPC_UNIT_RELATIONSHIP_TYPE_DEFAULT"
+		
+		// Vision
+		//----------------------------------------------------------------
+		"VisionDaytimeRange"		"800"		// Range of vision during day light.
+		"VisionNighttimeRange"		"800"		// Range of vision at night time.
+
+		// Creature Data
+		//----------------------------------------------------------------------------------------------------------------------
+	}
+
+	//=================================================================================
+	// Creature: Mini Mages
+	//=================================================================================
+	"npc_xhs_human_creep_melee_3"
+	{
+		// General
+		"BaseClass"					"npc_dota_creature"	// Class of entity of link to.
+		"Model"						"models/creeps/lane_creeps/creep_radiant_melee/radiant_melee_mega.vmdl"	// Model.
+		"ModelScale"				"0.98"
+		"Level"						"1"
+		"SoundSet"					"Creep_Good_Melee"
+		"UseAI"						"1"
+
+		// Abilities
+		//----------------------------------------------------------------
+		"Ability1"					""		// Ability 1.
+		"Ability2"					""		// Ability 2.
+		"Ability3"					""		// Ability 3.
+		"Ability4"					""		// Ability 4.
+
+		// Armor
+		//----------------------------------------------------------------
+		"ArmorPhysical"				"20"	// Physical protection.
+		"MagicalResistance"			"25"	// Magical protection.
+
+		// Attack
+		//----------------------------------------------------------------
+		"AttackCapabilities"		"DOTA_UNIT_CAP_MELEE_ATTACK"
+		"AttackDamageMin"			"493"						// Base damage range min. Tier balance: -20%.
+		"AttackDamageMax"			"510"						// Base damage range max. Tier balance: -20%.
+		"AttackRate"				"1.3"						// Speed of attack.
+		"AttackAnimationPoint"		"0.46"						// Normalized time in animation cycle to attack.
+		"AttackAcquisitionRange"	"1000"						// Range within a target can be acquired.
+		"AttackRange"				"128"						// Range within a target can be attacked.
+		"ProjectileModel"			""							// Particle system model for projectile.
+		"ProjectileSpeed"			""							// Speed of projectile.
+
+		// Bounty
+		//----------------------------------------------------------------
+		"BountyXP"					"206"		// Experience earn.
+		"BountyGoldMin"				"1254"		// Gold earned min.
+		"BountyGoldMax"				"1298"		// Gold earned max.
+
+		// Bounds
+		//----------------------------------------------------------------
+		"RingRadius"				"80"
+		"HealthBarOffset"			"160"
+		"BoundsHullName"			"DOTA_HULL_SIZE_REGULAR"
+
+		// Movement
+		//----------------------------------------------------------------
+		"MovementCapabilities"		"DOTA_UNIT_CAP_MOVE_GROUND"			// Type of locomotion - ground, air
+		"MovementSpeed"				"370"		// Speed
+		"MovementTurnRate"			"0.5"		// Turning rate.
+
+		// Status
+		//----------------------------------------------------------------
+		"StatusHealth"				"4858"		// Base health. Tier balance: -20%.
+		"StatusHealthRegen"			"8"		// Health regeneration rate.
+		"StatusMana"				"0"			// Base mana.
+		"StatusManaRegen"			"0"			// Mana regeneration rate.
+
+		// Team
+		//----------------------------------------------------------------
+		"TeamName"					"DOTA_TEAM_BADGUYS"			// Team name.
+		"CombatClassAttack"			"DOTA_COMBAT_CLASS_ATTACK_BASIC"
+		"CombatClassDefend"			"DOTA_COMBAT_CLASS_DEFEND_HERO"
+		"UnitRelationshipClass"		"DOTA_NPC_UNIT_RELATIONSHIP_TYPE_DEFAULT"
+		
+		// Vision
+		//----------------------------------------------------------------
+		"VisionDaytimeRange"		"800"		// Range of vision during day light.
+		"VisionNighttimeRange"		"800"		// Range of vision at night time.
+
+		// Creature Data
+		//----------------------------------------------------------------------------------------------------------------------
+	}
+
+	//=================================================================================
+	// Creature: Mini Tonys
+	//=================================================================================
+	"npc_xhs_elf_creep_melee_3"
+	{
+		// General
+		"BaseClass"					"npc_dota_creature"	// Class of entity of link to.
+		"Model"						"models/creeps/neutral_creeps/n_creep_satyr_b/n_creep_satyr_b.vmdl"	// Model.
+		"ModelScale"				"0.98"
+		"Level"						"1"
+		"SoundSet"					"Creep_Good_Melee"
+		"UseAI"						"1"
+
+		// Abilities
+		//----------------------------------------------------------------
+		"Ability1"					"nightelf_mountain_giant_model"		// Ability 1.
+		"Ability2"					""		// Ability 2.
+		"Ability3"					""		// Ability 3.
+		"Ability4"					""		// Ability 4.
+
+		// Armor
+		//----------------------------------------------------------------
+		"ArmorPhysical"				"20"	// Physical protection.
+		"MagicalResistance"			"25"	// Magical protection.
+
+		// Attack
+		//----------------------------------------------------------------
+		"AttackCapabilities"		"DOTA_UNIT_CAP_MELEE_ATTACK"
+		"AttackDamageMin"			"493"						// Base damage range min. Tier balance: -20%.
+		"AttackDamageMax"			"510"						// Base damage range max. Tier balance: -20%.
+		"AttackRate"				"1.3"						// Speed of attack.
+		"AttackAnimationPoint"		"0.46"						// Normalized time in animation cycle to attack.
+		"AttackAcquisitionRange"	"1000"						// Range within a target can be acquired.
+		"AttackRange"				"128"						// Range within a target can be attacked.
+		"ProjectileModel"			""							// Particle system model for projectile.
+		"ProjectileSpeed"			""							// Speed of projectile.
+
+		// Bounty
+		//----------------------------------------------------------------
+		"BountyXP"					"206"		// Experience earn.
+		"BountyGoldMin"				"1254"		// Gold earned min.
+		"BountyGoldMax"				"1298"		// Gold earned max.
+
+		// Bounds
+		//----------------------------------------------------------------
+		"RingRadius"				"80"
+		"HealthBarOffset"			"160"
+		"BoundsHullName"			"DOTA_HULL_SIZE_REGULAR"
+
+		// Movement
+		//----------------------------------------------------------------
+		"MovementCapabilities"		"DOTA_UNIT_CAP_MOVE_GROUND"			// Type of locomotion - ground, air
+		"MovementSpeed"				"370"		// Speed
+		"MovementTurnRate"			"0.5"		// Turning rate.
+
+		// Status
+		//----------------------------------------------------------------
+		"StatusHealth"				"4858"		// Base health. Tier balance: -20%.
+		"StatusHealthRegen"			"8"		// Health regeneration rate.
+		"StatusMana"				"0"			// Base mana.
+		"StatusManaRegen"			"0"			// Mana regeneration rate.
+
+		// Team
+		//----------------------------------------------------------------
+		"TeamName"					"DOTA_TEAM_BADGUYS"			// Team name.
+		"CombatClassAttack"			"DOTA_COMBAT_CLASS_ATTACK_BASIC"
+		"CombatClassDefend"			"DOTA_COMBAT_CLASS_DEFEND_HERO"
+		"UnitRelationshipClass"		"DOTA_NPC_UNIT_RELATIONSHIP_TYPE_DEFAULT"
+		
+		// Vision
+		//----------------------------------------------------------------
+		"VisionDaytimeRange"		"800"		// Range of vision during day light.
+		"VisionNighttimeRange"		"800"		// Range of vision at night time.
+
+		// Creature Data
+		//----------------------------------------------------------------------------------------------------------------------
+	}
+
+	//=================================================================================
+	// Creature: Mini Knights
+	//=================================================================================
+	"npc_xhs_orc_creep_melee_3"
+	{
+		// General
+		"BaseClass"					"npc_dota_creature"	// Class of entity of link to.
+		"Model"						"models/creeps/neutral_creeps/n_creep_centaur_med/n_creep_centaur_med.vmdl"	// Model.
+		"ModelScale"				"0.98"
+		"Level"						"1"
+		"SoundSet"					"Creep_Bad_Melee"
+		"UseAI"						"1"
+
+		// Abilities
+		//----------------------------------------------------------------
+		"Ability1"					""		// Ability 1.
+		"Ability2"					""		// Ability 2.
+		"Ability3"					""		// Ability 3.
+		"Ability4"					""		// Ability 4.
+
+		// Armor
+		//----------------------------------------------------------------
+		"ArmorPhysical"				"20"	// Physical protection.
+		"MagicalResistance"			"25"	// Magical protection.
+
+		// Attack
+		//----------------------------------------------------------------
+		"AttackCapabilities"		"DOTA_UNIT_CAP_MELEE_ATTACK"
+		"AttackDamageMin"			"493"						// Base damage range min. Tier balance: -20%.
+		"AttackDamageMax"			"510"						// Base damage range max. Tier balance: -20%.
+		"AttackRate"				"1.3"						// Speed of attack.
+		"AttackAnimationPoint"		"0.46"						// Normalized time in animation cycle to attack.
+		"AttackAcquisitionRange"	"1000"						// Range within a target can be acquired.
+		"AttackRange"				"128"						// Range within a target can be attacked.
+		"ProjectileModel"			""							// Particle system model for projectile.
+		"ProjectileSpeed"			""							// Speed of projectile.
+
+		// Bounty
+		//----------------------------------------------------------------
+		"BountyXP"					"206"		// Experience earn.
+		"BountyGoldMin"				"1254"		// Gold earned min.
+		"BountyGoldMax"				"1298"		// Gold earned max.
+
+		// Bounds
+		//----------------------------------------------------------------
+		"RingRadius"				"80"
+		"HealthBarOffset"			"160"
+		"BoundsHullName"			"DOTA_HULL_SIZE_REGULAR"
+
+		// Movement
+		//----------------------------------------------------------------
+		"MovementCapabilities"		"DOTA_UNIT_CAP_MOVE_GROUND"			// Type of locomotion - ground, air
+		"MovementSpeed"				"370"		// Speed
+		"MovementTurnRate"			"0.5"		// Turning rate.
+
+		// Status
+		//----------------------------------------------------------------
+		"StatusHealth"				"4858"		// Base health. Tier balance: -20%.
+		"StatusHealthRegen"			"8"		// Health regeneration rate.
+		"StatusMana"				"0"			// Base mana.
+		"StatusManaRegen"			"0"			// Mana regeneration rate.
+
+		// Team
+		//----------------------------------------------------------------
+		"TeamName"					"DOTA_TEAM_BADGUYS"			// Team name.
+		"CombatClassAttack"			"DOTA_COMBAT_CLASS_ATTACK_BASIC"
+		"CombatClassDefend"			"DOTA_COMBAT_CLASS_DEFEND_HERO"
+		"UnitRelationshipClass"		"DOTA_NPC_UNIT_RELATIONSHIP_TYPE_DEFAULT"
+		
+		// Vision
+		//----------------------------------------------------------------
+		"VisionDaytimeRange"		"800"		// Range of vision during day light.
+		"VisionNighttimeRange"		"800"		// Range of vision at night time.
+
+		// Creature Data
+		//----------------------------------------------------------------------------------------------------------------------
+	}
+
+	//=================================================================================
+	// Creature: Mini Fiends
+	//=================================================================================
+	"npc_xhs_undead_creep_ranged_3"
+	{
+		// General
+		"BaseClass"					"npc_dota_creature"	// Class of entity of link to.
+		"Model"						"models/creeps/lane_creeps/creep_bad_ranged/lane_dire_ranged.vmdl"	// Model.
+		"ModelScale"				"0.98"
+		"Level"						"1"
+		"SoundSet"					"Creep_Bad_Range"
+		"UseAI"						"1"
+
+		// Abilities
+		//----------------------------------------------------------------
+		"Ability1"					""		// Ability 1.
+		"Ability2"					""		// Ability 2.
+		"Ability3"					""		// Ability 3.
+		"Ability4"					""		// Ability 4.
+
+		// Armor
+		//----------------------------------------------------------------
+		"ArmorPhysical"				"20"	// Physical protection.
+		"MagicalResistance"			"25"	// Magical protection.
+
+		// Attack
+		//----------------------------------------------------------------
+		"AttackCapabilities"		"DOTA_UNIT_CAP_RANGED_ATTACK"
+		"AttackDamageMin"			"246"						// Base damage range min. Tier balance: -20%.
+		"AttackDamageMax"			"275"						// Base damage range max. Tier balance: -20%.
+		"AttackRate"				"1.45"						// Speed of attack.
+		"AttackAnimationPoint"		"0.3"						// Normalized time in animation cycle to attack.
+		"AttackAcquisitionRange"	"1000"						// Range within a target can be acquired.
+		"AttackRange"				"400"						// Range within a target can be attacked.
+		"ProjectileModel"			"particles/base_attacks/ranged_badguy.vpcf"							// Particle system model for projectile.
+		"ProjectileSpeed"			"900"						// Speed of projectile.
+
+		// Bounty
+		//----------------------------------------------------------------
+		"BountyXP"					"168"		// Experience earn.
+		"BountyGoldMin"				"968"		// Gold earned min.
+		"BountyGoldMax"				"1012"		// Gold earned max.
+
+		// Bounds
+		//----------------------------------------------------------------
+		"RingRadius"				"80"
+		"HealthBarOffset"			"160"
+		"BoundsHullName"			"DOTA_HULL_SIZE_REGULAR"
+
+		// Movement
+		//----------------------------------------------------------------
+		"MovementCapabilities"		"DOTA_UNIT_CAP_MOVE_GROUND"			// Type of locomotion - ground, air
+		"MovementSpeed"				"370"		// Speed
+		"MovementTurnRate"			"0.5"		// Turning rate.
+
+		// Status
+		//----------------------------------------------------------------
+		"StatusHealth"				"2710"		// Base health. Tier balance: -20%.
+		"StatusHealthRegen"			"8"		// Health regeneration rate.
+		"StatusMana"				"220"		// Base mana.
+		"StatusManaRegen"			"1.0"		// Mana regeneration rate.
+
+		// Team
+		//----------------------------------------------------------------
+		"TeamName"					"DOTA_TEAM_BADGUYS"			// Team name.
+		"CombatClassAttack"			"DOTA_COMBAT_CLASS_ATTACK_BASIC"
+		"CombatClassDefend"			"DOTA_COMBAT_CLASS_DEFEND_HERO"
+		"UnitRelationshipClass"		"DOTA_NPC_UNIT_RELATIONSHIP_TYPE_DEFAULT"
+
+		// Vision
+		//----------------------------------------------------------------
+		"VisionDaytimeRange"		"800"		// Range of vision during day light.
+		"VisionNighttimeRange"		"800"		// Range of vision at night time.
+
+		// Creature Data
+		//----------------------------------------------------------------
+	}
+
+	//=================================================================================
+	// Creature: Mini Trolls
+	//=================================================================================
+	"npc_xhs_orc_creep_ranged_3"
+	{
+		// General
+		"BaseClass"					"npc_dota_creature"	// Class of entity of link to.
+		"Model"						"models/creeps/neutral_creeps/n_creep_troll_dark_a/n_creep_troll_dark_a.vmdl"	// Model.
+		"ModelScale"				"1.02"
+		"Level"						"1"
+		"SoundSet"					"n_creep_TrollWarlord"
+		"UseAI"						"1"
+
+		// Abilities
+		//----------------------------------------------------------------
+		"Ability1"					""		// Ability 1.
+		"Ability2"					""		// Ability 2.
+		"Ability3"					""		// Ability 3.
+		"Ability4"					""		// Ability 4.
+
+		// Armor
+		//----------------------------------------------------------------
+		"ArmorPhysical"				"20"	// Physical protection.
+		"MagicalResistance"			"25"	// Magical protection.
+
+		// Attack
+		//----------------------------------------------------------------
+		"AttackCapabilities"		"DOTA_UNIT_CAP_RANGED_ATTACK"
+		"AttackDamageMin"			"246"						// Base damage range min. Tier balance: -20%.
+		"AttackDamageMax"			"275"						// Base damage range max. Tier balance: -20%.
+		"AttackRate"				"1.45"						// Speed of attack.
+		"AttackAnimationPoint"		"0.3"						// Normalized time in animation cycle to attack.
+		"AttackAcquisitionRange"	"1000"						// Range within a target can be acquired.
+		"AttackRange"				"400"						// Range within a target can be attacked.
+		"ProjectileModel"			"particles/base_attacks/ranged_badguy.vpcf"							// Particle system model for projectile.
+		"ProjectileSpeed"			"900"						// Speed of projectile.
+
+		// Bounty
+		//----------------------------------------------------------------
+		"BountyXP"					"168"		// Experience earn.
+		"BountyGoldMin"				"968"		// Gold earned min.
+		"BountyGoldMax"				"1012"		// Gold earned max.
+
+		// Bounds
+		//----------------------------------------------------------------
+		"RingRadius"				"80"
+		"HealthBarOffset"			"160"
+		"BoundsHullName"			"DOTA_HULL_SIZE_REGULAR"
+
+		// Movement
+		//----------------------------------------------------------------
+		"MovementCapabilities"		"DOTA_UNIT_CAP_MOVE_GROUND"			// Type of locomotion - ground, air
+		"MovementSpeed"				"370"		// Speed
+		"MovementTurnRate"			"0.5"		// Turning rate.
+
+		// Status
+		//----------------------------------------------------------------
+		"StatusHealth"				"2710"		// Base health. Tier balance: -20%.
+		"StatusHealthRegen"			"8"		// Health regeneration rate.
+		"StatusMana"				"220"		// Base mana.
+		"StatusManaRegen"			"1.0"		// Mana regeneration rate.
+
+		// Team
+		//----------------------------------------------------------------
+		"TeamName"					"DOTA_TEAM_BADGUYS"			// Team name.
+		"CombatClassAttack"			"DOTA_COMBAT_CLASS_ATTACK_BASIC"
+		"CombatClassDefend"			"DOTA_COMBAT_CLASS_DEFEND_HERO"
+		"UnitRelationshipClass"		"DOTA_NPC_UNIT_RELATIONSHIP_TYPE_DEFAULT"
+
+		// Vision
+		//----------------------------------------------------------------
+		"VisionDaytimeRange"		"800"		// Range of vision during day light.
+		"VisionNighttimeRange"		"800"		// Range of vision at night time.
+
+		// Creature Data
+		//----------------------------------------------------------------
+	}
+
+	//=================================================================================
+	// Creature: Mini Ranas
+	//=================================================================================
+	"npc_xhs_elf_creep_ranged_3"
+	{
+		// General
+		"BaseClass"					"npc_dota_creature"	// Class of entity of link to.
+		"Model"						"models/creeps/lane_creeps/creep_bird_radiant/creep_bird_radiant_ranged.vmdl"	// Model.
+		"ModelScale"				"0.98"
+		"Level"						"1"
+		"SoundSet"					"Creep_Good_Range"
+		"UseAI"						"1"
+
+		// Abilities
+		//----------------------------------------------------------------
+		"Ability1"					""		// Ability 1.
+		"Ability2"					""		// Ability 2.
+		"Ability3"					""		// Ability 3.
+		"Ability4"					""		// Ability 4.
+
+		// Armor
+		//----------------------------------------------------------------
+		"ArmorPhysical"				"20"	// Physical protection.
+		"MagicalResistance"			"25"	// Magical protection.
+
+		// Attack
+		//----------------------------------------------------------------
+		"AttackCapabilities"		"DOTA_UNIT_CAP_RANGED_ATTACK"
+		"AttackDamageMin"			"246"						// Base damage range min. Tier balance: -20%.
+		"AttackDamageMax"			"275"						// Base damage range max. Tier balance: -20%.
+		"AttackRate"				"1.45"						// Speed of attack.
+		"AttackAnimationPoint"		"0.3"						// Normalized time in animation cycle to attack.
+		"AttackAcquisitionRange"	"1000"						// Range within a target can be acquired.
+		"AttackRange"				"400"						// Range within a target can be attacked.
+		"ProjectileModel"			"particles/base_attacks/ranged_goodguy.vpcf"							// Particle system model for projectile.
+		"ProjectileSpeed"			"900"						// Speed of projectile.
+
+		// Bounty
+		//----------------------------------------------------------------
+		"BountyXP"					"168"		// Experience earn.
+		"BountyGoldMin"				"968"		// Gold earned min.
+		"BountyGoldMax"				"1012"		// Gold earned max.
+
+		// Bounds
+		//----------------------------------------------------------------
+		"RingRadius"				"80"
+		"HealthBarOffset"			"160"
+		"BoundsHullName"			"DOTA_HULL_SIZE_REGULAR"
+
+		// Movement
+		//----------------------------------------------------------------
+		"MovementCapabilities"		"DOTA_UNIT_CAP_MOVE_GROUND"			// Type of locomotion - ground, air
+		"MovementSpeed"				"370"		// Speed
+		"MovementTurnRate"			"0.5"		// Turning rate.
+
+		// Status
+		//----------------------------------------------------------------
+		"StatusHealth"				"2710"		// Base health. Tier balance: -20%.
+		"StatusHealthRegen"			"4"		// Health regeneration rate.
+		"StatusMana"				"220"		// Base mana.
+		"StatusManaRegen"			"1.0"		// Mana regeneration rate.
+
+		// Team
+		//----------------------------------------------------------------
+		"TeamName"					"DOTA_TEAM_BADGUYS"			// Team name.
+		"CombatClassAttack"			"DOTA_COMBAT_CLASS_ATTACK_BASIC"
+		"CombatClassDefend"			"DOTA_COMBAT_CLASS_DEFEND_HERO"
+		"UnitRelationshipClass"		"DOTA_NPC_UNIT_RELATIONSHIP_TYPE_DEFAULT"
+
+		// Vision
+		//----------------------------------------------------------------
+		"VisionDaytimeRange"		"800"		// Range of vision during day light.
+		"VisionNighttimeRange"		"800"		// Range of vision at night time.
+
+		// Creature Data
+		//----------------------------------------------------------------
+	}
+
+	//=================================================================================
+	// Creature: Mini Linas
+	//=================================================================================
+	"npc_xhs_human_creep_ranged_3"
+	{
+		// General
+		"BaseClass"					"npc_dota_creature"	// Class of entity of link to.
+		"Model"						"models/creeps/lane_creeps/creep_dc_radiant/creep_dc_radiant_ranged.vmdl"	// Model.
+		"ModelScale"				"0.98"
+		"Level"						"1"
+		"SoundSet"					"Creep_Good_Range"
+		"UseAI"						"1"
+
+		// Abilities
+		//----------------------------------------------------------------
+		"Ability1"					""		// Ability 1.
+		"Ability2"					""		// Ability 2.
+		"Ability3"					""		// Ability 3.
+		"Ability4"					""		// Ability 4.
+
+		// Armor
+		//----------------------------------------------------------------
+		"ArmorPhysical"				"20"	// Physical protection.
+		"MagicalResistance"			"25"	// Magical protection.
+
+		// Attack
+		//----------------------------------------------------------------
+		"AttackCapabilities"		"DOTA_UNIT_CAP_RANGED_ATTACK"
+		"AttackDamageMin"			"246"						// Base damage range min. Tier balance: -20%.
+		"AttackDamageMax"			"275"						// Base damage range max. Tier balance: -20%.
+		"AttackRate"				"1.45"						// Speed of attack.
+		"AttackAnimationPoint"		"0.3"						// Normalized time in animation cycle to attack.
+		"AttackAcquisitionRange"	"1000"						// Range within a target can be acquired.
+		"AttackRange"				"400"						// Range within a target can be attacked.
+		"ProjectileModel"			"particles/base_attacks/ranged_goodguy.vpcf"							// Particle system model for projectile.
+		"ProjectileSpeed"			"900"						// Speed of projectile.
+
+		// Bounty
+		//----------------------------------------------------------------
+		"BountyXP"					"168"		// Experience earn.
+		"BountyGoldMin"				"968"		// Gold earned min.
+		"BountyGoldMax"				"1012"		// Gold earned max.
+
+		// Bounds
+		//----------------------------------------------------------------
+		"RingRadius"				"80"
+		"HealthBarOffset"			"160"
+		"BoundsHullName"			"DOTA_HULL_SIZE_REGULAR"
+
+		// Movement
+		//----------------------------------------------------------------
+		"MovementCapabilities"		"DOTA_UNIT_CAP_MOVE_GROUND"			// Type of locomotion - ground, air
+		"MovementSpeed"				"370"		// Speed
+		"MovementTurnRate"			"0.5"		// Turning rate.
+
+		// Status
+		//----------------------------------------------------------------
+		"StatusHealth"				"2710"		// Base health. Tier balance: -20%.
+		"StatusHealthRegen"			"8"		// Health regeneration rate.
+		"StatusMana"				"220"		// Base mana.
+		"StatusManaRegen"			"1.0"		// Mana regeneration rate.
+
+		// Team
+		//----------------------------------------------------------------
+		"TeamName"					"DOTA_TEAM_BADGUYS"			// Team name.
+		"CombatClassAttack"			"DOTA_COMBAT_CLASS_ATTACK_BASIC"
+		"CombatClassDefend"			"DOTA_COMBAT_CLASS_DEFEND_HERO"
+		"UnitRelationshipClass"		"DOTA_NPC_UNIT_RELATIONSHIP_TYPE_DEFAULT"
+
+		// Vision
+		//----------------------------------------------------------------
+		"VisionDaytimeRange"		"800"		// Range of vision during day light.
+		"VisionNighttimeRange"		"800"		// Range of vision at night time.
+
+		// Creature Data
+		//----------------------------------------------------------------
+	}
+
+	//=================================================================================
+	// Creature: Mini Lycans
+	//=================================================================================
+	"npc_xhs_human_creep_melee_4"
+	{
+		// General
+		"BaseClass"					"npc_dota_creature"	// Class of entity of link to.
+		"Model"						"models/creeps/lane_creeps/creep_radiant_melee/radiant_flagbearer_mega.vmdl"	// Model.
+		"ModelScale"				"1.08"
+		"Level"						"1"
+		"SoundSet"					"Creep_Good_Melee"
+		"UseAI"						"1"
+
+		// Abilities
+		//----------------------------------------------------------------
+		"Ability1"					""	// Ability 1.
+		"Ability2"					""	// Ability 2.
+		"Ability3"					""	// Ability 3.
+		"Ability4"					""	// Ability 4.
+
+		// Armor
+		//----------------------------------------------------------------
+		"ArmorPhysical"				"40"	// Physical protection.
+		"MagicalResistance"			"25"	// Magical protection.
+
+		// Attack
+		//----------------------------------------------------------------
+		"AttackCapabilities"		"DOTA_UNIT_CAP_MELEE_ATTACK"
+		"AttackDamageMin"			"1270"						// Base damage range min. Tier balance: -20%.
+		"AttackDamageMax"			"1296"						// Base damage range max. Tier balance: -20%.
+		"AttackRate"				"1.0"						// Speed of attack.
+		"AttackAnimationPoint"		"0.5"						// Normalized time in animation cycle to attack.
+		"AttackAcquisitionRange"	"1000"						// Range within a target can be acquired.
+		"AttackRange"				"128"						// Range within a target can be attacked.
+		"ProjectileModel"			""							// Particle system model for projectile.
+		"ProjectileSpeed"			""							// Speed of projectile.
+
+		// Bounty
+		//----------------------------------------------------------------
+		"BountyXP"					"272"		// Experience earn.
+		"BountyGoldMin"				"1980"		// Gold earned min.
+		"BountyGoldMax"				"2024"		// Gold earned max.
+
+		// Bounds
+		//----------------------------------------------------------------
+		"RingRadius"				"80"
+		"HealthBarOffset"			"200"
+		"BoundsHullName"			"DOTA_HULL_SIZE_REGULAR"
+
+		// Movement
+		//----------------------------------------------------------------
+		"MovementCapabilities"		"DOTA_UNIT_CAP_MOVE_GROUND"			// Type of locomotion - ground, air
+		"MovementSpeed"				"370"		// Speed
+		"MovementTurnRate"			"0.5"		// Turning rate.
+		
+		// Status
+		//----------------------------------------------------------------
+		"StatusHealth"				"6371"			// Base health. Tier balance: -20%.
+		"StatusHealthRegen"			"22"			// Health regeneration rate.
+		"StatusMana"				"430"			// Base mana.
+		"StatusManaRegen"			"1.0"			// Mana regeneration rate.
+
+		// Team
+		//----------------------------------------------------------------
+		"TeamName"					"DOTA_TEAM_BADGUYS"			// Team name.
+		"CombatClassAttack"			"DOTA_COMBAT_CLASS_ATTACK_BASIC"
+		"CombatClassDefend"			"DOTA_COMBAT_CLASS_DEFEND_HERO"
+		"UnitRelationshipClass"		"DOTA_NPC_UNIT_RELATIONSHIP_TYPE_DEFAULT"
+		
+		// Vision
+		//----------------------------------------------------------------
+		"VisionDaytimeRange"		"1400"		// Range of vision during day light.
+		"VisionNighttimeRange"		"1400"		// Range of vision at night time.
+
+		// Creature Data
+		//----------------------------------------------------------------
+	}
+
+	//=================================================================================
+	// Creature: Mini Lich Kings
+	//=================================================================================
+	"npc_xhs_undead_creep_melee_4"
+	{
+		// General
+		"BaseClass"					"npc_dota_creature"	// Class of entity of link to.
+		"Model"						"models/creeps/lane_creeps/creep_bad_melee/creep_bad_melee_mega.vmdl"	// Model.
+		"ModelScale"				"1.08"
+		"Level"						"1"
+		"SoundSet"					"Creep_Bad_Melee"
+		"UseAI"						"1"
+
+		// Abilities
+		//----------------------------------------------------------------
+		"Ability1"					""	// Ability 1.
+		"Ability2"					""	// Ability 2.
+		"Ability3"					""	// Ability 3.
+		"Ability4"					""	// Ability 4.
+
+		// Armor
+		//----------------------------------------------------------------
+		"ArmorPhysical"				"40"	// Physical protection.
+		"MagicalResistance"			"25"	// Magical protection.
+
+		// Attack
+		//----------------------------------------------------------------
+		"AttackCapabilities"		"DOTA_UNIT_CAP_MELEE_ATTACK"
+		"AttackDamageMin"			"1270"						// Base damage range min. Tier balance: -20%.
+		"AttackDamageMax"			"1296"						// Base damage range max. Tier balance: -20%.
+		"AttackRate"				"1.0"						// Speed of attack.
+		"AttackAnimationPoint"		"0.5"						// Normalized time in animation cycle to attack.
+		"AttackAcquisitionRange"	"1000"						// Range within a target can be acquired.
+		"AttackRange"				"128"						// Range within a target can be attacked.
+		"ProjectileModel"			""							// Particle system model for projectile.
+		"ProjectileSpeed"			""							// Speed of projectile.
+
+		// Bounty
+		//----------------------------------------------------------------
+		"BountyXP"					"272"		// Experience earn.
+		"BountyGoldMin"				"1980"		// Gold earned min.
+		"BountyGoldMax"				"2024"		// Gold earned max.
+
+		// Bounds
+		//----------------------------------------------------------------
+		"RingRadius"				"80"
+		"HealthBarOffset"			"200"
+		"BoundsHullName"			"DOTA_HULL_SIZE_REGULAR"
+
+		// Movement
+		//----------------------------------------------------------------
+		"MovementCapabilities"		"DOTA_UNIT_CAP_MOVE_GROUND"			// Type of locomotion - ground, air
+		"MovementSpeed"				"370"		// Speed
+		"MovementTurnRate"			"0.5"		// Turning rate.
+		
+		// Status
+		//----------------------------------------------------------------
+		"StatusHealth"				"6371"			// Base health. Tier balance: -20%.
+		"StatusHealthRegen"			"22"			// Health regeneration rate.
+		"StatusMana"				"430"			// Base mana.
+		"StatusManaRegen"			"1.0"			// Mana regeneration rate.
+
+		// Team
+		//----------------------------------------------------------------
+		"TeamName"					"DOTA_TEAM_BADGUYS"			// Team name.
+		"CombatClassAttack"			"DOTA_COMBAT_CLASS_ATTACK_BASIC"
+		"CombatClassDefend"			"DOTA_COMBAT_CLASS_DEFEND_HERO"
+		"UnitRelationshipClass"		"DOTA_NPC_UNIT_RELATIONSHIP_TYPE_DEFAULT"
+		
+		// Vision
+		//----------------------------------------------------------------
+		"VisionDaytimeRange"		"1400"		// Range of vision during day light.
+		"VisionNighttimeRange"		"1400"		// Range of vision at night time.
+
+	}
+
+	//=================================================================================
+	// Creature: Mini Illidans
+	//=================================================================================
+	"npc_xhs_elf_creep_melee_4"
+	{
+		// General
+		"BaseClass"					"npc_dota_creature"	// Class of entity of link to.
+		"Model"						"models/creeps/neutral_creeps/n_creep_satyr_c/n_creep_satyr_c.vmdl"	// Model.
+		"ModelScale"				"1.08"
+		"Level"						"1"
+		"SoundSet"					"Creep_Good_Melee"
+		"UseAI"						"1"
+
+		// Abilities
+		//----------------------------------------------------------------
+		"Ability1"					""	// Ability 1.
+		"Ability2"					""	// Ability 2.
+		"Ability3"					""	// Ability 3.
+		"Ability4"					""	// Ability 4.
+
+		// Armor
+		//----------------------------------------------------------------
+		"ArmorPhysical"				"40"	// Physical protection.
+		"MagicalResistance"			"25"	// Magical protection.
+
+		// Attack
+		//----------------------------------------------------------------
+		"AttackCapabilities"		"DOTA_UNIT_CAP_MELEE_ATTACK"
+		"AttackDamageMin"			"1270"						// Base damage range min. Tier balance: -20%.
+		"AttackDamageMax"			"1296"						// Base damage range max. Tier balance: -20%.
+		"AttackRate"				"1.0"						// Speed of attack.
+		"AttackAnimationPoint"		"0.5"						// Normalized time in animation cycle to attack.
+		"AttackAcquisitionRange"	"1000"						// Range within a target can be acquired.
+		"AttackRange"				"128"						// Range within a target can be attacked.
+		"ProjectileModel"			""							// Particle system model for projectile.
+		"ProjectileSpeed"			""							// Speed of projectile.
+
+		// Bounty
+		//----------------------------------------------------------------
+		"BountyXP"					"272"		// Experience earn.
+		"BountyGoldMin"				"1980"		// Gold earned min.
+		"BountyGoldMax"				"2024"		// Gold earned max.
+
+		// Bounds
+		//----------------------------------------------------------------
+		"RingRadius"				"80"
+		"HealthBarOffset"			"200"
+		"BoundsHullName"			"DOTA_HULL_SIZE_REGULAR"
+
+		// Movement
+		//----------------------------------------------------------------
+		"MovementCapabilities"		"DOTA_UNIT_CAP_MOVE_GROUND"			// Type of locomotion - ground, air
+		"MovementSpeed"				"370"		// Speed
+		"MovementTurnRate"			"0.5"		// Turning rate.
+		
+		// Status
+		//----------------------------------------------------------------
+		"StatusHealth"				"6371"			// Base health. Tier balance: -20%.
+		"StatusHealthRegen"			"22"			// Health regeneration rate.
+		"StatusMana"				"430"			// Base mana.
+		"StatusManaRegen"			"1.0"			// Mana regeneration rate.
+
+		// Team
+		//----------------------------------------------------------------
+		"TeamName"					"DOTA_TEAM_BADGUYS"			// Team name.
+		"CombatClassAttack"			"DOTA_COMBAT_CLASS_ATTACK_BASIC"
+		"CombatClassDefend"			"DOTA_COMBAT_CLASS_DEFEND_HERO"
+		"UnitRelationshipClass"		"DOTA_NPC_UNIT_RELATIONSHIP_TYPE_DEFAULT"
+		
+		// Vision
+		//----------------------------------------------------------------
+		"VisionDaytimeRange"		"1400"		// Range of vision during day light.
+		"VisionNighttimeRange"		"1400"		// Range of vision at night time.
+
+		// Creature Data
+		//----------------------------------------------------------------------------------------------------------------------
+	}
+
+	//=================================================================================
+	// Creature: Mini Titans
+	//=================================================================================
+	"npc_xhs_orc_creep_melee_4"
+	{
+		// General
+		"BaseClass"					"npc_dota_creature"	// Class of entity of link to.
+		"Model"						"models/creeps/neutral_creeps/n_creep_centaur_lrg/n_creep_centaur_lrg.vmdl"	// Model.
+		"ModelScale"				"1.08"
+		"Level"						"1"
+		"SoundSet"					"Creep_Bad_Melee"
+		"UseAI"						"1"
+
+		// Abilities
+		//----------------------------------------------------------------
+		"Ability1"					""	// Ability 1.
+		"Ability2"					""	// Ability 2.
+		"Ability3"					""	// Ability 3.
+		"Ability4"					""	// Ability 4.
+
+		// Armor
+		//----------------------------------------------------------------
+		"ArmorPhysical"				"40"	// Physical protection.
+		"MagicalResistance"			"25"	// Magical protection.
+
+		// Attack
+		//----------------------------------------------------------------
+		"AttackCapabilities"		"DOTA_UNIT_CAP_MELEE_ATTACK"
+		"AttackDamageMin"			"1270"						// Base damage range min. Tier balance: -20%.
+		"AttackDamageMax"			"1296"						// Base damage range max. Tier balance: -20%.
+		"AttackRate"				"1.0"						// Speed of attack.
+		"AttackAnimationPoint"		"0.5"						// Normalized time in animation cycle to attack.
+		"AttackAcquisitionRange"	"1000"						// Range within a target can be acquired.
+		"AttackRange"				"128"						// Range within a target can be attacked.
+		"ProjectileModel"			""							// Particle system model for projectile.
+		"ProjectileSpeed"			""							// Speed of projectile.
+
+		// Bounty
+		//----------------------------------------------------------------
+		"BountyXP"					"272"		// Experience earn.
+		"BountyGoldMin"				"1980"		// Gold earned min.
+		"BountyGoldMax"				"2024"		// Gold earned max.
+
+		// Bounds
+		//----------------------------------------------------------------
+		"RingRadius"				"80"
+		"HealthBarOffset"			"200"
+		"BoundsHullName"			"DOTA_HULL_SIZE_REGULAR"
+
+		// Movement
+		//----------------------------------------------------------------
+		"MovementCapabilities"		"DOTA_UNIT_CAP_MOVE_GROUND"			// Type of locomotion - ground, air
+		"MovementSpeed"				"370"		// Speed
+		"MovementTurnRate"			"0.5"		// Turning rate.
+		
+		// Status
+		//----------------------------------------------------------------
+		"StatusHealth"				"6371"			// Base health. Tier balance: -20%.
+		"StatusHealthRegen"			"22"			// Health regeneration rate.
+		"StatusMana"				"430"			// Base mana.
+		"StatusManaRegen"			"1.0"			// Mana regeneration rate.
+
+		// Team
+		//----------------------------------------------------------------
+		"TeamName"					"DOTA_TEAM_BADGUYS"			// Team name.
+		"CombatClassAttack"			"DOTA_COMBAT_CLASS_ATTACK_BASIC"
+		"CombatClassDefend"			"DOTA_COMBAT_CLASS_DEFEND_HERO"
+		"UnitRelationshipClass"		"DOTA_NPC_UNIT_RELATIONSHIP_TYPE_DEFAULT"
+		
+		// Vision
+		//----------------------------------------------------------------
+		"VisionDaytimeRange"		"1400"		// Range of vision during day light.
+		"VisionNighttimeRange"		"1400"		// Range of vision at night time.
+
+		// Creature Data
+		//----------------------------------------------------------------------------------------------------------------------
+	}
+
+	//=================================================================================
+	// Creature: Mini Black Dragons
+	//=================================================================================
+	"npc_xhs_orc_creep_ranged_4"
+	{
+		// General
+		"BaseClass"					"npc_dota_creature"	// Class of entity of link to.
+		"Model"						"models/creeps/neutral_creeps/n_creep_troll_dark_b/n_creep_troll_dark_b.vmdl"	// Model.
+		"ModelScale"				"1.12"
+		"Level"						"1"
+		"SoundSet"					"n_creep_TrollWarlord"
+		"UseAI"						"1"
+
+		// Abilities
+		//----------------------------------------------------------------
+		"Ability1"					""			// Ability 1.
+		"Ability2"					""			// Ability 2.
+		"Ability3"					""			// Ability 3.
+		"Ability4"					""			// Ability 4.
+
+		// Armor
+		//----------------------------------------------------------------
+		"ArmorPhysical"				"40"	// Physical protection.
+		"MagicalResistance"			"25"	// Magical protection.
+
+		// Attack
+		//----------------------------------------------------------------
+		"AttackCapabilities"		"DOTA_UNIT_CAP_RANGED_ATTACK"
+		"AttackDamageMin"			"542"						// Base damage range min. Reduced by an additional 25%.
+		"AttackDamageMax"			"572"						// Base damage range max. Reduced by an additional 25%.
+		"AttackRate"				"1.05"						// Speed of attack.
+		"AttackAnimationPoint"		"0.40"						// Normalized time in animation cycle to attack.
+		"AttackAcquisitionRange"	"1500"						// Range within a target can be acquired.
+		"AttackRange"				"600"						// Range within a target can be attacked.
+		"ProjectileModel"			"particles/base_attacks/ranged_badguy.vpcf"							// Particle system model for projectile.
+		"ProjectileSpeed"			"1100"							// Speed of projectile.
+
+		// Bounty
+		//----------------------------------------------------------------
+		"BountyXP"					"212"		// Experience earn.
+		"BountyGoldMin"				"1672"		// Gold earned min.
+		"BountyGoldMax"				"1716"		// Gold earned max.
+
+		// Bounds
+		//----------------------------------------------------------------
+		"RingRadius"				"80"
+		"HealthBarOffset"			"200"
+		"BoundsHullName"			"DOTA_HULL_SIZE_REGULAR"
+
+		// Movement
+		//----------------------------------------------------------------
+		"MovementCapabilities"		"DOTA_UNIT_CAP_MOVE_GROUND"			// Type of locomotion - ground, air
+		"MovementSpeed"				"370"		// Speed
+		"MovementTurnRate"			"0.5"		// Turning rate.
+
+		// Status
+		//----------------------------------------------------------------
+		"StatusHealth"				"5262"			// Base health. Tier balance: -20%.
+		"StatusHealthRegen"			"22"			// Health regeneration rate.
+		"StatusMana"				"410"			// Base mana.
+		"StatusManaRegen"			"1.0"			// Mana regeneration rate.
+
+		// Team
+		//----------------------------------------------------------------
+		"TeamName"					"DOTA_TEAM_BADGUYS"			// Team name.
+		"CombatClassAttack"			"DOTA_COMBAT_CLASS_ATTACK_BASIC"
+		"CombatClassDefend"			"DOTA_COMBAT_CLASS_DEFEND_HERO"
+		"UnitRelationshipClass"		"DOTA_NPC_UNIT_RELATIONSHIP_TYPE_DEFAULT"
+
+		// Vision
+		//----------------------------------------------------------------
+		"VisionDaytimeRange"		"1400"		// Range of vision during day light.
+		"VisionNighttimeRange"		"1400"		// Range of vision at night time.
+	}
+
+	//=================================================================================
+	// Creature: Mini Silencers
+	//=================================================================================
+	"npc_xhs_human_creep_ranged_4"
+	{
+		// General
+		"BaseClass"					"npc_dota_creature"	// Class of entity of link to.
+		"Model"						"models/creeps/lane_creeps/creep_dc_radiant/creep_dc_radiant_ranged_mega.vmdl"	// Model.
+		"ModelScale"				"1.08"
+		"Level"						"1"
+		"SoundSet"					"Creep_Good_Range"
+		"UseAI"						"1"
+
+		// Abilities
+		//----------------------------------------------------------------
+		"Ability1"					""			// Ability 1.
+		"Ability2"					""			// Ability 2.
+		"Ability3"					""			// Ability 3.
+		"Ability4"					""			// Ability 4.
+
+		// Armor
+		//----------------------------------------------------------------
+		"ArmorPhysical"				"40"	// Physical protection.
+		"MagicalResistance"			"25"	// Magical protection.
+
+		// Attack
+		//----------------------------------------------------------------
+		"AttackCapabilities"		"DOTA_UNIT_CAP_RANGED_ATTACK"
+		"AttackDamageMin"			"722"						// Base damage range min. Tier balance: -20%.
+		"AttackDamageMax"			"763"						// Base damage range max. Tier balance: -20%.
+		"AttackRate"				"1.05"						// Speed of attack.
+		"AttackAnimationPoint"		"0.40"						// Normalized time in animation cycle to attack.
+		"AttackAcquisitionRange"	"1500"						// Range within a target can be acquired.
+		"AttackRange"				"600"						// Range within a target can be attacked.
+		"ProjectileModel"			"particles/base_attacks/ranged_goodguy.vpcf"							// Particle system model for projectile.
+		"ProjectileSpeed"			"900"							// Speed of projectile.
+
+		// Bounty
+		//----------------------------------------------------------------
+		"BountyXP"					"212"		// Experience earn.
+		"BountyGoldMin"				"1672"		// Gold earned min.
+		"BountyGoldMax"				"1716"		// Gold earned max.
+
+		// Bounds
+		//----------------------------------------------------------------
+		"RingRadius"				"80"
+		"HealthBarOffset"			"200"
+		"BoundsHullName"			"DOTA_HULL_SIZE_REGULAR"
+
+		// Movement
+		//----------------------------------------------------------------
+		"MovementCapabilities"		"DOTA_UNIT_CAP_MOVE_GROUND"			// Type of locomotion - ground, air
+		"MovementSpeed"				"370"		// Speed
+		"MovementTurnRate"			"0.5"		// Turning rate.
+
+		// Status
+		//----------------------------------------------------------------
+		"StatusHealth"				"5262"			// Base health. Tier balance: -20%.
+		"StatusHealthRegen"			"22"			// Health regeneration rate.
+		"StatusMana"				"410"			// Base mana.
+		"StatusManaRegen"			"1.0"			// Mana regeneration rate.
+
+		// Team
+		//----------------------------------------------------------------
+		"TeamName"					"DOTA_TEAM_BADGUYS"			// Team name.
+		"CombatClassAttack"			"DOTA_COMBAT_CLASS_ATTACK_BASIC"
+		"CombatClassDefend"			"DOTA_COMBAT_CLASS_DEFEND_HERO"
+		"UnitRelationshipClass"		"DOTA_NPC_UNIT_RELATIONSHIP_TYPE_DEFAULT"
+
+		// Vision
+		//----------------------------------------------------------------
+		"VisionDaytimeRange"		"1400"		// Range of vision during day light.
+		"VisionNighttimeRange"		"1400"		// Range of vision at night time.
+
+	}
+
+	//=================================================================================
+	// Creature: Mega Radiant Bird Creeps
+	//=================================================================================
+	"npc_xhs_elf_creep_ranged_4"
+	{
+		// General
+		"BaseClass"					"npc_dota_creature"	// Class of entity of link to.
+		"Model"						"models/creeps/lane_creeps/creep_bird_radiant/creep_bird_radiant_ranged_mega.vmdl"	// Model.
+		"ModelScale"				"1.08"
+		"Level"						"1"
+		"SoundSet"					"Creep_Good_Range"
+		"UseAI"						"1"
+
+		// Abilities
+		//----------------------------------------------------------------
+		"Ability1"					""			// Ability 1.
+		"Ability2"					""			// Ability 2.
+		"Ability3"					""			// Ability 3.
+		"Ability4"					""			// Ability 4.
+
+		// Armor
+		//----------------------------------------------------------------
+		"ArmorPhysical"				"40"	// Physical protection.
+		"MagicalResistance"			"25"	// Magical protection.
+
+		// Attack
+		//----------------------------------------------------------------
+		"AttackCapabilities"		"DOTA_UNIT_CAP_RANGED_ATTACK"
+		"AttackDamageMin"			"722"						// Base damage range min. Tier balance: -20%.
+		"AttackDamageMax"			"763"						// Base damage range max. Tier balance: -20%.
+		"AttackRate"				"1.05"						// Speed of attack.
+		"AttackAnimationPoint"		"0.40"						// Normalized time in animation cycle to attack.
+		"AttackAcquisitionRange"	"1500"						// Range within a target can be acquired.
+		"AttackRange"				"600"						// Range within a target can be attacked.
+		"ProjectileModel"			"particles/base_attacks/ranged_goodguy.vpcf"							// Particle system model for projectile.
+		"ProjectileSpeed"			"1100"							// Speed of projectile.
+
+		// Bounty
+		//----------------------------------------------------------------
+		"BountyXP"					"212"		// Experience earn.
+		"BountyGoldMin"				"1672"		// Gold earned min.
+		"BountyGoldMax"				"1716"		// Gold earned max.
+
+		// Bounds
+		//----------------------------------------------------------------
+		"RingRadius"				"80"
+		"HealthBarOffset"			"200"
+		"BoundsHullName"			"DOTA_HULL_SIZE_REGULAR"
+
+		// Movement
+		//----------------------------------------------------------------
+		"MovementCapabilities"		"DOTA_UNIT_CAP_MOVE_GROUND"			// Type of locomotion - ground, air
+		"MovementSpeed"				"370"		// Speed
+		"MovementTurnRate"			"0.5"		// Turning rate.
+
+		// Status
+		//----------------------------------------------------------------
+		"StatusHealth"				"5262"			// Base health. Tier balance: -20%.
+		"StatusHealthRegen"			"22"			// Health regeneration rate.
+		"StatusMana"				"410"			// Base mana.
+		"StatusManaRegen"			"1.0"			// Mana regeneration rate.
+
+		// Team
+		//----------------------------------------------------------------
+		"TeamName"					"DOTA_TEAM_BADGUYS"			// Team name.
+		"CombatClassAttack"			"DOTA_COMBAT_CLASS_ATTACK_BASIC"
+		"CombatClassDefend"			"DOTA_COMBAT_CLASS_DEFEND_HERO"
+		"UnitRelationshipClass"		"DOTA_NPC_UNIT_RELATIONSHIP_TYPE_DEFAULT"
+
+		// Vision
+		//----------------------------------------------------------------
+		"VisionDaytimeRange"		"1400"		// Range of vision during day light.
+		"VisionNighttimeRange"		"1400"		// Range of vision at night time.
+
+		// Creature Data
+		//----------------------------------------------------------------
+	}
+
+	//=================================================================================
+	// Creature: Mini Wyverns
+	//=================================================================================
+	"npc_xhs_undead_creep_ranged_4"
+	{
+		// General
+		"BaseClass"					"npc_dota_creature"	// Class of entity of link to.
+		"Model"						"models/creeps/lane_creeps/creep_bad_ranged/lane_dire_ranged_mega.vmdl"	// Model.
+		"ModelScale"				"1.08"
+		"Level"						"1"
+		"SoundSet"					"Creep_Bad_Range"
+		"UseAI"						"1"
+
+		// Abilities
+		//----------------------------------------------------------------
+		"Ability1"					""			// Ability 1.
+		"Ability2"					""			// Ability 2.
+		"Ability3"					""			// Ability 3.
+		"Ability4"					""			// Ability 4.
+
+		// Armor
+		//----------------------------------------------------------------
+		"ArmorPhysical"				"40"	// Physical protection.
+		"MagicalResistance"			"25"	// Magical protection.
+
+		// Attack
+		//----------------------------------------------------------------
+		"AttackCapabilities"		"DOTA_UNIT_CAP_RANGED_ATTACK"
+		"AttackDamageMin"			"722"						// Base damage range min. Tier balance: -20%.
+		"AttackDamageMax"			"763"						// Base damage range max. Tier balance: -20%.
+		"AttackRate"				"1.05"						// Speed of attack.
+		"AttackAnimationPoint"		"0.40"						// Normalized time in animation cycle to attack.
+		"AttackAcquisitionRange"	"1500"						// Range within a target can be acquired.
+		"AttackRange"				"600"						// Range within a target can be attacked.
+		"ProjectileModel"			"particles/base_attacks/ranged_badguy.vpcf"							// Particle system model for projectile.
+		"ProjectileSpeed"			"1100"							// Speed of projectile.
+
+		// Bounty
+		//----------------------------------------------------------------
+		"BountyXP"					"212"		// Experience earn.
+		"BountyGoldMin"				"1672"		// Gold earned min.
+		"BountyGoldMax"				"1716"		// Gold earned max.
+
+		// Bounds
+		//----------------------------------------------------------------
+		"RingRadius"				"80"
+		"HealthBarOffset"			"200"
+		"BoundsHullName"			"DOTA_HULL_SIZE_REGULAR"
+
+		// Movement
+		//----------------------------------------------------------------
+		"MovementCapabilities"		"DOTA_UNIT_CAP_MOVE_GROUND"			// Type of locomotion - ground, air
+		"MovementSpeed"				"370"		// Speed
+		"MovementTurnRate"			"0.5"		// Turning rate.
+
+		// Status
+		//----------------------------------------------------------------
+		"StatusHealth"				"5262"			// Base health. Tier balance: -20%.
+		"StatusHealthRegen"			"22"			// Health regeneration rate.
+		"StatusMana"				"410"			// Base mana.
+		"StatusManaRegen"			"1.0"			// Mana regeneration rate.
+
+		// Team
+		//----------------------------------------------------------------
+		"TeamName"					"DOTA_TEAM_BADGUYS"			// Team name.
+		"CombatClassAttack"			"DOTA_COMBAT_CLASS_ATTACK_BASIC"
+		"CombatClassDefend"			"DOTA_COMBAT_CLASS_DEFEND_HERO"
+		"UnitRelationshipClass"		"DOTA_NPC_UNIT_RELATIONSHIP_TYPE_DEFAULT"
+
+		// Vision
+		//----------------------------------------------------------------
+		"VisionDaytimeRange"		"1400"		// Range of vision during day light.
+		"VisionNighttimeRange"		"1400"		// Range of vision at night time.
+
+	}
+}

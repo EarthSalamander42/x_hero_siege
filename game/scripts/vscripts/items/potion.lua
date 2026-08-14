@@ -1,3 +1,6 @@
+local SupporterRecoveryEffects = require("components/battlepass/recovery_effects"):Init()
+local LIGHT_POTION_PARTICLE = "particles/items2_fx/mekanism.vpcf"
+
 function FullRestauration(event)
 local caster = event.caster
 local ability = event.ability
@@ -9,11 +12,8 @@ local Mana = 30000
 	caster:SetMana(caster:GetMana() + Mana)
 	SendOverheadEventMessage(nil, OVERHEAD_ALERT_MANA_ADD, caster, Mana, nil)
 
-	for _, Zone in pairs(GameRules.GameMode.Zones) do
-		if Zone:ContainsUnit(caster) then
-			Zone:AddStat(caster:GetPlayerID(), ZONE_STAT_POTIONS, 1)
-		end
-	end
+	XHSRecordPotionUse(caster, ability and ability:GetAbilityName())
+	SupporterRecoveryEffects:PlayPotion(caster, "light", LIGHT_POTION_PARTICLE)
 end
 
 function Invulnerability(event)
@@ -23,9 +23,10 @@ local duration = ability:GetLevelSpecialValueFor("duration", (ability:GetLevel()
 
 	caster:AddNewModifier( caster, nil, "modifier_invulnerable", {duration = duration})
 
-	for _, Zone in pairs(GameRules.GameMode.Zones) do
-		if Zone:ContainsUnit(caster) then
-			Zone:AddStat(caster:GetPlayerID(), ZONE_STAT_POTIONS, 1)
-		end
-	end
+	XHSRecordPotionUse(caster, ability and ability:GetAbilityName())
+end
+
+function AntiMagic(event)
+	local ability = event.ability
+	XHSRecordPotionUse(event.caster, ability and ability:GetAbilityName())
 end

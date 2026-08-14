@@ -1,0 +1,122 @@
+<root>
+	<styles>
+		<include src="s2r://panorama/styles/dotastyles.vcss_c" />
+		<include src="file://{resources}/styles/custom_game/xhs_theme.css" />
+		<include src="file://{resources}/styles/custom_game/popup_settings_reborn.css" />
+	</styles>
+
+	<scripts>
+		<include src="file://{resources}/scripts/custom_game/popup_settings_reborn.js" />
+	</scripts>
+
+	<Panel class="XHSSettingsRoot" hittest="false" hittestchildren="false">
+		<Button id="XHSSettingsBackdrop" class="XHSSettingsBackdrop" />
+
+		<Panel id="XHSSettingsContainer" class="XHSSettingsContainer">
+			<Panel class="XHSSettingsBorder" hittest="false" />
+
+			<Panel class="XHSSettingsNavigation">
+				<Panel class="XHSSettingsNavigationTexture" hittest="false" />
+				<Panel class="XHSSettingsBrand">
+					<Panel class="XHSSettingsBrandIcon">
+						<Image src="s2r://panorama/images/control_icons/24px/settings_options.vsvg" />
+					</Panel>
+					<Panel class="XHSSettingsBrandCopy">
+						<Label class="XHSSettingsEyebrow" text="X HERO SIEGE" />
+						<Label class="XHSSettingsBrandTitle" text="#xhs_settings_title" />
+					</Panel>
+				</Panel>
+
+				<Panel class="XHSSettingsNavLabel"><Label text="#xhs_settings_categories" /></Panel>
+				<Button id="XHSSettingsTabGame" class="XHSSettingsNavButton IsActive">
+					<Image src="s2r://panorama/images/control_icons/24px/settings_options.vsvg" />
+					<Label text="#xhs_settings_tab_game" />
+				</Button>
+				<Button id="XHSSettingsTabSupporter" class="XHSSettingsNavButton">
+					<Image src="file://{images}/custom_game/battlepass/supporter_pass_shield_blue.png" />
+					<Label text="#xhs_settings_tab_supporter" />
+				</Button>
+
+				<Panel class="XHSSettingsNavFooter">
+					<Label text="#xhs_settings_footer" />
+				</Panel>
+			</Panel>
+
+			<Panel class="XHSSettingsMain">
+				<Panel class="XHSSettingsHeader">
+					<Panel class="XHSSettingsHeaderCopy">
+						<Label id="XHSSettingsPageEyebrow" class="XHSSettingsPageEyebrow" text="#xhs_settings_game_eyebrow" />
+						<Label id="XHSSettingsPageTitle" class="XHSSettingsPageTitle" text="#xhs_settings_game_title" />
+						<Label id="XHSSettingsPageDescription" class="XHSSettingsPageDescription" text="#xhs_settings_game_description" />
+					</Panel>
+					<Button id="XHSSettingsCloseButton" class="XHSSettingsCloseButton">
+						<Image src="s2r://panorama/images/control_icons/24px/x_close.vsvg" />
+					</Button>
+				</Panel>
+
+				<Panel class="XHSSettingsContent">
+					<Panel id="XHSSettingsGamePage" class="XHSSettingsPage IsVisible">
+						<Label class="XHSSettingsSectionTitle" text="#xhs_settings_gameplay_ui" />
+						<Panel class="XHSSettingsRows">
+							<Panel class="XHSSettingsRow">
+								<Panel class="XHSSettingsRowCopy">
+									<Label class="XHSSettingsRowTitle" text="#xhs_setting_show_advertize" />
+									<Label class="XHSSettingsRowDescription" text="#xhs_setting_show_advertize_desc" />
+								</Panel>
+								<DOTASettingsCheckbox id="XHSSettingShowAdvertize" class="XHSSettingsCheckbox" />
+							</Panel>
+
+							<Panel class="XHSSettingsRow">
+								<Panel class="XHSSettingsRowCopy">
+									<Label class="XHSSettingsRowTitle" text="#xhs_setting_show_quest_ui" />
+									<Label class="XHSSettingsRowDescription" text="#xhs_setting_show_quest_ui_desc" />
+								</Panel>
+								<DOTASettingsCheckbox id="XHSSettingShowQuestUI" class="XHSSettingsCheckbox" />
+							</Panel>
+
+							<Panel class="XHSSettingsRow">
+								<Panel class="XHSSettingsRowCopy">
+									<Label class="XHSSettingsRowTitle" text="#xhs_setting_controlled_creeps_auto_attack" />
+									<Label class="XHSSettingsRowDescription" text="#xhs_setting_controlled_creeps_auto_attack_desc" />
+								</Panel>
+								<DOTASettingsCheckbox id="XHSSettingControlledCreepsAutoAttack" class="XHSSettingsCheckbox" />
+							</Panel>
+						</Panel>
+					</Panel>
+
+					<Panel id="XHSSettingsSupporterPage" class="XHSSettingsPage">
+						<Label class="XHSSettingsSectionTitle" text="#xhs_sp_settings" />
+						<Panel class="XHSSettingsRows">
+							<Panel class="XHSSettingsRow">
+								<Panel class="XHSSettingsRowCopy"><Label class="XHSSettingsRowTitle" text="#xhs_sp_setting_tag" /><Label class="XHSSettingsRowDescription" text="#xhs_sp_setting_tag_desc" /></Panel>
+								<DOTASettingsCheckbox id="XHSSettingSupporterTag" class="XHSSettingsCheckbox" />
+							</Panel>
+							<Panel class="XHSSettingsRow">
+								<Panel class="XHSSettingsRowCopy"><Label class="XHSSettingsRowTitle" text="#xhs_sp_setting_cosmetics" /><Label class="XHSSettingsRowDescription" text="#xhs_sp_setting_cosmetics_desc" /></Panel>
+								<DOTASettingsCheckbox id="XHSSettingSupporterCosmetics" class="XHSSettingsCheckbox" />
+							</Panel>
+							<Panel class="XHSSettingsRow">
+								<Panel class="XHSSettingsRowCopy"><Label class="XHSSettingsRowTitle" text="#xhs_sp_setting_xp" /><Label class="XHSSettingsRowDescription" text="#xhs_sp_setting_xp_desc" /></Panel>
+								<DOTASettingsCheckbox id="XHSSettingSupporterXP" class="XHSSettingsCheckbox" />
+							</Panel>
+							<Panel class="XHSSettingsRow">
+								<Panel class="XHSSettingsRowCopy"><Label class="XHSSettingsRowTitle" text="#xhs_sp_setting_winrate" /><Label class="XHSSettingsRowDescription" text="#xhs_sp_setting_winrate_desc" /></Panel>
+								<DOTASettingsCheckbox id="XHSSettingSupporterWinrate" class="XHSSettingsCheckbox" />
+							</Panel>
+							<Panel class="XHSSettingsRow XHSSettingsActionRow">
+								<Panel class="XHSSettingsRowCopy"><Label class="XHSSettingsRowTitle" text="#xhs_sp_type_companion" /><Label class="XHSSettingsRowDescription" text="#xhs_sp_disable_companion_desc" /></Panel>
+								<Button id="XHSSettingsDisableCompanion" class="XHSSettingsActionButton"><Label text="#xhs_sp_disable" /></Button>
+							</Panel>
+						</Panel>
+					</Panel>
+				</Panel>
+
+				<Panel class="XHSSettingsFooter">
+					<Label id="XHSSettingsStatus" class="XHSSettingsStatus" text="" />
+					<Button id="XHSSettingsCancelButton" class="XHSSettingsButton XHSSettingsButtonSecondary"><Label text="#xhs_sp_cancel" /></Button>
+					<Button id="XHSSettingsSaveButton" class="XHSSettingsButton XHSSettingsButtonPrimary"><Label text="#xhs_sp_save" /></Button>
+				</Panel>
+			</Panel>
+		</Panel>
+	</Panel>
+</root>

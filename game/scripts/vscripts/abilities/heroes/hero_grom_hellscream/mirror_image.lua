@@ -87,9 +87,21 @@ function Phantasm(keys)
 	-- Spawn illusions
 	for i = 1, images_count do
 		local origin = casterOrigin + table.remove(vRandomSpawnPos, 1)
+		local isFinalWaveIllusion = caster.xhs_final_wave_unit == true
 
 		-- handle_UnitOwner needs to be nil, else it will crash the game.
 		local illusion = CreateUnitByName(unit_name, origin, true, caster, nil, caster:GetTeamNumber())
+		-- Final-wave Grom images are regular combat units and need the segmented
+		-- creep-hero frame. Keep every other Grom image hidden, especially the
+		-- separate phase-three Hellscream mirror encounter. Set the marker before
+		-- npc_spawned is processed so neither path flashes the wrong presentation.
+		illusion.xhs_final_wave_illusion = isFinalWaveIllusion
+		if isFinalWaveIllusion then
+			illusion.xhs_hide_health_bar = false
+			illusion.xhs_custom_health_bar_kind = "creep_hero"
+		else
+			illusion.xhs_hide_health_bar = true
+		end
 		illusion:SetControllableByPlayer(player, true)
 
 		illusion:SetAngles(casterAngles.x, casterAngles.y, casterAngles.z)
@@ -100,9 +112,7 @@ function Phantasm(keys)
 		--		illusion:HeroLevelUp(false)
 		--	end
 
-		for abilitySlot = 0, 15 do
-			local ability = caster:GetAbilityByIndex(abilitySlot)
-			if ability then
+		ForEachUnitAbility(caster, function(ability)
 				local abilityLevel = ability:GetLevel()
 				local abilityName = ability:GetAbilityName()
 				local illusionAbility = illusion:FindAbilityByName(abilityName)
@@ -114,8 +124,7 @@ function Phantasm(keys)
 				if ability:GetName() == "grom_hellscream_mirror_image" then
 					ability:SetActivated(false)
 				end
-			end
-		end
+		end)
 
 		-- Recreate the items of the caster
 		for itemSlot = 0, 5 do
@@ -129,10 +138,21 @@ function Phantasm(keys)
 
 		illusion:AddNewModifier(caster, ability, "modifier_illusion", { duration = duration, outgoing_damage = outgoingDamage, incoming_damage = incomingDamage })
 		illusion:MakeIllusion()
+		if XHSCreepHealthBars ~= nil and XHSCreepHealthBars.Apply ~= nil then
+			XHSCreepHealthBars:Apply(illusion)
+		end
 		illusion:SetHealth(caster:GetHealth())
 		table.insert(caster.phantasm_illusions, illusion)
 		illusion:RemoveAbility("boss_health")
 		illusion:RemoveAbility("cant_die_generic")
 		illusion:RemoveModifierByName("modifier_cant_die_generic")
+
+		if isFinalWaveIllusion then
+			local ancient = Entities:FindByClassname(nil, "npc_dota_fort")
+			if ancient ~= nil and not ancient:IsNull() then
+				illusion:SetInitialGoalEntity(ancient)
+				illusion:MoveToPositionAggressive(ancient:GetAbsOrigin())
+			end
+		end
 	end
 end

@@ -21,6 +21,7 @@ function holdout_entrangling_roots:OnSpellStart()
 end
 
 modifier_entrangling_roots = modifier_entrangling_roots or class({})
+modifier_entrangling_roots.XHS_LINK_CLIENT = true
 
 function modifier_entrangling_roots:IsDebuff() return false end
 function modifier_entrangling_roots:IsHidden() return false end
@@ -95,6 +96,7 @@ function holdout_rejuvenation_alt:OnSpellStart()
 end
 
 modifier_rejuvenation = modifier_rejuvenation or class({})
+modifier_rejuvenation.XHS_LINK_CLIENT = true
 
 function modifier_rejuvenation:OnCreated()
 	if IsServer() then
@@ -119,7 +121,7 @@ function modifier_rejuvenation:OnIntervalThink()
 end
 
 function modifier_rejuvenation:GetEffectName()
-	return "particles/econ/events/ti6/bottle_ti6.vpcf"
+	return "particles/custom/supporter_pass/regen_aura_anchor.vpcf"
 end
 
 function modifier_rejuvenation:GetEffectAttachType()
@@ -139,6 +141,7 @@ function holdout_mark_of_the_claw:GetIntrinsicModifierName()
 end
 
 modifier_mark_of_the_claw = modifier_mark_of_the_claw or class({})
+modifier_mark_of_the_claw.XHS_LINK_CLIENT = true
 
 function modifier_mark_of_the_claw:IsHidden() return true end
 
@@ -203,6 +206,7 @@ function holdout_strength_of_the_wild:GetIntrinsicModifierName()
 end
 
 modifier_strength_of_the_wild = modifier_strength_of_the_wild or class({})
+modifier_strength_of_the_wild.XHS_LINK_CLIENT = true
 
 function holdout_strength_of_the_wild:IsHidden() return true end
 
@@ -264,6 +268,7 @@ function imba_malfurion_living_tower:OnSpellStart()
 end
 
 modifier_imba_malfurion_living_tower = modifier_imba_malfurion_living_tower or class({})
+modifier_imba_malfurion_living_tower.XHS_LINK_CLIENT = true
 
 function modifier_imba_malfurion_living_tower:IsHidden() return true end
 function modifier_imba_malfurion_living_tower:RemoveOnDeath() return false end
@@ -310,7 +315,7 @@ function modifier_imba_malfurion_living_tower:OnAttackStart(keys)
 
 	if keys.attacker == self:GetParent() then
 		self:GetParent():EmitSound("Tree.GrowBack")
-		self:GetParent():StartGestureWithPlaybackRate(ACT_DOTA_CUSTOM_TOWER_ATTACK, self:GetParent():GetAttacksPerSecond())
+		self:GetParent():StartGestureWithPlaybackRate(ACT_DOTA_CUSTOM_TOWER_ATTACK, self:GetParent():GetAttacksPerSecond(false))
 	end
 end
 

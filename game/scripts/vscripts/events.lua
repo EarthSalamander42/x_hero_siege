@@ -1,3 +1,77 @@
+local function GetXHSLaneParticipantCount()
+	local participantCount = GetXHSCombatParticipantCount ~= nil
+		and GetXHSCombatParticipantCount()
+		or PlayerResource:GetPlayerCount()
+	return math.max(1, math.min(8, tonumber(participantCount) or 1))
+end
+
+local function SetXHSLaneDoorState(lane, open)
+	local wasOpen = CREEP_LANES ~= nil
+		and CREEP_LANES[lane] ~= nil
+		and CREEP_LANES[lane][1] == 1
+	if CREEP_LANES ~= nil and CREEP_LANES[lane] ~= nil then
+		CREEP_LANES[lane][1] = open and 1 or 0
+	end
+
+	for _, obstruction in pairs(Entities:FindAllByName("obstruction_lane" .. lane)) do
+		obstruction:SetEnabled(not open, true)
+	end
+	DoEntFire(
+		"door_lane" .. lane,
+		"SetAnimation",
+		open and "gate_02_open" or "gate_02_close",
+		0,
+		nil,
+		nil
+	)
+
+	for _, tower in pairs(Entities:FindAllByName("dota_badguys_tower" .. lane)) do
+		if open and tower:IsAlive() then
+			tower:RemoveModifierByName("modifier_invulnerable")
+		elseif tower:IsAlive() and not tower:HasModifier("modifier_invulnerable") then
+			tower:AddNewModifier(tower, nil, "modifier_invulnerable", nil)
+		end
+	end
+
+	for _, rax in pairs(Entities:FindAllByName("dota_badguys_barracks_" .. lane)) do
+		if rax:IsAlive() and not rax:HasModifier("modifier_invulnerable") then
+			rax:AddNewModifier(rax, nil, "modifier_invulnerable", nil)
+		end
+	end
+	if XHSRefreshPhaseOneLaneStructureState ~= nil then
+		XHSRefreshPhaseOneLaneStructureState(lane)
+	end
+
+	if open and not wasOpen and XHSKnockbackHeroesAtOpeningDoors ~= nil then
+		XHSKnockbackHeroesAtOpeningDoors({ "door_lane" .. lane })
+	end
+end
+
+function RefreshXHSCombatLanes(forceDefaults)
+	if GameRules:State_Get() < DOTA_GAMERULES_STATE_GAME_IN_PROGRESS then
+		return 0
+	end
+	if forceDefaults ~= true and GameMode.xhs_manual_lane_configuration == true then
+		local activeLaneCount = 0
+		for lane = 1, 8 do
+			local open = CREEP_LANES ~= nil
+				and CREEP_LANES[lane] ~= nil
+				and CREEP_LANES[lane][1] == 1
+			SetXHSLaneDoorState(lane, open)
+			if open then activeLaneCount = activeLaneCount + 1 end
+		end
+		return activeLaneCount
+	end
+
+	local participantCount = GetXHSLaneParticipantCount()
+	_G.CREEP_LANES_TYPE = participantCount <= 4 and 2 or 1
+	local laneCount = math.min(8, participantCount * CREEP_LANES_TYPE)
+	for lane = 1, 8 do
+		SetXHSLaneDoorState(lane, lane <= laneCount)
+	end
+	return laneCount
+end
+
 ListenToGameEvent('game_rules_state_change', function()
 	local newState = GameRules:State_Get()
 
@@ -29,6 +103,13 @@ ListenToGameEvent('game_rules_state_change', function()
 		require('zones/dialog_xhs')
 		require('zones/zone_tables_xhs')
 	elseif newState == DOTA_GAMERULES_STATE_PRE_GAME then
+		local player_count = GetXHSLaneParticipantCount()
+		if player_count <= 4 then
+			_G.CREEP_LANES_TYPE = 2
+		else
+			_G.CREEP_LANES_TYPE = 1
+		end
+
 		if Gold then
 			Gold:Init()
 		end
@@ -37,13 +118,7 @@ ListenToGameEvent('game_rules_state_change', function()
 			DoEntFire("door_lane" .. i, "SetAnimation", "gate_02_close", 0, nil, nil)
 		end
 
-		if GetMapName() ~= "x_hero_siege_demo" then
-			-- debug
-			--			if IsInToolsMode() then
-			Entities:FindByName(nil, "trigger_special_event_tp_off"):Disable()
-			Entities:FindByName(nil, "trigger_special_event"):Enable()
-			--			end
-		end
+		SetXHSOptionalEventsUnlocked(false)
 
 		local diff = { "Easy", "Normal", "Hard", "Extreme", "Divine" }
 		local Color = { "green", "Yellow", "orange", "red", "darkred" }
@@ -101,20 +176,23 @@ ListenToGameEvent('game_rules_state_change', function()
 			end
 		end
 
-		for NumPlayers = 1, PlayerResource:GetPlayerCount() * CREEP_LANES_TYPE do
-			CREEP_LANES[NumPlayers][1] = 1
-			local DoorObs = Entities:FindAllByName("obstruction_lane" .. NumPlayers)
-			for _, obs in pairs(DoorObs) do
-				obs:SetEnabled(false, true)
-			end
-			DoEntFire("door_lane" .. NumPlayers, "SetAnimation", "gate_02_open", 0, nil, nil)
-			local towers = Entities:FindAllByName("dota_badguys_tower" .. NumPlayers)
-			for _, tower in pairs(towers) do
-				tower:RemoveModifierByName("modifier_invulnerable")
-			end
-		end
+		RefreshXHSCombatLanes()
+		SetXHSOptionalEventsUnlocked(false)
 	end
 end, nil)
+
+local function SendXHSRewardNotification(playerID, rewardType, amount, title, text)
+	local player = PlayerResource:GetPlayer(playerID)
+	if player == nil then return end
+
+	CustomGameEventManager:Send_ServerToPlayer(player, "xhs_reward_notification", {
+		type = rewardType,
+		amount = amount,
+		title = title,
+		text = text,
+		duration = 2.6,
+	})
+end
 
 -- Cleanup a player when they leave
 --[[
@@ -127,6 +205,55 @@ ListenToGameEvent('player_disconnect', function(keys)
 --	CloseLane(userid)
 end, nil)
 --]]
+local hidden_innate_abilities = {
+	"necronomicon_warrior_sight",
+	"holdout_blue_effect",
+}
+local DUNGEON_CHECKPOINT_MODEL = "models/props_structures/outpost.vmdl"
+
+local XHS_CREEP_ARMOR_DIFFICULTY_MULTIPLIERS = {
+	[1] = 0.70, -- Easy
+	[2] = 0.85, -- Normal
+	[3] = 1.00, -- Hard: current KV armor is the reference
+	[4] = 1.20, -- Extreme
+	[5] = 1.40, -- Divine
+}
+
+local XHS_PHASE_TWO_ARMOR_CREEPS = {
+	npc_ghul_II = true,
+	npc_orc_II = true,
+	npc_magnataur_destroyer_crypt = true,
+}
+
+local XHS_DRAGON_ARMOR_CREEPS = {
+	npc_dota_creature_green_dragon = true,
+	npc_dota_creature_red_dragon = true,
+	npc_dota_creature_blue_dragon = true,
+}
+
+local function IsXHSPhaseOneArmorCreep(unitName)
+	local race, attackType = string.match(unitName or "", "^npc_xhs_([%a]+)_creep_([%a]+)_[1-4]$")
+	local validRace = race == "undead" or race == "orc" or race == "elf" or race == "human"
+	local validAttackType = attackType == "melee" or attackType == "ranged"
+	return validRace and validAttackType
+end
+
+local function ShouldScaleXHSCreepArmor(unitName)
+	return IsXHSPhaseOneArmorCreep(unitName)
+		or XHS_PHASE_TWO_ARMOR_CREEPS[unitName] == true
+		or XHS_DRAGON_ARMOR_CREEPS[unitName] == true
+end
+
+local function ApplyXHSCreepDifficultyArmor(npc, unitName, difficulty, referenceArmor)
+	if not ShouldScaleXHSCreepArmor(unitName) then return end
+
+	local multiplier = XHS_CREEP_ARMOR_DIFFICULTY_MULTIPLIERS[difficulty] or 1.0
+	local scaledArmor = math.floor((referenceArmor * multiplier) * 10 + 0.5) / 10
+	npc:SetPhysicalArmorBaseValue(scaledArmor)
+	npc.xhs_hard_reference_armor = referenceArmor
+	npc.xhs_difficulty_armor_multiplier = multiplier
+end
+
 -- An NPC has spawned somewhere in game. This includes heroes
 ListenToGameEvent('npc_spawned', function(keys)
 	local difficulty = GameRules:GetCustomGameDifficulty()
@@ -135,14 +262,19 @@ ListenToGameEvent('npc_spawned', function(keys)
 	local normal_xp = npc:GetDeathXP()
 	local normal_min_damage = npc:GetBaseDamageMin()
 	local normal_max_damage = npc:GetBaseDamageMax()
+	local normal_armor = npc:GetPhysicalArmorValue(false)
 	local hero_level = npc:GetLevel()
 
-	if GetMapName() == "x_hero_siege_8" then
-		local normal_bounty = npc:GetGoldBounty() * 2
-		local normal_xp = npc:GetDeathXP() * 2
-	end
-
 	if npc and IsValidEntity(npc) then
+		if npc:IsRealHero() and npc:IsAlive() and npc.xhs_dead_inventory_lock_active == true
+			and StopXHSDeadInventoryLock ~= nil then
+			StopXHSDeadInventoryLock(npc)
+		end
+
+		if npc:IsRealHero() and _G.XHSUnitTombstone ~= nil then
+			_G.XHSUnitTombstone:RegisterHero(npc)
+		end
+
 		--ALL NPC
 		for i = 1, #innate_abilities do
 			local current_ability = npc:FindAbilityByName(innate_abilities[i])
@@ -151,11 +283,45 @@ ListenToGameEvent('npc_spawned', function(keys)
 			end
 		end
 
+		-- Technical innates must keep functioning without occupying HUD slots.
+		for i = 1, #hidden_innate_abilities do
+			local hidden_ability = npc:FindAbilityByName(hidden_innate_abilities[i])
+			if hidden_ability then
+				hidden_ability:SetHidden(true)
+			end
+		end
+
+		if npc:GetUnitName() == "npc_dota_dungeon_checkpoint" then
+			-- The map-placed checkpoint keeps the model serialized in the VMAP.
+			-- Override both model references before attaching model-dependent PFX.
+			npc:SetOriginalModel(DUNGEON_CHECKPOINT_MODEL)
+			npc:SetModel(DUNGEON_CHECKPOINT_MODEL)
+			npc:SetMaterialGroup("1")
+
+			if npc.xhs_outpost_ambient_particle == nil then
+				npc.xhs_outpost_ambient_particle = ParticleManager:CreateParticle(
+					"particles/world_outpost/world_outpost_radiant_ambient.vpcf",
+					PATTACH_ABSORIGIN_FOLLOW,
+					npc
+				)
+				ParticleManager:SetParticleControlEnt(
+					npc.xhs_outpost_ambient_particle,
+					0,
+					npc,
+					PATTACH_ABSORIGIN_FOLLOW,
+					nil,
+					npc:GetAbsOrigin(),
+					true
+				)
+			end
+		end
+
 		if npc:GetTeamNumber() ~= 2 or npc:GetUnitName() == "npc_dota_creature_muradin_bronzebeard" then
 			local unit_kv = GetUnitKeyValuesByName(npc:GetUnitName())
 
-			if unit_kv and unit_kv["UseAI"] then
-				npc:AddNewModifier(npc, nil, "modifier_ai", { state = unit_kv["UseAI"] })
+			local aiState = unit_kv and tonumber(unit_kv["UseAI"]) or 0
+			if aiState > 0 then
+				npc:AddNewModifier(npc, nil, "modifier_ai", { state = aiState })
 			end
 		end
 
@@ -168,10 +334,76 @@ ListenToGameEvent('npc_spawned', function(keys)
 			end, 0.1)
 		end
 
+		if npc:GetUnitName() == "npc_dota_hero_grom_hellscream" and XHSGrom_AttachPhase3AI ~= nil then
+			GameRules:GetGameModeEntity():SetContextThink("AttachGromPhase3AI" .. tostring(npc:entindex()), function()
+				if npc ~= nil and IsValidEntity(npc) and not npc:IsNull() then
+					XHSGrom_AttachPhase3AI(npc)
+				end
+				return nil
+			end, 0.1)
+		end
+
+		if npc:GetUnitName() == "npc_dota_hero_illidan" and XHSIllidan_AttachPhase3AI ~= nil then
+			GameRules:GetGameModeEntity():SetContextThink("AttachIllidanPhase3AI" .. tostring(npc:entindex()), function()
+				if npc ~= nil and IsValidEntity(npc) and not npc:IsNull() then
+					XHSIllidan_AttachPhase3AI(npc)
+				end
+				return nil
+			end, 0.1)
+		end
+
+		if npc:GetUnitName() == "npc_dota_hero_balanar" and XHSBalanar_AttachPhase3AI ~= nil then
+			GameRules:GetGameModeEntity():SetContextThink("AttachBalanarPhase3AI" .. tostring(npc:entindex()), function()
+				if npc ~= nil and IsValidEntity(npc) and not npc:IsNull() then
+					XHSBalanar_AttachPhase3AI(npc)
+				end
+				return nil
+			end, 0.1)
+		end
+
+		if npc:GetUnitName() == "npc_dota_hero_proudmoore" and XHSProudmoore_AttachPhase3AI ~= nil then
+			GameRules:GetGameModeEntity():SetContextThink("AttachProudmoorePhase3AI" .. tostring(npc:entindex()), function()
+				if npc ~= nil and IsValidEntity(npc) and not npc:IsNull() then
+					XHSProudmoore_AttachPhase3AI(npc)
+				end
+				return nil
+			end, 0.1)
+		end
+
+		if npc:GetUnitName() == "npc_dota_hero_arthas" and XHSArthas_AttachPhase3AI ~= nil then
+			GameRules:GetGameModeEntity():SetContextThink("AttachArthasPhase3AI" .. tostring(npc:entindex()), function()
+				if npc ~= nil and IsValidEntity(npc) and not npc:IsNull() then
+					XHSArthas_AttachPhase3AI(npc)
+				end
+				return nil
+			end, 0.1)
+		end
+
+		if npc:GetUnitName() == "npc_dota_boss_lich_king" and XHSLichKing_AttachPhase3AI ~= nil then
+			GameRules:GetGameModeEntity():SetContextThink("AttachLichKingPhase3AI" .. tostring(npc:entindex()), function()
+				if npc ~= nil and IsValidEntity(npc) and not npc:IsNull() and not npc:IsInvulnerable() then
+					XHSLichKing_AttachPhase3AI(npc)
+				end
+				return nil
+			end, 0.1)
+		end
+
+		if npc:GetUnitName() == "npc_dota_boss_spirit_master" and XHSSpiritMaster_AttachPhase3AI ~= nil then
+			GameRules:GetGameModeEntity():SetContextThink("AttachSpiritMasterPhase3AI" .. tostring(npc:entindex()), function()
+				if npc ~= nil and IsValidEntity(npc) and not npc:IsNull() then
+					XHSSpiritMaster_AttachPhase3AI(npc)
+				end
+				return nil
+			end, 0.1)
+		end
+
 		-- HERO NPC
 		if npc:IsRealHero() and npc:GetTeamNumber() == DOTA_TEAM_GOODGUYS then
 			if npc.bFirstSpawnComplete == nil then
 				npc:AddNewModifier(npc, nil, "modifier_custom_mechanics", {})
+				if npc:GetUnitName() == "npc_dota_hero_rattletrap" then
+					npc:AddNewModifier(npc, nil, "modifier_xhs_space_marine_attack_sound", {})
+				end
 
 				if npc:IsFakeHero() and AbilitiesHeroes_XX[npc:GetUnitName()] then
 					npc:AddAbility("ability_level_20"):SetLevel(1)
@@ -230,6 +462,11 @@ ListenToGameEvent('npc_spawned', function(keys)
 
 		-- CREATURES NPC
 		if not npc:IsRealHero() and (npc:GetTeamNumber() == DOTA_TEAM_CUSTOM_1 or npc:GetTeamNumber() == DOTA_TEAM_CUSTOM_2 or npc:GetTeamNumber() == DOTA_TEAM_NEUTRALS) then
+			if XHSCreepPassives ~= nil then
+				XHSCreepPassives:Apply(npc, difficulty)
+			end
+			ApplyXHSCreepDifficultyArmor(npc, npc:GetUnitName(), difficulty, normal_armor)
+
 			if difficulty == 1 then
 				npc:SetMinimumGoldBounty(normal_bounty * 1.5)
 				npc:SetMaximumGoldBounty(normal_bounty * 1.5)
@@ -343,6 +580,176 @@ function GameMode:OnPlayerChangedName(keys)
 end
 
 --]]
+
+local function RemoveNewestPurchasedItem(hero, itemName, itemEntIndex, minPurchaseTime)
+	if hero == nil or hero:IsNull() or itemName == nil or itemName == "" then return false end
+
+	local itemToRemove = nil
+	local newestPurchaseTime = -1
+	local fallbackItem = nil
+	local fallbackPurchaseTime = -1
+	if itemEntIndex ~= nil and itemEntIndex > 0 then
+		local eventItem = EntIndexToHScript(itemEntIndex)
+		if eventItem ~= nil and not eventItem:IsNull() then
+			local eventItemName = eventItem.GetAbilityName and eventItem:GetAbilityName() or eventItem:GetName()
+			if eventItemName == itemName then
+				itemToRemove = eventItem
+			end
+		end
+	end
+
+	if itemToRemove == nil then
+		for slot = 0, 14 do
+			local item = hero:GetItemInSlot(slot)
+			if item ~= nil and not item:IsNull() then
+				local slotItemName = item.GetAbilityName and item:GetAbilityName() or item:GetName()
+				if slotItemName == itemName then
+					local purchaseTime = item.GetPurchaseTime and item:GetPurchaseTime() or 0
+					if itemToRemove == nil or purchaseTime >= newestPurchaseTime then
+						itemToRemove = item
+						newestPurchaseTime = purchaseTime
+					end
+				end
+
+				local purchaseTime = item.GetPurchaseTime and item:GetPurchaseTime() or 0
+				if minPurchaseTime ~= nil and purchaseTime >= minPurchaseTime and purchaseTime >= fallbackPurchaseTime then
+					fallbackItem = item
+					fallbackPurchaseTime = purchaseTime
+				end
+			end
+		end
+	end
+
+	if fallbackItem ~= nil and (itemToRemove == nil or (minPurchaseTime ~= nil and newestPurchaseTime < minPurchaseTime)) then
+		itemToRemove = fallbackItem
+	end
+
+	if itemToRemove ~= nil and not itemToRemove:IsNull() then
+		hero:RemoveItem(itemToRemove)
+		return true
+	end
+
+	return false
+end
+
+ListenToGameEvent('dota_item_purchased', function(keys)
+	local playerID = tonumber(keys.PlayerID)
+	if playerID == nil or playerID < 0 then return end
+	if IsPlayerXHSInventoryLocked == nil or not IsPlayerXHSInventoryLocked(playerID) then return end
+
+	local itemName = keys.itemname or ""
+	local itemCost = tonumber(keys.itemcost) or 0
+	local itemEntIndex = tonumber(keys.item_entindex or keys.ItemEntityIndex or keys.item_ent_index) or -1
+	local purchaseGameTime = GameRules:GetGameTime()
+
+	local lockedHero = PlayerResource:GetSelectedHeroEntity(playerID)
+	if lockedHero == nil or lockedHero:IsNull() then
+		local player = PlayerResource:GetPlayer(playerID)
+		lockedHero = player and player:GetAssignedHero() or nil
+	end
+	if lockedHero ~= nil and not lockedHero:IsNull() and SendXHSInventoryLockedError ~= nil then
+		SendXHSInventoryLockedError(lockedHero)
+	else
+		SendErrorMessage(playerID, "#error_dead_inventory_locked")
+	end
+
+	GameRules:GetGameModeEntity():SetContextThink(DoUniqueString("xhs_locked_inventory_purchase_rollback"), function()
+		local hero = PlayerResource:GetSelectedHeroEntity(playerID)
+		if hero == nil or hero:IsNull() then
+			local player = PlayerResource:GetPlayer(playerID)
+			hero = player and player:GetAssignedHero() or nil
+		end
+
+		RemoveNewestPurchasedItem(hero, itemName, itemEntIndex, purchaseGameTime - 0.5)
+
+		if itemCost > 0 then
+			PlayerResource:ModifyGold(playerID, itemCost, false, DOTA_ModifyGold_Unspecified)
+		end
+
+		return nil
+	end, 0)
+end, nil)
+
+local function GetXHSTrackedPlayerHero(playerID)
+	if playerID == nil or playerID < 0 or not PlayerResource:IsValidPlayerID(playerID) then return nil end
+
+	local hero = PlayerResource:GetSelectedHeroEntity(playerID)
+	if hero ~= nil and not hero:IsNull() then return hero end
+
+	local player = PlayerResource:GetPlayer(playerID)
+	return player ~= nil and player:GetAssignedHero() or nil
+end
+
+ListenToGameEvent('dota_player_used_ability', function(keys)
+	local playerID = tonumber(keys.PlayerID or keys.player_id or keys.playerid)
+	if playerID == nil or playerID < 0 then return end
+
+	local abilityName = keys.abilityname or keys.itemname or keys.ability_name
+	if XHSIsPotionItemName == nil or XHSIsPotionItemName(abilityName) ~= true then return end
+	if XHSRecordPotionUseForPlayer == nil then return end
+
+	XHSRecordPotionUseForPlayer(playerID, GetXHSTrackedPlayerHero(playerID), abilityName)
+end, nil)
+
+local function GetHeroFromInventoryEvent(keys)
+	local unitEntIndex = tonumber(keys.unit_entindex or keys.inventory_parent_entindex or keys.entindex or keys.entityIndex)
+	if unitEntIndex ~= nil and unitEntIndex > 0 then
+		local unit = EntIndexToHScript(unitEntIndex)
+		if unit ~= nil and not unit:IsNull() and unit.IsRealHero and unit:IsRealHero() then
+			return unit
+		end
+	end
+
+	local playerID = tonumber(keys.PlayerID or keys.player_id or keys.playerid)
+	if playerID ~= nil and playerID >= 0 then
+		local hero = nil
+		if PlayerResource:IsValidPlayerID(playerID) and PlayerResource:HasSelectedHero(playerID) then
+			hero = PlayerResource:GetSelectedHeroEntity(playerID)
+		end
+
+		if hero == nil or hero:IsNull() then
+			local player = PlayerResource:GetPlayer(playerID)
+			hero = player and player:GetAssignedHero() or nil
+		end
+
+		if hero ~= nil and not hero:IsNull() then
+			return hero
+		end
+	end
+
+	return nil
+end
+
+local function RestoreReincarnationInventoryForHero(hero)
+	if hero == nil or hero:IsNull() then return end
+	if IsPlayerXHSReincarnating == nil or RestoreXHSReincarnationInventory == nil then return end
+	if not hero.GetPlayerID or not IsPlayerXHSReincarnating(hero:GetPlayerID()) then return end
+
+	if RestoreXHSReincarnationInventory(hero) and SendXHSReincarnationInventoryLockedError ~= nil then
+		SendXHSReincarnationInventoryLockedError(hero)
+	end
+end
+
+local function OnReincarnationInventoryChanged(keys)
+	local hero = GetHeroFromInventoryEvent(keys or {})
+	if hero ~= nil then
+		RestoreReincarnationInventoryForHero(hero)
+		return
+	end
+
+	for playerID = 0, PlayerResource:GetPlayerCount() - 1 do
+		if IsPlayerXHSReincarnating ~= nil and IsPlayerXHSReincarnating(playerID) then
+			RestoreReincarnationInventoryForHero(PlayerResource:GetSelectedHeroEntity(playerID))
+		end
+	end
+end
+
+ListenToGameEvent('dota_inventory_changed', OnReincarnationInventoryChanged, nil)
+ListenToGameEvent('dota_inventory_item_changed', OnReincarnationInventoryChanged, nil)
+ListenToGameEvent('dota_inventory_item_added', OnReincarnationInventoryChanged, nil)
+ListenToGameEvent('dota_inventory_player_got_item', OnReincarnationInventoryChanged, nil)
+ListenToGameEvent('inventory_updated', OnReincarnationInventoryChanged, nil)
+
 ListenToGameEvent('dota_player_learned_ability', function(keys)
 	local player = EntIndexToHScript(keys.player)
 	local hero = player:GetAssignedHero()
@@ -424,6 +831,18 @@ ListenToGameEvent('dota_player_gained_level', function(keys)
 
 	if hero:GetUnitName() == "npc_dota_hero_sniper" then
 		if hero_level == 20 then
+			local rocket_launcher = hero:FindAbilityByName("holdout_rocket_launcher")
+			local plasma_rifle = hero:FindAbilityByName("holdout_plasma_rifle")
+
+			if rocket_launcher ~= nil and not rocket_launcher:IsNull() and rocket_launcher:GetToggleState() then
+				rocket_launcher:ToggleAbility()
+			end
+			if plasma_rifle ~= nil and not plasma_rifle:IsNull() and plasma_rifle:GetToggleState() then
+				plasma_rifle:ToggleAbility()
+			end
+
+			hero:RemoveModifierByName("modifier_rocket_launcher")
+			hero:RemoveModifierByName("modifier_plasma_rifle")
 			hero:RemoveAbility("holdout_rocket_launcher")
 			hero:RemoveAbility("holdout_plasma_rifle")
 		end
@@ -492,33 +911,41 @@ ListenToGameEvent('dota_player_gained_level', function(keys)
 			hero:RemoveAbility("ability_capture")
 		end
 
-		for i = 0, 17 do
-			local ability = hero:GetAbilityByIndex(i)
-
-			if IsValidEntity(ability) then
-				if ability:GetLevel() < ability:GetMaxLevel() then
-					for j = 1, ability:GetMaxLevel() - ability:GetLevel() do
-						hero:UpgradeAbility(ability)
-					end
+		ForEachUnitAbility(hero, function(ability)
+			if ability:GetLevel() < ability:GetMaxLevel() then
+				for j = 1, ability:GetMaxLevel() - ability:GetLevel() do
+					hero:UpgradeAbility(ability)
 				end
 			end
-		end
+		end)
 
 		if AbilitiesHeroes_XX[hero:GetUnitName()] then
 			hero.lvl_20 = true
-			Notifications:Bottom(hero:GetPlayerOwnerID(), { text = "You've reached level 20. Check out your new abilities! ", duration = 10 })
+			local notification_segments = {
+				{ text = "You've reached level 20. Check out your new abilities! " },
+			}
+
 			for _, ability in pairs(AbilitiesHeroes_XX[hero:GetUnitName()]) do
 				if ability ~= nil then
-					Notifications:Bottom(hero:GetPlayerOwnerID(), { ability = ability[1], continue = true })
-					hero:AddAbility(ability[1])
-					hero:UpgradeAbility(hero:FindAbilityByName(ability[1]))
-					local oldab = hero:GetAbilityByIndex(ability[2])
-					if oldab:GetAutoCastState() then
+					table.insert(notification_segments, { ability = ability[1] })
+					local new_ability = hero:AddAbility(ability[1])
+					if new_ability ~= nil then
+						new_ability:SetLevel(new_ability:GetMaxLevel())
+					end
+					local oldab = GetUnitAbilityBySafeIndex(hero, ability[2])
+					if oldab ~= nil and oldab:GetAutoCastState() then
 						oldab:ToggleAutoCast()
 					end
-					hero:SwapAbilities(oldab:GetName(), ability[1], true, true)
+					if oldab ~= nil then
+						hero:SwapAbilities(oldab:GetName(), ability[1], true, true)
+					end
 				end
 			end
+
+			Notifications:Bottom(hero:GetPlayerOwnerID(), {
+				duration = 10,
+				segments = notification_segments,
+			})
 		else
 			print("No Level 20 Ability for " .. hero:GetUnitName() .. " found!")
 		end
@@ -611,6 +1038,10 @@ ListenToGameEvent("player_chat", function(keys)
 	end
 
 	for str in string.gmatch(text, "%S+") do
+		if str == "-xhs_precache_report" and IsInToolsMode() and XHSPrecache then
+			XHSPrecache:PrintReport()
+		end
+
 		if donator_level == 1 or donator_level == 2 or donator_level == 3 or IsInToolsMode() then
 			for Frozen = 0, PlayerResource:GetPlayerCount() - 1 do
 				local PlayerNames = { "Red", "Blue", "Cyan", "Purple", "Yellow", "Orange", "Green", "Pink" }
@@ -619,10 +1050,21 @@ ListenToGameEvent("player_chat", function(keys)
 						local hero = PlayerResource:GetPlayer(Frozen):GetAssignedHero()
 						hero:AddNewModifier(hero, nil, "modifier_pause_creeps", {})
 						hero:AddNewModifier(hero, nil, "modifier_invulnerable", {})
-						PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(), hero)
-						Notifications:TopToAll({ text = "[ADMIN MOD]: ", duration = 6.0, style = { color = "red", ["font-size"] = "30px" } })
-						Notifications:TopToAll({ text = PlayerNames[Frozen + 1] .. " ", style = { color = PlayerNames[Frozen + 1], ["font-size"] = "25px" }, continue = true })
-						Notifications:TopToAll({ text = "player has been jailed!", style = { color = "white", ["font-size"] = "25px" }, continue = true })
+						CameraMotion:Follow(hero:GetPlayerOwnerID(), hero, {
+							from = hero,
+							duration = 0,
+							owner = "admin_freeze",
+							priority = 200,
+							policy = "replace",
+						})
+						Notifications:TopToAll({
+							duration = 6.0,
+							segments = {
+								{ text = "[ADMIN MOD]: ",                style = { color = "red", ["font-size"] = "30px" } },
+								{ text = PlayerNames[Frozen + 1] .. " ", style = { color = PlayerNames[Frozen + 1], ["font-size"] = "25px" } },
+								{ text = "player has been jailed!",      style = { color = "white", ["font-size"] = "25px" } },
+							},
+						})
 					end
 					if str == "-unfreeze_" .. Frozen + 1 then
 						local hero = PlayerResource:GetPlayer(Frozen):GetAssignedHero()
@@ -630,26 +1072,45 @@ ListenToGameEvent("player_chat", function(keys)
 						hero:RemoveModifierByName("modifier_pause_creeps")
 						hero:RemoveModifierByName("modifier_invulnerable")
 						hero:RemoveModifierByName("modifier_command_restricted")
-						PlayerResource:SetCameraTarget(hero:GetPlayerOwnerID(), nil)
-						Notifications:TopToAll({ text = "[ADMIN MOD]: ", duration = 6.0, style = { color = "red", ["font-size"] = "30px" } })
-						Notifications:TopToAll({ text = PlayerNames[Frozen + 1] .. " ", style = { color = PlayerNames[Frozen + 1], ["font-size"] = "25px" }, continue = true })
-						Notifications:TopToAll({ text = "player has been released!", style = { color = "white", ["font-size"] = "25px" }, continue = true })
+						CameraMotion:Release(hero:GetPlayerOwnerID(), {
+							owner = "admin_freeze",
+							mode = "free",
+							reason = "admin freeze ended",
+						})
+						Notifications:TopToAll({
+							duration = 6.0,
+							segments = {
+								{ text = "[ADMIN MOD]: ",                style = { color = "red", ["font-size"] = "30px" } },
+								{ text = PlayerNames[Frozen + 1] .. " ", style = { color = PlayerNames[Frozen + 1], ["font-size"] = "25px" } },
+								{ text = "player has been released!",    style = { color = "white", ["font-size"] = "25px" } },
+							},
+						})
 					end
 					if str == "-kill_" .. Frozen + 1 then
 						local hero = PlayerResource:GetPlayer(Frozen):GetAssignedHero()
 						if hero:IsAlive() then
 							hero:Kill(nil, nil)
-							Notifications:TopToAll({ text = "[ADMIN MOD]: ", duration = 6.0, style = { color = "red", ["font-size"] = "30px" } })
-							Notifications:TopToAll({ text = PlayerNames[Frozen + 1] .. " ", style = { color = PlayerNames[Frozen + 1], ["font-size"] = "25px" }, continue = true })
-							Notifications:TopToAll({ text = "player has been slayed!", style = { color = "white", ["font-size"] = "25px" }, continue = true })
+							Notifications:TopToAll({
+								duration = 6.0,
+								segments = {
+									{ text = "[ADMIN MOD]: ",                style = { color = "red", ["font-size"] = "30px" } },
+									{ text = PlayerNames[Frozen + 1] .. " ", style = { color = PlayerNames[Frozen + 1], ["font-size"] = "25px" } },
+									{ text = "player has been slayed!",      style = { color = "white", ["font-size"] = "25px" } },
+								},
+							})
 						end
 					end
 					if str == "-revive_" .. Frozen + 1 then
 						local hero = PlayerResource:GetPlayer(Frozen):GetAssignedHero()
 						hero:RespawnHero(false, false)
-						Notifications:TopToAll({ text = "[ADMIN MOD]: ", duration = 6.0, style = { color = "red", ["font-size"] = "30px" } })
-						Notifications:TopToAll({ text = PlayerNames[Frozen + 1] .. " ", style = { color = PlayerNames[Frozen + 1], ["font-size"] = "25px" }, continue = true })
-						Notifications:TopToAll({ text = "player has been revived!", style = { color = "white", ["font-size"] = "25px" }, continue = true })
+						Notifications:TopToAll({
+							duration = 6.0,
+							segments = {
+								{ text = "[ADMIN MOD]: ",                style = { color = "red", ["font-size"] = "30px" } },
+								{ text = PlayerNames[Frozen + 1] .. " ", style = { color = PlayerNames[Frozen + 1], ["font-size"] = "25px" } },
+								{ text = "player has been revived!",     style = { color = "white", ["font-size"] = "25px" } },
+							},
+						})
 					end
 					if str == "-yolo_" .. Frozen + 1 then
 						local hero = PlayerResource:GetPlayer(Frozen):GetAssignedHero()
@@ -660,9 +1121,14 @@ ListenToGameEvent("player_chat", function(keys)
 						yolo2 = ParticleManager:CreateParticle("particles/units/heroes/hero_ember_spirit/ember_spirit_flameguard.vpcf", PATTACH_ABSORIGIN_FOLLOW, hero)
 						hero:EmitSound("Hero_Batrider.Firefly.Cast")
 						hero:EmitSound("Hero_Batrider.Firefly.Loop")
-						Notifications:TopToAll({ text = "[ADMIN MOD]: ", duration = 6.0, style = { color = "red", ["font-size"] = "30px" } })
-						Notifications:TopToAll({ text = PlayerNames[Frozen + 1] .. " ", style = { color = PlayerNames[Frozen + 1], ["font-size"] = "25px" }, continue = true })
-						Notifications:TopToAll({ text = "player is in YOLO state!", style = { color = "white", ["font-size"] = "25px" }, continue = true })
+						Notifications:TopToAll({
+							duration = 6.0,
+							segments = {
+								{ text = "[ADMIN MOD]: ",                style = { color = "red", ["font-size"] = "30px" } },
+								{ text = PlayerNames[Frozen + 1] .. " ", style = { color = PlayerNames[Frozen + 1], ["font-size"] = "25px" } },
+								{ text = "player is in YOLO state!",     style = { color = "white", ["font-size"] = "25px" } },
+							},
+						})
 					end
 					if str == "-unyolo_" .. Frozen + 1 then
 						local hero = PlayerResource:GetPlayer(Frozen):GetAssignedHero()
@@ -671,9 +1137,14 @@ ListenToGameEvent("player_chat", function(keys)
 						hero:StopSound("Hero_Batrider.Firefly.Loop")
 						ParticleManager:DestroyParticle(yolo, true)
 						ParticleManager:DestroyParticle(yolo2, true)
-						Notifications:TopToAll({ text = "[ADMIN MOD]: ", duration = 6.0, style = { color = "red", ["font-size"] = "30px" } })
-						Notifications:TopToAll({ text = PlayerNames[Frozen + 1] .. " ", style = { color = PlayerNames[Frozen + 1], ["font-size"] = "25px" }, continue = true })
-						Notifications:TopToAll({ text = "player is not in YOLO state anymore.", style = { color = "white", ["font-size"] = "25px" }, continue = true })
+						Notifications:TopToAll({
+							duration = 6.0,
+							segments = {
+								{ text = "[ADMIN MOD]: ",                        style = { color = "red", ["font-size"] = "30px" } },
+								{ text = PlayerNames[Frozen + 1] .. " ",         style = { color = PlayerNames[Frozen + 1], ["font-size"] = "25px" } },
+								{ text = "player is not in YOLO state anymore.", style = { color = "white", ["font-size"] = "25px" } },
+							},
+						})
 					end
 				end
 			end
@@ -684,18 +1155,10 @@ ListenToGameEvent("player_chat", function(keys)
 
 				if PlayerResource:GetSelectedHeroName(hero:GetPlayerID()) ~= "npc_dota_hero_" .. text then
 					--					if KeyValues.HeroKV["npc_dota_hero_"..text] then
-					PrecacheUnitByNameAsync("npc_dota_hero_" .. text, function()
-						local wisp = PlayerResource:GetSelectedHeroEntity(hero:GetPlayerID())
-						PlayerResource:ReplaceHeroWith(hero:GetPlayerID(), "npc_dota_hero_" .. text, 0, 0)
-
-						GameRules:GetGameModeEntity():SetContextThink("PreGame", function()
-							if wisp then
-								UTIL_Remove(wisp)
-							end
-
-							return nil
-						end, 1.0)
-					end, userID)
+					local wisp = PlayerResource:GetSelectedHeroEntity(hero:GetPlayerID())
+					XHSPrecache:ReplaceHeroWith(hero:GetPlayerID(), "npc_dota_hero_" .. text, 0, 0, wisp, {
+						cleanupDelay = 1.0,
+					})
 					-- else
 					-- 	Notifications:TopToAll({text="Hero don't exist!", duration=6.0, style={color="red", ["font-size"]="30px"}})
 					-- end
@@ -704,45 +1167,7 @@ ListenToGameEvent("player_chat", function(keys)
 		end
 
 		if str == "-bt" then
-			if GameRules:IsGamePaused() then
-				SendErrorMessage(hero:GetPlayerID(), "#error_buy_tome_pause")
-				return
-			end
-
-			local hero = player:GetAssignedHero()
-			local gold = Gold:GetGold(userID)
-			local cost = 10000
-			local numberOfTomes = math.floor(gold / cost)
-
-			if BT_ENABLED == 1 then
-				if numberOfTomes < 1 then
-					SendErrorMessage(hero:GetPlayerID(), "#error_cant_afford_tomes")
-					return
-				end
-
-				local i = 0
-
-				Notifications:Bottom(player, { text = "You've bought " .. numberOfTomes .. " Tomes!", duration = 5.0, style = { color = "white" } })
-				PlayerResource:SpendGold(player:GetPlayerID(), (numberOfTomes) * cost, DOTA_ModifyGold_PurchaseItem)
-
-				GameRules:GetGameModeEntity():SetContextThink("PreGame", function()
-					hero:IncrementAttributes(50)
-					hero:EmitSound("ui.trophy_levelup")
-
-					local pfx = ParticleManager:CreateParticle("particles/generic_hero_status/hero_levelup.vpcf", PATTACH_ABSORIGIN_FOLLOW, hero, hero)
-					ParticleManager:SetParticleControl(pfx, 0, hero:GetAbsOrigin())
-
-					i = i + 1
-
-					if i >= numberOfTomes then
-						return nil
-					else
-						return 0.1
-					end
-				end, FrameTime())
-			elseif BT_ENABLED == 0 then
-				SendErrorMessage(hero:GetPlayerID(), "#error_buy_tome_disabled")
-			end
+			BuyMaxSmallTomesForPlayer(userID)
 		end
 
 		if str == "-info" then
@@ -806,7 +1231,7 @@ ListenToGameEvent("player_chat", function(keys)
 			lane = tonumber(string.sub(lane, i, j))
 
 			if lane <= 8 then
-				print("Opening lane:", lane)
+				print("Closing lane:", lane)
 				CloseLane(hero:GetPlayerID(), lane)
 			end
 		end
@@ -928,17 +1353,209 @@ end
 -- * damagebits
 ---------------------------------------------------------
 
+local function IsValidXHSTombstoneEntity(entity)
+	return entity ~= nil and IsValidEntity(entity) and not entity:IsNull()
+end
+
+local XHS_TOMBSTONE_SPAWN_PARTICLE = "particles/units/heroes/hero_undying/undying_tombstone.vpcf"
+local XHS_TOMBSTONE_AMBIENT_PARTICLE = "particles/econ/items/undying/fall20_undying_head/fall20_undying_tombstone_ambient.vpcf"
+
+function XHSDestroyTombstoneDropEffects(drop)
+	if not IsValidXHSTombstoneEntity(drop) then return end
+
+	if drop.xhs_tombstone_ambient_particle ~= nil then
+		ParticleManager:DestroyParticle(drop.xhs_tombstone_ambient_particle, false)
+		ParticleManager:ReleaseParticleIndex(drop.xhs_tombstone_ambient_particle)
+		drop.xhs_tombstone_ambient_particle = nil
+	end
+end
+
+function XHSCleanupClaimedTombstoneDrops(hero, delay)
+	if hero == nil or hero.xhs_tombstone_claimed_drops == nil then return end
+
+	local claimedDrops = hero.xhs_tombstone_claimed_drops
+	hero.xhs_tombstone_claimed_drops = nil
+	GameRules:GetGameModeEntity():SetContextThink(DoUniqueString("xhs_tombstone_claimed_drop_cleanup"), function()
+		for dropEntindex, _ in pairs(claimedDrops) do
+			local numericEntindex = tonumber(dropEntindex)
+			if numericEntindex ~= nil and numericEntindex > 0 then
+				local drop = EntIndexToHScript(numericEntindex)
+				if IsValidXHSTombstoneEntity(drop) then
+					XHSDestroyTombstoneDropEffects(drop)
+					UTIL_Remove(drop)
+				end
+			end
+		end
+		return nil
+	end, math.max(0, tonumber(delay) or 0.2))
+end
+
+function XHSRemoveTombstoneGroundForHero(hero, cleanupClaimed)
+	if hero == nil then return end
+
+	local drop = hero.xhs_tombstone_drop
+	local item = hero.xhs_tombstone_item
+	hero.xhs_tombstone_drop = nil
+	hero.xhs_tombstone_item = nil
+
+	if IsValidXHSTombstoneEntity(drop) then
+		XHSDestroyTombstoneDropEffects(drop)
+		UTIL_Remove(drop)
+	end
+	if IsValidXHSTombstoneEntity(item) then
+		UTIL_Remove(item)
+	end
+	if cleanupClaimed == true then
+		XHSCleanupClaimedTombstoneDrops(hero, 0.2)
+	end
+end
+
+function EnsureXHSTombstoneGroundDrop(hero, position)
+	if not IsValidXHSTombstoneEntity(hero) or hero:IsAlive() then return nil, nil end
+	if IsValidXHSTombstoneEntity(hero.xhs_tombstone_drop)
+		and IsValidXHSTombstoneEntity(hero.xhs_tombstone_item) then
+		return hero.xhs_tombstone_item, hero.xhs_tombstone_drop
+	end
+
+	XHSRemoveTombstoneGroundForHero(hero)
+
+	local tombstonePosition = position or hero:GetAbsOrigin()
+	tombstonePosition = Vector(tombstonePosition.x, tombstonePosition.y, tombstonePosition.z)
+	local item = CreateItem("item_tombstone", hero, hero)
+	if not IsValidXHSTombstoneEntity(item) then return nil, nil end
+
+	item:SetPurchaseTime(0)
+	item:SetPurchaser(hero)
+	item.xhs_revive_hero_entindex = hero:entindex()
+	item.xhs_tombstone_position = tombstonePosition
+
+	local drop = SpawnEntityFromTableSynchronous("dota_item_tombstone_drop", {})
+	if not IsValidXHSTombstoneEntity(drop) then
+		UTIL_Remove(item)
+		return nil, nil
+	end
+
+	drop:SetContainedItem(item)
+	drop:SetAngles(0, RandomFloat(0, 360), 0)
+	FindClearSpaceForUnit(drop, tombstonePosition, true)
+	local dropPosition = drop:GetAbsOrigin()
+
+	local spawnParticle = ParticleManager:CreateParticle(XHS_TOMBSTONE_SPAWN_PARTICLE, PATTACH_WORLDORIGIN, nil)
+	ParticleManager:SetParticleControl(spawnParticle, 0, dropPosition)
+	ParticleManager:ReleaseParticleIndex(spawnParticle)
+
+	drop.xhs_tombstone_ambient_particle = ParticleManager:CreateParticle(
+		XHS_TOMBSTONE_AMBIENT_PARTICLE,
+		PATTACH_ABSORIGIN_FOLLOW,
+		drop
+	)
+
+	item.xhs_tombstone_drop_entindex = drop:entindex()
+	hero.xhs_tombstone_item = item
+	hero.xhs_tombstone_drop = drop
+
+	Timers:CreateTimer(0.5, function()
+		if not IsValidXHSTombstoneEntity(hero) then
+			if IsValidXHSTombstoneEntity(drop) then
+				XHSDestroyTombstoneDropEffects(drop)
+				UTIL_Remove(drop)
+			end
+			if IsValidXHSTombstoneEntity(item) then UTIL_Remove(item) end
+			return nil
+		end
+		if hero.xhs_tombstone_item ~= item then return nil end
+		if hero:IsAlive() then
+			XHSRemoveTombstoneGroundForHero(hero)
+			return nil
+		end
+		if not IsValidXHSTombstoneEntity(drop) and not IsValidXHSTombstoneEntity(item) then
+			if hero.xhs_tombstone_item == item then
+				hero.xhs_tombstone_drop = nil
+				hero.xhs_tombstone_item = nil
+			end
+			return nil
+		end
+		return 0.5
+	end)
+
+	return item, drop
+end
+
+function SpawnXHSTombstoneForHero(hero, position)
+	if not IsValidXHSTombstoneEntity(hero) or hero:IsAlive() then return nil, nil end
+
+	XHSRemoveTombstoneGroundForHero(hero, true)
+	if XHSClearTombstoneReviveState ~= nil then
+		XHSClearTombstoneReviveState(hero)
+	end
+	local oldState = hero.xhs_tombstone_state
+	if oldState ~= nil then
+		for _, channelItem in pairs(oldState.channels or {}) do
+			if IsValidXHSTombstoneEntity(channelItem) then
+				channelItem.xhs_finish_handled = true
+				local caster = channelItem:GetCaster()
+				if IsValidXHSTombstoneEntity(caster) and channelItem:IsChanneling() then
+					caster:InterruptChannel()
+				end
+				caster = channelItem:GetCaster()
+				if IsValidXHSTombstoneEntity(caster) then
+					for slot = 0, 14 do
+						if caster:GetItemInSlot(slot) == channelItem then
+							caster:RemoveItem(channelItem)
+							break
+						end
+					end
+				end
+				if IsValidXHSTombstoneEntity(channelItem) then
+					UTIL_Remove(channelItem)
+				end
+			end
+		end
+	end
+
+	hero.xhs_tombstone_state = {
+		channels = {},
+		end_time = nil,
+		completed = false,
+	}
+	return EnsureXHSTombstoneGroundDrop(hero, position)
+end
+
+-- Replace the legacy item-drop implementation above with a real allied unit.
+-- Keeping the old functions in this file makes hot reloads with an already
+-- claimed legacy item safe; the installed unit system owns every new death.
+local XHSUnitTombstone = require("abilities/xhs_tombstone_revive")
+XHSUnitTombstone:Install()
+
 ListenToGameEvent('entity_killed', function(keys)
 	local killedUnit = EntIndexToHScript(keys.entindex_killed)
 	if killedUnit == nil then return end
-	if killedUnit:FindModifierByName("modifier_breakable_container") then return end
-	local killerAbility = nil
+	if killedUnit.xhs_silent_phase_one_lane_cleanup == true then
+		-- Closed-lane structures are removed only to release entity/render cost.
+		-- They grant no kill credit, quest progress, Revenants or Magnataurs.
+		return
+	end
+	local killedUnitName = killedUnit.GetUnitName ~= nil and killedUnit:GetUnitName() or ""
+	if killedUnit:FindModifierByName("modifier_breakable_container")
+		or killedUnitName == "npc_dota_crate"
+		or killedUnitName == "npc_dota_vase" then
+		-- Breakables award their own loot, but never progress hero kill rewards,
+		-- zone kill quests, Fragment Quests or event-unlock thresholds.
+		return
+	end
+	-- local killerAbility = nil
 	local killer = nil
 	if keys.entindex_attacker ~= nil then killer = EntIndexToHScript(keys.entindex_attacker) end
 	if not killer then killer = GameRules:GetGameModeEntity() end
-	if keys.entindex_inflictor ~= nil then killerAbility = EntIndexToHScript(keys.entindex_inflictor) end
+	-- if keys.entindex_inflictor ~= nil then killerAbility = EntIndexToHScript(keys.entindex_inflictor) end
 	local difficulty = GameRules:GetCustomGameDifficulty()
 	local Zone = killedUnit.zone
+	if FragmentQuests ~= nil then
+		FragmentQuests:OnEntityKilled(killedUnit, killer)
+	end
+	if SpecialEvents ~= nil and SpecialEvents.OnFarmEventCreepKilled ~= nil then
+		SpecialEvents:OnFarmEventCreepKilled(killedUnit)
+	end
 
 	if Zone then
 		for _, zone in pairs(GameMode.Zones) do
@@ -946,7 +1563,34 @@ ListenToGameEvent('entity_killed', function(keys)
 		end
 	end
 
+	if killedUnit:GetUnitName() == "npc_dota_hero_grom_hellscream" and not killedUnit:IsIllusion() then
+		GameMode.XHSGromRealDefeated = true
+		if killedUnit.phantasm_illusions ~= nil then
+			for _, illusion in pairs(killedUnit.phantasm_illusions) do
+				if illusion ~= nil and IsValidEntity(illusion) and not illusion:IsNull() and illusion:IsAlive() then
+					illusion:Kill(nil, nil)
+				end
+			end
+
+			killedUnit.phantasm_illusions = {}
+		end
+	end
+
 	if killedUnit:IsRealHero() and (killedUnit:GetTeamNumber() == DOTA_TEAM_GOODGUYS) then
+		if StartXHSDeadInventoryLock ~= nil then
+			StartXHSDeadInventoryLock(killedUnit)
+		end
+
+		if FragmentQuests ~= nil then
+			FragmentQuests:OnHeroDeath(killedUnit)
+		end
+		if DestroyXHSReturnMarker ~= nil then
+			DestroyXHSReturnMarker(killedUnit)
+		end
+		if ReissueWaveCreepOrders ~= nil then
+			ReissueWaveCreepOrders(0.5)
+		end
+
 		-- local netTable = {}
 		--		CustomGameEventManager:Send_ServerToPlayer(killedUnit:GetPlayerOwner(), "life_lost", netTable)
 
@@ -976,15 +1620,8 @@ ListenToGameEvent('entity_killed', function(keys)
 
 		--Drop Tombstone to be revived if dead after Castle Defense
 		if CustomTimers.game_phase == 3 then
-			if killedUnit.ankh_respawn == true then
-			else
-				local newItem = CreateItem("item_tombstone", killedUnit, killedUnit)
-				newItem:SetPurchaseTime(0)
-				newItem:SetPurchaser(killedUnit)
-				local tombstone = SpawnEntityFromTableSynchronous("dota_item_tombstone_drop", {})
-				tombstone:SetContainedItem(newItem)
-				tombstone:SetAngles(0, RandomFloat(0, 360), 0)
-				FindClearSpaceForUnit(tombstone, killedUnit:GetAbsOrigin(), true)
+			if killedUnit.ankh_respawn ~= true then
+				SpawnXHSTombstoneForHero(killedUnit, killedUnit:GetAbsOrigin())
 			end
 		end
 
@@ -996,34 +1633,44 @@ ListenToGameEvent('entity_killed', function(keys)
 		end
 		return
 	elseif killedUnit:IsCreature() then
-		local ramero_check = 0
+		if killedUnit:GetUnitName() == "npc_death_revenant_banehallow" and GameMode.BanehallowRevenantsRemaining ~= nil then
+			GameMode.BanehallowRevenantsRemaining = math.max(0, GameMode.BanehallowRevenantsRemaining - 1)
+			CustomGameEventManager:Send_ServerToAllClients("xhs_boss_counter_update", {
+				boss_count = 1,
+				label = "Ghost Revenants",
+				remaining = GameMode.BanehallowRevenantsRemaining,
+				total = GameMode.BanehallowRevenantsTotal or 12,
+			})
+		end
+
 		if killedUnit:GetUnitName() == "npc_ramero" then
-			DropNeutralItemAtPositionForHero("item_lightning_sword", killedUnit:GetAbsOrigin(), killer, killer:GetTeam(), true)
-			ramero_check = ramero_check + 1
+			SpecialEvents.RameroDead = true
+			local rewardHero = GetPlayerHeroFromUnit(killer)
+			if rewardHero ~= nil then
+				SpecialEvents.RameroRewardHero = rewardHero
+				SpecialEvents.RameroRewardPending = true
+			end
 		elseif killedUnit:GetUnitName() == "npc_baristol" then
-			local hero = killer
-
-			if not killer:IsRealHero() then
-				hero = killer:GetPlayerOwner():GetAssignedHero()
-			end
-
-			if hero then
-				hero:IncrementAttributes(250)
-			end
-
-			ramero_check = ramero_check + 1
+			SpecialEvents.BaristolDead = true
+			GameMode:HideOptionalEventBossBar("baristol", killedUnit)
+			GrantTomeStatsToHero(killer, 250, "Tome Granted", "+250 all stats")
 		elseif killedUnit:GetUnitName() == "npc_ramero_2" then
-			DropNeutralItemAtPositionForHero("item_ring_of_superiority", killedUnit:GetAbsOrigin(), killer, killer:GetTeam(), true)
+			local rewardHero = GetPlayerHeroFromUnit(killer)
+			if rewardHero ~= nil then
+				SpecialEvents.SogatRewardHero = rewardHero
+				SpecialEvents.SogatRewardPending = true
+			end
 			DOOM_FIRST_TIME = true
 			GameRules:GetGameModeEntity():SetContextThink("Sogat", nil, 0)
+			SpecialEvents:EndSogatEvent(true)
 		elseif killedUnit:GetUnitName() == "npc_dota_hero_secret" then
 			local pos = killedUnit:GetAbsOrigin()
 			DropNeutralItemAtPositionForHero("item_orb_of_frost", pos, killer, killer:GetTeam(), true)
 			FROST_FIRST_TIME = true
 		end
 
-		if ramero_check == 2 then
-			GameRules:GetGameModeEntity():SetContextThink("RameroAndBaristol", nil, 0)
+		if SpecialEvents.RameroDead == true and SpecialEvents.BaristolDead == true then
+			SpecialEvents:EndRameroAndBaristolEvent(true)
 		end
 
 		if killedUnit:GetUnitName() == "npc_dota_creature_muradin_bronzebeard" and killedUnit:GetTeamNumber() ~= 2 then
@@ -1035,16 +1682,28 @@ ListenToGameEvent('entity_killed', function(keys)
 
 			MAGTHERIDON = MAGTHERIDON + 1
 
-			if MAGTHERIDON > 0 and difficulty == 1 then
-				EndMagtheridonArena()
-			elseif MAGTHERIDON > 1 and difficulty == 2 then
-				EndMagtheridonArena()
-			elseif MAGTHERIDON > 3 and difficulty == 3 then
-				EndMagtheridonArena()
-			elseif MAGTHERIDON > 3 and difficulty == 4 then
-				EndMagtheridonArena()
-			elseif MAGTHERIDON > 5 and difficulty == 5 then
-				EndMagtheridonArena()
+			if MAGTHERIDON >= GetXHSMagtheridonKillLimit(difficulty) then
+				GameMode.XHSPitLordDefeated = true
+				if PlayMagtheridonFinalDeathSequence ~= nil then
+					PlayMagtheridonFinalDeathSequence(killedUnit)
+				end
+
+				if XHSDevTools ~= nil and XHSDevTools:IsSandboxActive() then
+					CustomGameEventManager:Send_ServerToAllClients("hide_boss_hp", { boss_count = 1 })
+					CustomGameEventManager:Send_ServerToAllClients("hide_boss_hp", { boss_count = 2 })
+					if XHSMagtheridon_HideBossTimer ~= nil then
+						XHSMagtheridon_HideBossTimer(1)
+						XHSMagtheridon_HideBossTimer(2)
+					end
+					if XHSMagtheridon_HideFragmentCounter ~= nil then
+						XHSMagtheridon_HideFragmentCounter(1)
+						XHSMagtheridon_HideFragmentCounter(2)
+					end
+					Notifications:TopToAll({ text = "Dev sandbox: Magtheridon cleared. Campaign progression blocked.", duration = 6.0 })
+					XHSDevTools:PushState()
+				else
+					EndMagtheridonArena()
+				end
 			end
 		end
 
@@ -1056,6 +1715,12 @@ ListenToGameEvent('entity_killed', function(keys)
 						killer = PlayerResource:GetSelectedHeroEntity(killer:GetPlayerOwnerID())
 
 						killer:IncrementKills(1)
+						SpecialEvents:RefreshKillEventLeaderboard()
+						if killer:GetKills() >= XHS_RAMERO_BARISTOL_KILLS_REQUIRED
+							and SpecialEvents.Ramero_trigger == 0
+							and not (XHSDevTools ~= nil and XHSDevTools:IsSandboxActive()) then
+							SpecialEvents:StartRameroAndBaristolEvent(killer)
+						end
 
 						for _, Zone in pairs(GameMode.Zones) do
 							if Zone:ContainsUnit(killer) then
@@ -1074,6 +1739,7 @@ ListenToGameEvent('entity_killed', function(keys)
 						ParticleManager:ReleaseParticleIndex(ParticleManager:CreateParticleForPlayer("particles/darkmoon_last_hit_effect.vpcf", PATTACH_ABSORIGIN_FOLLOW, killedUnit, killer:GetPlayerOwner()))
 
 						killer:IncrementKills(1)
+						SpecialEvents:RefreshKillEventLeaderboard()
 
 						for _, Zone in pairs(GameMode.Zones) do
 							if Zone:ContainsUnit(killer) then
@@ -1082,18 +1748,18 @@ ListenToGameEvent('entity_killed', function(keys)
 						end
 
 						-- reward system based on kills, including kill events
-						if killer:GetKills() == 99 then
-							Notifications:Bottom(killer:GetPlayerOwnerID(), { text = "100 kills. You get 7500 gold.", duration = 5.0, style = { color = "yellow" } })
+						if killer:GetKills() == 50 then
+							SendXHSRewardNotification(killer:GetPlayerOwnerID(), "gold", 7500, "Kill Reward", "+7,500 gold")
 							PlayerResource:ModifyGold(killer:GetPlayerOwnerID(), 7500, false, DOTA_ModifyGold_Unspecified)
-						elseif killer:GetKills() == 199 then
-							Notifications:Bottom(killer:GetPlayerOwnerID(), { text = "200 kills. You get 25000 gold.", duration = 5.0, style = { color = "yellow" } })
+						elseif killer:GetKills() == 100 then
+							SendXHSRewardNotification(killer:GetPlayerOwnerID(), "gold", 25000, "Kill Reward", "+25,000 gold")
 							PlayerResource:ModifyGold(killer:GetPlayerOwnerID(), 25000, false, DOTA_ModifyGold_Unspecified)
-						elseif killer:GetKills() == 399 then
-							Notifications:Bottom(killer:GetPlayerOwnerID(), { text = "400 kills. You get 50000 gold.", duration = 5.0, style = { color = "yellow" } })
+						elseif killer:GetKills() == 200 then
+							SendXHSRewardNotification(killer:GetPlayerOwnerID(), "gold", 50000, "Kill Reward", "+50,000 gold")
 							PlayerResource:ModifyGold(killer:GetPlayerOwnerID(), 50000, false, DOTA_ModifyGold_Unspecified)
-						elseif killer:GetKills() >= 499 and SpecialEvents.Ramero_trigger == 0 then --500
+						elseif killer:GetKills() >= XHS_RAMERO_BARISTOL_KILLS_REQUIRED and SpecialEvents.Ramero_trigger == 0 and not (XHSDevTools ~= nil and XHSDevTools:IsSandboxActive()) then
 							SpecialEvents:StartRameroAndBaristolEvent(killer)
-						elseif killer:GetKills() >= 749 and SpecialEvents.Ramero_trigger == 1 then --750
+						elseif killer:GetKills() >= XHS_SOGAT_KILLS_REQUIRED and SpecialEvents.Ramero_trigger == 1 and not (XHSDevTools ~= nil and XHSDevTools:IsSandboxActive()) then
 							SpecialEvents:StartSogatEvent(killer)
 						end
 					end
@@ -1103,6 +1769,12 @@ ListenToGameEvent('entity_killed', function(keys)
 
 		return
 	elseif killedUnit:IsBuilding() then
+		local targetName = killedUnit.GetName ~= nil and killedUnit:GetName() or ""
+		local destroyedLane = tonumber(string.match(targetName, "^dota_badguys_barracks_(%d+)$"))
+		if destroyedLane ~= nil and XHSRefreshPhaseOneLaneStructureState ~= nil then
+			XHSRefreshPhaseOneLaneStructureState(destroyedLane)
+		end
+
 		if killedUnit:GetTeamNumber() == 2 then
 			if killedUnit:GetClassname() == "npc_dota_fort" then
 				GameRules:SetGameWinner(3)
@@ -1136,13 +1808,21 @@ ListenToGameEvent('entity_killed', function(keys)
 		if killedUnit:IsTower() then
 			if killedUnit:GetUnitName() == "xhs_tower_lane_1" then
 				for j = 1, difficulty do
-					CreateUnitByName("xhs_death_revenant", killedUnit:GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_1)
+					if SpawnReleasedPhaseOneCreep ~= nil then
+						SpawnReleasedPhaseOneCreep("xhs_death_revenant", killedUnit:GetAbsOrigin())
+					else
+						CreateUnitByName("xhs_death_revenant", killedUnit:GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_1)
+					end
 				end
 				-- CREEP_LANES[lane][2] = CREEP_LANES[lane][2] + 1
 				-- Notifications:TopToAll({text="Creep lane "..lane.." is now level "..CREEP_LANES[lane][2].."!", duration=5.0, style={color="lightgreen"}})
 			elseif killedUnit:GetUnitName() == "xhs_tower_lane_2" then
 				for j = 1, difficulty do
-					CreateUnitByName("xhs_death_revenant_2", killedUnit:GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_1)
+					if SpawnReleasedPhaseOneCreep ~= nil then
+						SpawnReleasedPhaseOneCreep("xhs_death_revenant_2", killedUnit:GetAbsOrigin())
+					else
+						CreateUnitByName("xhs_death_revenant_2", killedUnit:GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_1)
+					end
 				end
 				-- CREEP_LANES[lane][2] = CREEP_LANES[lane][2] + 1
 				-- Notifications:TopToAll({text="Creep lane "..lane.." is now level "..CREEP_LANES[lane][2].."!", duration=5.0, style={color="lightgreen"}})
@@ -1216,21 +1896,27 @@ end, nil)
 ---------------------------------------------------------
 
 function GameMode:OnPlayerRevived(event)
-	local hRevivedHero = EntIndexToHScript(event.target)
+	if type(event) ~= "table" then return end
+	local revivedIndex = tonumber(event.target or event.entindex_target or event.revived_entindex)
+	if revivedIndex == nil or revivedIndex <= 0 then return end
 
-	print("GameMode:OnPlayerRevived")
-	if hRevivedHero ~= nil and hRevivedHero:IsRealHero() then
-		hRevivedHero:AddNewModifier(hRevivedHero, nil, "modifier_invulnerable", { duration = 2.5 })
-		hRevivedHero:AddNewModifier(hRevivedHero, nil, "modifier_omninight_guardian_angel", { duration = 2.5 })
-		EmitSoundOn("Dungeon.HeroRevived", hRevivedHero)
+	local hRevivedHero = EntIndexToHScript(revivedIndex)
+	if hRevivedHero == nil or hRevivedHero:IsNull() or not hRevivedHero:IsRealHero() then return end
+	if StopXHSDeadInventoryLock ~= nil then
+		StopXHSDeadInventoryLock(hRevivedHero)
+	end
 
-		local hReviver = EntIndexToHScript(event.caster)
-		local flChannelTime = event.channel_time
-		if hReviver ~= nil and flChannelTime > 0.0 then
-			for _, Zone in pairs(GameMode.Zones) do
-				if Zone:ContainsUnit(hReviver) then
-					Zone:AddStat(hReviver:GetPlayerID(), ZONE_STAT_REVIVE_TIME, flChannelTime)
-				end
+	hRevivedHero:AddNewModifier(hRevivedHero, nil, "modifier_invulnerable", { duration = 2.5 })
+	hRevivedHero:AddNewModifier(hRevivedHero, nil, "modifier_omninight_guardian_angel", { duration = 2.5 })
+	EmitSoundOn("Dungeon.HeroRevived", hRevivedHero)
+
+	local reviverIndex = tonumber(event.caster or event.entindex_caster or event.reviver_entindex)
+	local hReviver = reviverIndex ~= nil and reviverIndex > 0 and EntIndexToHScript(reviverIndex) or nil
+	local flChannelTime = tonumber(event.channel_time) or 0
+	if hReviver ~= nil and not hReviver:IsNull() and flChannelTime > 0.0 then
+		for _, Zone in pairs(GameMode.Zones) do
+			if Zone:ContainsUnit(hReviver) then
+				Zone:AddStat(hReviver:GetPlayerID(), ZONE_STAT_REVIVE_TIME, flChannelTime)
 			end
 		end
 	end
@@ -1326,10 +2012,22 @@ end
 
 function GameMode:OnQuestStarted(zone, quest)
 	--	print("GameMode:OnQuestStarted - Quest " .. quest.szQuestName .. " in Zone " .. zone.szName .. " started.")
-	quest.bActivated = true
+	local bDevSandbox = XHSDevTools ~= nil and XHSDevTools:IsSandboxActive()
+	if quest.szQuestName == "kill_mag" then
+		quest.nCompleteLimit = GetXHSMagtheridonKillLimit()
+	elseif quest.szQuestName == "clear_grom_vanguard" then
+		quest.nCompleteLimit = GetXHSGromVanguardKillLimit()
+	elseif quest.szQuestName == "kill_dest_mag" then
+		quest.nCompleteLimit = GetXHSDestroyerMagnataurKillLimit()
+	end
 
-	for _, zone in pairs(GameMode.Zones) do
-		zone:OnQuestStarted(quest)
+	quest.bActivated = true
+	self:StartQuestBossVision(quest.szQuestName)
+
+	if bDevSandbox ~= true then
+		for _, zone in pairs(GameMode.Zones) do
+			zone:OnQuestStarted(quest)
+		end
 	end
 
 	if quest.Completion.Type == QUEST_EVENT_ON_DIALOG or quest.Completion.Type == QUEST_EVENT_ON_DIALOG_ALL_CONFIRMED then
@@ -1359,8 +2057,190 @@ end
 
 ---------------------------------------------------------
 
+local XHS_QUEST_FOCUS_TARGETS = {
+	teleport_top = "npc_xhs_paladin",
+	teleport_arthas = "npc_xhs_paladin_2",
+	kill_grom = "npc_dota_hero_grom_hellscream",
+	kill_illidan = "npc_dota_hero_illidan",
+	kill_balanar = "npc_dota_hero_balanar",
+	kill_proudmoore = "npc_dota_hero_proudmoore",
+	free_uther = "npc_xhs_uther_ice_prison",
+}
+
+local XHS_BOSS_QUEST_VISION_TARGETS = {
+	kill_mag = "npc_dota_hero_magtheridon",
+	kill_grom = "npc_dota_hero_grom_hellscream",
+	kill_illidan = "npc_dota_hero_illidan",
+	kill_balanar = "npc_dota_hero_balanar",
+	kill_proudmoore = "npc_dota_hero_proudmoore",
+	kill_arthas = "npc_dota_hero_arthas",
+	kill_banehallow = "npc_dota_hero_banehallow",
+	kill_lich_king = "npc_dota_boss_lich_king",
+	kill_spirit_master = "npc_dota_boss_spirit_master",
+}
+
+local XHS_BOSS_QUEST_FOW_RADIUS = 500
+local XHS_BOSS_QUEST_FOW_DURATION = 0.75
+local XHS_BOSS_QUEST_FOW_INTERVAL = 0.5
+
+local function FindXHSQuestTargetUnits(targetName)
+	local targets = {}
+	if targetName == nil then return targets end
+
+	local units = FindUnitsInRadius(
+		DOTA_TEAM_GOODGUYS,
+		Vector(0, 0, 0),
+		nil,
+		FIND_UNITS_EVERYWHERE,
+		DOTA_UNIT_TARGET_TEAM_BOTH,
+		DOTA_UNIT_TARGET_ALL,
+		DOTA_UNIT_TARGET_FLAG_MAGIC_IMMUNE_ENEMIES + DOTA_UNIT_TARGET_FLAG_INVULNERABLE,
+		FIND_ANY_ORDER,
+		false
+	)
+
+	for _, unit in pairs(units) do
+		if unit ~= nil and IsValidEntity(unit) and not unit:IsNull() and unit:IsAlive() and unit:GetUnitName() == targetName then
+			table.insert(targets, unit)
+		end
+	end
+
+	return targets
+end
+
+function GameMode:StartQuestBossVision(questName)
+	local targetName = questName and XHS_BOSS_QUEST_VISION_TARGETS[questName]
+	if targetName == nil or Timers == nil then return end
+
+	self.XHSQuestBossVisionWatchers = self.XHSQuestBossVisionWatchers or {}
+	if self.XHSQuestBossVisionWatchers[questName] == true then return end
+	local watchers = self.XHSQuestBossVisionWatchers
+	watchers[questName] = true
+
+	Timers:CreateTimer(0.0, function()
+		if GameMode:IsQuestActive(questName) ~= true then
+			watchers[questName] = nil
+			return nil
+		end
+
+		for _, unit in pairs(FindXHSQuestTargetUnits(targetName)) do
+			AddFOWViewer(DOTA_TEAM_GOODGUYS, unit:GetAbsOrigin(), XHS_BOSS_QUEST_FOW_RADIUS, XHS_BOSS_QUEST_FOW_DURATION, false)
+		end
+
+		return XHS_BOSS_QUEST_FOW_INTERVAL
+	end)
+end
+
+function GameMode:OnQuestFocusRequested(_, event)
+	local playerID = event and event.PlayerID
+	local questName = event and event.quest_id
+	local targetName = questName and XHS_QUEST_FOCUS_TARGETS[questName]
+	if playerID == nil or targetName == nil then return end
+
+	local player = PlayerResource:GetPlayer(playerID)
+	if player == nil then return end
+	if GameMode:IsQuestActive(questName) ~= true then return end
+
+	local playerHero = PlayerResource:GetSelectedHeroEntity(playerID)
+	local targetUnit = nil
+	local targetDistance = nil
+	for _, unit in pairs(FindXHSQuestTargetUnits(targetName)) do
+		if unit ~= nil and IsValidEntity(unit) and not unit:IsNull() then
+			local distance = 0
+			if playerHero ~= nil and IsValidEntity(playerHero) and not playerHero:IsNull() then
+				distance = (unit:GetAbsOrigin() - playerHero:GetAbsOrigin()):Length2D()
+			end
+			if targetUnit == nil or distance < targetDistance then
+				targetUnit = unit
+				targetDistance = distance
+			end
+		end
+	end
+
+	if targetUnit ~= nil then
+		CameraMotion:Sequence(playerID, {
+			{
+				type = "move",
+				to = targetUnit,
+				from = playerHero,
+				duration = 0.55,
+				easing = "smootherstep",
+			},
+			{ type = "hold",    duration = 1.70 },
+			{
+				type = "return",
+				to = function()
+					return PlayerResource:GetSelectedHeroEntity(playerID)
+				end,
+				duration = 0.65,
+				easing = "smootherstep",
+			},
+			{ type = "release", mode = "free" },
+		}, {
+			owner = "quest_focus:" .. tostring(questName),
+			priority = 10,
+			policy = "replace",
+		})
+	end
+end
+
+function GameMode:OnCameraFocusEntityRequested(_, event)
+	local playerID = event and tonumber(event.PlayerID) or -1
+	local entIndex = event and math.floor(tonumber(event.entindex) or -1) or -1
+	if playerID < 0 or entIndex <= 0 or CameraMotion == nil then return end
+	if not PlayerResource:IsValidPlayerID(playerID) or PlayerResource:GetPlayer(playerID) == nil then return end
+
+	local target = EntIndexToHScript(entIndex)
+	if target == nil or not IsValidEntity(target) or target:IsNull() or target.GetAbsOrigin == nil then return end
+
+	CameraMotion:Move(playerID, target, {
+		from = PlayerResource:GetSelectedHeroEntity(playerID),
+		duration = 0.4,
+		easing = "smootherstep",
+		owner = "manual_entity_focus",
+		priority = 10,
+		policy = "replace",
+		-- This is a user-initiated move from a freely panned client camera.
+		-- Always wait for the fresh client look-at handshake, even if another
+		-- camera request still considers its dummy captured.
+		origin_mode = "provider",
+		release = "free",
+	})
+end
+
+---------------------------------------------------------
+
+local XHS_MAIN_QUEST_NOTIFICATIONS = {
+	kill_rax = {
+		phase = "Phase 1",
+		title = "Castle Defense Complete",
+		subtitle = "The siege has been held. Prepare for the Destroyer Magnataurs.",
+		sound = "Dungeon.Stinger01",
+	},
+	kill_ice_towers = {
+		phase = "Final Wave",
+		title = "Castle Breach Sealed",
+		subtitle = "Return to the castle and survive the last assault.",
+		sound = "Dungeon.Stinger01",
+	},
+	kill_final_wave = {
+		phase = "Phase 2 Finished",
+		title = "Final Wave Cleared",
+		subtitle = "The castle is safe. Advance to the enemy leaders.",
+		sound = "Dungeon.Stinger01",
+	},
+	clear_grom_vanguard = {
+		phase = "Phase 3",
+		title = "Grom's Vanguard Broken",
+		subtitle = "The way to Grom Hellscream is open.",
+		sound = "Dungeon.Stinger01",
+	},
+}
+
 function GameMode:OnQuestCompleted(questZone, quest)
 	--	print("GameMode:OnQuestCompleted - Quest " .. quest.szQuestName .. " in Zone " .. questZone.szName .. " completed.")
+	local bDevSandbox = XHSDevTools ~= nil and XHSDevTools:IsSandboxActive()
+	local bQuestPreviouslyCompleted = quest.bCompleted == true
 	quest.nCompleted = quest.nCompleted + 1
 	if quest.nCompleted >= quest.nCompleteLimit then
 		quest.bCompleted = true
@@ -1368,13 +2248,15 @@ function GameMode:OnQuestCompleted(questZone, quest)
 
 	local bZonePreviouslyCompleted = questZone.bZoneCompleted
 
-	if quest.bOptional ~= true then
+	if quest.bOptional ~= true and bDevSandbox ~= true then
 		questZone:CheckForZoneComplete()
 	end
 
 	if quest.bCompleted == true then
-		for _, zone in pairs(GameMode.Zones) do
-			zone:OnQuestCompleted(quest)
+		if bDevSandbox ~= true then
+			for _, zone in pairs(GameMode.Zones) do
+				zone:OnQuestCompleted(quest)
+			end
 		end
 
 		if quest.Completion.Type == QUEST_EVENT_ON_DIALOG or quest.Completion.Type == QUEST_EVENT_ON_DIALOG_ALL_CONFIRMED then
@@ -1387,7 +2269,7 @@ function GameMode:OnQuestCompleted(questZone, quest)
 		end
 
 		local hLogicRelay = Entities:FindByName(nil, quest.szCompletionLogicRelay)
-		if hLogicRelay then
+		if hLogicRelay and bDevSandbox ~= true then
 			hLogicRelay:Trigger()
 		end
 
@@ -1402,13 +2284,79 @@ function GameMode:OnQuestCompleted(questZone, quest)
 			end
 		end
 
-		if quest.szQuestName == "kill_dest_mag" then
-			-- timers remains paused until magnataurs are killed
-			StartPhase2()
+		if bDevSandbox == true then
+			Notifications:TopToAll({ text = "Dev sandbox: quest completed without campaign follow-up.", duration = 4.0 })
+			if XHSDevTools ~= nil then
+				XHSDevTools:PushState()
+			end
+		elseif quest.szQuestName == "kill_dest_mag" then
+			if FragmentQuests ~= nil then
+				FragmentQuests:OnPhase2End()
+			end
+
+			if bQuestPreviouslyCompleted == false then
+				Notifications:TopToAll({ text = "Phase 2 Creeps enabled!", style = { color = "lightgreen" }, duration = 5.0 })
+			end
+
+			-- Timers remain paused until magnataurs are killed. The farm-exit
+			-- recovery path may already have advanced to phase two; keep this quest
+			-- callback idempotent so late destroyer deaths cannot skip to phase 3.
+			local currentPhase = CustomTimers ~= nil
+				and (tonumber(CustomTimers.game_phase) or 0) or 0
+			if currentPhase < 2 then
+				StartPhase2()
+			elseif CustomTimers ~= nil and currentPhase == 2 then
+				CustomTimers.timers_paused = 0
+			end
+		elseif quest.szQuestName == "kill_final_wave" then
+			if FragmentQuests ~= nil then
+				FragmentQuests:OnFinalWaveEnd()
+			end
+
+			StopGlobalSound("XHS.FinalWaveMusic")
+
+			if XHSSetGlobalObjectiveState ~= nil then
+				XHSSetGlobalObjectiveState("final_wave", "Completed", "Final Wave completed")
+			else
+				CustomGameEventManager:Send_ServerToAllClients("xhs_global_objective_update", {
+					id = "final_wave",
+					state = "Completed",
+					text = "Final Wave completed",
+				})
+			end
+
+			if CustomTimers ~= nil and CustomTimers.game_phase < 3 then
+				CustomTimers:IncrementGamePhase()
+			end
+
+			if bQuestPreviouslyCompleted == false and Timers ~= nil then
+				Timers:CreateTimer(1.5, function()
+					if XHSFocusPlayersOnShalLightbinder ~= nil then
+						XHSFocusPlayersOnShalLightbinder()
+					end
+					return nil
+				end)
+			end
+		elseif quest.szQuestName == "clear_grom_vanguard" then
+			if OpenGromGate ~= nil then
+				OpenGromGate()
+			end
+		elseif quest.szQuestName == "kill_proudmoore" then
+			if XHSActivateUtherIcePrison ~= nil then
+				XHSActivateUtherIcePrison()
+			end
+		elseif quest.szQuestName == "free_uther" then
+			if XHSReleaseUtherFromIce ~= nil then
+				XHSReleaseUtherFromIce()
+			end
 		elseif quest.szQuestName == "teleport_top" then
 			StartMagtheridonArena()
 		elseif quest.szQuestName == "teleport_arthas" then
-			StartArthasArena()
+			FourBossesKillCount()
+			-- Uther's prison now opens the last Proudmoore gate. His dialog only
+			-- authorizes the next encounter, so it cannot leave him trapped behind it.
+			if XHSOpenProudmooreFinalDoor ~= nil then XHSOpenProudmooreFinalDoor() end
+			Timers:CreateTimer(2.5, StartArthasArena)
 		end
 	end
 
@@ -1425,6 +2373,17 @@ function GameMode:OnQuestCompleted(questZone, quest)
 	netTable["ZoneStars"] = questZone.nStars
 
 	CustomGameEventManager:Send_ServerToAllClients("quest_completed", netTable)
+
+	if bQuestPreviouslyCompleted == false and quest.bCompleted == true and XHS_MAIN_QUEST_NOTIFICATIONS[quest.szQuestName] ~= nil then
+		local notification = XHS_MAIN_QUEST_NOTIFICATIONS[quest.szQuestName]
+		CustomGameEventManager:Send_ServerToAllClients("xhs_main_quest_completed", {
+			phase = notification.phase,
+			title = notification.title,
+			subtitle = notification.subtitle,
+			sound = notification.sound,
+			duration = 6.5,
+		})
+	end
 end
 
 ---------------------------------------------------------
@@ -1451,7 +2410,7 @@ function GameMode:OnDialogBegin(hPlayerHero, hDialogEnt)
 
 	local bShowAdvanceDialogButton = true
 	local NextDialog = self:GetDialogLine(hDialogEnt, hDialogEnt.nCurrentLine + 1)
-	if Dialog.bPlayersConfirm == true or NextDialog == nil or NextDialog.bPlayersConfirm == true or Dialog.bForceBreak == true then
+	if Dialog.bPlayersConfirm == true or NextDialog == nil or Dialog.bForceBreak == true then
 		bShowAdvanceDialogButton = false
 	end
 
@@ -1475,6 +2434,21 @@ function GameMode:OnDialogBegin(hPlayerHero, hDialogEnt)
 
 	if Dialog.bPlayersConfirm == true then
 		GameMode.bConfirmPending = true
+	end
+
+	local cinematicId = "xhs_dialog_" .. tostring(hDialogEnt:entindex())
+	local cinematicOptions = {
+		hide_hud = true,
+		allow_dialog_ui = true,
+		lock_orders = true,
+		camera_entindex = hDialogEnt:entindex(),
+		camera_speed = 0.5,
+		transition = 0.35,
+	}
+	if Dialog.bSendToAll == true then
+		XHSCinematics:BeginForAll(cinematicId, cinematicOptions)
+	else
+		XHSCinematics:BeginForPlayer(hPlayerHero:GetPlayerID(), cinematicId, cinematicOptions)
 	end
 
 	if Dialog.bSkipFacePlayer ~= true then
@@ -1570,6 +2544,13 @@ function GameMode:OnDialogEnded(eventSourceIndex, data)
 
 		if bShowNextLine == 1 and hPlayerHero then
 			self:OnDialogBegin(hPlayerHero, hDialogEnt)
+		else
+			local cinematicId = "xhs_dialog_" .. tostring(hDialogEnt:entindex())
+			if Dialog ~= nil and Dialog.bSendToAll == true then
+				XHSCinematics:EndForAll(cinematicId)
+			elseif hPlayerHero ~= nil then
+				XHSCinematics:EndForPlayer(hPlayerHero:GetPlayerID(), cinematicId)
+			end
 		end
 	end
 end
@@ -1735,6 +2716,16 @@ function GameMode:UpdateGameEndTables()
 		signoutTable["trophy_level"] = trophyLevel
 	end
 
+	local hasXHSBotSession = false
+	if api ~= nil and api.HasXHSBotSession ~= nil then
+		hasXHSBotSession = api:HasXHSBotSession()
+	elseif api ~= nil and api.HasXHSBotParticipants ~= nil then
+		hasXHSBotSession = api:HasXHSBotParticipants()
+	end
+	if hasXHSBotSession then
+		return
+	end
+
 	GameRules:SetEventMetadataCustomTable(metadataTable)
 	GameRules:SetEventSignoutCustomTable(signoutTable)
 end
@@ -1767,7 +2758,64 @@ end
 
 ---------------------------------------------------------
 
+local function ResolveAuthenticatedPersistentPlayerID(eventSourceIndex)
+	local playerID = XHSResolveEventPlayerID ~= nil and XHSResolveEventPlayerID(eventSourceIndex) or nil
+
+	if playerID == nil and api ~= nil and api.GetEventPlayerID ~= nil then
+		local ok, resolvedPlayerID = pcall(function()
+			return api:GetEventPlayerID(eventSourceIndex, nil)
+		end)
+		if ok then
+			playerID = tonumber(resolvedPlayerID)
+		end
+	elseif playerID == nil and CustomGameEventManager ~= nil
+		and CustomGameEventManager.GetPlayerIDFromEventSourceIndex ~= nil then
+		local ok, resolvedPlayerID = pcall(function()
+			return CustomGameEventManager:GetPlayerIDFromEventSourceIndex(eventSourceIndex)
+		end)
+		if ok then
+			playerID = tonumber(resolvedPlayerID)
+		end
+	elseif playerID == nil and tonumber(eventSourceIndex) ~= nil and tonumber(eventSourceIndex) > 0 then
+		-- Compatibility fallback for engine builds without
+		-- GetPlayerIDFromEventSourceIndex. The event source is authoritative;
+		-- payload PlayerID/nPlayerID is deliberately never consulted.
+		local ok, resolvedPlayerID = pcall(function()
+			local sender = EntIndexToHScript(tonumber(eventSourceIndex))
+			return sender ~= nil and sender.GetPlayerID ~= nil and sender:GetPlayerID() or nil
+		end)
+		if ok then
+			playerID = tonumber(resolvedPlayerID)
+		end
+	end
+
+	if playerID == nil or playerID < 0 or not PlayerResource:IsValidPlayerID(playerID) then
+		return nil
+	end
+
+	if api ~= nil and api.IsPersistentPlayerID ~= nil then
+		return api:IsPersistentPlayerID(playerID) and playerID or nil
+	end
+	if IsXHSPersistentPlayerID ~= nil then
+		return IsXHSPersistentPlayerID(playerID) and playerID or nil
+	end
+	if PlayerResource.IsFakeClient ~= nil and PlayerResource:IsFakeClient(playerID) then
+		return nil
+	end
+
+	return playerID
+end
+
 function GameMode:OnDialogConfirm(eventSourceIndex, data)
+	data = data or {}
+	local playerID = ResolveAuthenticatedPersistentPlayerID(eventSourceIndex)
+	if playerID == nil or data.ConfirmToken == nil then return end
+
+	GameMode.DialogConfirmPlayers = GameMode.DialogConfirmPlayers or {}
+	GameMode.DialogConfirmPlayers[data.ConfirmToken] = GameMode.DialogConfirmPlayers[data.ConfirmToken] or {}
+	if GameMode.DialogConfirmPlayers[data.ConfirmToken][playerID] then return end
+	GameMode.DialogConfirmPlayers[data.ConfirmToken][playerID] = true
+
 	if GameMode.DialogConfirmCount[data.ConfirmToken] == nil then
 		GameMode.DialogConfirmCount[data.ConfirmToken] = 1
 	else
@@ -1775,12 +2823,16 @@ function GameMode:OnDialogConfirm(eventSourceIndex, data)
 	end
 
 	local netTable = {}
-	netTable["PlayerID"] = data.nPlayerID
+	netTable["PlayerID"] = playerID
 	CustomGameEventManager:Send_ServerToAllClients("dialog_player_confirm", netTable)
 
 	local nValid = 0;
-	for iPlayer = 0, PlayerResource:GetPlayerCount() - 1 do
-		if PlayerResource:GetSteamAccountID(iPlayer) ~= 0 then
+	for iPlayer = 0, 23 do
+		local eligible = api ~= nil and api.IsPersistentPlayerID ~= nil
+			and api:IsPersistentPlayerID(iPlayer)
+			or api == nil and IsXHSPersistentPlayerID ~= nil
+			and IsXHSPersistentPlayerID(iPlayer)
+		if eligible then
 			nValid = nValid + 1
 		end
 	end
@@ -1801,6 +2853,9 @@ end
 ---------------------------------------------------------
 
 function GameMode:OnDialogConfirmExpired(eventSourceIndex, data)
+	data = data or {}
+	if ResolveAuthenticatedPersistentPlayerID(eventSourceIndex) == nil then return end
+
 	if data.ConfirmToken then
 		GameMode.DialogConfirmCount[data.ConfirmToken] = 4
 	end
@@ -1816,7 +2871,8 @@ end
 ---------------------------------------------------------
 
 function GameMode:OnRelicClaimed(eventSourceIndex, data)
-	local nPlayerID = data["PlayerID"]
+	data = data or {}
+	local nPlayerID = ResolveAuthenticatedPersistentPlayerID(eventSourceIndex)
 	local szClaimedRelicName = data["ClaimedRelicName"]
 	if nPlayerID ~= nil and szClaimedRelicName ~= nil then
 		print("GameMode:OnRelicClaimed - Player " .. nPlayerID .. " is trying to claim relic " .. szClaimedRelicName)

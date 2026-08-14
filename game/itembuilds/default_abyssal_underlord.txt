@@ -1,43 +1,50 @@
-"itembuilds/test_abyssal_underlord.txt"
+"itembuilds"
 {
 	"author"		"X Hero Siege Official"
 	"hero"			"npc_dota_hero_abyssal_underlord"
-	"Title"			"Recommended items for Pit Lord"
+	"Title"			"XHS Tank / Frontline - Pit Lord"
 
 	"Items"
 	{
-		"#DOTA_Item_Build_Title"
-		{
-		}
-
-		"#DOTA_Item_Build_Hero15"
-		{
-		}
-
 		"#DOTA_Item_Build_Starting_Items"
 		{
-			"item"		"item_amulet_of_the_wild"
+			"item"		"item_health_potion"
+			"item"		"item_mana_potion"
+			"item"		"item_orb_of_darkness"
 		}
 
 		"#DOTA_Item_Build_Early_Game"
 		{
-			"item"		"item_orb_of_fire"
+			"item"		"item_orb_of_earth"
+			"item"		"item_tome_small"
+			"item"		"item_tome_small"
+			"item"		"item_lifesteal_mask"
 			"item"		"item_ankh_of_reincarnation"
-			"item"		"item_tome_small"
-			"item"		"item_gloom_blade"
 		}
 
-		"#DOTA_Item_Build_Core_Items"
+		"#DOTA_Item_Build_Mid_Items"
 		{
-			"item"		"item_assassins_blade"
-			"item"		"item_bracer_of_protection"
-			"item"		"item_assassins_blade"
+			"item"		"item_orb_of_darkness2"
+			"item"		"item_orb_of_earth2"
+			"item"		"item_boots_of_speed"
+			"item"		"item_xhs_cloak_of_flames"
 		}
 
-		"#DOTA_Item_Build_Luxury"
+		"#DOTA_Item_Build_Late_Items"
 		{
-			"item"		"item_tome_small"
+			"item"		"item_bracer_of_the_void"
+			"item"		"item_orb_of_earth3"
+			"item"		"item_healing_wards2"
 			"item"		"item_tome_big"
+		}
+
+		"#DOTA_Item_Build_Other_Items"
+		{
+			"item"		"item_healing_wards"
+			"item"		"item_potion_full"
+			"item"		"item_potion_of_invulnerability"
+			"item"		"item_potion_of_antimagic"
+			"item"		"item_amulet_of_the_wild"
 		}
 	}
 }

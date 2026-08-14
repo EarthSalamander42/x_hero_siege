@@ -1,4 +1,5 @@
 modifier_movement_speed_activity = class({})
+modifier_movement_speed_activity.XHS_LINK_CLIENT = true
 
 require('libraries/modifiers/animation_code')
 

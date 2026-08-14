@@ -8,10 +8,118 @@ ListenToGameEvent('game_rules_state_change', function()
 
 	if state == DOTA_GAMERULES_STATE_CUSTOM_GAME_SETUP then
 		GameMode:InitDemo()
---	elseif state == DOTA_GAMERULES_STATE_PRE_GAME then
---		SendToServerConsole( "dota_dev forcegamestart" )
+		-- Team assignment is only guaranteed to be writable during custom setup.
+		-- Repair the local slot before the separate listener immediately finishes
+		-- this otherwise-skipped state.
+		GameMode:EnsureDemoPlayableHeroes(false)
+	elseif state == DOTA_GAMERULES_STATE_PRE_GAME then
+		-- The demo deliberately skips the ordinary XHS selection flow. Verify
+		-- after the engine assignment pass that every human owns a playable hero.
+		GameRules:GetGameModeEntity():SetContextThink("xhs_demo_ensure_playable_heroes", function()
+			GameMode:EnsureDemoPlayableHeroes()
+			return nil
+		end, 0.1)
 	end
 end, nil)
+
+ListenToGameEvent('player_connect_full', function()
+	if GetMapName() ~= "x_hero_siege_demo" then return end
+
+	-- A direct Tools launch can connect the local player after CUSTOM_GAME_SETUP
+	-- has already been collapsed to zero. Keep this event as the authoritative
+	-- late-arrival repair trigger; OnThink verifies the result afterward.
+	GameMode:EnsureDemoPlayableHeroes()
+end, nil)
+
+function GameMode:EnsureDemoPlayableHeroes(allowHeroCreation)
+	self.demoHeroRecoveryPending = self.demoHeroRecoveryPending or {}
+	local foundHuman = false
+	local allHumansReady = true
+
+	for playerID = 0, DOTA_MAX_TEAM_PLAYERS - 1 do
+		local isValidPlayer = PlayerResource:IsValidPlayerID(playerID)
+		local player = isValidPlayer and PlayerResource:GetPlayer(playerID) or nil
+		local isFakeClient = isValidPlayer
+			and PlayerResource.IsFakeClient ~= nil
+			and PlayerResource:IsFakeClient(playerID)
+
+		if player ~= nil and not isFakeClient then
+			foundHuman = true
+
+			if PlayerResource:GetTeam(playerID) ~= DOTA_TEAM_GOODGUYS
+				and PlayerResource.SetCustomTeamAssignment ~= nil then
+				local teamOK, teamError = pcall(function()
+					PlayerResource:SetCustomTeamAssignment(playerID, DOTA_TEAM_GOODGUYS)
+				end)
+				if not teamOK and XHSBootstrapLog ~= nil then
+					XHSBootstrapLog("warn", "demo player team assignment failed player_id="
+						.. tostring(playerID) .. " error=" .. tostring(teamError))
+				end
+			end
+			local teamReady = PlayerResource:GetTeam(playerID) == DOTA_TEAM_GOODGUYS
+
+			local hero = PlayerResource:GetSelectedHeroEntity(playerID)
+			if (hero == nil or hero:IsNull()) and player ~= nil and player.GetAssignedHero ~= nil then
+				hero = player:GetAssignedHero()
+			end
+			local needsPlayableHero = not teamReady
+				or hero == nil
+				or hero:IsNull()
+				or hero:GetUnitName() == "npc_dota_hero_wisp"
+				or hero:GetTeamNumber() ~= DOTA_TEAM_GOODGUYS
+
+			if needsPlayableHero then
+				allHumansReady = false
+			end
+
+			if needsPlayableHero
+				and teamReady
+				and hero ~= nil
+				and not hero:IsNull()
+				and hero:GetUnitName() == "npc_dota_hero_wisp"
+				and allowHeroCreation ~= false
+				and not self.demoHeroRecoveryPending[playerID] then
+				self.demoHeroRecoveryPending[playerID] = true
+
+				local function CompleteDemoHeroRecovery(newHero)
+					self.demoHeroRecoveryPending[playerID] = nil
+					if newHero ~= nil and not newHero:IsNull() then
+						newHero:SetGold(99999, false)
+						PlayerResource:SetCameraTarget(playerID, newHero)
+						GameRules:GetGameModeEntity():SetContextThink(
+							"xhs_demo_release_recovery_camera_" .. tostring(playerID),
+							function()
+								PlayerResource:SetCameraTarget(playerID, nil)
+								return nil
+							end,
+							0.1
+						)
+					end
+				end
+
+				-- Let the engine finish spawning its default Wisp first. Replacing it
+				-- on the same frame can race hero assignment and leave an incomplete
+				-- model, so keep the default visible briefly before Mountain King.
+				Timers:CreateTimer(0.5, function()
+					local currentHero = PlayerResource:GetSelectedHeroEntity(playerID)
+					if currentHero == nil
+						or currentHero:IsNull()
+						or currentHero:GetUnitName() ~= "npc_dota_hero_wisp" then
+						self.demoHeroRecoveryPending[playerID] = nil
+						return nil
+					end
+
+					XHSPrecache:ReplaceHeroWith(playerID, "npc_dota_hero_sven", 99999, 0, currentHero, {
+						cleanupDelay = 1.0,
+					}, CompleteDemoHeroRecovery)
+					return nil
+				end)
+			end
+		end
+	end
+
+	self.demoInitialPlayableHeroReady = foundHuman and allHumansReady
+end
 
 function GameMode:InitDemo()
 	GameRules:GetGameModeEntity():SetTowerBackdoorProtectionEnabled( true )
@@ -19,7 +127,6 @@ function GameMode:InitDemo()
 --	GameRules:GetGameModeEntity():SetBotThinkingEnabled( true ) -- the ConVar is currently disabled in C++
 	-- Set bot mode difficulty: can try GameRules:GetGameModeEntity():SetCustomGameDifficulty( 1 )
 
-	GameRules:SetUseUniversalShopMode(true)
 	GameRules:SetPreGameTime(10.0)
 	GameRules:SetStrategyTime(0.0)
 	GameRules:SetCustomGameSetupTimeout(0.0) -- skip the custom team UI with 0, or do indefinite duration with -1
@@ -53,7 +160,6 @@ function GameMode:InitDemo()
 	SendToServerConsole( "dota_hero_god_mode 0" )
 	SendToServerConsole( "dota_ability_debug 0" )
 	SendToServerConsole( "dota_creeps_no_spawning 0" )
-	SendToServerConsole( "dota_easybuy 1" )
 --	SendToServerConsole( "dota_bot_mode 1" )
 
 	self.m_bPlayerDataCaptured = false

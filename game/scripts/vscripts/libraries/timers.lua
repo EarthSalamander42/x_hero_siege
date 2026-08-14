@@ -1,4 +1,4 @@
-TIMERS_VERSION = "1.03"
+TIMERS_VERSION = "2.00"
 
 --[[
 
@@ -59,7 +59,60 @@ TIMERS_VERSION = "1.03"
 	})
 
 ]]
+-- Compatibility floor for zero-delay and overdue repeating timers. Unlike the
+-- legacy scheduler this is not a permanent polling interval: the thinker sleeps
+-- until the next timer deadline.
 TIMERS_THINK = 0.01
+
+local TIMER_CONTEXT_NAME = "xhs_adaptive_timers"
+local TIMER_GENERATION_KEY = "__xhs_timer_generation"
+
+local function HeapSwap(heap, a, b)
+	heap[a], heap[b] = heap[b], heap[a]
+end
+
+local function HeapPush(heap, entry)
+	local index = #heap + 1
+	heap[index] = entry
+
+	while index > 1 do
+		local parent = math.floor(index / 2)
+		if heap[parent].endTime <= entry.endTime then break end
+		HeapSwap(heap, parent, index)
+		index = parent
+	end
+end
+
+local function HeapPop(heap)
+	local count = #heap
+	if count == 0 then return nil end
+
+	local root = heap[1]
+	local tail = heap[count]
+	heap[count] = nil
+	count = count - 1
+
+	if count > 0 then
+		heap[1] = tail
+		local index = 1
+		while true do
+			local left = index * 2
+			if left > count then break end
+
+			local right = left + 1
+			local smallest = left
+			if right <= count and heap[right].endTime < heap[left].endTime then
+				smallest = right
+			end
+			if heap[index].endTime <= heap[smallest].endTime then break end
+
+			HeapSwap(heap, index, smallest)
+			index = smallest
+		end
+	end
+
+	return root
+end
 
 if Timers == nil then
 	--	print ( '[Timers] creating Timers' )
@@ -80,7 +133,14 @@ function Timers:_xpcall(f, ...)
 	local result = xpcall(function() return f(unpack(arg)) end,
 		function(msg)
 			-- build the error message
-			return msg .. '\n' .. debug.traceback() .. '\n'
+			local message = tostring(msg or "Unknown timer runtime error")
+			if debug ~= nil and type(debug.traceback) == "function" then
+				local ok, trace = pcall(debug.traceback, message, 2)
+				if ok and trace ~= nil then
+					return tostring(trace) .. '\n'
+				end
+			end
+			return message .. '\n'
 		end)
 
 	print(result)
@@ -93,92 +153,210 @@ function Timers:_xpcall(f, ...)
 	return unpack(result)
 end
 
-function Timers:start()
+function Timers:start(existingTimers)
 	Timers = self
-	self.timers = {}
+	self.timers = existingTimers or {}
+	self.gameTimeHeap = {}
+	self.realTimeHeap = {}
+	self.pendingEntries = {}
+	self.timerGeneration = 0
+	self.isThinking = false
+	self.thinkArmed = false
+	self.schedulerGeneration = (self.schedulerGeneration or 0) + 1
+	local schedulerGeneration = self.schedulerGeneration
 
-	local ent = Entities:CreateByClassname("info_target") -- Entities:FindByClassname(nil, 'CWorld')
-	ent:SetThink("Think", self, "timers", TIMERS_THINK)
+	self.thinker = Entities:CreateByClassname("info_target")
+	self.thinkCallback = function()
+		return Timers:Think(schedulerGeneration)
+	end
+
+	for name, timer in pairs(self.timers) do
+		self:_QueueTimer(name, timer)
+	end
+	self:_ArmThinker()
 end
 
-function Timers:Think()
-	if GameRules:State_Get() >= DOTA_GAMERULES_STATE_POST_GAME then
+function Timers:_UsesGameTime(timer)
+	return timer.useGameTime ~= false
+end
+
+function Timers:_IsEntryCurrent(entry)
+	local timer = self.timers[entry.name]
+	return timer ~= nil
+		and timer == entry.timer
+		and timer[TIMER_GENERATION_KEY] == entry.generation
+		and timer.endTime == entry.endTime
+		and self:_UsesGameTime(timer) == entry.useGameTime
+end
+
+function Timers:_PeekCurrent(heap)
+	while #heap > 0 do
+		local entry = heap[1]
+		if self:_IsEntryCurrent(entry) then
+			return entry
+		end
+		HeapPop(heap)
+	end
+	return nil
+end
+
+function Timers:_PushEntry(entry)
+	local heap = entry.useGameTime and self.gameTimeHeap or self.realTimeHeap
+	HeapPush(heap, entry)
+end
+
+function Timers:_QueueTimer(name, timer)
+	self.timerGeneration = self.timerGeneration + 1
+	timer[TIMER_GENERATION_KEY] = self.timerGeneration
+
+	local entry = {
+		name = name,
+		timer = timer,
+		generation = self.timerGeneration,
+		endTime = timer.endTime,
+		useGameTime = self:_UsesGameTime(timer),
+	}
+
+	if self.isThinking then
+		self.pendingEntries[#self.pendingEntries + 1] = entry
+	else
+		self:_PushEntry(entry)
+	end
+end
+
+function Timers:_FlushPendingEntries()
+	local pending = self.pendingEntries
+	self.pendingEntries = {}
+
+	for _, entry in ipairs(pending) do
+		if self:_IsEntryCurrent(entry) then
+			self:_PushEntry(entry)
+		end
+	end
+end
+
+function Timers:_GetNextDelay()
+	local gameEntry = self:_PeekCurrent(self.gameTimeHeap)
+	local realEntry = self:_PeekCurrent(self.realTimeHeap)
+	local delay = nil
+
+	if gameEntry ~= nil then
+		delay = gameEntry.endTime - GameRules:GetGameTime()
+	end
+	if realEntry ~= nil then
+		local realDelay = realEntry.endTime - Time()
+		if delay == nil or realDelay < delay then
+			delay = realDelay
+		end
+	end
+
+	if delay == nil then return nil end
+	return math.max(TIMERS_THINK, delay)
+end
+
+function Timers:_ArmThinker()
+	if self.isThinking or self.thinker == nil or self.thinker:IsNull() then return end
+
+	local delay = self:_GetNextDelay()
+	if delay == nil then
+		self.thinkArmed = false
 		return
 	end
 
-	-- Track game time, since the dt passed in to think is actually wall-clock time not simulation time.
-	local now = GameRules:GetGameTime()
+	self.thinkArmed = true
+	self.thinker:SetContextThink(TIMER_CONTEXT_NAME, self.thinkCallback, delay)
+end
 
-	-- Process timers
-	for k, v in pairs(Timers.timers) do
-		local bUseGameTime = true
-		if v.useGameTime ~= nil and v.useGameTime == false then
-			bUseGameTime = false
-		end
-		local bOldStyle = false
-		if v.useOldStyle ~= nil and v.useOldStyle == true then
-			bOldStyle = true
-		end
+local function BuildTimerErrorTrace(err)
+	local message = tostring(err == nil and "unknown timer error" or err)
+	if debug ~= nil and type(debug.traceback) == "function" then
+		local ok, trace = pcall(debug.traceback, message, 2)
+		if ok and trace ~= nil then return tostring(trace) end
+	end
+	return message
+end
 
-		local now = GameRules:GetGameTime()
-		if not bUseGameTime then
-			now = Time()
-		end
+function Timers:_RunDueHeap(heap, now)
+	while true do
+		local entry = self:_PeekCurrent(heap)
+		if entry == nil or entry.endTime > now then return end
 
-		if v.endTime == nil then
-			v.endTime = now
-		end
-		-- Check if the timer has finished
-		if now >= v.endTime then
-			-- Remove from timers list
-			Timers.timers[k] = nil
+		HeapPop(heap)
+		if self:_IsEntryCurrent(entry) then
+			local name = entry.name
+			local timer = entry.timer
+			self.timers[name] = nil
 
-			-- Run the callback
 			local status, nextCall
-			if v.context then
-				status, nextCall = xpcall(function() return v.callback(v.context, v) end, function(msg)
-					return msg .. '\n' .. debug.traceback() .. '\n'
-				end)
+			if timer.context then
+				status, nextCall = xpcall(function() return timer.callback(timer.context, timer) end, BuildTimerErrorTrace)
 			else
-				status, nextCall = xpcall(function() return v.callback(v) end, function(msg)
-					return msg .. '\n' .. debug.traceback() .. '\n'
-				end)
+				status, nextCall = xpcall(function() return timer.callback(timer) end, BuildTimerErrorTrace)
 			end
 
-			-- Make sure it worked
 			if status then
-				-- Check if it needs to loop
 				if nextCall then
-					-- Change its end time
-
-					if bOldStyle then
-						v.endTime = v.endTime + nextCall - now
+					if timer.useOldStyle == true then
+						timer.endTime = timer.endTime + nextCall - now
 					else
-						v.endTime = v.endTime + nextCall
+						timer.endTime = timer.endTime + nextCall
 					end
 
-					Timers.timers[k] = v
+					-- Preserve the legacy behavior: a repeating named timer
+					-- replaces a timer of the same name created by its callback.
+					self.timers[name] = timer
+					self:_QueueTimer(name, timer)
 				end
-
-				-- Update timer data
-				--self:UpdateTimerData()
 			else
-				-- Nope, handle the error
-				Timers:HandleEventError('Timer', k, nextCall)
+				self:HandleEventError("Timer", name, nextCall)
 			end
 		end
 	end
+end
 
-	return TIMERS_THINK
+function Timers:Think(schedulerGeneration)
+	-- Stops a legacy or superseded thinker cleanly after a script reload.
+	if schedulerGeneration ~= self.schedulerGeneration then return nil end
+
+	self.thinkArmed = false
+	if GameRules:State_Get() >= DOTA_GAMERULES_STATE_POST_GAME then return nil end
+
+	self.isThinking = true
+	self:_RunDueHeap(self.gameTimeHeap, GameRules:GetGameTime())
+	self:_RunDueHeap(self.realTimeHeap, Time())
+	self.isThinking = false
+	self:_FlushPendingEntries()
+
+	local delay = self:_GetNextDelay()
+	self.thinkArmed = delay ~= nil
+	return delay
 end
 
 function Timers:HandleEventError(name, event, err)
-	print(err)
-
 	-- Ensure we have data
 	name = tostring(name or 'unknown')
 	event = tostring(event or 'unknown')
 	err = tostring(err or 'unknown')
+
+	-- Never allow diagnostics to throw here: this function is the last line of
+	-- defence for the shared scheduler. In particular, Lua errors may be tables
+	-- or engine userdata rather than strings.
+	if XHSObservability ~= nil and type(XHSObservability.Log) == "function" then
+		pcall(function()
+			XHSObservability:Log("error", "timer", "TIMER_CALLBACK_FAILED", err, {
+				timer_name = event,
+				event_type = name,
+				server_game_time = GameRules ~= nil and GameRules.GetGameTime ~= nil
+					and GameRules:GetGameTime() or 0,
+			})
+		end)
+	end
+	local printed = false
+	if XHSBootstrapNativePrint ~= nil then
+		printed = pcall(XHSBootstrapNativePrint,
+			"[error][XHS_TIMER][" .. event .. "] " .. err)
+	end
+	if not printed then pcall(print, "[error][XHS_TIMER][" .. event .. "] " .. err) end
 
 	-- Tell everyone there was an error
 	--GameRules:SendCustomMessage(nil, name .. ' threw an error on event '..event, 0, 0)
@@ -225,6 +403,8 @@ function Timers:CreateTimer(name, args, context)
 	args.context = context
 
 	Timers.timers[name] = args
+	Timers:_QueueTimer(name, args)
+	Timers:_ArmThinker()
 
 	return name
 end
@@ -245,6 +425,19 @@ function Timers:RemoveTimers(killAll)
 	end
 
 	Timers.timers = timers
+	Timers.gameTimeHeap = {}
+	Timers.realTimeHeap = {}
+	Timers.pendingEntries = {}
+
+	for name, timer in pairs(timers) do
+		Timers:_QueueTimer(name, timer)
+	end
+	Timers:_ArmThinker()
 end
 
-if not Timers.timers then Timers:start() end
+-- Ability Lua files are also loaded in the client VM for prediction/tooltips.
+-- Entity creation is server-only, so the automatic thinker must never start
+-- from a client-side require().
+if IsServer() and (Timers.timers == nil or Timers.gameTimeHeap == nil) then
+	Timers:start(Timers.timers)
+end

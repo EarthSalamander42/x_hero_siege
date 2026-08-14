@@ -39,16 +39,42 @@ function ToggleCheatMenu() {
 		return;
 	}
 
-	var herolist = CustomNetTables.GetTableValue('hero_selection', 'herolist');
+	var heroListRendered = false;
 
-	Object.keys(herolist.herolist).sort().forEach(function (hero) {
-		var new_hero = $.CreatePanel('Panel', $("#" + herolist.herolist[hero]), hero);
-		new_hero.AddClass("HeroContainer")
-		new_hero.group = 'HeroChoises';
-		new_hero.SetPanelEvent('onactivate', function () { OnHeroSelected(hero); });
+	function RenderHeroList(data) {
+		if (heroListRendered || !data || !data.herolist) {
+			return;
+		}
 
-		var new_hero_image = $.CreatePanel('DOTAHeroImage', new_hero, '');
-		new_hero_image.hittest = false;
-		new_hero_image.heroname = hero;
+		var heroes = Object.keys(data.herolist).sort();
+		if (heroes.length === 0) {
+			return;
+		}
+
+		heroes.forEach(function (hero) {
+			var attributePanel = $("#" + data.herolist[hero]);
+			if (!attributePanel) {
+				return;
+			}
+
+			var new_hero = $.CreatePanel('Panel', attributePanel, hero);
+			new_hero.AddClass("HeroContainer");
+			new_hero.group = 'HeroChoises';
+			new_hero.SetPanelEvent('onactivate', function () { OnHeroSelected(hero); });
+
+			var new_hero_image = $.CreatePanel('DOTAHeroImage', new_hero, '');
+			new_hero_image.hittest = false;
+			new_hero_image.heroname = hero;
+		});
+
+		heroListRendered = true;
+	}
+
+	CustomNetTables.SubscribeNetTableListener('hero_selection', function (tableName, key, data) {
+		if (key === 'herolist') {
+			RenderHeroList(data);
+		}
 	});
+
+	RenderHeroList(CustomNetTables.GetTableValue('hero_selection', 'herolist'));
 })();

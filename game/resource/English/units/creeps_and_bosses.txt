@@ -1,0 +1,7 @@
+// XHS generated unit names: creeps and bosses
+// Generated from the tooltip audit pass. Keep keys stable; split by topic for maintainability.
+
+"npc_ghul_II"		"Lifestealer Phase 2"
+"npc_orc_II"		"Undying Phase 2"
+
+"npc_dota_hero_grom_hellscream_clone"		"Grom Hellscream"

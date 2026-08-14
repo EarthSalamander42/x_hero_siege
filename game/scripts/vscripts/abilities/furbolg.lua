@@ -52,6 +52,7 @@ end
 
 -- Earthshock slow debuff
 modifier_furbolg_earthshock_slow = class({})
+modifier_furbolg_earthshock_slow.XHS_LINK_CLIENT = true
 
 function modifier_furbolg_earthshock_slow:IsDebuff() return true end
 function modifier_furbolg_earthshock_slow:IsHidden() return false end

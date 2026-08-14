@@ -1,6 +1,7 @@
 LinkLuaModifier("modifier_endurance_buff", "modifiers/auras/modifier_endurance_aura.lua", LUA_MODIFIER_MOTION_NONE)
 
 modifier_endurance_aura = modifier_endurance_aura or class({})
+modifier_endurance_aura.XHS_LINK_CLIENT = true
 
 function modifier_endurance_aura:IsAura() return true end
 function modifier_endurance_aura:GetAuraDuration() return 0.2 end
@@ -9,6 +10,7 @@ function modifier_endurance_aura:GetAuraSearchTeam() return self:GetAbility():Ge
 function modifier_endurance_aura:GetAuraSearchType() return self:GetAbility():GetAbilityTargetType() end
 function modifier_endurance_aura:GetAuraSearchFlags() return self:GetAbility():GetAbilityTargetFlags() end
 function modifier_endurance_aura:GetModifierAura() return "modifier_endurance_buff" end
+function modifier_endurance_aura:GetAuraEntityReject(target) return IsXHSRuneUnit and IsXHSRuneUnit(target) end
 
 function modifier_endurance_aura:IsHidden() return true end
 function modifier_endurance_aura:IsPurgable() return false end
@@ -16,6 +18,7 @@ function modifier_endurance_aura:IsPurgeException() return false end
 function modifier_endurance_aura:RemoveOnDeath() return false end
 
 modifier_endurance_buff = modifier_endurance_buff or class({})
+modifier_endurance_buff.XHS_LINK_CLIENT = true
 
 function modifier_endurance_buff:GetTexture()
 	return "custom/holdout_endurance_aura"

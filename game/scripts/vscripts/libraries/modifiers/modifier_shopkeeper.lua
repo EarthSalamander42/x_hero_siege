@@ -1,4 +1,5 @@
 modifier_shopkeeper = class({})
+modifier_shopkeeper.XHS_LINK_CLIENT = true
 
 function modifier_shopkeeper:DeclareFunctions()
     local funcs = {

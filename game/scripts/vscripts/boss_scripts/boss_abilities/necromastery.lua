@@ -13,6 +13,7 @@ end
 -- Passive modifier
 LinkLuaModifier("modifier_frostivus_necromastery", "boss_scripts/boss_abilities/necromastery.lua", LUA_MODIFIER_MOTION_NONE )
 modifier_frostivus_necromastery = modifier_frostivus_necromastery or class({})
+modifier_frostivus_necromastery.XHS_LINK_CLIENT = true
 
 function modifier_frostivus_necromastery:IsHidden() return false end
 function modifier_frostivus_necromastery:IsDebuff() return false end

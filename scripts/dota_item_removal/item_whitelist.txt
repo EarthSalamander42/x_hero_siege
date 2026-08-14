@@ -8,11 +8,6 @@
 # [Core Dota Items Intentionally Kept]
 item_tpscroll
 item_monkey_king_bar
-item_ward_observer
-item_ward_sentry
-item_clarity
-item_flask
-item_dust
 
 # [XHS Shop Dependencies]
 # Items listed in game/scripts/shops/*.txt are added automatically by the generator.

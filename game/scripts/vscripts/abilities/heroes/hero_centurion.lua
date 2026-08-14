@@ -77,3 +77,145 @@ local damage = caster:GetMaxHealth() / 4
 	ParticleManager:SetParticleControl(eclipse, 3, Vector(radius, 0, 0))
 	ParticleManager:ReleaseParticleIndex(eclipse)
 end
+
+LinkLuaModifier("modifier_xhs_centurion_necromastery", "abilities/heroes/hero_centurion.lua", LUA_MODIFIER_MOTION_NONE)
+LinkLuaModifier("modifier_xhs_centurion_atrophy_aura", "abilities/heroes/hero_centurion.lua", LUA_MODIFIER_MOTION_NONE)
+LinkLuaModifier("modifier_xhs_centurion_atrophy_debuff", "abilities/heroes/hero_centurion.lua", LUA_MODIFIER_MOTION_NONE)
+LinkLuaModifier("modifier_xhs_centurion_atrophy_bonus", "abilities/heroes/hero_centurion.lua", LUA_MODIFIER_MOTION_NONE)
+
+xhs_centurion_necromastery = xhs_centurion_necromastery or class({})
+
+function xhs_centurion_necromastery:GetIntrinsicModifierName()
+	return "modifier_xhs_centurion_necromastery"
+end
+
+modifier_xhs_centurion_necromastery = modifier_xhs_centurion_necromastery or class({})
+modifier_xhs_centurion_necromastery.XHS_LINK_CLIENT = true
+
+function modifier_xhs_centurion_necromastery:IsHidden() return false end
+function modifier_xhs_centurion_necromastery:IsPurgable() return false end
+function modifier_xhs_centurion_necromastery:RemoveOnDeath() return false end
+
+function modifier_xhs_centurion_necromastery:DeclareFunctions()
+	return {
+		MODIFIER_EVENT_ON_DEATH,
+		MODIFIER_PROPERTY_PREATTACK_BONUS_DAMAGE,
+	}
+end
+
+function modifier_xhs_centurion_necromastery:OnDeath(keys)
+	if not IsServer() then return end
+
+	local parent = self:GetParent()
+	local ability = self:GetAbility()
+	if not ability then return end
+
+	if keys.unit == parent then
+		local release = ability:GetSpecialValueFor("necromastery_soul_release")
+		self:SetStackCount(math.max(0, math.floor(self:GetStackCount() * (1 - release))))
+		return
+	end
+
+	if keys.attacker ~= parent then return end
+	if not keys.unit or keys.unit:IsBuilding() then return end
+	if keys.unit:GetTeamNumber() == parent:GetTeamNumber() then return end
+	if parent:PassivesDisabled() then return end
+
+	local max_souls = ability:GetSpecialValueFor("necromastery_max_souls")
+	local hero_bonus = 0
+	if keys.unit:IsRealHero() then
+		hero_bonus = ability:GetSpecialValueFor("necromastery_souls_hero_bonus")
+	end
+
+	self:SetStackCount(math.min(max_souls, self:GetStackCount() + 1 + hero_bonus))
+end
+
+function modifier_xhs_centurion_necromastery:GetModifierPreAttack_BonusDamage()
+	local ability = self:GetAbility()
+	if not ability or self:GetParent():PassivesDisabled() then return 0 end
+
+	return self:GetStackCount() * ability:GetSpecialValueFor("necromastery_damage_per_soul")
+end
+
+xhs_centurion_atrophy_aura = xhs_centurion_atrophy_aura or class({})
+
+function xhs_centurion_atrophy_aura:GetIntrinsicModifierName()
+	return "modifier_xhs_centurion_atrophy_aura"
+end
+
+modifier_xhs_centurion_atrophy_aura = modifier_xhs_centurion_atrophy_aura or class({})
+modifier_xhs_centurion_atrophy_aura.XHS_LINK_CLIENT = true
+
+function modifier_xhs_centurion_atrophy_aura:IsHidden() return true end
+function modifier_xhs_centurion_atrophy_aura:IsPurgable() return false end
+function modifier_xhs_centurion_atrophy_aura:IsAura() return not self:GetParent():PassivesDisabled() end
+function modifier_xhs_centurion_atrophy_aura:GetModifierAura() return "modifier_xhs_centurion_atrophy_debuff" end
+function modifier_xhs_centurion_atrophy_aura:GetAuraRadius() return self:GetAbility():GetSpecialValueFor("radius") end
+function modifier_xhs_centurion_atrophy_aura:GetAuraSearchTeam() return DOTA_UNIT_TARGET_TEAM_ENEMY end
+function modifier_xhs_centurion_atrophy_aura:GetAuraSearchType() return DOTA_UNIT_TARGET_HERO + DOTA_UNIT_TARGET_BASIC end
+function modifier_xhs_centurion_atrophy_aura:GetAuraSearchFlags() return DOTA_UNIT_TARGET_FLAG_MAGIC_IMMUNE_ENEMIES end
+
+function modifier_xhs_centurion_atrophy_aura:DeclareFunctions()
+	return {
+		MODIFIER_EVENT_ON_DEATH,
+	}
+end
+
+function modifier_xhs_centurion_atrophy_aura:OnDeath(keys)
+	if not IsServer() then return end
+
+	local parent = self:GetParent()
+	local ability = self:GetAbility()
+	if not ability or parent:PassivesDisabled() then return end
+	if not keys.unit or keys.unit == parent or keys.unit:IsBuilding() then return end
+	if keys.unit:GetTeamNumber() == parent:GetTeamNumber() then return end
+	if (keys.unit:GetAbsOrigin() - parent:GetAbsOrigin()):Length2D() > ability:GetSpecialValueFor("radius") then return end
+
+	local bonus_damage = ability:GetSpecialValueFor("bonus_damage_from_creep")
+	if keys.unit:IsRealHero() then
+		bonus_damage = ability:GetSpecialValueFor("bonus_damage_from_hero")
+	end
+
+	local bonus = parent:AddNewModifier(parent, ability, "modifier_xhs_centurion_atrophy_bonus", {
+		duration = ability:GetSpecialValueFor("bonus_damage_duration")
+	})
+
+	if bonus then
+		bonus:SetStackCount(bonus:GetStackCount() + bonus_damage)
+	end
+end
+
+modifier_xhs_centurion_atrophy_debuff = modifier_xhs_centurion_atrophy_debuff or class({})
+modifier_xhs_centurion_atrophy_debuff.XHS_LINK_CLIENT = true
+
+function modifier_xhs_centurion_atrophy_debuff:IsDebuff() return true end
+function modifier_xhs_centurion_atrophy_debuff:IsPurgable() return false end
+
+function modifier_xhs_centurion_atrophy_debuff:DeclareFunctions()
+	return {
+		MODIFIER_PROPERTY_BASEDAMAGEOUTGOING_PERCENTAGE,
+	}
+end
+
+function modifier_xhs_centurion_atrophy_debuff:GetModifierBaseDamageOutgoing_Percentage()
+	local ability = self:GetAbility()
+	if not ability then return 0 end
+
+	return -ability:GetSpecialValueFor("damage_reduction_pct")
+end
+
+modifier_xhs_centurion_atrophy_bonus = modifier_xhs_centurion_atrophy_bonus or class({})
+modifier_xhs_centurion_atrophy_bonus.XHS_LINK_CLIENT = true
+
+function modifier_xhs_centurion_atrophy_bonus:IsHidden() return false end
+function modifier_xhs_centurion_atrophy_bonus:IsPurgable() return false end
+
+function modifier_xhs_centurion_atrophy_bonus:DeclareFunctions()
+	return {
+		MODIFIER_PROPERTY_PREATTACK_BONUS_DAMAGE,
+	}
+end
+
+function modifier_xhs_centurion_atrophy_bonus:GetModifierPreAttack_BonusDamage()
+	return self:GetStackCount()
+end

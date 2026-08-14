@@ -1,217 +1,1367 @@
+local function FormatPhase2CreepTimer(seconds)
+	seconds = math.max(0, math.floor(seconds or 0))
+	return tostring(math.floor(seconds / 60)) .. ":" .. string.format("%02d", seconds % 60)
+end
+
+local function ActivatePhase2CreepTimer()
+	if XHSSetGlobalObjectiveState == nil or CustomTimers == nil then return end
+
+	local remaining = math.max(0, (CustomTimers.current_time and CustomTimers.current_time["special_event"] or XHS_SPECIAL_EVENT_INTERVAL) - 1)
+	XHSSetGlobalObjectiveState("phase2_creeps", "Active", "Phase 2 creeps: " .. FormatPhase2CreepTimer(remaining), remaining)
+end
+
+local PHASE_2_WAVE_COUNTS = { left = 0, right = 0 }
+local PHASE_2_STAGE_WINDOW = 20
+local PHASE_2_STAGE_JOB = {
+	left = "phase_two_left_next_wave",
+	right = "phase_two_right_next_wave",
+}
+local PHASE_2_WAVE_INTERVAL = {
+	left = XHS_CREEPS_INTERVAL,
+	right = XHS_CREEPS_INTERVAL,
+}
+local PHASE_2_SIDES = {
+	left = {
+		unit_name = "npc_ghul_II",
+		spawner_name = "npc_dota_spawner_top_left_1",
+		door_name = "door_phase2_left",
+		obstruction_name = "obstruction_phase2_1",
+	},
+	right = {
+		unit_name = "npc_orc_II",
+		spawner_name = "npc_dota_spawner_top_right_1",
+		door_name = "door_phase2_right",
+		obstruction_name = "obstruction_phase2_2",
+	},
+}
+
+function ResetPhase2CreepWaveCounts()
+	PHASE_2_WAVE_COUNTS.left = 0
+	PHASE_2_WAVE_COUNTS.right = 0
+	if XHSWaveStager ~= nil then
+		XHSWaveStager:CancelJob(PHASE_2_STAGE_JOB.left, "phase_two_reset")
+		XHSWaveStager:CancelJob(PHASE_2_STAGE_JOB.right, "phase_two_reset")
+	end
+end
+
+local function GetPhase2Sides(side)
+	if side == "left" then return { "left" } end
+	if side == "right" then return { "right" } end
+	if side == "both" then return { "left", "right" } end
+	return nil
+end
+
+function OpenPhase2Doors(side, cinematic, callback)
+	local sides = GetPhase2Sides(side)
+	if sides == nil then return false end
+
+	local doors = {}
+	local obstructions = {}
+	for _, side_name in ipairs(sides) do
+		local config = PHASE_2_SIDES[side_name]
+		table.insert(doors, config.door_name)
+		table.insert(obstructions, config.obstruction_name)
+	end
+
+	if cinematic == true and XHSOpenDoorsWithCinematic ~= nil then
+		-- Both phase-two gates open together, but the reveal must stay on the
+		-- first (left) gate so the camera does not frame the empty midpoint.
+		local first_door = Entities:FindByName(nil, PHASE_2_SIDES.left.door_name)
+		local camera_position = first_door ~= nil and first_door:GetAbsOrigin() or nil
+		XHSOpenDoorsWithCinematic(doors, obstructions, "gate_entrance002_open", callback, {
+			camera_position = camera_position,
+			move_duration = 1.35,
+			hold_duration = 1.25,
+			return_duration = 1.0,
+		})
+		return true
+	end
+
+	for _, obstruction_name in ipairs(obstructions) do
+		for _, obstruction in pairs(Entities:FindAllByName(obstruction_name)) do
+			obstruction:SetEnabled(false, true)
+		end
+	end
+	for _, door_name in ipairs(doors) do
+		DoEntFire(door_name, "SetAnimation", "gate_entrance002_open", 0, nil, nil)
+	end
+	if XHSKnockbackHeroesAtOpeningDoors ~= nil then
+		XHSKnockbackHeroesAtOpeningDoors(doors)
+	end
+	if callback ~= nil then callback() end
+	return true
+end
+
+local function ConfigurePhase2Creep(unit, sideName, waveCount, registerDevUnit)
+	local difficulty = math.max(1, math.min(5, GameRules:GetCustomGameDifficulty() or 1))
+	unit:SetBaseDamageMin(
+		unit:GetRealDamageDone(unit)
+			+ PHASE_2_UPGRADE.damage[difficulty] * waveCount
+	)
+	unit:SetBaseDamageMax(
+		unit:GetRealDamageDone(unit)
+			+ PHASE_2_UPGRADE.damage[difficulty] * waveCount * 1.1
+	)
+	unit:SetMaxHealth(
+		unit:GetMaxHealth()
+			+ PHASE_2_UPGRADE.health[difficulty] * waveCount
+	)
+	unit:SetBaseMaxHealth(
+		unit:GetMaxHealth()
+			+ PHASE_2_UPGRADE.health[difficulty] * waveCount
+	)
+	unit:SetHealth(unit:GetMaxHealth())
+	unit:SetPhysicalArmorBaseValue(
+		unit:GetPhysicalArmorValue(false)
+			+ PHASE_2_UPGRADE.armor[difficulty] * waveCount
+	)
+	ApplyGrowthOverheadMarker(unit, waveCount)
+	if registerDevUnit == true and XHSDevTools ~= nil then
+		XHSDevTools:RegisterSpawnedUnit(unit)
+	end
+end
+
+local function IsPhase2SideActive(sideName)
+	local config = PHASE_2_SIDES[sideName]
+	local towerIndex = sideName == "left" and 1 or 2
+	local tower = Entities:FindByName(nil, "npc_tower_cold_" .. towerIndex)
+	return config ~= nil
+		and CustomTimers ~= nil
+		and CustomTimers.game_phase == 2
+		and CustomTimers.proc_final_wave ~= true
+		and tower ~= nil
+		and not tower:IsNull()
+		and tower:IsAlive()
+end
+
+local function BuildPhase2WaveDescriptors(sideName, waveCount)
+	local config = PHASE_2_SIDES[sideName]
+	local spawner = config ~= nil
+		and Entities:FindByName(nil, config.spawner_name)
+		or nil
+	if spawner == nil then
+		error("Missing Phase 2 spawner: " .. tostring(config and config.spawner_name))
+	end
+	local descriptors = {}
+	local point = spawner:GetAbsOrigin()
+	for index = 1, 8 do
+		descriptors[index] = {
+			unit_name = config.unit_name,
+			team = DOTA_TEAM_CUSTOM_1,
+			spawn_position = point + RandomVector(RandomInt(0, 50)),
+			side = sideName,
+			wave_count = waveCount,
+		}
+	end
+	return descriptors
+end
+
+local function PreparePhase2CreepWave(sideName)
+	if XHSWaveStager == nil or not IsPhase2SideActive(sideName) then return false end
+	local waveCount = PHASE_2_WAVE_COUNTS[sideName] + 1
+	local descriptors = BuildPhase2WaveDescriptors(sideName, waveCount)
+	local interval = PHASE_2_WAVE_INTERVAL[sideName]
+	XHSWaveStager:StartJob(PHASE_2_STAGE_JOB[sideName], descriptors, {
+		owner = "phase_two_" .. sideName,
+		window = PHASE_2_STAGE_WINDOW,
+		start_delay = math.max(0, interval - PHASE_2_STAGE_WINDOW),
+		wave_count = waveCount,
+		is_valid = function()
+			return IsPhase2SideActive(sideName)
+				and PHASE_2_WAVE_COUNTS[sideName] + 1 == waveCount
+		end,
+		configure = function(_, unit)
+			ConfigurePhase2Creep(unit, sideName, waveCount, false)
+		end,
+	})
+	return true
+end
+
+local function SpawnPhase2SideImmediately(sideName, registerDevUnits)
+	local waveCount = PHASE_2_WAVE_COUNTS[sideName] + 1
+	local descriptors = BuildPhase2WaveDescriptors(sideName, waveCount)
+	local spawned = 0
+	for _, descriptor in ipairs(descriptors) do
+		local unit = CreateUnitByName(
+			descriptor.unit_name,
+			descriptor.spawn_position,
+			true,
+			nil,
+			nil,
+			DOTA_TEAM_CUSTOM_1
+		)
+		if unit ~= nil then
+			ConfigurePhase2Creep(
+				unit,
+				sideName,
+				waveCount,
+				registerDevUnits
+			)
+			spawned = spawned + 1
+		end
+	end
+	PHASE_2_WAVE_COUNTS[sideName] = waveCount
+	return spawned
+end
+
+local function ReleasePreparedPhase2Side(sideName)
+	if XHSWaveStager == nil then return nil end
+	local job = XHSWaveStager:GetJob(PHASE_2_STAGE_JOB[sideName])
+	local expectedWave = PHASE_2_WAVE_COUNTS[sideName] + 1
+	if job == nil or tonumber(job.options.wave_count) ~= expectedWave then
+		XHSWaveStager:CancelJob(
+			PHASE_2_STAGE_JOB[sideName],
+			"phase_two_wave_mismatch"
+		)
+		return nil
+	end
+	local released = XHSWaveStager:ActivateJob(PHASE_2_STAGE_JOB[sideName])
+	PHASE_2_WAVE_COUNTS[sideName] = expectedWave
+	return released
+end
+
+function SpawnPhase2CreepWave(side, register_dev_units)
+	local sides = GetPhase2Sides(side)
+	if sides == nil then return 0 end
+	local spawned = 0
+	for _, sideName in ipairs(sides) do
+		local sideSpawned = nil
+		if register_dev_units ~= true then
+			sideSpawned = ReleasePreparedPhase2Side(sideName)
+		end
+		if sideSpawned == nil then
+			sideSpawned = SpawnPhase2SideImmediately(
+				sideName,
+				register_dev_units == true
+			)
+		end
+		spawned = spawned + sideSpawned
+		if register_dev_units ~= true then
+			PreparePhase2CreepWave(sideName)
+		end
+	end
+	return spawned
+end
+
 function StartPhase2()
 	CustomTimers:IncrementGamePhase() -- Phase 1 to Phase 2
 	CustomTimers.timers_paused = 0
+	ActivatePhase2CreepTimer()
+	ResetPhase2CreepWaveCounts()
 
-	local DoorObs = Entities:FindAllByName("obstruction_phase2_1")
-
-	for _, obs in pairs(DoorObs) do
-		obs:SetEnabled(false, true)
-	end
-
-	DoEntFire("door_phase2_left", "SetAnimation", "gate_entrance002_open", 0, nil, nil)
-	Phase2CreepsLeft()
-
-	if PlayerResource:GetPlayerCount() > 1 then
-		local DoorObs = Entities:FindAllByName("obstruction_phase2_2")
-
-		for _, obs in pairs(DoorObs) do
-			obs:SetEnabled(false, true)
-		end
-
-		DoEntFire("door_phase2_right", "SetAnimation", "gate_entrance002_open", 0, nil, nil)
-		Phase2CreepsRight()
-	end
+	local combatParticipants = GetXHSCombatParticipantCount ~= nil
+		and GetXHSCombatParticipantCount()
+		or PlayerResource:GetPlayerCount()
+	local multiplayer = combatParticipants > 1
+	CustomTimers.phase2_active_ice_towers = multiplayer and { 1, 2 } or { 1 }
+	CustomTimers.shal_lightbinder_released = false
 
 	for c = 1, 8 do
 		CREEP_LANES[c][1] = 0
 		CREEP_LANES[c][3] = 0
 	end
+
+	OpenPhase2Doors(multiplayer and "both" or "left", true, function()
+		Phase2Creeps(multiplayer and "both" or "left")
+	end)
+end
+
+function Phase2Creeps(side)
+	local sides = GetPhase2Sides(side)
+	if sides == nil then return end
+	Timers:CreateTimer(0, function()
+		if CustomTimers.proc_final_wave == true or CustomTimers.game_phase >= 3 then
+			return nil
+		end
+
+		local hasActiveSide = false
+		for _, sideName in ipairs(sides) do
+			if IsPhase2SideActive(sideName) then
+				hasActiveSide = true
+				if CustomTimers.timers_paused == 0
+					and not (XHSDevTools ~= nil and XHSDevTools:IsSandboxActive()) then
+					SpawnPhase2CreepWave(sideName, false)
+				end
+			end
+		end
+
+		return hasActiveSide and XHS_CREEPS_INTERVAL or nil
+	end)
 end
 
 function Phase2CreepsLeft()
-	local EntIceTower = Entities:FindByName(nil, "npc_tower_cold_1")
-	local point = Entities:FindByName(nil, "npc_dota_spawner_top_left_1"):GetAbsOrigin()
-	local difficulty = GameRules:GetCustomGameDifficulty()
-	local wave_count = 0
-
-	Timers:CreateTimer(function()
-		if not EntIceTower:IsNull() and CustomTimers.timers_paused == 0 then
-			wave_count = wave_count + 1
-
-			for j = 1, 8 do
-				local unit = CreateUnitByName("npc_ghul_II", point + RandomVector(RandomInt(0, 50)), true, nil, nil, DOTA_TEAM_CUSTOM_1)
-				unit:SetBaseDamageMin(unit:GetRealDamageDone(unit) + (PHASE_2_UPGRADE["damage"][difficulty] * wave_count))
-				unit:SetBaseDamageMax(unit:GetRealDamageDone(unit) + (PHASE_2_UPGRADE["damage"][difficulty] * wave_count) * 1.1)
-				unit:SetMaxHealth(unit:GetMaxHealth() + (PHASE_2_UPGRADE["health"][difficulty] * wave_count))
-				unit:SetBaseMaxHealth(unit:GetMaxHealth() + (PHASE_2_UPGRADE["health"][difficulty] * wave_count))
-				unit:SetHealth(unit:GetMaxHealth())
-				unit:SetPhysicalArmorBaseValue(unit:GetPhysicalArmorValue(false) + (PHASE_2_UPGRADE["armor"][difficulty] * wave_count))
-				if not unit.GrowthOverheadPfx then
-					unit.GrowthOverheadPfx = ParticleManager:CreateParticle("particles/units/heroes/hero_abaddon/abaddon_curse_counter_stack.vpcf", PATTACH_OVERHEAD_FOLLOW, unit)
-				end
-
-				ParticleManager:SetParticleControl(unit.GrowthOverheadPfx, 1, Vector(0, wave_count, 0))
-				--				local stack_10 = math.floor(wave_count / 10)
-				--				ParticleManager:SetParticleControl(unit.GrowthOverheadPfx, 2, Vector(stack_10, wave_count - stack_10*10, 0))
-			end
-
-			return XHS_CREEPS_INTERVAL
-		elseif EntIceTower:IsNull() then
-			return nil
-		else -- if CustomTimers.timers_paused == 1 or 2
-			return XHS_CREEPS_INTERVAL
-		end
-	end)
+	Phase2Creeps("left")
 end
 
 function Phase2CreepsRight()
-	local EntIceTower = Entities:FindByName(nil, "npc_tower_cold_2")
-	local point = Entities:FindByName(nil, "npc_dota_spawner_top_right_1"):GetAbsOrigin()
-	local difficulty = GameRules:GetCustomGameDifficulty()
-	local wave_count = 0
+	Phase2Creeps("right")
+end
 
-	Timers:CreateTimer(0, function()
-		if not EntIceTower:IsNull() and CustomTimers.timers_paused ~= 1 then
-			wave_count = wave_count + 1
-			for j = 1, 8 do
-				local unit = CreateUnitByName("npc_orc_II", point + RandomVector(RandomInt(0, 50)), true, nil, nil, DOTA_TEAM_CUSTOM_1)
-				unit:SetBaseDamageMin(unit:GetRealDamageDone(unit) + (PHASE_2_UPGRADE["damage"][difficulty] * wave_count))
-				unit:SetBaseDamageMax(unit:GetRealDamageDone(unit) + (PHASE_2_UPGRADE["damage"][difficulty] * wave_count) * 1.1)
-				unit:SetMaxHealth(unit:GetMaxHealth() + (PHASE_2_UPGRADE["health"][difficulty] * wave_count))
-				unit:SetBaseMaxHealth(unit:GetMaxHealth() + (PHASE_2_UPGRADE["health"][difficulty] * wave_count))
-				unit:SetHealth(unit:GetMaxHealth())
-				unit:SetPhysicalArmorBaseValue(unit:GetPhysicalArmorValue(false) + (PHASE_2_UPGRADE["armor"][difficulty] * wave_count))
-				if not unit.GrowthOverheadPfx then
-					unit.GrowthOverheadPfx = ParticleManager:CreateParticle("particles/units/heroes/hero_abaddon/abaddon_curse_counter_stack.vpcf", PATTACH_OVERHEAD_FOLLOW, unit)
-				end
+local SHAL_LIGHTBINDER_UNIT_NAME = "npc_xhs_paladin"
+local SHAL_RELEASE_CAMERA_MOVE_DURATION = 1.15
+local SHAL_RELEASE_CAMERA_HOLD_DURATION = 2.35
+local SHAL_RELEASE_FOW_RADIUS = 900
+local SHAL_RELEASE_FOW_DURATION = 5.0
+local SHAL_TOWER_EXIT_DISTANCE = 180
+local SHAL_RELEASE_FROST_PARTICLE = "particles/units/heroes/hero_crystalmaiden/maiden_freezing_field_explosion.vpcf"
+local SHAL_RELEASE_LIGHT_PARTICLE = "particles/units/heroes/hero_omniknight/omniknight_purification.vpcf"
 
-				ParticleManager:SetParticleControl(unit.GrowthOverheadPfx, 1, Vector(0, wave_count, 0))
-				--				local stack_10 = math.floor(wave_count / 10)
-				--				ParticleManager:SetParticleControl(unit.GrowthOverheadPfx, 2, Vector(stack_10, wave_count - stack_10*10, 0))
-			end
-			return 30
-		elseif CustomTimers.timers_paused == 1 then
-			return 30
-		elseif EntIceTower:IsNull() then
-			return nil
+local function IsValidPhase2Entity(entity)
+	return entity ~= nil and IsValidEntity(entity) and not entity:IsNull()
+end
+
+local function GetGoodguysRealHeroes()
+	local heroes = {}
+	for _, hero in pairs(HeroList:GetAllHeroes()) do
+		if IsValidPhase2Entity(hero) and hero:IsRealHero() and hero:GetTeamNumber() == DOTA_TEAM_GOODGUYS then
+			table.insert(heroes, hero)
 		end
-	end)
+	end
+	return heroes
+end
+
+local function GetClosestEntity(origin, entities)
+	local closest = nil
+	local closestDistance = nil
+	for _, entity in pairs(entities) do
+		if IsValidPhase2Entity(entity) then
+			local distance = (entity:GetAbsOrigin() - origin):Length2D()
+			if closestDistance == nil or distance < closestDistance then
+				closest = entity
+				closestDistance = distance
+			end
+		end
+	end
+	return closest
+end
+
+local function RefreshPhase2VIPNetTable()
+	if CDungeonZone == nil or CDungeonZone.VIPsAlive == nil then return end
+
+	local netTable = {}
+	for index, vip in pairs(CDungeonZone.VIPsAlive) do
+		if IsValidPhase2Entity(vip) then
+			netTable[index] = vip:entindex()
+		end
+	end
+	CustomNetTables:SetTableValue("vips", string.format("%d", 0), netTable)
+end
+
+local function SpawnHiddenShalAtTower(tower)
+	if not IsValidPhase2Entity(tower) then return nil end
+
+	local shal = nil
+	if CDungeonZone ~= nil and CDungeonZone.SpawnVIPs ~= nil then
+		local previousCount = #(CDungeonZone.VIPsAlive or {})
+		CDungeonZone:SpawnVIPs({
+			{
+				szVIPName = SHAL_LIGHTBINDER_UNIT_NAME,
+				szSpawnerName = tower:GetName(),
+				nCount = 1,
+				Activity = ACT_DOTA_IDLE,
+			},
+		})
+		shal = CDungeonZone.VIPsAlive and CDungeonZone.VIPsAlive[previousCount + 1] or nil
+	end
+
+	if not IsValidPhase2Entity(shal) then
+		shal = CreateUnitByName(SHAL_LIGHTBINDER_UNIT_NAME, tower:GetAbsOrigin(), true, nil, nil, DOTA_TEAM_GOODGUYS)
+		if IsValidPhase2Entity(shal) then
+			shal.zone = CDungeonZone
+			shal.isInHoldout = true
+			shal.bRequired = false
+			shal:AddNewModifier(shal, nil, "modifier_npc_dialog", { duration = -1 })
+			if CDungeonZone ~= nil then
+				CDungeonZone.VIPsAlive = CDungeonZone.VIPsAlive or {}
+				table.insert(CDungeonZone.VIPsAlive, shal)
+			end
+		end
+	end
+
+	if IsValidPhase2Entity(shal) then
+		shal.xhs_freed_shal_lightbinder = true
+		shal:AddNoDraw()
+		shal:SetAbsOrigin(tower:GetAbsOrigin())
+	end
+
+	return shal
+end
+
+local function GetShalExitDirection(towerOrigin, towerForward)
+	local fort = Entities:FindByName(nil, "dota_goodguys_fort")
+	if IsValidPhase2Entity(fort) then
+		local towardFort = fort:GetAbsOrigin() - towerOrigin
+		towardFort = Vector(towardFort.x, towardFort.y, 0)
+		if towardFort:Length2D() > 1 then
+			return towardFort:Normalized()
+		end
+	end
+
+	local forward = Vector(towerForward.x, towerForward.y, 0)
+	if forward:Length2D() > 1 then
+		return forward:Normalized()
+	end
+	return Vector(0, -1, 0)
+end
+
+local function RevealFreedShal(record)
+	local shal = record and record.shal or nil
+	if not IsValidPhase2Entity(shal) then return end
+
+	local direction = GetShalExitDirection(record.origin, record.forward)
+	shal:RemoveNoDraw()
+	shal:RemoveModifierByName("modifier_stack_count_animation_controller")
+	shal:SetForwardVector(direction)
+	FindClearSpaceForUnit(shal, record.origin + direction * SHAL_TOWER_EXIT_DISTANCE, true)
+	shal:StartGesture(ACT_DOTA_CAST_ABILITY_3)
+
+	local lightParticle = ParticleManager:CreateParticle(SHAL_RELEASE_LIGHT_PARTICLE, PATTACH_ABSORIGIN_FOLLOW, shal)
+	ParticleManager:ReleaseParticleIndex(lightParticle)
+end
+
+local function PlayShalReleaseCamera(towers)
+	for _, hero in pairs(GetGoodguysRealHeroes()) do
+		local targetTower = GetClosestEntity(hero:GetAbsOrigin(), towers)
+		local player = hero:GetPlayerOwner()
+		if targetTower ~= nil and player ~= nil then
+			local playerID = hero:GetPlayerOwnerID()
+			CameraMotion:Sequence(playerID, {
+				{
+					type = "move",
+					to = targetTower,
+					from = hero,
+					duration = SHAL_RELEASE_CAMERA_MOVE_DURATION,
+					easing = "smootherstep",
+				},
+				{ type = "hold", duration = SHAL_RELEASE_CAMERA_HOLD_DURATION },
+				{
+					type = "return",
+					to = function() return PlayerResource:GetSelectedHeroEntity(playerID) end,
+					duration = 0.85,
+					easing = "smootherstep",
+				},
+				{ type = "release", mode = "free" },
+			}, {
+				owner = "shal_release",
+				priority = 70,
+				policy = "replace",
+			})
+		end
+	end
+end
+
+local function FindFreedShalLightbinders()
+	local shals = {}
+	local units = FindUnitsInRadius(
+		DOTA_TEAM_GOODGUYS,
+		Vector(0, 0, 0),
+		nil,
+		FIND_UNITS_EVERYWHERE,
+		DOTA_UNIT_TARGET_TEAM_FRIENDLY,
+		DOTA_UNIT_TARGET_ALL,
+		DOTA_UNIT_TARGET_FLAG_INVULNERABLE
+			+ DOTA_UNIT_TARGET_FLAG_MAGIC_IMMUNE_ENEMIES,
+		FIND_ANY_ORDER,
+		false
+	)
+	for _, unit in pairs(units) do
+		if IsValidPhase2Entity(unit)
+			and unit:IsAlive()
+			and unit:GetUnitName() == SHAL_LIGHTBINDER_UNIT_NAME
+			and unit.xhs_freed_shal_lightbinder == true then
+			table.insert(shals, unit)
+		end
+	end
+	return shals
+end
+
+function XHSRemoveFreedShalLightbinder()
+	local shals = FindFreedShalLightbinders()
+	if #shals == 0 then return 0 end
+
+	local removeLookup = {}
+	for _, shal in ipairs(shals) do
+		removeLookup[shal] = true
+	end
+	if CDungeonZone ~= nil and type(CDungeonZone.VIPsAlive) == "table" then
+		for index = #CDungeonZone.VIPsAlive, 1, -1 do
+			if removeLookup[CDungeonZone.VIPsAlive[index]] == true then
+				table.remove(CDungeonZone.VIPsAlive, index)
+			end
+		end
+	end
+
+	for _, shal in ipairs(shals) do
+		if IsValidPhase2Entity(shal) then UTIL_Remove(shal) end
+	end
+	RefreshPhase2VIPNetTable()
+	return #shals
+end
+
+function XHSFocusPlayersOnShalLightbinder()
+	local shals = FindFreedShalLightbinders()
+	if #shals == 0 then return false end
+
+	for _, hero in pairs(GetGoodguysRealHeroes()) do
+		local shal = GetClosestEntity(hero:GetAbsOrigin(), shals)
+		local player = hero:GetPlayerOwner()
+		if shal ~= nil and player ~= nil then
+			AddFOWViewer(DOTA_TEAM_GOODGUYS, shal:GetAbsOrigin(), SHAL_RELEASE_FOW_RADIUS, SHAL_RELEASE_FOW_DURATION, false)
+			local playerID = hero:GetPlayerOwnerID()
+			CameraMotion:Sequence(playerID, {
+				{
+					type = "move",
+					to = shal,
+					from = hero,
+					duration = 0.65,
+					easing = "smootherstep",
+				},
+				{ type = "hold", duration = 2.35 },
+				{
+					type = "return",
+					to = function() return PlayerResource:GetSelectedHeroEntity(playerID) end,
+					duration = 0.75,
+					easing = "smootherstep",
+				},
+				{ type = "release", mode = "free" },
+			}, {
+				owner = "shal_lightbinder_focus",
+				priority = 70,
+				policy = "replace",
+			})
+		end
+	end
+
+	return true
 end
 
 function EndPhase2()
-	local ice_towers = Entities:FindAllByName("npc_tower_death")
-	for _, tower in pairs(ice_towers) do
-		tower:Kill(nil, nil)
+	if CustomTimers.shal_lightbinder_released == true then return end
+	CustomTimers.shal_lightbinder_released = true
+
+	if XHSSetGlobalObjectiveState ~= nil then
+		XHSSetGlobalObjectiveState("phase2_creeps", "Completed", "Phase 2 creep assault survived", nil)
 	end
 
-	for TW = 1, 2 do
-		local ice_towers_main = Entities:FindByName(nil, "npc_tower_cold_" .. TW)
-		ice_towers_main:Kill(nil, nil)
+	local activeTowerIndices = CustomTimers.phase2_active_ice_towers or { 1 }
+	local activeTowerLookup = {}
+	for _, towerIndex in ipairs(activeTowerIndices) do
+		activeTowerLookup[towerIndex] = true
 	end
-end
 
-function FinalWave()
-	KillCreeps(DOTA_TEAM_CUSTOM_1)
-	RefreshPlayers()
-	GameRules:SetHeroRespawnEnabled(false)
-
-	TeleportAllHeroes("final_wave_player_", 30.0)
-
-	EmitSoundOn("yaskar_01.music.ui_hero_select", Entities:FindByClassname(nil, "npc_dota_fort"))
-
-	Timers:CreateTimer(10, function()
-		FinalWaveSpawner("npc_abomination", "npc_banshee", "npc_necro", "npc_magnataur", "npc_dota_hero_balanar", 0, "west", "final_wave_player_2")
-	end)
-
-	Timers:CreateTimer(15, function()
-		FinalWaveSpawner("npc_tauren", "npc_chaos_orc", "npc_warlock", "npc_orc_raider", "npc_dota_hero_grom_hellscream", 270, "north", "final_wave_player_4")
-	end)
-
-	Timers:CreateTimer(20, function()
-		FinalWaveSpawner("npc_druid", "npc_guard", "npc_keeper", "npc_luna", "npc_dota_hero_illidan", 180, "east", "final_wave_player_6")
-	end)
-
-	Timers:CreateTimer(25, function()
-		FinalWaveSpawner("npc_captain", "npc_marine", "npc_marine", "npc_knight", "npc_dota_hero_proudmoore", 90, "south", "final_wave_player_0")
-	end)
-
-	Timers:CreateTimer(30, function()
-		for _, hero in pairs(HeroList:GetAllHeroes()) do
-			if hero:IsRealHero() and hero:GetTeam() == DOTA_TEAM_GOODGUYS then
-				CustomGameEventManager:Send_ServerToPlayer(hero:GetPlayerOwner(), "set_player_camera", { hPosition = hero:GetAbsOrigin() })
+	local allMainTowers = {}
+	local activeMainTowers = {}
+	local releaseRecords = {}
+	local laneOneTower = nil
+	for towerIndex = 1, 2 do
+		local tower = Entities:FindByName(nil, "npc_tower_cold_" .. towerIndex)
+		if IsValidPhase2Entity(tower) then
+			table.insert(allMainTowers, tower)
+			if towerIndex == 1 then laneOneTower = tower end
+			if activeTowerLookup[towerIndex] == true then
+				table.insert(activeMainTowers, tower)
+				AddFOWViewer(DOTA_TEAM_GOODGUYS, tower:GetAbsOrigin(), SHAL_RELEASE_FOW_RADIUS, SHAL_RELEASE_FOW_DURATION, false)
 			end
 		end
+	end
+	if IsValidPhase2Entity(laneOneTower) then
+		table.insert(releaseRecords, {
+			tower = laneOneTower,
+			origin = laneOneTower:GetAbsOrigin(),
+			forward = laneOneTower:GetForwardVector(),
+			shal = SpawnHiddenShalAtTower(laneOneTower),
+		})
+	end
+
+	RefreshPhase2VIPNetTable()
+	PlayShalReleaseCamera(
+		IsValidPhase2Entity(laneOneTower) and { laneOneTower } or {}
+	)
+
+	Timers:CreateTimer(SHAL_RELEASE_CAMERA_MOVE_DURATION, function()
+		if CustomTimers.shal_lightbinder_released ~= true then return nil end
+
+		for _, tower in pairs(Entities:FindAllByName("npc_tower_death")) do
+			if IsValidPhase2Entity(tower) and tower:IsAlive() then
+				tower:Kill(nil, nil)
+			end
+		end
+
+		for _, tower in pairs(allMainTowers) do
+			if IsValidPhase2Entity(tower) and tower:IsAlive() then
+				tower:Kill(nil, nil)
+			end
+		end
+
+		for _, record in pairs(releaseRecords) do
+			local frostParticle = ParticleManager:CreateParticle(SHAL_RELEASE_FROST_PARTICLE, PATTACH_WORLDORIGIN, nil)
+			ParticleManager:SetParticleControl(frostParticle, 0, record.origin)
+			ParticleManager:ReleaseParticleIndex(frostParticle)
+		end
+
+		Timers:CreateTimer(0.2, function()
+			for _, record in pairs(releaseRecords) do
+				RevealFreedShal(record)
+			end
+			RefreshPhase2VIPNetTable()
+			return nil
+		end)
+
+		return nil
 	end)
 
-	Timers:CreateTimer(31, function()
-		StopSoundOn("yaskar_01.music.ui_hero_select", Entities:FindByClassname(nil, 'npc_dota_fort'))
+	if #activeMainTowers == 0 then
+		for _, tower in pairs(Entities:FindAllByName("npc_tower_death")) do
+			if IsValidPhase2Entity(tower) and tower:IsAlive() then
+				tower:Kill(nil, nil)
+			end
+		end
+		for _, tower in pairs(allMainTowers) do
+			if IsValidPhase2Entity(tower) and tower:IsAlive() then
+				tower:Kill(nil, nil)
+			end
+		end
+	end
+end
 
-		local units = FindUnitsInRadius(DOTA_TEAM_NEUTRALS, Vector(0, 0, 0), nil, FIND_UNITS_EVERYWHERE, DOTA_UNIT_TARGET_TEAM_FRIENDLY, DOTA_UNIT_TARGET_ALL, DOTA_UNIT_TARGET_FLAG_INVULNERABLE, FIND_ANY_ORDER, false)
-		local number = 0
+local FINAL_WAVE_QUEST_NAME = "kill_final_wave"
+local FINAL_WAVE_TOTAL_UNITS = 52
+local FINAL_WAVE_INTRO_DURATION = 52.0
+local FINAL_WAVE_PREP_DURATION = 5.0
+local FINAL_WAVE_CARDINAL_REVEAL_DELAY = 2.8
+local FINAL_WAVE_BOSS_SUMMON_DELAY = 0.65
+local FINAL_WAVE_UNIT_SPAWN_INTERVAL = 0.18
+local FINAL_WAVE_PORTAL_FOW_RADIUS = 900
+local FINAL_WAVE_PORTAL_FOW_DURATION = 9.0
+local FINAL_WAVE_FOW_TRANSITION_OVERLAP = 0.35
+local FINAL_WAVE_CAMERA_RETURN_DURATION = 0.85
+local FINAL_WAVE_MUSIC_SOUND = "XHS.FinalWaveMusic"
+local FINAL_WAVE_PLAYER_TELEPORT_DELAY = 1.5
+local FINAL_WAVE_CINEMATIC_ID = "final_wave_intro"
+local FINAL_WAVE_STAGE_JOB = "final_wave_all_units"
+local FINAL_WAVE_LETTERBOX_PERCENT = 10
+local FINAL_WAVE_LETTERBOX_TRANSITION = 0.75
+local FINAL_WAVE_PORTAL_START_PARTICLE = "particles/items2_fx/teleport_start.vpcf"
+local FINAL_WAVE_PORTAL_END_PARTICLE = "particles/items2_fx/teleport_end.vpcf"
+local FINAL_WAVE_PORTAL_RING_PARTICLE = "particles/units/heroes/hero_templar_assassin/templar_assassin_trap_rings_inner.vpcf"
 
-		for _, v in pairs(units) do
-			number = number + 1
+local FINAL_WAVE_CAMERA_OFFSETS = {
+	west = Vector(325, 0, 0),
+	east = Vector(-325, 0, 0),
+	north = Vector(0, -425, 0),
+	south = Vector(0, 325, 0),
+}
+
+local FINAL_WAVE_CARDINALS = {
+	{
+		delay = 8.0,
+		direction = "west",
+		direction_label = "West",
+		boss_label = "Balanar",
+		angle = 0,
+		waypoint = "final_wave_player_2",
+		boss = "npc_dota_hero_balanar",
+		creeps = { "npc_abomination", "npc_banshee", "npc_necro", "npc_magnataur" },
+	},
+	{
+		delay = 18.0,
+		direction = "north",
+		direction_label = "North",
+		boss_label = "Grom",
+		angle = 270,
+		waypoint = "final_wave_player_4",
+		boss = "npc_dota_hero_grom_hellscream",
+		creeps = { "npc_tauren", "npc_chaos_orc", "npc_warlock", "npc_orc_raider" },
+	},
+	{
+		delay = 28.0,
+		direction = "east",
+		direction_label = "East",
+		boss_label = "Illidan",
+		angle = 180,
+		waypoint = "final_wave_player_6",
+		boss = "npc_dota_hero_illidan",
+		creeps = { "npc_druid", "npc_guard", "npc_keeper", "npc_luna" },
+	},
+	{
+		delay = 38.0,
+		direction = "south",
+		direction_label = "South",
+		boss_label = "Proudmoore",
+		angle = 90,
+		waypoint = "final_wave_player_0",
+		boss = "npc_dota_hero_proudmoore",
+		creeps = { "npc_captain", "npc_marine", "npc_marine", "npc_knight" },
+	},
+}
+
+local function GetFinalWaveStagedKey(direction, slot)
+	return tostring(direction) .. ":" .. tostring(slot)
+end
+
+local function BuildFinalWaveDescriptors()
+	local descriptors = {}
+	for _, config in ipairs(FINAL_WAVE_CARDINALS) do
+		local bossSpawner = Entities:FindByName(
+			nil,
+			"final_wave_" .. config.direction .. "_13"
+		)
+		if bossSpawner ~= nil then
+			table.insert(descriptors, {
+				unit_name = config.boss .. "_final_wave",
+				team = DOTA_TEAM_CUSTOM_1,
+				spawn_position = bossSpawner:GetAbsOrigin(),
+				direction = config.direction,
+				slot = 13,
+				angle = config.angle,
+				waypoint = config.waypoint,
+			})
 		end
 
-		if number > 0 then
-			return 1
+		local slot = 1
+		for _, creepName in ipairs(config.creeps) do
+			for _ = 1, 3 do
+				local spawner = Entities:FindByName(
+					nil,
+					"final_wave_" .. config.direction .. "_" .. tostring(slot)
+				)
+				if spawner ~= nil then
+					table.insert(descriptors, {
+						unit_name = creepName .. "_final_wave",
+						team = DOTA_TEAM_CUSTOM_1,
+						spawn_position = spawner:GetAbsOrigin(),
+						direction = config.direction,
+						slot = slot,
+						angle = config.angle,
+						waypoint = config.waypoint,
+					})
+				end
+				slot = slot + 1
+			end
 		end
+	end
+	return descriptors
+end
+
+function PrepareFinalWaveUnits(duration)
+	if XHSWaveStager == nil then return false end
+	if ResetPhase2CreepWaveCounts ~= nil then
+		ResetPhase2CreepWaveCounts()
+	end
+	local descriptors = BuildFinalWaveDescriptors()
+	if #descriptors ~= FINAL_WAVE_TOTAL_UNITS then
+		print("[XHS FinalWave] staging skipped: expected="
+			.. tostring(FINAL_WAVE_TOTAL_UNITS) .. " descriptors="
+			.. tostring(#descriptors))
+		return false
+	end
+
+	XHSWaveStager:StartJob(FINAL_WAVE_STAGE_JOB, descriptors, {
+		owner = "final_wave",
+		window = math.max(0.05, tonumber(duration) or 60),
+		is_valid = function()
+			return CustomTimers ~= nil
+				and CustomTimers.proc_final_wave == true
+				and XHS_TIMERS_FINAL_WAVE == false
+				and CustomTimers.game_phase == 2
+		end,
+		configure = function(_, unit)
+			unit.xhs_final_wave_prepared = true
+		end,
+	})
+	return true
+end
+
+local function GetFinalWaveCardinalFowDuration(config)
+	if config == nil then return FINAL_WAVE_PORTAL_FOW_DURATION end
+
+	for index, cardinal in ipairs(FINAL_WAVE_CARDINALS) do
+		if cardinal == config or cardinal.direction == config.direction then
+			local nextCardinal = FINAL_WAVE_CARDINALS[index + 1]
+			local revealEnd = nextCardinal ~= nil
+				and nextCardinal.delay
+				or (FINAL_WAVE_INTRO_DURATION + FINAL_WAVE_CAMERA_RETURN_DURATION)
+			return math.max(
+				FINAL_WAVE_PORTAL_FOW_DURATION,
+				revealEnd - (cardinal.delay or 0) + FINAL_WAVE_FOW_TRANSITION_OVERLAP
+			)
+		end
+	end
+
+	return FINAL_WAVE_PORTAL_FOW_DURATION
+end
+
+local function FindFinalWaveQuest()
+	if GameMode == nil or GameMode.Zones == nil then
+		return nil, nil
+	end
+
+	for _, zone in pairs(GameMode.Zones) do
+		if zone ~= nil and zone.Quests ~= nil then
+			for _, quest in pairs(zone.Quests) do
+				if quest ~= nil and quest.szQuestName == FINAL_WAVE_QUEST_NAME then
+					return zone, quest
+				end
+			end
+		end
+	end
+
+	return nil, nil
+end
+
+local function SendFinalWaveQuestProgress(zone, quest)
+	if zone == nil or quest == nil then return end
+
+	CustomGameEventManager:Send_ServerToAllClients("quest_completed", {
+		ZoneName = zone.szName,
+		QuestName = quest.szQuestName,
+		QuestType = quest.szQuestType,
+		Completed = quest.nCompleted,
+		CompleteLimit = quest.nCompleteLimit,
+		XPReward = quest.RewardXP or 0,
+		GoldReward = quest.RewardGold or 0,
+		ZoneCompleted = false,
+		Optional = quest.bOptional,
+		ZoneStars = zone.nStars,
+	})
+end
+
+local function UpdateFinalWaveQuestLimit()
+	local spawnedCount = math.min(CustomTimers.final_wave_spawned_kill_limit or 0, FINAL_WAVE_TOTAL_UNITS)
+	if spawnedCount <= 0 then return end
+
+	local zone, quest = FindFinalWaveQuest()
+	if zone == nil or quest == nil or quest.bCompleted == true then return end
+
+	quest.nCompleteLimit = spawnedCount
+
+	if quest.bActivated ~= true then
+		quest.nCompleted = 0
+		GameRules.GameMode:OnQuestStarted(zone, quest)
+	else
+		SendFinalWaveQuestProgress(zone, quest)
+	end
+end
+
+local function RegisterFinalWaveUnit(unit)
+	if unit == nil then return end
+
+	unit.zone = "xhs_holdout"
+	unit.xhs_final_wave_unit = true
+	CustomTimers.final_wave_units = CustomTimers.final_wave_units or {}
+	CustomTimers.final_wave_units[unit:entindex()] = unit
+	CustomTimers.final_wave_spawned_kill_limit = (CustomTimers.final_wave_spawned_kill_limit or 0) + 1
+end
+
+local function IsFinalWaveSequenceActive(sequenceId)
+	return sequenceId == nil or CustomTimers.final_wave_sequence_id == sequenceId
+end
+
+local function ReconcileFinalWaveQuest()
+	local spawnedCount = tonumber(CustomTimers.final_wave_spawned_kill_limit) or 0
+	if spawnedCount <= 0 then return false end
+
+	local liveCount = 0
+	for entIndex, unit in pairs(CustomTimers.final_wave_units or {}) do
+		if unit ~= nil and IsValidEntity(unit) and not unit:IsNull() and unit:IsAlive() then
+			liveCount = liveCount + 1
+		else
+			CustomTimers.final_wave_units[entIndex] = nil
+		end
+	end
+
+	local zone, quest = FindFinalWaveQuest()
+	if zone == nil or quest == nil or quest.bCompleted == true then
+		return quest ~= nil and quest.bCompleted == true
+	end
+
+	-- entity_killed can be missed when an engine removal/transform happens in
+	-- the cinematic. Infer only confirmed missing units and never reduce normal
+	-- kill progress.
+	local inferredDefeated = math.max(0, spawnedCount - liveCount)
+	while quest.bCompleted ~= true
+		and (tonumber(quest.nCompleted) or 0) < inferredDefeated do
+		GameRules.GameMode:OnQuestCompleted(zone, quest)
+	end
+	return quest.bCompleted == true
+end
+
+local function StartFinalWaveQuestWatchdog(sequenceId)
+	Timers:CreateTimer(2.0, function()
+		if not IsFinalWaveSequenceActive(sequenceId)
+			or CustomTimers.game_phase >= 3 then
+			return nil
+		end
+		if ReconcileFinalWaveQuest() then return nil end
+		return 2.0
 	end)
 end
 
-local final_wave_stun_time = 0
+local function GetFinalWaveFort()
+	return Entities:FindByClassname(nil, "npc_dota_fort")
+end
 
-function FinalWaveSpawner(creep1, creep2, creep3, creep4, boss_name, angles, direction, waypoint)
-	local number = 1
-	local waypoint = Entities:FindByName(nil, "final_wave_player_2")
+local function FindFinalWaveSpawner(direction, index)
+	return Entities:FindByName(nil, "final_wave_" .. direction .. "_" .. index)
+end
 
-	for i = 1, 3 do
-		local unit = CreateUnitByName(creep1 .. "_final_wave", Entities:FindByName(nil, "final_wave_" .. direction .. "_" .. number):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_1)
-		unit:SetAngles(0, angles, 0)
-		number = number + 1
+local function GetFinalWavePortalOrigin(config)
+	local bossSpawner = FindFinalWaveSpawner(config.direction, 13)
+	if bossSpawner ~= nil then
+		return bossSpawner:GetAbsOrigin()
 	end
 
-	for i = 1, 3 do
-		local unit = CreateUnitByName(creep2 .. "_final_wave", Entities:FindByName(nil, "final_wave_" .. direction .. "_" .. number):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_1)
-		unit:SetAngles(0, angles, 0)
-		number = number + 1
+	local firstSpawner = FindFinalWaveSpawner(config.direction, 1)
+	if firstSpawner ~= nil then
+		return firstSpawner:GetAbsOrigin()
 	end
 
-	for i = 1, 3 do
-		local unit = CreateUnitByName(creep3 .. "_final_wave", Entities:FindByName(nil, "final_wave_" .. direction .. "_" .. number):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_1)
-		unit:SetAngles(0, angles, 0)
-		number = number + 1
+	return Vector(0, 0, 0)
+end
+
+local function GetFinalWaveCameraPosition(config, position)
+	local offset = FINAL_WAVE_CAMERA_OFFSETS[config.direction]
+	if offset == nil then
+		return position
 	end
 
-	for i = 1, 3 do
-		local unit = CreateUnitByName(creep4 .. "_final_wave", Entities:FindByName(nil, "final_wave_" .. direction .. "_" .. number):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_1)
-		unit:SetAngles(0, angles, 0)
-		number = number + 1
-	end
+	return position + offset
+end
 
-	local boss = CreateUnitByName(boss_name .. "_final_wave", Entities:FindByName(nil, "final_wave_" .. direction .. "_" .. number):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_1)
-	boss:SetAngles(0, angles, 0)
-	boss:EmitSound("Hero_TemplarAssassin.Trap")
-	boss:SetInitialGoalEntity(waypoint)
-	ExecuteOrderFromTable({
-		UnitIndex = boss:entindex(),
-		OrderType = DOTA_UNIT_ORDER_ATTACK_MOVE,
-		Position = waypoint:GetAbsOrigin(),
-	})
-
-	local units = FindUnitsInRadius(DOTA_TEAM_CUSTOM_1, Vector(0, 0, 0), nil, FIND_UNITS_EVERYWHERE, DOTA_UNIT_TARGET_TEAM_FRIENDLY, DOTA_UNIT_TARGET_CREEP, DOTA_UNIT_TARGET_FLAG_NONE, FIND_ANY_ORDER, false)
-	for _, v in pairs(units) do
-		if v:IsCreature() and v:HasMovementCapability() then
-			v:AddNewModifier(v, nil, "modifier_pause_creeps", { duration = 25 + final_wave_stun_time, IsHidden = true }):SetStackCount(1)
-			v:AddNewModifier(v, nil, "modifier_invulnerable", { duration = 25 + final_wave_stun_time, IsHidden = true })
+local function SendFinalWaveCamera(position, speed)
+	for _, hero in pairs(HeroList:GetAllHeroes()) do
+		if hero:IsRealHero() and hero:GetTeam() == DOTA_TEAM_GOODGUYS then
+			CameraMotion:Move(hero:GetPlayerOwnerID(), position, {
+				from = hero,
+				duration = speed or 0.65,
+				easing = "smootherstep",
+				owner = "final_wave_intro",
+				priority = 100,
+				policy = "replace",
+				persistent = true,
+			})
 		end
 	end
+end
 
-	final_wave_stun_time = final_wave_stun_time - 5
+local function LockFinalWaveCamerasToHeroes()
+	if CameraMotion == nil then return end
 
 	for _, hero in pairs(HeroList:GetAllHeroes()) do
 		if hero:IsRealHero() and hero:GetTeam() == DOTA_TEAM_GOODGUYS then
-			CustomGameEventManager:Send_ServerToPlayer(hero:GetPlayerOwner(), "set_player_camera", { hPosition = boss:GetAbsOrigin() })
+			local playerID = hero:GetPlayerOwnerID()
+			if playerID ~= nil and playerID >= 0 then
+				CameraMotion:Follow(playerID, hero, {
+					from = hero,
+					duration = 0.35,
+					easing = "smootherstep",
+					owner = "final_wave_intro",
+					priority = 100,
+					policy = "replace",
+					persistent = true,
+				})
+			end
+		end
+	end
+end
+
+local function ApplyFinalWaveCinematicLock(unit, duration)
+	if unit == nil or unit:IsNull() then return end
+	if duration <= 0 then return end
+	if unit.SetIdleAcquire ~= nil then unit:SetIdleAcquire(false) end
+
+	local pauseModifier = unit:AddNewModifier(unit, nil, "modifier_pause_creeps", { duration = duration, IsHidden = true })
+	if pauseModifier ~= nil then
+		pauseModifier:SetStackCount(1)
+	end
+	unit:AddNewModifier(unit, nil, "modifier_invulnerable", { duration = duration, IsHidden = true })
+end
+
+local function QueueFinalWaveRelease(unit, waypoint)
+	if unit == nil or unit:IsNull() then return end
+
+	CustomTimers.final_wave_pending_units = CustomTimers.final_wave_pending_units or {}
+	table.insert(CustomTimers.final_wave_pending_units, {
+		unit = unit,
+		waypoint = waypoint,
+	})
+end
+
+local function ReleaseFinalWaveUnit(unit, waypoint)
+	if unit == nil or unit:IsNull() or not unit:IsAlive() then return end
+
+	unit:RemoveNoDraw()
+	unit:RemoveModifierByName("modifier_pause_creeps")
+	unit:RemoveModifierByName("modifier_invulnerable")
+	if unit.SetIdleAcquire ~= nil then unit:SetIdleAcquire(true) end
+
+	if waypoint ~= nil and not waypoint:IsNull() then
+		unit:SetInitialGoalEntity(waypoint)
+		ExecuteOrderFromTable({
+			UnitIndex = unit:entindex(),
+			OrderType = DOTA_UNIT_ORDER_ATTACK_MOVE,
+			Position = waypoint:GetAbsOrigin(),
+		})
+	end
+end
+
+local function ReleaseFinalWavePendingUnits()
+	if CustomTimers.final_wave_pending_units ~= nil then
+		for _, data in pairs(CustomTimers.final_wave_pending_units) do
+			ReleaseFinalWaveUnit(data.unit, data.waypoint)
+		end
+	end
+
+	CustomTimers.final_wave_pending_units = nil
+	UpdateFinalWaveQuestLimit()
+	-- At release time the quest limit already matches successful creations. A
+	-- partial spawn must remain completable instead of disabling every kill event
+	-- because the theoretical total of 52 was not reached.
+	CustomTimers.final_wave_kill_counting = (CustomTimers.final_wave_spawned_kill_limit or 0) > 0
+	ReconcileFinalWaveQuest()
+end
+
+local function DestroyFinalWaveParticle(particle)
+	if particle == nil then return end
+
+	ParticleManager:DestroyParticle(particle, false)
+	ParticleManager:ReleaseParticleIndex(particle)
+end
+
+local function CreateFinalWaveSpawnMarker(spawner)
+	if spawner == nil or spawner:IsNull() then return nil end
+
+	local particle = ParticleManager:CreateParticle(FINAL_WAVE_PORTAL_RING_PARTICLE, PATTACH_WORLDORIGIN, nil)
+	ParticleManager:SetParticleControl(particle, 0, spawner:GetAbsOrigin())
+	return particle
+end
+
+local function CreateFinalWaveTeleportChannel(origin)
+	-- This is deliberately the effect formerly played on arrival: it reads much
+	-- better as the visible channel while the boss itself is still hidden.
+	local particle = ParticleManager:CreateParticle(FINAL_WAVE_PORTAL_END_PARTICLE, PATTACH_WORLDORIGIN, nil)
+	ParticleManager:SetParticleControl(particle, 0, origin)
+	ParticleManager:SetParticleControl(particle, 1, origin)
+	return particle
+end
+
+local function CreateFinalWavePortalEffects(origin, fowDuration)
+	AddFOWViewer(
+		DOTA_TEAM_GOODGUYS,
+		origin,
+		FINAL_WAVE_PORTAL_FOW_RADIUS,
+		fowDuration or FINAL_WAVE_PORTAL_FOW_DURATION,
+		false
+	)
+	return CreateFinalWaveTeleportChannel(origin)
+end
+
+local function PlayFinalWaveArrivalEffects(unit)
+	if unit == nil or unit:IsNull() then return end
+
+	local origin = unit:GetAbsOrigin()
+	local particle = ParticleManager:CreateParticle(FINAL_WAVE_PORTAL_START_PARTICLE, PATTACH_ABSORIGIN_FOLLOW, unit)
+	ParticleManager:SetParticleControl(particle, 0, origin)
+	ParticleManager:SetParticleControl(particle, 1, origin)
+	ParticleManager:SetParticleControl(particle, 7, Vector(0.8, 0, 0))
+
+	Timers:CreateTimer(0.8, function()
+		DestroyFinalWaveParticle(particle)
+	end)
+
+	unit:EmitSound("Portal.Hero_Appear")
+end
+
+local function PlayFinalWaveSpawnAnimation(unit)
+	if unit == nil or unit:IsNull() then return end
+	StartAnimation(unit, {
+		duration = 1.10,
+		activity = ACT_DOTA_SPAWN,
+		rate = 1.0,
+	})
+end
+
+local function NotifyFinalWaveArrival(config)
+	if Notifications == nil then return end
+
+	Notifications:TopToAll({
+		text = config.boss_label .. " arrives from the " .. config.direction_label,
+		duration = 3.0,
+		style = { color = "#ffdc73", ["font-size"] = "28px", ["font-weight"] = "bold" },
+	})
+end
+
+local function SpawnFinalWaveUnit(unitName, spawner, angle, releaseWaypoint, lockDuration, hiddenUntilReveal)
+	if spawner == nil then return nil end
+
+	local unit = CreateUnitByName(unitName .. "_final_wave", spawner:GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_1)
+	if unit == nil then return nil end
+
+	if hiddenUntilReveal == true then
+		unit:AddNoDraw()
+	end
+
+	RegisterFinalWaveUnit(unit)
+	unit:SetAngles(0, angle, 0)
+	ApplyFinalWaveCinematicLock(unit, lockDuration)
+	QueueFinalWaveRelease(unit, releaseWaypoint)
+
+	UpdateFinalWaveQuestLimit()
+	CustomTimers.final_wave_kill_counting = (CustomTimers.final_wave_spawned_kill_limit or 0) >= FINAL_WAVE_TOTAL_UNITS
+
+	return unit
+end
+
+local function ActivatePreparedFinalWaveUnits()
+	CustomTimers.final_wave_prepared_units = {}
+	if XHSWaveStager == nil then return 0 end
+	local job = XHSWaveStager:GetJob(FINAL_WAVE_STAGE_JOB)
+	if job == nil then return 0 end
+
+	local released = XHSWaveStager:ActivateJob(FINAL_WAVE_STAGE_JOB, {
+		wake_spread = 0,
+		activate = function(_, unit, descriptor)
+			unit:AddNoDraw()
+			unit.xhs_final_wave_prepared = false
+			unit:SetAngles(0, descriptor.angle or 0, 0)
+			ApplyFinalWaveCinematicLock(
+				unit,
+				FINAL_WAVE_INTRO_DURATION + FINAL_WAVE_PREP_DURATION
+			)
+			local waypoint = Entities:FindByName(nil, descriptor.waypoint)
+			RegisterFinalWaveUnit(unit)
+			QueueFinalWaveRelease(unit, waypoint)
+			CustomTimers.final_wave_prepared_units[
+				GetFinalWaveStagedKey(descriptor.direction, descriptor.slot)
+			] = unit
+		end,
+	})
+	UpdateFinalWaveQuestLimit()
+	return tonumber(released) or 0
+end
+
+local function TakePreparedFinalWaveUnit(direction, slot)
+	local units = CustomTimers.final_wave_prepared_units
+	if units == nil then return nil end
+	local key = GetFinalWaveStagedKey(direction, slot)
+	local unit = units[key]
+	units[key] = nil
+	if unit == nil or unit:IsNull() or not unit:IsAlive() then return nil end
+	return unit
+end
+
+function FinalWave(force)
+	if force ~= true and XHSDevTools ~= nil and XHSDevTools:IsSandboxActive() then return end
+
+	CustomTimers.proc_final_wave = true
+	CustomTimers.final_wave_kill_counting = false
+	CustomTimers.final_wave_spawned_kill_limit = 0
+	CustomTimers.final_wave_units = {}
+	CustomTimers.final_wave_pending_units = {}
+	CustomTimers.final_wave_sequence_id = (CustomTimers.final_wave_sequence_id or 0) + 1
+	local finalWaveSequenceId = CustomTimers.final_wave_sequence_id
+
+	CustomTimers.current_time["special_event"] = 1
+	CustomTimers:Countdown("special_event")
+	if XHSSetGlobalObjectiveState ~= nil then
+		XHSSetGlobalObjectiveState("final_wave", "Active", "Final Wave active")
+	else
+		CustomGameEventManager:Send_ServerToAllClients("xhs_global_objective_update", {
+			id = "final_wave",
+			state = "Active",
+			text = "Final Wave active",
+		})
+	end
+	KillCreeps(DOTA_TEAM_CUSTOM_1, true)
+	ActivatePreparedFinalWaveUnits()
+	RefreshPlayers()
+	GameRules:SetHeroRespawnEnabled(false)
+
+	TeleportAllHeroes(
+		"final_wave_player_",
+		FINAL_WAVE_INTRO_DURATION,
+		FINAL_WAVE_PLAYER_TELEPORT_DELAY,
+		function()
+			if not IsFinalWaveSequenceActive(finalWaveSequenceId) then return end
+			-- Establish the hero-follow camera before the first cardinal reveal.
+			-- Without an explicit target, the cinematic overlay starts while the
+			-- teleport camera is still free and the first reveal appears to snap.
+			LockFinalWaveCamerasToHeroes()
+		end
+	)
+
+	Timers:CreateTimer(FINAL_WAVE_PLAYER_TELEPORT_DELAY, function()
+		if not IsFinalWaveSequenceActive(finalWaveSequenceId) then return end
+
+		if Runes ~= nil and Runes.OnFinalWaveTeleport ~= nil then
+			Runes:OnFinalWaveTeleport()
+		end
+
+		-- Music must not depend on the Panorama cinematic panel being loaded.
+		-- The custom sound event owns the requested 2x gain and this global
+		-- server emission reaches every player even after a script hot reload.
+		EmitGlobalSound(FINAL_WAVE_MUSIC_SOUND)
+
+		if XHSCinematics ~= nil then
+			XHSCinematics:BeginForAll(FINAL_WAVE_CINEMATIC_ID, {
+				-- Start the exit animation early so the HUD and full viewport are
+				-- restored exactly when the final wave is released.
+				duration = FINAL_WAVE_INTRO_DURATION
+					- FINAL_WAVE_PLAYER_TELEPORT_DELAY
+					- FINAL_WAVE_LETTERBOX_TRANSITION,
+				letterbox_pct = FINAL_WAVE_LETTERBOX_PERCENT,
+				transition = FINAL_WAVE_LETTERBOX_TRANSITION,
+				hide_hud = true,
+			})
+		end
+	end)
+
+	for _, config in ipairs(FINAL_WAVE_CARDINALS) do
+		Timers:CreateTimer(config.delay, function()
+			if not IsFinalWaveSequenceActive(finalWaveSequenceId) then return end
+			FinalWaveSpawner(config, finalWaveSequenceId)
+		end)
+	end
+
+	Timers:CreateTimer(FINAL_WAVE_INTRO_DURATION, function()
+		if not IsFinalWaveSequenceActive(finalWaveSequenceId) then return end
+
+		for _, hero in pairs(HeroList:GetAllHeroes()) do
+			if hero:IsRealHero() and hero:GetTeam() == DOTA_TEAM_GOODGUYS then
+				local playerID = hero:GetPlayerOwnerID()
+				CameraMotion:Return(playerID, function()
+					return PlayerResource:GetSelectedHeroEntity(playerID)
+				end, {
+					duration = FINAL_WAVE_CAMERA_RETURN_DURATION,
+					easing = "smootherstep",
+					owner = "final_wave_intro",
+					priority = 100,
+					policy = "replace",
+					release = "free",
+				})
+			end
+		end
+
+		if XHSCinematics ~= nil then
+			XHSCinematics:EndForAll(FINAL_WAVE_CINEMATIC_ID)
+		end
+
+		Notifications:TopToAll({
+			text = "Prepare! The final wave attacks in " .. math.floor(FINAL_WAVE_PREP_DURATION) .. " seconds.",
+			duration = FINAL_WAVE_PREP_DURATION,
+			style = { color = "#ffdc73", ["font-size"] = "26px", ["font-weight"] = "bold" },
+		})
+
+		-- Heroes are released by their teleport modifiers at this point and can
+		-- reposition while every final-wave unit remains paused and invulnerable.
+		Timers:CreateTimer(FINAL_WAVE_PREP_DURATION, function()
+			if not IsFinalWaveSequenceActive(finalWaveSequenceId) then return end
+			ReleaseFinalWavePendingUnits()
+			StartFinalWaveQuestWatchdog(finalWaveSequenceId)
+
+			local finalWaveFort = GetFinalWaveFort()
+			if finalWaveFort ~= nil then
+				EmitSoundOn("Hero_TemplarAssassin.Trap", finalWaveFort)
+			end
+		end)
+	end)
+end
+
+function FinalWaveSpawner(configOrCreep1, creep2, creep3, creep4, bossName, angle, direction, waypointName)
+	local config = configOrCreep1
+	local sequenceId = nil
+	if type(configOrCreep1) == "table" then
+		sequenceId = creep2
+	end
+
+	if not IsFinalWaveSequenceActive(sequenceId) then return end
+
+	if type(configOrCreep1) ~= "table" then
+		config = {
+			delay = 0,
+			direction = direction,
+			direction_label = direction or "",
+			boss_label = bossName or "",
+			angle = angle or 0,
+			waypoint = waypointName,
+			boss = bossName,
+			creeps = { configOrCreep1, creep2, creep3, creep4 },
+		}
+	end
+
+	if config == nil or config.direction == nil or config.boss == nil then return end
+
+	local releaseWaypoint = Entities:FindByName(nil, config.waypoint)
+	local lockDuration = math.max(
+		1.0,
+		FINAL_WAVE_INTRO_DURATION + FINAL_WAVE_PREP_DURATION - (config.delay or 0)
+	)
+	local portalOrigin = GetFinalWavePortalOrigin(config)
+	local bossSpawner = FindFinalWaveSpawner(config.direction, 13)
+	if bossSpawner == nil then return end
+
+	local teleportChannel = CreateFinalWavePortalEffects(portalOrigin, GetFinalWaveCardinalFowDuration(config))
+	NotifyFinalWaveArrival(config)
+
+	local spawnMarkers = {}
+	local spawnSlotCount = #config.creeps * 3
+	for slot = 1, spawnSlotCount do
+		local spawner = FindFinalWaveSpawner(config.direction, slot)
+		if spawner ~= nil then
+			spawnMarkers[slot] = CreateFinalWaveSpawnMarker(spawner)
+		end
+	end
+
+	local boss = TakePreparedFinalWaveUnit(config.direction, 13)
+		or SpawnFinalWaveUnit(config.boss, bossSpawner, config.angle, releaseWaypoint, lockDuration, true)
+	if boss == nil then
+		DestroyFinalWaveParticle(teleportChannel)
+		for _, marker in pairs(spawnMarkers) do
+			DestroyFinalWaveParticle(marker)
+		end
+		return
+	end
+
+	boss:EmitSound("Portal.Loop_Appear")
+	SendFinalWaveCamera(GetFinalWaveCameraPosition(config, boss:GetAbsOrigin()), 0.65)
+
+	Timers:CreateTimer(FINAL_WAVE_CARDINAL_REVEAL_DELAY, function()
+		DestroyFinalWaveParticle(teleportChannel)
+		teleportChannel = nil
+
+		if boss == nil or boss:IsNull() then return end
+		StopSoundOn("Portal.Loop_Appear", boss)
+		if not IsFinalWaveSequenceActive(sequenceId) then
+			boss:RemoveNoDraw()
+			return
+		end
+
+		boss:RemoveNoDraw()
+		PlayFinalWaveArrivalEffects(boss)
+		PlayFinalWaveSpawnAnimation(boss)
+	end)
+
+	local spawnSlot = 1
+	for _, creepName in ipairs(config.creeps) do
+		for _ = 1, 3 do
+			local currentSlot = spawnSlot
+			local currentCreepName = creepName
+			Timers:CreateTimer(FINAL_WAVE_CARDINAL_REVEAL_DELAY + FINAL_WAVE_BOSS_SUMMON_DELAY + ((spawnSlot - 1) * FINAL_WAVE_UNIT_SPAWN_INTERVAL), function()
+				DestroyFinalWaveParticle(spawnMarkers[currentSlot])
+				spawnMarkers[currentSlot] = nil
+
+				if not IsFinalWaveSequenceActive(sequenceId) then return end
+				local spawner = FindFinalWaveSpawner(config.direction, currentSlot)
+				if spawner == nil then return end
+				local creep = TakePreparedFinalWaveUnit(config.direction, currentSlot)
+					or SpawnFinalWaveUnit(currentCreepName, spawner, config.angle, releaseWaypoint, lockDuration, true)
+				if creep ~= nil then
+					creep:RemoveNoDraw()
+					PlayFinalWaveSpawnAnimation(creep)
+					creep:EmitSound("Hero_TemplarAssassin.Trap")
+				end
+			end)
+			spawnSlot = spawnSlot + 1
 		end
 	end
 end

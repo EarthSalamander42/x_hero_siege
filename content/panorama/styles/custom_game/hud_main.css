@@ -88,6 +88,67 @@
 	opacity-mask: url("file://panorama/images/masks/killcammask_left_psd.psd") 1;		
 }
 
+#XHSReincarnationPortraitOverlay
+{
+	width: 180px;
+	height: 180px;
+	horizontal-align: center;
+	vertical-align: center;
+	background-color: gradient( radial, 50% 48%, 0% 0%, 72% 72%, from( #07131ea8 ), color-stop( 0.54, #07131ed2 ), to( #02070cf4 ) );
+	opacity: 0;
+	visibility: collapse;
+	transition-property: opacity;
+	transition-duration: 0.12s;
+	z-index: 1000;
+}
+
+#XHSReincarnationPortraitOverlay.Visible
+{
+	opacity: 1;
+	visibility: visible;
+}
+
+#XHSReincarnationPortraitGlow
+{
+	width: 86px;
+	height: 86px;
+	horizontal-align: center;
+	vertical-align: center;
+	margin-top: -8px;
+	border: 2px solid #79dfff90;
+	border-radius: 50%;
+	background-color: gradient( radial, 50% 50%, 0% 0%, 60% 60%, from( #29bce824 ), color-stop( 0.7, #0e658c20 ), to( #06131c00 ) );
+	box-shadow: fill #25bde040 0px 0px 14px 1px, inset #a7eeff30 0px 0px 8px 0px;
+}
+
+#XHSReincarnationPortraitTime
+{
+	horizontal-align: center;
+	vertical-align: center;
+	margin-top: -9px;
+	color: #f1fbffff;
+	font-family: Radiance;
+	font-size: 46px;
+	font-weight: bold;
+	text-align: center;
+	text-shadow: 0px 2px 4px 3 #000000e8, 0px 0px 10px 1 #34c9f0a0;
+}
+
+#XHSReincarnationPortraitCaption
+{
+	horizontal-align: center;
+	vertical-align: center;
+	margin-top: 82px;
+	color: #9edff4ff;
+	font-family: Radiance;
+	font-size: 13px;
+	font-weight: semi-bold;
+	letter-spacing: 1px;
+	text-align: center;
+	text-transform: uppercase;
+	text-shadow: 0px 1px 3px 2 #000000f0;
+}
+
 
 .AbilityInsetShadowLeft,
 .AbilityInsetShadowRight,
@@ -130,6 +191,11 @@
 	height: 90px;
 	border-top-left-radius: 6px;
 	border-top-right-radius: 6px;
+}
+
+#tpCharges
+{
+	opacity: 0;
 }
 
 #DialogPanel
@@ -626,6 +692,217 @@
 	background-image: url("file://panorama/images/interface/boss/sandking_psd.psd");
 }
 
+#XHSBuyTomeButton,
+.XHSBuyTomeButton
+{
+	width: 34px;
+	height: 34px;
+	horizontal-align: left;
+	vertical-align: top;
+	margin-left: 7px;
+	margin-top: 0px;
+	margin-bottom: 0px;
+	background-color: #0614219a;
+	border: 1px solid #7fd7ff2a;
+	border-radius: 4px;
+	box-shadow: fill #0000007a 0px 0px 5px 0px;
+	opacity: 0.9;
+	tooltip-position: top;
+	z-index: 1200;
+
+	transition-property: brightness, opacity, pre-transform-scale2d, border;
+	transition-duration: 0.12s;
+	transition-timing-function: ease-in-out;
+}
+
+#XHSBuyTomeButton.XHSInjectedIntoCenterBlock,
+.XHSBuyTomeButton.XHSInjectedIntoCenterBlock
+{
+	horizontal-align: left;
+	vertical-align: top;
+	margin-left: 7px;
+	margin-top: 0px;
+	margin-bottom: 0px;
+}
+
+#XHSBuyTomeButton:hover,
+.XHSBuyTomeButton:hover,
+#XHSBuyTomeButton.XHSBuyTomeHovered,
+.XHSBuyTomeButton.XHSBuyTomeHovered
+{
+	brightness: 1.55;
+	opacity: 1;
+	pre-transform-scale2d: 1.04;
+	border: 1px solid #9fe8ff64;
+}
+
+#XHSBuyTomeButton:active,
+.XHSBuyTomeButton:active
+{
+	pre-transform-scale2d: 0.96;
+	brightness: 1.2;
+}
+
+@keyframes 'XHSTomeAutoBuyGlow'
+{
+	0%
+	{
+		box-shadow: fill #f6a92870 0px 0px 6px 1px;
+		brightness: 1;
+	}
+
+	50%
+	{
+		box-shadow: fill #ffe694dc 0px 0px 14px 3px;
+		brightness: 1.28;
+	}
+
+	100%
+	{
+		box-shadow: fill #f6a92870 0px 0px 6px 1px;
+		brightness: 1;
+	}
+}
+
+#XHSBuyTomeButton.TomeAutoBuyEnabled,
+.XHSBuyTomeButton.TomeAutoBuyEnabled
+{
+	border: 2px solid #ffd75e;
+	saturation: 1;
+	opacity: 1;
+	animation-name: XHSTomeAutoBuyGlow;
+	animation-duration: 1.15s;
+	animation-timing-function: ease-in-out;
+	animation-iteration-count: infinite;
+}
+
+#XHSBuyTomeButton.NoTomes,
+.XHSBuyTomeButton.NoTomes
+{
+	opacity: 0.42;
+	saturation: 0.35;
+	brightness: 0.75;
+}
+
+#XHSBuyTomeButton.TomePurchaseLocked,
+.XHSBuyTomeButton.TomePurchaseLocked
+{
+	opacity: 0.78;
+	saturation: 0.25;
+	brightness: 0.72;
+	border: 1px solid #e06a6aaa;
+}
+
+#XHSBuyTomeButton.TomePurchaseLocked:hover,
+.XHSBuyTomeButton.TomePurchaseLocked:hover
+{
+	brightness: 0.92;
+}
+
+#XHSBuyTomeButton.TomeAutoBuyEnabled,
+#XHSBuyTomeButton.NoTomes.TomeAutoBuyEnabled,
+#XHSBuyTomeButton.TomePurchaseLocked.TomeAutoBuyEnabled,
+.XHSBuyTomeButton.TomeAutoBuyEnabled,
+.XHSBuyTomeButton.NoTomes.TomeAutoBuyEnabled,
+.XHSBuyTomeButton.TomePurchaseLocked.TomeAutoBuyEnabled
+{
+	opacity: 1;
+	saturation: 1;
+	border: 2px solid #ffd75e;
+}
+
+#XHSBuyTomeDisabledOverlay,
+.XHSBuyTomeDisabledOverlay
+{
+	width: 100%;
+	height: 100%;
+	background-color: #3b0505b8;
+	border-radius: 3px;
+	visibility: collapse;
+	z-index: 5;
+}
+
+#XHSBuyTomeButton.TomePurchaseLocked #XHSBuyTomeDisabledOverlay,
+.XHSBuyTomeButton.TomePurchaseLocked .XHSBuyTomeDisabledOverlay
+{
+	visibility: visible;
+}
+
+#XHSBuyTomeDisabledMark,
+.XHSBuyTomeDisabledMark
+{
+	horizontal-align: center;
+	vertical-align: center;
+	color: #ffd6d6;
+	font-size: 24px;
+	font-weight: bold;
+	text-shadow: 0px 1px 3px 3 #000000;
+}
+
+#XHSBuyTomeIcon,
+.XHSBuyTomeIcon
+{
+	width: 28px;
+	height: 28px;
+	horizontal-align: center;
+	vertical-align: center;
+	border-radius: 3px;
+	opacity: 0.88;
+}
+
+#XHSBuyTomeCount,
+.XHSBuyTomeCount
+{
+	min-width: 22px;
+	height: 15px;
+	horizontal-align: right;
+	vertical-align: bottom;
+	margin-right: -5px;
+	margin-bottom: -4px;
+	padding: 0px 3px;
+	background-color: #07131ee8;
+	border: 1px solid #7fd7ff3c;
+	border-radius: 3px;
+	color: #d8f7ff;
+	font-size: 12px;
+	font-weight: bold;
+	text-align: center;
+	text-shadow: 0px 1px 2px 2 #000000;
+	text-overflow: shrink;
+}
+
+#XHSBuyTomeAutoBuyHint,
+.XHSBuyTomeAutoBuyHint
+{
+	min-width: 22px;
+	height: 12px;
+	horizontal-align: left;
+	vertical-align: top;
+	margin-left: -5px;
+	margin-top: -6px;
+	padding: 0px 3px;
+	background-color: #07131ef2;
+	border: 1px solid #7fd7ff70;
+	border-radius: 3px;
+	color: #bfeeff;
+	font-size: 8px;
+	font-weight: bold;
+	text-align: center;
+	text-shadow: 0px 1px 2px 2 #000000;
+	text-overflow: shrink;
+	z-index: 7;
+}
+
+#XHSBuyTomeAutoBuyHint.Enabled,
+.XHSBuyTomeAutoBuyHint.Enabled
+{
+	min-width: 27px;
+	background-color: #4a3008f2;
+	border: 1px solid #ffe17e;
+	color: #fff1a8;
+	box-shadow: fill #ffbf3860 0px 0px 4px 1px;
+}
+
 /*====================COMIC=====================*/
 
 #IntroComicContainer
@@ -879,6 +1156,441 @@
 {
 	opacity: 1;
 	transform: scale3d( 1, 1, 1 );
+}
+
+// -----------------------------------------------------------------------------
+// X Hero Siege dialog / party confirmation
+// -----------------------------------------------------------------------------
+
+#DialogPanel
+{
+	width: 830px;
+	min-width: 830px;
+	min-height: 286px;
+	margin-bottom: 270px;
+	transform-origin: 50% 100%;
+	pre-transform-scale2d: 0.86;
+	transform: translateY(22px);
+}
+
+#DialogPanel.Visible
+{
+	pre-transform-scale2d: 1;
+	transform: translateY(0px);
+}
+
+#DialogPanelBackground
+{
+	width: 100%;
+	height: 100%;
+	margin: 0px;
+	background-color: gradient( linear, 0% 0%, 100% 100%, from( #071827f5 ), color-stop( 0.55, #0a2138f2 ), to( #050b14f5 ) );
+	border: 1px solid #77c8ff66;
+	border-top: 2px solid #ffcf6699;
+	box-shadow: fill #000000b8 0px 0px 18px 2px;
+}
+
+#XHSDialogHeaderAccent
+{
+	width: 310px;
+	height: 3px;
+	horizontal-align: center;
+	margin-top: 0px;
+	background-color: gradient( linear, 0% 0%, 100% 0%, from( #5ad0ff00 ), color-stop( 0.5, #ffcf66e8 ), to( #5ad0ff00 ) );
+	box-shadow: fill #ffcf6655 0px 0px 7px 1px;
+}
+
+#XHSDialogPortraitRing
+{
+	width: 132px;
+	height: 132px;
+	margin-left: 26px;
+	margin-top: 38px;
+	border-radius: 50%;
+	border: 2px solid #ffcf66cc;
+	background-color: gradient( radial, 50% 50%, 0% 0%, 70% 70%, from( #5ad0ff55 ), color-stop( 0.72, #0a2138ee ), to( #02070dcc ) );
+	box-shadow: fill #5ad0ff55 0px 0px 12px 1px;
+}
+
+#DialogPanel #DialogPortrait,
+#DialogPanel #GlassBallOverlay
+{
+	width: 114px;
+	height: 114px;
+	margin-left: 35px;
+	margin-top: 47px;
+	border-radius: 50%;
+	border: 1px solid #9fdcffaa;
+	box-shadow: fill #000000cc 0px 0px 7px 1px;
+}
+
+#DialogPanel #GlassBallOverlay
+{
+	wash-color: #9fdcff55;
+}
+
+#DialogPanel .DialogPanelTitle
+{
+	margin-left: 164px;
+	margin-top: 28px;
+	padding: 4px 18px 5px 18px;
+	min-width: 420px;
+	background-color: gradient( linear, 0% 0%, 100% 0%, from( #0b2944f5 ), to( #07182700 ) );
+	border-left: 2px solid #ffcf66;
+	border-radius: 0px;
+	color: #dceeff;
+	font-size: 25px;
+	font-weight: bold;
+	letter-spacing: 1px;
+	text-transform: uppercase;
+	text-shadow: 0px 2px 4px #00111f;
+}
+
+#DialogPanel #DialogPanelContent
+{
+	width: 650px;
+	margin-left: 150px;
+	margin-top: 68px;
+	padding: 0px 15px 16px 15px;
+	flow-children: down;
+}
+
+#DialogPanel .SpeechBubble
+{
+	width: 620px;
+	min-height: 82px;
+	margin: 0px 0px 10px 0px;
+}
+
+#DialogPanel #SpeechBubbleContainer
+{
+	padding: 10px;
+}
+
+#DialogPanel .SpeechBubbleBackgroundOutline
+{
+	background-color: #77c8ff45;
+	border-radius: 3px;
+	box-shadow: fill #00000080 0px 0px 8px 0px;
+}
+
+#DialogPanel .SpeechBubbleBackground
+{
+	margin: 1px;
+	border-radius: 2px;
+	background-color: gradient( linear, 0% 0%, 100% 100%, from( #0d2740f5 ), to( #07131ff5 ) );
+	border: 1px solid #ffffff0b;
+}
+
+#DialogPanel .SpeechBubbleCalloutSquash
+{
+	width: 54px;
+	height: 54px;
+	transform: translateX(-18px) translateY(8px);
+	pre-transform-scale2d: 1, 0.38;
+	padding: 8px;
+}
+
+#DialogPanel .SpeechBubbleCallout
+{
+	background-color: #0d2740;
+	border: 3px solid #77c8ff55;
+}
+
+#DialogPanel .DialogPanelText
+{
+	max-width: 560px;
+	max-height: 150px;
+	margin: 18px 27px;
+	padding: 0px;
+	color: #dceeff;
+	font-size: 18px;
+	font-style: normal;
+	font-weight: semi-bold;
+	text-shadow: 0px 1px 3px #00111f;
+}
+
+#DialogPanel #DialogLabelSizer
+{
+	color: #dceeff00;
+}
+
+#DialogPlayerConfirm
+{
+	width: fit-children;
+	height: 70px;
+	horizontal-align: center;
+	margin-top: 0px;
+	padding: 4px 10px;
+	border: 1px solid #77c8ff24;
+	border-radius: 35px;
+	background-color: #0309128f;
+	box-shadow: fill #00000066 0px 0px 7px 0px;
+}
+
+#DialogPlayerConfirm.PartyFull
+{
+	width: 500px;
+	height: 132px;
+	flow-children: right-wrap;
+	border-radius: 32px;
+}
+
+#DialogPanel .PlayerConfirm
+{
+	visibility: collapse;
+	width: 72px;
+	height: 62px;
+	margin-left: 2px;
+	margin-right: 2px;
+	padding: 0px;
+	border: 0px solid transparent;
+	background-color: transparent;
+	overflow: noclip;
+	transition-property: border, box-shadow, brightness;
+	transition-duration: 0.2s;
+}
+
+#DialogPlayerConfirm.PartySolo .PlayerConfirm
+{
+	width: 112px;
+}
+
+#DialogPlayerConfirm.PartyMedium .PlayerConfirm
+{
+	width: 112px;
+}
+
+#DialogPlayerConfirm.PartyFull .PlayerConfirm
+{
+	width: 112px;
+}
+
+#DialogPanel .PlayerConfirm.ActivePlayer
+{
+	visibility: visible;
+}
+
+#DialogPanel .PlayerConfirm.Confirmed
+{
+	brightness: 1.15;
+}
+
+#DialogPanel .ConfirmHeroIcon
+{
+	width: 48px;
+	height: 48px;
+	horizontal-align: center;
+	margin-top: 0px;
+	margin-left: 0px;
+	border: 2px solid #c24a42cc;
+	border-radius: 50%;
+	box-shadow: fill #000000b8 0px 0px 5px 0px;
+	saturation: 0.48;
+	wash-color: #d03a2488;
+}
+
+#DialogPanel .Confirmed .ConfirmHeroIcon
+{
+	border: 2px solid #8fd39d;
+	box-shadow: fill #8fd39d66 0px 0px 8px 1px;
+	saturation: 1;
+	wash-color: #8fd39d22;
+	brightness: 1.25;
+}
+
+#DialogPanel .PlayerConfirm > Label
+{
+	width: 72px;
+	height: 14px;
+	horizontal-align: center;
+	vertical-align: bottom;
+	z-index: 3;
+	padding: 0px 2px;
+	background-color: transparent;
+	color: #a9c7dd;
+	font-size: 9px;
+	font-weight: semi-bold;
+	text-align: center;
+	text-overflow: shrink;
+	text-transform: uppercase;
+	letter-spacing: 0.2px;
+}
+
+#DialogPlayerConfirm.PartySolo .PlayerConfirm > Label
+{
+	width: 112px;
+	font-size: 10px;
+}
+
+#DialogPlayerConfirm.PartyMedium .PlayerConfirm > Label
+{
+	width: 112px;
+	font-size: 10px;
+}
+
+#DialogPlayerConfirm.PartyFull .PlayerConfirm > Label
+{
+	width: 112px;
+	font-size: 10px;
+}
+
+#DialogPanel .PlayerConfirm.Confirmed > Label
+{
+	color: #b9f0c4;
+}
+
+#ConfirmButton
+{
+	width: 200px;
+	height: 42px;
+	horizontal-align: center;
+	margin-top: 8px;
+	padding: 0px;
+	flow-children: none;
+	background-color: gradient( linear, 0% 0%, 100% 0%, from( #b57a1ff5 ), color-stop( 0.5, #e4ad42f5 ), to( #9a5c17f5 ) );
+	border: 1px solid #ffdf8ccc;
+	border-radius: 2px;
+	box-shadow: fill #00000099 0px 0px 7px 1px;
+	transition-property: brightness, box-shadow, opacity;
+	transition-duration: 0.12s;
+}
+
+#ConfirmButton:hover
+{
+	brightness: 1.18;
+	box-shadow: fill #ffcf6655 0px 0px 9px 1px;
+}
+
+#ConfirmButton:active
+{
+	brightness: 0.9;
+}
+
+#ConfirmButton .CheckMark
+{
+	visibility: collapse;
+}
+
+#ConfirmButton Label
+{
+	horizontal-align: center;
+	vertical-align: center;
+	color: #071827;
+	font-size: 15px;
+	font-weight: bold;
+	letter-spacing: 1px;
+	text-shadow: 0px 1px 1px #ffffff38;
+}
+
+#DialogPanel .DialogButtonContainer
+{
+	width: 620px;
+	height: 40px;
+	horizontal-align: right;
+	vertical-align: bottom;
+	margin-right: 30px;
+	margin-bottom: 28px;
+}
+
+#DialogPanel #ContinueDialogButton
+{
+	visibility: collapse;
+	width: 132px;
+	height: 38px;
+	min-width: 132px;
+	min-height: 38px;
+	horizontal-align: right;
+	vertical-align: center;
+	margin: 0px;
+	padding: 0px 20px;
+	border: 1px solid #77c8ff99;
+	border-radius: 2px;
+	background-image: none;
+	background-color: gradient( linear, 0% 0%, 100% 0%, from( #123653f5 ), color-stop( 0.5, #1b5378f5 ), to( #0c2943f5 ) );
+	box-shadow: fill #00000099 0px 0px 7px 1px;
+	transition-property: brightness, box-shadow;
+	transition-duration: 0.12s;
+}
+
+#DialogPanel.ShowAdvanceButton #ContinueDialogButton
+{
+	visibility: visible;
+}
+
+#DialogPanel #ContinueDialogButton:hover
+{
+	brightness: 1.2;
+	box-shadow: fill #5ad0ff44 0px 0px 8px 1px;
+}
+
+#DialogPanel #ContinueDialogButton Label
+{
+	horizontal-align: center;
+	vertical-align: center;
+	color: #dceeff;
+	font-size: 16px;
+	font-weight: bold;
+	letter-spacing: 1.5px;
+	text-transform: uppercase;
+	text-shadow: 0px 1px 3px #00111f;
+}
+
+#DialogPanel.JournalEntry
+{
+	width: 500px;
+	min-width: 500px;
+	min-height: 180px;
+	margin-bottom: 300px;
+}
+
+#DialogPanel.JournalEntry #DialogPanelBackground,
+#DialogPanel.JournalEntry #XHSDialogHeaderAccent,
+#DialogPanel.JournalEntry #XHSDialogPortraitRing,
+#DialogPanel.JournalEntry #XHSDialogBrand
+{
+	visibility: collapse;
+}
+
+#DialogPanel.JournalEntry #DialogPanelContent
+{
+	width: 420px;
+	margin-left: 68px;
+	margin-top: 6px;
+	padding: 32px;
+}
+
+#DialogPanel.JournalEntry .SpeechBubble
+{
+	width: 420px;
+	margin-top: 10px;
+	margin-left: 10px;
+	margin-bottom: 24px;
+}
+
+#DialogPanel.JournalEntry .DialogPanelTitle
+{
+	margin-top: 72px;
+	margin-left: 96px;
+	padding: 0px;
+	background-color: transparent;
+	border: 0px solid transparent;
+	color: #49434C;
+	font-size: 24px;
+	text-transform: none;
+}
+
+#DialogPanel.JournalEntry .DialogPanelText
+{
+	max-width: 340px;
+	max-height: 1000px;
+	margin-top: 72px;
+	margin-left: 22px;
+	padding: 0px;
+	color: #49434C;
+	font-size: 28px;
+	font-weight: normal;
+	text-overflow: clip;
 }
 
 #FloatingDialogPanelBackground

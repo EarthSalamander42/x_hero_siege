@@ -192,9 +192,17 @@ function ExorcismPhysics(event)
 				-- Focus the last attacked target if there's any
 				local last_targeted = caster.last_targeted
 				local target_enemy = nil
+				if ability:GetAbilityName() == "holdout_locust_swarm" then
+					for _, enemy in pairs(enemies) do
+						if enemy:HasModifier("modifier_xhs_crypt_lord_infested") then
+							target_enemy = enemy
+							break
+						end
+					end
+				end
 				for _, enemy in pairs(enemies) do
 					-- If the caster has a last_targeted and this is in range of the ghost acquisition, set to attack it
-					if last_targeted and enemy == last_targeted then
+					if target_enemy == nil and last_targeted and enemy == last_targeted then
 						target_enemy = enemy
 					end
 				end
@@ -258,6 +266,11 @@ function ExorcismPhysics(event)
 						local damage_table = {}
 
 						local spirit_damage = RandomInt(min_damage, max_damage)
+						local crypt_lord_swarm = ability:GetAbilityName() == "holdout_locust_swarm"
+						if crypt_lord_swarm and unit.current_target:HasModifier("modifier_xhs_crypt_lord_infested") then
+							spirit_damage = spirit_damage * (1 + ability:GetLevelSpecialValueFor(
+								"infested_bonus_pct", ability:GetLevel() - 1) * 0.01)
+						end
 						damage_table.victim = unit.current_target
 						damage_table.attacker = caster
 						damage_table.damage_type = abilityDamageType
@@ -271,6 +284,17 @@ function ExorcismPhysics(event)
 						local damagePostReduction = spirit_damage * (1 - damageReduction)
 
 						unit.damage_done = unit.damage_done + damagePostReduction
+						if crypt_lord_swarm then
+							local impale = caster:FindAbilityByName("nyx_assassin_impale")
+							if impale then
+								unit.current_target:AddNewModifier(caster, impale, "modifier_xhs_crypt_lord_infested", {
+									duration = ability:GetLevelSpecialValueFor("infested_duration", ability:GetLevel() - 1),
+								})
+							end
+							local instant_heal = damagePostReduction * ability:GetLevelSpecialValueFor(
+								"instant_heal_pct", ability:GetLevel() - 1) * 0.01
+							caster:Heal(instant_heal, ability)
+						end
 
 						-- Damage particle, different for buildings
 						if unit.current_target.InvulCount == 0 then

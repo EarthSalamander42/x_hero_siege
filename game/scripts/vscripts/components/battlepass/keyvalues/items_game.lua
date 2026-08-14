@@ -37,6 +37,32 @@ function ItemsGame:Init()
 	ItemsGame.battlepass2 = {}
 	ItemsGame.companions = {}
 
+	local hasSeason2026 = SupporterPass2026 ~= nil
+		and SupporterPass2026.ApplyCatalog ~= nil
+		and SupporterPass2026.BuildTracks ~= nil
+	if hasSeason2026 then
+		SupporterPass2026:ApplyCatalog(ItemsGame.custom_kv)
+		ItemsGame.battlepass, ItemsGame.battlepass2 =
+			SupporterPass2026:BuildTracks(ItemsGame)
+		ItemsGame.companions =
+			SupporterPass2026:BuildCompanionCatalog(ItemsGame)
+
+		SupporterPass2026:PublishRewardTrack(
+			"supporter_pass_rewards_free",
+			ItemsGame.battlepass
+		)
+		SupporterPass2026:PublishRewardTrack(
+			"supporter_pass_rewards_premium",
+			ItemsGame.battlepass2
+		)
+		CustomNetTables:SetTableValue(
+			"supporter_pass_player",
+			"companions",
+			ItemsGame.companions
+		)
+		return
+	end
+
 	local bp_reward_table = {}
 	local bp_reward_table2 = {}
 	local count = 1
@@ -48,12 +74,16 @@ function ItemsGame:Init()
 			if not itemKV.item_name then
 				itemKV.item_name = ItemsGame:GetItemName(count)
 			end
+			itemKV.unit = itemKV.unit or itemKV.unit_name or itemKV.file
+			itemKV.image = itemKV.image or itemKV.image_inventory
+			itemKV.rarity = itemKV.rarity or itemKV.item_rarity
 
 			table.insert(ItemsGame.companions, itemKV)
 		else
 			if ItemsGame:IsPremiumReward(count) == false then
 				local reward_table = {}
 				reward_table.image = ItemsGame:GetItemImage(count)
+				reward_table.image_inventory = reward_table.image
 				reward_table.level = ItemsGame:GetItemUnlockLevel(count)
 				reward_table.name = ItemsGame:GetItemName(count)
 				reward_table.rarity = ItemsGame:GetItemRarity(count)
@@ -62,6 +92,7 @@ function ItemsGame:Init()
 				reward_table.slot_id = ItemsGame:GetItemSlot(count)
 				reward_table.hero = ItemsGame:GetItemHero(count)
 				reward_table.item_unreleased = ItemsGame:GetItemReleaseState(count)
+				reward_table.runtime_assets = ItemsGame:GetItemRuntimeAssets(count)
 
 				table.insert(bp_reward_table, reward_table)
 			end
@@ -72,7 +103,7 @@ function ItemsGame:Init()
 
 	ItemsGame.battlepass = bp_reward_table
 
-	CustomNetTables:SetTableValue("battlepass_js_free", "rewards", { ItemsGame.battlepass })
+	CustomNetTables:SetTableValue("supporter_pass_rewards_free", "rewards", ItemsGame.battlepass)
 
 	count = 1
 
@@ -83,12 +114,16 @@ function ItemsGame:Init()
 			if not itemKV.item_name then
 				itemKV.item_name = ItemsGame:GetItemName(count)
 			end
+			itemKV.unit = itemKV.unit or itemKV.unit_name or itemKV.file
+			itemKV.image = itemKV.image or itemKV.image_inventory
+			itemKV.rarity = itemKV.rarity or itemKV.item_rarity
 
 			table.insert(ItemsGame.companions, itemKV)
 		else
 			if ItemsGame:IsPremiumReward(count) then
 				local reward_table = {}
 				reward_table.image = ItemsGame:GetItemImage(count)
+				reward_table.image_inventory = reward_table.image
 				reward_table.level = ItemsGame:GetItemUnlockLevel(count)
 				reward_table.name = ItemsGame:GetItemName(count)
 				reward_table.rarity = ItemsGame:GetItemRarity(count)
@@ -96,6 +131,7 @@ function ItemsGame:Init()
 				reward_table.item_id = tostring(count)
 				reward_table.slot_id = ItemsGame:GetItemSlot(count)
 				reward_table.hero = ItemsGame:GetItemHero(count)
+				reward_table.runtime_assets = ItemsGame:GetItemRuntimeAssets(count)
 
 				table.insert(bp_reward_table2, reward_table)
 			end
@@ -106,8 +142,17 @@ function ItemsGame:Init()
 
 	ItemsGame.battlepass2 = bp_reward_table2
 
-	CustomNetTables:SetTableValue("battlepass_js_premium", "rewards", { ItemsGame.battlepass2 })
-	CustomNetTables:SetTableValue("battlepass_player", "companions", { ItemsGame.companions })
+	if BuildXHSSupporterBonusRewards then
+		for _, reward in pairs(BuildXHSSupporterBonusRewards()) do
+			table.insert(ItemsGame.battlepass2, reward)
+		end
+		table.sort(ItemsGame.battlepass2, function(a, b)
+			return (tonumber(a.level) or 0) < (tonumber(b.level) or 0)
+		end)
+	end
+
+	CustomNetTables:SetTableValue("supporter_pass_rewards_premium", "rewards", ItemsGame.battlepass2)
+	CustomNetTables:SetTableValue("supporter_pass_player", "companions", ItemsGame.companions)
 end
 
 function ItemsGame:GetItemKV(item_id)
@@ -165,6 +210,25 @@ end
 
 function ItemsGame:GetItemVisuals(item_id)
 	return self:GetItemInfo(item_id, "visuals")
+end
+
+function ItemsGame:GetItemRuntimeAssets(item_id)
+	local runtimeAssets = {}
+	for _, visual in pairs(self:GetItemVisuals(item_id) or {}) do
+		if type(visual) == "table" and visual.modifier and visual.modifier ~= "" then
+			table.insert(runtimeAssets, {
+				kind = visual.type or "asset",
+				hook = visual.asset or "",
+				path = visual.modifier,
+			})
+		end
+	end
+	table.sort(runtimeAssets, function(a, b)
+		local aKey = tostring(a.hook or "") .. "\0" .. tostring(a.path or "")
+		local bKey = tostring(b.hook or "") .. "\0" .. tostring(b.path or "")
+		return aKey < bKey
+	end)
+	return runtimeAssets
 end
 
 function ItemsGame:GetItemName(item_id)
@@ -257,7 +321,7 @@ end
 --]]
 
 function ItemsGame:IsPremiumReward(item_id)
-	if self:GetItemInfo(item_id, "premium") == 1 then
+	if tonumber(self:GetItemInfo(item_id, "premium")) == 1 then
 		return true
 	end
 

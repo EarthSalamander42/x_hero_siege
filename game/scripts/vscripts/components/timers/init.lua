@@ -1,5 +1,20 @@
 -- require("components/timers/events")
 
+local SPECIAL_WAVE_WARNING_SOUND = "Dungeon.Stinger03"
+local SPECIAL_WAVE_WARNING_DURATION = 30
+local SPECIAL_WAVE_STAGE_JOB = "special_wave_next"
+local SPECIAL_WAVE_UNIT_COUNT = 10
+local SPECIAL_WAVE_UNITS = {
+	"npc_dota_creature_necrolyte_event_1",
+	"npc_dota_creature_naga_siren_event_2",
+	"npc_dota_creature_vengeful_spirit_event_3",
+	"npc_dota_creature_captain_event_4",
+	"npc_dota_creature_slardar_event_5",
+	"npc_dota_creature_chaos_knight_event_6",
+	"npc_dota_creature_luna_event_7",
+	"npc_dota_creature_clockwerk_event_8",
+}
+
 if CustomTimers == nil then
 	CustomTimers = class({})
 
@@ -17,12 +32,22 @@ if CustomTimers == nil then
 
 	CustomTimers.game_phase = 0
 	CustomTimers.creep_level = 1
+	CustomTimers.muradin_creep_level_delay_applied = false
 	CustomTimers.special_wave = 1
 	CustomTimers.enable_special_wave = false -- todo: use this to enable/disable special waves when notification happens 30s before and disable it when it has spawned. This will allow waves to spawn exactly when supposed to, rather than a few seconds before/after
+	CustomTimers.special_waves_disabled = false
+	CustomTimers.active_special_waves = {}
+	CustomTimers.active_special_wave_units = {}
+	CustomTimers.active_special_wave_count = 0
+	CustomTimers.active_special_wave_total = 0
+	CustomTimers.active_special_wave_direction = ""
+	CustomTimers.pending_special_wave_display_id = nil
+	CustomTimers.active_special_wave_timer_particles = {}
 	CustomTimers.proc_final_wave = false
 	CustomTimers.final_wave_delay = 60.0
 
 	CustomTimers.timers_paused = 0 -- 1 = half-pause, 2 = full-pause (excluding special arenas)
+	CustomTimers.current_event_timer_paused = false
 
 	CustomTimers.special_wave_region = {
 		"Incoming wave of Darkness from the West",
@@ -36,11 +61,241 @@ if CustomTimers == nil then
 	}
 end
 
+local function NormalizeSpecialWaveCardinal(cardinalPoint)
+	cardinalPoint = tonumber(cardinalPoint) or 0
+	if cardinalPoint > 4 then cardinalPoint = cardinalPoint - 4 end
+	return cardinalPoint
+end
+
+local function GetSpecialWaveSpawner(cardinalPoint)
+	local direction = CustomTimers:GetSpecialWavePoint(cardinalPoint)
+	if direction == nil then return nil, nil end
+	return Entities:FindByName(
+		nil,
+		"npc_dota_spawner_" .. direction .. "_event"
+	), direction
+end
+
+function PrepareSpecialWave(cardinalPoint, duration)
+	if XHSWaveStager == nil then return false end
+	local waveIndex = CustomTimers.special_wave
+	if waveIndex == 3 or waveIndex == 6 then return false end
+	local spawner, direction = GetSpecialWaveSpawner(cardinalPoint)
+	local unitName = SPECIAL_WAVE_UNITS[waveIndex]
+	if spawner == nil or unitName == nil then return false end
+
+	local descriptors = {}
+	for index = 1, SPECIAL_WAVE_UNIT_COUNT do
+		descriptors[index] = {
+			unit_name = unitName,
+			team = DOTA_TEAM_CUSTOM_1,
+			spawn_position = spawner:GetAbsOrigin(),
+			wave_index = waveIndex,
+			direction = direction,
+		}
+	end
+
+	XHSWaveStager:StartJob(SPECIAL_WAVE_STAGE_JOB, descriptors, {
+		owner = "special_wave",
+		window = math.max(0.05, tonumber(duration) or SPECIAL_WAVE_WARNING_DURATION),
+		wave_index = waveIndex,
+		direction = direction,
+		is_valid = function()
+			return CustomTimers.game_phase <= 2
+				and CustomTimers.proc_final_wave ~= true
+				and CustomTimers.special_waves_disabled ~= true
+				and CustomTimers.enable_special_wave == true
+				and CustomTimers.special_wave == waveIndex
+		end,
+	})
+	return true
+end
+
+if XHSQuestState == nil then
+	XHSQuestState = {
+		muradin_event_started = false,
+		global_objectives = {
+			muradin_event = {
+				state = "Active",
+				text = "Muradin Event in --:--",
+				default_text = "Muradin Event in --:--",
+			},
+			farm_event = {
+				state = "Inactive",
+				text = "Farm Event locked",
+				default_text = "Farm Event locked",
+			},
+			phase2_creeps = {
+				state = "Inactive",
+				text = "Phase 2 creeps locked",
+				default_text = "Phase 2 creeps locked",
+			},
+			final_wave = {
+				state = "Inactive",
+				text = "Final Wave locked",
+				default_text = "Final Wave locked",
+			},
+		},
+	}
+end
+
+function XHSUpdateQuestStateNetTable()
+	if CustomNetTables == nil or CustomTimers == nil then return end
+
+	CustomNetTables:SetTableValue("xhs_quest_state", "state", {
+		game_phase = CustomTimers.game_phase or 1,
+		creep_level = CustomTimers.creep_level or 1,
+		creep_seconds = CustomTimers.current_time and CustomTimers.current_time["creep_level"] or 0,
+		special_event_seconds = CustomTimers.current_time and CustomTimers.current_time["special_event"] or 0,
+		muradin_event_started = XHSQuestState.muradin_event_started == true,
+		global_objectives = XHSQuestState.global_objectives or {},
+	})
+end
+
+function XHSPersistQuestTimingState()
+	XHSUpdateQuestStateNetTable()
+end
+
+function XHSSetGlobalObjectiveState(id, state, text, seconds, started)
+	if id == nil or XHSQuestState == nil then return end
+
+	local objectives = XHSQuestState.global_objectives or {}
+	XHSQuestState.global_objectives = objectives
+
+	local current = objectives[id] or {}
+	local objective = {
+		state = state or current.state or "Inactive",
+		text = text or current.text or current.default_text or "",
+		default_text = current.default_text or current.defaultText or text or "",
+		started = started == true or current.started == true,
+	}
+
+	if seconds ~= nil then
+		objective.seconds = seconds
+	end
+
+	if id == "muradin_event" and (started == true or state == "Completed") then
+		XHSQuestState.muradin_event_started = true
+		objective.started = true
+	end
+
+	objectives[id] = objective
+	XHSUpdateQuestStateNetTable()
+
+	CustomGameEventManager:Send_ServerToAllClients("xhs_global_objective_update", {
+		id = id,
+		state = objective.state,
+		text = objective.text,
+		seconds = seconds,
+		started = objective.started,
+	})
+end
+
+function CustomTimers:GetVisibleSpecialWave()
+	local waves = CustomTimers.active_special_waves or {}
+	return waves[1]
+end
+
+function CustomTimers:SyncVisibleSpecialWaveFields()
+	local wave = CustomTimers:GetVisibleSpecialWave()
+	if wave ~= nil then
+		CustomTimers.active_special_wave_count = wave.remaining or 0
+		CustomTimers.active_special_wave_total = wave.total or 0
+		CustomTimers.active_special_wave_direction = wave.direction or ""
+	else
+		CustomTimers.active_special_wave_count = 0
+		CustomTimers.active_special_wave_total = 0
+		CustomTimers.active_special_wave_direction = ""
+	end
+
+	return wave
+end
+
+function CustomTimers:IsSpecialWaveDisplayPending(wave)
+	return wave ~= nil and CustomTimers.pending_special_wave_display_id ~= nil and CustomTimers.pending_special_wave_display_id == wave.id
+end
+
+function CustomTimers:BroadcastSpecialWaveActive(wave)
+	if wave == nil then return end
+
+	CustomGameEventManager:Send_ServerToAllClients("xhs_wave_active", {
+		id = wave.id or "",
+		remaining = wave.remaining or 0,
+		total = wave.total or 0,
+		direction = wave.direction or "",
+		wave_index = wave.wave_index or 0,
+	})
+end
+
+function CustomTimers:BroadcastSpecialWaveQueue()
+	local waves = CustomTimers.active_special_waves or {}
+	local queued = {}
+	local firstIndex = 2
+	if waves[1] ~= nil and CustomTimers:IsSpecialWaveDisplayPending(waves[1]) then
+		firstIndex = 1
+	end
+
+	for index = firstIndex, #waves do
+		local wave = waves[index]
+		table.insert(queued, {
+			id = wave.id or "",
+			remaining = wave.remaining or 0,
+			total = wave.total or 0,
+			direction = wave.direction or "",
+			wave_index = wave.wave_index or 0,
+		})
+	end
+
+	CustomGameEventManager:Send_ServerToAllClients("xhs_wave_queue_update", {
+		waves = queued,
+	})
+end
+
+function CustomTimers:BroadcastVisibleSpecialWave()
+	local wave = CustomTimers:SyncVisibleSpecialWaveFields()
+	if wave == nil or CustomTimers:IsSpecialWaveDisplayPending(wave) then return end
+
+	CustomTimers:BroadcastSpecialWaveActive(wave)
+end
+
+function CustomTimers:RemoveSpecialWave(wave)
+	if wave == nil then return false end
+
+	local waves = CustomTimers.active_special_waves or {}
+	for index, activeWave in ipairs(waves) do
+		if activeWave == wave then
+			table.remove(waves, index)
+			break
+		end
+	end
+
+	if CustomTimers.pending_special_wave_display_id == wave.id then
+		CustomTimers.pending_special_wave_display_id = nil
+	end
+
+	CustomTimers:SyncVisibleSpecialWaveFields()
+	return true
+end
+
+function CustomTimers:ScheduleVisibleSpecialWaveAfterClear()
+	local wave = CustomTimers:GetVisibleSpecialWave()
+	if wave == nil then return end
+
+	CustomTimers.pending_special_wave_display_id = wave.id
+	Timers:CreateTimer(2.4, function()
+		local visibleWave = CustomTimers:GetVisibleSpecialWave()
+		if visibleWave == nil or visibleWave.id ~= wave.id then return nil end
+
+		CustomTimers.pending_special_wave_display_id = nil
+		CustomTimers:BroadcastVisibleSpecialWave()
+		CustomTimers:BroadcastSpecialWaveQueue()
+		return nil
+	end)
+end
+
 ListenToGameEvent('game_rules_state_change', function()
 	if GameRules:State_Get() == DOTA_GAMERULES_STATE_GAME_IN_PROGRESS then
-		print("Attempt to increment game phase...")
 		CustomTimers:IncrementGamePhase()
-		print("Game phase incremented!")
 	end
 end, nil)
 
@@ -49,12 +304,46 @@ ListenToGameEvent('entity_killed', function(keys)
 	if not killed_unit then return end
 
 	if killed_unit:GetUnitName() == "npc_tower_cold" and CustomTimers.proc_final_wave == false then
-		CustomTimers.proc_final_wave = true
-		Notifications:TopToAll({ text = "WARNING! Final Wave incoming. Arriving in 60 seconds! Back to the Castle!", duration = 10.0 })
-		CustomTimers:IncrementGamePhase() -- Phase 2 to Phase 3
-		CustomTimers.current_time["special_event"] = CustomTimers.final_wave_delay
-		CustomTimers.current_time["special_wave"] = 1
-		CustomTimers:Countdown("special_wave") -- will not trigger a special wave while in phase 3
+		CustomTimers:PrepareFinalWaveCountdown()
+	end
+
+	CustomTimers.active_special_wave_units = CustomTimers.active_special_wave_units or {}
+	local specialWave = CustomTimers.active_special_wave_units[keys.entindex_killed]
+	if specialWave ~= nil then
+		CustomTimers.active_special_wave_units[keys.entindex_killed] = nil
+		if specialWave.units ~= nil then
+			specialWave.units[keys.entindex_killed] = nil
+		end
+
+		specialWave.remaining = math.max(0, (specialWave.remaining or 0) - 1)
+
+		local visibleWave = CustomTimers:GetVisibleSpecialWave()
+		local wasVisible = specialWave == visibleWave
+
+		if wasVisible and specialWave.remaining > 0 then
+			CustomTimers:SyncVisibleSpecialWaveFields()
+			CustomTimers:BroadcastVisibleSpecialWave()
+		elseif specialWave.remaining <= 0 then
+			CustomTimers:RemoveSpecialWave(specialWave)
+
+			if wasVisible then
+				CustomGameEventManager:Send_ServerToAllClients("xhs_wave_cleared", {
+					total = specialWave.total or 0,
+					direction = specialWave.direction or "",
+					wave_index = specialWave.wave_index or 0,
+				})
+
+				if CustomTimers:GetVisibleSpecialWave() ~= nil then
+					CustomTimers:ScheduleVisibleSpecialWaveAfterClear()
+				elseif FragmentQuests ~= nil then
+					FragmentQuests:OnSpecialWaveEnd(true)
+				end
+			elseif CustomTimers:IsSpecialWaveDisplayPending(specialWave) and CustomTimers:GetVisibleSpecialWave() ~= nil then
+				CustomTimers:ScheduleVisibleSpecialWaveAfterClear()
+			end
+		end
+
+		CustomTimers:BroadcastSpecialWaveQueue()
 	end
 
 	-- The Killing entity
@@ -62,9 +351,58 @@ ListenToGameEvent('entity_killed', function(keys)
 	--	if keys.entindex_attacker then killer = EntIndexToHScript(keys.entindex_attacker) end
 end, nil)
 
+function CustomTimers:PrepareFinalWaveCountdown(force)
+	if CustomTimers.proc_final_wave == true then return end
+	if force ~= true and XHSDevTools ~= nil and XHSDevTools:IsSandboxActive() then return end
+
+	CustomTimers.proc_final_wave = true
+	CustomTimers.final_wave_kill_counting = false
+	CustomTimers.final_wave_spawned_kill_limit = 0
+	if XHSWaveStager ~= nil then
+		XHSWaveStager:CancelJob(SPECIAL_WAVE_STAGE_JOB, "final_wave_countdown")
+	end
+	KillCreeps(DOTA_TEAM_CUSTOM_1)
+
+	for c = 1, 8 do
+		if CREEP_LANES[c] ~= nil then
+			CREEP_LANES[c][1] = 0
+			CREEP_LANES[c][3] = 0
+		end
+	end
+
+	CustomGameEventManager:Send_ServerToAllClients("update_special_event_label_final", {})
+	XHSSetGlobalObjectiveState("phase2_creeps", "Completed", "Phase 2 creep assault survived", nil)
+	XHSSetGlobalObjectiveState("final_wave", "Active", "Final Wave in " .. math.floor(CustomTimers.final_wave_delay) .. "s", CustomTimers.final_wave_delay)
+	CustomTimers.current_time["special_event"] = CustomTimers.final_wave_delay + 1
+	CustomTimers.current_time["special_wave"] = 1
+	CustomTimers:Countdown("special_wave")
+	CustomTimers:ShowFinalWaveCountdown(CustomTimers.final_wave_delay)
+	if PrepareFinalWaveUnits ~= nil then
+		PrepareFinalWaveUnits(CustomTimers.final_wave_delay)
+	end
+end
+
 function CustomTimers:Think()
+	if XHSDevTools ~= nil and XHSDevTools:IsSandboxActive() then
+		return
+	end
+
+	-- Farm exit has two dedicated callbacks, but this persistent campaign think
+	-- is the final watchdog for dedicated servers that lose a long-lived think.
+	if SpecialEvents ~= nil
+		and SpecialEvents.farm_event_leaderboard_phase == "celebration"
+		and SpecialEvents.farm_event_end_started ~= true
+		and tonumber(SpecialEvents.farm_event_exit_deadline) ~= nil
+		and GameRules:GetGameTime() >= tonumber(SpecialEvents.farm_event_exit_deadline)
+		and SpecialEvents.RequestFarmEventExit ~= nil then
+		SpecialEvents:RequestFarmEventExit(
+			"custom_timers_watchdog",
+			SpecialEvents.farm_event_generation
+		)
+	end
+
 	-- If no events is happening, keep running
-	if CustomTimers.timers_paused == 0 then
+	if CustomTimers.timers_paused == 0 and GameMode.SpecialArena_occuring ~= true then
 		CustomTimers:Countdown("game_time")
 
 		if GameRules:State_Get() == DOTA_GAMERULES_STATE_GAME_IN_PROGRESS then
@@ -106,23 +444,10 @@ function CustomTimers:Think()
 					SpawnCreeps()
 				end
 
-				-- every 4:30 minutes
-				if CustomTimers.creep_level <= 4 then
-					CustomTimers:Countdown("creep_level")
-
-					if CustomTimers.current_time["creep_level"] == -1 then
-						CustomTimers.creep_level = CustomTimers.creep_level + 1
-						CustomTimers.current_time["creep_level"] = XHS_CREEPS_UPGRADE_INTERVAL + 1
-						CreepLevels(CustomTimers.creep_level)
-					end
-				else
-					if CustomTimers.current_time["creep_level"] ~= 0 then
-						CustomTimers.current_time["creep_level"] = 0
-					end
-				end
+				CustomTimers:TickCreepLevel()
 			end
 
-			if CustomTimers.game_phase < 3 then
+			if CustomTimers.game_phase < 3 and CustomTimers.proc_final_wave ~= true and GameMode.SpecialArena_occuring ~= true and CustomTimers.special_waves_disabled ~= true then
 				if CustomTimers.special_wave <= 8 then
 					CustomTimers:Countdown("special_wave")
 
@@ -130,9 +455,14 @@ function CustomTimers:Think()
 
 					if CustomTimers.current_time["special_wave"] == 30 then
 						-- print("Special Wave in 30 seconds:", CustomTimers.special_wave_region[cardinal_point], CustomTimers.special_wave)
-						Notifications:TopToAll({ text = "WARNING: " .. CustomTimers.special_wave_region[cardinal_point] .. "!", duration = 25.0, style = { color = "red" } })
-						-- SpawnRunes()
-						CustomTimers.enable_special_wave = true
+						if cardinal_point ~= 3 and cardinal_point ~= 6 then
+							CustomTimers.enable_special_wave = true
+							PrepareSpecialWave(cardinal_point, 30)
+							CustomTimers:ShowSpecialWaveCountdown(cardinal_point, 30)
+							if Runes and Runes.OnSpecialWaveWarning then
+								Runes:OnSpecialWaveWarning(cardinal_point, CustomTimers:GetSpecialWavePoint(cardinal_point))
+							end
+						end
 					elseif CustomTimers.current_time["special_wave"] == 0 then
 						-- print("Special Wave:", CustomTimers.special_wave_region[cardinal_point], CustomTimers.special_wave)
 						SpecialWave(cardinal_point)
@@ -151,30 +481,49 @@ function CustomTimers:Think()
 
 	-- These timer should always run
 	if GameRules:State_Get() == DOTA_GAMERULES_STATE_GAME_IN_PROGRESS then
-		if CustomTimers.timers_paused ~= 2 and CustomTimers.game_phase < 3 then
+		local final_wave_countdown = CustomTimers.proc_final_wave == true and XHS_TIMERS_FINAL_WAVE == false
+		local final_wave_active = CustomTimers.proc_final_wave == true and XHS_TIMERS_FINAL_WAVE == true and CustomTimers.game_phase < 3
+		if CustomTimers.timers_paused ~= 2 and CustomTimers.current_event_timer_paused ~= true and GameMode.SpecialArena_occuring ~= true and (final_wave_countdown or (CustomTimers.game_phase < 3 and final_wave_active ~= true)) then
 			CustomTimers:Countdown("special_event")
 		end
 
+		if CustomTimers.timers_paused ~= 0 and CustomTimers.current_event_timer_paused ~= true and GameMode.Muradin_occuring == true and CustomTimers.game_phase == 1 then
+			CustomTimers:TickCreepLevel()
+			CustomTimers:TickMuradinSpecialWaveCountdown()
+		end
+
 		if GameMode.SpecialArena_occuring == true then CustomTimers:Countdown("special_arena") end
-		if GameMode.HeroImage_occuring == true then CustomTimers:Countdown("hero_image") end
-		if GameMode.SpiritBeast_occuring == true then CustomTimers:Countdown("spirit_beast") end
-		if GameMode.FrostInfernal_occuring == true then CustomTimers:Countdown("frost_infernal") end
-		if GameMode.AllHeroImages_occuring == true then CustomTimers:Countdown("all_hero_images") end
+		if GameMode.HeroImage_occuring == true and GameMode.HeroImageTimerStarted == true then CustomTimers:Countdown("hero_image") end
+		if GameMode.SpiritBeast_occuring == true and GameMode.SpiritBeastTimerStarted == true then CustomTimers:Countdown("spirit_beast") end
+		if GameMode.FrostInfernal_occuring == true and GameMode.FrostInfernalTimerStarted == true then CustomTimers:Countdown("frost_infernal") end
+		if GameMode.AllHeroImages_occuring == true and GameMode.AllHeroImagesTimerStarted == true then CustomTimers:Countdown("all_hero_images") end
 	end
 end
 
-function CustomTimers:Countdown(timer_name)
-	--	print(timer_name, CustomTimers.current_time[timer_name])
-	if timer_name == "game_time" then
-		CustomTimers.current_time[timer_name] = CustomTimers.current_time[timer_name] + 1
-	else
-		CustomTimers.current_time[timer_name] = CustomTimers.current_time[timer_name] - 1
+function CustomTimers:GetSpecialWaveTimerMetadata(t)
+	local wave_index = CustomTimers.special_wave or 0
+	local direction = ""
+	local show_compact = false
+
+	if wave_index >= 1 and wave_index <= 8 and CustomTimers.game_phase < 3 and CustomTimers.proc_final_wave ~= true then
+		direction = CustomTimers:GetSpecialWavePoint(wave_index) or ""
+		show_compact = t > 30
+
+		if (wave_index == 3 or wave_index == 6) and CustomTimers.enable_special_wave ~= true then
+			show_compact = false
+		end
 	end
 
-	-- Let's not bother JS if we don't have to (if minimum visual timer == 2 then set math.max 2nd params to 0)
-	--	if CustomTimers.current_time[timer_name] == 0 then return end
+	return {
+		wave_index = wave_index,
+		direction = direction,
+		show_compact = show_compact,
+		wave_interval = XHS_SPECIAL_WAVE_INTERVAL,
+	}
+end
 
-	local t = CustomTimers.current_time[timer_name]
+function CustomTimers:BroadcastTimer(timer_name)
+	local t = CustomTimers.current_time[timer_name] or 0
 	if t < 0 then t = t * (-1) end
 	local minutes = math.floor(t / 60)
 	local seconds = t - (minutes * 60)
@@ -190,26 +539,100 @@ function CustomTimers:Countdown(timer_name)
 		timer_second_01 = s01,
 		timer_name = timer_name,
 	}
+
+	if timer_name == "special_wave" then
+		local metadata = CustomTimers:GetSpecialWaveTimerMetadata(t)
+		for key, value in pairs(metadata) do
+			broadcast_gametimer[key] = value
+		end
+	end
+
+	if timer_name == "special_event" then
+		local muradin_frenzy = GameMode.Muradin_occuring == true and t <= 60
+		broadcast_gametimer.muradin_frenzy = muradin_frenzy and 1 or 0
+
+		if muradin_frenzy and XHSTriggerMuradinFrenzy ~= nil then
+			XHSTriggerMuradinFrenzy(t)
+		end
+	end
+
 	CustomGameEventManager:Send_ServerToAllClients("countdown_timer", broadcast_gametimer)
+
+	if timer_name == "creep_level" or timer_name == "special_event" then
+		XHSPersistQuestTimingState()
+	end
+end
+
+function CustomTimers:Countdown(timer_name)
+	--	print(timer_name, CustomTimers.current_time[timer_name])
+	if timer_name == "game_time" then
+		CustomTimers.current_time[timer_name] = CustomTimers.current_time[timer_name] + 1
+	else
+		CustomTimers.current_time[timer_name] = CustomTimers.current_time[timer_name] - 1
+	end
+
+	CustomTimers:BroadcastTimer(timer_name)
+end
+
+function CustomTimers:TickMuradinSpecialWaveCountdown()
+	if CustomTimers.enable_special_wave ~= true then return end
+	if CustomTimers.current_time["special_wave"] <= 0 then return end
+
+	CustomTimers:Countdown("special_wave")
+end
+
+function CustomTimers:TickCreepLevel()
+	if CustomTimers.game_phase ~= 1 then return end
+
+	if CustomTimers.creep_level < 4 then
+		CustomTimers:Countdown("creep_level")
+
+		if CustomTimers.current_time["creep_level"] <= 0 then
+			CustomTimers.creep_level = CustomTimers.creep_level + 1
+			CustomTimers.current_time["creep_level"] = XHS_CREEPS_UPGRADE_INTERVAL
+			if CustomTimers.creep_level == 2 and CustomTimers.muradin_creep_level_delay_applied ~= true then
+				CustomTimers.current_time["creep_level"] = CustomTimers.current_time["creep_level"] + XHS_MURADIN_EVENT_DURATION
+				CustomTimers.muradin_creep_level_delay_applied = true
+			end
+			CreepLevels(CustomTimers.creep_level)
+			CustomTimers:BroadcastTimer("creep_level")
+		end
+	else
+		if CustomTimers.current_time["creep_level"] ~= 0 then
+			CustomTimers.current_time["creep_level"] = 0
+			CustomTimers:BroadcastTimer("creep_level")
+		end
+	end
 end
 
 function CustomTimers:IncrementGamePhase()
 	CustomTimers.game_phase = CustomTimers.game_phase + 1
-	Notifications:TopToAll({ text = "GAME PHASE: Entering phase " .. CustomTimers.game_phase .. " !", duration = 5.0 })
+	if ResetPhaseOneSpawnBudget ~= nil then
+		ResetPhaseOneSpawnBudget(CustomTimers.game_phase == 1)
+	end
+
+	if CustomTimers.game_phase == 3 and RespawnDeadHeroesForPhase3Start ~= nil then
+		RespawnDeadHeroesForPhase3Start()
+	end
+
+	CustomGameEventManager:Send_ServerToAllClients("xhs_game_phase_update", {
+		phase = CustomTimers.game_phase,
+	})
+	CustomGameEventManager:Send_ServerToAllClients("xhs_creep_level_update", {
+		level = CustomTimers.creep_level,
+	})
+	XHSPersistQuestTimingState()
 
 	if CustomTimers.game_phase == 2 then
-		Notifications:TopToAll({ text = "Destroyer Magnataurs killed!", style = { continue = true }, duration = 5.0 })
-	elseif CustomTimers.game_phase == 3 then
-		Notifications:TopToAll({ text = "Respawn disabled!", style = { continue = true } })
+		return
+		-- elseif CustomTimers.game_phase == 3 then
+		-- 	Notifications:TopToAll({ text = "Phase 3 begins. Respawn disabled!", duration = 5.0, severity = "warning" })
+		-- else
+		-- 	Notifications:TopToAll({ text = "GAME PHASE: Entering phase " .. CustomTimers.game_phase .. " !", duration = 5.0 })
 	end
 end
 
-function SpecialWave(iCardinalPoint)
-	if CustomTimers.game_phase > 2 then return end
-
-	CustomTimers.enable_special_wave = false
-	CustomTimers.current_time["special_wave"] = XHS_SPECIAL_WAVE_INTERVAL + 1
-
+function CustomTimers:GetSpecialWavePoint(iCardinalPoint)
 	if iCardinalPoint > 4 then iCardinalPoint = iCardinalPoint - 4 end
 
 	local point = {
@@ -219,15 +642,119 @@ function SpecialWave(iCardinalPoint)
 		"south"
 	}
 
-	local unit = {
-		"npc_dota_creature_necrolyte_event_1",
-		"npc_dota_creature_naga_siren_event_2",
-		"npc_dota_creature_vengeful_spirit_event_3",
-		"npc_dota_creature_captain_event_4",
-		"npc_dota_creature_slardar_event_5",
-		"npc_dota_creature_chaos_knight_event_6",
-		"npc_dota_creature_luna_event_7",
-		"npc_dota_creature_clockwerk_event_8"
+	return point[iCardinalPoint]
+end
+
+function CustomTimers:ShowSpecialWaveCountdown(iCardinalPoint, duration, trackServerTimer)
+	if GameMode.SpecialArena_occuring == true then return end
+
+	local direction = CustomTimers:GetSpecialWavePoint(iCardinalPoint)
+	if direction == nil then return end
+	local remaining = math.max(0, tonumber(duration) or SPECIAL_WAVE_WARNING_DURATION)
+
+	local timer_name = "special_wave"
+	if trackServerTimer == false then
+		timer_name = nil
+	end
+
+	CustomGameEventManager:Send_ServerToAllClients("xhs_wave_timer", {
+		-- Keep the countdown's total duration separate from its current value.
+		-- ResumeSpecialWaveCountdown can reopen this notification below 30s;
+		-- treating that remaining value as the new total resets the radial to 100%.
+		duration = remaining,
+		remaining = remaining,
+		countdown_duration = SPECIAL_WAVE_WARNING_DURATION,
+		timer_name = timer_name,
+		wave_index = CustomTimers.special_wave or iCardinalPoint,
+		direction = direction,
+		eyebrow = "WAVE INCOMING",
+		title = "Wave of Darkness",
+		subtitle = string.upper(direction) .. " lane",
+		sound = remaining == SPECIAL_WAVE_WARNING_DURATION and SPECIAL_WAVE_WARNING_SOUND or nil
+	})
+
+	CustomTimers:CreateSpecialWaveTimerParticle(direction, remaining)
+end
+
+function CustomTimers:HideSpecialWaveCountdown()
+	CustomGameEventManager:Send_ServerToAllClients("xhs_wave_hide", {})
+	CustomTimers:ClearSpecialWaveTimerParticles()
+end
+
+function CustomTimers:ClearSpecialWaveTimerParticles()
+	local particles = CustomTimers.active_special_wave_timer_particles or {}
+	for index, particle in pairs(particles) do
+		if particle ~= nil then
+			ParticleManager:DestroyParticle(particle, false)
+			ParticleManager:ReleaseParticleIndex(particle)
+			particles[index] = nil
+		end
+	end
+end
+
+function CustomTimers:ResumeSpecialWaveCountdown()
+	if CustomTimers.game_phase >= 3 or CustomTimers.special_wave > 8 then return end
+	if CustomTimers.proc_final_wave == true then return end
+	if GameMode.SpecialArena_occuring == true then return end
+
+	local remaining = CustomTimers.current_time["special_wave"] or 0
+	if remaining <= 0 or remaining > 30 then return end
+	if CustomTimers.special_wave == 3 or CustomTimers.special_wave == 6 then return end
+
+	local stagedJob = XHSWaveStager ~= nil
+		and XHSWaveStager:GetJob(SPECIAL_WAVE_STAGE_JOB)
+		or nil
+	if stagedJob == nil
+		or tonumber(stagedJob.options.wave_index) ~= CustomTimers.special_wave then
+		PrepareSpecialWave(CustomTimers.special_wave, remaining)
+	end
+	CustomTimers:ShowSpecialWaveCountdown(CustomTimers.special_wave, remaining)
+end
+
+function CustomTimers:ShowFinalWaveCountdown(duration)
+	CustomGameEventManager:Send_ServerToAllClients("xhs_wave_timer", {
+		duration = duration,
+		remaining = duration,
+		countdown_duration = duration,
+		timer_name = "special_event",
+		eyebrow = "FINAL WAVE",
+		title = "Back to the Castle",
+		subtitle = "Final wave incoming in 60 seconds",
+		sound = SPECIAL_WAVE_WARNING_SOUND
+	})
+end
+
+function CustomTimers:CreateSpecialWaveTimerParticle(direction, duration)
+	local spawner = Entities:FindByName(nil, "npc_dota_spawner_" .. direction .. "_event")
+	if spawner == nil then return end
+
+	CustomTimers:ClearSpecialWaveTimerParticles()
+
+	local origin = spawner:GetAbsOrigin()
+	local radius = 1000
+
+	--TODO: Add a particle effect for the special wave timer countdown
+
+	AddFOWViewer(DOTA_TEAM_GOODGUYS, origin, radius, duration, false)
+end
+
+function SpecialWave(iCardinalPoint, force)
+	if CustomTimers.game_phase > 2 then return end
+	if CustomTimers.proc_final_wave == true then return end
+	if force ~= true and XHSDevTools ~= nil and XHSDevTools:IsSandboxActive() then return end
+	if CustomTimers.special_waves_disabled == true and force ~= true then return end
+
+	CustomTimers.enable_special_wave = false
+	CustomTimers.current_time["special_wave"] = XHS_SPECIAL_WAVE_INTERVAL + 1
+	local waveIndex = CustomTimers.special_wave
+
+	iCardinalPoint = NormalizeSpecialWaveCardinal(iCardinalPoint)
+
+	local point = {
+		"west",
+		"north",
+		"east",
+		"south"
 	}
 
 	local real_point = Entities:FindByName(nil, "npc_dota_spawner_" .. point[iCardinalPoint] .. "_event")
@@ -237,9 +764,69 @@ function SpecialWave(iCardinalPoint)
 		return
 	end
 
-	for j = 1, 10 do
-		CreateUnitByName(unit[CustomTimers.special_wave], real_point:GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_1)
+	local wave = {
+		id = DoUniqueString("xhs_special_wave"),
+		wave_index = waveIndex,
+		direction = point[iCardinalPoint],
+		total = SPECIAL_WAVE_UNIT_COUNT,
+		remaining = SPECIAL_WAVE_UNIT_COUNT,
+		units = {},
+	}
+	CustomTimers.active_special_waves = CustomTimers.active_special_waves or {}
+	CustomTimers.active_special_wave_units = CustomTimers.active_special_wave_units or {}
+	table.insert(CustomTimers.active_special_waves, wave)
+	CustomTimers:SyncVisibleSpecialWaveFields()
+
+	if FragmentQuests ~= nil then
+		FragmentQuests:OnSpecialWaveStart(waveIndex, wave.direction, wave.total)
 	end
+
+	local function RegisterSpecialWaveUnit(spawned_unit)
+		if spawned_unit ~= nil then
+			if RegisterPhaseOneBudgetEnemy ~= nil then
+				RegisterPhaseOneBudgetEnemy(spawned_unit)
+			end
+			wave.units[spawned_unit:entindex()] = true
+			CustomTimers.active_special_wave_units[spawned_unit:entindex()] = wave
+		end
+	end
+
+	local released = nil
+	if XHSWaveStager ~= nil then
+		local stagedJob = XHSWaveStager:GetJob(SPECIAL_WAVE_STAGE_JOB)
+		if stagedJob ~= nil
+			and tonumber(stagedJob.options.wave_index) == waveIndex
+			and stagedJob.options.direction == wave.direction then
+			released = XHSWaveStager:ActivateJob(SPECIAL_WAVE_STAGE_JOB, {
+				activate = function(_, spawnedUnit)
+					RegisterSpecialWaveUnit(spawnedUnit)
+				end,
+			})
+		elseif stagedJob ~= nil then
+			XHSWaveStager:CancelJob(
+				SPECIAL_WAVE_STAGE_JOB,
+				"special_wave_mismatch"
+			)
+		end
+	end
+
+	released = tonumber(released) or 0
+	for _ = released + 1, SPECIAL_WAVE_UNIT_COUNT do
+		local spawned_unit = CreateUnitByName(
+			SPECIAL_WAVE_UNITS[waveIndex],
+			real_point:GetAbsOrigin(),
+			true,
+			nil,
+			nil,
+			DOTA_TEAM_CUSTOM_1
+		)
+		RegisterSpecialWaveUnit(spawned_unit)
+	end
+
+	if CustomTimers:GetVisibleSpecialWave() == wave then
+		CustomTimers:BroadcastVisibleSpecialWave()
+	end
+	CustomTimers:BroadcastSpecialWaveQueue()
 
 	CustomTimers.special_wave = CustomTimers.special_wave + 1
 

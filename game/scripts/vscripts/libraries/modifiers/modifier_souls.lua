@@ -1,4 +1,5 @@
 modifier_souls = class({})
+modifier_souls.XHS_LINK_CLIENT = true
 
 --------------------------------------------------------------------------------
 

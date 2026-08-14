@@ -1,0 +1,769 @@
+.XHSFarmLeaderboardHost
+{
+	/* Keep the leaderboard input branch away from the left-side HUD.  The host
+	 * used to cover the whole screen and, once promoted above HUDElements,
+	 * could swallow the vanilla flyout-scoreboard button during farm events.
+	 * 730px still fits the two concurrent 326px leaderboards and their gap. */
+	width: 730px;
+	height: 100%;
+	horizontal-align: right;
+	overflow: noclip;
+	z-index: 18;
+}
+
+.XHSFarmLeaderboard
+{
+	width: 326px;
+	height: fit-children;
+	horizontal-align: right;
+	vertical-align: center;
+	margin-right: 18px;
+	flow-children: down;
+	overflow: noclip;
+	visibility: collapse;
+	opacity: 0;
+	transform: translateX( 28px );
+	pre-transform-scale2d: 0.98;
+	transition-property: opacity, transform, pre-transform-scale2d;
+	transition-duration: 0.28s;
+	transition-timing-function: ease-out;
+}
+
+.XHSFarmLeaderboard.IsVisible
+{
+	visibility: visible;
+	opacity: 1;
+	transform: translateX( 0px );
+	pre-transform-scale2d: 1;
+}
+
+.XHSFarmLeaderboard.IsFullyHidden,
+.XHSFarmLeaderboard.IsVisible.IsFullyHidden,
+.XHSFarmLeaderboard.IsArchived.IsReopened.IsFullyHidden
+{
+	visibility: collapse;
+	opacity: 0;
+	transform: translateX( 360px );
+}
+
+.XHSFarmLeaderboard.IsArchived
+{
+	opacity: 0;
+	transform: translateX( 360px );
+}
+
+.XHSFarmLeaderboard.IsArchived.IsReopened
+{
+	visibility: visible;
+	opacity: 1;
+	transform: translateX( 0px );
+}
+
+.XHSFarmLeaderboardToggle
+{
+	width: 30px;
+	height: 68px;
+	horizontal-align: right;
+	vertical-align: center;
+	margin-right: 0px;
+	visibility: collapse;
+	opacity: 0;
+	background-color: gradient( linear, 0% 0%, 100% 0%, from( #162b3ff5 ), to( #07111df8 ) );
+	border: 1px solid #65d8ff66;
+	border-right: 0px solid transparent;
+	box-shadow: fill #000000aa -4px -4px 10px 0px;
+	transition-property: opacity, brightness, width;
+	transition-duration: 0.2s;
+}
+
+.XHSFarmLeaderboardToggle.IsVisible
+{
+	visibility: visible;
+	opacity: 1;
+}
+
+.XHSFarmLeaderboardToggle:hover
+{
+	brightness: 1.45;
+	width: 36px;
+}
+
+.XHSFarmLeaderboardToggle Label
+{
+	align: center center;
+	color: #ffd77f;
+	font-size: 28px;
+	font-weight: bold;
+	text-shadow: 0px 0px 7px #ffb13c66;
+}
+
+.XHSFarmLeaderboardHeader
+{
+	width: 100%;
+	height: 62px;
+	flow-children: right;
+	background-color: gradient( linear, 0% 0%, 100% 100%, from( #081725f8 ), color-stop( 0.62, #0a2034f4 ), to( #07121ff7 ) );
+	border: 1px solid #62d8ff58;
+	border-left: 3px solid #ffbd43;
+	box-shadow: fill #000000a8 0px 5px 14px 0px, inset #bcecff10 0px 1px 0px 0px;
+}
+
+.XHSFarmLeaderboardHeader:hover
+{
+	brightness: 1.12;
+}
+
+.XHSFarmLeaderboardHeaderToggle
+{
+	width: 302px;
+	height: 100%;
+	ignore-parent-flow: true;
+	horizontal-align: left;
+	background-color: none;
+	border: 0px solid transparent;
+	z-index: 4;
+}
+
+.XHSFarmLeaderboard.IsSoloLocked .XHSFarmLeaderboardCollapse
+{
+	visibility: collapse;
+}
+
+.XHSFarmLeaderboardHide
+{
+	width: 24px;
+	height: 100%;
+	ignore-parent-flow: true;
+	horizontal-align: right;
+	background-color: #050c1488;
+	border: 0px solid transparent;
+	border-left: 1px solid #5ecae833;
+	z-index: 5;
+	transition-property: background-color, brightness;
+	transition-duration: 0.12s;
+}
+
+.XHSFarmLeaderboardHide:hover
+{
+	background-color: #18364acc;
+	brightness: 1.6;
+}
+
+.XHSFarmLeaderboardHide Label
+{
+	align: center center;
+	color: #ffd17d;
+	font-size: 22px;
+	font-weight: bold;
+	text-shadow: 0px 1px 4px #000000;
+}
+
+.XHSFarmWinnerCelebration
+{
+	width: 100%;
+	height: 0px;
+	visibility: collapse;
+	opacity: 0;
+	flow-children: right;
+	background-color: gradient( linear, 0% 0%, 100% 0%, from( #3a240df4 ), color-stop( 0.55, #18253af5 ), to( #08131ff5 ) );
+	border-left: 1px solid #ffc45c66;
+	border-right: 1px solid #ffc45c66;
+	overflow: noclip;
+}
+
+.XHSFarmLeaderboard.IsCelebrating .XHSFarmWinnerCelebration
+{
+	height: 78px;
+	visibility: visible;
+	opacity: 1;
+	animation-name: XHSFarmWinnerGlow;
+	animation-duration: 1.15s;
+	animation-iteration-count: infinite;
+	animation-timing-function: ease-in-out;
+}
+
+.XHSFarmWinnerCrown
+{
+	width: 64px;
+	height: 100%;
+	padding-top: 14px;
+	color: #ffe098;
+	font-size: 38px;
+	text-align: center;
+	text-shadow: 0px 0px 12px #ffad35bb;
+	animation-name: XHSFarmWinnerCrownPulse;
+	animation-duration: 0.8s;
+	animation-iteration-count: infinite;
+	animation-timing-function: ease-in-out;
+}
+
+.XHSFarmWinnerCopy
+{
+	width: fill-parent-flow( 1.0 );
+	height: 100%;
+	padding-top: 10px;
+	flow-children: down;
+}
+
+.XHSFarmWinnerEyebrow
+{
+	color: #ffbf51;
+	font-size: 10px;
+	font-weight: bold;
+	letter-spacing: 1.5px;
+}
+
+.XHSFarmWinnerName
+{
+	width: 100%;
+	height: 27px;
+	color: #fff5d8;
+	font-size: 21px;
+	font-weight: bold;
+	text-overflow: shrink;
+	white-space: nowrap;
+	text-shadow: 0px 1px 4px #000000;
+}
+
+.XHSFarmWinnerScore
+{
+	color: #ffd477;
+	font-size: 12px;
+	font-weight: bold;
+	letter-spacing: 0.5px;
+}
+
+/* The objective instance moves beside Farm only while both independent panels
+ * are actually open. The two custom UI roots never have to replace each other. */
+.XHSFarmLeaderboardHost.XHSObjectiveLeaderboardInstance.HasConcurrentLeaderboard .XHSFarmLeaderboard
+{
+	margin-right: 362px;
+}
+
+.XHSFarmLeaderboardHost.XHSObjectiveLeaderboardInstance.HasConcurrentLeaderboard .XHSFarmLeaderboardToggle
+{
+	margin-right: 344px;
+}
+
+.XHSFarmSupporterXPTotal
+{
+	width: 100%;
+	height: 30px;
+	flow-children: right;
+	padding: 7px 11px 0px 12px;
+	visibility: collapse;
+	background-color: gradient( linear, 0% 0%, 100% 0%, from( #101b2bea ), to( #07111de8 ) );
+	border-left: 1px solid #61d5ff38;
+	border-right: 1px solid #61d5ff38;
+	border-bottom: 1px solid #61d5ff22;
+}
+
+.XHSFarmSupporterXPTotal.IsVisible
+{
+	visibility: visible;
+}
+
+.XHSFarmSupporterXPTotalLabel
+{
+	width: fill-parent-flow( 1.0 );
+	color: #8faabe;
+	font-size: 10px;
+	font-weight: bold;
+	letter-spacing: 1.2px;
+	text-shadow: 0px 1px 2px #000000;
+}
+
+.XHSFarmSupporterXPTotalValue
+{
+	color: #ffd477;
+	font-size: 12px;
+	font-weight: bold;
+	letter-spacing: 0.5px;
+	text-align: right;
+	text-shadow: 0px 0px 5px #ffad3544, 0px 1px 2px #000000;
+}
+
+.XHSFarmLeaderboardHeaderAccent
+{
+	width: 4px;
+	height: 38px;
+	vertical-align: center;
+	margin-left: 8px;
+	background-color: gradient( linear, 0% 100%, 0% 0%, from( #ff9e26 ), to( #ffe09b ) );
+	box-shadow: fill #ffae4266 0px 0px 7px 0px;
+}
+
+.XHSFarmLeaderboardHeaderCopy
+{
+	width: 196px;
+	height: 100%;
+	margin-left: 10px;
+	padding-top: 10px;
+	flow-children: down;
+}
+
+.XHSFarmLeaderboardEyebrow
+{
+	color: #ffbe55;
+	font-size: 12px;
+	font-weight: bold;
+	letter-spacing: 2px;
+	text-shadow: 0px 1px 3px #000000;
+}
+
+.XHSFarmLeaderboardTitle
+{
+	margin-top: -1px;
+	color: #edf9ff;
+	font-family: titleFont, Radiance, FZKai-Z03, TH Sarabun New, YDYGO 540;
+	font-size: 20px;
+	font-weight: bold;
+	letter-spacing: 1px;
+	text-shadow: 0px 2px 4px #000000;
+}
+
+.XHSFarmLeaderboardCollapse
+{
+	width: 28px;
+	height: 100%;
+	background-color: none;
+	border: 0px solid transparent;
+	transition-property: brightness, pre-transform-scale2d;
+	transition-duration: 0.12s;
+}
+
+.XHSFarmLeaderboardCollapse:hover
+{
+	brightness: 1.7;
+	pre-transform-scale2d: 1.08;
+}
+
+.XHSFarmLeaderboardCollapse Label
+{
+	align: center center;
+	margin-top: 1px;
+	color: #91b9cf;
+	font-size: 13px;
+	text-shadow: 0px 1px 3px #000000;
+}
+
+.XHSFarmLeaderboardCollapse.IsCollapsed Label
+{
+	color: #ffd17d;
+}
+
+.XHSFarmLeaderboardLive
+{
+	width: 42px;
+	height: 100%;
+	flow-children: right;
+	vertical-align: center;
+	padding-top: 23px;
+}
+
+.XHSFarmLeaderboardLiveDot
+{
+	width: 7px;
+	height: 7px;
+	margin-top: 3px;
+	margin-right: 5px;
+	border-radius: 50%;
+	background-color: #ffb33f;
+	box-shadow: fill #ff9b33aa 0px 0px 7px 0px;
+	animation-name: XHSFarmLivePulse;
+	animation-duration: 1.15s;
+	animation-iteration-count: infinite;
+}
+
+.XHSFarmLeaderboardLive Label
+{
+	color: #ffd17d;
+	font-size: 11px;
+	font-weight: bold;
+	letter-spacing: 1px;
+	text-shadow: 0px 1px 3px #000000;
+}
+
+.XHSFarmLeaderboardColumnLabels
+{
+	width: 100%;
+	height: 24px;
+	flow-children: right;
+	padding: 5px 8px 0px 8px;
+	background-color: #030b14e8;
+	border-left: 1px solid #4abfe428;
+	border-right: 1px solid #4abfe428;
+}
+
+.XHSFarmLeaderboardColumnLabels Label
+{
+	color: #6f899d;
+	font-size: 10px;
+	font-weight: bold;
+	letter-spacing: 1px;
+	text-shadow: 0px 1px 2px #000000;
+}
+
+.XHSFarmLeaderboardColumnRank
+{
+	width: 35px;
+	text-align: center;
+}
+
+.XHSFarmLeaderboardColumnPlayer
+{
+	width: 150px;
+	margin-left: 45px;
+}
+
+.XHSFarmLeaderboardColumnProgress
+{
+	width: 58px;
+	text-align: right;
+}
+
+.XHSFarmLeaderboardRows
+{
+	width: 100%;
+	height: 64px;
+	padding-top: 4px;
+	padding-bottom: 4px;
+	overflow: noclip;
+	background-color: #02070dac;
+	border: 1px solid #4abfe428;
+	border-top: 0px solid transparent;
+	box-shadow: fill #00000094 0px 5px 14px 0px;
+	transition-property: height;
+	transition-duration: 0.24s;
+	transition-timing-function: ease-out;
+}
+
+.XHSFarmLeaderboard.IsCollapsed .XHSFarmWinnerCelebration,
+.XHSFarmLeaderboard.IsCollapsed .XHSFarmSupporterXPTotal,
+.XHSFarmLeaderboard.IsCollapsed .XHSFarmLeaderboardColumnLabels
+{
+	height: 0px;
+	visibility: collapse;
+	opacity: 0;
+}
+
+.XHSFarmLeaderboard.IsCollapsed .XHSFarmLeaderboardRows
+{
+	height: 42px;
+	visibility: visible;
+	opacity: 1;
+}
+
+.XHSFarmLeaderboard.IsCollapsed .XHSFarmLeaderboardRow
+{
+	visibility: collapse;
+	opacity: 0;
+}
+
+.XHSFarmLeaderboard.IsCollapsed .XHSFarmLeaderboardRow.IsLeader
+{
+	width: 316px;
+	height: 40px;
+	margin-left: 4px;
+	visibility: visible;
+	opacity: 1;
+}
+
+.XHSFarmLeaderboard.IsCollapsed .XHSFarmRank
+{
+	width: 30px;
+	padding-top: 8px;
+	font-size: 17px;
+}
+
+.XHSFarmLeaderboard.IsCollapsed .XHSFarmHeroFrame
+{
+	width: 46px;
+	height: 30px;
+}
+
+.XHSFarmLeaderboard.IsCollapsed .XHSFarmIdentity
+{
+	width: 135px;
+	margin-left: 7px;
+	padding-top: 3px;
+}
+
+.XHSFarmLeaderboard.IsCollapsed .XHSFarmPlayerName,
+.XHSFarmLeaderboard.IsCollapsed .XHSFarmPlayerStage
+{
+	width: 135px;
+}
+
+.XHSFarmLeaderboard.IsCollapsed .XHSFarmProgress
+{
+	width: 91px;
+	padding-top: 2px;
+}
+
+.XHSFarmLeaderboardWaiting
+{
+	align: center center;
+	color: #7890a3;
+	font-size: 11px;
+	font-weight: bold;
+	letter-spacing: 2px;
+	text-shadow: 0px 1px 3px #000000;
+	opacity: 0;
+	transition-property: opacity;
+	transition-duration: 0.18s;
+}
+
+.XHSFarmLeaderboardRows.IsWaiting .XHSFarmLeaderboardWaiting
+{
+	opacity: 1;
+}
+
+.XHSFarmLeaderboardRow
+{
+	width: 312px;
+	height: 50px;
+	margin-left: 6px;
+	ignore-parent-flow: true;
+	vertical-align: top;
+	flow-children: right;
+	overflow: noclip;
+	background-color: gradient( linear, 0% 0%, 100% 100%, from( #0a1825f5 ), color-stop( 0.68, #08131ff4 ), to( #050c15f7 ) );
+	border: 1px solid #4ebfe42b;
+	box-shadow: fill #00000080 0px 3px 8px 0px, inset #a8e9ff0b 0px 1px 0px 0px;
+	opacity: 0;
+	pre-transform-scale2d: 0.97;
+	transition-property: transform, opacity, pre-transform-scale2d, brightness, border, box-shadow;
+	transition-duration: 0.42s, 0.18s, 0.18s, 0.18s, 0.18s, 0.18s;
+	transition-timing-function: ease-in-out;
+}
+
+.XHSFarmLeaderboardRow.IsPresent
+{
+	opacity: 1;
+	pre-transform-scale2d: 1;
+}
+
+.XHSFarmLeaderboardRow.IsLocalPlayer
+{
+	background-color: gradient( linear, 0% 0%, 100% 100%, from( #0c2538f7 ), color-stop( 0.7, #092034f5 ), to( #071522f8 ) );
+	border: 1px solid #5dd8ff66;
+}
+
+.XHSFarmLeaderboardRow.IsLeader
+{
+	background-color: gradient( linear, 0% 0%, 100% 100%, from( #34230cf7 ), color-stop( 0.28, #172334f6 ), to( #08131ff7 ) );
+	border: 1px solid #ffc56080;
+	box-shadow: fill #00000090 0px 4px 10px 0px, inset #ffc96b15 0px 1px 0px 0px, fill #ffb74412 0px 0px 10px 0px;
+}
+
+.XHSFarmLeaderboardRow.IsReordering
+{
+	brightness: 1.35;
+	pre-transform-scale2d: 1.025;
+	border: 1px solid #bcefffaa;
+	box-shadow: fill #000000b0 0px 7px 14px 0px, fill #67d8ff2c 0px 0px 12px 0px;
+}
+
+.XHSFarmLeaderboardRow.IsMovingUp
+{
+	border: 1px solid #ffd171cc;
+	box-shadow: fill #000000b0 0px 7px 14px 0px, fill #ffbd492e 0px 0px 13px 0px;
+}
+
+.XHSFarmRowAccent
+{
+	width: 3px;
+	height: 100%;
+	background-color: #317b9b75;
+}
+
+.XHSFarmLeaderboardRow.IsLeader .XHSFarmRowAccent
+{
+	background-color: gradient( linear, 0% 100%, 0% 0%, from( #ff982b ), to( #ffe29a ) );
+	box-shadow: fill #ffb34855 0px 0px 5px 0px;
+}
+
+.XHSFarmRank
+{
+	width: 34px;
+	height: 100%;
+	padding-top: 12px;
+	color: #a9c0d1;
+	font-size: 20px;
+	font-weight: bold;
+	text-align: center;
+	text-shadow: 0px 2px 4px #000000;
+}
+
+.XHSFarmLeaderboardRow.IsLeader .XHSFarmRank
+{
+	color: #ffd77f;
+	text-shadow: 0px 0px 6px #ffb13c55, 0px 2px 4px #000000;
+}
+
+.XHSFarmHeroFrame
+{
+	width: 52px;
+	height: 36px;
+	vertical-align: center;
+	margin-left: 1px;
+	border: 1px solid #78cce34a;
+	background-color: #030910;
+	box-shadow: fill #000000a0 0px 2px 5px 0px;
+}
+
+.XHSFarmLeaderboardRow.IsLeader .XHSFarmHeroFrame
+{
+	border: 1px solid #ffc9678a;
+}
+
+.XHSFarmHeroImage
+{
+	width: 100%;
+	height: 100%;
+	saturation: 0.92;
+	brightness: 0.92;
+}
+
+.XHSFarmLeaderboardRow.IsDisconnected .XHSFarmHeroImage
+{
+	saturation: 0.15;
+	brightness: 0.38;
+}
+
+.XHSFarmIdentity
+{
+	width: 142px;
+	height: 100%;
+	margin-left: 8px;
+	padding-top: 8px;
+	flow-children: down;
+}
+
+.XHSFarmPlayerName
+{
+	width: 116px;
+	height: 20px;
+	color: #e8f6ff;
+	font-size: 15px;
+	font-weight: semi-bold;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	text-shadow: 0px 1px 3px #000000;
+}
+
+.XHSFarmPlayerStage
+{
+	width: 142px;
+	height: 18px;
+	margin-top: -1px;
+	color: #7fa8c1;
+	font-size: 12px;
+	font-weight: bold;
+	letter-spacing: 0.5px;
+	text-overflow: shrink;
+	white-space: nowrap;
+	text-shadow: 0px 1px 2px #000000;
+}
+
+.XHSFarmLeaderboardRow.IsLeader .XHSFarmPlayerStage
+{
+	color: #ffc766;
+}
+
+.XHSFarmProgress
+{
+	width: 51px;
+	height: 100%;
+	padding-top: 7px;
+	padding-right: 8px;
+	flow-children: down;
+}
+
+.XHSFarmKills
+{
+	width: 100%;
+	height: 23px;
+	color: #f3fbff;
+	font-size: 18px;
+	font-weight: bold;
+	text-align: right;
+	text-shadow: 0px 1px 3px #000000;
+}
+
+.XHSFarmKillsSuffix
+{
+	width: 100%;
+	height: 14px;
+	margin-top: -2px;
+	color: #6f8da2;
+	font-size: 9px;
+	font-weight: bold;
+	letter-spacing: 1px;
+	text-align: right;
+	text-shadow: 0px 1px 2px #000000;
+}
+
+.XHSFarmRankDelta
+{
+	width: 45px;
+	height: 18px;
+	ignore-parent-flow: true;
+	horizontal-align: right;
+	vertical-align: top;
+	margin-top: -9px;
+	margin-right: 5px;
+	color: #8dffbc;
+	font-size: 11px;
+	font-weight: bold;
+	text-align: right;
+	text-shadow: 0px 1px 3px #000000;
+	opacity: 0;
+	transform: translateY( 3px );
+	transition-property: opacity, transform;
+	transition-duration: 0.16s;
+}
+
+.XHSFarmRankDelta.IsVisible
+{
+	opacity: 1;
+	transform: translateY( 0px );
+}
+
+.XHSFarmRankDelta.IsDown
+{
+	color: #ff8d85;
+}
+
+.AspectRatio16x10 .XHSFarmLeaderboard
+{
+	margin-right: 14px;
+	pre-transform-scale2d: 0.94;
+}
+
+.AspectRatio16x10 .XHSFarmLeaderboard.IsVisible
+{
+	pre-transform-scale2d: 0.96;
+}
+
+@keyframes 'XHSFarmLivePulse'
+{
+	0% { opacity: 0.45; pre-transform-scale2d: 0.8; }
+	50% { opacity: 1; pre-transform-scale2d: 1.08; }
+	100% { opacity: 0.45; pre-transform-scale2d: 0.8; }
+}
+
+@keyframes 'XHSFarmWinnerGlow'
+{
+	0% { brightness: 1; box-shadow: inset #ffbd4715 0px 0px 8px 0px; }
+	50% { brightness: 1.35; box-shadow: inset #ffcf6470 0px 0px 18px 0px; }
+	100% { brightness: 1; box-shadow: inset #ffbd4715 0px 0px 8px 0px; }
+}
+
+@keyframes 'XHSFarmWinnerCrownPulse'
+{
+	0% { pre-transform-scale2d: 0.92; transform: rotateZ( -5deg ); }
+	50% { pre-transform-scale2d: 1.08; transform: rotateZ( 5deg ); }
+	100% { pre-transform-scale2d: 0.92; transform: rotateZ( -5deg ); }
+}

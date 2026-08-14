@@ -1,4 +1,5 @@
 modifier_boss_stun = class({})
+modifier_boss_stun.XHS_LINK_CLIENT = true
 
 function modifier_boss_stun:OnCreated(keys) 
 

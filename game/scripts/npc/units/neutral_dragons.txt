@@ -1,0 +1,237 @@
+"DOTAUnits"
+{
+	"Version"	"1"
+
+
+	//=================================================================================
+	// Creep Level 2: Green Dragon Form
+	//=================================================================================
+	"npc_dota_creature_green_dragon"
+	{										
+		// General
+		//----------------------------------------------------------------
+		"Model"						"models/heroes/dragon_knight/dragon_knight_dragon.vmdl"	// Dragon Knight form; default material group is green.
+		"BaseClass"					"npc_dota_creature"
+		"SoundSet"					"Hero_Phoenix"
+		"Level"						"1"
+		"ConsideredHero"			"1"
+		"ModelScale" 				"1.00"
+		"UnitLabel"					"green_dragon"
+		"UseAI"						"1"
+
+		// Abilities
+		//----------------------------------------------------------------
+		"Ability1"					""			// Ability 1
+		"Ability2"					""			// Ability 2
+		"Ability3"					""			// Ability 3
+		"Ability4"					""			// Ability 4
+
+		// Armor
+		//----------------------------------------------------------------
+		"ArmorPhysical"				"40"		// Physical protection.
+		"MagicalResistance"			"25"		// Magical protection.
+
+		// Attack
+		//----------------------------------------------------------------
+		"AttackCapabilities"		"DOTA_UNIT_CAP_RANGED_ATTACK"
+		"AttackDamageMin"			"352"		// Damage range min. Reduced by an additional 15%.
+		"AttackDamageMax"			"376"		// Damage range max. Reduced by an additional 15%.
+		"AttackRate"				"0.95"		// Speed of attack.
+		"AttackAnimationPoint"		"0.35"		// Normalized time in animation cycle to attack.
+		"AttackAcquisitionRange"	"800"		// Range within a target can be acquired.
+		"AttackRange"				"600"		// Range within a target can be attacked.
+		"ProjectileModel"			"particles/units/heroes/hero_phoenix/phoenix_base_attack.vpcf"			// Particle system model for projectile.
+		"ProjectileSpeed"			"1000"			// Speed of projectile.		   
+
+		// Bounds
+		//----------------------------------------------------------------
+		"RingRadius"				"105"
+		"HealthBarOffset"			"225"
+		"BoundsHullName"			"DOTA_HULL_SIZE_REGULAR"			// Hull type used for navigation/locomotion.
+
+		// Bounty
+		//----------------------------------------------------------------
+		"BountyXP"					"704"		// Experience earn.
+		"BountyGoldMin"				"8448"		// Gold earned min. Reduced by 20% for creep level 2.
+		"BountyGoldMax"				"9152"		// Gold earned max. Reduced by 20% for creep level 2.
+
+		// Movement
+		//----------------------------------------------------------------
+		"MovementCapabilities"		"DOTA_UNIT_CAP_MOVE_GROUND"
+		"MovementSpeed"				"370"		// Speed.
+
+		// Status
+		//----------------------------------------------------------------
+		"StatusHealth"				"6533"		// Base health. Level 1 Phoenix balance: -20%.
+		"StatusHealthRegen"			"44"		// Health regeneration rate.
+		"StatusMana"				"0"			// Base mana.
+		"StatusManaRegen"			"0"			// Mana regeneration rate.		 
+
+		// Vision
+		//----------------------------------------------------------------
+		"VisionDaytimeRange"		"1200"		// Range of vision during day light.
+		"VisionNighttimeRange"		"800"		// Range of vision at night time.
+
+		// Team
+		//----------------------------------------------------------------
+		"TeamName"					"DOTA_TEAM_BADGUYS"							// Team name.
+		"CombatClassAttack"			"DOTA_COMBAT_CLASS_ATTACK_BASIC"
+		"CombatClassDefend"			"DOTA_COMBAT_CLASS_DEFEND_HERO"
+		"UnitRelationshipClass"		"DOTA_NPC_UNIT_RELATIONSHIP_TYPE_DEFAULT"
+	}
+
+	//=================================================================================
+	// Creep Level 3: Red Dragon Form
+	//=================================================================================
+	"npc_dota_creature_red_dragon"
+	{										
+		// General
+		//----------------------------------------------------------------
+		"Model"						"models/heroes/dragon_knight/dragon_knight_dragon.vmdl"	// Dragon Knight form; material group 1 is red.
+		"BaseClass"					"npc_dota_creature"
+		"SoundSet"					"Hero_Phoenix"
+		"Level"						"1"
+		"ConsideredHero"			"1"
+		"ModelScale" 				"1.40"
+		"UnitLabel"					"red_dragon"
+		"UseAI"						"1"
+
+		// Abilities
+		//----------------------------------------------------------------
+		"Ability1"					""			// Ability 1
+		"Ability2"					""			// Ability 2
+		"Ability3"					""			// Ability 3
+		"Ability4"					""			// Ability 4
+
+		// Armor
+		//----------------------------------------------------------------
+		"ArmorPhysical"				"60"		// Physical protection.
+		"MagicalResistance"			"25"		// Magical protection.
+
+		// Attack
+		//----------------------------------------------------------------
+		"AttackCapabilities"		"DOTA_UNIT_CAP_RANGED_ATTACK"
+		"AttackDamageMin"			"1307"		// Damage range min. Reduced by an additional 15%.
+		"AttackDamageMax"			"1325"		// Damage range max. Reduced by an additional 15%.
+		"AttackRate"				"0.9"		// Speed of attack.
+		"AttackAnimationPoint"		"0.35"		// Normalized time in animation cycle to attack.
+		"AttackAcquisitionRange"	"800"		// Range within a target can be acquired.
+		"AttackRange"				"600"		// Range within a target can be attacked.
+		"ProjectileModel"			"particles/units/heroes/hero_phoenix/phoenix_base_attack.vpcf"			// Particle system model for projectile.
+		"ProjectileSpeed"			"1000"			// Speed of projectile.		   
+
+		// Bounds
+		//----------------------------------------------------------------
+		"RingRadius"				"130"
+		"HealthBarOffset"			"280"
+		"BoundsHullName"			"DOTA_HULL_SIZE_REGULAR"			// Hull type used for navigation/locomotion.
+
+		// Bounty
+		//----------------------------------------------------------------
+		"BountyXP"					"1540"		// Experience earn.
+		"BountyGoldMin"				"14960"		// Gold earned min.
+		"BountyGoldMax"				"15840"		// Gold earned max.
+
+		// Movement
+		//----------------------------------------------------------------
+		"MovementCapabilities"		"DOTA_UNIT_CAP_MOVE_GROUND"
+		"MovementSpeed"				"370"		// Speed.
+
+		// Status
+		//----------------------------------------------------------------
+		"StatusHealth"				"20790"		// Base health. Reduced by 30% for balancing.
+		"StatusHealthRegen"			"15"		// Health regeneration rate scaled with the 30% HP reduction.
+		"StatusMana"				"0"			// Base mana.
+		"StatusManaRegen"			"0"			// Mana regeneration rate.		 
+
+		// Vision
+		//----------------------------------------------------------------
+		"VisionDaytimeRange"		"1200"		// Range of vision during day light.
+		"VisionNighttimeRange"		"800"		// Range of vision at night time.
+
+		// Team
+		//----------------------------------------------------------------
+		"TeamName"					"DOTA_TEAM_BADGUYS"							// Team name.
+		"CombatClassAttack"			"DOTA_COMBAT_CLASS_ATTACK_BASIC"
+		"CombatClassDefend"			"DOTA_COMBAT_CLASS_DEFEND_HERO"
+		"UnitRelationshipClass"		"DOTA_NPC_UNIT_RELATIONSHIP_TYPE_DEFAULT"
+
+	}
+
+	//=================================================================================
+	// Creep Level 4: Blue Dragon Form
+	//=================================================================================
+	"npc_dota_creature_blue_dragon"
+	{										
+		// General
+		//----------------------------------------------------------------
+		"Model"						"models/heroes/dragon_knight/dragon_knight_dragon.vmdl"	// Dragon Knight form; material group 2 is blue.
+		"BaseClass"					"npc_dota_creature"
+		"SoundSet"					"Hero_Phoenix"
+		"Level"						"1"
+		"ConsideredHero"			"1"
+		"ModelScale" 				"1.55"
+		"UnitLabel"					"blue_dragon"
+		"UseAI"						"1"
+
+		// Abilities
+		//----------------------------------------------------------------
+		"Ability1"					""			// Ability 1
+		"Ability2"					""			// Ability 2
+		"Ability3"					""			// Ability 3
+		"Ability4"					""			// Ability 4
+
+		// Armor
+		//----------------------------------------------------------------
+		"ArmorPhysical"				"100"		// Physical protection.
+		"MagicalResistance"			"25"		// Magical protection.
+
+		// Attack
+		//----------------------------------------------------------------
+		"AttackCapabilities"		"DOTA_UNIT_CAP_RANGED_ATTACK"
+		"AttackDamageMin"			"3545"		// Damage range min. Reduced by an additional 15%.
+		"AttackDamageMax"			"3575"		// Damage range max. Reduced by an additional 15%.
+		"AttackRate"				"0.9"		// Speed of attack.
+		"AttackAnimationPoint"		"0.35"		// Normalized time in animation cycle to attack.
+		"AttackAcquisitionRange"	"800"		// Range within a target can be acquired.
+		"AttackRange"				"600"		// Range within a target can be attacked.
+		"ProjectileModel"			"particles/units/heroes/hero_phoenix/phoenix_base_attack.vpcf"			// Particle system model for projectile.
+		"ProjectileSpeed"			"1000"			// Speed of projectile.		   
+
+		// Bounds
+		//----------------------------------------------------------------
+		"RingRadius"				"130"
+		"HealthBarOffset"			"280"
+		"BoundsHullName"			"DOTA_HULL_SIZE_REGULAR"			// Hull type used for navigation/locomotion.
+
+		// Bounty
+		//----------------------------------------------------------------
+		"BountyXP"					"1540"		// Experience earn.
+		"BountyGoldMin"				"32560"		// Gold earned min.
+		"BountyGoldMax"				"33440"		// Gold earned max.
+
+		// Movement
+		//----------------------------------------------------------------
+		"MovementCapabilities"		"DOTA_UNIT_CAP_MOVE_GROUND"
+		"MovementSpeed"				"370"		// Speed.
+
+		// Status
+		//----------------------------------------------------------------
+		"StatusHealth"				"37785"		// Base health. Reduced by 25%.
+		"StatusHealthRegen"			"22"		// Health regeneration rate.
+		"StatusMana"				"0"			// Base mana.
+		"StatusManaRegen"			"0"			// Mana regeneration rate.		 
+
+		// Vision
+		//----------------------------------------------------------------
+		"VisionDaytimeRange"		"1200"		// Range of vision during day light.
+		"VisionNighttimeRange"		"800"		// Range of vision at night time.
+
+		// Team
+		//----------------------------------------------------------------
+		"TeamName"					"DOTA_TEAM_BADGUYS"							// Team name.
+		"CombatClassAttack"			"DOTA_COMBAT_CLASS_ATTACK_BASIC"
+		"CombatClassDefend"			"DOTA_COMBAT_CLASS_DEFEND_HERO"
+		"UnitRelationshipClass"		"DOTA_NPC_UNIT_RELATIONSHIP_TYPE_DEFAULT"
+	}
+}

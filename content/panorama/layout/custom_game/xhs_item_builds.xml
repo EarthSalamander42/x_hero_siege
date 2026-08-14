@@ -1,0 +1,56 @@
+<root>
+	<styles>
+		<include src="s2r://panorama/styles/dotastyles.vcss_c" />
+		<include src="file://{resources}/styles/custom_game/xhs_item_builds.css" />
+	</styles>
+	<scripts>
+		<include src="file://{resources}/scripts/custom_game/xhs_item_builds.js" />
+	</scripts>
+
+	<Panel>
+		<Panel id="XHSItemBuildRoot" class="XHSItemBuildRoot" hittest="true">
+		<Panel id="XHSItemBuildHeader" class="XHSItemBuildHeader">
+			<Panel class="XHSItemBuildTitleBlock">
+				<Label id="XHSItemBuildTitle" class="XHSItemBuildTitle" text="#xhs_item_builds_title" />
+				<Label id="XHSItemBuildHero" class="XHSItemBuildHero" text="" />
+			</Panel>
+			<Label id="XHSItemBuildSaveState" class="XHSItemBuildSaveState" text="#xhs_item_builds_loading" />
+		</Panel>
+
+		<Panel id="XHSItemBuildToolbar" class="XHSItemBuildToolbar">
+			<Button id="XHSItemBuildPrevious" class="XHSItemBuildIconButton"><Label text="‹" /></Button>
+			<Button id="XHSItemBuildSelector" class="XHSItemBuildSelector"><Label id="XHSItemBuildSelectorLabel" text="" /></Button>
+			<Button id="XHSItemBuildNext" class="XHSItemBuildIconButton"><Label text="›" /></Button>
+			<Button id="XHSItemBuildEdit" class="XHSItemBuildActionButton"><Label id="XHSItemBuildEditLabel" text="#xhs_item_builds_edit" /></Button>
+		</Panel>
+
+		<Panel id="XHSItemBuildManageToolbar" class="XHSItemBuildManageToolbar">
+			<Button id="XHSItemBuildNew" class="XHSItemBuildSmallButton"><Label text="#xhs_item_builds_new" /></Button>
+			<Button id="XHSItemBuildRename" class="XHSItemBuildSmallButton"><Label text="#xhs_item_builds_rename" /></Button>
+			<Button id="XHSItemBuildDelete" class="XHSItemBuildSmallButton Danger"><Label text="#xhs_item_builds_delete" /></Button>
+		</Panel>
+
+		<Panel id="XHSItemBuildSections" class="XHSItemBuildSections" />
+
+		<Panel id="XHSItemBuildCatalog" class="XHSItemBuildCatalog">
+			<Panel class="XHSItemBuildCatalogHeader">
+				<Label id="XHSItemBuildCatalogTitle" text="#xhs_item_builds_add_item" />
+				<Button id="XHSItemBuildCatalogClose" class="XHSItemBuildCatalogClose"><Label text="×" /></Button>
+			</Panel>
+			<TextEntry id="XHSItemBuildSearch" class="XHSItemBuildSearch" placeholder="#xhs_item_builds_search" />
+			<Panel id="XHSItemBuildCatalogItems" class="XHSItemBuildCatalogItems" />
+		</Panel>
+
+		<Panel id="XHSItemBuildNameDialog" class="XHSItemBuildNameDialog">
+			<Panel class="XHSItemBuildNameDialogCard">
+				<Label id="XHSItemBuildNameDialogTitle" class="XHSItemBuildNameDialogTitle" text="#xhs_item_builds_name" />
+				<TextEntry id="XHSItemBuildNameEntry" class="XHSItemBuildNameEntry" maxchars="32" />
+				<Panel class="XHSItemBuildNameDialogActions">
+					<Button id="XHSItemBuildNameCancel" class="XHSItemBuildSmallButton"><Label text="#xhs_item_builds_cancel" /></Button>
+					<Button id="XHSItemBuildNameConfirm" class="XHSItemBuildSmallButton Primary"><Label text="#xhs_item_builds_confirm" /></Button>
+				</Panel>
+			</Panel>
+		</Panel>
+		</Panel>
+	</Panel>
+</root>

@@ -43,6 +43,10 @@ _G.ZONE_STAR_CRITERIA_KILLS            = 2
 _G.ZONE_STAR_CRITERIA_QUEST_COMPLETE   = 3
 
 -- X Hero Siege
+_G.XHS_GAMEMODE_CLASSIC                = 1
+_G.XHS_GAMEMODE_REBORN                 = 2
+_G.XHS_GAMEMODE_ACTIVE                 = XHS_GAMEMODE_REBORN
+
 _G.PREGAMETIME                         = 90.0
 _G.SPECIAL_ARENA_DURATION              = 120.0
 _G.MAGTHERIDON                         = 0
@@ -60,12 +64,72 @@ _G.SOGAT_ARTIFACT_PICKED               = false
 _G.DOOM_ARTIFACT_MERGED                = false
 _G.MAGNATAURS_TO_KILL                  = 1
 
-if IsInToolsMode() then
-	_G.PREGAMETIME = 15.0
+function GetXHSMagtheridonKillLimit(difficulty)
+	if difficulty == nil and GameRules ~= nil then
+		difficulty = GameRules:GetCustomGameDifficulty()
+	end
+
+	difficulty = tonumber(difficulty) or 1
+
+	local limits = {
+		[0] = 1,
+		[1] = 1,
+		[2] = 2,
+		[3] = 4,
+		[4] = 4,
+		[5] = 6,
+	}
+
+	return limits[difficulty] or 1
 end
 
-if GetMapName() == "x_hero_siege_4" then
-	_G.CREEP_LANES_TYPE = 2
+function GetXHSGromVanguardKillLimit(difficulty)
+	if difficulty == nil and GameRules ~= nil then
+		difficulty = GameRules:GetCustomGameDifficulty()
+	end
+
+	difficulty = tonumber(difficulty) or 1
+
+	local limits = {
+		[0] = 64,
+		[1] = 64,
+		[2] = 88,
+		[3] = 120,
+		[4] = 144,
+		[5] = 184,
+	}
+
+	return limits[difficulty] or limits[1]
+end
+
+function GetXHSActivePhaseOneLaneCount()
+	local activeLanes = 0
+	for lane = 1, 8 do
+		if CREEP_LANES ~= nil and CREEP_LANES[lane] ~= nil and CREEP_LANES[lane][1] == 1 then
+			activeLanes = activeLanes + 1
+		end
+	end
+	return activeLanes
+end
+
+function GetXHSDestroyerMagnataurKillLimit(difficulty)
+	local override = tonumber(_G.XHS_DESTROYER_MAGNATAUR_KILL_LIMIT_OVERRIDE)
+	if override ~= nil and override > 0 then
+		return math.max(1, math.floor(override))
+	end
+
+	if difficulty == nil and GameRules ~= nil then
+		difficulty = GameRules:GetCustomGameDifficulty()
+	end
+
+	difficulty = tonumber(difficulty) or 1
+
+	local activeLanes = GetXHSActivePhaseOneLaneCount()
+	return math.max(1, (MAGNATAURS_TO_KILL or 1) * activeLanes * difficulty)
+end
+
+if IsInToolsMode() then
+	_G.PREGAMETIME = 15.0
 end
 
 _G.BT_ENABLED = 1
@@ -99,15 +163,31 @@ CREEP_LANES[6] = { 0, 1, 1 }
 CREEP_LANES[7] = { 0, 1, 1 }
 CREEP_LANES[8] = { 0, 1, 1 }
 
-PLAYER_COLORS = {}                   -- Stores individual player colors
-PLAYER_COLORS[0] = { 200, 0, 0 }     --Red
-PLAYER_COLORS[1] = { 0, 50, 200 }    --Blue
-PLAYER_COLORS[2] = { 0, 255, 255 }   --Cyan
-PLAYER_COLORS[3] = { 100, 0, 100 }   --Purple
-PLAYER_COLORS[4] = { 255, 255, 0 }   --Yellow
-PLAYER_COLORS[5] = { 255, 150, 0 }   --Orange
-PLAYER_COLORS[6] = { 0, 125, 0 }     --Green (Dark)
-PLAYER_COLORS[7] = { 255, 100, 255 } --Pink
+PLAYER_COLORS = {}                    -- Stores individual player colors
+PLAYER_COLORS[0] = { 0, 50, 200 }     --Blue
+PLAYER_COLORS[1] = { 0, 255, 255 }    --Cyan
+PLAYER_COLORS[2] = { 100, 0, 100 }    --Purple
+PLAYER_COLORS[3] = { 255, 255, 0 }    --Yellow
+PLAYER_COLORS[4] = { 255, 150, 0 }    --Orange
+PLAYER_COLORS[5] = { 255, 100, 255 }  --Pink
+PLAYER_COLORS[6] = { 163, 176, 0 }    --Olive
+PLAYER_COLORS[7] = { 101, 217, 247 }  --Light Blue
+PLAYER_COLORS[8] = { 0, 125, 0 }      --Green (Dark)
+PLAYER_COLORS[9] = { 164, 105, 0 }    --Brown
+PLAYER_COLORS[10] = { 120, 255, 80 }  --Light Green
+PLAYER_COLORS[11] = { 180, 100, 255 } --Light Purple
+PLAYER_COLORS[12] = { 255, 210, 80 }  --Gold
+PLAYER_COLORS[13] = { 80, 255, 190 }  --Mint
+PLAYER_COLORS[14] = { 255, 110, 170 } --Rose
+PLAYER_COLORS[15] = { 160, 210, 255 } --Sky
+PLAYER_COLORS[16] = { 130, 150, 170 } --Steel
+PLAYER_COLORS[17] = { 210, 130, 80 }  --Copper
+PLAYER_COLORS[18] = { 120, 90, 60 }   --Bronze
+PLAYER_COLORS[19] = { 210, 255, 120 } --Lime
+PLAYER_COLORS[20] = { 255, 150, 210 } --Light Pink
+PLAYER_COLORS[21] = { 100, 220, 220 } --Teal
+PLAYER_COLORS[22] = { 190, 190, 255 } --Lavender
+PLAYER_COLORS[23] = { 230, 230, 230 } --Silver
 
 HEROLIST = {}
 HEROLIST[1] = "enchantress"       -- Dryad
@@ -138,20 +218,6 @@ HEROLIST[25] = "nevermore"        -- Banehallow
 HEROLIST[26] = "brewmaster"       -- Pandaren Brewmaster
 HEROLIST[27] = "warlock"          -- Archimonde
 HEROLIST[28] = "razor"            -- Ghost Revenant
--- DOTA 2
-HEROLIST[29] = "axe"
-HEROLIST[30] = "monkey_king"
-HEROLIST[31] = "medusa"
-HEROLIST[32] = "doom_bringer"
-HEROLIST[33] = "bristleback"
-HEROLIST[34] = "leshrac"
-HEROLIST[35] = "naga_siren"
-HEROLIST[36] = "magnataur"
-if IsInToolsMode() then
-	HEROLIST[37] = "troll_warlord"
-	HEROLIST[38] = "snapfire"
-	HEROLIST[39] = "void_spirit"
-end
 
 HEROLIST_VIP = {}
 HEROLIST_VIP[1] = "slardar"       -- Centurion
@@ -237,7 +303,9 @@ AbilitiesHeroes_XX = {
 	npc_dota_hero_crystal_maiden = { { "holdout_rain_of_ice", 2 } },
 	npc_dota_hero_dragon_knight = { { "holdout_knights_armor", 6 } },
 	npc_dota_hero_elder_titan = { { "holdout_shockwave_20", 0 }, { "holdout_war_stomp_20", 1 }, { "holdout_roar_20", 4 }, { "holdout_reincarnation", 6 } },
-	npc_dota_hero_enchantress = { { "neutral_spell_immunity", 6 } },
+	-- Keep the level-20 immunity in one of the six HUD-visible slots. Trueshot
+	-- Aura moves to the extra slot but remains enabled and continues to apply.
+	npc_dota_hero_enchantress = { { "neutral_spell_immunity", 5 } },
 	npc_dota_hero_invoker = { { "holdout_rain_of_fire", 2 } },
 	npc_dota_hero_juggernaut = { { "brewmaster_primal_split", 2 } },
 	npc_dota_hero_lich = { { "holdout_frost_chaos", 4 } },
@@ -286,7 +354,7 @@ _G.innate_abilities = {
 	"holdout_magic_shield",
 	"holdout_anubarak_claw",
 	"undead_burrow",
-	"ogre_magi_bloodlust",
+	"rifleman_bloodlust",
 	"holdout_beastmaster_misc",
 	"holdout_frostmourne_hungers",
 	"holdout_battlecry_alt2",
@@ -308,7 +376,8 @@ _G.innate_abilities = {
 	"pugna_decrepify",
 	"holdout_giant_form",
 	"holdout_monkey_king_bar",
-	"holdout_stitch",
+	"muradin_true_strike",
+	"holdout_soul_harvest",
 	"troll_warlord_berserkers_rage",
 	"holdout_lich_king_effects",
 	"wisp_pick_random_hero",
@@ -380,11 +449,6 @@ _G.multiplayer_abilities_cast = {
 }
 
 MODIFIER_ITEMS_WITH_LEVELS = {}
-MODIFIER_ITEMS_WITH_LEVELS["modifier_orb_of_darkness_active"] = {
-	"item_bracer_of_the_void",
-	"item_orb_of_darkness2",
-	"item_orb_of_darkness",
-}
 MODIFIER_ITEMS_WITH_LEVELS["modifier_orb_of_lightning_active"] = {
 	"item_celestial_claws",
 	"item_orb_of_lightning2",
@@ -404,6 +468,7 @@ XHS_BOSSES_TABLE = {
 	npc_dota_hero_illidan = {
 		doors_to_open = { "door_balanar", "door_balanar2" },
 		obstructions_to_disable = { "obstruction_balanar" },
+		camera_focus_door = "door_balanar",
 		death_animation = { duration = 6.0, activity = ACT_DOTA_DIE, rate = 0.35 },
 		death_sound = "skeleton_king_wraith_death_long_09",
 		death_no_draw_delay = 12.0,
@@ -412,18 +477,16 @@ XHS_BOSSES_TABLE = {
 	npc_dota_hero_balanar = {
 		doors_to_open = { "door_proudmoore", "door_proudmoore2" },
 		obstructions_to_disable = { "obstruction_proudmoore" },
+		camera_focus_door = "door_proudmoore",
 		death_animation = { duration = 6.0, activity = ACT_DOTA_DIE, rate = 0.3 },
 		death_sound = "skeleton_king_wraith_death_long_09",
 		death_no_draw_delay = 12.0,
 		four_bosses_kill_count = true,
 	},
 	npc_dota_hero_proudmoore = {
-		doors_to_open = { "door_proudmoore3" },
-		obstructions_to_disable = { "obstruction_proudmoore2" },
 		death_animation = { duration = 6.0, activity = ACT_DOTA_DIE, rate = 0.4 },
 		death_sound = "skeleton_king_wraith_death_long_09",
 		death_no_draw_delay = 12.0,
-		four_bosses_kill_count = true,
 	},
 	npc_dota_hero_arthas = {
 		death_animation = { duration = 6.0, activity = ACT_DOTA_DIE, rate = 0.1 },
@@ -448,6 +511,14 @@ XHS_BOSSES_TABLE = {
 		refresh_players = true,
 		func_next_delay = 17.0,
 		func_next = function() StartSpiritMasterArena() end
+	},
+	npc_dota_boss_spirit_master = {
+		death_animation = { duration = 10.0, activity = ACT_DOTA_DIE, rate = 0.3 },
+		death_sound = "razor_raz_death_04",
+		death_no_draw_delay = 10.0,
+		refresh_players = true,
+		func_next_delay = 14.0,
+		func_next = function() EndGame() end
 	},
 	npc_dota_boss_spirit_master_storm = {
 		death_animation = { duration = 10.0, activity = ACT_DOTA_DIE, rate = 0.3 },
@@ -488,6 +559,8 @@ XHS_FARM_EVENT_DURATION = 180.0
 XHS_GLOBAL_RESPAWN_TIME = 5.0
 XHS_HERO_VISION = 2000
 XHS_RAMERO_BARISTOL_TIME = 120.0
+XHS_RAMERO_BARISTOL_KILLS_REQUIRED = 300
+XHS_SOGAT_KILLS_REQUIRED = 500
 _G.XHS_STARTING_GOLD = { 10000, 5000, 4000, 3000, 2000 }
 SPIRIT_MASTER_KILLED_BOSS_COUNT = 0
 

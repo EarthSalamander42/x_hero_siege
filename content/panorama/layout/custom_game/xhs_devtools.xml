@@ -1,0 +1,178 @@
+<root>
+	<styles>
+		<include src="s2r://panorama/styles/custom_game/xhs_devtools.css" />
+	</styles>
+
+	<scripts>
+		<include src="s2r://panorama/scripts/custom_game/xhs_devtools.js" />
+	</scripts>
+
+	<Panel class="XHSDevToolsRoot" hittest="false" hittestchildren="true">
+		<Panel id="XHSDevToolsRoot" class="XHSDevToolsHost" hittest="false" hittestchildren="true">
+			<Button id="XHSDevToolsCompactToggle" class="XHSDevToolsCompactToggle" onactivate="XHSDevToolsToggleCompactHUD();">
+				<Label id="XHSDevToolsCompactToggleLabel" text="&#x203A;" />
+			</Button>
+
+			<Panel id="XHSDevToolsButtons" hittest="false" hittestchildren="true">
+				<Panel id="XHSDevToolsTimescale" class="XHSDevToolsTimescale" />
+
+				<Button id="XHSDevToolsToggle" class="XHSDevToolsToggle" onactivate="XHSDevToolsTogglePanel();">
+					<Label text="DEV" />
+				</Button>
+			</Panel>
+
+
+			<Panel id="XHSDevToolsSpectator" class="XHSDevToolsSpectator" hittest="true" hittestchildren="true">
+				<Button id="XHSDevToolsSpectatorPrevious" class="XHSDevToolsSpectatorArrow">
+					<Label text="‹" />
+				</Button>
+
+				<DOTAHeroImage
+					id="XHSDevToolsSpectatorHero"
+					class="XHSDevToolsSpectatorHero"
+					heroname="npc_dota_hero_wisp"
+					heroimagestyle="icon" />
+
+				<Panel id="XHSDevToolsSpectatorIdentity" class="XHSDevToolsSpectatorIdentity" hittest="true">
+					<Label id="XHSDevToolsSpectatorName" class="XHSDevToolsSpectatorName" text="WAITING FOR AI ALLIES" />
+					<Panel class="XHSDevToolsSpectatorMeta">
+						<Label id="XHSDevToolsSpectatorCounter" class="XHSDevToolsSpectatorCounter" text="0 / 0" />
+						<Label class="XHSDevToolsSpectatorSeparator" text="•" />
+						<Label id="XHSDevToolsSpectatorGold" class="XHSDevToolsSpectatorGold" text="0 GOLD" />
+					</Panel>
+				</Panel>
+
+				<Button id="XHSDevToolsSpectatorFollow" class="XHSDevToolsSpectatorFollow">
+					<Label id="XHSDevToolsSpectatorFollowLabel" text="FOLLOW" />
+				</Button>
+
+				<Button id="XHSDevToolsSpectatorNext" class="XHSDevToolsSpectatorArrow">
+					<Label text="›" />
+				</Button>
+			</Panel>
+
+			<Panel id="XHSDevToolsPerformance" class="XHSDevToolsPerformance" hittest="false" hittestchildren="true">
+				<Button id="XHSDevToolsPerformanceHeader" class="XHSDevToolsPerformanceHeader" hittest="true" hittestchildren="false" onactivate="XHSDevToolsTogglePerformance();">
+					<Panel class="XHSDevToolsPerformanceCompactMetric">
+						<Label class="CompactName" text="CLIENT" />
+						<Label id="XHSDevToolsLocalFPS" class="CompactValue" text="--" />
+					</Panel>
+					<Panel class="XHSDevToolsPerformanceCompactMetric">
+						<Label class="CompactName" text="SIM" />
+						<Panel class="CompactValueStack">
+							<Label id="XHSDevToolsServerHealth" class="CompactValue" text="--" />
+							<Label id="XHSDevToolsServerHealthLow" class="CompactExtreme" text="LOW --" />
+						</Panel>
+					</Panel>
+					<Panel class="XHSDevToolsPerformanceCompactMetric">
+						<Label class="CompactName" text="CREEPS" />
+						<Panel class="CompactValueStack">
+							<Label id="XHSDevToolsCreepCount" class="CompactValue" text="--" />
+							<Label id="XHSDevToolsCreepCountHigh" class="CompactExtreme" text="HIGH --" />
+						</Panel>
+					</Panel>
+					<Label class="XHSDevToolsPerformanceArrow CollapsedArrow" text="+" />
+					<Label class="XHSDevToolsPerformanceArrow ExpandedArrow" text="-" />
+				</Button>
+
+				<Panel id="XHSDevToolsPerformanceColumnControls" class="XHSDevToolsPerformanceColumnControls">
+					<Label class="XHSDevToolsPerformanceColumnControlsTitle" text="COLUMNS" />
+					<Button id="XHSPerfColumnToggleClient" class="XHSDevToolsPerformanceColumnToggle Active"><Label text="CLIENT" /></Button>
+					<Button id="XHSPerfColumnToggleServer" class="XHSDevToolsPerformanceColumnToggle Active"><Label text="SERVER" /></Button>
+					<Button id="XHSPerfColumnToggleActivity" class="XHSDevToolsPerformanceColumnToggle Active"><Label text="ACTIVITY" /></Button>
+					<Button id="XHSPerfColumnToggleBots" class="XHSDevToolsPerformanceColumnToggle Active"><Label text="BOTS" /></Button>
+				</Panel>
+
+				<Panel id="XHSDevToolsPerformanceDetails" class="XHSDevToolsPerformanceDetails">
+					<Panel id="XHSPerfColumnClient" class="XHSDevToolsPerformanceClientColumn">
+						<Label class="XHSDevToolsPerformanceColumnTitle" text="CLIENT FPS" />
+						<Panel id="XHSPerfPlayers" class="XHSDevToolsPerformancePlayers" />
+					</Panel>
+
+					<Panel id="XHSPerfColumnServer" class="XHSDevToolsPerformanceServerColumn">
+						<Label class="XHSDevToolsPerformanceColumnTitle" text="SERVER / MOD" />
+						<Panel class="XHSDevToolsPerformanceRow"><Label text="Active units" /><Label id="XHSPerfTotalUnits" class="Value" text="--" /></Panel>
+						<Panel class="XHSDevToolsPerformanceRow"><Label text="P1 assault / cap" /><Label id="XHSPerfPhaseOneBudget" class="Value" text="--" /></Panel>
+						<Panel class="XHSDevToolsPerformanceRow"><Label text="P1 spawned / skipped" /><Label id="XHSPerfPhaseOneWave" class="Value" text="--" /></Panel>
+						<Panel class="XHSDevToolsPerformanceRow"><Label text="Wave loops / sec" /><Label id="XHSPerfWaveLoops" class="Value" text="--" /></Panel>
+						<Panel class="XHSDevToolsPerformanceRow"><Label text="AI ticks / sec" /><Label id="XHSPerfAITicks" class="Value" text="--" /></Panel>
+						<Panel class="XHSDevToolsPerformanceRow"><Label text="Ability loops / sec" /><Label id="XHSPerfAbilityLoops" class="Value" text="--" /></Panel>
+						<Panel class="XHSDevToolsPerformanceRow"><Label text="Movement owners AI / wave" /><Label id="XHSPerfMovementOwners" class="Value" text="--" /></Panel>
+						<Panel class="XHSDevToolsPerformanceRow"><Label text="Staged / cap" /><Label id="XHSPerfStagedUnits" class="Value" text="--" /></Panel>
+						<Panel class="XHSDevToolsPerformanceRow"><Label text="Stage jobs / pending" /><Label id="XHSPerfStageQueue" class="Value" text="--" /></Panel>
+						<Panel class="XHSDevToolsPerformanceRow"><Label text="Stage cleanup / create max" /><Label id="XHSPerfStageCleanup" class="Value" text="--" /></Panel>
+						<Panel class="XHSDevToolsPerformanceRow"><Label text="Thinkers" /><Label id="XHSPerfThinkers" class="Value" text="--" /></Panel>
+						<Panel class="XHSDevToolsPerformanceRow"><Label text="Heroes / bosses" /><Label id="XHSPerfHeroesBosses" class="Value" text="--" /></Panel>
+						<Panel class="XHSDevToolsPerformanceRow"><Label text="Summons" /><Label id="XHSPerfSummons" class="Value" text="--" /></Panel>
+						<Panel class="XHSDevToolsPerformanceRow"><Label text="Breakables / other" /><Label id="XHSPerfOther" class="Value" text="--" /></Panel>
+						<Panel class="XHSDevToolsPerformanceRow"><Label text="Simulation lag / health" /><Label id="XHSPerfSimulation" class="Value" text="--" /></Panel>
+						<Panel class="XHSDevToolsPerformanceRow"><Label text="Profiler cost" /><Label id="XHSPerfCost" class="Value" text="--" /></Panel>
+					</Panel>
+
+					<Panel id="XHSPerfColumnActivity" class="XHSDevToolsPerformanceActivityColumn">
+						<Label class="XHSDevToolsPerformanceColumnTitle" text="ACTIVITY / SECOND" />
+						<Panel class="XHSDevToolsPerformanceRow"><Label text="Spatial queries / hits" /><Label id="XHSPerfZoneSearches" class="Value WideValue" text="--" /></Panel>
+						<Panel class="XHSDevToolsPerformanceRow"><Label text="Spatial cost / max" /><Label id="XHSPerfZoneCost" class="Value WideValue" text="--" /></Panel>
+						<Panel class="XHSDevToolsPerformanceRow"><Label text="Orders / repeated" /><Label id="XHSPerfOrders" class="Value WideValue" text="--" /></Panel>
+						<Panel class="XHSDevToolsPerformanceRow"><Label text="Creep orders AI / wave" /><Label id="XHSPerfCreepOrders" class="Value WideValue" text="--" /></Panel>
+						<Panel class="XHSDevToolsPerformanceRow"><Label text="Owner conflicts / blocked" /><Label id="XHSPerfOrderConflicts" class="Value WideValue" text="--" /></Panel>
+						<Panel class="XHSDevToolsPerformanceRow"><Label text="Deduplicated / handoffs" /><Label id="XHSPerfOrderDedup" class="Value WideValue" text="--" /></Panel>
+						<Panel class="XHSDevToolsPerformanceRow"><Label text="Stage created / fallback" /><Label id="XHSPerfStageCreated" class="Value WideValue" text="--" /></Panel>
+						<Panel class="XHSDevToolsPerformanceRow"><Label text="Stage released / cancelled" /><Label id="XHSPerfStageReleased" class="Value WideValue" text="--" /></Panel>
+						<Panel class="XHSDevToolsPerformanceRow"><Label text="Stage failures / missing" /><Label id="XHSPerfStageFailures" class="Value WideValue" text="--" /></Panel>
+						<Panel class="XHSDevToolsPerformanceRow"><Label text="Stage cost / AI wakes" /><Label id="XHSPerfStageCost" class="Value WideValue" text="--" /></Panel>
+						<Panel class="XHSDevToolsPerformanceRow"><Label text="AI / wave thinks" /><Label id="XHSPerfThinks" class="Value WideValue" text="--" /></Panel>
+						<Panel class="XHSDevToolsPerformanceRow"><Label text="Ability loops" /><Label id="XHSPerfAbilityThinks" class="Value" text="--" /></Panel>
+						<Panel class="XHSDevToolsPerformanceRow"><Label text="Damage / casts" /><Label id="XHSPerfCombat" class="Value WideValue" text="--" /></Panel>
+						<Panel class="XHSDevToolsPerformanceRow"><Label text="Projectiles L / T" /><Label id="XHSPerfProjectiles" class="Value WideValue" text="--" /></Panel>
+						<Panel class="XHSDevToolsPerformanceRow"><Label text="Spawns / deaths" /><Label id="XHSPerfChurn" class="Value WideValue" text="--" /></Panel>
+						<Panel class="XHSDevToolsPerformanceRow"><Label text="Target changes" /><Label id="XHSPerfTargetChanges" class="Value" text="--" /></Panel>
+						<Panel class="XHSDevToolsPerformanceRow"><Label text="Spatial cache H / M" /><Label id="XHSPerfSpatialCache" class="Value WideValue" text="--" /></Panel>
+						<Label class="XHSDevToolsPerformanceSourceTitle" text="SAMPLED SPATIAL HOTSPOTS" />
+						<Label id="XHSPerfZoneSource1" class="XHSDevToolsPerformanceSource" text="--" />
+						<Label id="XHSPerfZoneSource2" class="XHSDevToolsPerformanceSource" text="" />
+						<Label id="XHSPerfZoneSource3" class="XHSDevToolsPerformanceSource" text="" />
+						<Label class="XHSDevToolsPerformanceSourceTitle" text="SAMPLED ORDER HOTSPOTS" />
+						<Label id="XHSPerfOrderSource1" class="XHSDevToolsPerformanceSource" text="--" />
+						<Label id="XHSPerfOrderSource2" class="XHSDevToolsPerformanceSource" text="" />
+					</Panel>
+
+					<Panel id="XHSPerfColumnBots" class="XHSDevToolsPerformanceBotColumn">
+						<Label class="XHSDevToolsPerformanceColumnTitle" text="ALLIED BOTS" />
+						<Panel class="XHSDevToolsPerformanceRow"><Label text="Live / configured" /><Label id="XHSPerfBotCount" class="Value" text="--" /></Panel>
+						<Panel class="XHSDevToolsPerformanceRow"><Label text="Engine verified" /><Label id="XHSPerfBotEngine" class="Value" text="--" /></Panel>
+						<Panel class="XHSDevToolsPerformanceRow"><Label text="Active / idle" /><Label id="XHSPerfBotActivity" class="Value" text="--" /></Panel>
+						<Panel class="XHSDevToolsPerformanceRow"><Label text="Orders/s / limited" /><Label id="XHSPerfBotOrders" class="Value" text="--" /></Panel>
+						<Panel class="XHSDevToolsPerformanceRow"><Label text="Casts / rejected" /><Label id="XHSPerfBotCasts" class="Value" text="--" /></Panel>
+						<Panel class="XHSDevToolsPerformanceRow"><Label text="Decision avg / max" /><Label id="XHSPerfBotDecision" class="Value" text="--" /></Panel>
+						<Panel class="XHSDevToolsPerformanceRow"><Label text="Think avg / max" /><Label id="XHSPerfBotThink" class="Value" text="--" /></Panel>
+						<Panel class="XHSDevToolsPerformanceRow"><Label text="Base threat / units" /><Label id="XHSPerfBotThreat" class="Value" text="--" /></Panel>
+						<Panel class="XHSDevToolsPerformanceRow"><Label text="Danger / recoveries" /><Label id="XHSPerfBotSafety" class="Value" text="--" /></Panel>
+						<Panel class="XHSDevToolsPerformanceRow"><Label text="Safe errors / streak" /><Label id="XHSPerfBotErrors" class="Value" text="--" /></Panel>
+					</Panel>
+				</Panel>
+			</Panel>
+
+			<Panel id="XHSDevToolsPanel" class="XHSDevToolsPanel">
+				<Panel class="XHSDevToolsHeader">
+					<Panel class="XHSDevToolsHeaderText">
+						<Label class="XHSDevToolsEyebrow" text="TOOLS MODE" />
+						<Label class="XHSDevToolsTitle" text="XHS Dev Sandbox" />
+
+						<Button class="XHSDevToolsClose" onactivate="XHSDevToolsTogglePanel();">
+							<Label text="X" />
+						</Button>
+					</Panel>
+				</Panel>
+
+				<Panel id="XHSDevToolsStatus" class="XHSDevToolsStatus">
+					<Label id="XHSDevToolsStatusText" text="Requesting state..." />
+				</Panel>
+
+				<Panel id="XHSDevToolsSandboxBar" class="XHSDevToolsSandboxBar" />
+				<Panel id="XHSDevToolsTabs" class="XHSDevToolsTabs" />
+				<Panel id="XHSDevToolsContent" class="XHSDevToolsContent" />
+			</Panel>
+		</Panel>
+	</Panel>
+</root>

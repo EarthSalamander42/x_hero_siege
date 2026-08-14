@@ -11,251 +11,11 @@ var LeaderboardInfoContainer = $("#LeaderboardInfoContainer");
 var toggle = false;
 var first_time = false;
 
-var secret_key = CustomNetTables.GetTableValue("game_options", "server_key");
-if (secret_key && secret_key["1"]) secret_key = secret_key["1"];
 var game_version = CustomNetTables.GetTableValue("game_options", "game_version");
 var game_type = undefined;
 if (game_version)
 	game_type = game_version.game_type;
 
-/*
-var api = {
-	base : "https://api.frostrose-studio.com/",
-	urls : {
-		modifyCompanion : "imba/modify-companion",
-//		modifyStatue : "imba/modify-statue",
-		modifyEmblem : "imba/modify-emblem",
-		modifyArmory : "imba/modify-armory",
-		toggleIngameTag : "imba/toggle-ingame-tag",
-		toggleBPRewards : "imba/toggle-bp-rewards",
-		togglePlayerXP : "imba/toggle-player-xp",
-		toggleWinrate : "imba/toggle-winrate",
-		PlayerPosition : "imba/trackme",
-		modifyTag : "imba/modify-tag",
-	},
-	updateCompanion : function(data, success_callback, error_callback) {
-		$.AsyncWebRequest(api.base + api.urls.modifyCompanion, {
-			type : "POST",
-			dataType : "json",
-			data : data,
-			timeout : 5000,
-			headers : {'X-Dota-Server-Key' : secret_key},
-			success : function(obj) {
-				if (obj.error) {
-//					$.Msg("Error updating companion");
-					error_callback();
-				} else {
-//					$.Msg("Updated companion");
-					success_callback();
-				}
-			},
-			error : function(err) {
-//				$.Msg("Error updating companion" + JSON.stringify(err));
-				error_callback();
-			}
-		});
-	},
-	// updateStatue : function(data, success_callback, error_callback) {
-		// $.AsyncWebRequest(api.base + api.urls.modifyStatue, {
-			// type : "POST",
-			// dataType : "json",
-			// data : data,
-			// timeout : 5000,
-			// headers : {'X-Dota-Server-Key' : secret_key},
-			// success : function(obj) {
-				// if (obj.error) {
-					// $.Msg("Error updating statue");
-					// error_callback();
-				// } else {
-					// $.Msg("Updated statue");
-					// success_callback();
-				// }
-			// },
-			// error : function(err) {
-				// $.Msg("Error updating statue " + JSON.stringify(err));
-				// error_callback();
-			// }
-		// });
-	// },
-	updateEmblem : function(data, success_callback, error_callback) {
-		$.AsyncWebRequest(api.base + api.urls.modifyEmblem, {
-			type : "POST",
-			dataType : "json",
-			data : data,
-			timeout : 5000,
-			headers : {'X-Dota-Server-Key' : secret_key},
-			success : function(obj) {
-				if (obj.error) {
-					$.Msg("Error updating emblem");
-					error_callback();
-				} else {
-//					$.Msg("Updated emblem");
-					success_callback();
-				}
-			},
-			error : function(err) {
-				$.Msg("Error updating emblem " + JSON.stringify(err));
-				error_callback();
-			}
-		});
-	},
-	updateIngameTag : function(data, success_callback, error_callback) {
-		$.AsyncWebRequest(api.base + api.urls.toggleIngameTag, {
-			type : "POST",
-			dataType : "json",
-			data : data,
-			timeout : 5000,
-			headers : {'X-Dota-Server-Key' : secret_key},
-			success : function(obj) {
-//				$.Msg(obj)
-				if (obj.error) {
-					$.Msg("Error updating ingame tag");
-					error_callback();
-				} else {
-					$.Msg("Updated ingame tag");
-					success_callback();
-				}
-			},
-			error : function(err) {
-				$.Msg("Error ingame tag " + JSON.stringify(err));
-				error_callback();
-			}
-		});
-	},
-	updateBPRewards : function(data, success_callback, error_callback) {
-		$.AsyncWebRequest(api.base + api.urls.toggleBPRewards, {
-			type : "POST",
-			dataType : "json",
-			data : data,
-			timeout : 5000,
-			headers : {'X-Dota-Server-Key' : secret_key},
-			success : function(obj) {
-//				$.Msg(obj)
-				if (obj.error) {
-					$.Msg("Error updating bp rewards");
-					error_callback();
-				} else {
-//					$.Msg("Updated bp rewards");
-					success_callback();
-				}
-			},
-			error : function(err) {
-				$.Msg("Error bp rewards " + JSON.stringify(err));
-				error_callback();
-			}
-		});
-	},
-	updatePlayerXP : function(data, success_callback, error_callback) {
-		$.AsyncWebRequest(api.base + api.urls.togglePlayerXP, {
-			type : "POST",
-			dataType : "json",
-			data : data,
-			timeout : 5000,
-			headers : {'X-Dota-Server-Key' : secret_key},
-			success : function(obj) {
-//				$.Msg(obj)
-				if (obj.error) {
-					$.Msg("Error updating ply xp");
-					error_callback();
-				} else {
-//					$.Msg("Updated ply xp");
-					success_callback();
-				}
-			},
-			error : function(err) {
-				$.Msg("Error ply xp " + JSON.stringify(err));
-				error_callback();
-			}
-		});
-	},
-	updateWinrate : function(data, success_callback, error_callback) {
-		$.AsyncWebRequest(api.base + api.urls.toggleWinrate, {
-			type : "POST",
-			dataType : "json",
-			data : data,
-			timeout : 5000,
-			headers : {'X-Dota-Server-Key' : secret_key},
-			success : function(obj) {
-//				$.Msg(obj)
-				if (obj.error) {
-					$.Msg("Error updating winrate");
-					error_callback();
-				} else {
-//					$.Msg("Updated winrate");
-					success_callback();
-				}
-			},
-			error : function(err) {
-				$.Msg("Error winrate " + JSON.stringify(err));
-				error_callback();
-			}
-		});
-	},
-	getPlayerPosition : function(data, callback) {
-		$.AsyncWebRequest(api.base + api.urls.PlayerPosition, {
-			type : "GET",
-			data : data,
-			dataType : "json",
-			timeout : 5000,
-			headers : {'X-Dota-Server-Key' : secret_key},
-			success : function(obj) {
-				if (obj.error)
-					$.Msg("Error finding player position");
-				else {
-					callback(obj.data);
-				}
-			},
-			error : function(err) {
-				$.Msg("Error finding player position " + JSON.stringify(err));
-			}
-		});
-	},
-	updateArmory : function(data, success_callback, error_callback) {
-		$.AsyncWebRequest(api.base + api.urls.modifyArmory, {
-			type : "POST",
-			dataType : "json",
-			data : data,
-			timeout : 5000,
-			headers : {'X-Dota-Server-Key' : secret_key},
-			success : function(obj) {
-				if (obj.error) {
-//					$.Msg("Error updating armory");
-					error_callback();
-				} else {
-//					$.Msg("Updated armory");
-					success_callback();
-				}
-			},
-			error : function(err) {
-				$.Msg("Error updating armory " + JSON.stringify(err));
-				error_callback();
-			}
-		});
-	},
-	updateTag : function(data, success_callback, error_callback) {
-		$.AsyncWebRequest(api.base + api.urls.modifyTag, {
-			type : "POST",
-			dataType : "json",
-			data : data,
-			timeout : 5000,
-			headers : {'X-Dota-Server-Key' : secret_key},
-			success : function(obj) {
-				if (obj.error) {
-					$.Msg("Error updating tag");
-					error_callback();
-				} else {
-					$.Msg("Updated tag");
-					success_callback();
-				}
-			},
-			error : function(err) {
-				$.Msg("Error updating tag " + JSON.stringify(err));
-				error_callback();
-			}
-		});
-	},
-};
-*/
 
 function ToggleBattlepass() {
 	if (toggle === false) {
@@ -873,16 +633,7 @@ function GenerateBattlepassPanel(reward_list, reward_row, bRewardsDisabled) {
 
 			// 			if (bp_type == "bundle" || bp_type == "wearable" || bp_type == "taunt") {
 			// 				var hero_tooltip = $.Localize("#" + bp_hero);
-			// 				var new_hero_tooltip = undefined;
-
-			// 				if (hero_tooltip.indexOf(" (IMBA)") !== -1) {
-			// 					new_hero_tooltip = hero_tooltip.replace(" (IMBA)", "");
-			// 				}
-
-			// 				if (new_hero_tooltip)
-			// 					reward.FindChildTraverse("BattlepassRewardTitle").text = new_hero_tooltip + ": " + $.Localize("#" + bp_name);
-			// 				else
-			// 					reward.FindChildTraverse("BattlepassRewardTitle").text = hero_tooltip + ": " + $.Localize("#" + bp_name);
+			// 				reward.FindChildTraverse("BattlepassRewardTitle").text = hero_tooltip + ": " + $.Localize("#" + bp_name);
 			// 			} else
 			// 				reward.FindChildTraverse("BattlepassRewardTitle").text = $.Localize("#battlepass_" + bp_type) + ": " + $.Localize("#" + bp_name);
 
@@ -1035,16 +786,7 @@ function GenerateArmoryPanel(reward_list, premium_reward_list, bRewardsDisabled)
 
 						if (bp_type == "bundle" || bp_type == "wearable" || bp_type == "taunt") {
 							var hero_tooltip = $.Localize("#" + bp_hero);
-							var new_hero_tooltip = undefined;
-
-							if (hero_tooltip.indexOf(" (IMBA)") !== -1) {
-								new_hero_tooltip = hero_tooltip.replace(" (IMBA)", "");
-							}
-
-							if (new_hero_tooltip)
-								reward.FindChildTraverse("BattlepassRewardTitle").text = new_hero_tooltip + ": " + $.Localize("#" + bp_name);
-							else
-								reward.FindChildTraverse("BattlepassRewardTitle").text = hero_tooltip + ": " + $.Localize("#" + bp_name);
+							reward.FindChildTraverse("BattlepassRewardTitle").text = hero_tooltip + ": " + $.Localize("#" + bp_name);
 						} else
 							reward.FindChildTraverse("BattlepassRewardTitle").text = $.Localize("#battlepass_" + bp_type) + ": " + $.Localize("#" + bp_name);
 
@@ -1174,16 +916,7 @@ function GenerateArmoryPanel(reward_list, premium_reward_list, bRewardsDisabled)
 
 						if (bp_type == "bundle" || bp_type == "wearable" || bp_type == "taunt") {
 							var hero_tooltip = $.Localize("#" + bp_hero);
-							var new_hero_tooltip = undefined;
-
-							if (hero_tooltip.indexOf(" (IMBA)") !== -1) {
-								new_hero_tooltip = hero_tooltip.replace(" (IMBA)", "");
-							}
-
-							if (new_hero_tooltip)
-								reward.FindChildTraverse("BattlepassRewardTitle").text = new_hero_tooltip + ": " + $.Localize("#" + bp_name);
-							else
-								reward.FindChildTraverse("BattlepassRewardTitle").text = hero_tooltip + ": " + $.Localize("#" + bp_name);
+							reward.FindChildTraverse("BattlepassRewardTitle").text = hero_tooltip + ": " + $.Localize("#" + bp_name);
 						} else
 							reward.FindChildTraverse("BattlepassRewardTitle").text = $.Localize("#battlepass_" + bp_type) + ": " + $.Localize("#" + bp_name);
 
@@ -1604,9 +1337,9 @@ function _ScoreboardUpdater_UpdatePlayerPanelXP(playerId, playerPanel, ImbaXP_Pa
 	// const current_max_xp = player_info.MaxXP;
 	// const level = player_info.Lvl;
 
-	let current_xp = player_info.whalepass_xp;
+	let current_xp = player_info.supporter_pass_xp || player_info.XP || 0;
 	const current_max_xp = 1000;
-	let level = 0;
+	let level = 1;
 
 	while (current_xp >= current_max_xp) {
 		current_xp -= 1000;
@@ -1662,32 +1395,18 @@ function CreateBattlepassButton() {
 	if (Parent.FindChildTraverse("BattlepassButton")) {
 		Parent.FindChildTraverse("BattlepassButton").DeleteAsync(0);
 	}
-
-	var BattlepassButton = $.CreatePanel("Button", $.GetContextPanel(), "BattlepassButton");
-	BattlepassButton.SetPanelEvent("onactivate", function () {
-		ToggleBattlepass();
-	});
-
-	BattlepassButton.SetPanelEvent("onmouseover", function () {
-		$.DispatchEvent("UIShowTextTooltip", BattlepassButton, $.Localize("#battlepass"));
-	})
-
-	BattlepassButton.SetPanelEvent("onmouseout", function () {
-		$.DispatchEvent("UIHideTextTooltip", BattlepassButton);
-	})
-	BattlepassButton.SetParent(Parent);
 }
 
-function OpenWhalepass() {
+function OpenSupporterPass() {
 	const bp_player = CustomNetTables.GetTableValue("battlepass_player", Players.GetLocalPlayer());
 
 	if (bp_player) {
-		const whalepass_url = bp_player.whalepass_url;
+		const supporter_url = bp_player.supporter_url;
 
-		if (whalepass_url) {
-			$.DispatchEvent('ExternalBrowserGoToURL', whalepass_url);
+		if (supporter_url) {
+			$.DispatchEvent('ExternalBrowserGoToURL', supporter_url);
 		} else {
-			$.Msg("Whalepass URL not available");
+			$.Msg("Supporter Pass URL not available");
 		}
 	} else {
 		$.Msg("Battlepass player info not available");
@@ -1778,57 +1497,38 @@ function PlayerQuests() {
 		}
 	}
 
-	if (game_type == "IMBA") {
-		var values = [
-			"bounty_multiplier", // todo: add % in text
-			"exp_multiplier", // todo: add % in text
-			"initial_gold",
-			"initial_level",
-			"max_level",
-			"gold_tick",
-		]
+	var panels = {
+		"bounty_multiplier": "BountyMultiplier",
+		"exp_multiplier": "ExpMultiplier",
+		"initial_gold": "InitialGold",
+		"initial_level": "InitialLevel",
+		"max_level": "MaxLevel",
+		"gold_tick": "GoldTick",
+	}
 
-		// Update the game options display
-		for (var i in values) {
-			var value = CustomNetTables.GetTableValue("game_options", values[i]);
+	for (var i in panels) {
+		const panel = panels[i];
 
-			if (value && value[1] && $("#" + value + "_value"))
-				$("#" + value + "_value").text = value[1];
-		}
-	} else {
-		var panels = {
-			"bounty_multiplier": "BountyMultiplier",
-			"exp_multiplier": "ExpMultiplier",
-			"initial_gold": "InitialGold",
-			"initial_level": "InitialLevel",
-			"max_level": "MaxLevel",
-			"gold_tick": "GoldTick",
+		if ($("#" + panel + "Desc")) {
+			$("#" + panel + "Desc").style.visibility = "collapse";
 		}
 
-		for (var i in panels) {
-			const panel = panels[i];
-
-			if ($("#" + panel + "Desc")) {
-				$("#" + panel + "Desc").style.visibility = "collapse";
-			}
-
-			if ($("#" + panel + "Value")) {
-				$("#" + panel + "Value").style.visibility = "collapse";
-			}
+		if ($("#" + panel + "Value")) {
+			$("#" + panel + "Value").style.visibility = "collapse";
 		}
+	}
 
-		if (game_type == "PW") {
-			var max_score = CustomNetTables.GetTableValue("game_score", "max_score");
+	if (game_type == "PW") {
+		var max_score = CustomNetTables.GetTableValue("game_score", "max_score");
 
-			if (max_score)
-				max_score = max_score.kills;
-			else
-				return;
+		if (max_score)
+			max_score = max_score.kills;
+		else
+			return;
 
-			$("#BountyMultiplierValue").text = max_score;
-			$("#BountyMultiplierDesc").style.visibility = "visible";
-			$("#BountyMultiplierValue").style.visibility = "visible";
-		}
+		$("#BountyMultiplierValue").text = max_score;
+		$("#BountyMultiplierDesc").style.visibility = "visible";
+		$("#BountyMultiplierValue").style.visibility = "visible";
 	}
 
 	GameEvents.Subscribe("safe_to_leave", SafeToLeave);

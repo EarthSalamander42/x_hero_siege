@@ -1,0 +1,368 @@
+/* The stock pause card and rotating Dota tips are replaced by the XHS battle briefing. */
+DOTAPaused
+{
+	visibility: collapse;
+	opacity: 0;
+}
+
+.XHSPauseRoot
+{
+	width: 100%;
+	height: 100%;
+	z-index: 240;
+	opacity: 1;
+	transition-property: opacity;
+	transition-duration: .12s;
+}
+
+.XHSPauseRoot.XHSPauseHidden
+{
+	visibility: collapse;
+	opacity: 0;
+}
+
+.XHSPauseBackdrop
+{
+	width: 1040px;
+	height: 496px;
+	horizontal-align: center;
+	vertical-align: center;
+	margin-top: 42px;
+	background-color: gradient( radial, 50% 50%, 0% 0%, 50% 50%, from( #020b16b8 ), color-stop( .58, #0208126e ), to( #00000000 ) );
+}
+
+.XHSPauseFrame
+{
+	width: 790px;
+	height: 376px;
+	horizontal-align: center;
+	vertical-align: center;
+	margin-bottom: 42px;
+	flow-children: down;
+	background-color: gradient( linear, 0% 0%, 100% 100%, from( #0a263bf7 ), color-stop( .48, #071522f9 ), to( #040911fb ) );
+	border: 1px solid #79d7ff78;
+	box-shadow: fill #000000cf 0px 0px 28px 2px, #55d6ff35 0px 0px 24px 0px;
+	opacity: 1;
+	transform: translateY( 0px ) scaleX( 1 ) scaleY( 1 );
+	transition-property: opacity, transform, brightness;
+	transition-duration: .28s;
+	transition-timing-function: ease-out;
+}
+
+.XHSPauseIntro .XHSPauseFrame
+{
+	opacity: 0;
+	transform: translateY( -18px ) scaleX( .965 ) scaleY( .965 );
+	brightness: 1.35;
+}
+
+.XHSPauseChrome
+{
+	width: 100%;
+	height: 18px;
+	overflow: noclip;
+}
+
+.XHSPauseTopGlow
+{
+	width: 72%;
+	height: 2px;
+	horizontal-align: center;
+	background-color: gradient( linear, 0% 0%, 100% 0%, from( #51cfff00 ), color-stop( .5, #b8f1ffff ), to( #51cfff00 ) );
+	box-shadow: #62dcffb0 0px 0px 12px 0px;
+}
+
+.XHSPauseCorner
+{
+	width: 74px;
+	height: 16px;
+	margin-top: -1px;
+	border-top: 2px solid #ffcf66c7;
+}
+
+.XHSPauseCornerLeft
+{
+	horizontal-align: left;
+	margin-left: 18px;
+	border-left: 2px solid #ffcf6688;
+}
+
+.XHSPauseCornerRight
+{
+	horizontal-align: right;
+	margin-right: 18px;
+	border-right: 2px solid #ffcf6688;
+}
+
+.XHSPauseHeader
+{
+	width: 100%;
+	height: 98px;
+	flow-children: right;
+	padding: 15px 23px 10px 23px;
+	border-bottom: 1px solid #77c8ff2c;
+	background-color: gradient( linear, 0% 0%, 100% 0%, from( #0b2940d8 ), color-stop( .62, #071724b5 ), to( #050b13a0 ) );
+}
+
+.XHSPauseMark
+{
+	width: 55px;
+	height: 55px;
+	vertical-align: center;
+	margin-right: 16px;
+	border: 1px solid #8fe5ff9c;
+	border-radius: 50%;
+	background-color: gradient( radial, 50% 45%, 0% 0%, 55% 55%, from( #2ea9d9b8 ), color-stop( .45, #0e4565f2 ), to( #06121ff7 ) );
+	box-shadow: fill #0000009c 0px 0px 10px 0px, #58d8ff62 0px 0px 15px 0px;
+}
+
+.XHSPauseMarkCore
+{
+	width: 31px;
+	height: 31px;
+	horizontal-align: center;
+	vertical-align: center;
+	border: 1px solid #ffcf6688;
+	transform: rotateZ( 45deg );
+}
+
+.XHSPauseMarkBar
+{
+	width: 5px;
+	height: 18px;
+	vertical-align: center;
+	background-color: #e9fbffff;
+	box-shadow: #6de2ff9c 0px 0px 6px 0px;
+	transform: rotateZ( -45deg );
+}
+
+.XHSPauseMarkBarLeft
+{
+	horizontal-align: left;
+	margin-left: 8px;
+}
+
+.XHSPauseMarkBarRight
+{
+	horizontal-align: right;
+	margin-right: 8px;
+}
+
+.XHSPauseHeading
+{
+	width: fill-parent-flow( 1 );
+	height: 100%;
+	flow-children: down;
+}
+
+.XHSPauseEyebrow
+{
+	height: 17px;
+	color: #ffcf66;
+	font-size: 12px;
+	font-weight: bold;
+	letter-spacing: 3px;
+	text-shadow: 0px 1px 3px #000000;
+}
+
+.XHSPauseTitle
+{
+	height: 34px;
+	color: #f1fbff;
+	font-size: 29px;
+	font-weight: semi-bold;
+	letter-spacing: 2px;
+	text-shadow: 0px 2px 5px #000000, 0px 0px 8px #49cfff30;
+}
+
+.XHSPauseSubtitle
+{
+	height: 20px;
+	color: #8eb6ce;
+	font-size: 14px;
+	letter-spacing: 1px;
+}
+
+.XHSPauseState
+{
+	width: 112px;
+	height: 48px;
+	vertical-align: center;
+	flow-children: down;
+	padding-top: 5px;
+	border-left: 1px solid #77c8ff3b;
+}
+
+.XHSPauseStateLabel
+{
+	width: 100%;
+	color: #7396ad;
+	font-size: 11px;
+	font-weight: bold;
+	letter-spacing: 1.5px;
+	text-align: right;
+}
+
+.XHSPauseStateValue
+{
+	width: 100%;
+	color: #8fe8ff;
+	font-size: 18px;
+	font-weight: bold;
+	letter-spacing: 2px;
+	text-align: right;
+	text-shadow: 0px 0px 8px #48d6ff66;
+}
+
+.XHSPauseIntelRow
+{
+	width: 100%;
+	height: 94px;
+	flow-children: right;
+	padding: 12px 20px 10px 20px;
+	background-color: #02091252;
+	border-bottom: 1px solid #77c8ff24;
+}
+
+.XHSPauseIntelCell
+{
+	width: fill-parent-flow( 1 );
+	height: 100%;
+	flow-children: down;
+	padding: 5px 10px 0px 10px;
+}
+
+.XHSPauseIntelDivider
+{
+	width: 1px;
+	height: 48px;
+	vertical-align: center;
+	background-color: gradient( linear, 0% 0%, 0% 100%, from( #77c8ff00 ), color-stop( .5, #77c8ff52 ), to( #77c8ff00 ) );
+}
+
+.XHSPauseIntelLabel
+{
+	width: 100%;
+	height: 18px;
+	color: #7096ad;
+	font-size: 11px;
+	font-weight: bold;
+	letter-spacing: 1.5px;
+	text-align: center;
+}
+
+.XHSPauseIntelValue
+{
+	width: 100%;
+	height: 27px;
+	color: #e8f8ff;
+	font-size: 19px;
+	font-weight: bold;
+	letter-spacing: .8px;
+	text-align: center;
+	text-overflow: shrink;
+	text-shadow: 0px 1px 4px #000000;
+}
+
+.XHSPauseIntelDetail
+{
+	width: 100%;
+	height: 20px;
+	color: #7897aa;
+	font-size: 12px;
+	text-align: center;
+	text-overflow: shrink;
+}
+
+.XHSPauseFocus
+{
+	width: 744px;
+	height: 111px;
+	horizontal-align: center;
+	margin-top: 12px;
+	flow-children: right;
+	background-color: gradient( linear, 0% 0%, 100% 0%, from( #0d3048d9 ), color-stop( .62, #0a1b2ad4 ), to( #071019c8 ) );
+	border: 1px solid #77c8ff45;
+	box-shadow: inset #00000065 0px 0px 12px 0px;
+}
+
+.XHSPauseFocusAccent
+{
+	width: 4px;
+	height: 100%;
+	background-color: gradient( linear, 0% 0%, 0% 100%, from( #ffe1a0 ), color-stop( .42, #ffbd41 ), to( #b7680c ) );
+	box-shadow: #ffc55470 0px 0px 9px 0px;
+}
+
+.XHSPauseFocusCopy
+{
+	width: fill-parent-flow( 1 );
+	height: 100%;
+	flow-children: down;
+	padding: 12px 17px 10px 17px;
+}
+
+.XHSPauseFocusEyebrow
+{
+	width: 100%;
+	height: 17px;
+	color: #ffcf66;
+	font-size: 11px;
+	font-weight: bold;
+	letter-spacing: 2px;
+}
+
+.XHSPauseFocusTitle
+{
+	width: 100%;
+	height: 30px;
+	color: #f4fbff;
+	font-size: 22px;
+	font-weight: semi-bold;
+	letter-spacing: .5px;
+	text-overflow: shrink;
+	text-shadow: 0px 1px 4px #000000;
+}
+
+.XHSPauseFocusBody
+{
+	width: 100%;
+	height: 39px;
+	color: #a8c7d9;
+	font-size: 15px;
+	line-height: 18px;
+	text-overflow: shrink;
+}
+
+.XHSPauseFooter
+{
+	width: 100%;
+	height: 43px;
+	flow-children: right;
+	padding: 12px 26px 0px 26px;
+}
+
+.XHSPauseFooterLine
+{
+	width: fill-parent-flow( 1 );
+	height: 1px;
+	vertical-align: center;
+	background-color: gradient( linear, 0% 0%, 100% 0%, from( #77c8ff00 ), to( #77c8ff3d ) );
+}
+
+.XHSPauseFooterLine:last-child
+{
+	background-color: gradient( linear, 0% 0%, 100% 0%, from( #77c8ff3d ), to( #77c8ff00 ) );
+}
+
+.XHSPauseFooterText
+{
+	width: 470px;
+	height: 20px;
+	margin: 0px 12px;
+	color: #63859a;
+	font-size: 12px;
+	letter-spacing: .5px;
+	text-align: center;
+	text-overflow: shrink;
+}

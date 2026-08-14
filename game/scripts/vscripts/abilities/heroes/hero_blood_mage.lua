@@ -236,22 +236,38 @@ end
 function PhoenixDegen(event)
 	local caster = event.caster
 	local ability = event.ability
+	if not IsValidEntity(caster) or caster._xhsPhoenixEggTransition then
+		return
+	end
+
 	local phoenix_damage_per_second = ability:GetLevelSpecialValueFor("phoenix_damage_per_second", ability:GetLevel() - 1)
 	local phoenixHP = caster:GetHealth()
 
-	caster:SetHealth(phoenixHP - phoenix_damage_per_second)
-
-	-- On Health 0 spawn an Egg (same as OnDeath)
-	if caster:GetHealth() == 0 then
+	-- SetHealth does not issue a real death event and can leave creatures clamped at
+	-- the engine's minimum health (displayed as 0). Transition before crossing it.
+	if phoenixHP <= phoenix_damage_per_second then
 		PhoenixEgg(event)
+		return
 	end
+
+	caster:SetHealth(phoenixHP - phoenix_damage_per_second)
 end
 
 -- Removes the phoenix and spawns the egg with a timer
 function PhoenixEgg(event)
 	local caster = event.caster --the phoenix
 	local ability = event.ability
+	if not IsValidEntity(caster) or caster._xhsPhoenixEggTransition then
+		return
+	end
+	caster._xhsPhoenixEggTransition = true
+
 	local hero = caster:GetOwner()
+	if not IsValidEntity(hero) then
+		caster._xhsPhoenixEggTransition = nil
+		return
+	end
+
 	local phoenix_egg_duration = ability:GetLevelSpecialValueFor("phoenix_egg_duration", ability:GetLevel() - 1)
 
 	-- Set the position, a bit floating over the ground
@@ -259,10 +275,16 @@ function PhoenixEgg(event)
 	local position = Vector(origin.x, origin.y, origin.z + 50)
 
 	local egg = CreateUnitByName("human_phoenix_egg", origin, true, hero, hero, hero:GetTeamNumber())
+	if not IsValidEntity(egg) then
+		caster._xhsPhoenixEggTransition = nil
+		return
+	end
 	egg:SetAbsOrigin(position)
+	egg:SetOwner(hero)
 
 	-- Keep reference to the egg
 	hero.egg = egg
+	hero.phoenix = nil
 
 	-- Apply modifiers for the summon properties
 	egg:AddNewModifier(hero, ability, "modifier_kill", { duration = phoenix_egg_duration })
@@ -275,24 +297,34 @@ end
 function PhoenixEggCheckReborn(event)
 	local unit = event.unit --the egg
 	local attacker = event.attacker
-	local ability = event.ability
 	local hero = unit:GetOwner()
-	local player = hero:GetPlayerOwner()
-	local playerID = hero:GetPlayerID()
+	if not IsValidEntity(hero) then
+		unit:RemoveSelf()
+		return
+	end
 
 	if unit == attacker then
-		local phoenix = CreateUnitByName("npc_dota_creature_phoenix", unit:GetAbsOrigin(), true, player, hero, hero:GetTeamNumber())
-		phoenix:SetControllableByPlayer(playerID, true)
+		local phoenix = CreateUnitByName("npc_dota_creature_phoenix", unit:GetAbsOrigin(), true, hero, hero, hero:GetTeamNumber())
+		if IsValidEntity(phoenix) then
+			local playerID = hero:GetPlayerOwnerID()
+			phoenix:SetOwner(hero)
+			if playerID ~= nil and playerID >= 0 then
+				phoenix:SetControllableByPlayer(playerID, true)
+			end
 
-		-- Keep reference
-		hero.egg = egg
+			-- Keep references in sync for recasts and future rebirths.
+			hero.phoenix = phoenix
+		end
 	else
 		local particleName = "particles/units/heroes/hero_phoenix/phoenix_supernova_death.vpcf"
 		local particle = ParticleManager:CreateParticle(particleName, PATTACH_CUSTOMORIGIN, unit)
 		ParticleManager:SetParticleControl(particle, 0, unit:GetAbsOrigin())
 		ParticleManager:SetParticleControl(particle, 1, unit:GetAbsOrigin())
 		ParticleManager:SetParticleControl(particle, 3, unit:GetAbsOrigin())
+		ParticleManager:ReleaseParticleIndex(particle)
 	end
+
+	hero.egg = nil
 
 	-- Remove the egg
 	unit:RemoveSelf()

@@ -1,0 +1,132 @@
+// Mod-owned portrait entries only.
+// This file is injected inside Valve's top-level "Portraits" block.
+// Do not add another "Portraits" wrapper and do not edit generated portraits.txt.
+
+// XHS Castle. The selectable fort uses an invisible world model, while the
+// visible Ancient is a map prop. Render Valve's Radiant Ancient as the
+// portrait background model and hide the invisible fort itself.
+"models/development/invisiblebox.vmdl"
+{
+	"cameras"
+	{
+		"Default"
+		{
+			"PortraitPosition"		"342.305298 -444.800629 651.281982"
+			"PortraitAngles"		"38.067272 121.565834 0.000000"
+			"PortraitFOV"		"45.000000"
+			"PortraitFar"		"1000.000000"
+		}
+	}
+	"PortraitLightPosition"		"443.386566 462.592041 943.930908"
+	"PortraitLightAngles"		"53.211140 -128.560425 108.902771"
+	"PortraitLightFOV"		"38.485001"
+	"PortraitLightDistance"		"1221.910034"
+	"PortraitLightColor"		"255 255 255"
+	"PortraitLightScale"		"4.670000"
+	"PortraitShadowColor"		"77 134 195"
+	"PortraitShadowScale"		"1.000000"
+	"PortraitGroundShadowScale"		"1.000000"
+	"PortraitAmbientDirection"		"-0.352 -0.923 -0.154"
+	"PortraitAmbientColor"		"116 174 222"
+	"PortraitAmbientScale"		"5.000000"
+	"PortraitSpecularColor"		"48 182 222"
+	"PortraitSpecularDirection"		"0.000000 0.000000 -1.000000"
+	"PortraitSpecularPower"		"16.000000"
+	"PortraitBackgroundColor1"		"1.000000 0.709804 0.964706"
+	"PortraitBackgroundColor2"		"1.000000 1.000000 1.000000"
+	"PortraitBackgroundColor3"		"1.000000 1.000000 1.000000"
+	"PortraitBackgroundColor4"		"0.313726 0.909804 1.000000"
+	"PortraitBackgroundTexture"		"materials/vgui/hud/heroportraits/portraitbackground_bluebloom.vmat"
+	"PortraitBackgroundModel"		"models/props_structures/radiant_ancient001.vmdl"
+	"PortraitAnimationCycle"		"0.000000"
+	"PortraitAnimationRate"		"1.000000"
+	"PortraitHideHero"		"1"
+}
+
+// Ranged Human 4: DC Radiant mega ranged creep, framed with Valve's standard
+// Radiant mega ranged-creep portrait configuration.
+"models/creeps/lane_creeps/creep_dc_radiant/creep_dc_radiant_ranged_mega.vmdl"
+{
+	"PortraitLightPosition"		"32.842575 28.978897 228.010422"
+	"PortraitLightAngles"		"61.560005 138.129349 0.000000"
+	"PortraitLightFOV"		"90.000000"
+	"PortraitLightDistance"		"145.320007"
+	"PortraitLightColor"		"254 248 242"
+	"PortraitShadowColor"		"0 0 0"
+	"PortraitShadowScale"		"1.000000"
+	"PortraitAmbientColor"		"37 46 47"
+	"PortraitAmbientScale"		"1.000000"
+	"PortraitSpecularColor"		"251 74 84"
+	"PortraitBackgroundTexture"		"materials/vgui/hud/heroportraits/portraitbackground_forest_two.vmat"
+	"PortraitBackgroundColor1"		"0.239994 0.650004 0.669993"
+	"PortraitBackgroundColor2"		"0.482353 0.576471 0.580392"
+	"PortraitBackgroundColor3"		"0.827451 0.847059 0.850980"
+	"PortraitBackgroundColor4"		"0.239994 0.650004 0.669993"
+	"PortraitLightScale"		"2.638000"
+	"PortraitGroundShadowScale"		"1.500000"
+	"PortraitAmbientDirection"		"-79.070 -84.150 -25.320"
+	"PortraitAnimationActivity"		"ACT_DOTA_CAPTURE"
+	"cameras"
+	{
+		"default"
+		{
+			"PortraitPosition"		"279.673859 41.197357 89.425636"
+			"PortraitAngles"		"352.630005 190.080002 0.000000"
+			"PortraitFOV"		"23.000000"
+			"PortraitFar"		"1000.000000"
+		}
+	}
+	"PortraitSpecularDirection"		"0.000000 0.000000 -1.000000"
+	"PortraitSpecularPower"		"16.000000"
+	"PortraitAnimationCycle"		"0.000000"
+	"PortraitAnimationRate"		"1.000000"
+	"PortraitHideHero"		"0"
+	"PortraitHideParticles"		"0"
+	"PortraitHideDropShadow"		"0"
+	"PortraitDesaturateParticles"		"0"
+	"PortraitDesaturateHero"		"1"
+}
+
+// Ranged Elf 4: Bird Radiant mega ranged creep, using the same Valve
+// Radiant mega ranged-creep portrait camera and lighting.
+"models/creeps/lane_creeps/creep_bird_radiant/creep_bird_radiant_ranged_mega.vmdl"
+{
+	"PortraitLightPosition"		"32.842575 28.978897 228.010422"
+	"PortraitLightAngles"		"61.560005 138.129349 0.000000"
+	"PortraitLightFOV"		"90.000000"
+	"PortraitLightDistance"		"145.320007"
+	"PortraitLightColor"		"254 248 242"
+	"PortraitShadowColor"		"0 0 0"
+	"PortraitShadowScale"		"1.000000"
+	"PortraitAmbientColor"		"37 46 47"
+	"PortraitAmbientScale"		"1.000000"
+	"PortraitSpecularColor"		"251 74 84"
+	"PortraitBackgroundTexture"		"materials/vgui/hud/heroportraits/portraitbackground_forest_two.vmat"
+	"PortraitBackgroundColor1"		"0.239994 0.650004 0.669993"
+	"PortraitBackgroundColor2"		"0.482353 0.576471 0.580392"
+	"PortraitBackgroundColor3"		"0.827451 0.847059 0.850980"
+	"PortraitBackgroundColor4"		"0.239994 0.650004 0.669993"
+	"PortraitLightScale"		"2.638000"
+	"PortraitGroundShadowScale"		"1.500000"
+	"PortraitAmbientDirection"		"-79.070 -84.150 -25.320"
+	"PortraitAnimationActivity"		"ACT_DOTA_CAPTURE"
+	"cameras"
+	{
+		"default"
+		{
+			"PortraitPosition"		"279.673859 41.197357 89.425636"
+			"PortraitAngles"		"352.630005 190.080002 0.000000"
+			"PortraitFOV"		"23.000000"
+			"PortraitFar"		"1000.000000"
+		}
+	}
+	"PortraitSpecularDirection"		"0.000000 0.000000 -1.000000"
+	"PortraitSpecularPower"		"16.000000"
+	"PortraitAnimationCycle"		"0.000000"
+	"PortraitAnimationRate"		"1.000000"
+	"PortraitHideHero"		"0"
+	"PortraitHideParticles"		"0"
+	"PortraitHideDropShadow"		"0"
+	"PortraitDesaturateParticles"		"0"
+	"PortraitDesaturateHero"		"1"
+}

@@ -189,30 +189,38 @@ function SkinChanger(keys)
 		end
 	end
 
-	local hero = PlayerResource:ReplaceHeroWith(PlayerID, keys.HeroSwap, gold, 0)
-	hero:GetAbilityByIndex(4):StartCooldown(60)
-	hero:AddExperience(CURRENT_XP, false, false)
-	hero:SetAbsOrigin(loc)
-	hero:SetBaseStrength(Strength)
-	hero:SetBaseIntellect(Intellect)
-	hero:SetBaseAgility(Agility)
-	hero:SetHealth(HP)
-	hero:SetMana(Mana)
+	XHSPrecache:ReplaceHeroWith(PlayerID, keys.HeroSwap, gold, 0, caster, {
+		cleanupOld = false,
+	}, function(hero)
+		if hero == nil or hero:IsNull() then return end
 
-	for i = 0, 14 do
-		if items[i] then
-			local item = CreateItem(items[i][1], nil, nil)
-			hero:AddItem(item)
+		local swap_ability = GetUnitAbilityBySafeIndex(hero, 4)
+		if swap_ability ~= nil then
+			swap_ability:StartCooldown(60)
+		end
+		hero:AddExperience(CURRENT_XP, false, false)
+		hero:SetAbsOrigin(loc)
+		hero:SetBaseStrength(Strength)
+		hero:SetBaseIntellect(Intellect)
+		hero:SetBaseAgility(Agility)
+		hero:SetHealth(HP)
+		hero:SetMana(Mana)
 
-			item:StartCooldown(items[i][2])
+		for i = 0, 14 do
+			if items[i] then
+				local item = CreateItem(items[i][1], nil, nil)
+				hero:AddItem(item)
 
-			if item:GetCurrentCharges() ~= 0 then
-				item:SetCurrentCharges(items[i][3])
+				item:StartCooldown(items[i][2])
+
+				if item:GetCurrentCharges() ~= 0 then
+					item:SetCurrentCharges(items[i][3])
+				end
 			end
 		end
-	end
 
-	if not caster:IsNull() then
-		UTIL_Remove(caster)
-	end
+		if not caster:IsNull() then
+			UTIL_Remove(caster)
+		end
+	end)
 end

@@ -1,7 +1,9 @@
 const fs = require('fs');
+const https = require('https');
 const path = require('path');
 
 const repoRoot = path.resolve(__dirname, '..');
+const defaultDotaItemsUrl = 'https://raw.githubusercontent.com/spirit-bear-productions/dota_vpk_updates/main/scripts/npc/items.txt';
 
 function resolveRepoPath(value) {
   if (path.isAbsolute(value)) {
@@ -13,7 +15,7 @@ function resolveRepoPath(value) {
 
 function parseArgs(argv) {
   const args = {
-    dotaItemsPath: 'scripts/dota_item_removal/official_dota_items.txt',
+    dotaItemsPath: defaultDotaItemsUrl,
     whitelistPath: 'scripts/dota_item_removal/item_whitelist.txt',
     outputPath: 'game/scripts/npc/generated/removed_dota_items.txt',
   };
@@ -46,8 +48,8 @@ function printHelp() {
   node scripts/update_removed_dota_items.js [options]
 
 Options:
-  --dota-items <path>   Path to Valve's extracted scripts/npc/items.txt
-                        Default: scripts/dota_item_removal/official_dota_items.txt
+  --dota-items <path>   Path or URL to Valve's scripts/npc/items.txt
+                        Default: ${defaultDotaItemsUrl}
   --whitelist <path>    Manual allow-list
                         Default: scripts/dota_item_removal/item_whitelist.txt
   --output <path>       Generated REMOVE entries
@@ -73,8 +75,78 @@ function addItem(set, itemName) {
   }
 }
 
+function isHttpUrl(value) {
+  return /^https?:\/\//i.test(value);
+}
+
+function normalizeDotaItemsSource(value) {
+  if (value === defaultDotaItemsUrl) {
+    return value;
+  }
+
+  if (isHttpUrl(value)) {
+    return value
+      .replace('https://github.com/', 'https://raw.githubusercontent.com/')
+      .replace('/blob/', '/');
+  }
+
+  return resolveRepoPath(value);
+}
+
+function fetchUrlText(url) {
+  return new Promise((resolve, reject) => {
+    https.get(url, {
+      headers: {
+        'User-Agent': 'x-hero-siege-item-removal-generator',
+      },
+    }, (response) => {
+      if (response.statusCode >= 300 && response.statusCode < 400 && response.headers.location) {
+        response.resume();
+        fetchUrlText(response.headers.location).then(resolve, reject);
+        return;
+      }
+
+      if (response.statusCode !== 200) {
+        response.resume();
+        reject(new Error(`Failed to fetch ${url}: HTTP ${response.statusCode}`));
+        return;
+      }
+
+      response.setEncoding('utf8');
+      let data = '';
+      response.on('data', (chunk) => {
+        data += chunk;
+      });
+      response.on('end', () => resolve(data));
+    }).on('error', reject);
+  });
+}
+
+async function readTextFromSource(source) {
+  if (isHttpUrl(source)) {
+    return fetchUrlText(source);
+  }
+
+  if (!fs.existsSync(source)) {
+    throw new Error(`Official Dota items file not found: ${source}
+
+Use the default live source:
+  node scripts/update_removed_dota_items.js
+
+Or pass a local file / URL:
+  node scripts/update_removed_dota_items.js --dota-items C:\\path\\to\\items.txt
+  node scripts/update_removed_dota_items.js --dota-items ${defaultDotaItemsUrl}`);
+  }
+
+  return fs.readFileSync(source, 'utf8');
+}
+
 function readLines(filePath) {
   return fs.readFileSync(filePath, 'utf8').split(/\r?\n/);
+}
+
+function readLinesFromText(text) {
+  return text.split(/\r?\n/);
 }
 
 function readManualWhitelist(filePath) {
@@ -104,9 +176,9 @@ function readManualWhitelist(filePath) {
   return items;
 }
 
-function readTopLevelItemKeys(filePath) {
+function readTopLevelItemKeysFromLines(lines) {
   const items = new Set();
-  for (const line of readLines(filePath)) {
+  for (const line of lines) {
     const clean = stripComment(line);
     const match = clean.match(/^\s*"(?<item>item_[^"]+)"\s*(?:\{|$|"REMOVE")/);
     if (match) {
@@ -115,6 +187,10 @@ function readTopLevelItemKeys(filePath) {
   }
 
   return items;
+}
+
+function readTopLevelItemKeys(filePath) {
+  return readTopLevelItemKeysFromLines(readLines(filePath));
 }
 
 function readShopItems(shopDir) {
@@ -145,7 +221,7 @@ function readShopItems(shopDir) {
   return items;
 }
 
-function readManualOverrideItemBlocks(filePath) {
+function readManualOverrideItems(filePath) {
   const items = new Set();
   if (!fs.existsSync(filePath)) {
     return items;
@@ -153,7 +229,7 @@ function readManualOverrideItemBlocks(filePath) {
 
   for (const line of readLines(filePath)) {
     const clean = stripComment(line);
-    const match = clean.match(/^\s*"(?<item>item_[^"]+)"\s*\{/);
+    const match = clean.match(/^\s*"(?<item>item_[^"]+)"\s*(?:\{|$|"REMOVE")/);
     if (match) {
       addItem(items, match.groups.item);
     }
@@ -168,41 +244,86 @@ function mergeSet(target, source) {
   }
 }
 
-function main() {
+function sortedSetValues(set) {
+  return [...set].sort();
+}
+
+function intersectSets(left, right) {
+  const result = new Set();
+  for (const value of left) {
+    if (right.has(value)) {
+      result.add(value);
+    }
+  }
+  return result;
+}
+
+function subtractSets(left, right) {
+  const result = new Set();
+  for (const value of left) {
+    if (!right.has(value)) {
+      result.add(value);
+    }
+  }
+  return result;
+}
+
+function addCommentedItemSection(lines, title, items) {
+  lines.push('//');
+  lines.push(`// ${title}: ${items.length}`);
+
+  if (items.length === 0) {
+    lines.push('// - none');
+    return;
+  }
+
+  for (const item of items) {
+    lines.push(`// - ${item}`);
+  }
+}
+
+function takeCategory(source, alreadyListed) {
+  const items = subtractSets(source, alreadyListed);
+  mergeSet(alreadyListed, items);
+  return sortedSetValues(items);
+}
+
+async function main() {
   const args = parseArgs(process.argv.slice(2));
   if (args.help) {
     printHelp();
     return;
   }
 
-  const dotaItemsPath = resolveRepoPath(args.dotaItemsPath);
+  const dotaItemsSource = normalizeDotaItemsSource(args.dotaItemsPath);
   const whitelistPath = resolveRepoPath(args.whitelistPath);
   const outputPath = resolveRepoPath(args.outputPath);
   const customItemsPath = resolveRepoPath('game/scripts/npc/npc_items_custom.txt');
   const overridePath = resolveRepoPath('game/scripts/npc/npc_abilities_override.txt');
   const shopDir = resolveRepoPath('game/scripts/shops');
 
-  if (!fs.existsSync(dotaItemsPath)) {
-    throw new Error(`Official Dota items file not found: ${dotaItemsPath}
-
-Extract Valve's latest scripts/npc/items.txt from Dota's pak01_dir.vpk and save it as:
-  scripts/dota_item_removal/official_dota_items.txt
-
-Or pass it directly:
-  node scripts/update_removed_dota_items.js --dota-items C:\\path\\to\\items.txt`);
-  }
-
-  const officialItems = readTopLevelItemKeys(dotaItemsPath);
+  const officialItemsText = await readTextFromSource(dotaItemsSource);
+  const officialItems = readTopLevelItemKeysFromLines(readLinesFromText(officialItemsText));
   const allowedItems = new Set();
+  const manualWhitelistItems = readManualWhitelist(whitelistPath);
+  const shopItems = readShopItems(shopDir);
+  const customItems = readTopLevelItemKeys(customItemsPath);
+  const manualOverrideItems = readManualOverrideItems(overridePath);
 
-  mergeSet(allowedItems, readManualWhitelist(whitelistPath));
-  mergeSet(allowedItems, readShopItems(shopDir));
-  mergeSet(allowedItems, readTopLevelItemKeys(customItemsPath));
-  mergeSet(allowedItems, readManualOverrideItemBlocks(overridePath));
+  mergeSet(allowedItems, manualWhitelistItems);
+  mergeSet(allowedItems, shopItems);
+  mergeSet(allowedItems, customItems);
+  mergeSet(allowedItems, manualOverrideItems);
 
   const removedItems = [...officialItems]
     .filter((item) => !allowedItems.has(item))
     .sort();
+  const listedAllowedItems = new Set();
+  const officialAllowedItems = takeCategory(intersectSets(officialItems, allowedItems), listedAllowedItems);
+  const shopOnlyItems = takeCategory(subtractSets(shopItems, officialItems), listedAllowedItems);
+  const xhsCustomOnlyItems = takeCategory(subtractSets(customItems, officialItems), listedAllowedItems);
+  const manualWhitelistExtraItems = takeCategory(manualWhitelistItems, listedAllowedItems);
+  const manualOverrideExtraItems = takeCategory(manualOverrideItems, listedAllowedItems);
 
   fs.mkdirSync(path.dirname(outputPath), { recursive: true });
 
@@ -210,30 +331,38 @@ Or pass it directly:
     '// AUTO-GENERATED FILE - DO NOT EDIT BY HAND',
     '// Regenerate with: node scripts/update_removed_dota_items.js',
     `// Generated at: ${new Date().toISOString()}`,
-    `// Source: ${dotaItemsPath}`,
+    `// Source: ${dotaItemsSource}`,
     '//',
     `// Official items: ${officialItems.size}`,
     `// Allowed items: ${allowedItems.size}`,
     `// Removed items: ${removedItems.length}`,
-    '',
-    '"DOTAAbilities"',
-    '{',
-    ...removedItems.map((item) => `\t"${item}"\t"REMOVE"`),
-    '}',
-    '',
   ];
+
+  addCommentedItemSection(lines, 'Allowed official Dota items', officialAllowedItems);
+  addCommentedItemSection(lines, 'XHS shop items', shopOnlyItems);
+  addCommentedItemSection(lines, 'XHS custom items not in shops', xhsCustomOnlyItems);
+  addCommentedItemSection(lines, 'Manual whitelist extras', manualWhitelistExtraItems);
+  addCommentedItemSection(lines, 'Manual override extras', manualOverrideExtraItems);
+
+  lines.push('');
+  lines.push('"DOTAAbilities"');
+  lines.push('{');
+  for (const item of removedItems) {
+    lines.push(`\t"${item}"\t"REMOVE"`);
+  }
+  lines.push('}');
+  lines.push('');
 
   fs.writeFileSync(outputPath, lines.join('\n'), 'ascii');
 
   console.log(`Generated: ${outputPath}`);
+  console.log(`Source: ${dotaItemsSource}`);
   console.log(`Official items: ${officialItems.size}`);
   console.log(`Allowed items: ${allowedItems.size}`);
   console.log(`Removed items: ${removedItems.length}`);
 }
 
-try {
-  main();
-} catch (error) {
+main().catch((error) => {
   console.error(error.message);
   process.exit(1);
-}
+});

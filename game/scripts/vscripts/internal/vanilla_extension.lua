@@ -1,31 +1,456 @@
+if IsServer() and CDOTA_PlayerResource ~= nil
+	and CDOTA_PlayerResource.HasSelectedHero ~= nil
+	and _G.XHS_NATIVE_HAS_SELECTED_HERO == nil then
+	_G.XHS_NATIVE_HAS_SELECTED_HERO = CDOTA_PlayerResource.HasSelectedHero
+
+	-- ReplaceHeroWith can briefly leave a player slot flagged as selected while
+	-- its new hero entity does not exist yet. Preserve the useful vanilla
+	-- contract globally: a positive result always has a usable hero handle.
+	CDOTA_PlayerResource.HasSelectedHero = function(self, playerID)
+		if not _G.XHS_NATIVE_HAS_SELECTED_HERO(self, playerID) then
+			return false
+		end
+
+		local hero = self:GetSelectedHeroEntity(playerID)
+		if hero == nil then return false end
+		if IsValidEntity ~= nil and not IsValidEntity(hero) then return false end
+		if hero.IsNull ~= nil and hero:IsNull() then return false end
+		return true
+	end
+end
+
+-- Keep projectile instrumentation transparent to gameplay code. Every caller
+-- continues to use ProjectileManager's vanilla API while the extension records
+-- activity before delegating to the original engine function.
+if IsServer() and ProjectileManager ~= nil then
+	if ProjectileManager.CreateLinearProjectile ~= nil
+		and _G.XHS_NATIVE_CREATE_LINEAR_PROJECTILE == nil then
+		_G.XHS_NATIVE_CREATE_LINEAR_PROJECTILE = ProjectileManager.CreateLinearProjectile
+
+		ProjectileManager.CreateLinearProjectile = function(manager, info)
+			local counters = _G.XHSPerformanceCounters
+			if counters ~= nil and counters.Increment ~= nil then
+				counters:Increment("linear_projectiles", 1)
+			end
+			return _G.XHS_NATIVE_CREATE_LINEAR_PROJECTILE(manager, info)
+		end
+	end
+
+	if ProjectileManager.CreateTrackingProjectile ~= nil
+		and _G.XHS_NATIVE_CREATE_TRACKING_PROJECTILE == nil then
+		_G.XHS_NATIVE_CREATE_TRACKING_PROJECTILE = ProjectileManager.CreateTrackingProjectile
+
+		ProjectileManager.CreateTrackingProjectile = function(manager, info)
+			local counters = _G.XHSPerformanceCounters
+			if counters ~= nil and counters.Increment ~= nil then
+				counters:Increment("tracking_projectiles", 1)
+			end
+			return _G.XHS_NATIVE_CREATE_TRACKING_PROJECTILE(manager, info)
+		end
+	end
+end
+
+if IsServer() and LinkLuaModifier ~= nil and _G.XHS_NATIVE_LINK_LUA_MODIFIER == nil then
+	_G.XHS_NATIVE_LINK_LUA_MODIFIER = LinkLuaModifier
+	_G.XHS_LINK_LUA_MODIFIER_REGISTRY = _G.XHS_LINK_LUA_MODIFIER_REGISTRY or {}
+	_G.XHS_CLIENT_LINKED_LUA_MODIFIERS = _G.XHS_CLIENT_LINKED_LUA_MODIFIERS or {}
+	_G.XHS_PENDING_CLIENT_LINK_LUA_MODIFIERS = _G.XHS_PENDING_CLIENT_LINK_LUA_MODIFIERS or {}
+	_G.XHS_CLIENT_LINK_LUA_MODIFIER_THINK_ACTIVE = _G.XHS_CLIENT_LINK_LUA_MODIFIER_THINK_ACTIVE or false
+
+	local function XHSPublishClientLinkedLuaModifiers()
+		if CustomNetTables == nil then return end
+
+		local payload = {}
+		for name, entry in pairs(_G.XHS_CLIENT_LINKED_LUA_MODIFIERS) do
+			payload[name] = {
+				name = entry.name,
+				path = entry.path,
+				motion = entry.motion,
+			}
+		end
+
+		CustomNetTables:SetTableValue("xhs_lua_modifiers", "client_links", payload)
+	end
+
+	local function XHSInspectClientLuaModifierLink(name, entry)
+		if name == nil or entry == nil then return false, false end
+		if _G.XHS_CLIENT_LINKED_LUA_MODIFIERS[name] ~= nil then return false, false end
+
+		local modifierClass = _G[name]
+		if modifierClass ~= nil and modifierClass.XHS_LINK_CLIENT == true then
+			_G.XHS_CLIENT_LINKED_LUA_MODIFIERS[name] = entry
+			_G.XHS_PENDING_CLIENT_LINK_LUA_MODIFIERS[name] = nil
+			return true, false
+		end
+
+		if modifierClass ~= nil then
+			_G.XHS_PENDING_CLIENT_LINK_LUA_MODIFIERS[name] = nil
+			return false, false
+		end
+
+		entry.attempts = (entry.attempts or 0) + 1
+		if entry.attempts >= 20 then
+			_G.XHS_PENDING_CLIENT_LINK_LUA_MODIFIERS[name] = nil
+			return false, false
+		end
+
+		return false, true
+	end
+
+	local function XHSInspectPendingClientLuaModifierLinks()
+		local hasPending = false
+		local changed = false
+
+		for name, entry in pairs(_G.XHS_PENDING_CLIENT_LINK_LUA_MODIFIERS) do
+			local entryChanged, entryPending = XHSInspectClientLuaModifierLink(name, entry)
+			changed = changed or entryChanged
+			hasPending = hasPending or entryPending
+		end
+
+		if changed then
+			XHSPublishClientLinkedLuaModifiers()
+		end
+
+		if hasPending then
+			return 0.1
+		end
+
+		_G.XHS_CLIENT_LINK_LUA_MODIFIER_THINK_ACTIVE = false
+		return nil
+	end
+
+	local function XHSScheduleClientLuaModifierLinkInspect()
+		if _G.XHS_CLIENT_LINK_LUA_MODIFIER_THINK_ACTIVE == true then return end
+		if GameRules == nil or GameRules.GetGameModeEntity == nil then return end
+
+		local mode = GameRules:GetGameModeEntity()
+		if mode == nil then return end
+
+		_G.XHS_CLIENT_LINK_LUA_MODIFIER_THINK_ACTIVE = true
+		mode:SetContextThink("xhs_client_link_lua_modifier_inspect", XHSInspectPendingClientLuaModifierLinks, 0.0)
+	end
+
+	LinkLuaModifier = function(name, path, motion)
+		_G.XHS_NATIVE_LINK_LUA_MODIFIER(name, path, motion)
+
+		if name == nil or path == nil then return end
+
+		_G.XHS_LINK_LUA_MODIFIER_REGISTRY[name] = {
+			name = name,
+			path = path,
+			motion = motion or LUA_MODIFIER_MOTION_NONE,
+		}
+		_G.XHS_PENDING_CLIENT_LINK_LUA_MODIFIERS[name] = _G.XHS_LINK_LUA_MODIFIER_REGISTRY[name]
+
+		XHSScheduleClientLuaModifierLinkInspect()
+	end
+
+	if CDOTA_BaseNPC ~= nil and CDOTA_BaseNPC.AddNewModifier ~= nil and _G.XHS_NATIVE_ADD_NEW_MODIFIER == nil then
+		_G.XHS_NATIVE_ADD_NEW_MODIFIER = CDOTA_BaseNPC.AddNewModifier
+
+		CDOTA_BaseNPC.AddNewModifier = function(self, caster, ability, modifierName, modifierTable)
+			if self == nil or (IsValidEntity ~= nil and not IsValidEntity(self)) then
+				return nil
+			end
+
+			local modifier = _G.XHS_NATIVE_ADD_NEW_MODIFIER(self, caster, ability, modifierName, modifierTable)
+			local entry = _G.XHS_LINK_LUA_MODIFIER_REGISTRY[modifierName]
+			if entry ~= nil then
+				local changed = XHSInspectClientLuaModifierLink(modifierName, entry)
+				if changed then
+					XHSPublishClientLinkedLuaModifiers()
+				end
+			end
+
+			return modifier
+		end
+	end
+end
+
 function GetReductionFromArmor(armor)
 	return ((0.052 * armor) / (0.9 + 0.048 * armor))
 end
 
-function CDOTA_BaseNPC:SendLifestealAttack(hTarget)
-	local lifesteal = 0
+local XHS_SUPPORTER_LIFESTEAL_CONFIG = {
+	attack = {
+		player_field = "attack_lifesteal_pfx",
+		default_particle = "particles/generic_gameplay/generic_lifesteal.vpcf",
+		cooldown = 0.30,
+	},
+	spell = {
+		player_field = "spell_lifesteal_pfx",
+		default_particle = "particles/items3_fx/octarine_core_lifesteal.vpcf",
+		slot = "spell_lifesteal",
+		item_field = "pfx",
+	},
+}
 
-	-- useless atm because modifier can't have multiple instances, find a way to call lifefsteal attack once
+local XHS_SUPPORTER_LIFESTEAL_PARTICLE_PROFILES = {
+	["particles/econ/items/drow/drow_arcana/drow_arcana_lifesteal.vpcf"] = "hero_cp1",
+	["particles/econ/items/lone_druid/lone_druid_immortal_2021/lone_druid_immortal_2021_lifesteal.vpcf"] = "hero_cp1",
+}
+
+local XHS_SUPPORTER_LIFESTEAL_BLOCKED_PREFIXES = {
+	"particles/units/heroes/hero_skeletonking/wraith_king_vampiric_aura_lifesteal",
+	"particles/units/heroes/hero_skeletonking/skeletonking_vampiric_aura_lifesteal",
+}
+
+local function XHSIsValidLifestealEntity(entity)
+	if entity == nil then return false end
+	if IsValidEntity ~= nil and not IsValidEntity(entity) then return false end
+	if entity.IsNull ~= nil and entity:IsNull() then return false end
+	return true
+end
+
+local function XHSGetLifestealPlayerID(hero)
+	if not XHSIsValidLifestealEntity(hero) then return nil end
+	if hero.IsRealHero == nil or not hero:IsRealHero() then return nil end
+	if hero.GetPlayerOwnerID == nil then return nil end
+
+	local playerID = hero:GetPlayerOwnerID()
+	if type(playerID) ~= "number" or playerID < 0 then return nil end
+	if PlayerResource ~= nil and PlayerResource.IsValidPlayerID ~= nil
+		and not PlayerResource:IsValidPlayerID(playerID) then
+		return nil
+	end
+
+	return playerID
+end
+
+local function XHSIsValidLifestealParticlePath(path)
+	if type(path) ~= "string" then return false end
+	local normalized = string.lower(path)
+	return string.sub(normalized, 1, 10) == "particles/"
+		and string.sub(normalized, -5) == ".vpcf"
+end
+
+local function XHSIsBlockedLifestealParticle(path)
+	if not XHSIsValidLifestealParticlePath(path) then return false end
+	local normalized = string.lower(path)
+
+	for _, prefix in ipairs(XHS_SUPPORTER_LIFESTEAL_BLOCKED_PREFIXES) do
+		if string.sub(normalized, 1, string.len(prefix)) == prefix then
+			return true
+		end
+	end
+
+	return false
+end
+
+local function XHSResolveSupporterLifestealParticle(hero, playerID, config)
+	local fallback = config.default_particle
+	if Battlepass ~= nil and Battlepass.AreSupporterRewardsEnabled ~= nil then
+		local success, enabled = pcall(Battlepass.AreSupporterRewardsEnabled, Battlepass, playerID)
+		if success and not enabled then return fallback end
+	end
+
+	-- Resolve the currently equipped reward at playback time. This keeps every
+	-- spell-lifesteal source in sync with live and DEV-local loadout changes,
+	-- even when the cached player-particle table predates the equip action.
+	if Battlepass ~= nil and Battlepass.GetEquippedSupporterItem ~= nil
+		and config.slot ~= nil and config.item_field ~= nil then
+		local success, item = pcall(
+			Battlepass.GetEquippedSupporterItem,
+			Battlepass,
+			playerID,
+			config.slot
+		)
+		local equippedParticle = success and type(item) == "table"
+			and item[config.item_field] or nil
+		if XHSIsValidLifestealParticlePath(equippedParticle)
+			and not XHSIsBlockedLifestealParticle(equippedParticle) then
+			return equippedParticle
+		end
+	end
+
+	if Battlepass == nil or Battlepass.GetPlayerParticle == nil then return fallback end
+	local particle = Battlepass:GetPlayerParticle(hero, config.player_field, fallback)
+	if not XHSIsValidLifestealParticlePath(particle) then return fallback end
+	if XHSIsBlockedLifestealParticle(particle) then return fallback end
+	return particle
+end
+
+local function XHSSetLifestealParticleControlEntity(particle, controlPoint, entity)
+	if not XHSIsValidLifestealEntity(entity) then return false end
+
+	ParticleManager:SetParticleControl(particle, controlPoint, entity:GetAbsOrigin())
+	ParticleManager:SetParticleControlEnt(
+		particle,
+		controlPoint,
+		entity,
+		PATTACH_POINT_FOLLOW,
+		"attach_hitloc",
+		entity:GetAbsOrigin(),
+		true
+	)
+	return true
+end
+
+local function XHSCreateSupporterLifestealParticle(hero, victim, particleName)
+	if not XHSIsValidLifestealParticlePath(particleName) then return false end
+	if XHSIsBlockedLifestealParticle(particleName) then return false end
+	if ParticleManager == nil or ParticleManager.CreateParticle == nil then return false end
+
+	local profile = XHS_SUPPORTER_LIFESTEAL_PARTICLE_PROFILES[string.lower(particleName)] or "hero"
+	local parent = hero
+	if profile == "victim_to_hero" or profile == "victim_to_hero_world" then
+		if not XHSIsValidLifestealEntity(victim) then return false end
+		parent = victim
+	end
+
+	local particle = ParticleManager:CreateParticle(
+		particleName,
+		PATTACH_ABSORIGIN_FOLLOW,
+		parent
+	)
+	if particle == nil or particle < 0 then return false end
+
+	if profile == "victim_to_hero_world" then
+		-- Drow Arcana emits around CP0 and attracts toward CP1. Absolute
+		-- origins avoid attach_hitloc errors on XHS units without that point.
+		ParticleManager:SetParticleControl(particle, 0, victim:GetAbsOrigin())
+		ParticleManager:SetParticleControl(particle, 1, hero:GetAbsOrigin())
+	elseif profile == "victim_to_hero" then
+		XHSSetLifestealParticleControlEntity(particle, 0, victim)
+		XHSSetLifestealParticleControlEntity(particle, 1, hero)
+	elseif profile == "hero_cp1" then
+		XHSSetLifestealParticleControlEntity(particle, 0, hero)
+		XHSSetLifestealParticleControlEntity(particle, 1, hero)
+	else
+		XHSSetLifestealParticleControlEntity(particle, 0, hero)
+	end
+
+	ParticleManager:ReleaseParticleIndex(particle)
+	return true
+end
+
+-- Trusted Tools-mode previews supply a server-owned candidate path directly.
+-- Reuse the exact runtime profiles while bypassing the player's equipped item
+-- and rewards visibility, so the Content Studio can never validate a fallback
+-- or a different cosmetic by mistake.
+function XHSPlaySupporterLifestealPreviewFX(hero, victim, particleName)
+	if IsServer ~= nil and not IsServer() then return false end
+	return XHSCreateSupporterLifestealParticle(hero, victim, particleName)
+end
+
+local function XHSGetSupporterLifestealState(hero)
+	hero.xhs_supporter_lifesteal_fx_state = hero.xhs_supporter_lifesteal_fx_state or {}
+	return hero.xhs_supporter_lifesteal_fx_state
+end
+
+local function XHSGetSupporterLifestealTime()
+	if GameRules ~= nil and GameRules.GetGameTime ~= nil then
+		return GameRules:GetGameTime()
+	end
+	if Time ~= nil then return Time() end
+	return nil
+end
+
+function XHSPlaySupporterLifestealFX(hero, victim, kind, actualHeal)
+	if IsServer ~= nil and not IsServer() then return false end
+
+	local playerID = XHSGetLifestealPlayerID(hero)
+	local config = XHS_SUPPORTER_LIFESTEAL_CONFIG[kind]
+	local heal = tonumber(actualHeal) or 0
+	if playerID == nil or config == nil or heal <= 0 then return false end
+
+	if config.cooldown ~= nil then
+		local state = XHSGetSupporterLifestealState(hero)
+		local now = XHSGetSupporterLifestealTime()
+		local lastTime = tonumber(state.last_attack_fx_time)
+		if now ~= nil and lastTime ~= nil and now >= lastTime
+			and now - lastTime < config.cooldown then
+			return false
+		end
+		if now ~= nil then
+			state.last_attack_fx_time = now
+		end
+	end
+
+	local particleName = XHSResolveSupporterLifestealParticle(hero, playerID, config)
+	return XHSCreateSupporterLifestealParticle(hero, victim, particleName)
+end
+
+function XHSPlaySupporterAttackLifestealFX(hero, victim, actualHeal)
+	return XHSPlaySupporterLifestealFX(hero, victim, "attack", actualHeal)
+end
+
+function XHSQueueSupporterSpellLifestealFX(hero, victim, actualHeal)
+	if IsServer ~= nil and not IsServer() then return false end
+	if XHSGetLifestealPlayerID(hero) == nil then return false end
+
+	local heal = tonumber(actualHeal) or 0
+	if heal <= 0 then return false end
+
+	local state = XHSGetSupporterLifestealState(hero)
+	state.pending_spell_heal = (tonumber(state.pending_spell_heal) or 0) + heal
+	if XHSIsValidLifestealEntity(victim) then
+		state.pending_spell_victim = victim
+	end
+	if state.spell_fx_scheduled then return true end
+	state.spell_fx_scheduled = true
+
+	local function FlushSupporterSpellLifestealFX()
+		state.spell_fx_scheduled = false
+		local pendingHeal = tonumber(state.pending_spell_heal) or 0
+		local pendingVictim = state.pending_spell_victim
+		state.pending_spell_heal = nil
+		state.pending_spell_victim = nil
+
+		if pendingHeal > 0 then
+			XHSPlaySupporterLifestealFX(hero, pendingVictim, "spell", pendingHeal)
+		end
+		return nil
+	end
+
+	if Timers ~= nil and Timers.CreateTimer ~= nil then
+		Timers:CreateTimer(0.03, FlushSupporterSpellLifestealFX)
+		return true
+	end
+
+	if GameRules ~= nil and GameRules.GetGameModeEntity ~= nil then
+		local gameMode = GameRules:GetGameModeEntity()
+		if gameMode ~= nil then
+			local contextName = "xhs_supporter_spell_lifesteal_" .. tostring(hero:entindex())
+			if DoUniqueString ~= nil then
+				contextName = DoUniqueString(contextName)
+			end
+			gameMode:SetContextThink(contextName, FlushSupporterSpellLifestealFX, 0.03)
+			return true
+		end
+	end
+
+	FlushSupporterSpellLifestealFX()
+	return true
+end
+
+function CDOTA_BaseNPC:SendLifestealAttack(hTarget, damage_dealt)
+	local lifesteal = 0
+	local lifesteal_source = nil
+
 	for _, parent_modifier in pairs(self:FindAllModifiers()) do
-		if parent_modifier and parent_modifier.GetModifierLifesteal and parent_modifier:GetModifierLifesteal() and lifesteal then
-			if parent_modifier:GetModifierLifesteal() > lifesteal then
-				lifesteal = parent_modifier:GetModifierLifesteal()
+		if parent_modifier and parent_modifier.GetModifierLifesteal then
+			local modifier_lifesteal = tonumber(parent_modifier:GetModifierLifesteal()) or 0
+			if modifier_lifesteal > lifesteal then
+				lifesteal = modifier_lifesteal
+				lifesteal_source = parent_modifier:GetAbility()
 			end
 		end
 	end
 
-	-- print("Lifesteal is " .. lifesteal .. "%")
-
 	if lifesteal > 0 then
-		local damage = self:GetRealDamageDone(hTarget)
+		-- OnTakeDamage supplies the final damage actually received by the victim.
+		local damage = math.max(0, tonumber(damage_dealt) or 0)
 		local heal = damage * (lifesteal / 100)
+		if heal <= 0 then return end
 
-		self:Heal(heal, self)
-		SendOverheadEventMessage(nil, OVERHEAD_ALERT_HEAL, self, heal, nil)
+		local health_before = self:GetHealth()
+		self:Heal(heal, lifesteal_source)
+		local actual_heal = math.max(0, self:GetHealth() - health_before)
+		if actual_heal <= 0 then return end
 
-		local lifesteal_pfx = ParticleManager:CreateParticle("particles/generic_gameplay/generic_lifesteal.vpcf", PATTACH_ABSORIGIN_FOLLOW, self)
-		ParticleManager:SetParticleControl(lifesteal_pfx, 0, self:GetAbsOrigin())
-		ParticleManager:ReleaseParticleIndex(lifesteal_pfx)
+		SendOverheadEventMessage(nil, OVERHEAD_ALERT_HEAL, self, actual_heal, nil)
+		XHSPlaySupporterAttackLifestealFX(self, hTarget, actual_heal)
 	end
 end
 
@@ -72,11 +497,20 @@ function CDOTA_BaseNPC:RemoveItemByName(ItemName, bStash)
 	end
 end
 
-function CDOTA_BaseNPC:IncrementAttributes(amount, bAll)
+function CDOTA_BaseNPC:IncrementAttributes(amount, options)
 	if self:IsIllusion() then return end
 	if not self:IsAlive() then return end
 
-	local bSoundPlayed = false
+	local playSound = true
+	local playEffect = true
+	if type(options) == "table" and options.play_sound == false then
+		playSound = false
+	elseif options == false then
+		playSound = false
+	end
+	if type(options) == "table" and options.play_effect == false then
+		playEffect = false
+	end
 
 	if self:HasModifier("modifier_tome_of_stats") then
 		self:FindModifierByName("modifier_tome_of_stats"):SetStackCount(self:FindModifierByName("modifier_tome_of_stats"):GetStackCount() + amount)
@@ -84,13 +518,22 @@ function CDOTA_BaseNPC:IncrementAttributes(amount, bAll)
 		self:AddNewModifier(self, nil, "modifier_tome_of_stats", {}):SetStackCount(amount)
 	end
 
+	if XHSRecordTomeStats ~= nil and (type(options) ~= "table" or options.record_stats ~= false) then
+		XHSRecordTomeStats(self, amount)
+	end
+
 	if not self.GetPlayerID then return end
 
-	local particle1 = ParticleManager:CreateParticle("particles/generic_hero_status/hero_levelup.vpcf", PATTACH_ABSORIGIN_FOLLOW, self, self)
-	ParticleManager:SetParticleControl(particle1, 0, self:GetAbsOrigin())
+	if playEffect == true then
+		local levelupParticle = XHSGetBattlepassParticle ~= nil
+			and XHSGetBattlepassParticle(self, "levelup_pfx", "particles/generic_hero_status/hero_levelup.vpcf")
+			or "particles/generic_hero_status/hero_levelup.vpcf"
+		local particle1 = ParticleManager:CreateParticle(levelupParticle, PATTACH_ABSORIGIN_FOLLOW, self)
+		ParticleManager:SetParticleControl(particle1, 0, self:GetAbsOrigin())
+		XHSDestroyParticleAfter(particle1, 1.5, false)
+	end
 
-	if bSoundPlayed == false then
-		bSoundPlayed = true
+	if playSound == true then
 		self:EmitSound("ui.trophy_levelup")
 	end
 
@@ -183,73 +626,134 @@ ignored_pfx_list["particles/econ/events/ti10/emblem/ti10_emblem_effect.vpcf"] = 
 ignored_pfx_list["particles/units/heroes/hero_ember_spirit/ember_spirit_flameguard.vpcf"] = true
 ignored_pfx_list["particles/act_2/campfire_flame.vpcf"] = true
 
--- Call custom functions whenever CreateParticle is being called anywhere
-local original_CreateParticle = CScriptParticleManager.CreateParticle
-CScriptParticleManager.CreateParticle = function(self, sParticleName, iAttachType, hParent, hCaster)
-	local override = nil
+-- Keep runtime particle accounting centralized without changing particle paths.
+XHSParticleTelemetry = XHSParticleTelemetry or {
+	active = {},
+	active_by_path = {},
+	created_total = 0,
+	destroyed_total = 0,
+	released_total = 0,
+	dropped_records = 0,
+	tracked_count = 0,
+	maximum_records = 5000,
+}
 
-	if hCaster then
-		override = CustomNetTables:GetTableValue("battlepass_player", sParticleName .. '_' .. hCaster:GetPlayerOwnerID())
+function XHSParticleTelemetry:Created(index, path, scope)
+	if index == nil then return end
+	self.created_total = self.created_total + 1
+	local replaced = self.active[index]
+	if replaced ~= nil then
+		self.active_by_path[replaced.path] = math.max(0, (self.active_by_path[replaced.path] or 1) - 1)
+		if self.active_by_path[replaced.path] == 0 then self.active_by_path[replaced.path] = nil end
 	end
+	if self.active[index] == nil and self.tracked_count >= self.maximum_records then
+		self.dropped_records = self.dropped_records + 1
+		return
+	end
+	path = tostring(path or "unknown")
+	self.active[index] = { path = path, scope = scope or "all", created_at = Time(), destroyed = false }
+	if replaced == nil then self.tracked_count = self.tracked_count + 1 end
+	self.active_by_path[path] = (self.active_by_path[path] or 0) + 1
+end
 
-	if override then
-		sParticleName = override["1"]
+function XHSParticleTelemetry:Destroyed(index)
+	local record = self.active[index]
+	if record == nil or record.destroyed == true then return end
+	record.destroyed = true
+	record.destroyed_at = Time()
+	self.destroyed_total = self.destroyed_total + 1
+end
+
+function XHSParticleTelemetry:Released(index)
+	local record = self.active[index]
+	if record ~= nil then
+		self.active_by_path[record.path] = math.max(0, (self.active_by_path[record.path] or 1) - 1)
+		if self.active_by_path[record.path] == 0 then self.active_by_path[record.path] = nil end
+		self.active[index] = nil
+		self.tracked_count = math.max(0, self.tracked_count - 1)
+	end
+	self.released_total = self.released_total + 1
+end
+
+function XHSParticleTelemetry:GetSnapshot()
+	local now = Time()
+	local alive, destroyedUnreleased, oldest = 0, 0, 0
+	local top = {}
+	for _, record in pairs(self.active) do
+		if record.destroyed then destroyedUnreleased = destroyedUnreleased + 1 else alive = alive + 1 end
+		oldest = math.max(oldest, now - (record.created_at or now))
+	end
+	for path, count in pairs(self.active_by_path) do table.insert(top, { path = path, count = count }) end
+	table.sort(top, function(a, b) return a.count > b.count end)
+	while #top > 10 do table.remove(top) end
+	return {
+		alive = alive,
+		destroyed_unreleased = destroyedUnreleased,
+		tracked = alive + destroyedUnreleased,
+		oldest_seconds = math.floor(oldest * 10 + 0.5) / 10,
+		created_total = self.created_total,
+		destroyed_total = self.destroyed_total,
+		released_total = self.released_total,
+		dropped_records = self.dropped_records,
+		top = top,
+	}
+end
+
+local original_CreateParticle = CScriptParticleManager.CreateParticle
+CScriptParticleManager.CreateParticle = function(self, sParticleName, iAttachType, hParent)
+	if XHSPrecache and XHSPrecache.NoteRuntimeAsset then
+		XHSPrecache:NoteRuntimeAsset("particle", sParticleName, "CreateParticle")
 	end
 
 	-- call the original function
 	local response = original_CreateParticle(self, sParticleName, iAttachType, hParent)
+	XHSParticleTelemetry:Created(response, sParticleName, "all")
 
 	--	print("CreateParticle response:", sParticleName)
 
 	if not ignored_pfx_list[sParticleName] and CScriptParticleManager and CScriptParticleManager.ACTIVE_PARTICLES then
-		if hCaster and not hCaster:IsHero() then
-			table.insert(CScriptParticleManager.ACTIVE_PARTICLES, { response, 0 })
-		else
-			table.insert(CScriptParticleManager.ACTIVE_PARTICLES, { response, 0 })
-		end
+		table.insert(CScriptParticleManager.ACTIVE_PARTICLES, { response, 0 })
 	end
 
 	return response
 end
 
--- Call custom functions whenever CreateParticleForTeam is being called anywhere
+-- Preserve runtime asset accounting for team-scoped particles.
 local original_CreateParticleForTeam = CScriptParticleManager.CreateParticleForTeam
-CScriptParticleManager.CreateParticleForTeam = function(self, sParticleName, iAttachType, hParent, iTeamNumber, hCaster)
-	--	print("Create Particle (override):", sParticleName, iAttachType, hParent, iTeamNumber, hCaster)
-
-	local override = nil
-
-	if hCaster then
-		override = CustomNetTables:GetTableValue("battlepass_player", sParticleName .. '_' .. hCaster:GetPlayerOwnerID())
-	end
-
-	if override then
-		sParticleName = override["1"]
+CScriptParticleManager.CreateParticleForTeam = function(self, sParticleName, iAttachType, hParent, iTeamNumber)
+	if XHSPrecache and XHSPrecache.NoteRuntimeAsset then
+		XHSPrecache:NoteRuntimeAsset("particle", sParticleName, "CreateParticleForTeam")
 	end
 
 	-- call the original function
 	local response = original_CreateParticleForTeam(self, sParticleName, iAttachType, hParent, iTeamNumber)
+	XHSParticleTelemetry:Created(response, sParticleName, "team")
 
 	return response
 end
 
--- Call custom functions whenever CreateParticleForPlayer is being called anywhere
+-- Preserve runtime asset accounting for player-scoped particles.
 local original_CreateParticleForPlayer = CScriptParticleManager.CreateParticleForPlayer
-CScriptParticleManager.CreateParticleForPlayer = function(self, sParticleName, iAttachType, hParent, hPlayer, hCaster)
-	--	print("Create Particle (override):", sParticleName, iAttachType, hParent, hPlayer, hCaster)
-
-	local override = nil
-
-	if hCaster then
-		override = CustomNetTables:GetTableValue("battlepass_player", sParticleName .. '_' .. hCaster:GetPlayerOwnerID())
-	end
-
-	if override then
-		sParticleName = override["1"]
+CScriptParticleManager.CreateParticleForPlayer = function(self, sParticleName, iAttachType, hParent, hPlayer)
+	if XHSPrecache and XHSPrecache.NoteRuntimeAsset then
+		XHSPrecache:NoteRuntimeAsset("particle", sParticleName, "CreateParticleForPlayer")
 	end
 
 	-- call the original function
 	local response = original_CreateParticleForPlayer(self, sParticleName, iAttachType, hParent, hPlayer)
+	XHSParticleTelemetry:Created(response, sParticleName, "player")
 
 	return response
+end
+
+local original_DestroyParticle = CScriptParticleManager.DestroyParticle
+CScriptParticleManager.DestroyParticle = function(self, particleIndex, immediate)
+	XHSParticleTelemetry:Destroyed(particleIndex)
+	return original_DestroyParticle(self, particleIndex, immediate)
+end
+
+local original_ReleaseParticleIndex = CScriptParticleManager.ReleaseParticleIndex
+CScriptParticleManager.ReleaseParticleIndex = function(self, particleIndex)
+	XHSParticleTelemetry:Released(particleIndex)
+	return original_ReleaseParticleIndex(self, particleIndex)
 end

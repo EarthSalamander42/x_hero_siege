@@ -71,6 +71,10 @@ function Morph(keys)
 	local target = keys.target
 	local duration = ability:GetLevelSpecialValueFor("voodoo_duration", ability_level)
 
+	if caster ~= nil and not caster:IsNull() then
+		caster:EmitSound("Hero_Lion.Hex.Cast")
+	end
+
 	if target:IsIllusion() then
 		target:Kill(nil, nil)
 	else

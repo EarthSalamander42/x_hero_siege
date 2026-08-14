@@ -1,6 +1,7 @@
 LinkLuaModifier("modifier_unholy_buff", "modifiers/auras/modifier_unholy_aura.lua", LUA_MODIFIER_MOTION_NONE)
 
 modifier_unholy_aura = modifier_unholy_aura or class({})
+modifier_unholy_aura.XHS_LINK_CLIENT = true
 
 function modifier_unholy_aura:IsAura() return true end
 function modifier_unholy_aura:GetAuraDuration() return 0.2 end
@@ -9,6 +10,7 @@ function modifier_unholy_aura:GetAuraSearchTeam() return self:GetAbility():GetAb
 function modifier_unholy_aura:GetAuraSearchType() return self:GetAbility():GetAbilityTargetType() end
 function modifier_unholy_aura:GetAuraSearchFlags() return self:GetAbility():GetAbilityTargetFlags() end
 function modifier_unholy_aura:GetModifierAura() return "modifier_unholy_buff" end
+function modifier_unholy_aura:GetAuraEntityReject(target) return IsXHSRuneUnit and IsXHSRuneUnit(target) end
 
 function modifier_unholy_aura:IsHidden() return true end
 function modifier_unholy_aura:IsPurgable() return false end
@@ -16,6 +18,7 @@ function modifier_unholy_aura:IsPurgeException() return false end
 function modifier_unholy_aura:RemoveOnDeath() return false end
 
 modifier_unholy_buff = modifier_unholy_buff or class({})
+modifier_unholy_buff.XHS_LINK_CLIENT = true
 
 function modifier_unholy_buff:GetTexture()
 	return "custom/holdout_unholy_aura"

@@ -1,43 +1,50 @@
-"itembuilds/test_skeleton_king.txt"
+"itembuilds"
 {
 	"author"		"X Hero Siege Official"
 	"hero"			"npc_dota_hero_skeleton_king"
-	"Title"			"Recommended items for Lich King"
+	"Title"			"XHS Bruiser - Lich King"
 
 	"Items"
 	{
-		"#DOTA_Item_Build_Title"
-		{
-		}
-
-		"#DOTA_Item_Build_Hero5"
-		{
-		}
-
 		"#DOTA_Item_Build_Starting_Items"
 		{
-			"item"		"item_amulet_of_the_wild"
+			"item"		"item_health_potion"
+			"item"		"item_mana_potion"
+			"item"		"item_orb_of_darkness"
 		}
 
 		"#DOTA_Item_Build_Early_Game"
 		{
+			"item"		"item_orb_of_fire"
 			"item"		"item_tome_small"
-			"item"		"item_ankh_of_reincarnation"
-			"item"		"item_gloom_blade"
-		}
-
-		"#DOTA_Item_Build_Core_Items"
-		{
-			"item"		"item_assassins_blade"
+			"item"		"item_tome_small"
 			"item"		"item_lifesteal_mask"
-			"item"		"item_bracer_of_protection"
-			"item"		"item_assassins_blade"
+			"item"		"item_ankh_of_reincarnation"
 		}
 
-		"#DOTA_Item_Build_Luxury"
+		"#DOTA_Item_Build_Mid_Items"
 		{
-			"item"		"item_tome_small"
+			"item"		"item_orb_of_darkness2"
+			"item"		"item_orb_of_fire2"
+			"item"		"item_boots_of_speed"
+			"item"		"item_xhs_cloak_of_flames"
+		}
+
+		"#DOTA_Item_Build_Late_Items"
+		{
+			"item"		"item_bracer_of_the_void"
+			"item"		"item_searing_blade"
 			"item"		"item_tome_big"
+		}
+
+		"#DOTA_Item_Build_Other_Items"
+		{
+			"item"		"item_healing_wards"
+			"item"		"item_potion_full"
+			"item"		"item_potion_of_invulnerability"
+			"item"		"item_potion_of_antimagic"
+			"item"		"item_amulet_of_the_wild"
+			"item"		"item_orb_of_earth"
 		}
 	}
 }

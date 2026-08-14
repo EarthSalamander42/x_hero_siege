@@ -1,4 +1,5 @@
 modifier_stack_count_animation_controller = class({})
+modifier_stack_count_animation_controller.XHS_LINK_CLIENT = true
 
 --------------------------------------------------------------------------------
 

@@ -1,10 +1,44 @@
 item_tome_small = item_tome_small or class({})
 
+local function GetTomeCasterPlayerID(caster)
+	if caster == nil or caster:IsNull() then return nil end
+
+	if XHSGetPlayerIDFromUnit ~= nil then
+		local playerID = XHSGetPlayerIDFromUnit(caster)
+		if playerID ~= nil then return playerID end
+	end
+
+	if caster.GetPlayerID ~= nil then
+		local playerID = caster:GetPlayerID()
+		if playerID ~= nil and playerID >= 0 then return playerID end
+	end
+
+	if caster.GetPlayerOwnerID ~= nil then
+		local playerID = caster:GetPlayerOwnerID()
+		if playerID ~= nil and playerID >= 0 then return playerID end
+	end
+
+	return nil
+end
+
+local function ApplyTomeStats(item)
+	local caster = item:GetCaster()
+	if caster == nil or caster:IsNull() then return end
+
+	local amount = item:GetSpecialValueFor("stat_bonus")
+	caster:IncrementAttributes(amount, { record_stats = false })
+
+	if XHSRecordTomeStatsForPlayer ~= nil then
+		XHSRecordTomeStatsForPlayer(GetTomeCasterPlayerID(caster), amount)
+	end
+
+	item:SpendCharge(0.0)
+end
+
 function item_tome_small:OnSpellStart()
 	if not IsServer() then return end
 
-	self:GetCaster():IncrementAttributes(self:GetSpecialValueFor("stat_bonus"))
-	self:SpendCharge(0.0)
+	ApplyTomeStats(self)
 end
 
 item_tome_big = item_tome_big or class({})
@@ -12,8 +46,7 @@ item_tome_big = item_tome_big or class({})
 function item_tome_big:OnSpellStart()
 	if not IsServer() then return end
 
-	self:GetCaster():IncrementAttributes(self:GetSpecialValueFor("stat_bonus"))
-	self:SpendCharge(0.0)
+	ApplyTomeStats(self)
 end
 
 item_tome_of_power = item_tome_of_power or class({})
@@ -31,6 +64,7 @@ function item_tome_of_power:OnSpellStart()
 end
 
 modifier_tome_of_stats = modifier_tome_of_stats or class({})
+modifier_tome_of_stats.XHS_LINK_CLIENT = true
 
 function modifier_tome_of_stats:IsHidden() return true end
 

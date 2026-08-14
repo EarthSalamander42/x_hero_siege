@@ -1,4 +1,5 @@
 modifier_activity14 = class({})
+modifier_activity14.XHS_LINK_CLIENT = true
 
 require('libraries/modifiers/animation_code')
 

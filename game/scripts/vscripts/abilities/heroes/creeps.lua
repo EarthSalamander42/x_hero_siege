@@ -8,6 +8,7 @@ function campfire:GetIntrinsicModifierName()
 end
 
 modifier_campfire = modifier_campfire or class({})
+modifier_campfire.XHS_LINK_CLIENT = true
 
 function modifier_campfire:IsHidden()
 	return true
@@ -37,15 +38,23 @@ function modifier_campfire:GetAuraRadius()
 	return self.aura_radius
 end
 
+function modifier_campfire:GetAuraEntityReject(target)
+	return IsXHSRuneUnit and IsXHSRuneUnit(target)
+end
+
 function modifier_campfire:OnCreated(kv)
 	if IsServer() then
 		self.aura_radius = self:GetAbility():GetSpecialValueFor("aura_radius")
+		local parent = self:GetParent()
+		parent:SetDayTimeVisionRange(self.aura_radius)
+		parent:SetNightTimeVisionRange(self.aura_radius)
 
 		--		self:GetParent():AddNewModifier( self:GetParent(), nil, "modifier_disable_aggro", { duration = -1 } )
-		self:GetParent():AddNewModifier(self:GetParent(), nil, "modifier_provides_fow_position", { duration = -1 })
+		-- parent:AddNewModifier(parent, nil, "modifier_provides_fow_position", { duration = -1 })
 
-		EmitSoundOn("Campfire.Warmth.Loop", self:GetParent())
+		EmitSoundOn("Campfire.Warmth.Loop", parent)
 
+		-- Let the spawned campfire settle before attaching its persistent flame.
 		self:StartIntervalThink(0.25)
 	end
 end
@@ -56,24 +65,30 @@ function modifier_campfire:CheckState()
 		state[MODIFIER_STATE_ROOTED] = true
 		state[MODIFIER_STATE_NO_HEALTH_BAR] = true
 		state[MODIFIER_STATE_NOT_ON_MINIMAP] = true
-		state[MODIFIER_STATE_BLIND] = true
 		state[MODIFIER_STATE_INVULNERABLE] = true
-		state[MODIFIER_STATE_OUT_OF_GAME] = true
+		state[MODIFIER_STATE_UNSELECTABLE] = true
+		state[MODIFIER_STATE_NO_UNIT_COLLISION] = true
 	end
 
 	return state
 end
 
 function modifier_campfire:OnIntervalThink()
-	if IsServer() then
-		if (not self.nFXIndex) then
-			local vCasterPos = self:GetCaster():GetOrigin()
-			local vOffset = Vector(0, 0, 50)
+	if not IsServer() or self.nFXIndex ~= nil then return end
 
-			self.nFXIndex = ParticleManager:CreateParticle("particles/act_2/campfire_flame.vpcf", PATTACH_ABSORIGIN, self:GetCaster())
-			ParticleManager:SetParticleControl(self.nFXIndex, 2, vCasterPos + vOffset)
-		end
-	end
+	local parent = self:GetParent()
+	self.nFXIndex = ParticleManager:CreateParticle(
+		"particles/act_2/campfire_flame.vpcf",
+		PATTACH_ABSORIGIN,
+		parent
+	)
+	ParticleManager:SetParticleControl(
+		self.nFXIndex,
+		2,
+		parent:GetAbsOrigin() + Vector(0, 0, 50)
+	)
+	self:AddParticle(self.nFXIndex, false, false, -1, false, false)
+	self:StartIntervalThink(-1)
 end
 
 function modifier_campfire:OnDestroy()
@@ -83,13 +98,10 @@ function modifier_campfire:OnDestroy()
 end
 
 modifier_campfire_effect = class({})
+modifier_campfire_effect.XHS_LINK_CLIENT = true
 
 function modifier_campfire_effect:GetEffectName()
-	return "particles/camp_fire_buff.vpcf"
-end
-
-function modifier_campfire_effect:OnCreated(kv)
-
+	return "particles/custom/supporter_pass/regen_aura_anchor.vpcf"
 end
 
 function modifier_campfire_effect:DeclareFunctions()
@@ -121,10 +133,11 @@ end
 --------------------------------------------------------------------------------
 
 modifier_disease_cloud_aura = class({})
+modifier_disease_cloud_aura.XHS_LINK_CLIENT = true
 
 function modifier_disease_cloud_aura:OnCreated()
 	if IsServer() then
-		local particle = ParticleManager:CreateParticle("particles/custom/undead/disease_cloud.vpcf", PATTACH_ABSORIGIN_FOLLOW, self:GetParent())
+		local particle = ParticleManager:CreateParticle("particles/units/heroes/hero_pudge/pudge_rot.vpcf", PATTACH_ABSORIGIN_FOLLOW, self:GetParent())
 		ParticleManager:SetParticleControl(particle, 1, Vector(200, 0, 0))
 		self:AddParticle(particle, false, false, 1, false, false)
 	end
@@ -135,7 +148,7 @@ function modifier_disease_cloud_aura:OnDestroy()
 		local unit = self:GetParent()
 		if unit:GetUnitName() == "undead_abomination" then
 			local disease_cloud_dummy = CreateUnitByName("dummy_unit_disease_cloud", unit:GetAbsOrigin(), false, nil, nil, unit:GetTeamNumber())
-			local explosion = ParticleManager:CreateParticle("particles/custom/undead/rot_recipient.vpcf", PATTACH_ABSORIGIN_FOLLOW, disease_cloud_dummy)
+			local explosion = ParticleManager:CreateParticle("particles/units/heroes/hero_pudge/pudge_rot_recipient.vpcf", PATTACH_ABSORIGIN_FOLLOW, disease_cloud_dummy)
 			Timers:CreateTimer(1, function() ParticleManager:DestroyParticle(explosion, true) end)
 			Timers:CreateTimer(10, function()
 				UTIL_Remove(disease_cloud_dummy)
@@ -168,9 +181,9 @@ function modifier_disease_cloud_aura:GetAuraSearchTeam()
 	return DOTA_UNIT_TARGET_TEAM_ENEMY
 end
 
---  function modifier_disease_cloud_aura:GetAuraEntityReject(target)
---		return IsBuilding()
---	end
+function modifier_disease_cloud_aura:GetAuraEntityReject(target)
+	return IsXHSRuneUnit and IsXHSRuneUnit(target)
+end
 
 function modifier_disease_cloud_aura:GetAuraSearchType()
 	return DOTA_UNIT_TARGET_HERO + DOTA_UNIT_TARGET_BASIC
@@ -183,6 +196,7 @@ end
 --------------------------------------------------------------------------------
 
 modifier_disease_cloud_debuff = class({})
+modifier_disease_cloud_debuff.XHS_LINK_CLIENT = true
 
 function modifier_disease_cloud_debuff:IsPurgable()
 	return false
@@ -199,7 +213,7 @@ function modifier_disease_cloud_debuff:OnCreated()
 end
 
 function modifier_disease_cloud_debuff:GetEffectName()
-	return "particles/custom/undead/disease_debuff.vpcf"
+	return "particles/units/heroes/hero_pudge/pudge_rot_recipient.vpcf"
 end
 
 function modifier_disease_cloud_debuff:GetEffectAttachType()

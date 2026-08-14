@@ -170,6 +170,8 @@ function CDungeonZone:PrecacheNPCs(zoneTable)
 		return
 	end
 
+	GameRules.GameMode.PrecachedEnemies = GameRules.GameMode.PrecachedEnemies or {}
+
 	for _, npcTable in pairs(zoneTable) do
 		if npcTable ~= nil then
 			--	print( "CDungeonZone:PrecacheEnemies() - Precaching squad " .. tostring( enemyTable ) )
@@ -203,6 +205,7 @@ function CDungeonZone:PrecacheVIPs(vipTable)
 
 	local nVIPCount = 0
 	CDungeonZone.nPrecacheVIPCount = 0
+	GameRules.GameMode.PrecachedVIPs = GameRules.GameMode.PrecachedVIPs or {}
 
 	--	print( "CDungeonZone:PrecacheVIPs() - Precaching VIPs " .. tostring( vipTable ) )
 	for _, unitTable in pairs(vipTable) do
@@ -484,7 +487,9 @@ function CDungeonZone:SpawnBreakables()
 				local fThreshold = 1 - fSpawnChance
 				local bSpawnBreakable = RandomFloat(0, 1) >= fThreshold
 				if bSpawnBreakable then
-					local hUnit = CreateUnitByName(breakableTable.szNPCName, vSpawnLoc, true, nil, nil, DOTA_TEAM_BADGUYS)
+					-- Breakables share the lane-creep team so native creep
+					-- acquisition never selects them. Players remain hostile.
+					local hUnit = CreateUnitByName(breakableTable.szNPCName, vSpawnLoc, true, nil, nil, DOTA_TEAM_CUSTOM_1)
 					if hUnit ~= nil then
 						local vSpawnerForward = hSpawner:GetForwardVector()
 						hUnit:SetForwardVector(vSpawnerForward)
@@ -963,7 +968,13 @@ function CDungeonZone:Activate()
 
 	if not CDungeonZone.bSpawnedVIPs then
 		--		print(CDungeonZone.VIPs)
-		CDungeonZone:SpawnVIPs(CDungeonZone.VIPs)
+		local immediateVIPs = {}
+		for _, vip in pairs(CDungeonZone.VIPs) do
+			if vip.bDeferredSpawn ~= true then
+				table.insert(immediateVIPs, vip)
+			end
+		end
+		CDungeonZone:SpawnVIPs(immediateVIPs)
 		CDungeonZone:SpawnNeutrals(CDungeonZone.Neutrals)
 		CDungeonZone.bSpawnedVIPs = true
 	end
@@ -1051,6 +1062,23 @@ end
 
 --------------------------------------------------------------------
 
+local function CanQuestCountKilledUnit(quest, killedUnit)
+	if quest.szQuestName == "kill_final_wave" then
+		return CustomTimers ~= nil
+			and CustomTimers.final_wave_kill_counting == true
+			and killedUnit.xhs_final_wave_unit == true
+			and killedUnit.xhs_final_wave_illusion ~= true
+	end
+
+	if quest.szQuestName == "clear_grom_vanguard" then
+		return killedUnit.xhs_grom_vanguard_unit == true
+	end
+
+	return true
+end
+
+--------------------------------------------------------------------
+
 function CDungeonZone:OnEnemyKilled(killedUnit, Zone)
 	-- print("OnEnemyKilled", killedUnit:GetUnitName())
 	for _, quest in pairs(CDungeonZone.Quests) do
@@ -1082,7 +1110,7 @@ function CDungeonZone:OnEnemyKilled(killedUnit, Zone)
 			if quest.bActivated == true and quest.Completion.Type == QUEST_EVENT_ON_ENEMY_KILLED and quest.Completion.szNPCName == killedUnit:GetUnitName() and ((quest.Completion.szZoneName == Zone.szName) or (quest.Completion.szZoneName == nil)) then
 				GameRules.GameMode:OnQuestCompleted(CDungeonZone, quest)
 			end
-			if quest.bActivated == true and quest.Completion.Type == QUEST_EVENT_ON_TEAM_ENEMY_KILLED and quest.Completion.szTeamName == killedUnit:GetTeam() and ((quest.Completion.szZoneName == Zone.szName) or (quest.Completion.szZoneName == nil)) then
+			if quest.bActivated == true and CanQuestCountKilledUnit(quest, killedUnit) and quest.Completion.Type == QUEST_EVENT_ON_TEAM_ENEMY_KILLED and quest.Completion.szTeamName == killedUnit:GetTeam() and ((quest.Completion.szZoneName == Zone.szName) or (quest.Completion.szZoneName == nil)) then
 				GameRules.GameMode:OnQuestCompleted(CDungeonZone, quest)
 			end
 		end
@@ -1619,7 +1647,16 @@ function CDungeonZone:CheckForZoneComplete()
 			local nTotalData4 = bit.lshift(nTotalDamage / 1000000, 16) + bit.band(nTotalHealing / 1000000, 0xFFFF)
 			local nTotalData5 = bit.lshift(nTotalPlayerDeaths[0], 24) + bit.lshift(nTotalPlayerDeaths[1], 16) + bit.lshift(nTotalPlayerDeaths[2], 8) + nTotalPlayerDeaths[3]
 
-			GameRules:AddEventMetadataLeaderboardEntry("total", nTotalTime, nTotalStars, nMaxTotalStars, nTotalData1, nTotalData2, nTotalData3, nTotalData4, nTotalData5)
+			local hasXHSBotSession = false
+			if api ~= nil and api.HasXHSBotSession ~= nil then
+				hasXHSBotSession = api:HasXHSBotSession()
+			elseif api ~= nil and api.HasXHSBotParticipants ~= nil then
+				hasXHSBotSession = api:HasXHSBotParticipants()
+			end
+
+			if not hasXHSBotSession then
+				GameRules:AddEventMetadataLeaderboardEntry("total", nTotalTime, nTotalStars, nMaxTotalStars, nTotalData1, nTotalData2, nTotalData3, nTotalData4, nTotalData5)
+			end
 		end
 
 		GameRules.GameMode:OnZoneCompleted(CDungeonZone)
@@ -1884,7 +1921,9 @@ function CDungeonZone:HoldoutThink()
 
 			if CDungeonZone.nVIPsKilled > CDungeonZone.nVIPDeathsAllowed then
 				GameRules.GameMode:OnGameFinished()
-				GameRules:MakeTeamLose(DOTA_TEAM_GOODGUYS)
+				-- Keep every defeat on the normal completion path. MakeTeamLose enters
+				-- POST_GAME immediately and bypasses the final EndScreen snapshot.
+				GameRules:SetGameWinner(DOTA_TEAM_BADGUYS)
 			end
 
 			return

@@ -1,22 +1,30 @@
 <root>
 	<scripts>
-    	<include src="s2r://panorama/scripts/custom_game/init.js" />
-    	<include src="s2r://panorama/scripts/custom_game/util.js" />
+		<include src="s2r://panorama/scripts/custom_game/init.js" />
+		<include src="s2r://panorama/scripts/custom_game/util.js" />
+		<include src="s2r://panorama/scripts/custom_game/xhs_performance_reporter.js" />
+		<include src="s2r://panorama/scripts/custom_game/camera_motion.js" />
 	</scripts>
 
 	<Panel>
+		<CustomUIElement type="Hud"					layoutfile="file://{resources}/layout/custom_game/xhs_creep_health_bars.xml" />
 		<CustomUIElement type="GameInfo" layoutfile="file://{resources}/layout/custom_game/game_info.xml" />
-		<CustomUIElement type="Hud"					layoutfile="file://{resources}/layout/custom_game/barebones_notifications.xml" />
-<!--	<CustomUIElement type="Hud"					layoutfile="file://{resources}/layout/custom_game/barebones_attachments.xml" /> -->
-		<CustomUIElement type="Hud"					layoutfile="file://{resources}/layout/custom_game/frostrose_battlepass/battlepass.xml" />
-		<CustomUIElement type="Hud"					layoutfile="file://{resources}/layout/custom_game/hud_hero_demo.xml" /> 
+		<CustomUIElement type="Hud"					layoutfile="file://{resources}/layout/custom_game/xhs_notifications.xml" />
+		<CustomUIElement type="Hud"					layoutfile="file://{resources}/layout/custom_game/xhs_supporter_pass.xml" />
+		<CustomUIElement type="Hud"					layoutfile="file://{resources}/layout/custom_game/popup_settings_reborn.xml" />
+		<CustomUIElement type="Hud"					layoutfile="file://{resources}/layout/custom_game/xhs_supporter_content_studio.xml" />
 		<CustomUIElement type="Hud"					layoutfile="file://{resources}/layout/custom_game/precache.xml" />
 		<CustomUIElement type="Hud"					layoutfile="file://{resources}/layout/custom_game/boss_healthbar.xml" />
 		<CustomUIElement type="Hud"					layoutfile="file://{resources}/layout/custom_game/hud_main.xml" />
+		<CustomUIElement type="Hud"					layoutfile="file://{resources}/layout/custom_game/xhs_top_hud.xml" />
+		<CustomUIElement type="Hud"					layoutfile="file://{resources}/layout/custom_game/xhs_farm_leaderboard.xml" />
+		<CustomUIElement type="Hud"					layoutfile="file://{resources}/layout/custom_game/xhs_sogat_leaderboard.xml" />
 		<CustomUIElement type="Hud"					layoutfile="file://{resources}/layout/custom_game/xhs_events.xml" />
-		<CustomUIElement type="Hud"					layoutfile="file://{resources}/layout/custom_game/xhs_timers.xml" />
+		<CustomUIElement type="Hud"					layoutfile="file://{resources}/layout/custom_game/xhs_devtools.xml" />
 		<CustomUIElement type="Hud"					layoutfile="file://{resources}/layout/custom_game/gold.xml" />
-		<CustomUIElement type="EndScreen"			layoutfile="file://{resources}/layout/custom_game/frostrose_end_screen.xml" />
+		<CustomUIElement type="Hud"					layoutfile="file://{resources}/layout/custom_game/xhs_cinematic.xml" />
+		<CustomUIElement type="Hud"					layoutfile="file://{resources}/layout/custom_game/xhs_ui_recovery.xml" />
+		<CustomUIElement type="EndScreen"			layoutfile="file://{resources}/layout/custom_game/xhs_end_screen.xml" />
 		<CustomUIElement type="FlyoutScoreboard"	layoutfile="file://{resources}/layout/custom_game/dungeon_scoreboard.xml" />
 
 		<CustomUIElement type="Hud" layoutfile="file://{resources}/layout/custom_game/ingame_advertize/ingame_advertize.xml" />

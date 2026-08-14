@@ -1,4 +1,14 @@
-require("libraries/timers")
+local function KoboldCleanupTimer(delay, callback)
+	if Timers and Timers.CreateTimer then
+		Timers:CreateTimer(delay, callback)
+		return
+	end
+
+	local game_mode = GameRules:GetGameModeEntity()
+	if game_mode then
+		game_mode:SetContextThink(DoUniqueString("kobold_cleanup"), callback, delay)
+	end
+end
 
 function LifeSteal(keys)
 	local caster = keys.caster
@@ -9,12 +19,14 @@ function LifeSteal(keys)
 	if ability:IsCooldownReady() then
 		ability:StartCooldown(cooldown)
 		caster:EmitSound("Hero_LifeStealer.OpenWounds.Cast")
+		local health_before = caster:GetHealth()
 		caster:Heal(caster:GetAttackDamage() * ability:GetSpecialValueFor("lifesteal") / 100, caster)
+		local actual_heal = math.max(0, caster:GetHealth() - health_before)
 		SendOverheadEventMessage(nil, OVERHEAD_ALERT_HEAL, caster, caster:GetAttackDamage() * ability:GetSpecialValueFor("lifesteal") / 100, nil)
 
-		local lifesteal_pfx = ParticleManager:CreateParticle("particles/generic_gameplay/generic_lifesteal.vpcf", PATTACH_ABSORIGIN_FOLLOW, caster)
-		ParticleManager:SetParticleControl(lifesteal_pfx, 0, caster:GetAbsOrigin())
-		ParticleManager:ReleaseParticleIndex(lifesteal_pfx)
+		if actual_heal > 0 and XHSPlaySupporterAttackLifestealFX ~= nil then
+			XHSPlaySupporterAttackLifestealFX(caster, keys.target or keys.unit, actual_heal)
+		end
 	end
 end
 
@@ -100,17 +112,17 @@ function KoboldArmy(keys)
 		double:SetHasInventory(true)
 		double:SetCanSellItems(false)
 
-		Timers:CreateTimer(duration - 0.1, function()
-			UTIL_Remove(double)
+		KoboldCleanupTimer(duration - 0.1, function()
+			if double and IsValidEntity(double) then
+				UTIL_Remove(double)
+			end
 		end)
 
 		-- Useless since they are removed before, just shows duration of the illusions
 		ability:ApplyDataDrivenModifier(caster, double, "modifier_kill", { duration = duration })
 
 		-- Learn the skills of the caster
-		for abilitySlot = 0, 15 do
-			local ability = caster:GetAbilityByIndex(abilitySlot)
-			if ability then
+		ForEachUnitAbility(caster, function(ability)
 				local abilityLevel = ability:GetLevel()
 				local abilityName = ability:GetAbilityName()
 				local doubleAbility = double:FindAbilityByName(abilityName)
@@ -124,8 +136,7 @@ function KoboldArmy(keys)
 					double:RemoveModifierByName("modifier_reincarnation")
 					double:SetRespawnsDisabled(true)
 				end
-			end
-		end
+		end)
 
 		-- Recreate the items of the caster
 		for itemSlot = 0, 5 do
@@ -142,5 +153,79 @@ function KoboldArmy(keys)
 		double:SetPlayerID(caster:GetPlayerOwnerID())
 		-- Add the illusion created to a table within the caster handle, to remove the illusions on the next cast if necessary
 		table.insert(caster.kobold_super_illusions, double)
+	end
+end
+
+xhs_kobold_poof = xhs_kobold_poof or class({})
+
+function xhs_kobold_poof:OnAbilityPhaseStart()
+	if not IsServer() then return true end
+
+	self:GetCaster():StartGesture(ACT_DOTA_CAST_ABILITY_2)
+	self:GetCaster():EmitSound("Hero_Meepo.Poof.Channel")
+
+	return true
+end
+
+function xhs_kobold_poof:OnAbilityPhaseInterrupted()
+	if not IsServer() then return end
+
+	self:GetCaster():FadeGesture(ACT_DOTA_CAST_ABILITY_2)
+	self:GetCaster():StopSound("Hero_Meepo.Poof.Channel")
+end
+
+function xhs_kobold_poof:OnSpellStart()
+	if not IsServer() then return end
+
+	local caster = self:GetCaster()
+	local origin = caster:GetAbsOrigin()
+	local destination = self:GetCursorPosition()
+	local target = self:GetCursorTarget()
+
+	if target and not target:IsNull() then
+		destination = target:GetAbsOrigin()
+	end
+
+	caster:StopSound("Hero_Meepo.Poof.Channel")
+	self:PoofBurst(origin)
+
+	local start_pfx = ParticleManager:CreateParticle("particles/units/heroes/hero_meepo/meepo_poof_start.vpcf", PATTACH_WORLDORIGIN, caster)
+	ParticleManager:SetParticleControl(start_pfx, 0, origin)
+	ParticleManager:ReleaseParticleIndex(start_pfx)
+
+	FindClearSpaceForUnit(caster, destination, true)
+	ProjectileManager:ProjectileDodge(caster)
+
+	self:PoofBurst(caster:GetAbsOrigin())
+
+	local end_pfx = ParticleManager:CreateParticle("particles/units/heroes/hero_meepo/meepo_poof_end.vpcf", PATTACH_WORLDORIGIN, caster)
+	ParticleManager:SetParticleControl(end_pfx, 0, caster:GetAbsOrigin())
+	ParticleManager:ReleaseParticleIndex(end_pfx)
+
+	caster:EmitSound("Hero_Meepo.Poof.End")
+end
+
+function xhs_kobold_poof:PoofBurst(position)
+	local caster = self:GetCaster()
+	local enemies = FindUnitsInRadius(
+		caster:GetTeamNumber(),
+		position,
+		nil,
+		self:GetSpecialValueFor("radius"),
+		DOTA_UNIT_TARGET_TEAM_ENEMY,
+		DOTA_UNIT_TARGET_HERO + DOTA_UNIT_TARGET_BASIC,
+		DOTA_UNIT_TARGET_FLAG_NONE,
+		FIND_ANY_ORDER,
+		false
+	)
+
+	for _, enemy in pairs(enemies) do
+		ApplyDamage({
+			victim = enemy,
+			attacker = caster,
+			damage = self:GetSpecialValueFor("poof_damage"),
+			damage_type = self:GetAbilityDamageType(),
+			ability = self
+		})
 	end
 end

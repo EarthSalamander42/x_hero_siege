@@ -1,0 +1,52 @@
+"itembuilds"
+{
+	"author"		"X Hero Siege Official"
+	"hero"			"npc_dota_hero_luna"
+	"Title"			"XHS Wave / Area DPS - Huntress"
+
+	"Items"
+	{
+		"#DOTA_Item_Build_Starting_Items"
+		{
+			"item"		"item_health_potion"
+			"item"		"item_mana_potion"
+			"item"		"item_lifesteal_mask"
+		}
+
+		"#DOTA_Item_Build_Early_Game"
+		{
+			"item"		"item_orb_of_lightning"
+			"item"		"item_xhs_orb_of_venom"
+			"item"		"item_tome_small"
+			"item"		"item_tome_small"
+			"item"		"item_ankh_of_reincarnation"
+		}
+
+		"#DOTA_Item_Build_Mid_Items"
+		{
+			"item"		"item_orb_of_lightning2"
+			"item"		"item_viridian_gem"
+			"item"		"item_boots_of_speed"
+			"item"		"item_potion_full"
+		}
+
+		"#DOTA_Item_Build_Late_Items"
+		{
+			"item"		"item_celestial_claws"
+			"item"		"item_plagueheart"
+			"item"		"item_tome_big"
+		}
+
+		"#DOTA_Item_Build_Other_Items"
+		{
+			"item"		"item_orb_of_darkness"
+			"item"		"item_orb_of_wind"
+			"item"		"item_xhs_cloak_of_flames"
+			"item"		"item_healing_wards"
+			"item"		"item_potion_full"
+			"item"		"item_potion_of_invulnerability"
+			"item"		"item_potion_of_antimagic"
+			"item"		"item_amulet_of_the_wild"
+		}
+	}
+}

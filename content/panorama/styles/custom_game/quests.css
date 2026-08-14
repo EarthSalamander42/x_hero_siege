@@ -2,67 +2,278 @@
 {
 	horizontal-align: left;
 	vertical-align: top;
-	margin-top: 23%;
-	margin-left: 20px;
-	max-height: 600px;
-	padding: 10px;
-	border-radius: 20px;
+	margin-top: 295px;
+	margin-left: 24px;
+	width: 400px;
+	max-height: 480px;
+	padding: 10px 12px 10px 12px;
+	border-radius: 2px;
+	overflow: noclip;
+	background-color: gradient( linear, 0% 0%, 100% 100%, from( xhs_panel_bg ), to( xhs_panel_bg_deep ) );
+	border-left: 2px solid #5ad0ff78;
+	border-top: 1px solid xhs_border_soft;
+	border-bottom: 1px solid #77c8ff14;
+	box-shadow: fill #00111f42 0px 0px 5px 0px;
 
-	transition-property: background-color;
+	transform: translatex( 0px );
+	transition-property: background-color, brightness, transform, opacity;
 	transition-duration: .18s;
+}
+
+@keyframes 'XHSQuestActivatedPulse'
+{
+	0% {
+		brightness: 2.0;
+		background-color: gradient( linear, 0% 0%, 100% 0%, from( #5ad0ff88 ), color-stop( .52, #12364be8 ), to( #06142322 ) );
+		transform: translatex( -12px );
+	}
+	34% {
+		brightness: 1.35;
+		background-color: gradient( linear, 0% 0%, 100% 0%, from( #12364be8 ), color-stop( .5, #5ad0ff55 ), to( #06142322 ) );
+		transform: translatex( 0px );
+	}
+	70% {
+		brightness: 1.18;
+		background-color: gradient( linear, 0% 0%, 100% 0%, from( #0b223466 ), to( #06142322 ) );
+		transform: translatex( 0px );
+	}
+	100% {
+		brightness: 1.0;
+		transform: translatex( 0px );
+	}
 }
 
 #QuestLog:hover
 {
-	background-color: #000000da;
+	background-color: gradient( linear, 0% 0%, 100% 100%, from( xhs_panel_bg_strong ), to( #06101dcc ) );
+	brightness: 1.05;
+}
+
+#QuestLog.QuestLogPinnedBackground
+{
+	background-color: gradient( linear, 0% 0%, 100% 100%, from( xhs_panel_bg_strong ), to( #06101dcc ) );
+}
+
+#QuestLog.QuestLogCollapsed
+{
+	transform: translatex( -460px );
+	opacity: 0;
+}
+
+#QuestLog.QuestLogCollapsed.QuestLogTemporaryReveal
+{
+	transform: translatex( 0px );
+	opacity: 1;
 }
 
 .HUDFlipped #QuestLog {
 	horizontal-align: right;
 }
 
-.Zone
+.HUDFlipped #QuestLog.QuestLogCollapsed
+{
+	transform: translatex( 460px );
+}
+
+.HUDFlipped #QuestLog.QuestLogCollapsed.QuestLogTemporaryReveal
 {
 	transform: translatex( 0px );
-	transition-property: transform;
+}
+
+.QuestLogCollapseButton
+{
+	width: 24px;
+	height: 24px;
+	horizontal-align: left;
+	vertical-align: top;
+	margin-top: 295px;
+	margin-left: 424px;
+	ignore-parent-flow: true;
+	opacity: .42;
+	brightness: .82;
+	background-color: gradient( linear, 0% 0%, 100% 100%, from( #06111ac0 ), to( #102536c8 ) );
+	border: 1px solid #77c8ff24;
+	box-shadow: fill #00111f78 0px 0px 4px 0px;
+	z-index: 12;
+	transition-property: opacity, brightness, background-color, border, transform;
+	transition-duration: .14s;
+}
+
+.QuestLogCollapseButton:hover
+{
+	opacity: 1;
+	brightness: 1.2;
+	background-color: #12364be8;
+	border: 1px solid #77c8ff7a;
+}
+
+.QuestLogCollapseArrow
+{
+	width: 9px;
+	height: 9px;
+	horizontal-align: center;
+	vertical-align: center;
+	margin-left: 2px;
+	opacity: .72;
+	border-top: 2px solid #9be6ff9a;
+	border-right: 2px solid #9be6ff9a;
+	box-shadow: #5ad0ff24 0px 0px 5px 0px;
+	transform: rotateZ( 225deg );
+	transition-property: opacity, transform, brightness;
+	transition-duration: .14s;
+}
+
+.QuestLogCollapseButton:hover .QuestLogCollapseArrow
+{
+	opacity: 1;
+	border-top: 2px solid #9be6ff;
+	border-right: 2px solid #9be6ff;
+	box-shadow: #5ad0ff55 0px 0px 5px 0px;
+}
+
+.QuestLogCollapseButton.QuestLogCollapsed .QuestLogCollapseArrow
+{
+	margin-left: -2px;
+	transform: rotateZ( 45deg );
+}
+
+.QuestLogCollapseButton.QuestLogCollapsed
+{
+	transform: translatex( -416px );
+}
+
+.HUDFlipped .QuestLogCollapseButton
+{
+	horizontal-align: right;
+	margin-left: 0px;
+	margin-right: 424px;
+}
+
+.HUDFlipped .QuestLogCollapseButton .QuestLogCollapseArrow
+{
+	margin-left: -2px;
+	transform: rotateZ( 45deg );
+}
+
+.HUDFlipped .QuestLogCollapseButton.QuestLogCollapsed .QuestLogCollapseArrow
+{
+	margin-left: 2px;
+	transform: rotateZ( 225deg );
+}
+
+.HUDFlipped .QuestLogCollapseButton.QuestLogCollapsed
+{
+	transform: translatex( 416px );
+}
+
+.QuestLogPinButton
+{
+	width: 24px;
+	height: 22px;
+	horizontal-align: right;
+	vertical-align: top;
+	ignore-parent-flow: true;
+	background-color: #07131dcc;
+	border: 1px solid #77c8ff2d;
+	box-shadow: fill #00111f88 0px 0px 4px 0px;
+	transition-property: brightness, background-color, border;
+	transition-duration: .14s;
+}
+
+.QuestLogPinButton:hover,
+.QuestLogPinButton.Checked
+{
+	background-color: #102536e8;
+	border: 1px solid #77c8ff70;
+	brightness: 1.15;
+}
+
+.QuestLogPinButton.Checked
+{
+	background-color: #12364be8;
+	border: 1px solid #9be6ffcc;
+	box-shadow: fill #00111f88 0px 0px 4px 0px, #5ad0ff44 0px 0px 6px 0px;
+}
+
+.QuestLogPinCheckMark
+{
+	width: 10px;
+	height: 10px;
+	horizontal-align: center;
+	vertical-align: center;
+	background-color: #9be6ff;
+	box-shadow: #5ad0ff80 0px 0px 6px 0px;
+	visibility: collapse;
+}
+
+.QuestLogPinButton.Checked .QuestLogPinCheckMark
+{
+	visibility: visible;
+}
+
+.HUDFlipped .QuestLogPinButton
+{
+	horizontal-align: left;
+	margin-left: 39px;
+	margin-right: 0px;
+}
+
+.Zone
+{
+	width: 100%;
+	height: fit-children;
+	transform: translatex( 0px );
+	transition-property: transform, opacity, brightness;
 	transition-duration: 0.2s;
-	transition-delay: 10.0s;
+}
+
+#QuestsContainer
+{
+	width: 100%;
+	height: fill-parent-flow( 1.0 );
+	max-height: 430px;
+	flow-children: down;
+	overflow: squish scroll;
+	padding-right: 6px;
 }
 
 .QuestLogHeader
 {
-	color: #965D01;
+	width: 100%;
+	color: xhs_accent_text;
 	font-weight: thin;
-	text-align: center;
-	text-shadow: 1px 1px 2px 2.0 #00000011;
+	text-align: left;
+	text-shadow: 0px 1px 3px xhs_shadow;
 
 	font-family: Radiance,FZKai-Z03,TH Sarabun New,YDYGO 540;
-	font-size: 16px;
+	font-size: 15px;
 	background-color: none;
-	letter-spacing: 3px;
+	letter-spacing: 4px;
+	text-transform: uppercase;
+	margin-bottom: 2px;
 }
 
 .QuestZoneName
 {
-	color: gradient(linear, 0% 0%, 0% 100%, from(#E7D291), to(#965D01));
-	text-shadow: 0px 2px 2px 4 black;
+	width: 100%;
+	color: gradient(linear, 0% 0%, 0% 100%, from(#f3fbff), color-stop(0.5, #89dcff), to(#3e9dd0));
 
 	font-weight: bold;
-	text-align: center;
-	text-shadow: 1px 1px 0px 2.0 #000000;
+	text-align: left;
+	text-shadow: 0px 2px 4px xhs_shadow;
 
 	font-family: Radiance,FZKai-Z03,TH Sarabun New,YDYGO 540;
-	font-size: 24px;
+	font-size: 26px;
 
-	margin-bottom: 4px;
+	margin-bottom: 6px;
 }
 
 .QuestText,
 .RewardText
 {
-	color: #B79358;
+	color: xhs_text_muted;
 	text-align: center;
-	text-shadow: 1px 1px 2px 2.0 #000000ff;
+	text-shadow: 1px 1px 2px 2.0 #00111fff;
 
 	font-family: Radiance,FZKai-Z03,TH Sarabun New,YDYGO 540;
 	font-weight: thin;
@@ -74,14 +285,55 @@
 
 .QuestText
 {
-	color: gradient(linear, 0% 0%, 0% 100%, from(#E7D291), to(#4da6ff));
-	max-width: 250px;
+	color: xhs_text;
+	width: fill-parent-flow( 1.0 );
+	height: fit-children;
+	/* max-width: none; */
 	text-align: left;
-	margin-left: 4px;
+	margin-left: 7px;
+	text-overflow: shrink;
 	
 	transition-property: opacity, color;
 	transition-duration: .32s;
 	transition-timing-function: ease-in-out;
+}
+
+.QuestInfoButton
+{
+	width: 17px;
+	height: 17px;
+	margin-left: 5px;
+	margin-top: 4px;
+	border-radius: 50%;
+	background-color: #082235cc;
+	border: 1px solid #77c8ff55;
+	box-shadow: #2bbdff22 0px 0px 5px 0px;
+	visibility: collapse;
+	transition-property: brightness, background-color, border;
+	transition-duration: .14s;
+}
+
+.HasQuestInfo.Active .QuestInfoButton
+{
+	visibility: visible;
+}
+
+.QuestInfoButton:hover
+{
+	brightness: 1.55;
+	background-color: #0d3654e8;
+	border: 1px solid #9de5ff99;
+}
+
+.QuestInfoLabel
+{
+	width: 100%;
+	height: 100%;
+	color: #bdeeff;
+	font-size: 13px;
+	font-weight: bold;
+	text-align: center;
+	text-shadow: 0px 1px 2px #00111fff;
 }
 
 .desert_outpost .QuestText,
@@ -89,7 +341,7 @@
 .desert_start .QuestText,
 .desert_town .QuestText
 {
-	color: #FAD2A1;
+	color: #bfe8ff;
 }
 
 #QuestReward
@@ -104,7 +356,9 @@
 
 .Completed .QuestText
 {
-	opacity: .1;
+	opacity: .82;
+	color: #8fd7b0;
+	text-shadow: 0px 0px 5px #3dff8f24, 1px 1px 2px #00111fff;
 }
 
 .Completed .QuestText:hover {
@@ -113,19 +367,211 @@
 
 .Quest.HideOutOfZone 
 {
-	visibility: collapse;
+	opacity: .42;
+	brightness: .55;
 }
 
 .QuestIcon
 {
-	width: 26px;
-	height: 26px;
+	width: 20px;
+	height: 20px;
+	margin-top: 3px;
 	background-size: 100%;
+	wash-color: xhs_accent_soft;
 }
 
 #ZoneQuestsContainer
 {
-	flow-children: up;
+	width: 100%;
+	height: fit-children;
+	flow-children: down;
+}
+
+.Quest
+{
+	width: 100%;
+	height: fit-children;
+	min-height: 30px;
+	margin-top: 2px;
+	padding: 3px 6px 3px 0px;
+	background-color: #06203322;
+	border-left: 3px solid #77c8ff12;
+	transition-property: opacity, brightness, background-color, border, wash-color;
+	transition-duration: .18s;
+}
+
+.Quest.CollapsibleMainQuest
+{
+	transition-property: opacity, brightness, background-color, border, wash-color;
+}
+
+.Quest.CollapsibleMainQuest:hover
+{
+	brightness: 1.14;
+	background-color: gradient( linear, 0% 0%, 100% 0%, from( #0d2b426e ), to( #06142328 ) );
+}
+
+.QuestCollapseChevron
+{
+	width: 8px;
+	height: 8px;
+	margin-left: 7px;
+	margin-right: 2px;
+	margin-top: 8px;
+	border-top: 2px solid #9be6ffbb;
+	border-right: 2px solid #9be6ffbb;
+	transform: rotateZ( 135deg );
+	visibility: collapse;
+	transition-property: transform, brightness;
+	transition-duration: .14s;
+}
+
+.Quest.CollapsibleMainQuest .QuestCollapseChevron
+{
+	visibility: visible;
+}
+
+.Quest.CollapsibleMainQuest.XHSMainQuestCollapsed .QuestCollapseChevron
+{
+	transform: rotateZ( 45deg );
+	brightness: .85;
+}
+
+.Quest.XHSHiddenQuest
+{
+	visibility: collapse;
+}
+
+.Quest.XHSCollapsedByMainQuest
+{
+	visibility: collapse;
+}
+
+.Quest.Active
+{
+	background-color: gradient( linear, 0% 0%, 100% 0%, from( #0b223466 ), to( #06142322 ) );
+	border-left: 3px solid #7fd8ff88;
+	box-shadow: inset #5ad0ff18 0px 0px 12px 0px;
+}
+
+.Quest.QuestJustActivated
+{
+	animation-name: XHSQuestActivatedPulse;
+	animation-duration: 1.6s;
+	animation-iteration-count: 1;
+	animation-timing-function: ease-out;
+	border-left-color: #9be6ff;
+	box-shadow: inset #5ad0ff28 0px 0px 14px 0px, #5ad0ff36 0px 0px 10px 0px;
+}
+
+.Quest.Active .QuestText
+{
+	color: #f3fbff;
+	text-shadow: 0px 1px 3px #00111fff;
+}
+
+.Quest.Inactive
+{
+	opacity: .62;
+	brightness: .82;
+	background-color: #06142118;
+	border-left: 3px solid #7792a71f;
+}
+
+.Quest.Inactive .QuestText
+{
+	color: #dcecf4;
+	text-shadow: 0px 1px 2px #00111fff;
+}
+
+.Quest.SubQuest
+{
+	min-height: 24px;
+	margin-top: 1px;
+	margin-left: 32px;
+	width: 90%;
+	padding-top: 1px;
+	padding-bottom: 1px;
+	background-color: #03132322;
+	border-left: 2px solid #77c8ff18;
+}
+
+.Quest.SubQuest.XHSPhase1Quest
+{
+	border-left: 2px solid #5fb6d955;
+}
+
+.Quest.SubQuest.XHSPhase2Quest
+{
+	border-left: 2px solid #5f7f9650;
+}
+
+.Quest.SubQuest.XHSPhase3Quest
+{
+	border-left: 2px solid #5f7f9650;
+}
+
+.Quest.SubQuest .QuestText
+{
+	font-size: 14px;
+	color: #b9d3e2;
+}
+
+.Quest.SubQuest .QuestIcon,
+.Quest.SubQuest .QuestIconCheckMark
+{
+	width: 15px;
+	height: 15px;
+	margin-left: 2px;
+	margin-top: 4px;
+}
+
+.Quest.SubQuest.Active
+{
+	border-left: 2px solid #7fd8ff70;
+	background-color: gradient( linear, 0% 0%, 100% 0%, from( #0b223455 ), to( #06142318 ) );
+	box-shadow: inset #5ad0ff14 0px 0px 10px 0px;
+}
+
+.Quest.SubQuest.Active .QuestText
+{
+	color: #f3fbff;
+	text-shadow: 0px 1px 3px #00111fff;
+}
+
+.Quest.SubQuest.Inactive
+{
+	opacity: .58;
+	brightness: .78;
+	background-color: #04101b14;
+	border-left: 2px solid #4f697922;
+	box-shadow: none;
+}
+
+.Quest.SubQuest.Inactive .QuestText
+{
+	color: #dcecf4;
+	text-shadow: 0px 1px 2px #00111fff;
+}
+
+.Quest.SubQuest.Inactive .QuestIcon,
+.Quest.SubQuest.Inactive .QuestIconCheckMark
+{
+	wash-color: #4f6979;
+	opacity: .55;
+}
+
+.Quest.SubQuest.Completed
+{
+	opacity: .92;
+	brightness: .98;
+	background-color: gradient( linear, 0% 0%, 100% 0%, from( #0d382646 ), to( #06142316 ) );
+	border-left: 2px solid #68f0a4a8;
+}
+
+.Quest.SubQuest.Completed .QuestText
+{
+	color: #9ee8bd;
 }
 
 .Completed .QuestIcon
@@ -136,22 +582,25 @@
 .QuestIcon.Explore
 {
 	background-image: url("file://panorama/images/interface/quest_pip_empty_psd.psd");
-	wash-color: white;
+	wash-color: xhs_accent_soft;
 }
 
 .QuestIcon.Holdout
 {
 	background-image: url("file://panorama/images/interface/quest_holdout_empty_psd.psd");
+	wash-color: xhs_accent_soft;
 }
 
 
 .QuestIconCheckMark
 {
-	width: 32px;
-	height: 32px;
+	width: 22px;
+	height: 22px;
+	margin-top: 2px;
 	background-image: url("file://panorama/images/interface/quest_pip_complete_psd.psd");
 
 	background-size: 100%;
+	wash-color: #7df2a4;
 	visibility: collapse;
 }
 
@@ -160,9 +609,22 @@
 	visibility: visible;
 }
 
+.Quest.SubQuest.Completed .QuestIconCheckMark
+{
+	width: 16px;
+	height: 16px;
+	margin-left: 2px;
+	margin-top: 4px;
+}
+
 #QuestNumbers
 {
 	visibility: collapse;
+	margin-left: 4px;
+	color: #7ad7ff;
+	width: 54px;
+	text-align: right;
+	text-overflow: shrink;
 }
 
 .ShowNumbers #QuestNumbers
@@ -173,8 +635,10 @@
 .Zone.Completed,
 .Zone.NotInZone
 {
-	transform: translatex( -500px );
-	visibility: collapse;
+	transform: translatex( 0px );
+	visibility: visible;
+	opacity: .58;
+	brightness: .75;
 }
 
 #XPReward,
@@ -189,3 +653,29 @@
 	visibility: visible;
 }
 
+.AspectRatio4x3 #QuestLog
+{
+	width: 320px;
+	max-height: 400px;
+}
+
+.AspectRatio4x3 .QuestLogCollapseButton
+{
+	margin-left: 348px;
+}
+
+.AspectRatio4x3.HUDFlipped .QuestLogCollapseButton
+{
+	margin-left: 0px;
+	margin-right: 348px;
+}
+
+.AspectRatio4x3 #QuestsContainer
+{
+	max-height: 350px;
+}
+
+.AspectRatio4x3 .QuestText
+{
+	font-size: 15px;
+}

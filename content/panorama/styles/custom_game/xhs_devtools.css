@@ -1,0 +1,1544 @@
+.XHSDevToolsRoot {
+	width: 100%;
+	height: 100%;
+	z-index: 900;
+}
+
+.XHSDevToolsHost {
+	width: 100%;
+	height: 100%;
+	flow-children: down;
+	visibility: collapse;
+	z-index: 900;
+}
+
+.XHSDevToolsHost.LogOnly .XHSDevToolsToggle,
+.XHSDevToolsHost.LogOnly .XHSDevToolsTimescale,
+.XHSDevToolsHost.LogOnly .XHSDevToolsPanel {
+	visibility: collapse;
+}
+
+.XHSDevToolsHost.SpectatorOnly .XHSDevToolsToggle,
+.XHSDevToolsHost.SpectatorOnly .XHSDevToolsTimescale,
+.XHSDevToolsHost.SpectatorOnly .XHSDevToolsPanel,
+.XHSDevToolsHost.SpectatorOnly .XHSDevToolsPerformance {
+	visibility: collapse;
+}
+
+.XHSDevToolsHost.LogOnly .XHSDevToolsPerformance {
+	margin-top: 48px;
+}
+
+.XHSDevToolsCompactToggle {
+	width: 30px;
+	height: 30px;
+	ignore-parent-flow: true;
+	horizontal-align: right;
+	vertical-align: top;
+	margin-top: 48px;
+	margin-right: 10px;
+	background-color: gradient( linear, 0% 0%, 100% 0%, from( #07111df8 ), to( #162b3ff5 ) );
+	border: 1px solid #69d7ff88;
+	box-shadow: fill #000000aa -4px 0px 9px 0px;
+	z-index: 9020;
+	transition-property: transform, brightness, background-color;
+	transition-duration: 0.2s;
+	transition-timing-function: ease-in-out;
+}
+
+.XHSDevToolsCompactToggle:hover {
+	brightness: 1.5;
+	background-color: gradient( linear, 0% 0%, 100% 0%, from( #0a2036f8 ), to( #1c3952f5 ) );
+}
+
+.XHSDevToolsCompactToggle Label {
+	width: 100%;
+	height: 100%;
+	color: #bceef8;
+	font-size: 26px;
+	font-weight: bold;
+	text-align: center center;
+	text-shadow: 0px 0px 6px #5ad0ff66;
+}
+
+#XHSDevToolsButtons,
+.XHSDevToolsPerformance {
+	transition-property: transform, opacity;
+	transition-duration: 0.2s;
+	transition-timing-function: ease-in-out;
+}
+
+.XHSDevToolsHost.CompactHidden #XHSDevToolsButtons,
+.XHSDevToolsHost.CompactHidden .XHSDevToolsPerformance {
+	opacity: 0;
+	transform: translateX( 398px );
+}
+
+.XHSDevToolsToggle {
+	width: 52px;
+	height: 30px;
+	horizontal-align: right;
+	vertical-align: top;
+	background-color: #111a22ee;
+	border: 1px solid #69d7ff88;
+	box-shadow: fill #000000aa 0px 0px 8px 0px;
+	z-index: 9010;
+}
+
+.XHSDevToolsToggle:hover {
+	brightness: 1.6;
+}
+
+.XHSDevToolsToggle.Disabled {
+	background-color: #2b1e10ee;
+	border: 1px solid #ffbd5f88;
+}
+
+.XHSDevToolsToggle Label {
+	horizontal-align: center;
+	vertical-align: center;
+	color: #d8f7ff;
+	font-size: 14px;
+	font-weight: bold;
+	text-shadow: 0px 1px 3px 2 #000000;
+}
+
+#XHSDevToolsButtons {
+	width: fit-children;
+	height: fit-children;
+	visibility: visible;
+	flow-children: right;
+	horizontal-align: right;
+	vertical-align: top;
+	margin-top: 48px;
+	margin-right: 48px;
+	flow-children: right;
+	z-index: 9010;
+}
+
+.XHSDevToolsSpectator {
+	width: 410px;
+	height: 38px;
+	horizontal-align: right;
+	vertical-align: top;
+	margin-top: 30px;
+	margin-right: 10px;
+	flow-children: right;
+	visibility: collapse;
+	background-color: #09151fee;
+	border: 1px solid #69d7ff66;
+	box-shadow: fill #000000bb 0px 0px 9px 0px;
+	z-index: 9010;
+}
+
+.XHSDevToolsSpectator.Visible {
+	visibility: visible;
+}
+
+.XHSDevToolsSpectatorArrow {
+	width: 34px;
+	height: 100%;
+	background-color: #122733cc;
+	border-right: 1px solid #69d7ff33;
+}
+
+#XHSDevToolsSpectatorNext {
+	border-right: 0px;
+	border-left: 1px solid #69d7ff33;
+}
+
+.XHSDevToolsSpectatorArrow:hover,
+.XHSDevToolsSpectatorFollow:hover,
+.XHSDevToolsSpectatorIdentity:hover {
+	brightness: 1.6;
+}
+
+.XHSDevToolsSpectatorArrow:active,
+.XHSDevToolsSpectatorFollow:active,
+.XHSDevToolsSpectatorIdentity:active {
+	brightness: 0.82;
+}
+
+.XHSDevToolsSpectatorArrow:disabled,
+.XHSDevToolsSpectatorFollow:disabled {
+	saturation: 0;
+	opacity: 0.35;
+}
+
+.XHSDevToolsSpectatorArrow Label {
+	horizontal-align: center;
+	vertical-align: center;
+	color: #c9f3ff;
+	font-size: 25px;
+	font-weight: bold;
+	margin-top: -2px;
+	text-shadow: 0px 1px 3px 2 #000000;
+}
+
+.XHSDevToolsSpectatorHero {
+	width: 48px;
+	height: 36px;
+	vertical-align: center;
+	margin-left: 1px;
+	border: 1px solid #8fdfff55;
+}
+
+.XHSDevToolsSpectatorIdentity {
+	width: 198px;
+	height: 100%;
+	flow-children: down;
+	padding: 3px 8px 2px 8px;
+}
+
+.XHSDevToolsSpectatorName {
+	width: 100%;
+	height: 18px;
+	color: #e6f8ff;
+	font-size: 13px;
+	font-weight: bold;
+	letter-spacing: 0.4px;
+	text-overflow: shrink;
+	text-shadow: 0px 1px 3px 2 #000000;
+}
+
+.XHSDevToolsSpectatorMeta {
+	width: 100%;
+	height: 14px;
+	flow-children: right;
+}
+
+.XHSDevToolsSpectatorCounter,
+.XHSDevToolsSpectatorSeparator {
+	color: #7399a7;
+	font-size: 10px;
+	font-weight: bold;
+}
+
+.XHSDevToolsSpectatorSeparator {
+	margin-left: 6px;
+	margin-right: 6px;
+}
+
+.XHSDevToolsSpectatorGold {
+	color: #ffd56b;
+	font-size: 10px;
+	font-weight: bold;
+	text-shadow: 0px 1px 3px 2 #000000;
+}
+
+.XHSDevToolsSpectatorFollow {
+	width: 94px;
+	height: 100%;
+	background-color: #183544dd;
+	border-left: 1px solid #69d7ff33;
+	border-right: 1px solid #69d7ff33;
+}
+
+.XHSDevToolsSpectatorFollow.Active {
+	background-color: #236477ee;
+	border-color: #9fe8ff99;
+	box-shadow: fill #4bd8ff22 0px 0px 8px 0px;
+}
+
+.XHSDevToolsSpectatorFollow Label {
+	horizontal-align: center;
+	vertical-align: center;
+	color: #b9d5df;
+	font-size: 11px;
+	font-weight: bold;
+	letter-spacing: 0.5px;
+	text-shadow: 0px 1px 3px 2 #000000;
+}
+
+.XHSDevToolsSpectatorFollow.Active Label {
+	color: #effcff;
+}
+
+.XHSDevToolsTimescale {
+	height: 30px;
+	horizontal-align: right;
+	vertical-align: top;
+	flow-children: right;
+	visibility: collapse;
+	z-index: 9010;
+}
+
+.XHSDevToolsTimescale.Visible {
+	visibility: visible;
+}
+
+.XHSDevToolsTimescaleButton {
+	width: 46px;
+	height: 30px;
+	margin-right: 4px;
+	background-color: #111a22ee;
+	border: 1px solid #69d7ff55;
+	box-shadow: fill #000000aa 0px 0px 8px 0px;
+}
+
+.XHSDevToolsTimescaleButton:hover {
+	brightness: 1.6;
+}
+
+.XHSDevToolsTimescaleButton:active {
+	brightness: 0.82;
+}
+
+.XHSDevToolsTimescaleButton.Active {
+	background-color: #216a80ee;
+	border-color: #9fe8ffcc;
+	box-shadow: fill #4bd8ff33 0px 0px 9px 0px;
+}
+
+.XHSDevToolsTimescaleButton Label {
+	horizontal-align: center;
+	vertical-align: center;
+	color: #b9d5df;
+	font-size: 13px;
+	font-weight: bold;
+	text-shadow: 0px 1px 3px 2 #000000;
+}
+
+.XHSDevToolsTimescaleButton.Active Label {
+	color: #f1fcff;
+}
+
+.XHSDevToolsPerformance {
+	width: 342px;
+	horizontal-align: right;
+	vertical-align: top;
+	margin-top: 10px;
+	margin-right: 48px;
+	flow-children: down;
+	background-color: #0b1218ee;
+	border: 1px solid #69d7ff55;
+	box-shadow: fill #000000aa 0px 0px 8px 0px;
+	z-index: 9010;
+}
+
+.XHSDevToolsPerformance.Warning {
+	border-color: #ffbf5f99;
+}
+
+.XHSDevToolsPerformance.Critical {
+	border-color: #ff625fcc;
+	box-shadow: fill #ff3b2433 0px 0px 10px 0px;
+}
+
+.XHSDevToolsPerformance.Expanded {
+	width: 880px;
+}
+
+.XHSDevToolsPerformanceHeader {
+	width: 100%;
+	height: 30px;
+	flow-children: right;
+}
+
+.XHSDevToolsPerformanceCompactMetric {
+	width: fill-parent-flow(1);
+	height: 100%;
+	padding-left: 8px;
+	flow-children: right;
+	border-right: 1px solid #69d7ff18;
+}
+
+.XHSDevToolsPerformanceCompactMetric .CompactName {
+	width: 50px;
+	vertical-align: center;
+	color: #7899a5;
+	font-size: 9px;
+	font-weight: bold;
+	letter-spacing: 1px;
+}
+
+.XHSDevToolsPerformanceCompactMetric .CompactValue {
+	width: fill-parent-flow(1);
+	vertical-align: center;
+	color: #e2f4f8;
+	font-size: 13px;
+	font-weight: bold;
+	text-align: right;
+}
+
+.XHSDevToolsPerformanceCompactMetric .CompactValueStack {
+	width: fill-parent-flow(1);
+	height: 28px;
+	vertical-align: center;
+	flow-children: down;
+}
+
+.XHSDevToolsPerformanceCompactMetric .CompactValueStack .CompactValue {
+	width: 100%;
+	height: 16px;
+	font-size: 12px;
+	text-align: right;
+}
+
+.XHSDevToolsPerformanceCompactMetric .CompactExtreme {
+	width: 100%;
+	height: 11px;
+	color: #7899a5;
+	font-size: 8px;
+	font-weight: bold;
+	letter-spacing: 0.5px;
+	text-align: right;
+}
+
+.XHSDevToolsPerformanceCompactMetric .CompactExtreme.Low {
+	color: #ffd27e;
+}
+
+.XHSDevToolsPerformanceCompactMetric .CompactExtreme.Critical {
+	color: #ff8d84;
+}
+
+.XHSDevToolsPerformanceCompactMetric .CompactValue.Low {
+	color: #ffd27e;
+}
+
+.XHSDevToolsPerformanceCompactMetric .CompactValue.Critical {
+	color: #ff8d84;
+}
+
+.XHSDevToolsPerformanceHeader:hover {
+	brightness: 1.5;
+}
+
+.XHSDevToolsPerformanceRank {
+	width: 24px;
+	height: 100%;
+	padding-top: 6px;
+	color: #6f8d98;
+	font-size: 11px;
+	text-align: center;
+}
+
+.XHSDevToolsPerformanceName {
+	width: 78px;
+	height: 100%;
+	padding-top: 5px;
+	color: #a8dce9;
+	font-size: 12px;
+	font-weight: bold;
+	letter-spacing: 1px;
+}
+
+.XHSDevToolsPerformancePrimaryValue {
+	width: fill-parent-flow(1);
+	height: 100%;
+	padding-top: 3px;
+	color: #f1fcff;
+	font-size: 16px;
+	font-weight: bold;
+	text-align: right;
+}
+
+.XHSDevToolsPerformance.Warning .XHSDevToolsPerformancePrimaryValue {
+	color: #ffd27e;
+}
+
+.XHSDevToolsPerformance.Critical .XHSDevToolsPerformancePrimaryValue {
+	color: #ff8d84;
+}
+
+.XHSDevToolsPerformanceArrow {
+	width: 25px;
+	height: 100%;
+	padding-top: 4px;
+	color: #75cce4;
+	font-size: 15px;
+	font-weight: bold;
+	text-align: center;
+}
+
+.XHSDevToolsPerformanceArrow.ExpandedArrow {
+	visibility: collapse;
+}
+
+.XHSDevToolsPerformance.Expanded .XHSDevToolsPerformanceArrow.CollapsedArrow {
+	visibility: collapse;
+}
+
+.XHSDevToolsPerformance.Expanded .XHSDevToolsPerformanceArrow.ExpandedArrow {
+	visibility: visible;
+}
+
+.XHSDevToolsPerformanceColumnControls {
+	width: 100%;
+	height: 29px;
+	padding: 4px 7px 3px 7px;
+	flow-children: right;
+	border-top: 1px solid #69d7ff22;
+	visibility: collapse;
+}
+
+.XHSDevToolsPerformance.Expanded .XHSDevToolsPerformanceColumnControls {
+	visibility: visible;
+}
+
+.XHSDevToolsPerformanceColumnControlsTitle {
+	width: fill-parent-flow(1);
+	vertical-align: center;
+	color: #547985;
+	font-size: 9px;
+	font-weight: bold;
+	letter-spacing: 1px;
+}
+
+.XHSDevToolsPerformanceColumnToggle {
+	width: 75px;
+	height: 21px;
+	margin-left: 4px;
+	background-color: #101b22;
+	border: 1px solid #4b6d7855;
+}
+
+.XHSDevToolsPerformanceColumnToggle Label {
+	width: 100%;
+	vertical-align: center;
+	color: #667f88;
+	font-size: 9px;
+	font-weight: bold;
+	text-align: center;
+}
+
+.XHSDevToolsPerformanceColumnToggle:hover {
+	brightness: 1.6;
+}
+
+.XHSDevToolsPerformanceColumnToggle.Active {
+	background-color: #153844;
+	border-color: #69d7ff99;
+}
+
+.XHSDevToolsPerformanceColumnToggle.Active Label {
+	color: #bceef8;
+}
+
+.XHSDevToolsPerformanceDetails {
+	width: 100%;
+	padding: 4px 7px 7px 7px;
+	flow-children: right;
+	border-top: 1px solid #69d7ff22;
+	visibility: collapse;
+}
+
+.XHSDevToolsPerformanceDetails .ColumnHidden {
+	visibility: collapse;
+}
+
+.XHSDevToolsPerformance.Expanded .XHSDevToolsPerformanceDetails {
+	visibility: visible;
+}
+
+.XHSDevToolsPerformanceClientColumn {
+	width: 198px;
+	min-height: 220px;
+	margin-right: 10px;
+	padding-right: 9px;
+	flow-children: down;
+	border-right: 1px solid #69d7ff22;
+}
+
+.XHSDevToolsPerformanceServerColumn {
+	width: 198px;
+	min-height: 220px;
+	margin-right: 10px;
+	padding-right: 9px;
+	flow-children: down;
+	border-right: 1px solid #69d7ff22;
+}
+
+.XHSDevToolsPerformanceActivityColumn {
+	width: 225px;
+	min-height: 220px;
+	margin-right: 10px;
+	padding-right: 9px;
+	flow-children: down;
+	border-right: 1px solid #69d7ff22;
+}
+
+.XHSDevToolsPerformanceBotColumn {
+	width: fill-parent-flow(1);
+	flow-children: down;
+}
+
+.XHSDevToolsPerformanceColumnTitle {
+	width: 100%;
+	height: 22px;
+	padding-top: 3px;
+	color: #6fcde8;
+	font-size: 10px;
+	font-weight: bold;
+	letter-spacing: 1px;
+}
+
+.XHSDevToolsPerformancePlayers {
+	width: 100%;
+	flow-children: down;
+}
+
+.XHSDevToolsPerformancePlayerRow {
+	width: 100%;
+	height: 24px;
+	flow-children: right;
+	border-bottom: 1px solid #ffffff0a;
+}
+
+.XHSDevToolsPerformancePlayerName {
+	width: fill-parent-flow(1);
+	vertical-align: center;
+	color: #a9c1ca;
+	font-size: 11px;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.XHSDevToolsPerformancePlayerFPS {
+	width: 62px;
+	vertical-align: center;
+	color: #8ee6ac;
+	font-size: 12px;
+	font-weight: bold;
+	text-align: right;
+}
+
+.XHSDevToolsPerformancePlayerFPS.Low {
+	color: #ffd27e;
+}
+
+.XHSDevToolsPerformancePlayerFPS.Critical {
+	color: #ff8d84;
+}
+
+.XHSDevToolsPerformancePlayerFPS.Unknown {
+	color: #667e87;
+}
+
+.XHSDevToolsPerformanceRow {
+	width: 100%;
+	height: 20px;
+	flow-children: right;
+}
+
+.XHSDevToolsPerformanceRow Label {
+	width: fill-parent-flow(1);
+	vertical-align: center;
+	color: #78919b;
+	font-size: 10px;
+}
+
+.XHSDevToolsPerformanceRow Label.Value {
+	width: 72px;
+	color: #d8edf3;
+	font-size: 11px;
+	font-weight: semi-bold;
+	text-align: right;
+}
+
+.XHSDevToolsPerformanceRow Label.Value.WideValue {
+	width: 88px;
+}
+
+.XHSDevToolsPerformanceRow Label.Value.Warning {
+	color: #ffd27e;
+}
+
+.XHSDevToolsPerformanceRow Label.Value.Critical {
+	color: #ff8d84;
+}
+
+.XHSDevToolsPerformanceSourceTitle {
+	width: 100%;
+	height: 18px;
+	margin-top: 3px;
+	padding-top: 3px;
+	color: #5f9aaa;
+	font-size: 8px;
+	letter-spacing: 1px;
+}
+
+.XHSDevToolsPerformanceSource {
+	width: 100%;
+	height: 15px;
+	color: #8eabb4;
+	font-size: 8px;
+	text-overflow: shrink;
+	white-space: nowrap;
+}
+
+.XHSDevToolsPanel {
+	width: 760px;
+	height: 780px;
+	horizontal-align: right;
+	vertical-align: top;
+	margin-top: 8px;
+	margin-right: 18px;
+	background-color: #091017f4;
+	border: 1px solid #7ddcff66;
+	box-shadow: fill #000000dd 0px 0px 18px 0px;
+	flow-children: down;
+	padding: 12px;
+	visibility: collapse;
+	z-index: 9020;
+}
+
+.XHSDevToolsPanel.Visible {
+	visibility: visible;
+}
+
+.XHSDevToolsHeader {
+	width: 100%;
+	height: 54px;
+	flow-children: right;
+}
+
+.XHSDevToolsEyebrow {
+	color: #79d9ff;
+	font-size: 12px;
+	font-weight: bold;
+	letter-spacing: 0px;
+	text-shadow: 0px 1px 2px 2 #000000;
+}
+
+.XHSDevToolsHeaderText {
+	width: 100%;
+	flow-children: right;
+}
+
+.XHSDevToolsTitle {
+	color: #f2fbff;
+	font-size: 24px;
+	font-weight: bold;
+	text-shadow: 0px 1px 3px 2 #000000;
+	align: center center;
+}
+
+.XHSDevToolsClose {
+	width: 32px;
+	height: 32px;
+	horizontal-align: right;
+	background-color: #2a1111ee;
+	border: 1px solid #ff7f7f66;
+}
+
+.XHSDevToolsClose:hover {
+	brightness: 1.8;
+}
+
+.XHSDevToolsClose Label {
+	horizontal-align: center;
+	vertical-align: center;
+	color: #ffdada;
+	font-size: 16px;
+	font-weight: bold;
+}
+
+.XHSDevToolsStatus {
+	width: 100%;
+	min-height: 28px;
+	padding: 5px 8px;
+	background-color: #101b24dd;
+	border: 1px solid #ffffff12;
+}
+
+.XHSDevToolsStatus Label {
+	color: #c8dfe8;
+	font-size: 13px;
+	text-shadow: 0px 1px 2px 2 #000000;
+}
+
+.XHSDevToolsStatus Label.Error {
+	color: #ffaaaa;
+}
+
+.XHSDevToolsSandboxBar {
+	width: 100%;
+	min-height: 46px;
+	margin-top: 8px;
+	padding: 7px 8px;
+	background-color: #0c1620ee;
+	border: 1px solid #ffffff18;
+	flow-children: right;
+}
+
+.XHSDevToolsSandboxText {
+	width: fill-parent-flow(1);
+	vertical-align: center;
+	flow-children: down;
+}
+
+.XHSDevToolsSandboxTitle {
+	color: #eefaff;
+	font-size: 14px;
+	font-weight: bold;
+	text-shadow: 0px 1px 2px 2 #000000;
+}
+
+.XHSDevToolsSandboxHint {
+	color: #8fa5ae;
+	font-size: 12px;
+	margin-top: 1px;
+	text-shadow: 0px 1px 2px 2 #000000;
+}
+
+.XHSDevToolsSandboxToggleButton {
+	width: 150px;
+	vertical-align: center;
+	margin-right: 0px;
+	margin-bottom: 0px;
+}
+
+.XHSDevToolsTabs {
+	width: 100%;
+	height: 70px;
+	margin-top: 10px;
+	flow-children: right-wrap;
+}
+
+.XHSDevToolsTab {
+	width: 15.6%;
+	height: 30px;
+	margin-right: 1%;
+	margin-bottom: 5px;
+	background-color: #162530ee;
+	border: 1px solid #ffffff18;
+}
+
+.XHSDevToolsTab.Active {
+	background-color: #1c4861ee;
+	border: 1px solid #7fdcff88;
+}
+
+.XHSDevToolsTab:hover {
+	brightness: 1.5;
+}
+
+.XHSDevToolsTab Label,
+.XHSDevToolsButton Label {
+	horizontal-align: center;
+	vertical-align: center;
+	color: #eefaff;
+	font-size: 13px;
+	font-weight: semi-bold;
+	text-shadow: 0px 1px 2px 2 #000000;
+	text-overflow: shrink;
+}
+
+.XHSDevToolsContent {
+	width: 100%;
+	height: fill-parent-flow(1);
+	margin-top: 6px;
+	flow-children: down;
+	overflow: squish scroll;
+}
+
+.XHSDevToolsSection {
+	width: 100%;
+	margin-bottom: 12px;
+	padding: 10px;
+	background-color: #101820dd;
+	border: 1px solid #ffffff14;
+	flow-children: down;
+}
+
+.XHSDevToolsSectionTitle {
+	color: #9fe8ff;
+	font-size: 15px;
+	font-weight: bold;
+	margin-bottom: 8px;
+	text-shadow: 0px 1px 2px 2 #000000;
+}
+
+.XHSDevToolsSubsectionTitle {
+	width: 100%;
+	margin-top: 4px;
+	margin-bottom: 7px;
+	color: #7ccfe8;
+	font-size: 12px;
+	font-weight: bold;
+	text-transform: uppercase;
+	letter-spacing: 1px;
+	text-shadow: 0px 1px 2px 2 #000000;
+}
+
+.XHSDevToolsGrid {
+	width: 100%;
+	flow-children: right-wrap;
+}
+
+.XHSDevToolsBattlepassGrid {
+	width: 100%;
+	flow-children: right-wrap;
+}
+
+.XHSDevToolsBattlepassItem {
+	width: 174px;
+	height: 238px;
+	margin-right: 8px;
+	margin-bottom: 8px;
+	padding: 7px;
+	flow-children: down;
+	background-color: #091118f4;
+	border: 1px solid #57819655;
+	box-shadow: 0px 3px 8px 0px #000000aa;
+}
+
+.XHSDevToolsBattlepassItem:hover {
+	border-color: #8edfffaa;
+	brightness: 1.12;
+}
+
+.XHSDevToolsBattlepassItem.VisualOnly {
+	border-color: #9b865344;
+}
+
+.XHSDevToolsBattlepassImageFrame {
+	width: 158px;
+	height: 124px;
+	background-color: #020609;
+	border: 1px solid #ffffff20;
+	overflow: clip;
+}
+
+.XHSDevToolsBattlepassImage {
+	width: 100%;
+	height: 100%;
+}
+
+.XHSDevToolsBattlepassMissingImage {
+	horizontal-align: center;
+	vertical-align: center;
+	color: #71838c;
+	font-size: 13px;
+	font-weight: bold;
+	letter-spacing: 1px;
+}
+
+.XHSDevToolsBattlepassItemName {
+	width: 100%;
+	height: 31px;
+	margin-top: 5px;
+	color: #f2f8fb;
+	font-size: 13px;
+	font-weight: bold;
+	text-overflow: shrink;
+	text-align: center;
+	vertical-align: center;
+}
+
+.XHSDevToolsBattlepassItemMeta,
+.XHSDevToolsBattlepassItemSource {
+	width: 100%;
+	color: #8eb8c9;
+	font-size: 10px;
+	text-align: center;
+	text-overflow: shrink;
+}
+
+.XHSDevToolsBattlepassItemSource {
+	height: 16px;
+	color: #e4ba58;
+	font-weight: bold;
+}
+
+.XHSDevToolsBattlepassTestButton.XHSDevToolsButton {
+	width: 100%;
+	height: 27px;
+	margin-top: 3px;
+	margin-right: 0px;
+	margin-bottom: 0px;
+}
+
+.XHSDevToolsButton {
+	width: 132px;
+	height: 32px;
+	margin-right: 6px;
+	margin-bottom: 6px;
+	background-color: #22313cee;
+	border: 1px solid #ffffff1f;
+}
+
+.XHSDevToolsButton:hover {
+	brightness: 1.45;
+}
+
+.XHSDevToolsButton:active {
+	brightness: 0.85;
+}
+
+.XHSDevToolsButton.Small {
+	width: 76px;
+}
+
+.XHSDevToolsButton.Tiny {
+	width: 38px;
+}
+
+.XHSDevToolsButton.Accent {
+	background-color: #1b4657ee;
+	border-color: #7fdcff66;
+}
+
+.XHSDevToolsButton.Warn {
+	background-color: #4b3513ee;
+	border-color: #ffcc6a66;
+}
+
+.XHSDevToolsButton.Flow {
+	background-color: #183f2bee;
+	border-color: #74f0a666;
+}
+
+.XHSDevToolsButton.Danger {
+	background-color: #4a1717ee;
+	border-color: #ff777766;
+}
+
+.XHSDevToolsButton.Active {
+	background-color: #216a80ee;
+	border-color: #9fe8ff99;
+}
+
+.XHSDevToolsOverheadRefresh { width: 118px; margin-top: 8px; }
+.XHSDevToolsSelectionHealthBars { width: 210px; margin-top: 5px; }
+.XHSDevToolsOverheadFilters { width: 100%; margin-top: 8px; flow-children: right; }
+.XHSDevToolsOverheadFilters .XHSDevToolsButton { width: 150px; }
+.XHSDevToolsOverheadTable { width: 100%; margin-top: 5px; flow-children: down; }
+.XHSDevToolsOverheadRow { width: 100%; height: 50px; margin-bottom: 4px; padding: 5px; flow-children: right; background-color: #091219cc; border: 1px solid #ffffff12; }
+.XHSDevToolsOverheadRow.HasOverride { background-color: #102c38dd; border-color: #7fdcff55; }
+.XHSDevToolsOverheadIdentity { width: fill-parent-flow(1); height: 100%; flow-children: down; }
+.XHSDevToolsOverheadName { width: 100%; color: #eaf8fc; font-size: 13px; font-weight: semi-bold; text-overflow: shrink; }
+.XHSDevToolsOverheadMeta { width: 100%; color: #83b8c9; font-size: 10px; }
+.XHSDevToolsOverheadEntry { width: 70px; height: 32px; margin-right: 6px; padding: 5px 8px; color: #f1fbff; font-size: 14px; text-align: center; background-color: #050b0fee; border: 1px solid #62ccea66; }
+.XHSDevToolsOverheadStep, .XHSDevToolsOverheadApply, .XHSDevToolsOverheadReset { margin-bottom: 0; }
+.XHSDevToolsOverheadReset { width: 82px; margin-right: 0; }
+
+.XHSDevToolsQuestGrid {
+	width: 100%;
+	flow-children: right-wrap;
+}
+
+.XHSDevToolsQuestRow {
+	width: 342px;
+	min-height: 42px;
+	margin-right: 6px;
+	margin-bottom: 6px;
+	padding: 4px;
+	background-color: #080d12a8;
+	flow-children: right;
+}
+
+.XHSDevToolsBossGrid {
+	width: 100%;
+	flow-children: right-wrap;
+}
+
+.XHSDevToolsBossCard {
+	width: 228px;
+	min-height: 104px;
+	margin-right: 7px;
+	margin-bottom: 7px;
+	padding: 8px;
+	background-color: gradient( linear, 0% 0%, 100% 100%, from( #0b1720dd ), to( #080d12dd ) );
+	border: 1px solid #ffffff18;
+	flow-children: down;
+}
+
+.XHSDevToolsBossCardHeader {
+	width: 100%;
+	min-height: 46px;
+	margin-bottom: 7px;
+	flow-children: right;
+}
+
+.XHSDevToolsHeroIconFrame {
+	width: 42px;
+	height: 42px;
+	margin-right: 9px;
+	background-color: #05090dcc;
+	border: 1px solid #7fdcff44;
+	box-shadow: #00000099 0px 0px 8px 0px;
+}
+
+.XHSDevToolsHeroIcon {
+	width: 100%;
+	height: 100%;
+}
+
+.XHSDevToolsBossText {
+	width: fill-parent-flow(1);
+	vertical-align: center;
+	flow-children: down;
+}
+
+.XHSDevToolsBossCard.Active {
+	background-color: gradient( linear, 0% 0%, 100% 100%, from( #123348e8 ), to( #081119e8 ) );
+	border: 1px solid #7fdcff88;
+	box-shadow: #5ad0ff22 0px 0px 10px 0px;
+}
+
+.XHSDevToolsBossName {
+	width: 100%;
+	color: #eefaff;
+	font-size: 14px;
+	font-weight: bold;
+	text-shadow: 0px 1px 2px 2 #000000;
+	text-overflow: shrink;
+}
+
+.XHSDevToolsBossStatus {
+	width: 100%;
+	margin-top: 2px;
+	color: #8fa5ae;
+	font-size: 12px;
+	text-shadow: 0px 1px 2px 2 #000000;
+}
+
+.XHSDevToolsBossCard.Active .XHSDevToolsBossStatus {
+	color: #9fe8ff;
+}
+
+.XHSDevToolsLaneRow {
+	width: 100%;
+	min-height: 36px;
+	margin-bottom: 4px;
+	padding: 3px;
+	background-color: #080d12a8;
+	flow-children: right;
+}
+
+.XHSDevToolsQuestName {
+	width: fill-parent-flow(1);
+	vertical-align: center;
+	color: #d9edf5;
+	font-size: 13px;
+	margin-left: 3px;
+	margin-right: 4px;
+	text-shadow: 0px 1px 2px 2 #000000;
+	text-overflow: shrink;
+}
+
+.XHSDevToolsLaneName {
+	width: 70px;
+	vertical-align: center;
+	color: #d9edf5;
+	font-size: 13px;
+	font-weight: bold;
+	text-shadow: 0px 1px 2px 2 #000000;
+}
+
+.XHSDevToolsBossLine,
+.XHSDevToolsMuted,
+.XHSDevToolsUnavailableLine {
+	color: #c8dfe8;
+	font-size: 13px;
+	margin-bottom: 4px;
+	text-shadow: 0px 1px 2px 2 #000000;
+}
+
+.XHSDevToolsUnavailableLine {
+	color: #ffd18a;
+}
+
+.XHSDevToolsMuted {
+	color: #8fa5ae;
+}
+
+.XHSDevToolsBotCardGrid {
+	width: 100%;
+	flow-children: right-wrap;
+}
+
+.XHSDevToolsBotCard {
+	width: 49%;
+	min-height: 382px;
+	margin-right: 1%;
+	margin-bottom: 8px;
+	padding: 9px;
+	flow-children: down;
+	background-color: gradient(linear, 0% 0%, 100% 100%, from(#0b2029e8), to(#080f15e8));
+	border: 1px solid #65d8ff38;
+	box-shadow: inset #42d4ff10 0px 0px 10px 0px;
+}
+
+.XHSDevToolsBotCard.HasError {
+	border-color: #ff696980;
+	background-color: gradient(linear, 0% 0%, 100% 100%, from(#2b1518e8), to(#100b10e8));
+}
+
+.XHSDevToolsBotCardHeader {
+	width: 100%;
+	height: 48px;
+	margin-bottom: 6px;
+	flow-children: right;
+}
+
+.XHSDevToolsBotHeaderText {
+	width: fill-parent-flow(1);
+	vertical-align: center;
+	flow-children: down;
+}
+
+.XHSDevToolsBotName {
+	width: 100%;
+	color: #eafaff;
+	font-size: 15px;
+	font-weight: bold;
+	text-shadow: 0px 1px 2px 2 #000000;
+	text-overflow: shrink;
+}
+
+.XHSDevToolsBotMeta {
+	width: 100%;
+	margin-top: 2px;
+	color: #7da9b9;
+	font-size: 10px;
+	text-transform: uppercase;
+	text-shadow: 0px 1px 2px 2 #000000;
+	text-overflow: shrink;
+}
+
+.XHSDevToolsBotStateRow {
+	width: 100%;
+	height: 25px;
+	margin-bottom: 5px;
+	padding: 3px 5px;
+	flow-children: right;
+	background-color: #102d38bb;
+	border: 1px solid #5bd9ff2e;
+}
+
+.XHSDevToolsBotState,
+.XHSDevToolsBotGoal {
+	vertical-align: center;
+	font-size: 11px;
+	text-shadow: 0px 1px 2px 2 #000000;
+	text-overflow: shrink;
+}
+
+.XHSDevToolsBotState {
+	width: 42%;
+	color: #88e5ff;
+	font-weight: bold;
+}
+
+.XHSDevToolsBotGoal {
+	width: 58%;
+	color: #c4d8df;
+	text-align: right center;
+}
+
+.XHSDevToolsBotMetrics {
+	width: 100%;
+	margin-bottom: 5px;
+	flow-children: right-wrap;
+}
+
+.XHSDevToolsBotMetric {
+	width: 49%;
+	height: 27px;
+	margin-right: 1%;
+	margin-bottom: 3px;
+	padding: 2px 4px;
+	flow-children: down;
+	background-color: #070d12a8;
+	border: 1px solid #ffffff0c;
+}
+
+.XHSDevToolsBotMetric.Wide {
+	width: 99%;
+}
+
+.XHSDevToolsBotMetricKey {
+	width: 100%;
+	height: 10px;
+	color: #657f8a;
+	font-size: 8px;
+	letter-spacing: 1px;
+	text-transform: uppercase;
+}
+
+.XHSDevToolsBotMetricValue {
+	width: 100%;
+	height: 14px;
+	color: #d0e4ea;
+	font-size: 10px;
+	text-overflow: shrink;
+}
+
+.XHSDevToolsBotDecisions {
+	width: 100%;
+	margin-bottom: 5px;
+	padding: 4px 5px;
+	flow-children: down;
+	background-color: #070d12a8;
+}
+
+.XHSDevToolsBotDecisionLine,
+.XHSDevToolsBotActionLine {
+	width: 100%;
+	color: #a8c0c9;
+	font-size: 9px;
+	line-height: 12px;
+	text-overflow: shrink;
+	text-shadow: 0px 1px 2px 2 #000000;
+}
+
+.XHSDevToolsBotSubheading {
+	width: 100%;
+	margin-top: 1px;
+	margin-bottom: 2px;
+	color: #659db0;
+	font-size: 9px;
+	font-weight: bold;
+	letter-spacing: 1px;
+}
+
+.XHSDevToolsBotActionsList {
+	width: 100%;
+	min-height: 38px;
+	margin-bottom: 4px;
+	padding: 3px 5px;
+	flow-children: down;
+	background-color: #071117aa;
+	border: 1px solid #4acff51a;
+}
+
+.XHSDevToolsBotEngine {
+	width: 100%;
+	margin-bottom: 5px;
+	color: #75cf9b;
+	font-size: 10px;
+}
+
+.XHSDevToolsBotEngine.Error,
+.XHSDevToolsBotError {
+	color: #ff8e8e;
+}
+
+.XHSDevToolsBotError {
+	width: 100%;
+	margin-bottom: 5px;
+	font-size: 10px;
+	white-space: normal;
+}
+
+.XHSDevToolsBotGoalGrid {
+	width: 100%;
+	flow-children: right-wrap;
+}
+
+.XHSDevToolsBotGoalGrid .XHSDevToolsButton.Tiny {
+	width: 19%;
+	height: 26px;
+	margin-right: 1%;
+	margin-bottom: 0px;
+}
+
+.XHSDevToolsBotGoalGrid .XHSDevToolsButton.Tiny Label {
+	font-size: 10px;
+}
+
+.XHSDevToolsLagLabStatus {
+	width: 100%;
+	min-height: 38px;
+	flow-children: right;
+}
+
+.XHSDevToolsLagLabStage {
+	width: fill-parent-flow(1);
+	vertical-align: center;
+	color: #ffd474;
+	font-size: 14px;
+	font-weight: bold;
+	letter-spacing: 1px;
+}
+
+.XHSDevToolsLagLabFeedback {
+	width: 100%;
+	margin-top: 4px;
+	color: #83dbff;
+	font-size: 11px;
+	white-space: normal;
+}
+
+.XHSDevToolsLagLabFeedback.Error {
+	color: #ff8585;
+}
+
+.XHSDevToolsLagLabGrid {
+	width: 100%;
+	flow-children: right-wrap;
+}
+
+.XHSDevToolsLagLabCard {
+	width: 32%;
+	min-height: 82px;
+	margin-right: 1%;
+	margin-bottom: 7px;
+	padding: 7px;
+	flow-children: down;
+	background-color: #071117aa;
+	border: 1px solid #52d6ff20;
+}
+
+.XHSDevToolsLagLabCard.IsOff {
+	background-color: #071117aa;
+	border-color: #52636a42;
+}
+
+.XHSDevToolsLagLabCard.IsTesting {
+	background-color: gradient(linear, 0% 0%, 100% 100%, from(#48340fdd), to(#171108dd));
+	border-color: #ffd36b99;
+	box-shadow: inset #ffca4b18 0px 0px 12px 0px;
+}
+
+.XHSDevToolsLagLabCard.IsOn {
+	background-color: gradient(linear, 0% 0%, 100% 100%, from(#123d29e8), to(#071811e8));
+	border-color: #72ed9eaa;
+	box-shadow: inset #58f29120 0px 0px 14px 0px;
+}
+
+.XHSDevToolsLagLabCard:hover {
+	brightness: 1.45;
+	border-color: #7fdcff66;
+}
+
+.XHSDevToolsLagLabCard:active {
+	brightness: 0.8;
+}
+
+.XHSDevToolsLagLabCard:disabled {
+	saturation: 0.2;
+	opacity: 0.55;
+}
+
+.XHSDevToolsLagLabCardTitle {
+	width: fill-parent-flow(1);
+	vertical-align: center;
+	color: #eefaff;
+	font-size: 13px;
+	font-weight: semi-bold;
+	text-shadow: 0px 1px 2px 2 #000000;
+}
+
+.XHSDevToolsLagLabCardHeader {
+	width: 100%;
+	height: 25px;
+	margin-bottom: 5px;
+	flow-children: right;
+}
+
+.XHSDevToolsLagLabCheckbox {
+	width: 42px;
+	height: 22px;
+	vertical-align: center;
+	background-color: #111a20ee;
+	border: 1px solid #73838a66;
+}
+
+.XHSDevToolsLagLabCard.IsTesting .XHSDevToolsLagLabCheckbox {
+	background-color: #5b400fee;
+	border-color: #ffd36baa;
+}
+
+.XHSDevToolsLagLabCard.IsOn .XHSDevToolsLagLabCheckbox {
+	background-color: #176738ee;
+	border-color: #7af0a4cc;
+}
+
+.XHSDevToolsLagLabCheckboxLabel {
+	horizontal-align: center;
+	vertical-align: center;
+	color: #9babb1;
+	font-size: 10px;
+	font-weight: bold;
+}
+
+.XHSDevToolsLagLabCard.IsTesting .XHSDevToolsLagLabCheckboxLabel {
+	color: #ffe09a;
+}
+
+.XHSDevToolsLagLabCard.IsOn .XHSDevToolsLagLabCheckboxLabel {
+	color: #d9ffe6;
+}
+
+.XHSDevToolsLagLabHint {
+	width: 100%;
+	color: #849ca6;
+	font-size: 10px;
+	white-space: normal;
+}
+
+.XHSDevToolsLagLabHotspot {
+	width: 100%;
+	min-height: 36px;
+	margin-bottom: 4px;
+	padding: 3px;
+	flow-children: right;
+	background-color: #080d12a8;
+}
+
+.XHSDevToolsLagLabSource {
+	width: fill-parent-flow(1);
+	vertical-align: center;
+	color: #c9e4ed;
+	font-size: 11px;
+	text-overflow: shrink;
+}
+
+.XHSDevToolsLagLabHotspot .XHSDevToolsButton {
+	height: 28px;
+	margin-bottom: 0;
+}
+
+.XHSDevToolsLagLabResultTitle {
+	width: 100%;
+	margin-bottom: 7px;
+	color: #d8f4ff;
+	font-size: 12px;
+	white-space: normal;
+}
+
+.XHSDevToolsLagLabTable {
+	width: 100%;
+	flow-children: down;
+}
+
+.XHSDevToolsLagLabRow {
+	width: 100%;
+	height: 24px;
+	padding: 2px 5px;
+	flow-children: right;
+	background-color: #07111788;
+	border-bottom: 1px solid #ffffff0a;
+}
+
+.XHSDevToolsLagLabRow.Header {
+	background-color: #12303bbb;
+}
+
+.XHSDevToolsLagLabMetric {
+	width: fill-parent-flow(1);
+	vertical-align: center;
+	color: #b9d2da;
+	font-size: 11px;
+}
+
+.XHSDevToolsLagLabValue {
+	width: 105px;
+	vertical-align: center;
+	color: #dcecf1;
+	font-size: 11px;
+	text-align: right center;
+}
+
+.XHSDevToolsLagLabValue.Improved {
+	color: #79e69e;
+}
+
+.XHSDevToolsLagLabValue.Regressed {
+	color: #ff8585;
+}

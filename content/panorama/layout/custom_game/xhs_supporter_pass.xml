@@ -1,0 +1,467 @@
+<root>
+	<styles>
+		<include src="file://{resources}/styles/custom_game/xhs_theme.css" />
+		<include src="file://{resources}/styles/custom_game/xhs_supporter_pass.css" />
+	</styles>
+
+	<scripts>
+		<include src="file://{resources}/scripts/custom_game/util.js" />
+		<include src="file://{resources}/scripts/custom_game/xhs_name_display.js" />
+		<include src="file://{resources}/scripts/custom_game/generated/xhs_supporter_couriers.js" />
+		<include src="file://{resources}/scripts/custom_game/generated/xhs_supporter_effigy_catalog.js" />
+		<include src="file://{resources}/scripts/custom_game/xhs_supporter_pass.js" />
+	</scripts>
+
+	<Panel class="XHSSupporterPassRoot" hittest="false">
+		<Button id="XHSSupporterPassButton" class="XHSSupporterPassButton" hittest="true">
+			<Panel class="XHSSupporterPassButtonGlow" hittest="false" ignore-parent-flow="true" />
+
+			<Panel class="XHSSupporterPassButtonContent" hittest="false">
+				<Panel class="XHSSupporterPassButtonIcon">
+					<Label class="XHSSupporterPassButtonIconText" text="#xhs_sp_title" />
+				</Panel>
+
+				<Panel class="XHSSupporterPassButtonCopy">
+					<Panel id="XHSSupporterFragmentsCounter" class="XHSSupporterFragmentsCounter" hittest="false">
+						<Label class="XHSSupporterFragmentsCounterIcon" text="F" />
+						<Label id="XHSSupporterFragmentsCounterValue" class="XHSSupporterFragmentsCounterValue" text="0" />
+					</Panel>
+				</Panel>
+			</Panel>
+		</Button>
+
+		<Panel id="XHSSupporterPassWindow" class="XHSSupporterPassWindow" hittest="true">
+			<Panel class="XHSPassHeader">
+				<Panel class="XHSPassHeaderMedia" hittest="false" ignore-parent-flow="true" />
+				<Panel class="XHSPassHeaderVeil" hittest="false" ignore-parent-flow="true" />
+				<Panel class="XHSPassHeaderCopy">
+					<Panel class="XHSPassHeaderProgressTop">
+						<Label id="XHSPassHeaderLevelLabel" class="XHSPassHeaderLevelLabel" text="LEVEL 1" />
+						<Panel class="XHSPassHeaderFragmentsInline" hittest="false">
+							<Image class="XHSPassFragmentLogo XHSPassFragmentLogoSmall" src="file://{images}/custom_game/battlepass/supporter_fragments_logo.png" />
+							<Label id="XHSPassHeaderFragmentsValue" class="XHSPassHeaderFragmentsValue" text="0" />
+						</Panel>
+					</Panel>
+					<Panel class="XHSPassHeaderProgressBar">
+						<Panel id="XHSPassHeaderXpProgress" class="XHSPassHeaderProgressFill" />
+					</Panel>
+					<Label id="XHSPassHeaderXPLabel" class="XHSPassHeaderXPLabel" text="0 / 1000 XP" />
+				</Panel>
+
+				<Panel class="XHSPassTopBar">
+					<Button id="XHSPassTabOverview" class="XHSPassTab IsActive">
+						<Label text="#xhs_sp_tab_overview" />
+					</Button>
+					<Button id="XHSPassTabAchievements" class="XHSPassTab">
+						<Label text="#xhs_sp_tab_achievements" />
+					</Button>
+					<Button id="XHSPassTabRewards" class="XHSPassTab">
+						<Label text="#xhs_sp_tab_rewards" />
+					</Button>
+					<Button id="XHSPassTabShop" class="XHSPassTab">
+						<Label text="#xhs_sp_tab_shop" />
+					</Button>
+					<Button id="XHSPassTabArmory" class="XHSPassTab">
+						<Label text="#xhs_sp_tab_armory" />
+					</Button>
+				</Panel>
+
+				<Button id="XHSPassDevUnlockUIButton" class="XHSPassDevUnlockUIButton">
+					<Label id="XHSPassDevUnlockUILabel" text="DEV: UNLOCK UI" />
+				</Button>
+
+				<Button id="XHSPassDevFreeUIButton" class="XHSPassDevUnlockUIButton XHSPassDevFreeUIButton">
+					<Label id="XHSPassDevFreeUILabel" text="DEV: FREE UI" />
+				</Button>
+
+				<Panel id="XHSPassHeaderFragmentsWallet" class="XHSPassHeaderFragmentsWallet" hittest="false">
+					<Image class="XHSPassFragmentLogo" src="file://{images}/custom_game/battlepass/supporter_fragments_logo.png" />
+					<Label id="XHSPassHeaderWalletValue" class="XHSPassHeaderWalletValue" text="0" />
+				</Panel>
+
+				<Button id="XHSPassCloseButton" class="XHSPassIconButton">
+					<Label text="X" />
+				</Button>
+			</Panel>
+
+			<Panel class="XHSPassBody">
+				<Panel class="XHSPassContent">
+					<Panel id="XHSPassOverviewPage" class="XHSPassPage IsVisible">
+						<Panel id="XHSPassOverviewGrid" class="XHSPassOverviewGrid">
+							<Panel class="XHSPassHeroRow">
+								<Panel class="XHSPassProfileCard XHSPanel">
+									<Panel class="XHSPassProfileTop">
+										<DOTAAvatarImage id="XHSPassAvatar" class="XHSPassAvatar" />
+										<Panel class="XHSPassProfileCopy">
+											<Label id="XHSPassPlayerName" class="XHSPassProfileName" text="#xhs_sp_player" />
+											<Label id="XHSPassPlayerTier" class="XHSPassProfileTier" text="#xhs_sp_free_player" />
+											<Label id="XHSPassAccessTimeline" class="XHSPassAccessTimeline" text="" />
+										</Panel>
+									</Panel>
+									<Panel class="XHSPassProgressBlock">
+										<Panel class="XHSPassProgressHeader">
+											<Label id="XHSPassLevelLabel" text="#xhs_sp_season_level" />
+											<Label id="XHSPassXpLabel" text="0 / 2000 XP" />
+										</Panel>
+										<Panel class="XHSPassProgressBar">
+											<Panel id="XHSPassXpProgress" class="XHSPassProgressFill" />
+										</Panel>
+									</Panel>
+								</Panel>
+
+								<Panel class="XHSPassProfileStats">
+									<Panel class="XHSPassStatsRow">
+										<Panel class="XHSPassHeaderStat">
+											<Label class="XHSPassHeaderStatLabel" text="#xhs_sp_tier" />
+											<Label id="XHSPassTierValue" class="XHSPassHeaderStatValue" text="#xhs_sp_free" />
+										</Panel>
+										<Panel class="XHSPassHeaderStat">
+											<Label class="XHSPassHeaderStatLabel" text="#xhs_sp_global_xp" />
+											<Label id="XHSPassGlobalXPValue" class="XHSPassHeaderStatValue" text="-" />
+										</Panel>
+										<Panel class="XHSPassHeaderStat">
+											<Label class="XHSPassHeaderStatLabel" text="#xhs_sp_supporter_xp" />
+											<Label id="XHSPassSeasonXPValue" class="XHSPassHeaderStatValue" text="0 / 1000" />
+										</Panel>
+									</Panel>
+									<Panel class="XHSPassStatsRow">
+										<Panel class="XHSPassHeaderStat">
+											<Label class="XHSPassHeaderStatLabel" text="#xhs_sp_fragments" />
+											<Label id="XHSPassFragmentsValue" class="XHSPassHeaderStatValue" text="0" />
+										</Panel>
+										<Panel class="XHSPassHeaderStat">
+											<Label class="XHSPassHeaderStatLabel" text="#xhs_sp_daily_earnings" />
+											<Label id="XHSPassWeeklyCapValue" class="XHSPassHeaderStatValue" text="0 / 100" />
+										</Panel>
+										<Panel class="XHSPassHeaderStat">
+											<Label class="XHSPassHeaderStatLabel" text="#xhs_sp_xp_boost" />
+											<Label id="XHSPassXPBoostValue" class="XHSPassHeaderStatValue" text="+0%" />
+										</Panel>
+										<Panel class="XHSPassHeaderStat">
+											<Label class="XHSPassHeaderStatLabel" text="#xhs_sp_vote_power" />
+											<Label id="XHSPassVotePowerValue" class="XHSPassHeaderStatValue" text="1 vote" />
+										</Panel>
+									</Panel>
+								</Panel>
+							</Panel>
+
+							<Panel class="XHSPassTiersCard XHSPanel">
+								<Panel class="XHSPassSectionHeader XHSPassTierSectionHeader">
+									<Label class="XHSPassSectionTitle" text="#xhs_sp_supporter_tiers" />
+									<Label class="XHSPassSectionNote" text="#xhs_sp_supporter_tiers_note" />
+									<Button id="XHSPassChinaPaymentButton" class="XHSPassChinaPaymentButton">
+										<Label text="WECHAT PAY 微信支付 / ALIPAY 支付宝" />
+									</Button>
+								</Panel>
+								<Panel id="XHSPassTierRows" class="XHSPassTierRows" />
+							</Panel>
+						</Panel>
+					</Panel>
+
+					<Panel id="XHSPassAchievementsPage" class="XHSPassPage">
+						<Panel id="XHSPassAchievementsScroll" class="XHSPassAchievementsScroll">
+							<Panel class="XHSPassAchievementsHero">
+								<Panel class="XHSPassAchievementsHeroCopy">
+									<Label class="XHSPassAchievementsEyebrow" text="#xhs_sp_achievements_eyebrow" />
+									<Label class="XHSPassAchievementsTitle" text="#xhs_sp_achievements_title" />
+									<Label class="XHSPassAchievementsIntro" text="#xhs_sp_achievements_intro" />
+								</Panel>
+								<Panel class="XHSPassAchievementsSummary">
+									<Panel class="XHSPassAchievementsSummaryStat IsScore">
+										<Label class="XHSPassAchievementsSummaryLabel" text="#xhs_sp_achievement_score" />
+										<Label id="XHSPassAchievementScore" class="XHSPassAchievementsSummaryValue" text="0" />
+									</Panel>
+									<Panel class="XHSPassAchievementsSummaryStat">
+										<Label class="XHSPassAchievementsSummaryLabel" text="#xhs_sp_achievement_completion" />
+										<Label id="XHSPassAchievementCompletion" class="XHSPassAchievementsSummaryValue" text="0 / 0" />
+									</Panel>
+								</Panel>
+							</Panel>
+
+							<Panel class="XHSPassAchievementsToolbar">
+								<Button id="XHSPassAchievementFilterAll" class="XHSPassAchievementFilter IsActive"><Label text="#xhs_sp_achievement_filter_all" /></Button>
+								<Button id="XHSPassAchievementFilterProgress" class="XHSPassAchievementFilter"><Label text="#xhs_sp_achievement_filter_progress" /></Button>
+								<Button id="XHSPassAchievementFilterComplete" class="XHSPassAchievementFilter"><Label text="#xhs_sp_achievement_filter_complete" /></Button>
+								<Button id="XHSPassAchievementFilterComing" class="XHSPassAchievementFilter"><Label text="#xhs_sp_achievement_filter_coming" /></Button>
+							</Panel>
+
+							<Panel id="XHSPassAchievementsGrid" class="XHSPassAchievementsGrid" />
+						</Panel>
+					</Panel>
+
+					<Panel id="XHSPassRewardsPage" class="XHSPassPage">
+						<Panel class="XHSPassSectionHeader">
+							<Label class="XHSPassSectionTitle" text="#xhs_sp_season_rewards" />
+							<Label class="XHSPassSectionNote" text="#xhs_sp_season_rewards_note" />
+						</Panel>
+						<Panel id="XHSPassRewardTracks" class="XHSPassRewardTracks" />
+					</Panel>
+
+					<Panel id="XHSPassShopPage" class="XHSPassPage">
+						<Panel class="XHSPassSectionHeader">
+							<Label class="XHSPassSectionTitle" text="#xhs_sp_fragment_shop" />
+							<Label id="XHSPassShopRefresh" class="XHSPassSectionNote" text="PERMANENT CATALOG" />
+						</Panel>
+						<Panel class="XHSPassShopViewTabs">
+							<Button id="XHSPassShopHighlightsTab" class="XHSPassShopViewTab IsActive"><Label text="HIGHLIGHTS" /></Button>
+							<Button id="XHSPassShopBrowseTab" class="XHSPassShopViewTab"><Label text="BROWSE ALL" /></Button>
+						</Panel>
+						<Panel id="XHSPassShopHighlightsView" class="XHSPassShopView IsVisible">
+							<Panel class="XHSPassShopViewHeader">
+								<Label class="XHSPassShopViewTitle" text="CURATED HIGHLIGHTS" />
+								<Label class="XHSPassShopViewNote" text="FEATURED PICKS FROM THE PERMANENT CATALOG" />
+							</Panel>
+							<Panel id="XHSPassShopHighlights" class="XHSPassShopHighlights">
+								<Panel id="XHSPassShopHero" class="XHSPassShopHero" />
+								<Panel id="XHSPassShopFeatured" class="XHSPassShopFeatured" />
+							</Panel>
+						</Panel>
+						<Panel id="XHSPassShopBrowseView" class="XHSPassShopView XHSPassShopBrowseView">
+							<Panel class="XHSPassShopBrowseHeader">
+								<Label class="XHSPassShopViewTitle" text="BROWSE THE CATALOG" />
+								<Panel id="XHSPassShopFilters" class="XHSPassSectionFilterTabs" />
+							</Panel>
+							<Panel class="XHSPassShopDiscoveryBar">
+								<TextEntry id="XHSPassShopSearch" class="XHSPassShopSearch" placeholder="Search permanent items..." />
+								<Panel class="XHSPassShopFacetGroup">
+									<Label class="XHSPassShopFacetLabel" text="EDITION" />
+									<Panel id="XHSPassShopEditionFilters" class="XHSPassShopFacetTabs" />
+								</Panel>
+								<Panel class="XHSPassShopFacetGroup IsRarity">
+									<Label class="XHSPassShopFacetLabel" text="RARITY" />
+									<Panel id="XHSPassShopRarityFilters" class="XHSPassShopFacetTabs" />
+								</Panel>
+								<Label id="XHSPassShopCatalogMeta" class="XHSPassShopCatalogMeta" text="" />
+							</Panel>
+							<Panel id="XHSPassShopCatalogHeader" class="XHSPassShopCatalogHeader">
+								<Label class="XHSPassShopCatalogTitle" text="PERMANENT COLLECTION" />
+								<Label id="XHSPassShopCatalogCount" class="XHSPassShopCatalogCount" text="" />
+							</Panel>
+							<Panel id="XHSPassShopPager" class="XHSPassPaginationBar" />
+							<Panel id="XHSPassShopGrid" class="XHSPassShopGrid" />
+						</Panel>
+						<Panel id="XHSPassShopDetailOverlay" class="XHSPassShopDetailOverlay" hittest="false">
+							<Button id="XHSPassShopDetailBackdrop" class="XHSPassShopDetailBackdrop" />
+							<Panel class="XHSPassShopDetailWindow">
+								<Panel class="XHSPassShopDetailHeader">
+									<Panel class="XHSPassShopDetailHeaderCopy">
+										<Label class="XHSPassShopDetailEyebrow" text="PERMANENT SUPPORTER ITEM" />
+										<Label id="XHSPassShopDetailTitle" class="XHSPassShopDetailTitle" text="" />
+									</Panel>
+									<Button id="XHSPassShopDetailClose" class="XHSPassShopDetailClose"><Label text="X" /></Button>
+								</Panel>
+								<Panel id="XHSPassShopDetailBody" class="XHSPassShopDetailBody" />
+							</Panel>
+						</Panel>
+						<Panel id="XHSPassPurchaseConfirmOverlay" class="XHSPassPurchaseConfirmOverlay" hittest="false">
+							<Button id="XHSPassPurchaseConfirmBackdrop" class="XHSPassPurchaseConfirmBackdrop" />
+							<Panel class="XHSPassPurchaseConfirmWindow">
+								<Label class="XHSPassPurchaseConfirmEyebrow" text="#xhs_sp_purchase_confirmation" />
+								<Panel class="XHSPassPurchaseConfirmItem">
+									<Panel id="XHSPassPurchaseConfirmPreview" class="XHSPassPurchaseConfirmPreview" />
+									<Panel class="XHSPassPurchaseConfirmCopy">
+										<Label id="XHSPassPurchaseConfirmTitle" class="XHSPassPurchaseConfirmTitle" text="" />
+										<Label id="XHSPassPurchaseConfirmPrice" class="XHSPassPurchaseConfirmPrice" text="" />
+									</Panel>
+								</Panel>
+								<Label class="XHSPassPurchaseConfirmPolicy" text="#xhs_sp_purchase_no_refund_notice" />
+								<Label id="XHSPassPurchaseConfirmOwnership" class="XHSPassPurchaseConfirmOwnership" text="" />
+								<Panel class="XHSPassPurchaseConfirmActions">
+									<Button id="XHSPassPurchaseConfirmCancel" class="XHSPassPurchaseConfirmCancel"><Label text="#xhs_sp_cancel" /></Button>
+									<Button id="XHSPassPurchaseConfirmSubmit" class="XHSPassPurchaseConfirmSubmit"><Label text="#xhs_sp_confirm_purchase" /></Button>
+								</Panel>
+							</Panel>
+						</Panel>
+					</Panel>
+
+					<Panel id="XHSPassArmoryPage" class="XHSPassPage">
+						<Panel class="XHSPassSectionHeader HasFilters XHSPassArmoryHeader">
+							<Label class="XHSPassSectionTitle" text="#xhs_sp_armory" />
+							<Panel id="XHSPassArmoryFilters" class="XHSPassSectionFilterTabs" />
+							<Button id="XHSPassArmoryRefreshButton" class="XHSPassArmoryRefreshButton">
+								<Label id="XHSPassArmoryRefreshLabel" text="#xhs_sp_armory_refresh" />
+							</Button>
+							<Label class="XHSPassSectionNote" text="#xhs_sp_armory_note" />
+						</Panel>
+						<Panel id="XHSPassArmoryPager" class="XHSPassPaginationBar" />
+						<Panel id="XHSPassArmoryGrid" class="XHSPassShopGrid XHSPassArmoryGrid" />
+						<Panel id="XHSPassCourierRequestOverlay" class="XHSPassCourierRequestOverlay" hittest="false">
+							<Button id="XHSPassCourierRequestBackdrop" class="XHSPassCourierRequestBackdrop" />
+							<Panel class="XHSPassCourierRequestWindow">
+								<Panel class="XHSPassCourierRequestWindowHeader">
+									<Panel class="XHSPassCourierRequestHeaderCopy">
+										<Label class="XHSPassCourierRequestWindowEyebrow" text="FEATURE REQUESTS" />
+										<Label id="XHSPassAssetRequestTitle" class="XHSPassCourierRequestTitle" text="#xhs_sp_courier_request_title" />
+										<Label id="XHSPassAssetRequestBody" class="XHSPassCourierRequestBody" text="#xhs_sp_courier_request_body" />
+									</Panel>
+									<Button id="XHSPassCourierRequestCloseButton" class="XHSPassCourierRequestCloseButton">
+										<Label text="×" />
+									</Button>
+								</Panel>
+								<Panel id="XHSPassAssetRequestTypeTabs" class="XHSPassAssetRequestTabs IsPrimary" />
+								<Panel class="XHSPassAssetRequestBrowseBar">
+									<Panel id="XHSPassAssetRequestCategoryTabs" class="XHSPassAssetRequestTabs IsCategory" />
+								</Panel>
+								<Panel class="XHSPassAssetRequestSearchRow">
+									<TextEntry id="XHSPassAssetRequestSearch" class="XHSPassAssetRequestSearch" placeholder="#xhs_sp_request_search" />
+								</Panel>
+								<Panel id="XHSPassCourierRequestPager" class="XHSPassPaginationBar" />
+								<Panel id="XHSPassCourierRequestGrid" class="XHSPassShopGrid XHSPassCourierRequestGrid" />
+							</Panel>
+						</Panel>
+					</Panel>
+
+				</Panel>
+			</Panel>
+
+		<Panel id="XHSPassAchievementRevealOverlay" class="XHSPassAchievementRevealOverlay" hittest="false" ignore-parent-flow="true">
+				<Panel class="XHSPassAchievementRevealBackdrop" hittest="false" />
+				<Panel class="XHSPassAchievementRevealBurst" hittest="false" />
+				<Panel class="XHSPassAchievementRevealWindow">
+					<Label class="XHSPassAchievementRevealEyebrow" text="#xhs_sp_achievement_unlocked" />
+					<Image id="XHSPassAchievementRevealMedal" class="XHSPassAchievementRevealMedal" />
+					<Label id="XHSPassAchievementRevealRank" class="XHSPassAchievementRevealRank" text="GOLD" />
+					<Label id="XHSPassAchievementRevealTitle" class="XHSPassAchievementRevealTitle" text="Achievement" />
+					<Label id="XHSPassAchievementRevealDescription" class="XHSPassAchievementRevealDescription" text="" />
+					<Panel class="XHSPassAchievementRevealRewards">
+						<Panel class="XHSPassAchievementRevealReward"><Label class="XHSPassAchievementRevealRewardLabel" text="#xhs_sp_fragments" /><Label id="XHSPassAchievementRevealFragments" class="XHSPassAchievementRevealRewardValue" text="+0" /></Panel>
+						<Panel class="XHSPassAchievementRevealReward"><Label class="XHSPassAchievementRevealRewardLabel" text="#xhs_sp_achievement_score" /><Label id="XHSPassAchievementRevealPoints" class="XHSPassAchievementRevealRewardValue" text="+0" /></Panel>
+					</Panel>
+					<Panel class="XHSPassAchievementRevealActions">
+						<Button id="XHSPassAchievementRevealAllButton" class="XHSPassAchievementRevealSecondary"><Label text="#xhs_sp_achievement_reveal_all" /></Button>
+						<Button id="XHSPassAchievementRevealContinueButton" class="XHSPassAchievementRevealPrimary"><Label text="#xhs_sp_continue" /></Button>
+					</Panel>
+					<Label id="XHSPassAchievementRevealRemaining" class="XHSPassAchievementRevealRemaining" text="" />
+				</Panel>
+			</Panel>
+
+			<Panel id="XHSPassAchievementRecordHover" class="XHSPassAchievementRecordHover" hittest="false" ignore-parent-flow="true">
+				<Panel class="XHSPassAchievementRecordHoverGlow" hittest="false" ignore-parent-flow="true" />
+				<Panel class="XHSPassAchievementRecordHoverHeader">
+					<DOTAAvatarImage id="XHSPassAchievementRecordHoverAvatar" class="XHSPassAchievementRecordHoverAvatar" steamid="0" />
+					<Panel class="XHSPassAchievementRecordHoverIdentity">
+						<Label class="XHSPassAchievementRecordHoverEyebrow" text="#xhs_sp_achievement_record_holder" />
+						<DOTAUserName id="XHSPassAchievementRecordHoverName" class="XHSPassAchievementRecordHoverName" steamid="0" />
+						<Label id="XHSPassAchievementRecordHoverSteamID" class="XHSPassAchievementRecordHoverSteamID" text="SteamID" />
+					</Panel>
+					<Panel class="XHSPassAchievementRecordHoverPlacement">
+						<Label class="XHSPassAchievementRecordHoverRank" text="#1" />
+						<Label class="XHSPassAchievementRecordHoverWorldwide" text="#xhs_sp_achievement_record_worldwide" />
+					</Panel>
+				</Panel>
+				<Panel class="XHSPassAchievementRecordHoverDivider" />
+				<Panel class="XHSPassAchievementRecordHoverDetails">
+					<Image id="XHSPassAchievementRecordHoverMedal" class="XHSPassAchievementRecordHoverMedal" />
+					<Panel class="XHSPassAchievementRecordHoverAchievement">
+						<Label id="XHSPassAchievementRecordHoverTitle" class="XHSPassAchievementRecordHoverTitle" text="Achievement" />
+						<Label id="XHSPassAchievementRecordHoverTier" class="XHSPassAchievementRecordHoverTier" text="Rank" />
+					</Panel>
+					<Panel class="XHSPassAchievementRecordHoverValueBlock">
+						<Label class="XHSPassAchievementRecordHoverValueLabel" text="#xhs_sp_achievement_record_value" />
+						<Label id="XHSPassAchievementRecordHoverValue" class="XHSPassAchievementRecordHoverValue" text="0" />
+					</Panel>
+				</Panel>
+			</Panel>
+
+			<Panel id="XHSPassPremiumCTA" class="XHSPassPremiumCTA" hittest="true">
+				<Label class="XHSPassPremiumCTAEyebrow" text="#xhs_sp_premium_cta_eyebrow" />
+				<Label class="XHSPassPremiumCTACopy" text="#xhs_sp_premium_cta_copy" />
+				<Button id="XHSPassPremiumCTAButton" class="XHSPassPremiumCTAButton">
+					<Label text="#xhs_sp_premium_cta_button" />
+				</Button>
+			</Panel>
+
+			<Panel id="XHSPassChinaPaymentOverlay" class="XHSPassChinaPaymentOverlay" hittest="false">
+				<Button id="XHSPassChinaPaymentBackdrop" class="XHSPassChinaPaymentBackdrop" />
+				<Panel class="XHSPassChinaPaymentWindow">
+					<Panel class="XHSPassChinaPaymentHeader">
+						<Panel class="XHSPassChinaPaymentHeaderCopy">
+							<Label class="XHSPassChinaPaymentEyebrow" text="DIRECT IN-GAME FALLBACK  /  游戏内支付" />
+							<Label class="XHSPassChinaPaymentTitle" text="WECHAT PAY 微信支付 &amp; ALIPAY 支付宝" />
+							<Label class="XHSPassChinaPaymentCopy" text="Fixed supporter access through Stripe Checkout. The Frostrose website is not required.  /  通过 Stripe Checkout 安全购买，无需访问 Frostrose 网站。" />
+						</Panel>
+						<Button id="XHSPassChinaPaymentCloseButton" class="XHSPassChinaPaymentCloseButton"><Label text="X" /></Button>
+					</Panel>
+
+					<Label id="XHSPassChinaPaymentStatus" class="XHSPassChinaPaymentStatus" text="Loading secure payment options..." />
+
+					<Panel class="XHSPassChinaPaymentStep">
+						<Label class="XHSPassChinaPaymentStepLabel" text="1  SELECT SUPPORTER TIER  /  选择支持等级" />
+						<Panel id="XHSPassChinaPaymentTiers" class="XHSPassChinaPaymentChoices XHSPassChinaPaymentTierChoices" />
+					</Panel>
+
+					<Panel class="XHSPassChinaPaymentStep">
+						<Label class="XHSPassChinaPaymentStepLabel" text="2  SELECT FIXED ACCESS  /  选择有效期" />
+						<Panel id="XHSPassChinaPaymentDurations" class="XHSPassChinaPaymentChoices" />
+					</Panel>
+
+					<Panel class="XHSPassChinaPaymentStep">
+						<Label class="XHSPassChinaPaymentStepLabel" text="3  SELECT PAYMENT METHOD  /  选择支付方式" />
+						<Panel id="XHSPassChinaPaymentProviders" class="XHSPassChinaPaymentChoices" />
+					</Panel>
+
+					<Panel class="XHSPassChinaPaymentSummary">
+						<Panel class="XHSPassChinaPaymentSummaryCopy">
+							<Label id="XHSPassChinaPaymentSelection" class="XHSPassChinaPaymentSelection" text="Select an offer" />
+							<Label id="XHSPassChinaPaymentPrice" class="XHSPassChinaPaymentPrice" text="--" />
+						</Panel>
+						<Button id="XHSPassChinaPaymentCancelButton" class="XHSPassChinaPaymentSecondary"><Label text="CANCEL" /></Button>
+						<Button id="XHSPassChinaPaymentContinueButton" class="XHSPassChinaPaymentContinue"><Label text="OPEN SECURE CHECKOUT" /></Button>
+					</Panel>
+					<Label class="XHSPassChinaPaymentSafety" text="Your entitlement activates only after a signed webhook or authenticated Stripe verification. Keep this window open while the game confirms the payment." />
+				</Panel>
+			</Panel>
+
+			<Panel id="XHSPassActionToast" class="XHSPassActionToast" hittest="false">
+				<Label id="XHSPassActionToastText" class="XHSPassActionToastText" text="" />
+			</Panel>
+
+			<Button id="XHSPassBackToTopButton" class="XHSPassBackToTopButton" ignore-parent-flow="true">
+				<Label text="▲" />
+			</Button>
+		</Panel>
+		<!-- Static references ensure the content compiler includes every medal texture;
+		     the cards themselves select the appropriate image at runtime. -->
+		<Panel class="XHSPassAchievementAssetPreload" hittest="false">
+			<Image src="file://{images}/custom_game/achievements/achievement_rank_bronze.png" />
+			<Image src="file://{images}/custom_game/achievements/achievement_rank_silver.png" />
+			<Image src="file://{images}/custom_game/achievements/achievement_rank_gold.png" />
+			<Image src="file://{images}/custom_game/achievements/achievement_rank_xhs_absolute.png" />
+			<Image src="file://{images}/custom_game/achievements/wins_icon_png.png" />
+			<Image src="file://{images}/custom_game/achievements/battlecup_icon_png.png" />
+			<Image src="file://{images}/custom_game/achievements/rampages_icon_png.png" />
+			<Image src="file://{images}/custom_game/achievements/wins_in_party_icon_png.png" />
+			<Image src="file://{images}/custom_game/achievements/weekly_reward_icon_png.png" />
+			<Image src="file://{images}/custom_game/achievements/hero_challenges_icon_png.png" />
+			<Image src="file://{images}/custom_game/achievements/calibrate_ranked_icon_png.png" />
+			<Image src="file://{images}/custom_game/achievements/equip_seasonal_terrain_icon_png.png" />
+			<Image src="file://{images}/custom_game/achievements/death_summary_icon_png.png" />
+			<Image src="file://{images}/custom_game/achievements/predict_victory_icon_png.png" />
+			<Image src="file://{images}/custom_game/achievements/win_core_matches_png.png" />
+			<Image src="file://{images}/custom_game/achievements/mvp_icon_png.png" />
+			<Image src="file://{images}/custom_game/achievements/win_support_matches_png.png" />
+			<Image src="file://{images}/custom_game/achievements/beat_comparative_stat_icon_png.png" />
+			<Image src="file://{images}/custom_game/achievements/first_blood_icon_png.png" />
+			<Image src="file://{images}/custom_game/achievements/relics_icon_png.png" />
+			<Image src="file://{images}/custom_game/achievements/plus_icon_png.png" />
+			<Image src="file://{images}/custom_game/achievements/ranked_roles_icon_png.png" />
+			<Image src="file://{images}/custom_game/achievements/dpc_logo_png.png" />
+			<Image src="file://{images}/custom_game/achievements/dpc_app_png.png" />
+			<Image src="file://{images}/custom_game/achievements/give_commends_icon_png.png" />
+			<Image src="file://{images}/custom_game/achievements/destroy_wards_icon_png.png" />
+			<Image src="file://{images}/custom_game/achievements/give_tips_icon_png.png" />
+			<Image src="file://{images}/custom_game/achievements/plant_observer_wards_icon_png.png" />
+			<Image src="file://{images}/custom_game/achievements/follow_lane_suggestor_icon_png.png" />
+			<Image src="file://{images}/custom_game/achievements/hero_levels_icon_png.png" />
+			<Image src="file://{images}/custom_game/achievements/view_post_game_analytics_icon_png.png" />
+			<Image src="file://{images}/custom_game/achievements/purchase_relic_icon_png.png" />
+			<Image src="file://{images}/custom_game/achievements/spectator_win_probability_icon_png.png" />
+			<Image src="file://{images}/custom_game/achievements/buy_legacy_set_icon_png.png" />
+			<Image src="file://{images}/custom_game/achievements/select_plus_guide_icon_png.png" />
+			<Image src="file://{images}/custom_game/achievements/pick_suggested_hero_icon_png.png" />
+			<Image src="file://{images}/custom_game/achievements/view_hero_trends_icon_png.png" />
+			<Image src="file://{images}/custom_game/achievements/make_relic_progress_icon_png.png" />
+			<Image src="file://{images}/custom_game/achievements/hero_chat_wheel_icon_png.png" />
+		</Panel>
+	</Panel>
+</root>

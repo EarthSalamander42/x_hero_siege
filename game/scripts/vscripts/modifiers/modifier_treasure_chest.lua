@@ -1,4 +1,5 @@
 modifier_treasure_chest = class({})
+modifier_treasure_chest.XHS_LINK_CLIENT = true
 
 --------------------------------------------------------------------------------
 

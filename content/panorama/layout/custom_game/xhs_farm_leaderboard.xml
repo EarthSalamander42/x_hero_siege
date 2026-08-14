@@ -1,0 +1,63 @@
+<root>
+	<styles>
+		<include src="s2r://panorama/styles/dotastyles.vcss_c" />
+		<include src="s2r://panorama/styles/custom_game/xhs_theme.vcss_c" />
+		<include src="s2r://panorama/styles/custom_game/xhs_farm_leaderboard.vcss_c" />
+	</styles>
+
+	<scripts>
+		<include src="file://{resources}/scripts/custom_game/util.js" />
+		<include src="file://{resources}/scripts/custom_game/xhs_name_display.js" />
+		<include src="s2r://panorama/scripts/custom_game/xhs_farm_leaderboard.vjs_c" />
+	</scripts>
+
+	<Panel class="XHSFarmLeaderboardHost XHSFarmLeaderboardInstance" leaderboard_instance="farm" leaderboard_net_table="xhs_farm_leaderboard" hittest="false" hittestchildren="true">
+		<Panel id="XHSFarmLeaderboard" class="XHSFarmLeaderboard" hittest="false" hittestchildren="true">
+			<Panel id="XHSFarmLeaderboardHeader" class="XHSFarmLeaderboardHeader" hittest="false" hittestchildren="true">
+				<Panel class="XHSFarmLeaderboardHeaderAccent" />
+				<Panel class="XHSFarmLeaderboardHeaderCopy">
+					<Label id="XHSFarmLeaderboardEyebrow" class="XHSFarmLeaderboardEyebrow" text="FARM EVENT" />
+					<Label id="XHSFarmLeaderboardTitle" class="XHSFarmLeaderboardTitle" text="LIVE LEADERBOARD" />
+				</Panel>
+				<Panel id="XHSFarmLeaderboardCollapse" class="XHSFarmLeaderboardCollapse" hittest="false">
+					<Label id="XHSFarmLeaderboardCollapseLabel" text="&#x25B2;" />
+				</Panel>
+				<Panel class="XHSFarmLeaderboardLive">
+					<Panel class="XHSFarmLeaderboardLiveDot" />
+					<Label id="XHSFarmLeaderboardStatus" text="LIVE" />
+				</Panel>
+				<Button id="XHSFarmLeaderboardHeaderToggle" class="XHSFarmLeaderboardHeaderToggle" hittest="true" />
+				<Button id="XHSFarmLeaderboardHide" class="XHSFarmLeaderboardHide" hittest="true">
+					<Label text="&#x203A;" />
+				</Button>
+			</Panel>
+
+			<Panel id="XHSFarmWinnerCelebration" class="XHSFarmWinnerCelebration" hittest="false">
+				<Label class="XHSFarmWinnerCrown" text="★" />
+				<Panel class="XHSFarmWinnerCopy">
+					<Label class="XHSFarmWinnerEyebrow" text="FARM EVENT WINNER" />
+					<Label id="XHSFarmWinnerName" class="XHSFarmWinnerName" text="" />
+					<Label id="XHSFarmWinnerScore" class="XHSFarmWinnerScore" text="" />
+				</Panel>
+			</Panel>
+
+			<Panel id="XHSFarmSupporterXPTotal" class="XHSFarmSupporterXPTotal" hittest="false">
+				<Label class="XHSFarmSupporterXPTotalLabel" text="TOTAL SUPPORTER XP" />
+				<Label id="XHSFarmSupporterXPTotalValue" class="XHSFarmSupporterXPTotalValue" text="+0 XP" />
+			</Panel>
+
+			<Panel class="XHSFarmLeaderboardColumnLabels" hittest="false">
+				<Label class="XHSFarmLeaderboardColumnRank" text="#" />
+				<Label class="XHSFarmLeaderboardColumnPlayer" text="PLAYER" />
+				<Label class="XHSFarmLeaderboardColumnProgress" text="PROGRESS" />
+			</Panel>
+
+			<Panel id="XHSFarmLeaderboardRows" class="XHSFarmLeaderboardRows" hittest="false">
+				<Label id="XHSFarmLeaderboardWaiting" class="XHSFarmLeaderboardWaiting" text="PREPARING ARENAS" />
+			</Panel>
+		</Panel>
+		<Button id="XHSFarmLeaderboardToggle" class="XHSFarmLeaderboardToggle" hittest="true">
+			<Label id="XHSFarmLeaderboardToggleLabel" text="‹" />
+		</Button>
+	</Panel>
+</root>

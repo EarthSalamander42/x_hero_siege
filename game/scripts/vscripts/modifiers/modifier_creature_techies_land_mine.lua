@@ -1,4 +1,5 @@
 modifier_creature_techies_land_mine = class({})
+modifier_creature_techies_land_mine.XHS_LINK_CLIENT = true
 
 --------------------------------------------------------------------------------
 

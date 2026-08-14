@@ -7,6 +7,7 @@
 	{
 		"ID"							"2516"
 		"BaseClass"						"item_lua"
+		"AllowedInBackpack"				"0"
 		"ScriptFile"					"items/item_orb_of_lightning.lua"
 		"AbilityTextureName"			"custom/orb_of_lightning"
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET"
@@ -27,6 +28,7 @@
 
 		// Shops
 		"ItemCost"						"10000"
+		"ItemPurchasable"				"1"
 //		"ItemInitialStockTime"			"510.0"
 //		"ItemStockMax"					"2" 
 //		"ItemStockTime"					"30.0"
@@ -57,6 +59,7 @@
 	{
 		"ID"							"2541"
 		"BaseClass"						"item_lua"
+		"AllowedInBackpack"				"0"
 		"ScriptFile"					"items/item_orb_of_lightning.lua"
 		"AbilityTextureName"			"custom/orb_of_lightning2"
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET"
@@ -76,6 +79,7 @@
 
 		// Shops
 		"ItemCost"						"20000"
+		"ItemPurchasable"				"1"
 //		"ItemInitialStockTime"			"990.0"
 //		"ItemStockMax"					"2" 
 //		"ItemStockTime"					"30.0"
@@ -109,7 +113,7 @@
 		"ID"							"2540"
 		"BaseClass"             		"item_datadriven"
 		"Model"							"models/props_gameplay/recipe.vmdl"
-		"AbilityTextureName"			"custom/recipe"
+		"AbilityTextureName"			"recipe"
 		
 		// Item Info
 		//-------------------------------------------------------------------------------------------------------------
@@ -158,6 +162,7 @@
 
 		// Shops
 		"ItemCost"						"50000"
+		"ItemPurchasable"				"1"
 //		"ItemInitialStockTime"			"1470.0"
 //		"ItemStockMax"					"2" 
 //		"ItemStockTime"					"30.0"
@@ -189,10 +194,11 @@
 	{
 		"ID"							"2517"
 		"BaseClass"						"item_lua"
+		"AllowedInBackpack"				"0"
 		"ScriptFile"					"items/item_orb_of_fire.lua"
 		"AbilityTextureName"			"custom/orb_of_fire"
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET"
-		"AbilityCooldown"				"10.0"
+		"AbilityCooldown"				"1.0"
 	
 		"ItemShareability"				"ITEM_FULLY_SHAREABLE"
 		"AbilitySharedCooldown"         "orb_of_fire"
@@ -208,6 +214,7 @@
 	
 		// Shops
 		"ItemCost"						"10000"
+		"ItemPurchasable"				"1"
 //		"ItemInitialStockTime"			"510.0"
 //		"ItemStockMax"					"2" 
 //		"ItemStockTime"					"30.0"
@@ -235,10 +242,11 @@
 	{
 		"ID"							"2538"
 		"BaseClass"						"item_lua"
+		"AllowedInBackpack"				"0"
 		"ScriptFile"					"items/item_orb_of_fire.lua"
 		"AbilityTextureName"			"custom/orb_of_fire2"
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET"
-		"AbilityCooldown"				"10.0"
+		"AbilityCooldown"				"1.0"
 
 		"ItemShareability"				"ITEM_FULLY_SHAREABLE"
 		"AbilitySharedCooldown"         "orb_of_fire"
@@ -254,6 +262,7 @@
 
 		// Shops
 		"ItemCost"						"20000"
+		"ItemPurchasable"				"1"
 //		"ItemInitialStockTime"			"990.0"
 //		"ItemStockMax"					"2" 
 //		"ItemStockTime"					"30.0"
@@ -360,7 +369,7 @@
 		"ID"							"2539"
 		"BaseClass"             		"item_datadriven"
 		"Model"							"models/props_gameplay/recipe.vmdl"
-		"AbilityTextureName"			"custom/recipe"
+		"AbilityTextureName"			"recipe"
 		
 		// Item Info
 		//-------------------------------------------------------------------------------------------------------------
@@ -390,14 +399,16 @@
 		//-------------------------------------------------------------------------------------------------------------
 		"ID"							"2501"
 		"BaseClass"						"item_lua"
+		"AllowedInBackpack"				"0"
 		"ScriptFile"					"items/item_orb_of_fire.lua"
 		"AbilityTextureName" 			"custom/searing_blade"
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET"
-		"AbilityCooldown"				"10.0"
+		"AbilityCooldown"				"1.0"
 		
 		// Item Info
 		//-------------------------------------------------------------------------------------------------------------
 		"ItemCost"						"50000"
+		"ItemPurchasable"				"1"
 //		"ItemInitialStockTime"			"1470.0"
 //		"ItemStockMax"					"2" 
 //		"ItemStockTime"					"30.0"
@@ -412,7 +423,6 @@
 		"SecretShop"					"1"
 		"ItemBaseLevel"					"3"
 		"MaxUpgradeLevel"				"3"
-		"AllowedInBackpack"				"0"
 
 		"AbilityValues"
 		{
@@ -508,7 +518,7 @@
 		"ID"							"2515"
 		"BaseClass"             		"item_datadriven"
 		"Model"							"models/props_gameplay/recipe.vmdl"
-		"AbilityTextureName"			"custom/recipe"
+		"AbilityTextureName"			"recipe"
 		
 		// Item Info
 		//-------------------------------------------------------------------------------------------------------------
@@ -537,9 +547,11 @@
 	{
 		"ID"							"2535"
 		"BaseClass"                     "item_datadriven"
-		"AbilityTextureName"			"custom/orb_of_frost"
+		"AllowedInBackpack"				"0"
+		"AbilityTextureName"			"orb_of_frost"
 		"AbilityBehavior"               "DOTA_ABILITY_BEHAVIOR_NO_TARGET"
-		"AbilityCooldown"				"10.0"
+		"AbilityCooldown"				"1.0"
+		"AbilitySharedCooldown"         "orb_of_frost"
 	
 		// Shops
 		"ItemCost"						"0"
@@ -707,17 +719,25 @@
 	{
 		"ID"							"2537"
 		"BaseClass"                     "item_lua"
+		"AllowedInBackpack"				"0"
 		"ScriptFile"					"items/item_orb_of_earth.lua"
 		"AbilityTextureName"			"custom/orb_of_earth"
-		"AbilityBehavior"               "DOTA_ABILITY_BEHAVIOR_PASSIVE"
+		"AbilityBehavior"               "DOTA_ABILITY_BEHAVIOR_NO_TARGET"
+		"ItemShopTags"					"damage"
+		"ItemAliases"					"orb of earth"
+		"ItemPermanent"					"0"
+		"ItemStackable"					"0"
+		"Orb"							"1"
 
 		// Shops
 		"ItemCost"						"10000"
+		"SecretShop"					"0"
 //		"ItemInitialStockTime"			"510.0"
 //		"ItemStockMax"					"2" 
 //		"ItemStockTime"					"30.0"
 //		"ItemStockInitial"				"0"
-		"AbilityCooldown"				"10.0"
+		"AbilityCooldown"				"1.0"
+		"AbilitySharedCooldown"         "orb_of_earth"
 		"ItemShareability"				"ITEM_FULLY_SHAREABLE"
 		"ItemPurchasable"				"1"
 		"ItemKillable"					"1"
@@ -737,8 +757,165 @@
 		"AbilityValues"
 		{
 			"bonus_damage"			"100"
-			"bash_duration"			"1.0"
-			"bash_chance"			"10"
+			"bonus_armor"			"5"
+			"bash_duration"			"0.5"
+			"bash_chance"			"7"
+		}
+	}
+
+	//=================================================================================================================
+	// Orb of Earth 2
+	//=================================================================================================================
+	"item_orb_of_earth2"
+	{
+		"ID"							"2548"
+		"BaseClass"                     "item_lua"
+		"AllowedInBackpack"				"0"
+		"ScriptFile"					"items/item_orb_of_earth.lua"
+		"AbilityTextureName"			"custom/orb_of_earth3"
+		"AbilityBehavior"               "DOTA_ABILITY_BEHAVIOR_NO_TARGET"
+
+		// Shops
+		"ItemCost"						"20000"
+//		"ItemInitialStockTime"			"990.0"
+//		"ItemStockMax"					"2" 
+//		"ItemStockTime"					"30.0"
+//		"ItemStockInitial"				"0"
+		"AbilityCooldown"				"1.0"
+		"AbilitySharedCooldown"         "orb_of_earth"
+		"ItemShareability"				"ITEM_FULLY_SHAREABLE"
+		"ItemPurchasable"				"1"
+		"ItemKillable"					"1"
+		"ItemSellable"					"1"
+		"ItemDroppable"					"1"
+		"ItemQuality"					"artifact"
+		"ItemAliases"					"orb of earth 2"
+		"ItemBaseLevel"					"2"
+		"MaxUpgradeLevel"				"3"
+
+		"Model"							"models/props_gameplay/red_box.vmdl"
+		"Effect"						"particles/units/heroes/hero_earth_spirit/espirit_geomagentic_target_sphere.vpcf"
+	
+		"UIPickupSound"                 "Item.PickUpGemShop"
+		"UIDropSound"                   "Item.DropGemShop"
+		"WorldDropSound"                "Item.DropGemWorld"
+
+		"AbilityValues"
+		{
+			"bonus_damage"			"300"
+			"bonus_armor"			"15"
+			"bash_duration"			"0.5"
+			"bash_chance"			"7"
+		}
+	}
+
+	//=================================================================================================================
+	// Recipe: Orb of Earth 2
+	//=================================================================================================================
+	"item_recipe_orb_of_earth2"
+	{
+		// General
+		//-------------------------------------------------------------------------------------------------------------
+		"ID"							"2549"
+		"BaseClass"             		"item_datadriven"
+		"Model"							"models/props_gameplay/recipe.vmdl"
+		"AbilityTextureName"			"recipe"
+		
+		// Item Info
+		//-------------------------------------------------------------------------------------------------------------
+		"ItemCost"						"10000"
+		"ItemShopTags"					""
+//		"ItemInitialStockTime"			"990.0"
+//		"ItemStockMax"					"2" 
+//		"ItemStockTime"					"30.0"
+//		"ItemStockInitial"				"0"
+		
+		// Recipe
+		//-------------------------------------------------------------------------------------------------------------
+		"ItemRecipe"					"1"
+		"ItemResult"					"item_orb_of_earth2"
+		"ItemRequirements"
+		{
+			"01"						"item_orb_of_earth"
+		}
+	}
+
+	//=================================================================================================================
+	// Orb of Earth 3
+	//=================================================================================================================
+	"item_orb_of_earth3"
+	{
+		"ID"							"2550"
+		"BaseClass"                     "item_lua"
+		"AllowedInBackpack"				"0"
+		"ScriptFile"					"items/item_orb_of_earth.lua"
+		"AbilityTextureName"			"custom/orb_of_earth2"
+		"AbilityBehavior"               "DOTA_ABILITY_BEHAVIOR_NO_TARGET"
+
+		// Shops
+		"ItemCost"						"50000"
+//		"ItemInitialStockTime"			"1470.0"
+//		"ItemStockMax"					"2" 
+//		"ItemStockTime"					"30.0"
+//		"ItemStockInitial"				"0"
+		"AbilityCooldown"				"1.0"
+		"AbilitySharedCooldown"         "orb_of_earth"
+		"ItemShareability"				"ITEM_FULLY_SHAREABLE"
+		"ItemPurchasable"				"1"
+		"ItemKillable"					"1"
+		"ItemSellable"					"1"
+		"ItemDroppable"					"1"
+		"ItemQuality"					"epic"
+		"ItemAliases"					"orb of earth 3"
+		"SecretShop"					"1"
+		"ItemBaseLevel"					"3"
+		"MaxUpgradeLevel"				"3"
+
+		"Model"							"models/props_gameplay/red_box.vmdl"
+		"Effect"						"particles/units/heroes/hero_earth_spirit/espirit_geomagentic_target_sphere.vpcf"
+	
+		"UIPickupSound"                 "Item.PickUpGemShop"
+		"UIDropSound"                   "Item.DropGemShop"
+		"WorldDropSound"                "Item.DropGemWorld"
+
+		"AbilityValues"
+		{
+			"bonus_damage"			"900"
+			"bonus_armor"			"30"
+			"bash_duration"			"0.5"
+			"bash_chance"			"7"
+		}
+	}
+
+	//=================================================================================================================
+	// Recipe: Orb of Earth 3
+	//=================================================================================================================
+	"item_recipe_orb_of_earth3"
+	{
+		// General
+		//-------------------------------------------------------------------------------------------------------------
+		"ID"							"2551"
+		"BaseClass"             		"item_datadriven"
+		"Model"							"models/props_gameplay/recipe.vmdl"
+		"AbilityTextureName"			"recipe"
+		
+		// Item Info
+		//-------------------------------------------------------------------------------------------------------------
+		"ItemCost"						"30000"
+		"ItemShopTags"					""
+//		"ItemInitialStockTime"			"1470.0"
+//		"ItemStockMax"					"2" 
+//		"ItemStockTime"					"30.0"
+//		"ItemStockInitial"				"0"
+		
+		// Recipe
+		//-------------------------------------------------------------------------------------------------------------
+		"ItemRecipe"					"1"
+		"SecretShop"					"1"
+		"ItemResult"					"item_orb_of_earth3"
+		"ItemRequirements"
+		{
+			"01"						"item_orb_of_earth2"
 		}
 	}
 
@@ -749,12 +926,14 @@
 	{
 		"ID"							"2518"
 		"BaseClass"						"item_lua"
+		"AllowedInBackpack"				"0"
 		"ScriptFile"					"items/item_orb_of_darkness.lua"
 		"AbilityTextureName"			"custom/orb_of_darkness"
-		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET"
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_PASSIVE"
 	
 		// Shops
 		"ItemCost"						"10000"
+		"ItemPurchasable"				"1"
 		"AbilityCooldown"				"1.0"
 //		"ItemInitialStockTime"			"510.0"
 //		"ItemStockMax"					"2" 
@@ -794,12 +973,14 @@
 	{
 		"ID"							"2543"
 		"BaseClass"						"item_lua"
+		"AllowedInBackpack"				"0"
 		"ScriptFile"					"items/item_orb_of_darkness.lua"
 		"AbilityTextureName"			"custom/orb_of_darkness2"
-		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET"
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_PASSIVE"
 
 		// Shops
 		"ItemCost"						"20000"
+		"ItemPurchasable"				"1"
 		"AbilityCooldown"				"1.0"
 //		"ItemInitialStockTime"			"990.0"
 //		"ItemStockMax"					"2" 
@@ -842,7 +1023,7 @@
 		"ID"							"2544"
 		"BaseClass"             		"item_datadriven"
 		"Model"							"models/props_gameplay/recipe.vmdl"
-		"AbilityTextureName"			"custom/recipe"
+		"AbilityTextureName"			"recipe"
 
 		// Item Info
 		//-------------------------------------------------------------------------------------------------------------
@@ -872,15 +1053,17 @@
 		//-------------------------------------------------------------------------------------------------------------
 		"ID"							"2511"
 		"BaseClass"						"item_lua"
+		"AllowedInBackpack"				"0"
 		"ScriptFile"					"items/item_orb_of_darkness.lua"
 		"AbilityTextureName"			"custom/bracer_of_the_void"		
-		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET"
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_PASSIVE"
 		"Model"							"models/props_gameplay/red_box.vmdl"
 		"Effect"						"particles/generic_gameplay/dropped_item.vpcf"
 
 		// Item Info
 		//-------------------------------------------------------------------------------------------------------------
 		"ItemCost"						"50000"
+		"ItemPurchasable"				"1"
 		"AbilityCooldown"				"1.0"
 //		"ItemInitialStockTime"			"1470.0"
 //		"ItemStockMax"					"2" 
@@ -896,7 +1079,6 @@
 		"SecretShop"					"1"
 		"ItemBaseLevel"					"3"
 		"MaxUpgradeLevel"				"3"
-		"AllowedInBackpack"				"0"
 
 		"AbilityValues"
 		{
@@ -906,6 +1088,384 @@
 			"bonus_armor"			"20"
 			"bonus_health_regen"	"20"
 			"max_units"				"10"
+		}
+	}
+
+	//=================================================================================================================
+	// Recipe: Bracer of the Void
+	//=================================================================================================================
+	"item_recipe_bracer_of_the_void"
+	{
+		// General
+		//-------------------------------------------------------------------------------------------------------------
+		"ID"							"2520"
+		"BaseClass"             		"item_datadriven"
+		"Model"							"models/props_gameplay/recipe.vmdl"
+		"AbilityTextureName"			"recipe"
+		
+		// Item Info
+		//-------------------------------------------------------------------------------------------------------------
+		"ItemCost"						"30000"	
+		"ItemShopTags"					""
+//		"ItemInitialStockTime"			"1470.0"
+//		"ItemStockMax"					"2" 
+//		"ItemStockTime"					"30.0"
+//		"ItemStockInitial"				"0"
+		
+		// Recipe
+		//-------------------------------------------------------------------------------------------------------------
+		"ItemRecipe"					"1"
+		"SecretShop"					"1"
+		"ItemResult"					"item_bracer_of_the_void"
+		"ItemRequirements"
+		{
+			"01"						"item_orb_of_darkness2"
+		}
+	}
+
+	//=================================================================================================================
+	// Orb of Arcane
+	//=================================================================================================================
+	"item_orb_of_arcane"
+	{
+		"ID"							"2556"
+		"BaseClass"						"item_lua"
+		"AllowedInBackpack"				"0"
+		"ScriptFile"					"items/item_orb_of_arcane.lua"
+		"AbilityTextureName"			"custom/orb_of_arcane"
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_PASSIVE"
+		"ItemShareability"				"ITEM_FULLY_SHAREABLE"
+		"ItemShopTags"                    "spell_amp;lifesteal"
+		"ItemQuality"					"artifact"
+		"ItemAliases"					"orb of arcane"
+		"ItemPermanent"					"0"
+		"ItemStackable"					"0"
+		"ItemKillable"					"1"
+		"ItemSellable"					"1"
+		"ItemDroppable"					"1"
+		"ItemBaseLevel"					"1"
+		"MaxUpgradeLevel"				"3"
+
+		"ItemCost"						"10000"
+		"ItemPurchasable"				"1"
+
+		"Model"							"models/props_gameplay/red_box.vmdl"
+		"Effect"						"particles/items_fx/ethereal_blade_explosion.vpcf"
+
+		"UIPickupSound"					"Item.PickUpGemShop"
+		"UIDropSound"					"Item.DropGemShop"
+		"WorldDropSound"				"Item.DropGemWorld"
+
+		"AbilityValues"
+		{
+			"spell_amp"							"35"
+			"spell_lifesteal_pct"             "8"
+		}
+	}
+
+	//=================================================================================================================
+	// Mystic Gem
+	//=================================================================================================================
+	"item_mystic_gem"
+	{
+		"ID"							"2557"
+		"BaseClass"						"item_lua"
+		"AllowedInBackpack"				"0"
+		"ScriptFile"					"items/item_orb_of_arcane.lua"
+		"AbilityTextureName"			"custom/mystic_gem"
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_PASSIVE"
+		"ItemShareability"				"ITEM_FULLY_SHAREABLE"
+		"ItemShopTags"                    "spell_amp;lifesteal"
+		"ItemQuality"					"artifact"
+		"ItemAliases"					"mystic gem"
+		"ItemPermanent"					"0"
+		"ItemStackable"					"0"
+		"ItemKillable"					"1"
+		"ItemSellable"					"1"
+		"ItemDroppable"					"1"
+		"ItemBaseLevel"					"2"
+		"MaxUpgradeLevel"				"3"
+
+		"ItemCost"						"20000"
+		"ItemPurchasable"				"1"
+
+		"Model"							"models/props_gameplay/red_box.vmdl"
+		"Effect"						"particles/items_fx/ethereal_blade_explosion.vpcf"
+
+		"UIPickupSound"					"Item.PickUpGemShop"
+		"UIDropSound"					"Item.DropGemShop"
+		"WorldDropSound"				"Item.DropGemWorld"
+
+		"AbilityValues"
+		{
+			"spell_amp"                         "50"
+			"spell_lifesteal_pct"             "16"
+		}
+	}
+
+	//=================================================================================================================
+	// Recipe: Mystic Gem
+	//=================================================================================================================
+	"item_recipe_mystic_gem"
+	{
+		"ID"							"2558"
+		"BaseClass"             		"item_datadriven"
+		"Model"							"models/props_gameplay/recipe.vmdl"
+		"AbilityTextureName"			"recipe"
+		"ItemCost"						"10000"
+		"ItemShopTags"					""
+		"ItemRecipe"					"1"
+		"ItemResult"					"item_mystic_gem"
+		"ItemRequirements"
+		{
+			"01"						"item_orb_of_arcane"
+		}
+	}
+
+	//=================================================================================================================
+	// Astral Core
+	//=================================================================================================================
+	"item_astral_core"
+	{
+		"ID"							"2559"
+		"BaseClass"						"item_lua"
+		"AllowedInBackpack"				"0"
+		"ScriptFile"					"items/item_orb_of_arcane.lua"
+		"AbilityTextureName"			"custom/astral_core"
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_UNIT_TARGET"
+		"AbilityUnitTargetTeam"			"DOTA_UNIT_TARGET_TEAM_ENEMY"
+		"AbilityUnitTargetType"			"DOTA_UNIT_TARGET_HERO | DOTA_UNIT_TARGET_BASIC"
+		"AbilityCastPoint"               "0"
+		"AbilityCastRange"				"700"
+		"AbilityCooldown"                "30"
+		"AbilityManaCost"                "0"
+		"AbilitySharedCooldown"          "ethereal"
+		"ItemShareability"				"ITEM_FULLY_SHAREABLE"
+		"ItemShopTags"                    "spell_amp;lifesteal"
+		"ItemQuality"					"epic"
+		"ItemAliases"					"astral core"
+		"ItemPermanent"					"0"
+		"ItemStackable"					"0"
+		"ItemKillable"					"1"
+		"ItemSellable"					"1"
+		"ItemDroppable"					"1"
+		"SecretShop"					"1"
+		"ItemBaseLevel"					"3"
+		"MaxUpgradeLevel"				"3"
+
+		"ItemCost"						"50000"
+		"ItemPurchasable"				"1"
+
+		"Model"							"models/props_gameplay/red_box.vmdl"
+		"Effect"						"particles/items_fx/ethereal_blade_explosion.vpcf"
+
+		"UIPickupSound"					"Item.PickUpGemShop"
+		"UIDropSound"					"Item.DropGemShop"
+		"WorldDropSound"				"Item.DropGemWorld"
+
+		"AbilityValues"
+		{
+			"spell_amp"                         "70"
+			"spell_lifesteal_pct"             "25"
+			"ethereal_duration"               "5.0"
+			"extra_spell_damage_percent"      "-100"
+			"projectile_speed"                "800"
+			"ethereal_movement_slow_pct"      "-60"
+		}
+	}
+
+	//=================================================================================================================
+	// Recipe: Astral Core
+	//=================================================================================================================
+	"item_recipe_astral_core"
+	{
+		"ID"							"2560"
+		"BaseClass"             		"item_datadriven"
+		"Model"							"models/props_gameplay/recipe.vmdl"
+		"AbilityTextureName"			"recipe"
+		"ItemCost"						"30000"
+		"ItemShopTags"					""
+		"ItemRecipe"					"1"
+		"SecretShop"					"1"
+		"ItemResult"					"item_astral_core"
+		"ItemRequirements"
+		{
+			"01"						"item_mystic_gem"
+		}
+	}
+
+	//=================================================================================================================
+	// Orb of Venom
+	//=================================================================================================================
+	"item_xhs_orb_of_venom"
+	{
+		"ID"							"2561"
+		"BaseClass"						"item_lua"
+		"AllowedInBackpack"				"0"
+		"ScriptFile"					"items/item_orb_of_venom_xhs.lua"
+		"AbilityTextureName"			"custom/orb_of_venom"
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET"
+		"AbilityCooldown"				"1.0"
+		"AbilitySharedCooldown"         "orb_of_venom"
+		"ItemShareability"				"ITEM_FULLY_SHAREABLE"
+		"ItemShopTags"					"damage"
+		"ItemQuality"					"artifact"
+		"ItemAliases"					"orb of venom"
+		"ItemPermanent"					"0"
+		"ItemStackable"					"0"
+		"ItemKillable"					"1"
+		"ItemSellable"					"1"
+		"ItemDroppable"					"1"
+		"ItemBaseLevel"					"1"
+		"MaxUpgradeLevel"				"3"
+
+		"ItemCost"						"10000"
+		"ItemPurchasable"				"1"
+
+		"Model"							"models/props_gameplay/red_box.vmdl"
+		"Effect"						"particles/units/heroes/hero_viper/viper_poison_debuff.vpcf"
+
+		"UIPickupSound"					"Item.PickUpGemShop"
+		"UIDropSound"					"Item.DropGemShop"
+		"WorldDropSound"				"Item.DropGemWorld"
+
+		"AbilityValues"
+		{
+			"bonus_damage"					"50"
+			"poison_damage_per_second"		"25"
+			"poison_duration"				"4.0"
+			"armor_reduction"				"0"
+			"toxic_saturation_damage"		"0"
+		}
+	}
+
+	//=================================================================================================================
+	// Viridian Gem
+	//=================================================================================================================
+	"item_viridian_gem"
+	{
+		"ID"							"2562"
+		"BaseClass"						"item_lua"
+		"AllowedInBackpack"				"0"
+		"ScriptFile"					"items/item_orb_of_venom_xhs.lua"
+		"AbilityTextureName"			"custom/viridian_gem"
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET"
+		"AbilityCooldown"				"1.0"
+		"AbilitySharedCooldown"         "orb_of_venom"
+		"ItemShareability"				"ITEM_FULLY_SHAREABLE"
+		"ItemShopTags"					"damage"
+		"ItemQuality"					"artifact"
+		"ItemAliases"					"viridian gem"
+		"ItemPermanent"					"0"
+		"ItemStackable"					"0"
+		"ItemKillable"					"1"
+		"ItemSellable"					"1"
+		"ItemDroppable"					"1"
+		"ItemBaseLevel"					"2"
+		"MaxUpgradeLevel"				"3"
+
+		"ItemCost"						"20000"
+		"ItemPurchasable"				"1"
+
+		"Model"							"models/props_gameplay/red_box.vmdl"
+		"Effect"						"particles/units/heroes/hero_viper/viper_poison_debuff.vpcf"
+
+		"UIPickupSound"					"Item.PickUpGemShop"
+		"UIDropSound"					"Item.DropGemShop"
+		"WorldDropSound"				"Item.DropGemWorld"
+
+		"AbilityValues"
+		{
+			"bonus_damage"					"150"
+			"poison_damage_per_second"		"75"
+			"poison_duration"				"4.0"
+			"armor_reduction"				"5"
+			"toxic_saturation_damage"		"0"
+		}
+	}
+
+	//=================================================================================================================
+	// Recipe: Viridian Gem
+	//=================================================================================================================
+	"item_recipe_viridian_gem"
+	{
+		"ID"							"2563"
+		"BaseClass"             		"item_datadriven"
+		"Model"							"models/props_gameplay/recipe.vmdl"
+		"AbilityTextureName"			"recipe"
+		"ItemCost"						"10000"
+		"ItemShopTags"					""
+		"ItemRecipe"					"1"
+		"ItemResult"					"item_viridian_gem"
+		"ItemRequirements"
+		{
+			"01"						"item_xhs_orb_of_venom"
+		}
+	}
+
+	//=================================================================================================================
+	// Plagueheart
+	//=================================================================================================================
+	"item_plagueheart"
+	{
+		"ID"							"2564"
+		"BaseClass"						"item_lua"
+		"AllowedInBackpack"				"0"
+		"ScriptFile"					"items/item_orb_of_venom_xhs.lua"
+		"AbilityTextureName"			"custom/plagueheart"
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET"
+		"AbilityCooldown"				"1.0"
+		"AbilitySharedCooldown"         "orb_of_venom"
+		"ItemShareability"				"ITEM_FULLY_SHAREABLE"
+		"ItemShopTags"					"damage"
+		"ItemQuality"					"epic"
+		"ItemAliases"					"plagueheart"
+		"ItemPermanent"					"0"
+		"ItemStackable"					"0"
+		"ItemKillable"					"1"
+		"ItemSellable"					"1"
+		"ItemDroppable"					"1"
+		"SecretShop"					"1"
+		"ItemBaseLevel"					"3"
+		"MaxUpgradeLevel"				"3"
+
+		"ItemCost"						"50000"
+		"ItemPurchasable"				"1"
+
+		"Model"							"models/props_gameplay/red_box.vmdl"
+		"Effect"						"particles/units/heroes/hero_viper/viper_poison_debuff.vpcf"
+
+		"UIPickupSound"					"Item.PickUpGemShop"
+		"UIDropSound"					"Item.DropGemShop"
+		"WorldDropSound"				"Item.DropGemWorld"
+
+		"AbilityValues"
+		{
+			"bonus_damage"					"450"
+			"poison_damage_per_second"		"150"
+			"poison_duration"				"4.0"
+			"armor_reduction"				"12"
+			"toxic_saturation_damage"		"500"
+		}
+	}
+
+	//=================================================================================================================
+	// Recipe: Plagueheart
+	//=================================================================================================================
+	"item_recipe_plagueheart"
+	{
+		"ID"							"2565"
+		"BaseClass"             		"item_datadriven"
+		"Model"							"models/props_gameplay/recipe.vmdl"
+		"AbilityTextureName"			"recipe"
+		"ItemCost"						"30000"
+		"ItemShopTags"					""
+		"ItemRecipe"					"1"
+		"SecretShop"					"1"
+		"ItemResult"					"item_plagueheart"
+		"ItemRequirements"
+		{
+			"01"						"item_viridian_gem"
 		}
 	}
 }

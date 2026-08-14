@@ -5,13 +5,27 @@ local herolist = {}
 local hotdisabledlist = {}
 local totalheroes = 0
 
+-- The game mode force-spawns Wisp as the temporary hero-selection unit. It
+-- must remain available to that flow, but it is never a playable demo hero.
+-- Keep this exclusion local to the demo picker instead of changing the shared
+-- hero data that provisions the selection unit.
+local nonPickableHeroes = {
+	["npc_dota_hero_wisp"] = true,
+}
+
 -- list all available heroes and get their primary attrs, and send it to client
 ListenToGameEvent('game_rules_state_change', function()
 	if GameRules:State_Get() == DOTA_GAMERULES_STATE_HERO_SELECTION then
 		local herolistFile = "scripts/npc/herolist.txt"
 
 		for key, value in pairs(LoadKeyValues(herolistFile)) do
-			if KeyValues.HeroKV[key] == nil then -- Cookies: If the hero is not in custom file, load vanilla KV's
+			local isDisabled = tonumber(value) == 0
+			local isNonPickable = nonPickableHeroes[key] == true
+			local isPickable = not isDisabled and not isNonPickable
+
+			if not isPickable then
+				hotdisabledlist[key] = 1
+			elseif KeyValues.HeroKV[key] == nil then -- Cookies: If the hero is not in custom file, load vanilla KV's
 				--				print(key .. " is not in custom file!")
 				local data = LoadKeyValues("scripts/npc/npc_heroes.txt")
 				if data and data[key] then
@@ -19,17 +33,13 @@ ListenToGameEvent('game_rules_state_change', function()
 				end
 			end
 
-			herolist[key] = KeyValues.HeroKV[key].AttributePrimary
-
 			--			if api.imba.hero_is_disabled(key) then
 			--				hotdisabledlist[key] = 1
 			--			end
 
-			if value == 0 then
-				hotdisabledlist[key] = 1
-			else
+			if isPickable and KeyValues.HeroKV[key] then
+				herolist[key] = KeyValues.HeroKV[key].AttributePrimary
 				totalheroes = totalheroes + 1
-				assert(key ~= "npc_dota_hero_wisp", "npc_dota_hero_wisp cannot be a pickable hero")
 			end
 		end
 

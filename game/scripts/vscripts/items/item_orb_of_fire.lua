@@ -4,12 +4,29 @@
 LinkLuaModifier("modifier_orb_of_fire_active", "items/item_orb_of_fire.lua", LUA_MODIFIER_MOTION_NONE)
 LinkLuaModifier("modifier_orb_of_fire_passive", "items/item_orb_of_fire.lua", LUA_MODIFIER_MOTION_NONE)
 
-local function StartSpell(caster, ability)
-	if caster:HasModifier("modifier_orb_of_fire_active") then
-		caster:RemoveModifierByName("modifier_orb_of_fire_active")
-	else
-		caster:AddNewModifier(caster, ability, "modifier_orb_of_fire_active", {})
+require("items/orb_toggle")
+
+local XHS_INNATE_CLEAVE_ABILITIES = {
+	holdout_innate_great_cleave = true,
+}
+
+local function HasActiveInnateCleave(unit)
+	if unit == nil or unit:IsNull() or unit:PassivesDisabled() then
+		return false
 	end
+
+	for abilityName in pairs(XHS_INNATE_CLEAVE_ABILITIES) do
+		local innate = unit:FindAbilityByName(abilityName)
+		if innate ~= nil and innate:GetLevel() > 0 then
+			return true
+		end
+	end
+
+	return false
+end
+
+local function StartSpell(caster, ability)
+	XHSOrbToggle.Toggle(caster, ability, "modifier_orb_of_fire_active")
 end
 
 item_orb_of_fire = class({})
@@ -79,6 +96,7 @@ end
 --------------------------------------------------------------
 
 modifier_orb_of_fire_active = class({})
+modifier_orb_of_fire_active.XHS_LINK_CLIENT = true
 
 function modifier_orb_of_fire_active:IsHidden() return false end
 function modifier_orb_of_fire_active:IsPurgable() return false end
@@ -104,6 +122,12 @@ end
 function modifier_orb_of_fire_active:OnAttackLanded(params)
 	if IsServer() then
 		if params.attacker == self:GetParent() and params.target:GetTeamNumber() ~= params.attacker:GetTeamNumber() then
+			-- Fire Orb, Blazing Gem and Searing Blade share this active modifier.
+			-- Their cleave must not add a second splash event while the hero's
+			-- innate cleave is functioning. If Break disables the innate, the item
+			-- remains a valid independent cleave source.
+			if HasActiveInnateCleave(self:GetParent()) then return end
+
 			local ability = self:GetAbility()
 
 			local items = {
@@ -136,6 +160,13 @@ function modifier_orb_of_fire_active:OnAttackLanded(params)
 				event.target = params.target
 				event.ability = ability
 				Splash(event)
+
+				local cleaveParticle = ParticleManager:CreateParticle(
+					"particles/econ/items/faceless_void/faceless_void_weapon_bfury/faceless_void_weapon_bfury_cleave.vpcf",
+					PATTACH_ABSORIGIN_FOLLOW,
+					params.target
+				)
+				ParticleManager:ReleaseParticleIndex(cleaveParticle)
 			end
 		end
 	end
@@ -144,6 +175,7 @@ end
 --------------------------------------------------------------
 
 modifier_orb_of_fire_passive = class({})
+modifier_orb_of_fire_passive.XHS_LINK_CLIENT = true
 
 function modifier_orb_of_fire_passive:IsHidden() return true end
 function modifier_orb_of_fire_passive:IsPurgable() return false end
@@ -154,6 +186,14 @@ function modifier_orb_of_fire_passive:RemoveOnDeath() return false end
 -- allow multiple instances of that modifier
 function modifier_orb_of_fire_passive:GetAttributes()
 	return MODIFIER_ATTRIBUTE_MULTIPLE
+end
+
+function modifier_orb_of_fire_passive:OnCreated()
+	XHSOrbToggle.OnIntrinsicCreated(self, "modifier_orb_of_fire_active")
+end
+
+function modifier_orb_of_fire_passive:OnDestroy()
+	XHSOrbToggle.OnIntrinsicDestroyed(self, "modifier_orb_of_fire_active")
 end
 
 function modifier_orb_of_fire_passive:DeclareFunctions()

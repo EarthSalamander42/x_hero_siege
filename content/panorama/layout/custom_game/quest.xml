@@ -3,14 +3,19 @@
 		<include src="s2r://panorama/styles/dotastyles.vcss_c" />
 		<include src="s2r://panorama/styles/hudstyles.vcss_c"/>
 	
+		<include src="s2r://panorama/styles/custom_game/xhs_theme.vcss_c" />
 		<include src="s2r://panorama/styles/custom_game/quests.vcss_c" />
 	</styles>
 
-	<Panel class="Quest LeftRightFlow" hittest="false">
+	<Panel class="Quest LeftRightFlow" hittest="false" hittestchildren="true">
 			<Panel id="QuestIcon" class="QuestIcon Explore" hittest="false"/>
 			<Panel id="QuestIconCheckMark" class="QuestIconCheckMark" hittest="false"/>
 			<Label id="QuestText" class="QuestText" text="" hittest="false"/>
 			<Label id="QuestNumbers" class="QuestText" text="({d:completed} / {d:complete_limit})" hittest="false"/>
+			<Panel id="QuestCollapseChevron" class="QuestCollapseChevron" hittest="false"/>
+			<Button id="QuestInfoButton" class="QuestInfoButton" hittest="true">
+				<Label class="QuestInfoLabel" text="i" hittest="false"/>
+			</Button>
 
 			<Panel id="QuestReward" class="LeftRightFlow">
 				<Label id="XPReward" class="RewardText"  text="+{d:xp_reward} XP" hittest="false"/>
