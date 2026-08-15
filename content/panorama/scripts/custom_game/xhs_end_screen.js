@@ -446,6 +446,21 @@ var XHSEndScreen = (function () {
 		$.DispatchEvent("ExternalBrowserGoToURL", url);
 	}
 
+	function GetPublishedGameId() {
+		var identity = CustomNetTables.GetTableValue("xhs_run_identity", "current") || {};
+		var value = identity.game_id === undefined || identity.game_id === null ? "" : String(identity.game_id).trim();
+		return value && value !== "0" && value !== "-" ? value : "";
+	}
+
+	function RefreshFallbackGameId() {
+		var value = GetPublishedGameId();
+		var button = Panel("XHSEndScreenFallbackGameIdButton");
+		var label = Panel("XHSEndScreenFallbackGameId");
+		if (!button || !label) return;
+		label.text = value;
+		button.SetHasClass("IsAvailable", !!value);
+	}
+
 	function OpenSupporterPortal() {
 		if (supporterPortalRequestPending) return;
 		supporterPortalRequestPending = true;
@@ -470,6 +485,7 @@ var XHSEndScreen = (function () {
 
 		root.SetHasClass("IsLoading", false);
 		root.SetHasClass("IsFallback", true);
+		RefreshFallbackGameId();
 	}
 
 	function ScheduleEndScreenFallback() {
@@ -826,6 +842,7 @@ var XHSEndScreen = (function () {
 		return (data.info && data.info.id)
 			|| data.game_id
 			|| (data.data && data.data.game_id)
+			|| GetPublishedGameId()
 			|| data.match_id
 			|| (data.info && data.info.match_id)
 			|| "-";
@@ -2691,6 +2708,21 @@ var XHSEndScreen = (function () {
 			fallbackClose.SetPanelEvent("onactivate", FinishGame);
 		}
 
+		var fallbackGameId = Panel("XHSEndScreenFallbackGameIdButton");
+		if (fallbackGameId) {
+			fallbackGameId.SetPanelEvent("onactivate", function () {
+				var url = GetPublicMatchURL(GetPublishedGameId());
+				if (url) OpenExternalURL(url);
+			});
+			fallbackGameId.SetPanelEvent("onmouseover", function () {
+				var value = GetPublishedGameId();
+				if (value) $.DispatchEvent("UIShowTextTooltip", fallbackGameId, "Open this match on the Frostrose website");
+			});
+			fallbackGameId.SetPanelEvent("onmouseout", function () {
+				$.DispatchEvent("UIHideTextTooltip", fallbackGameId);
+			});
+		}
+
 		var hall = Panel("XHSEndScreenHallButton");
 		if (hall) {
 			hall.enabled = false;
@@ -2787,6 +2819,10 @@ var XHSEndScreen = (function () {
 		HideVanillaHud();
 		BindButtons();
 		SubscribeEndGameData();
+		CustomNetTables.SubscribeNetTableListener("xhs_run_identity", function (tableName, key) {
+			if (key === "current") RefreshFallbackGameId();
+		});
+		RefreshFallbackGameId();
 		GameEvents.Subscribe("supporter_pass_payment_portal_ready", function (payload) {
 			supporterPortalRequestPending = false;
 			if (payload && payload.url) OpenExternalURL(payload.url);

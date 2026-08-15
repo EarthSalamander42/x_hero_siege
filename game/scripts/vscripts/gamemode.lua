@@ -1234,17 +1234,37 @@ function GameMode:OnGameplaySettingsUpdated(eventSourceIndex, event)
 
 	event = type(event) == "table" and event or {}
 	self.xhs_gameplay_settings = self.xhs_gameplay_settings or {}
-	self.xhs_gameplay_settings[playerID] = {
-		controlled_creeps_auto_attack_after_move = event.controlled_creeps_auto_attack_after_move == true
+	local settings = self.xhs_gameplay_settings[playerID] or {}
+	settings.controlled_creeps_auto_attack_after_move = event.controlled_creeps_auto_attack_after_move == true
 			or event.controlled_creeps_auto_attack_after_move == 1
-			or event.controlled_creeps_auto_attack_after_move == "1",
-	}
+			or event.controlled_creeps_auto_attack_after_move == "1"
+	if type(event.starting_item_slots) == "table" then
+		local normalized = {}
+		local occupied = {}
+		for _, itemName in ipairs({ "item_health_potion", "item_mana_potion", "item_lifesteal_mask" }) do
+			local slot = tonumber(event.starting_item_slots[itemName])
+			if slot == nil or slot < 0 or slot > 5 or slot ~= math.floor(slot) or occupied[slot] then
+				normalized = nil
+				break
+			end
+			normalized[itemName] = slot
+			occupied[slot] = true
+		end
+		if normalized ~= nil then settings.starting_item_slots = normalized end
+	end
+	self.xhs_gameplay_settings[playerID] = settings
 end
 
 function GameMode:IsControlledCreepAutoAttackEnabled(playerID)
 	local settings = self.xhs_gameplay_settings
 		and self.xhs_gameplay_settings[tonumber(playerID)] or nil
 	return settings ~= nil and settings.controlled_creeps_auto_attack_after_move == true
+end
+
+function GameMode:GetStartingItemSlots(playerID)
+	local settings = self.xhs_gameplay_settings
+		and self.xhs_gameplay_settings[tonumber(playerID)] or nil
+	return settings and settings.starting_item_slots or nil
 end
 
 local function IsXHSPlayerControlledCreep(unit, playerID)

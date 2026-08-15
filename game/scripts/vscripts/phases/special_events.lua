@@ -54,6 +54,7 @@ local KILL_EVENT_OBJECTIVES_NET_KEY = "state"
 local FARM_EVENT_RETURN_TELEPORT_DURATION = 3.0
 local FARM_EVENT_RETURN_GRACE_DURATION = 3.0
 local FARM_EVENT_RETURN_TOTAL_DELAY = FARM_EVENT_RETURN_TELEPORT_DURATION + FARM_EVENT_RETURN_GRACE_DURATION
+local FARM_EVENT_MAGNATAUR_DOOR_WATCHDOG_DELAY = FARM_EVENT_RETURN_TOTAL_DELAY + 0.25
 local FARM_EVENT_CREEPS_PER_WAVE = 10
 local FARM_EVENT_CELEBRATION_DURATION = 10.0
 local FARM_EVENT_PRELOAD_INTERVAL = 0.1
@@ -176,6 +177,51 @@ local MURADIN_TELEPORT_END_PARTICLE = "particles/items2_fx/teleport_end.vpcf"
 
 local function IsValidAliveUnit(unit)
 	return unit ~= nil and not unit:IsNull() and unit:IsAlive()
+end
+
+function SpecialEvents:OpenFarmExitMagnataurDoors(generation)
+	if tonumber(generation) ~= (tonumber(self.farm_event_generation) or 0) then return 0 end
+
+	local openedLanes = {}
+	local openedDoors = {}
+	for lane, magnataurs in pairs(self.farm_exit_magnataurs_by_lane or {}) do
+		local hasLivingMagnataur = false
+		for _, unit in ipairs(magnataurs or {}) do
+			if IsValidAliveUnit(unit) then
+				hasLivingMagnataur = true
+				break
+			end
+		end
+
+		-- Keep the lane disabled for phase-one spawning. Only open the physical
+		-- dead-end gate so its Magnataurs can enter the playable area.
+		if hasLivingMagnataur then
+			for _, obstruction in pairs(Entities:FindAllByName("obstruction_lane" .. tostring(lane))) do
+				obstruction:SetEnabled(false, true)
+			end
+			local doorName = "door_lane" .. tostring(lane)
+			DoEntFire(doorName, "SetAnimation", "gate_02_open", 0, nil, nil)
+			table.insert(openedLanes, tonumber(lane) or lane)
+			table.insert(openedDoors, doorName)
+		end
+	end
+
+	if #openedDoors > 0 and XHSKnockbackHeroesAtOpeningDoors ~= nil then
+		XHSKnockbackHeroesAtOpeningDoors(openedDoors)
+	end
+	LogFarmEventTransition(
+		#openedLanes > 0 and "info" or "warn",
+		"FARM_EVENT_MAGNATAUR_DOOR_WATCHDOG",
+		#openedLanes > 0
+			and "Opened collapsed lane doors for living Destroyer Magnataurs"
+			or "No living Destroyer Magnataurs required a collapsed lane door",
+		FarmEventTransitionSnapshot(self, {
+			opened_lane_count = #openedLanes,
+			opened_lanes = openedLanes,
+			spawned_magnataurs = tonumber(self.farm_exit_magnataur_count) or 0,
+		})
+	)
+	return #openedLanes
 end
 
 local function RemoveSpecialArenaDisplayDummy(globalName)
@@ -1706,6 +1752,7 @@ function SpecialEvents:FarmEvent(time)
 	self.farm_exit_wave_scheduled = false
 	self.farm_exit_wave_spawned = false
 	self.farm_exit_magnataur_count = 0
+	self.farm_exit_magnataurs_by_lane = {}
 	self:SuspendNonFarmCreeps()
 	self:StartFarmLeaderboardPublisher()
 	UpdateGlobalObjective("farm_event", "Active", "Preparing Farm Event arenas", nil)
@@ -1895,6 +1942,7 @@ function SpecialEvents:EndFarmEvent()
 		* magnataurBatchesPerLane
 		* math.max(1, tonumber(GameRules:GetCustomGameDifficulty()) or 1)
 	local spawnedMagnataurCount = 0
+	self.farm_exit_magnataurs_by_lane = {}
 	LogFarmEventTransition("info", "FARM_EVENT_END_MAGNATAUR_SPAWN_STARTED", "Starting Destroyer Magnataur creation", FarmEventTransitionSnapshot(self, {
 		active_lanes = activeLaneCount,
 		expected = expectedMagnataurCount,
@@ -1912,6 +1960,8 @@ function SpecialEvents:EndFarmEvent()
 						laneAttacker = laneAttacker or magnataur
 						for _, unit in ipairs(magnataurs or {}) do
 							spawnedMagnataurCount = spawnedMagnataurCount + 1
+							self.farm_exit_magnataurs_by_lane[lane] = self.farm_exit_magnataurs_by_lane[lane] or {}
+							table.insert(self.farm_exit_magnataurs_by_lane[lane], unit)
 							self:SuspendNonFarmUnit(unit)
 						end
 					end
@@ -1933,6 +1983,16 @@ function SpecialEvents:EndFarmEvent()
 				.. " difficulty=" .. tostring(GameRules:GetCustomGameDifficulty())
 		)
 	end
+	local magnataurDoorWatchdogGeneration = tonumber(self.farm_event_generation) or 0
+	GameRules:GetGameModeEntity():SetContextThink(
+		"xhs_farm_event_magnataur_door_watchdog_" .. tostring(magnataurDoorWatchdogGeneration),
+		function()
+			if magnataurDoorWatchdogGeneration ~= (tonumber(self.farm_event_generation) or 0) then return nil end
+			self:OpenFarmExitMagnataurDoors(magnataurDoorWatchdogGeneration)
+			return nil
+		end,
+		FARM_EVENT_MAGNATAUR_DOOR_WATCHDOG_DELAY
+	)
 	-- The quest must match successful engine creations, not the theoretical
 	-- lane count. A partial asset/entity failure can otherwise make phase two
 	-- permanently impossible even though some destroyers are present.

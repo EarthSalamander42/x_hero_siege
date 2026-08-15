@@ -614,6 +614,63 @@ function api:GetPlayerIngameAdvertizeHidden(player_id)
 	return nil
 end
 
+function api:GetPlayerCompanionShown(player_id)
+	if not PlayerResource:IsValidPlayerID(player_id) then
+		return true
+	end
+
+	local steamid = tostring(PlayerResource:GetSteamID(player_id))
+	if self.players == nil or self.players[steamid] == nil then
+		return true
+	end
+
+	local player = self.players[steamid]
+	local supporter_pass = player.supporter_pass or {}
+	local settings = supporter_pass.settings or player.settings or {}
+	local value = settings.show_companion
+	if value == nil then value = player.show_companion end
+	if value == nil then return true end
+	return value == true or value == 1
+end
+
+local XHS_DEFAULT_STARTING_ITEM_SLOTS = {
+	item_health_potion = 0,
+	item_mana_potion = 1,
+	item_lifesteal_mask = 2,
+}
+
+local function XHSNormalizeStartingItemSlots(value)
+	if type(value) ~= "table" then
+		return table.shallowcopy ~= nil and table.shallowcopy(XHS_DEFAULT_STARTING_ITEM_SLOTS)
+			or { item_health_potion = 0, item_mana_potion = 1, item_lifesteal_mask = 2 }
+	end
+	local normalized = {}
+	local occupied = {}
+	for itemName, defaultSlot in pairs(XHS_DEFAULT_STARTING_ITEM_SLOTS) do
+		local slot = tonumber(value[itemName])
+		if slot == nil or slot < 0 or slot > 5 or slot ~= math.floor(slot) or occupied[slot] then
+			return { item_health_potion = 0, item_mana_potion = 1, item_lifesteal_mask = 2 }
+		end
+		normalized[itemName] = slot
+		occupied[slot] = true
+	end
+	return normalized
+end
+
+function api:GetPlayerStartingItemSlots(player_id)
+	if not PlayerResource:IsValidPlayerID(player_id) then
+		return XHSNormalizeStartingItemSlots(nil)
+	end
+	local steamid = tostring(PlayerResource:GetSteamID(player_id))
+	local player = self.players and self.players[steamid] or nil
+	if player == nil then return XHSNormalizeStartingItemSlots(nil) end
+	local supporter_pass = player.supporter_pass or {}
+	local settings = supporter_pass.settings or player.settings or {}
+	return XHSNormalizeStartingItemSlots(
+		settings.starting_item_slots or player.starting_item_slots
+	)
+end
+
 function api:GetPlayerWinrate(player_id)
 	if not PlayerResource:IsValidPlayerID(player_id) then
 		native_print("api:GetPlayerWinrate: Player ID not valid!")
@@ -1261,7 +1318,9 @@ function api:UpdateSupporterPassSettings(player_id, settings, callback)
 		if settings.pass_rewards ~= nil then payload.pass_rewards = settings.pass_rewards == true or settings.pass_rewards == 1 end
 		if settings.player_xp ~= nil then payload.player_xp = settings.player_xp == true or settings.player_xp == 1 end
 		if settings.winrate_toggle ~= nil then payload.winrate_toggle = settings.winrate_toggle == true or settings.winrate_toggle == 1 end
+		if settings.show_companion ~= nil then payload.show_companion = settings.show_companion == true or settings.show_companion == 1 end
 		if settings.xhs_ingame_advertize_hidden ~= nil then payload.xhs_ingame_advertize_hidden = settings.xhs_ingame_advertize_hidden == true or settings.xhs_ingame_advertize_hidden == 1 end
+		if settings.starting_item_slots ~= nil then payload.starting_item_slots = XHSNormalizeStartingItemSlots(settings.starting_item_slots) end
 
 		api:Request("supporter-pass/settings", function(data)
 			if api.players and api.players[steamid] then
@@ -1287,6 +1346,16 @@ function api:UpdateSupporterPassSettings(player_id, settings, callback)
 				elseif settings.xhs_ingame_advertize_hidden ~= nil then
 					api.players[steamid].xhs_ingame_advertize_hidden = settings.xhs_ingame_advertize_hidden
 				end
+				if data.show_companion ~= nil then
+					api.players[steamid].show_companion = data.show_companion
+				elseif settings.show_companion ~= nil then
+					api.players[steamid].show_companion = settings.show_companion
+				end
+				if data.starting_item_slots ~= nil then
+					api.players[steamid].starting_item_slots = XHSNormalizeStartingItemSlots(data.starting_item_slots)
+				elseif settings.starting_item_slots ~= nil then
+					api.players[steamid].starting_item_slots = XHSNormalizeStartingItemSlots(settings.starting_item_slots)
+				end
 				api.players[steamid].supporter_pass = api.players[steamid].supporter_pass or {}
 				api.players[steamid].supporter_pass.settings = api.players[steamid].supporter_pass.settings or {}
 				local persisted_settings = api.players[steamid].supporter_pass.settings
@@ -1294,7 +1363,9 @@ function api:UpdateSupporterPassSettings(player_id, settings, callback)
 				if api.players[steamid].pass_rewards ~= nil then persisted_settings.pass_rewards = api.players[steamid].pass_rewards end
 				if api.players[steamid].player_xp ~= nil then persisted_settings.player_xp = api.players[steamid].player_xp end
 				if api.players[steamid].winrate_toggle ~= nil then persisted_settings.winrate_toggle = api.players[steamid].winrate_toggle end
+				if api.players[steamid].show_companion ~= nil then persisted_settings.show_companion = api.players[steamid].show_companion end
 				if api.players[steamid].xhs_ingame_advertize_hidden ~= nil then persisted_settings.xhs_ingame_advertize_hidden = api.players[steamid].xhs_ingame_advertize_hidden end
+				if api.players[steamid].starting_item_slots ~= nil then persisted_settings.starting_item_slots = api.players[steamid].starting_item_slots end
 			end
 
 			Finish(true, data)
@@ -1988,6 +2059,16 @@ function api:GetApiGameId()
 	return self.game_id
 end
 
+function api:PublishRunIdentity(registrationState)
+	local gameID = tonumber(self.game_id)
+	local matchID = self.GetMatchID ~= nil and self:GetMatchID() or nil
+	CustomNetTables:SetTableValue("xhs_run_identity", "current", {
+		game_id = gameID ~= nil and gameID > 0 and tostring(gameID) or "",
+		match_id = matchID ~= nil and tostring(matchID) or "",
+		state = tostring(registrationState or self.game_register_state or "unknown"),
+	})
+end
+
 function api:CheatDetector()
 	if CustomNetTables:GetTableValue("game_options", "game_count").value == 1 then
 		if Convars:GetBool("sv_cheats") == true or GameRules:IsCheatMode() then
@@ -2389,10 +2470,12 @@ function api:RegisterToolsTelemetrySession()
 
 	local botCount = self.GetXHSBotParticipantCount ~= nil and self:GetXHSBotParticipantCount() or 0
 	self.tools_session_register_state = "pending"
+	self:PublishRunIdentity("pending")
 	self:Request("tools-session-register", function(data)
 		local gameID = tonumber(data and data.game_id)
 		if gameID == nil or gameID <= 0 then
 			self.tools_session_register_state = "failed"
+			self:PublishRunIdentity("failed")
 			print("tools-session-register: backend returned an invalid game_id")
 			return
 		end
@@ -2400,10 +2483,12 @@ function api:RegisterToolsTelemetrySession()
 		self.game_id = gameID
 		self.tools_telemetry_session = true
 		self.tools_session_register_state = "ready"
+		self:PublishRunIdentity("ready")
 		self:ScheduleRuntimeLogFlush(0.1)
 		self:ScheduleBotAuditCheckpoints(BOT_AUDIT_CHECKPOINT_INITIAL_DELAY)
 	end, function(errorData)
 		self.tools_session_register_state = "failed"
+		self:PublishRunIdentity("failed")
 		print("tools-session-register: failed; Lua logs remain local ("
 			.. tostring(errorData and errorData.message or "unknown error") .. ")")
 	end, "POST", {
@@ -2837,15 +2922,18 @@ function api:RegisterGame(callback, register_players)
 	end
 
 	self.game_register_state = "pending"
+	self:PublishRunIdentity("pending")
 	self:Request("game-register", function(data)
 		api.game_id = tonumber(data.game_id)
 		if api.game_id == nil or api.game_id <= 0 then
 			api.game_id = nil
 			api.game_register_state = "failed"
+			api:PublishRunIdentity("failed")
 			print("game-register: backend returned an invalid game_id")
 			return
 		end
 		api.game_register_state = "ready"
+		api:PublishRunIdentity("ready")
 		print("game-register: ready with game_id=" .. tostring(api.game_id))
 		if XHSFlushBootstrapLogs ~= nil then
 			XHSFlushBootstrapLogs()
@@ -2912,6 +3000,7 @@ function api:RegisterGame(callback, register_players)
 	end, function(error_data)
 		api.game_id = nil
 		api.game_register_state = "failed"
+		api:PublishRunIdentity("failed")
 		print("game-register: failed; persistent completion disabled for this match ("
 			.. tostring(error_data and error_data.message or "unknown error") .. ")")
 		-- fail-safe if http request can't reach backend

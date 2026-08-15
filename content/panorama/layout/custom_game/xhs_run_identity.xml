@@ -1,0 +1,15 @@
+<root>
+	<styles>
+		<include src="s2r://panorama/styles/custom_game/xhs_run_identity.css" />
+	</styles>
+
+	<scripts>
+		<include src="s2r://panorama/scripts/custom_game/xhs_run_identity.js" />
+	</scripts>
+
+	<Panel class="XHSRunIdentityHost" hittest="false" hittestchildren="true">
+		<Button id="XHSRunIdSecondRowButton" hittest="true">
+			<Label id="XHSRunIdSecondRowLabel" text="GAME ID -" hittest="false" />
+		</Button>
+	</Panel>
+</root>

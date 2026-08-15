@@ -5,9 +5,10 @@
 	var HOVER_INTERVAL = 0.05;
 	var TOOLTIP_LAYER_INTERVAL = 0.25;
 	var END_SCREEN_LAYER_Z_INDEX = "1350";
-	var CONTEXT_MENU_LAYER_Z_INDEX = "13900";
-	var TOOLTIP_LAYER_Z_INDEX = "14000";
+	var CONTEXT_MENU_LAYER_Z_INDEX = "16900";
+	var TOOLTIP_LAYER_Z_INDEX = "17000";
 	var CINEMATIC_LAYER_Z_INDEX = "15000";
+	var VANILLA_SETTINGS_LAYER_Z_INDEX = "16000";
 	var TOOLTIP_BLOCKING_PANEL_IDS = [
 		"XHSTopHudRoot",
 		"XHSDevToolsRoot",
@@ -20,6 +21,7 @@
 	var FLYOUT_SUPPORTER_HOVER_ID = "XHSSupporterHoverCard_Scoreboard";
 	var FLYOUT_SUPPORTER_HOVER_Z_INDEX = "1400";
 	var WORLD_HEALTH_FRAME_IDS = ["XHSOverheadRoot", "XHSCreepHealthBarsRoot"];
+	var vanillaSettingsWasOpen = null;
 	var FLYOUT_OCCLUDED_PANEL_IDS = [
 		"XHSWaveCountdown",
 		"XHSWaveQueue",
@@ -63,7 +65,7 @@
 	// across vanilla and custom Panorama branches.
 	var HUD_LAYER_RULES = [
 		{ key: "world_health_bars", z: 70, ids: ["XHSCreepHealthBarsRoot"], classes: ["XHSCreepHealthBars"] },
-		{ key: "xhs_hud", z: 90, ids: ["DungeonHUDContents", "XHSTopHudRoot", "QuestLog", "QuestLogCollapseButton"] },
+		{ key: "xhs_hud", z: 90, ids: ["DungeonHUDContents", "XHSTopHudRoot", "QuestLog", "QuestLogCollapseButton"], classes: ["XHSRunIdentityHost"] },
 		{ key: "base", z: 100, ids: ["HUDElements"] },
 		{ key: "leaderboards", z: 300, ids: ["XHSFarmLeaderboard"] },
 		{ key: "scoreboard", z: 400, ids: ["XHSScoreboard", "TeamsContainer"] },
@@ -436,24 +438,66 @@
 			&& Number(shop.actuallayoutheight || shop.desiredlayoutheight || 0) > 0;
 	}
 
-	function publishWorldHealthFrameOcclusion(hud) {
+	function isVanillaSettingsOpen(hud) {
+		if (!isValid(hud) || !hud.FindChildTraverse) return false;
+		var popupManager = hud.FindChildTraverse("PopupManager");
+		return isValid(popupManager)
+			&& popupManager.BHasClass
+			&& popupManager.BHasClass("HaveActivePopups");
+	}
+
+	function publishWorldHealthFrameOcclusion(hud, settingsOpen) {
 		try {
 			var config = GameUI.CustomUIConfig();
 			config.xhsWorldHealthFrameOcclusion = {
 				flyoutLeft: isFlyoutScoreboardOpen(hud),
-				shopRight: isVanillaShopOpen(hud)
+				shopRight: isVanillaShopOpen(hud),
+				settingsModal: settingsOpen === true
 			};
 		} catch (error) {}
 	}
 
-	function syncWorldHealthFrameOcclusion(hud) {
+	function syncWorldHealthFrameOcclusion(hud, settingsOpen) {
 		// Partial flyout/shop masks are applied per health frame by their feature
 		// scripts. Keep the roots rendered so only overlapping frames disappear.
-		var occluded = false;
+		var occluded = settingsOpen === true;
 		for (var frameIndex = 0; frameIndex < WORLD_HEALTH_FRAME_IDS.length; frameIndex++) {
 			var frameRoot = hud.FindChildTraverse(WORLD_HEALTH_FRAME_IDS[frameIndex]);
 			if (!isValid(frameRoot)) continue;
 			frameRoot.SetHasClass("XHSWorldHealthFramesOccluded", occluded);
+		}
+	}
+
+	function syncVanillaSettingsLayer(hud, settingsOpen) {
+		if (!isValid(hud) || !hud.FindChildTraverse) return;
+		var popupManager = hud.FindChildTraverse("PopupManager");
+		if (!isValid(popupManager)) return;
+
+		if (settingsOpen === true) {
+			if (popupManager._xhsSettingsOriginalParent === undefined) {
+				popupManager._xhsSettingsOriginalParent = popupManager.GetParent ? popupManager.GetParent() : null;
+				popupManager._xhsSettingsOriginalZIndex = popupManager.style.zIndex;
+			}
+			if (popupManager.GetParent && popupManager.GetParent() !== hud && popupManager.SetParent) {
+				popupManager.SetParent(hud);
+			}
+			popupManager.style.zIndex = VANILLA_SETTINGS_LAYER_Z_INDEX;
+			if (hud.MoveChildAfter && hud.GetChildCount && hud.GetChild) {
+				var lastChild = hud.GetChild(hud.GetChildCount() - 1);
+				if (isValid(lastChild) && lastChild !== popupManager) hud.MoveChildAfter(popupManager, lastChild);
+			}
+			return;
+		}
+
+		var originalParent = popupManager._xhsSettingsOriginalParent;
+		if (isValid(originalParent) && popupManager.GetParent
+			&& popupManager.GetParent() !== originalParent && popupManager.SetParent) {
+			popupManager.SetParent(originalParent);
+		}
+		if (popupManager._xhsSettingsOriginalParent !== undefined) {
+			popupManager.style.zIndex = popupManager._xhsSettingsOriginalZIndex || null;
+			popupManager._xhsSettingsOriginalParent = undefined;
+			popupManager._xhsSettingsOriginalZIndex = undefined;
 		}
 	}
 
@@ -544,8 +588,14 @@
 		}
 
 		applyCompositionLayerOrder(hud);
-		publishWorldHealthFrameOcclusion(hud);
-		syncWorldHealthFrameOcclusion(hud);
+		var vanillaSettingsOpen = isVanillaSettingsOpen(hud);
+		if (vanillaSettingsWasOpen !== vanillaSettingsOpen) {
+			vanillaSettingsWasOpen = vanillaSettingsOpen;
+			// $.Msg("[XHS UI Layers] Vanilla settings " + (vanillaSettingsOpen ? "opened" : "closed"));
+		}
+		syncVanillaSettingsLayer(hud, vanillaSettingsOpen);
+		publishWorldHealthFrameOcclusion(hud, vanillaSettingsOpen);
+		syncWorldHealthFrameOcclusion(hud, vanillaSettingsOpen);
 		syncFlyoutTargetedOcclusion(hud);
 		syncFlyoutSupporterHoverLayer(hud);
 

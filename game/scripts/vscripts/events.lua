@@ -118,7 +118,9 @@ ListenToGameEvent('game_rules_state_change', function()
 			DoEntFire("door_lane" .. i, "SetAnimation", "gate_02_close", 0, nil, nil)
 		end
 
-		SetXHSOptionalEventsUnlocked(false)
+		-- QA needs direct access to the post-Muradin optional events from the
+		-- beginning of a Tools match. Public games keep the normal Muradin gate.
+		SetXHSOptionalEventsUnlocked(IsInToolsMode())
 
 		local diff = { "Easy", "Normal", "Hard", "Extreme", "Divine" }
 		local Color = { "green", "Yellow", "orange", "red", "darkred" }
@@ -177,7 +179,7 @@ ListenToGameEvent('game_rules_state_change', function()
 		end
 
 		RefreshXHSCombatLanes()
-		SetXHSOptionalEventsUnlocked(false)
+		SetXHSOptionalEventsUnlocked(IsInToolsMode())
 	end
 end, nil)
 

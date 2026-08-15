@@ -82,6 +82,29 @@
 								<DOTASettingsCheckbox id="XHSSettingControlledCreepsAutoAttack" class="XHSSettingsCheckbox" />
 							</Panel>
 						</Panel>
+
+						<Panel class="XHSStartingItemsSection">
+							<Panel class="XHSStartingItemsHeader">
+								<Panel class="XHSSettingsRowCopy">
+									<Label class="XHSSettingsRowTitle" text="#xhs_setting_starting_items" />
+									<Label class="XHSSettingsRowDescription" text="#xhs_setting_starting_items_desc" />
+								</Panel>
+								<Button id="XHSStartingItemsReset" class="XHSStartingItemsReset"><Label text="#xhs_setting_starting_items_reset" /></Button>
+							</Panel>
+							<Panel class="XHSStartingInventory">
+								<Panel class="XHSStartingInventoryRow">
+									<Panel id="XHSStartingItemSlot0" class="XHSStartingInventorySlot"><Label class="XHSStartingSlotNumber" text="1" hittest="false" /><Panel id="XHSStartingItemHolder0" class="XHSStartingItemHolder" /></Panel>
+									<Panel id="XHSStartingItemSlot1" class="XHSStartingInventorySlot"><Label class="XHSStartingSlotNumber" text="2" hittest="false" /><Panel id="XHSStartingItemHolder1" class="XHSStartingItemHolder" /></Panel>
+									<Panel id="XHSStartingItemSlot2" class="XHSStartingInventorySlot"><Label class="XHSStartingSlotNumber" text="3" hittest="false" /><Panel id="XHSStartingItemHolder2" class="XHSStartingItemHolder" /></Panel>
+								</Panel>
+								<Panel class="XHSStartingInventoryRow">
+									<Panel id="XHSStartingItemSlot3" class="XHSStartingInventorySlot"><Label class="XHSStartingSlotNumber" text="4" hittest="false" /><Panel id="XHSStartingItemHolder3" class="XHSStartingItemHolder" /></Panel>
+									<Panel id="XHSStartingItemSlot4" class="XHSStartingInventorySlot"><Label class="XHSStartingSlotNumber" text="5" hittest="false" /><Panel id="XHSStartingItemHolder4" class="XHSStartingItemHolder" /></Panel>
+									<Panel id="XHSStartingItemSlot5" class="XHSStartingInventorySlot"><Label class="XHSStartingSlotNumber" text="6" hittest="false" /><Panel id="XHSStartingItemHolder5" class="XHSStartingItemHolder" /></Panel>
+								</Panel>
+							</Panel>
+							<Label class="XHSStartingItemsHint" text="#xhs_setting_starting_items_hint" />
+						</Panel>
 					</Panel>
 
 					<Panel id="XHSSettingsSupporterPage" class="XHSSettingsPage">
@@ -103,9 +126,9 @@
 								<Panel class="XHSSettingsRowCopy"><Label class="XHSSettingsRowTitle" text="#xhs_sp_setting_winrate" /><Label class="XHSSettingsRowDescription" text="#xhs_sp_setting_winrate_desc" /></Panel>
 								<DOTASettingsCheckbox id="XHSSettingSupporterWinrate" class="XHSSettingsCheckbox" />
 							</Panel>
-							<Panel class="XHSSettingsRow XHSSettingsActionRow">
-								<Panel class="XHSSettingsRowCopy"><Label class="XHSSettingsRowTitle" text="#xhs_sp_type_companion" /><Label class="XHSSettingsRowDescription" text="#xhs_sp_disable_companion_desc" /></Panel>
-								<Button id="XHSSettingsDisableCompanion" class="XHSSettingsActionButton"><Label text="#xhs_sp_disable" /></Button>
+							<Panel class="XHSSettingsRow">
+								<Panel class="XHSSettingsRowCopy"><Label class="XHSSettingsRowTitle" text="#xhs_sp_setting_show_companion" /><Label class="XHSSettingsRowDescription" text="#xhs_sp_setting_show_companion_desc" /></Panel>
+								<DOTASettingsCheckbox id="XHSSettingShowCompanion" class="XHSSettingsCheckbox" />
 							</Panel>
 						</Panel>
 					</Panel>

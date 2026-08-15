@@ -39,5 +39,6 @@
 		"xhs_bootstrap_status",
 		"xhs_achievements_catalog",
 		"xhs_achievements_player",
+		"xhs_run_identity",
 	]
 }

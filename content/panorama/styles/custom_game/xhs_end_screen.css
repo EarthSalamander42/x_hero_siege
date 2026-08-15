@@ -305,6 +305,41 @@
 	font-size: 16px;
 }
 
+.XHSEndScreenFallbackGameId {
+	height: 28px;
+	horizontal-align: center;
+	margin-top: 8px;
+	padding: 0px 10px;
+	flow-children: right;
+	background-color: #07131f88;
+	border: 1px solid #6e879944;
+	visibility: collapse;
+}
+
+.XHSEndScreenFallbackGameId.IsAvailable {
+	visibility: visible;
+}
+
+.XHSEndScreenFallbackGameId:hover {
+	border-color: #8fbdd088;
+}
+
+.XHSEndScreenFallbackGameIdLabel,
+.XHSEndScreenFallbackGameIdValue {
+	vertical-align: center;
+	font-size: 12px;
+	letter-spacing: 1px;
+}
+
+.XHSEndScreenFallbackGameIdLabel {
+	margin-right: 8px;
+	color: #7893a5;
+}
+
+.XHSEndScreenFallbackGameIdValue {
+	color: #c7e5f2;
+}
+
 .XHSEndScreenFallbackButton {
 	width: 190px;
 	height: 42px;

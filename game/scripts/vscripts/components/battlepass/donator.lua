@@ -151,6 +151,13 @@ function Battlepass:DonatorCompanion(ID, unit_name, js)
 		unit_name = UNIQUE_DONATOR_COMPANION[tostring(PlayerResource:GetSteamID(ID))]
 	end
 
+	if unit_name ~= nil and unit_name ~= "" and api ~= nil and api.GetPlayerCompanionShown ~= nil and not api:GetPlayerCompanionShown(ID) then
+		CompanionLog("suppressed player=%s: show_companion setting is disabled", tostring(ID))
+		stored_companions[ID] = nil
+		hero.companion = nil
+		return
+	end
+
 	-- A missing companion means disabled. Never replace an invalid or incomplete
 	-- backend mapping with an unrelated cosmetic.
 	if unit_name == nil or unit_name == false then

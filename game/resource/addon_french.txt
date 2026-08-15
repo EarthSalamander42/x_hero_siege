@@ -4517,6 +4517,8 @@
 		"xhs_sp_setting_xp_desc"                                                                       "Afficher l'XP saisonnier et de compte dans les surfaces de l'interface utilisateur sociale."
 		"xhs_sp_setting_winrate"                                                                       "Visibilité du taux de victoire"
 		"xhs_sp_setting_winrate_desc"                                                                  "Affichez votre taux de victoire saisonnier sur les surfaces de profil public."
+		"xhs_sp_setting_show_companion"                                                                "Afficher le compagnon"
+		"xhs_sp_setting_show_companion_desc"                                                           "Affiche votre compagnon équipé pendant les parties. Cette préférence est conservée entre les parties."
 		"xhs_sp_disable_companion_desc"                                                                "Supprimez votre compagnon supporter actuel pour ce match."
 		"xhs_sp_disable"                                                                               "Désactiver"
 		"xhs_sp_companion_disabled"                                                                    "Compagnon désactivé."
@@ -4877,6 +4879,11 @@
 		"xhs_setting_show_quest_ui_desc"                                                               "Démarre chaque partie avec le journal de quêtes déplié."
 		"xhs_setting_controlled_creeps_auto_attack"                                                    "Les creeps contrôlés attaquent après un ordre de déplacement"
 		"xhs_setting_controlled_creeps_auto_attack_desc"                                               "Les déplacements au sol deviennent des déplacements offensifs pour les creeps que vous contrôlez."
+		"xhs_setting_starting_items"                                                                    "Emplacement des objets de départ"
+		"xhs_setting_starting_items_desc"                                                               "Glissez chaque objet de départ dans l'un des six emplacements de l'inventaire principal."
+		"xhs_setting_starting_items_hint"                                                               "Le Masque de la mort est accordé uniquement en difficulté Facile. Un emplacement occupé utilise sans risque le prochain emplacement libre."
+		"xhs_setting_starting_items_reset"                                                              "RÉINITIALISER"
+		"xhs_setting_starting_items_invalid"                                                            "Choisissez un emplacement différent pour chaque objet de départ."
 		"xhs_settings_topbar_tooltip"                                                                  "Paramètres X Hero Siege"
 	}
 }

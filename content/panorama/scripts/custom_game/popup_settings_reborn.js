@@ -5,6 +5,13 @@ var XHSSettings = (function () {
 	var QUEST_DEFAULT_STORAGE_KEY = "xhs_show_quest_ui_by_default";
 	var ADS_HIDDEN_STORAGE_KEY = "xhs_ingame_advertize_hidden";
 	var CONTROLLED_CREEPS_AUTO_ATTACK_STORAGE_KEY = "xhs_controlled_creeps_auto_attack_after_move";
+	var STARTING_ITEM_SLOTS_STORAGE_KEY = "xhs_starting_item_slots";
+	var STARTING_ITEMS = ["item_health_potion", "item_mana_potion", "item_lifesteal_mask"];
+	var DEFAULT_STARTING_ITEM_SLOTS = {
+		item_health_potion: 0,
+		item_mana_potion: 1,
+		item_lifesteal_mask: 2
+	};
 	var SETTING_KEYS = [
 		"show_advertize",
 		"show_quest_ui",
@@ -12,7 +19,8 @@ var XHSSettings = (function () {
 		"toggle_tag",
 		"pass_rewards",
 		"player_xp",
-		"winrate_toggle"
+		"winrate_toggle",
+		"show_companion"
 	];
 	var CONTROL_IDS = {
 		show_advertize: "XHSSettingShowAdvertize",
@@ -21,13 +29,18 @@ var XHSSettings = (function () {
 		toggle_tag: "XHSSettingSupporterTag",
 		pass_rewards: "XHSSettingSupporterCosmetics",
 		player_xp: "XHSSettingSupporterXP",
-		winrate_toggle: "XHSSettingSupporterWinrate"
+		winrate_toggle: "XHSSettingSupporterWinrate",
+		show_companion: "XHSSettingShowCompanion"
 	};
 	var original = {};
 	var draft = {};
 	var activeTab = "game";
 	var saving = false;
 	var saveSerial = 0;
+
+	function StartingItemTrace(message) {
+		$.Msg("[XHS Settings][StartingItems] " + message);
+	}
 
 	function Panel(id) {
 		return ROOT && ROOT.FindChildTraverse ? ROOT.FindChildTraverse(id) : null;
@@ -45,13 +58,39 @@ var XHSSettings = (function () {
 			var key = SETTING_KEYS[i];
 			copy[key] = source && source[key] === true;
 		}
+		copy.starting_item_slots = NormalizeStartingItemSlots(source && source.starting_item_slots);
 		return copy;
+	}
+
+	function NormalizeStartingItemSlots(value) {
+		var normalized = {};
+		var occupied = {};
+		for (var i = 0; i < STARTING_ITEMS.length; i++) {
+			var itemName = STARTING_ITEMS[i];
+			var slot = value ? Number(value[itemName]) : NaN;
+			if (slot % 1 !== 0 || slot < 0 || slot > 5 || occupied[slot]) {
+				return {
+					item_health_potion: DEFAULT_STARTING_ITEM_SLOTS.item_health_potion,
+					item_mana_potion: DEFAULT_STARTING_ITEM_SLOTS.item_mana_potion,
+					item_lifesteal_mask: DEFAULT_STARTING_ITEM_SLOTS.item_lifesteal_mask
+				};
+			}
+			normalized[itemName] = slot;
+			occupied[slot] = true;
+		}
+		return normalized;
 	}
 
 	function SettingsEqual(left, right) {
 		for (var i = 0; i < SETTING_KEYS.length; i++) {
 			var key = SETTING_KEYS[i];
 			if ((left && left[key] === true) !== (right && right[key] === true)) return false;
+		}
+		var leftSlots = NormalizeStartingItemSlots(left && left.starting_item_slots);
+		var rightSlots = NormalizeStartingItemSlots(right && right.starting_item_slots);
+		for (var j = 0; j < STARTING_ITEMS.length; j++) {
+			var itemName = STARTING_ITEMS[j];
+			if (leftSlots[itemName] !== rightSlots[itemName]) return false;
 		}
 		return true;
 	}
@@ -85,6 +124,29 @@ var XHSSettings = (function () {
 		}
 	}
 
+	function ReadStoredStartingItemSlots(fallback) {
+		var config = GameUI.CustomUIConfig ? GameUI.CustomUIConfig() : null;
+		if (config && config.xhs_starting_item_slots) return NormalizeStartingItemSlots(config.xhs_starting_item_slots);
+		var storage = GetLocalStorage();
+		if (storage && storage.GetItem) {
+			try {
+				var raw = storage.GetItem(STARTING_ITEM_SLOTS_STORAGE_KEY);
+				if (raw) return NormalizeStartingItemSlots(JSON.parse(raw));
+			} catch (error) {}
+		}
+		return NormalizeStartingItemSlots(fallback);
+	}
+
+	function StoreStartingItemSlots(value) {
+		var normalized = NormalizeStartingItemSlots(value);
+		var config = GameUI.CustomUIConfig ? GameUI.CustomUIConfig() : null;
+		if (config) config.xhs_starting_item_slots = normalized;
+		var storage = GetLocalStorage();
+		if (storage && storage.SetItem) {
+			try { storage.SetItem(STARTING_ITEM_SLOTS_STORAGE_KEY, JSON.stringify(normalized)); } catch (error) {}
+		}
+	}
+
 	function GetLocalPlayerData() {
 		if (typeof CustomNetTables === "undefined" || !CustomNetTables.GetTableValue) return {};
 		var playerID = Players.GetLocalPlayer ? Players.GetLocalPlayer() : -1;
@@ -94,6 +156,8 @@ var XHSSettings = (function () {
 
 	function BuildSettings() {
 		var player = GetLocalPlayerData();
+		var backendSlots = player.starting_item_slots || (player.settings && player.settings.starting_item_slots);
+		var backendSettings = player.settings || {};
 		var passRewards = player.pass_rewards !== undefined ? player.pass_rewards : player.bp_rewards;
 		var adsHidden = player.xhs_ingame_advertize_hidden;
 		if (adsHidden === undefined) adsHidden = ReadStoredBoolean(ADS_HIDDEN_STORAGE_KEY, false);
@@ -101,10 +165,12 @@ var XHSSettings = (function () {
 			show_advertize: !IsTruthy(adsHidden, false),
 			show_quest_ui: ReadStoredBoolean(QUEST_DEFAULT_STORAGE_KEY, true),
 			controlled_creeps_auto_attack: ReadStoredBoolean(CONTROLLED_CREEPS_AUTO_ATTACK_STORAGE_KEY, false),
+			starting_item_slots: backendSlots ? NormalizeStartingItemSlots(backendSlots) : ReadStoredStartingItemSlots(DEFAULT_STARTING_ITEM_SLOTS),
 			toggle_tag: IsTruthy(player.toggle_tag, true),
 			pass_rewards: passRewards === 0 ? false : IsTruthy(passRewards, true),
 			player_xp: IsTruthy(player.player_xp, true),
-			winrate_toggle: IsTruthy(player.winrate_toggle, true)
+			winrate_toggle: IsTruthy(player.winrate_toggle, true),
+			show_companion: IsTruthy(player.show_companion !== undefined ? player.show_companion : backendSettings.show_companion, true)
 		};
 	}
 
@@ -125,7 +191,120 @@ var XHSSettings = (function () {
 		for (var key in CONTROL_IDS) {
 			if (CONTROL_IDS.hasOwnProperty(key)) SetCheckboxChecked(Panel(CONTROL_IDS[key]), draft[key] === true);
 		}
+		RenderStartingItemSlots();
 		UpdateFooter();
+	}
+
+	function FindStartingItemInSlot(slot) {
+		for (var i = 0; i < STARTING_ITEMS.length; i++) {
+			var itemName = STARTING_ITEMS[i];
+			if (draft.starting_item_slots[itemName] === slot) return itemName;
+		}
+		return "";
+	}
+
+	function MoveStartingItem(itemName, targetSlot) {
+		StartingItemTrace("Move requested item=" + itemName + " targetSlot=" + targetSlot);
+		if (STARTING_ITEMS.indexOf(itemName) < 0 || targetSlot < 0 || targetSlot > 5) {
+			StartingItemTrace("Move rejected: invalid item or slot");
+			return;
+		}
+		var sourceSlot = draft.starting_item_slots[itemName];
+		if (sourceSlot === targetSlot) {
+			StartingItemTrace("Move ignored: item already in slot " + targetSlot);
+			return;
+		}
+		var displaced = FindStartingItemInSlot(targetSlot);
+		draft.starting_item_slots[itemName] = targetSlot;
+		if (displaced) draft.starting_item_slots[displaced] = sourceSlot;
+		StartingItemTrace("Move applied sourceSlot=" + sourceSlot + " targetSlot=" + targetSlot + " displaced=" + (displaced || "none"));
+		RenderStartingItemSlots();
+		UpdateFooter();
+		Game.EmitSound("General.ButtonClick");
+	}
+
+	function BindStartingItemDrag(dragSource, itemName) {
+		StartingItemTrace("Binding source item=" + itemName + " panel=" + dragSource.id);
+		dragSource.SetAttributeString("xhs_item_name", itemName);
+		dragSource.hittest = true;
+		dragSource.hittestchildren = false;
+		if (dragSource.SetDraggable) {
+			dragSource.SetDraggable(true);
+			StartingItemTrace("SetDraggable(true) item=" + itemName);
+		} else {
+			dragSource.draggable = true;
+			StartingItemTrace("SetDraggable unavailable; property fallback item=" + itemName);
+		}
+		dragSource.SetPanelEvent("onmouseover", function () {
+			StartingItemTrace("onmouseover item=" + itemName);
+			$.DispatchEvent("DOTAShowAbilityTooltip", dragSource, itemName);
+		});
+		dragSource.SetPanelEvent("onmouseout", function () {
+			StartingItemTrace("onmouseout item=" + itemName);
+			$.DispatchEvent("DOTAHideAbilityTooltip", dragSource);
+		});
+	}
+
+	function OnStartingItemDragStart(panelId, dragCallbacks) {
+		$.DispatchEvent("DOTAHideAbilityTooltip", panelId);
+		var itemName = panelId && panelId.GetAttributeString ? panelId.GetAttributeString("xhs_item_name", "") : "";
+		StartingItemTrace("native DragStart item=" + itemName + " panel=" + (panelId ? panelId.id : "missing"));
+		if (STARTING_ITEMS.indexOf(itemName) < 0) return false;
+		var display = $.CreatePanel("Panel", ROOT, "");
+		display.SetAttributeString("xhs_item_name", itemName);
+		display.hittest = false;
+		display.hittestchildren = false;
+		display.AddClass("XHSStartingDragImage");
+		var displayImage = $.CreatePanel("DOTAItemImage", display, "");
+		displayImage.itemname = itemName;
+		displayImage.hittest = false;
+		displayImage.AddClass("XHSStartingDragItemImage");
+		dragCallbacks.displayPanel = display;
+		dragCallbacks.offsetX = 32;
+		dragCallbacks.offsetY = 22;
+		return true;
+	}
+
+	function OnStartingItemDragEnd(panelId, draggedPanel) {
+		var itemName = panelId && panelId.GetAttributeString ? panelId.GetAttributeString("xhs_item_name", "") : "";
+		StartingItemTrace("native DragEnd item=" + itemName + " panel=" + (panelId ? panelId.id : "missing") + " draggedPanel=" + !!draggedPanel);
+		if (draggedPanel && draggedPanel.DeleteAsync) draggedPanel.DeleteAsync(0.0);
+		return true;
+	}
+
+	function PanelContainsCursor(panel, cursor) {
+		if (!panel || !panel.GetPositionWithinWindow) return false;
+		var position = panel.GetPositionWithinWindow();
+		var scaleX = Number(panel.actualuiscale_x) || 1;
+		var scaleY = Number(panel.actualuiscale_y) || 1;
+		var width = (Number(panel.actuallayoutwidth) || 0) * scaleX;
+		var height = (Number(panel.actuallayoutheight) || 0) * scaleY;
+		return cursor[0] >= position.x && cursor[0] <= position.x + width &&
+			cursor[1] >= position.y && cursor[1] <= position.y + height;
+	}
+
+	function RenderStartingItemSlots() {
+		draft.starting_item_slots = NormalizeStartingItemSlots(draft.starting_item_slots);
+		for (var slot = 0; slot < 6; slot++) {
+			var holder = Panel("XHSStartingItemHolder" + slot);
+			if (!holder) continue;
+			holder.RemoveAndDeleteChildren();
+			var itemName = FindStartingItemInSlot(slot);
+			if (!itemName) continue;
+			var dragSource = $.CreatePanel("Panel", holder, "XHSStartingItem_" + itemName);
+			dragSource.AddClass("XHSStartingItemDragSource");
+			var image = $.CreatePanel("DOTAItemImage", dragSource, "");
+			image.itemname = itemName;
+			image.hittest = false;
+			image.AddClass("XHSStartingItemImage");
+			image.SetHasClass("IsEasyOnly", itemName === "item_lifesteal_mask");
+			BindStartingItemDrag(dragSource, itemName);
+		}
+	}
+
+	function IsCursorInsidePanel(panel) {
+		if (typeof GameUI.GetCursorPosition !== "function") return false;
+		return PanelContainsCursor(panel, GameUI.GetCursorPosition());
 	}
 
 	function ReadControls() {
@@ -194,17 +373,19 @@ var XHSSettings = (function () {
 		StoreBoolean(QUEST_DEFAULT_STORAGE_KEY, draft.show_quest_ui);
 		StoreBoolean(ADS_HIDDEN_STORAGE_KEY, !draft.show_advertize);
 		StoreBoolean(CONTROLLED_CREEPS_AUTO_ATTACK_STORAGE_KEY, draft.controlled_creeps_auto_attack);
-		SendGameplaySettings(draft.controlled_creeps_auto_attack);
+		StoreStartingItemSlots(draft.starting_item_slots);
+		SendGameplaySettings(draft.controlled_creeps_auto_attack, draft.starting_item_slots);
 		var config = GameUI.CustomUIConfig ? GameUI.CustomUIConfig() : null;
 		if (config && typeof config.SetXHSQuestLogDefaultVisibility === "function") {
 			config.SetXHSQuestLogDefaultVisibility(draft.show_quest_ui);
 		}
 	}
 
-	function SendGameplaySettings(controlledCreepsAutoAttack) {
+	function SendGameplaySettings(controlledCreepsAutoAttack, startingItemSlots) {
 		if (typeof GameEvents === "undefined" || !GameEvents.SendCustomGameEventToServer) return;
 		GameEvents.SendCustomGameEventToServer("xhs_update_gameplay_settings", {
-			controlled_creeps_auto_attack_after_move: controlledCreepsAutoAttack === true ? 1 : 0
+			controlled_creeps_auto_attack_after_move: controlledCreepsAutoAttack === true ? 1 : 0,
+			starting_item_slots: NormalizeStartingItemSlots(startingItemSlots)
 		});
 	}
 
@@ -228,7 +409,9 @@ var XHSSettings = (function () {
 			toggle_tag: draft.toggle_tag ? 1 : 0,
 			pass_rewards: draft.pass_rewards ? 1 : 0,
 			player_xp: draft.player_xp ? 1 : 0,
-			winrate_toggle: draft.winrate_toggle ? 1 : 0
+			winrate_toggle: draft.winrate_toggle ? 1 : 0,
+			show_companion: draft.show_companion ? 1 : 0,
+			starting_item_slots: NormalizeStartingItemSlots(draft.starting_item_slots)
 		});
 		$.Schedule(16.0, function () {
 			if (!saving || serial !== saveSerial) return;
@@ -248,24 +431,54 @@ var XHSSettings = (function () {
 		Game.EmitSound("General.Cancel");
 	}
 
-	function DisableCompanion() {
-		if (typeof GameEvents === "undefined" || !GameEvents.SendCustomGameEventToServer) {
-			SetStatus($.Localize("#xhs_sp_settings_failed"), "error");
-			return;
-		}
-		GameEvents.SendCustomGameEventToServer("supporter_pass_change_companion", { unit: "", js: true });
-		SetStatus($.Localize("#xhs_sp_companion_disabled"), "success");
+	function ResetStartingItemSlots() {
+		if (saving) return;
+		draft.starting_item_slots = NormalizeStartingItemSlots(DEFAULT_STARTING_ITEM_SLOTS);
+		RenderStartingItemSlots();
+		UpdateFooter();
 		Game.EmitSound("General.ButtonClick");
 	}
 
 	function Bind() {
-		Panel("XHSSettingsBackdrop").SetPanelEvent("onactivate", function () { Toggle(false); });
+		StartingItemTrace("Bind begin");
+		$.RegisterEventHandler("DragStart", ROOT, OnStartingItemDragStart);
+		$.RegisterEventHandler("DragEnd", ROOT, OnStartingItemDragEnd);
+		Panel("XHSSettingsBackdrop").SetPanelEvent("onactivate", function () {
+			if (!IsCursorInsidePanel(Panel("XHSSettingsContainer"))) Toggle(false);
+		});
 		Panel("XHSSettingsCloseButton").SetPanelEvent("onactivate", function () { Toggle(false); });
 		Panel("XHSSettingsTabGame").SetPanelEvent("onactivate", function () { SwitchTab("game"); });
 		Panel("XHSSettingsTabSupporter").SetPanelEvent("onactivate", function () { SwitchTab("supporter"); });
 		Panel("XHSSettingsSaveButton").SetPanelEvent("onactivate", Save);
 		Panel("XHSSettingsCancelButton").SetPanelEvent("onactivate", Cancel);
-		Panel("XHSSettingsDisableCompanion").SetPanelEvent("onactivate", DisableCompanion);
+		Panel("XHSStartingItemsReset").SetPanelEvent("onactivate", ResetStartingItemSlots);
+		for (var slot = 0; slot < 6; slot++) {
+			(function (targetSlot) {
+				var slotPanel = Panel("XHSStartingItemSlot" + targetSlot);
+				var dropPanel = Panel("XHSStartingItemHolder" + targetSlot);
+				StartingItemTrace("Binding drop slot=" + targetSlot + " slotPanel=" + !!slotPanel + " dropPanel=" + !!dropPanel);
+				$.RegisterEventHandler("DragEnter", dropPanel, function () {
+					StartingItemTrace("native DragEnter slot=" + targetSlot);
+					slotPanel.AddClass("IsDragTarget");
+					return true;
+				});
+				$.RegisterEventHandler("DragLeave", dropPanel, function () {
+					StartingItemTrace("native DragLeave slot=" + targetSlot);
+					slotPanel.RemoveClass("IsDragTarget");
+					return true;
+				});
+				$.RegisterEventHandler("DragDrop", dropPanel, function (panelId, draggedPanel) {
+					slotPanel.RemoveClass("IsDragTarget");
+					var itemName = draggedPanel && draggedPanel.GetAttributeString
+						? draggedPanel.GetAttributeString("xhs_item_name", "") : "";
+					StartingItemTrace("native DragDrop slot=" + targetSlot + " panelId=" + panelId + " item=" + itemName + " draggedPanel=" + !!draggedPanel);
+					if (itemName !== "") {
+						$.Schedule(0.0, function () { MoveStartingItem(itemName, targetSlot); });
+					}
+					return itemName !== "";
+				});
+			})(slot);
+		}
 		for (var key in CONTROL_IDS) {
 			if (CONTROL_IDS.hasOwnProperty(key)) Panel(CONTROL_IDS[key]).SetPanelEvent("onactivate", function () { $.Schedule(0.0, ReadControls); });
 		}
@@ -288,7 +501,12 @@ var XHSSettings = (function () {
 			}
 		}
 		$.Schedule(1.0, function () {
-			SendGameplaySettings(ReadStoredBoolean(CONTROLLED_CREEPS_AUTO_ATTACK_STORAGE_KEY, false));
+			var initialSettings = BuildSettings();
+			StoreStartingItemSlots(initialSettings.starting_item_slots);
+			SendGameplaySettings(
+				initialSettings.controlled_creeps_auto_attack,
+				initialSettings.starting_item_slots
+			);
 		});
 		GameEvents.Subscribe("supporter_pass_settings_success", function () {
 			if (!saving) return;
@@ -302,13 +520,18 @@ var XHSSettings = (function () {
 			saving = false;
 			original = BuildSettings();
 			draft = CopySettings(original);
+			StoreGameSettings();
 			RenderControls();
 			SetStatus($.Localize((payload && payload.message) || "#xhs_sp_settings_failed"), "error");
 		});
 		if (CustomNetTables.SubscribeNetTableListener) {
 			CustomNetTables.SubscribeNetTableListener("supporter_pass_player", function (tableName, key) {
-				if (key !== String(Players.GetLocalPlayer()) || saving || !ROOT.BHasClass("IsVisible")) return;
-				original = BuildSettings();
+				if (key !== String(Players.GetLocalPlayer()) || saving) return;
+				var latest = BuildSettings();
+				StoreStartingItemSlots(latest.starting_item_slots);
+				SendGameplaySettings(latest.controlled_creeps_auto_attack, latest.starting_item_slots);
+				if (!ROOT.BHasClass("IsVisible")) return;
+				original = latest;
 				draft = CopySettings(original);
 				RenderControls();
 			});

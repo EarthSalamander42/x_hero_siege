@@ -131,6 +131,7 @@ function Battlepass:GetPlayerInfoXP() -- yet it has too much useless loops, form
 			if has_backend_player and supporter_table.player_xp == nil then supporter_table.player_xp = api:GetPlayerXPEnabled(player_id) end
 			if has_backend_player then supporter_table.winrate = supporter_table.winrate or api:GetPlayerSeasonalWinrate(player_id) end
 			if has_backend_player and supporter_table.winrate_toggle == nil then supporter_table.winrate_toggle = api:GetPlayerWinrateShown(player_id) end
+			if has_backend_player and supporter_table.show_companion == nil and api.GetPlayerCompanionShown ~= nil then supporter_table.show_companion = api:GetPlayerCompanionShown(player_id) end
 			if has_backend_player and supporter_table.xhs_ingame_advertize_hidden == nil and api.GetPlayerIngameAdvertizeHidden ~= nil then supporter_table.xhs_ingame_advertize_hidden = api:GetPlayerIngameAdvertizeHidden(player_id) end
 			supporter_table.XP_change = supporter_table.XP_change or 0
 			if has_backend_player then supporter_table.ingame_tag = supporter_table.ingame_tag or api:GetPlayerIngameTag(player_id) end

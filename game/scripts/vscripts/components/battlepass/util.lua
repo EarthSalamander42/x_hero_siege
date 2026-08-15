@@ -3648,6 +3648,21 @@ function Battlepass:SupporterPassUnequipItem(event_source_index, event)
 	end)
 end
 
+local function XHSNormalizeStartingItemSlots(value)
+	if type(value) ~= "table" then return nil end
+	local normalized = {}
+	local occupied = {}
+	for _, itemName in ipairs({ "item_health_potion", "item_mana_potion", "item_lifesteal_mask" }) do
+		local slot = tonumber(value[itemName])
+		if slot == nil or slot < 0 or slot > 5 or slot ~= math.floor(slot) or occupied[slot] then
+			return nil
+		end
+		normalized[itemName] = slot
+		occupied[slot] = true
+	end
+	return normalized
+end
+
 function Battlepass:SupporterPassUpdateSettings(event_source_index, event)
 	event = self:GetSupporterPassEventPayload(event_source_index, event)
 	local playerID = event.PlayerID
@@ -3666,7 +3681,20 @@ function Battlepass:SupporterPassUpdateSettings(event_source_index, event)
 	if event.pass_rewards ~= nil then settings.pass_rewards = event.pass_rewards == 1 or event.pass_rewards == true end
 	if event.player_xp ~= nil then settings.player_xp = event.player_xp == 1 or event.player_xp == true end
 	if event.winrate_toggle ~= nil then settings.winrate_toggle = event.winrate_toggle == 1 or event.winrate_toggle == true end
+	if event.show_companion ~= nil then settings.show_companion = event.show_companion == 1 or event.show_companion == true end
 	if event.xhs_ingame_advertize_hidden ~= nil then settings.xhs_ingame_advertize_hidden = event.xhs_ingame_advertize_hidden == 1 or event.xhs_ingame_advertize_hidden == true end
+	if event.starting_item_slots ~= nil then
+		settings.starting_item_slots = XHSNormalizeStartingItemSlots(event.starting_item_slots)
+		if settings.starting_item_slots == nil then
+			local player = PlayerResource:GetPlayer(playerID)
+			if player ~= nil then
+				CustomGameEventManager:Send_ServerToPlayer(player, "supporter_pass_settings_failed", {
+					message = "#xhs_setting_starting_items_invalid",
+				})
+			end
+			return
+		end
+	end
 
 	if next(settings) == nil then
 		return
@@ -3679,7 +3707,9 @@ function Battlepass:SupporterPassUpdateSettings(event_source_index, event)
 	end
 	if settings.player_xp ~= nil then ply_table.player_xp = settings.player_xp end
 	if settings.winrate_toggle ~= nil then ply_table.winrate_toggle = settings.winrate_toggle end
+	if settings.show_companion ~= nil then ply_table.show_companion = settings.show_companion end
 	if settings.xhs_ingame_advertize_hidden ~= nil then ply_table.xhs_ingame_advertize_hidden = settings.xhs_ingame_advertize_hidden end
+	if settings.starting_item_slots ~= nil then ply_table.starting_item_slots = settings.starting_item_slots end
 
 	CustomNetTables:SetTableValue("supporter_pass_player", tostring(playerID), ply_table)
 
@@ -3705,7 +3735,7 @@ function Battlepass:SupporterPassUpdateSettings(event_source_index, event)
 
 			local hero = PlayerResource:GetSelectedHeroEntity(playerID)
 
-			if settings.pass_rewards ~= nil then
+			if settings.pass_rewards ~= nil or settings.show_companion ~= nil then
 				Battlepass:ApplySupporterLoadout(playerID, hero)
 			end
 
@@ -3716,7 +3746,7 @@ function Battlepass:SupporterPassUpdateSettings(event_source_index, event)
 	else
 		local hero = PlayerResource:GetSelectedHeroEntity(playerID)
 
-		if settings.pass_rewards ~= nil then
+		if settings.pass_rewards ~= nil or settings.show_companion ~= nil then
 			Battlepass:ApplySupporterLoadout(playerID, hero)
 		end
 

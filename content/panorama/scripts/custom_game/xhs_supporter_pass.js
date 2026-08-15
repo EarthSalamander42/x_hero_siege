@@ -5980,7 +5980,7 @@ var XHSSupporterPass = (function () {
 			"Gold: 50 Extreme wins / XHS Absolute: 100 Divine wins."
 		],
 		the_ancient_stands: [
-			"Win the run.",
+			"Win the run on Divine difficulty.",
 			"Finish with at least 70% / 80% / 90% / 100% Ancient health for Bronze / Silver / Gold / XHS Absolute."
 		],
 		borrowed_time: ["Win on Hard or higher.", "Do not die during the run."],

@@ -34,6 +34,10 @@
 				<Label class="XHSEndScreenFallbackIcon" text="!" />
 				<Label class="XHSEndScreenFallbackTitle" text="Unable to load run summary" />
 				<Label class="XHSEndScreenFallbackText" text="A problem occurred while preparing the end screen. You can safely leave the game." />
+				<Button id="XHSEndScreenFallbackGameIdButton" class="XHSEndScreenFallbackGameId">
+					<Label class="XHSEndScreenFallbackGameIdLabel" text="GAME ID" />
+					<Label id="XHSEndScreenFallbackGameId" class="XHSEndScreenFallbackGameIdValue" text="" />
+				</Button>
 				<Button id="XHSEndScreenFallbackClose" class="XHSEndScreenButton XHSEndScreenFallbackButton">
 					<Label text="Leave game" />
 				</Button>

@@ -2766,18 +2766,50 @@ function StartingItems(hero, newHero, options)
 
 	XHSEnsurePermanentTownPortalScroll(newHero)
 
+	local playerID = newHero:GetPlayerOwnerID()
+	local startingItemSlots = GameRules.GameMode ~= nil
+		and GameRules.GameMode.GetStartingItemSlots ~= nil
+		and GameRules.GameMode:GetStartingItemSlots(playerID) or nil
+	if startingItemSlots == nil and api ~= nil and api.GetPlayerStartingItemSlots ~= nil then
+		startingItemSlots = api:GetPlayerStartingItemSlots(playerID)
+	end
+	startingItemSlots = startingItemSlots or {
+		item_health_potion = 0,
+		item_mana_potion = 1,
+		item_lifesteal_mask = 2,
+	}
+
+	local function AddStartingItem(itemName, sellable)
+		local item = newHero:AddItemByName(itemName)
+		if item == nil then return nil end
+		item:SetPurchaseTime(0)
+		if sellable == false then item:SetSellable(false) end
+
+		local desiredSlot = tonumber(startingItemSlots[itemName])
+		if desiredSlot ~= nil and desiredSlot >= 0 and desiredSlot <= 5 then
+			local currentSlot = nil
+			for slot = 0, 5 do
+				if newHero:GetItemInSlot(slot) == item then
+					currentSlot = slot
+					break
+				end
+			end
+			if currentSlot ~= nil and currentSlot ~= desiredSlot
+				and newHero:GetItemInSlot(desiredSlot) == nil then
+				newHero:SwapItems(currentSlot, desiredSlot)
+			end
+		end
+		return item
+	end
+
 	if difficulty ~= 5 then
 		newHero:AddNewModifier(newHero, nil, "modifier_ankh", { charges = 5 - difficulty })
 
-		local item = newHero:AddItemByName("item_health_potion")
-		item:SetPurchaseTime(0)
-
-		local item = newHero:AddItemByName("item_mana_potion")
-		item:SetPurchaseTime(0)
+		AddStartingItem("item_health_potion", true)
+		AddStartingItem("item_mana_potion", true)
 
 		if difficulty == 1 then
-			local item = newHero:AddItemByName("item_lifesteal_mask")
-			item:SetSellable(false)
+			AddStartingItem("item_lifesteal_mask", false)
 		end
 	end
 
