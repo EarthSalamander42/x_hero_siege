@@ -237,6 +237,15 @@
 			return;
 		}
 
+		// WorldToScreen returns physical screen pixels, while Panorama positions
+		// panels in scaled layout pixels. Convert through the current viewport so
+		// health frames stay attached on ultrawide and non-default UI scales.
+		var screenWidth = typeof Game.GetScreenWidth === "function" ? Number(Game.GetScreenWidth()) : rootWidth;
+		var screenHeight = typeof Game.GetScreenHeight === "function" ? Number(Game.GetScreenHeight()) : rootHeight;
+		if (screenWidth > 0 && screenHeight > 0) {
+			screenX *= rootWidth / screenWidth;
+			screenY *= rootHeight / screenHeight;
+		}
 		var x = Math.floor(screenX - (metrics.width * 0.5));
 		var y = Math.floor(screenY - metrics.height - SCREEN_Y_OFFSET);
 		if (x < -metrics.width || x > rootWidth || y < -metrics.height || y > rootHeight) {

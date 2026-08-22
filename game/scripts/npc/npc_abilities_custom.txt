@@ -6064,12 +6064,9 @@
 		"AbilityValues"
 		{
 			"illusion_duration"						"60.0"
-			"outgoing_damage"						"50 15 -20 -55"
 			"outgoing_damage_tooltip"				"150 115 80 45"
-			"incoming_damage"						"125"
-			"tooltip_incoming_damage_total_pct"		"225"
+			"incoming_damage_tooltip"				"225"
 			"images_count"							"2 3 4 5"
-			"invuln_duration"						"0.35"
 		}
 	}
 
@@ -15477,7 +15474,8 @@
 	{
 		// General
 		//-------------------------------------------------------------------------------------------------------------
-		"BaseClass"             		"ability_datadriven"
+		"BaseClass"                     "ability_lua"
+		"ScriptFile"                    "abilities/heroes/hero_kobold_knight.lua"
 		"MaxLevel"					"4"
 		"AbilityTextureName"			"life_stealer_feast"
 		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_UNIT_TARGET | DOTA_ABILITY_BEHAVIOR_AUTOCAST | DOTA_ABILITY_BEHAVIOR_ATTACK"
@@ -15516,31 +15514,6 @@
 			"lifesteal"					"250"
 		}
 
-		"Modifiers"
-		{
-			"modifier_life_steal"
-			{
-				"Passive"						"1"
-				"IsHidden"						"1"
-				"IsPurgable"					"0"
-
-				"Orb"
-				{
-					"Priority"					"DOTA_ORB_PRIORITY_ABILITY"
-					"ProjectileName"			"particles/units/heroes/hero_drow/drow_frost_arrow.vpcf"
-					"CastAttack"				"1"
-				}
-
-				"OnOrbImpact"
-				{
-					"RunScript"
-					{
-						"ScriptFile"			"abilities/heroes/hero_kobold_knight.lua"
-						"Function"				"LifeSteal"
-					}
-				}
-			}
-		}
 	}
 
 	//======================================================================================================

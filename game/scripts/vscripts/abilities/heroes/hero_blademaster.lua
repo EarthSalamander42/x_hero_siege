@@ -7,6 +7,8 @@
 
 xhs_blademaster_mirror_image = xhs_blademaster_mirror_image or class({})
 
+local MIRROR_IMAGE_INVULNERABILITY_DURATION = 0.35
+
 LinkLuaModifier("modifier_xhs_blademaster_mirror_image_invulnerable", "abilities/heroes/hero_blademaster.lua", LUA_MODIFIER_MOTION_NONE)
 LinkLuaModifier("modifier_xhs_blademaster_mirror_image_handler", "abilities/heroes/hero_blademaster.lua", LUA_MODIFIER_MOTION_NONE)
 
@@ -48,7 +50,7 @@ function xhs_blademaster_mirror_image:OnSpellStart()
 	}
 
 	local pfx = ParticleManager:CreateParticle("particles/items2_fx/manta_phase.vpcf", PATTACH_ABSORIGIN, self:GetCaster())
-	self:GetCaster():AddNewModifier(self:GetCaster(), self, "modifier_xhs_blademaster_mirror_image_invulnerable", { duration = self:GetSpecialValueFor("invuln_duration") })
+	self:GetCaster():AddNewModifier(self:GetCaster(), self, "modifier_xhs_blademaster_mirror_image_invulnerable", { duration = MIRROR_IMAGE_INVULNERABILITY_DURATION })
 
 	if self:GetCaster():GetUnitName() == "npc_dota_hero_juggernaut" then
 		EmitSoundOn("Blademaster.MirrorImage", self:GetCaster())
@@ -67,8 +69,8 @@ function xhs_blademaster_mirror_image:OnSpellStart()
 	self:GetCaster():SetContextThink(DoUniqueString("blademaster_mirror_image"), function()
 		-- "API Additions - Global (Server): * CreateIllusions( hOwner, hHeroToCopy, hModifierKeys, nNumIllusions, nPadding, bScramblePosition, bFindClearSpace ) Note: See script_help2 for supported modifier keys"
 		self.illusions = CreateIllusions(self:GetCaster(), self:GetCaster(), {
-			outgoing_damage           = self:GetSpecialValueFor("outgoing_damage"),
-			incoming_damage           = self:GetSpecialValueFor("incoming_damage"),
+			outgoing_damage           = self:GetSpecialValueFor("outgoing_damage_tooltip") - 100,
+			incoming_damage           = self:GetSpecialValueFor("incoming_damage_tooltip") - 100,
 			bounty_base               = self:GetCaster():GetLevel() * 2,
 			bounty_growth             = nil,
 			outgoing_damage_structure = nil,
@@ -97,7 +99,7 @@ function xhs_blademaster_mirror_image:OnSpellStart()
 		self:GetCaster():Stop()
 
 		return nil
-	end, self:GetSpecialValueFor("invuln_duration"))
+	end, MIRROR_IMAGE_INVULNERABILITY_DURATION)
 end
 
 function xhs_blademaster_mirror_image:SetInventory(illusion)

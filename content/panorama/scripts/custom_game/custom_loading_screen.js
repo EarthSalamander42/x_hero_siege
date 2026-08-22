@@ -663,6 +663,14 @@ function XHSBotSetupCreateHeroOption(dropdown, slot, suffix, hero_name, display_
 		// Valve's square hero-icon resources keep the full KV unit name.
 		option.style.backgroundImage = "url(\"file://{images}/heroes/icons/" + hero_name + ".png\")";
 	}
+	// Commit pointer selections from the option itself. Waiting for the parent
+	// DropDown's selected panel is racy: a net-table render can restore the old
+	// selection (usually Random) before oninputsubmit observes the clicked row.
+	option.SetPanelEvent("onactivate", (function (target_slot, target_hero_name) {
+		return function () {
+			XHSBotSetupSelectHero(target_slot, target_hero_name);
+		};
+	})(slot, hero_name));
 	dropdown.AddOption(option);
 	return option;
 }

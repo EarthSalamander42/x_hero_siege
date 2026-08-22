@@ -1004,11 +1004,15 @@ function XHSDevTools:StartCampaignFlow(boss)
 		return "Campaign flow started at Magtheridon"
 	elseif boss == "four_bosses" then
 		FOUR_BOSSES = 0
+		if XHSResetPhase3BossEncounters ~= nil then
+			XHSResetPhase3BossEncounters()
+		end
+		EndMagtheridonArena()
 		self:ActivateQuestByName("kill_grom")
 		self:ActivateQuestByName("kill_illidan")
 		self:ActivateQuestByName("kill_balanar")
 		self:ActivateQuestByName("kill_proudmoore")
-		EndMagtheridonArena()
+		OpenGromGate()
 		return "Campaign flow started at the four bosses"
 	elseif boss == "arthas" then
 		self:ActivateQuestByName("kill_arthas")

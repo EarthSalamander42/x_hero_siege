@@ -605,6 +605,169 @@ local function SetupMagtheridonPhase3Boss(magtheridon, bossCount)
 	end
 end
 
+local PHASE3_LEADER_ENCOUNTERS = {
+	kill_grom = {
+		unit_name = "npc_dota_hero_grom_hellscream",
+		spawn_name = "spawn_grom_hellscream",
+		facing = 270,
+		boss_count = 1,
+		boss_reference = "GromPhase3Boss",
+		attach_ai = function(boss)
+			if XHSGrom_AttachPhase3AI ~= nil then XHSGrom_AttachPhase3AI(boss) end
+		end,
+	},
+	kill_illidan = {
+		unit_name = "npc_dota_hero_illidan",
+		spawn_name = "spawn_illidan",
+		facing = 0,
+		boss_count = 2,
+		boss_reference = "IllidanPhase3Boss",
+		attach_ai = function(boss)
+			if XHSIllidan_AttachPhase3AI ~= nil then XHSIllidan_AttachPhase3AI(boss) end
+		end,
+	},
+	kill_balanar = {
+		unit_name = "npc_dota_hero_balanar",
+		spawn_name = "spawn_balanar",
+		facing = 90,
+		boss_count = 3,
+		boss_reference = "BalanarPhase3Boss",
+		attach_ai = function(boss)
+			if XHSBalanar_AttachPhase3AI ~= nil then XHSBalanar_AttachPhase3AI(boss) end
+		end,
+	},
+	kill_proudmoore = {
+		unit_name = "npc_dota_hero_proudmoore",
+		spawn_name = "spawn_admiral_proudmore",
+		facing = 180,
+		boss_count = 4,
+		boss_reference = "ProudmoorePhase3Boss",
+		attach_ai = function(boss)
+			if XHSProudmoore_AttachPhase3AI ~= nil then XHSProudmoore_AttachPhase3AI(boss) end
+		end,
+		setup = function(boss)
+			XHSSetupUtherIcePrison(boss)
+		end,
+	},
+}
+
+local PHASE3_NEXT_LEADER_QUEST = {
+	npc_dota_hero_grom_hellscream = "kill_illidan",
+	npc_dota_hero_illidan = "kill_balanar",
+	npc_dota_hero_balanar = "kill_proudmoore",
+}
+
+local function GetPhase3LeaderEncounterState(questName)
+	GameMode.XHSPhase3LeaderEncounters = GameMode.XHSPhase3LeaderEncounters or {}
+	local state = GameMode.XHSPhase3LeaderEncounters[questName]
+	if state == nil then
+		state = {
+			door_open = false,
+			quest_active = false,
+			activated = false,
+		}
+		GameMode.XHSPhase3LeaderEncounters[questName] = state
+	end
+	return state
+end
+
+local function IsValidPhase3Leader(boss)
+	return boss ~= nil and IsValidEntity(boss) and not boss:IsNull()
+end
+
+function XHSResetPhase3BossEncounters()
+	GameMode.XHSPhase3LeaderSequenceStarted = true
+	GameMode.XHSPhase3LeaderEncounters = {}
+	GameMode.GromPhase3Boss = nil
+	GameMode.IllidanPhase3Boss = nil
+	GameMode.BalanarPhase3Boss = nil
+	GameMode.ProudmoorePhase3Boss = nil
+end
+
+function XHSTryActivatePhase3BossEncounter(questName)
+	local config = PHASE3_LEADER_ENCOUNTERS[questName]
+	if config == nil then return nil end
+
+	local state = GetPhase3LeaderEncounterState(questName)
+	if state.activated == true or state.door_open ~= true or state.quest_active ~= true then
+		return state.boss
+	end
+
+	local boss = XHSPreparePhase3BossEncounter(questName)
+	if not IsValidPhase3Leader(boss) or not boss:IsAlive() then return nil end
+
+	state.activated = true
+	boss.xhs_phase3_staged = false
+	boss.xhs_phase3_encounter_active = true
+	boss:Stop()
+	boss:RemoveModifierByName("modifier_ai")
+	boss:RemoveModifierByName("modifier_pause_creeps")
+	boss:RemoveModifierByName("modifier_invulnerable")
+	config.attach_ai(boss)
+	return boss
+end
+
+function XHSPreparePhase3BossEncounter(questName)
+	local config = PHASE3_LEADER_ENCOUNTERS[questName]
+	if config == nil then return nil end
+
+	local state = GetPhase3LeaderEncounterState(questName)
+	if state.activated == true then return state.boss end
+	if IsValidPhase3Leader(state.boss) and state.boss:IsAlive() then return state.boss end
+
+	local spawn = Entities:FindByName(nil, config.spawn_name)
+	if spawn == nil or not IsValidEntity(spawn) then
+		print("XHSPreparePhase3BossEncounter - ERROR: Missing spawn " .. config.spawn_name)
+		return nil
+	end
+
+	local boss = CreateUnitByName(config.unit_name, spawn:GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_2)
+	if not IsValidPhase3Leader(boss) then
+		print("XHSPreparePhase3BossEncounter - ERROR: Failed to create " .. config.unit_name)
+		return nil
+	end
+
+	state.boss = boss
+	boss.zone = "xhs_holdout"
+	boss.boss_count = config.boss_count
+	boss.xhs_boss_bar_suppressed = true
+	boss.xhs_boss_bar_reveal_quest = questName
+	boss.xhs_phase3_staged = true
+	boss.xhs_phase3_encounter_active = false
+	boss:SetAngles(0, config.facing, 0)
+	boss:Stop()
+	boss:RemoveModifierByName("modifier_ai")
+	if XHSPhase3BossAI ~= nil then XHSPhase3BossAI:HideVanillaHealthBar(boss) end
+	local pause = boss:AddNewModifier(boss, nil, "modifier_pause_creeps", { IsHidden = true })
+	if pause ~= nil then pause:SetStackCount(1) end
+	boss:AddNewModifier(boss, nil, "modifier_invulnerable", { IsHidden = true })
+	GameMode[config.boss_reference] = boss
+	RegisterXHSDevSpawn(boss)
+	if config.setup ~= nil then config.setup(boss) end
+	return boss
+end
+
+function XHSPrepareNextPhase3Boss(previousBossUnitName)
+	local questName = PHASE3_NEXT_LEADER_QUEST[previousBossUnitName]
+	if questName == nil then return nil end
+	XHSPreparePhase3BossEncounter(questName)
+	return questName
+end
+
+function XHSMarkPhase3BossDoorOpened(questName)
+	if PHASE3_LEADER_ENCOUNTERS[questName] == nil then return end
+	local state = GetPhase3LeaderEncounterState(questName)
+	state.door_open = true
+	XHSTryActivatePhase3BossEncounter(questName)
+end
+
+function XHSActivatePhase3BossEncounter(questName)
+	if PHASE3_LEADER_ENCOUNTERS[questName] == nil then return end
+	local state = GetPhase3LeaderEncounterState(questName)
+	state.quest_active = true
+	XHSTryActivatePhase3BossEncounter(questName)
+end
+
 local MAGTHERIDON_DEATH_PARTICLE = "particles/econ/items/shadow_fiend/sf_fire_arcana/sf_fire_arcana_shadowraze.vpcf"
 local MAGTHERIDON_DEATH_BURSTS = {
 	{ delay = 0.00, offset = Vector(0, 0, 80) },
@@ -717,6 +880,9 @@ function EndMagtheridonArena()
 	CustomGameEventManager:Send_ServerToAllClients("hide_ui", {})
 
 	Notifications:TopToAll({ text = "Magtheridon has been killed! Door opened.", style = { color = "white" }, duration = 10.0 })
+	if GameMode.XHSPhase3LeaderSequenceStarted ~= true then
+		XHSResetPhase3BossEncounters()
+	end
 
 	XHSOpenDoorsWithCinematic(
 		{ "door_magtheridon" },
@@ -729,60 +895,6 @@ function EndMagtheridonArena()
 			return_duration = 1.0,
 		}
 	)
-
-	Timers:CreateTimer(2.0, function()
-		local grom = CreateUnitByName("npc_dota_hero_grom_hellscream", Entities:FindByName(nil, "spawn_grom_hellscream"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_2)
-		grom.zone = "xhs_holdout"
-		grom.boss_count = 1
-		grom.xhs_boss_bar_suppressed = true
-		grom.xhs_boss_bar_reveal_quest = "kill_grom"
-		grom:SetAngles(0, 270, 0)
-		GameMode.GromPhase3Boss = grom
-		RegisterXHSDevSpawn(grom)
-		if XHSGrom_AttachPhase3AI ~= nil then
-			XHSGrom_AttachPhase3AI(grom)
-		end
-	end)
-
-	Timers:CreateTimer(4.0, function()
-		local illidan = CreateUnitByName("npc_dota_hero_illidan", Entities:FindByName(nil, "spawn_illidan"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_2)
-		illidan.zone = "xhs_holdout"
-		illidan.boss_count = 2
-		illidan.xhs_boss_bar_suppressed = true
-		illidan.xhs_boss_bar_reveal_quest = "kill_illidan"
-		illidan:SetAngles(0, 0, 0)
-		RegisterXHSDevSpawn(illidan)
-		if XHSIllidan_AttachPhase3AI ~= nil then
-			XHSIllidan_AttachPhase3AI(illidan)
-		end
-	end)
-
-	Timers:CreateTimer(6.0, function()
-		local balanar = CreateUnitByName("npc_dota_hero_balanar", Entities:FindByName(nil, "spawn_balanar"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_2)
-		balanar.zone = "xhs_holdout"
-		balanar.boss_count = 3
-		balanar.xhs_boss_bar_suppressed = true
-		balanar.xhs_boss_bar_reveal_quest = "kill_balanar"
-		balanar:SetAngles(0, 90, 0)
-		RegisterXHSDevSpawn(balanar)
-		if XHSBalanar_AttachPhase3AI ~= nil then
-			XHSBalanar_AttachPhase3AI(balanar)
-		end
-	end)
-
-	Timers:CreateTimer(8.0, function()
-		local proudmoore = CreateUnitByName("npc_dota_hero_proudmoore", Entities:FindByName(nil, "spawn_admiral_proudmore"):GetAbsOrigin(), true, nil, nil, DOTA_TEAM_CUSTOM_2)
-		proudmoore.zone = "xhs_holdout"
-		proudmoore.boss_count = 4
-		proudmoore.xhs_boss_bar_suppressed = true
-		proudmoore.xhs_boss_bar_reveal_quest = "kill_proudmoore"
-		proudmoore:SetAngles(0, 180, 0)
-		RegisterXHSDevSpawn(proudmoore)
-		if XHSProudmoore_AttachPhase3AI ~= nil then
-			XHSProudmoore_AttachPhase3AI(proudmoore)
-		end
-		XHSSetupUtherIcePrison(proudmoore)
-	end)
 end
 
 local function CloseMagtheridonGate()
@@ -1006,6 +1118,7 @@ function OpenGromGate()
 	if state.gate_opened == true then return end
 
 	state.gate_opened = true
+	XHSPreparePhase3BossEncounter("kill_grom")
 	local cameraPosition = nil
 	local reference = Entities:FindByName(nil, "npc_dota_spawner_magtheridon_arena")
 	if reference ~= nil then
@@ -1041,6 +1154,7 @@ function OpenGromGate()
 				ai.xhs_boss_bar_revealed = false
 			end
 		end
+		XHSMarkPhase3BossDoorOpened("kill_grom")
 	end, {
 		camera_position = cameraPosition,
 		move_duration = 1.35,

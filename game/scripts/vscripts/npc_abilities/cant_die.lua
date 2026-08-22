@@ -246,6 +246,7 @@ function modifier_cant_die_generic:OnTakeDamage(event)
 			end
 
 			local bossConfig = XHS_BOSSES_TABLE[parent:GetUnitName()]
+			local nextPhase3Quest = nil
 			local cameraPosition = nil
 			if bossConfig.camera_focus_door ~= nil then
 				local cameraDoor = Entities:FindByName(nil, bossConfig.camera_focus_door)
@@ -256,12 +257,18 @@ function modifier_cant_die_generic:OnTakeDamage(event)
 			local function FinishBossDoorTransition()
 				StartAnimation(parent, XHS_BOSSES_TABLE[parent:GetUnitName()].death_animation)
 				EmitSoundOn("skeleton_king_wraith_death_long_09", parent)
+				if nextPhase3Quest ~= nil and XHSMarkPhase3BossDoorOpened ~= nil then
+					XHSMarkPhase3BossDoorOpened(nextPhase3Quest)
+				end
 			end
 
 			-- Start moving the camera before the six-second death beat, then open
 			-- the next arena exactly when the camera reaches its doors.
 			if bDevSandbox ~= true and bossConfig.doors_to_open ~= nil and XHSOpenDoorsWithCinematic ~= nil then
 				Timers:CreateTimer(4.65, function()
+					if XHSPrepareNextPhase3Boss ~= nil then
+						nextPhase3Quest = XHSPrepareNextPhase3Boss(parent:GetUnitName())
+					end
 					XHSOpenDoorsWithCinematic(
 						bossConfig.doors_to_open,
 						bossConfig.obstructions_to_disable,

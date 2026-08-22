@@ -10,24 +10,100 @@ local function KoboldCleanupTimer(delay, callback)
 	end
 end
 
-function LifeSteal(keys)
-	local caster = keys.caster
-	local ability = keys.ability
-	local ability_level = ability:GetLevel() - 1
-	local cooldown = ability:GetCooldown(ability_level)
+LinkLuaModifier("modifier_holdout_life_steal", "abilities/heroes/hero_kobold_knight.lua", LUA_MODIFIER_MOTION_NONE)
 
-	if ability:IsCooldownReady() then
-		ability:StartCooldown(cooldown)
-		caster:EmitSound("Hero_LifeStealer.OpenWounds.Cast")
-		local health_before = caster:GetHealth()
-		caster:Heal(caster:GetAttackDamage() * ability:GetSpecialValueFor("lifesteal") / 100, caster)
-		local actual_heal = math.max(0, caster:GetHealth() - health_before)
-		SendOverheadEventMessage(nil, OVERHEAD_ALERT_HEAL, caster, caster:GetAttackDamage() * ability:GetSpecialValueFor("lifesteal") / 100, nil)
+holdout_life_steal = holdout_life_steal or class({})
 
-		if actual_heal > 0 and XHSPlaySupporterAttackLifestealFX ~= nil then
-			XHSPlaySupporterAttackLifestealFX(caster, keys.target or keys.unit, actual_heal)
-		end
+function holdout_life_steal:GetIntrinsicModifierName()
+	return "modifier_holdout_life_steal"
+end
+
+function holdout_life_steal:OnSpellStart()
+	if not IsServer() then return end
+	local caster = self:GetCaster()
+	local target = self:GetCursorTarget()
+	if caster == nil or target == nil or target:IsNull() then return end
+
+	self.manual_cast_target = target
+	caster:MoveToTargetToAttack(target)
+end
+
+modifier_holdout_life_steal = modifier_holdout_life_steal or class({})
+modifier_holdout_life_steal.XHS_LINK_CLIENT = true
+
+function modifier_holdout_life_steal:IsHidden() return true end
+function modifier_holdout_life_steal:IsPurgable() return false end
+
+function modifier_holdout_life_steal:OnCreated()
+	if not IsServer() then return end
+	self.attack_records = {}
+end
+
+function modifier_holdout_life_steal:DeclareFunctions()
+	return {
+		MODIFIER_EVENT_ON_ATTACK_RECORD,
+		MODIFIER_EVENT_ON_ATTACK,
+		MODIFIER_EVENT_ON_TAKEDAMAGE,
+		MODIFIER_EVENT_ON_ATTACK_RECORD_DESTROY,
+	}
+end
+
+function modifier_holdout_life_steal:CanUseLifeSteal(target)
+	local parent = self:GetParent()
+	local ability = self:GetAbility()
+	if parent == nil or ability == nil or ability:IsNull() then return false end
+	if target == nil or target:IsNull() or target:GetTeamNumber() == parent:GetTeamNumber() then return false end
+	if target:IsBuilding() or target:IsOther() or ability:GetLevel() <= 0 then return false end
+
+	local is_manual_cast = ability.manual_cast_target == target
+	if is_manual_cast then return true end
+	if not ability:GetAutoCastState() or not ability:IsCooldownReady() then return false end
+	return parent:GetMana() >= ability:GetManaCost(ability:GetLevel() - 1)
+end
+
+function modifier_holdout_life_steal:OnAttackRecord(keys)
+	if not IsServer() or keys.attacker ~= self:GetParent() then return end
+	if not self:CanUseLifeSteal(keys.target) then return end
+
+	local ability = self:GetAbility()
+	local is_manual_cast = ability.manual_cast_target == keys.target
+	self.attack_records[keys.record] = keys.target
+	if is_manual_cast then
+		ability.manual_cast_target = nil
+	else
+		local level = ability:GetLevel() - 1
+		self:GetParent():SpendMana(ability:GetManaCost(level), ability)
+		ability:StartCooldown(ability:GetCooldown(level))
 	end
+end
+
+function modifier_holdout_life_steal:OnAttack(keys)
+	if not IsServer() or keys.attacker ~= self:GetParent() then return end
+	if self.attack_records[keys.record] == nil then return end
+	self:GetParent():EmitSound("Hero_LifeStealer.OpenWounds.Cast")
+end
+
+function modifier_holdout_life_steal:OnTakeDamage(keys)
+	if not IsServer() or keys.attacker ~= self:GetParent() then return end
+	local target = self.attack_records[keys.record]
+	if target == nil or keys.unit ~= target or (tonumber(keys.damage) or 0) <= 0 then return end
+
+	local parent = self:GetParent()
+	local heal = keys.damage * self:GetAbility():GetSpecialValueFor("lifesteal") * 0.01
+	local health_before = parent:GetHealth()
+	parent:Heal(heal, self:GetAbility())
+	local actual_heal = math.max(0, parent:GetHealth() - health_before)
+	if actual_heal <= 0 then return end
+
+	SendOverheadEventMessage(nil, OVERHEAD_ALERT_HEAL, parent, actual_heal, nil)
+	if XHSPlaySupporterAttackLifestealFX ~= nil then
+		XHSPlaySupporterAttackLifestealFX(parent, target, actual_heal)
+	end
+end
+
+function modifier_holdout_life_steal:OnAttackRecordDestroy(keys)
+	if not IsServer() then return end
+	self.attack_records[keys.record] = nil
 end
 
 function KoboldArmy(keys)

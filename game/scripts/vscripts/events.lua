@@ -338,7 +338,7 @@ ListenToGameEvent('npc_spawned', function(keys)
 
 		if npc:GetUnitName() == "npc_dota_hero_grom_hellscream" and XHSGrom_AttachPhase3AI ~= nil then
 			GameRules:GetGameModeEntity():SetContextThink("AttachGromPhase3AI" .. tostring(npc:entindex()), function()
-				if npc ~= nil and IsValidEntity(npc) and not npc:IsNull() then
+				if npc ~= nil and IsValidEntity(npc) and not npc:IsNull() and npc.xhs_phase3_staged ~= true then
 					XHSGrom_AttachPhase3AI(npc)
 				end
 				return nil
@@ -347,7 +347,7 @@ ListenToGameEvent('npc_spawned', function(keys)
 
 		if npc:GetUnitName() == "npc_dota_hero_illidan" and XHSIllidan_AttachPhase3AI ~= nil then
 			GameRules:GetGameModeEntity():SetContextThink("AttachIllidanPhase3AI" .. tostring(npc:entindex()), function()
-				if npc ~= nil and IsValidEntity(npc) and not npc:IsNull() then
+				if npc ~= nil and IsValidEntity(npc) and not npc:IsNull() and npc.xhs_phase3_staged ~= true then
 					XHSIllidan_AttachPhase3AI(npc)
 				end
 				return nil
@@ -356,7 +356,7 @@ ListenToGameEvent('npc_spawned', function(keys)
 
 		if npc:GetUnitName() == "npc_dota_hero_balanar" and XHSBalanar_AttachPhase3AI ~= nil then
 			GameRules:GetGameModeEntity():SetContextThink("AttachBalanarPhase3AI" .. tostring(npc:entindex()), function()
-				if npc ~= nil and IsValidEntity(npc) and not npc:IsNull() then
+				if npc ~= nil and IsValidEntity(npc) and not npc:IsNull() and npc.xhs_phase3_staged ~= true then
 					XHSBalanar_AttachPhase3AI(npc)
 				end
 				return nil
@@ -365,7 +365,7 @@ ListenToGameEvent('npc_spawned', function(keys)
 
 		if npc:GetUnitName() == "npc_dota_hero_proudmoore" and XHSProudmoore_AttachPhase3AI ~= nil then
 			GameRules:GetGameModeEntity():SetContextThink("AttachProudmoorePhase3AI" .. tostring(npc:entindex()), function()
-				if npc ~= nil and IsValidEntity(npc) and not npc:IsNull() then
+				if npc ~= nil and IsValidEntity(npc) and not npc:IsNull() and npc.xhs_phase3_staged ~= true then
 					XHSProudmoore_AttachPhase3AI(npc)
 				end
 				return nil
@@ -2024,6 +2024,9 @@ function GameMode:OnQuestStarted(zone, quest)
 	end
 
 	quest.bActivated = true
+	if XHSActivatePhase3BossEncounter ~= nil then
+		XHSActivatePhase3BossEncounter(quest.szQuestName)
+	end
 	self:StartQuestBossVision(quest.szQuestName)
 
 	if bDevSandbox ~= true then
